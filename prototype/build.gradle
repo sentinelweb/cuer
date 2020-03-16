@@ -37,7 +37,16 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.0.0'
     implementation 'androidx.navigation:navigation-ui-ktx:2.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
+
+    // cc sender
+    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.23'
+    // this is not needed to use the library, but it provides the very useful MediaRouteButton.
+    implementation 'androidx.mediarouter:mediarouter:1.1.0'
+
+    // test
     testImplementation 'junit:junit:4.12'
+
+    // andrid test
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 }

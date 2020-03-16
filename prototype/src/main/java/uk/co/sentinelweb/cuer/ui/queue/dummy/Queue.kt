@@ -19,7 +19,11 @@ object Queue {
         QueueItem("2","https://www.youtube.com/watch?v=6a2dLVx8THA","Animating Poststructuralism"),
         QueueItem("3","https://www.youtube.com/watch?v=CkHooEp3vRE","Masters Of Money | Part 1 | John Maynard Keynes"),
         QueueItem("4","https://www.youtube.com/watch?v=EIYqTj402PE","Masters Of Money | Part 2 | Friedrich Hayek"),
-        QueueItem("5","https://www.youtube.com/watch?v=oaIpYo3Z5lc","Masters Of Money | Part 3 | Karl Marx")
+        QueueItem("5","https://www.youtube.com/watch?v=oaIpYo3Z5lc","Masters Of Money | Part 3 | Karl Marx"),
+        QueueItem("6","https://www.youtube.com/watch?v=OFdgR8Zt084","Order! High Voltage - John Bercow x Electric Six"),
+        QueueItem("7","https://www.youtube.com/watch?v=vMiF9Bv-72s","Adorno and Horkheimer: Dialectic of Enlightenment - Part I"),
+        QueueItem("8","https://https://www.youtube.com/watch?v=AXyr4Zasdkg","Foucault: Biopower, Governmentality, ∂and the Subject"),
+        QueueItem("9","https://www.youtube.com/watch?v=GNGvqjwich0&t=73s","The Marketplace of Ideas: A Critique")
     )
 
     /**
