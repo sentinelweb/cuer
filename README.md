@@ -1,2 +1,2 @@
 # cuer
-Media que manager for android
+MVP Media que manager for android
