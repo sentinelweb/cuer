@@ -4,4 +4,9 @@ class MainPresenter(
     private val view: MainContract.View,
     private val state: MainState
 ) : MainContract.Presenter {
+
+    override fun initChromecast() {
+        view.initMediaRouteButton()
+        view.checkPlayServices()
+    }
 }

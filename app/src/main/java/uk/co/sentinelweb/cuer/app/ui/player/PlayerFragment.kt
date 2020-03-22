@@ -6,10 +6,8 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerPresenter
 
-class PlayerFragment : Fragment(R.layout.fragment_player) {
+class PlayerFragment : Fragment(R.layout.player_fragment) {
 
     private val presenter: PlayerPresenter by currentScope.inject()
 

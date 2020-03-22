@@ -7,7 +7,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 
-class PlaylistFragment : Fragment(R.layout.fragment_playlist) {
+class PlaylistFragment : Fragment(R.layout.playlist_fragment) {
 
     private val presenter: PlaylistPresenter by currentScope.inject()
 
