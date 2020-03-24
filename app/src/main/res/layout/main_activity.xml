@@ -12,6 +12,16 @@
         android:id="@+id/player_controls_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="bottom"
+        app:layout_constraintBottom_toTopOf="@id/nav_view"
+        />
+
+    <fragment
+        android:name="uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment"
+        android:id="@+id/player_controls_viewx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:visibility="visible"
         android:layout_gravity="bottom"
         app:layout_constraintBottom_toTopOf="@id/nav_view"

@@ -10,7 +10,6 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
-import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.utils.PlayServicesUtils
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.view_player_controls_example.*
 import kotlinx.android.synthetic.main.view_player_controls_example.view.*
@@ -27,7 +26,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.SimpleChromeCastUiController
 class MainActivity : AppCompatActivity(), MainContract.View {
 
     private val presenter: MainContract.Presenter by currentScope.inject()
-    private val chromeCastWrapper:ChromeCastWrapper by inject()
+    private val chromeCastWrapper: ChromeCastWrapper by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,24 +55,26 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun checkPlayServices() {
         // can't use CastContext until I'm sure the user has GooglePlayServices
-        PlayServicesUtils.checkGooglePlayServicesAvailability(this, SERVICES_REQUEST_CODE, Runnable { initChromeCast() })
+        chromeCastWrapper.checkPlayServices(this,SERVICES_REQUEST_CODE, this::initChromeCast )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        // can't use CastContext until I'm sure the user has GooglePlayServices
-        if(requestCode == SERVICES_REQUEST_CODE)
-            PlayServicesUtils.checkGooglePlayServicesAvailability(this, SERVICES_REQUEST_CODE, Runnable { initChromeCast() })
+        // rerun check which definitely should pass here
+        if (requestCode == SERVICES_REQUEST_CODE) {
+            chromeCastWrapper.checkPlayServices(this,SERVICES_REQUEST_CODE, this::initChromeCast )
+        }
     }
 
     private fun initChromeCast() {
-        ChromecastYouTubePlayerContext(CastContext.getSharedInstance(this).sessionManager, SimpleChromeCastConnectionListener(
-            SimpleChromeCastUiController(player_controls_view),
-            chromecast_connection_status,
-            player_status,
-            chromecast_controls_root
-        )
+        ChromecastYouTubePlayerContext(
+            CastContext.getSharedInstance(this).sessionManager, SimpleChromeCastConnectionListener(
+                SimpleChromeCastUiController(player_controls_view),
+                chromecast_connection_status,
+                player_status,
+                chromecast_controls_root
+            )
         )
     }
 
