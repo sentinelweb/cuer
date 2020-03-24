@@ -13,10 +13,18 @@ interface CastPlayerContract {
     }
 
     interface PresenterExternal {
-
+        fun initMediaRouteButton()
+        fun setConnectionState(s: ConnectionState)
     }
 
     interface View {
+        val presenterExternal: PresenterExternal
+        fun initMediaRouteButton()
+        fun setConnectionText(text: String)
+    }
+
+    enum class ConnectionState {
+        CC_DISCONNECTED, CC_CONNECTING, CC_CONNECTED,
 
     }
 }

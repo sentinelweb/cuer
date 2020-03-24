@@ -3,4 +3,6 @@
     <string name="bottomnav_title_browse">Browse</string>
     <string name="bottomnav_title_playlist">Playlist</string>
     <string name="bottomnav_title_player">Player</string>
+    <string name="media_route_menu_title">Cast on</string>
+    <string name="menu_play">Play</string>
 </resources>

@@ -3,16 +3,18 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_play"
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_play_arrow_black"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -20,19 +22,19 @@
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_pause_black"
+        app:layout_constraintBottom_toBottomOf="@id/cast_player_play"
         app:layout_constraintLeft_toLeftOf="@id/cast_player_play"
         app:layout_constraintRight_toRightOf="@id/cast_player_play"
         app:layout_constraintTop_toTopOf="@id/cast_player_play"
-        app:layout_constraintBottom_toBottomOf="@id/cast_player_play"
         />
 
     <ProgressBar
         android:layout_width="@dimen/player_button_icon_size"
         android:layout_height="@dimen/player_button_icon_size"
+        app:layout_constraintBottom_toBottomOf="@id/cast_player_play"
         app:layout_constraintLeft_toLeftOf="@id/cast_player_play"
         app:layout_constraintRight_toRightOf="@id/cast_player_play"
         app:layout_constraintTop_toTopOf="@id/cast_player_play"
-        app:layout_constraintBottom_toBottomOf="@id/cast_player_play"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -40,8 +42,8 @@
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_fast_rewind_black"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toLeftOf="@id/cast_player_play"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -49,8 +51,8 @@
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_fast_forward_black"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toRightOf="@id/cast_player_play"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -58,8 +60,8 @@
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_skip_previous_black"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toLeftOf="@id/cast_player_seek_back"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -67,14 +69,34 @@
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_skip_next_black"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toRightOf="@id/cast_player_seek_forward"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/cast_player_status_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="-"
+        app:layout_constraintRight_toLeftOf="@id/media_route_button"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <androidx.mediarouter.app.MediaRouteButton
+        android:id="@+id/media_route_button"
+        android:layout_width="@dimen/player_button_size"
+        android:layout_height="@dimen/player_button_size"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <SeekBar
         android:id="@+id/cast_player_seek"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:max="1000"
         app:layout_constraintTop_toBottomOf="@id/cast_player_play"
         />
 

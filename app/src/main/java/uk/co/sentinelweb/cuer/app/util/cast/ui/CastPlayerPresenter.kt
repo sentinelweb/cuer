@@ -3,7 +3,8 @@ package uk.co.sentinelweb.cuer.app.util.cast.ui
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
     private val state: CastPlayerState
-) : CastPlayerContract.Presenter {
+) : CastPlayerContract.Presenter, CastPlayerContract.PresenterExternal {
+
     override fun playPressed() {
 
     }
@@ -32,4 +33,18 @@ class CastPlayerPresenter(
 
     }
 
+    override fun initMediaRouteButton() {
+        view.initMediaRouteButton()
+    }
+
+    override fun setConnectionState(s: CastPlayerContract.ConnectionState) {
+        state.connectionState = s
+        view.setConnectionText(
+            when (s) {
+                CastPlayerContract.ConnectionState.CC_DISCONNECTED -> "-"
+                CastPlayerContract.ConnectionState.CC_CONNECTING -> "*"
+                CastPlayerContract.ConnectionState.CC_CONNECTED -> "="
+            }
+        )
+    }
 }

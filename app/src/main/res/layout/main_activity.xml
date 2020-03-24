@@ -12,23 +12,23 @@
         android:id="@+id/player_controls_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_gravity="bottom"
-        app:layout_constraintBottom_toTopOf="@id/nav_view"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
         />
 
     <fragment
+        android:id="@+id/cast_player_fragment"
         android:name="uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment"
-        android:id="@+id/player_controls_viewx"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible"
         android:layout_gravity="bottom"
-        app:layout_constraintBottom_toTopOf="@id/nav_view"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
         />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/nav_view"
+        android:id="@+id/bottom_nav_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="0dp"
@@ -46,11 +46,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/nav_view"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/mobile_navigation"
+        app:navGraph="@navigation/bottom_navigation"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
