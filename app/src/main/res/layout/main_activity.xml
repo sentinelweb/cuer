@@ -8,14 +8,14 @@
     android:paddingTop="?attr/actionBarSize"
     >
     <!-- player -->
-    <uk.co.sentinelweb.cuer.app.util.cast.PlayerControlsView
-        android:id="@+id/player_controls_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
-        />
+<!--    <uk.co.sentinelweb.cuer.app.util.cast.PlayerControlsView-->
+<!--        android:id="@+id/player_controls_view"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="bottom"-->
+<!--        android:visibility="gone"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"-->
+<!--        />-->
 
     <fragment
         android:id="@+id/cast_player_fragment"

@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         val activityModule = module {
             scope(named<MainActivity>()) {
                 scoped<MainContract.View> { getSource() }
-                scoped<MainContract.Presenter> { MainPresenter(get(), get(), get()) }
+                scoped<MainContract.Presenter> { MainPresenter(get(), get(), get(), get()) }
                 scoped {
                     (getSource<MainActivity>()
                         .supportFragmentManager

@@ -2,47 +2,48 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     >
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/cast_player_play"
-        android:layout_width="@dimen/player_button_size"
-        android:layout_height="@dimen/player_button_size"
-        android:src="@drawable/ic_player_play_arrow_black"
+    <FrameLayout
+        android:id="@+id/cast_player_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
+        >
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/cast_player_pause"
-        android:layout_width="@dimen/player_button_size"
-        android:layout_height="@dimen/player_button_size"
-        android:src="@drawable/ic_player_pause_black"
-        app:layout_constraintBottom_toBottomOf="@id/cast_player_play"
-        app:layout_constraintLeft_toLeftOf="@id/cast_player_play"
-        app:layout_constraintRight_toRightOf="@id/cast_player_play"
-        app:layout_constraintTop_toTopOf="@id/cast_player_play"
-        />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/cast_player_play"
+            android:layout_width="@dimen/player_button_size"
+            android:layout_height="@dimen/player_button_size"
+            android:src="@drawable/ic_player_play_arrow_black"
+            />
 
-    <ProgressBar
-        android:layout_width="@dimen/player_button_icon_size"
-        android:layout_height="@dimen/player_button_icon_size"
-        app:layout_constraintBottom_toBottomOf="@id/cast_player_play"
-        app:layout_constraintLeft_toLeftOf="@id/cast_player_play"
-        app:layout_constraintRight_toRightOf="@id/cast_player_play"
-        app:layout_constraintTop_toTopOf="@id/cast_player_play"
-        />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/cast_player_pause"
+            android:layout_width="@dimen/player_button_size"
+            android:layout_height="@dimen/player_button_size"
+            android:src="@drawable/ic_player_pause_black"
+
+            />
+
+        <ProgressBar
+            android:id="@+id/cast_player_buffering"
+            android:layout_width="@dimen/player_button_size"
+            android:layout_height="@dimen/player_button_size"
+            />
+    </FrameLayout>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_seek_back"
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_fast_rewind_black"
-        app:layout_constraintRight_toLeftOf="@id/cast_player_play"
+        app:layout_constraintRight_toLeftOf="@id/cast_player_center"
         app:layout_constraintTop_toTopOf="parent"
         />
 
@@ -51,7 +52,7 @@
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_fast_forward_black"
-        app:layout_constraintLeft_toRightOf="@id/cast_player_play"
+        app:layout_constraintLeft_toRightOf="@id/cast_player_center"
         app:layout_constraintTop_toTopOf="parent"
         />
 
@@ -77,9 +78,9 @@
         android:id="@+id/cast_player_status_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="-"
         app:layout_constraintRight_toLeftOf="@id/media_route_button"
         app:layout_constraintTop_toTopOf="parent"
+        tools:text="-"
         />
 
     <androidx.mediarouter.app.MediaRouteButton
@@ -92,12 +93,46 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
+    <TextView
+        android:id="@+id/cast_player_current_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/cast_player_seek"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:text="11:22:33"
+        android:layout_marginLeft="8dp"
+        tools:ignore="RtlHardcoded"
+        />
+
+    <TextView
+        android:id="@+id/cast_player_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        app:layout_constraintBottom_toTopOf="@id/cast_player_seek"
+        app:layout_constraintLeft_toRightOf="@+id/cast_player_current_time"
+        app:layout_constraintRight_toLeftOf="@+id/cast_player_duration"
+        tools:text="title"
+        />
+
+    <TextView
+        android:id="@+id/cast_player_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/cast_player_seek"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:text="44:44:44"
+        android:layout_marginRight="8dp"
+        tools:ignore="RtlHardcoded"
+        />
+
     <SeekBar
         android:id="@+id/cast_player_seek"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="1000"
-        app:layout_constraintTop_toBottomOf="@id/cast_player_play"
+        app:layout_constraintTop_toBottomOf="@id/cast_player_center"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

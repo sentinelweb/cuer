@@ -1,26 +1,24 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
 import com.google.android.gms.cast.framework.CastContext
-import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
-import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubeCastConnectionListener
+import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 
 class MainPresenter(
     private val view: MainContract.View,
     private val state: MainState,
-    private val playerFragment: CastPlayerContract.PresenterExternal
-
+    private val playerPresenter: CastPlayerContract.PresenterExternal,
+    private val creator: YoutubePlayerContextCreator
 ) : MainContract.Presenter {
 
     override fun initChromecast() {
-        playerFragment.initMediaRouteButton()
+        playerPresenter.initMediaRouteButton()
+        playerPresenter.reset()
         view.checkPlayServices()
     }
 
-    override fun setCastContext(sharedInstance: CastContext) {
-        state.youtubePlayerContext = ChromecastYouTubePlayerContext(
-            sharedInstance.sessionManager,
-            YoutubeCastConnectionListener(playerFragment)
-        )
+    override fun setCastContext(castContext: CastContext) {
+        state.youtubePlayerContext = creator.createContext(castContext, playerPresenter)
     }
+
 }

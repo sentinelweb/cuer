@@ -1,50 +1,100 @@
 package uk.co.sentinelweb.cuer.app.util.cast.ui
 
+import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi.*
+
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
     private val state: CastPlayerState
 ) : CastPlayerContract.Presenter, CastPlayerContract.PresenterExternal {
 
-    override fun playPressed() {
-
+    override fun addListener(l: CastPlayerContract.PresenterExternal.Listener) {
+        state.listeners.add(l)
     }
 
-    override fun pausePressed() {
-
+    override fun removeListener(l: CastPlayerContract.PresenterExternal.Listener) {
+        state.listeners.remove(l)
     }
 
-    override fun seekBackPressed() {
-
+    override fun onPlayPressed() {
+        state.listeners.forEach { it.playPressed() }
     }
 
-    override fun seekFwdPressed() {
-
+    override fun onPausePressed() {
+        state.listeners.forEach { it.pausePressed() }
     }
 
-    override fun trackBackPressed() {
-
+    override fun onSeekBackPressed() {
+        state.listeners.forEach { it.seekBackPressed() }
     }
 
-    override fun trackFwdPressed() {
+    override fun onSeekFwdPressed() {
+        state.listeners.forEach { it.seekFwdPressed() }
+    }
 
+    override fun onTrackBackPressed() {
+        state.listeners.forEach { it.trackBackPressed() }
+    }
+
+    override fun onTrackFwdPressed() {
+        state.listeners.forEach { it.trackFwdPressed() }
     }
 
     override fun onSeekChanged(ratio: Float) {
-
+        state.listeners.forEach { it.onSeekChanged(ratio) }
     }
 
     override fun initMediaRouteButton() {
         view.initMediaRouteButton()
     }
 
-    override fun setConnectionState(s: CastPlayerContract.ConnectionState) {
-        state.connectionState = s
+    override fun setConnectionState(connState: CastPlayerContract.ConnectionState) {
+        state.connectionState = connState
         view.setConnectionText(
-            when (s) {
-                CastPlayerContract.ConnectionState.CC_DISCONNECTED -> "-"
-                CastPlayerContract.ConnectionState.CC_CONNECTING -> "*"
-                CastPlayerContract.ConnectionState.CC_CONNECTED -> "="
+            when (connState) {
+                CC_DISCONNECTED -> "X"
+                CC_CONNECTING -> "*"
+                CC_CONNECTED -> "="
             }
         )
+    }
+
+    override fun setPlayerState(playState: CastPlayerContract.PlayerStateUi) {
+        state.playState = playState
+        when (playState) {
+            UNKNOWN -> view.setPaused() // todo better state
+            UNSTARTED -> view.setPaused() // todo better state
+            ENDED -> view.setPaused()
+            PLAYING -> view.setPlaying()
+            PAUSED -> view.setPaused()
+            BUFFERING -> view.setBuffering()
+            VIDEO_CUED -> TODO()
+        }
+    }
+
+    override fun setCurrentSecond(second: Float) {
+        state.positionMs = (second * 1000).toLong()
+        view.setCurrentSecond("${state.positionMs / 1000} s") // todo map time
+    }
+
+    override fun setDuration(duration: Float) {
+        state.durationMs = (duration * 1000).toLong()
+        view.setDuration("${state.durationMs / 1000} s") // todo map time
+    }
+
+    override fun error(msg: String) {
+        view.showMessage(msg)
+    }
+
+    override fun setTitle(title: String) {
+        state.title = title
+        view.setTitle(title)
+    }
+
+    override fun reset() {
+        state.title = "".apply { view.setTitle(this) }
+        state.positionMs = 0L.apply { view.setCurrentSecond(this.toString()) }
+        state.durationMs = 0L.apply { view.setDuration(this.toString()) }
+        view.setPaused()
     }
 }

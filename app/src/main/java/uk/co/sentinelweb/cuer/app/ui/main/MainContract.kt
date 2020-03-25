@@ -5,7 +5,7 @@ import com.google.android.gms.cast.framework.CastContext
 interface MainContract {
     interface Presenter {
         fun initChromecast()
-        fun setCastContext(sharedInstance: CastContext)
+        fun setCastContext(castContext: CastContext)
     }
 
     interface View {

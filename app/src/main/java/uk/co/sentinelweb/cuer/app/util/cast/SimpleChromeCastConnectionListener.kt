@@ -41,7 +41,7 @@ class SimpleChromeCastConnectionListener constructor(
     }
 
     private fun initializeCastPlayer(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        val idProvider = VideoIdProvider()
+        val idProvider = Queue.VideoIdProvider()
         chromecastYouTubePlayerContext.initialize(object : AbstractYouTubePlayerListener() {
             override fun onReady(youTubePlayer: YouTubePlayer) {
                 chromeCastUiController.youTubePlayer = youTubePlayer
@@ -70,13 +70,5 @@ class SimpleChromeCastConnectionListener constructor(
                 }
             }
         })
-    }
-
-    class VideoIdProvider() {
-        private var index = 0;
-
-        fun getNextVideoId() = getId(Queue.ITEMS[index].url).also { index++ }
-
-        fun getId(url: String) = url.substring(url.indexOf("?v=") + 3)
     }
 }
