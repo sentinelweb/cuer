@@ -41,17 +41,17 @@ class SimpleChromeCastConnectionListener constructor(
     }
 
     private fun initializeCastPlayer(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        val idProvider = Queue.VideoIdProvider()
+        val idProvider = Queue.VideoProvider()
         chromecastYouTubePlayerContext.initialize(object : AbstractYouTubePlayerListener() {
             override fun onReady(youTubePlayer: YouTubePlayer) {
                 chromeCastUiController.youTubePlayer = youTubePlayer
 
                 youTubePlayer.addListener(chromeCastUiController)
-                youTubePlayer.loadVideo(idProvider.getNextVideoId(), 0f)
+                youTubePlayer.loadVideo(idProvider.getNextVideo().getId(), 0f)
 
                 chromecast_controls_root
                     .findViewById<Button>(R.id.next_video_button)
-                    .setOnClickListener { youTubePlayer.loadVideo(idProvider.getNextVideoId(), 0f) }
+                    .setOnClickListener { youTubePlayer.loadVideo(idProvider.getNextVideo().getId(), 0f) }
             }
 
             override fun onStateChange(

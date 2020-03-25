@@ -16,8 +16,8 @@ object Queue {
         val url: String,
         val title: String
     ) {
-
         override fun toString(): String = "$title - $url"
+        fun getId() = url.substring(url.indexOf("?v=") + 3)
     }
 
 
@@ -25,6 +25,10 @@ object Queue {
      * An array of sample (dummy) items.
      */
     val ITEMS: List<QueueItem> = listOf(
+        QueueItem(
+            "https://www.youtube.com/watch?v=c2_t3M_vSsg",
+            "Responding to a Pandemic: The Myth of Sisyphus"
+        ),
         QueueItem(
             "https://www.youtube.com/watch?v=52nqjrCs57s",
             "Why You Can't FOCUS - And How To Fix That"
@@ -55,7 +59,7 @@ object Queue {
         ),
         QueueItem(
             "https://https://www.youtube.com/watch?v=AXyr4Zasdkg",
-            "Foucault: Biopower, Governmentality, ∂and the Subject"
+            "Foucault: Biopower, Governmentality, and the Subject"
         ),
         QueueItem(
             "https://www.youtube.com/watch?v=GNGvqjwich0&t=73s",
@@ -63,19 +67,19 @@ object Queue {
         )
     )
 
-    class VideoIdProvider() {
-        private var nextIndex = 0
+    class VideoProvider() {
+        private var index = -1
 
-        fun getNextVideoId() = getId(ITEMS[nextIndex].url).also {
-            nextIndex++;
-            if (nextIndex >= ITEMS.size) nextIndex = 0
+        fun getNextVideo():QueueItem  {
+            index++;
+            if (index >= ITEMS.size) index = 0
+            return ITEMS[index]
         }
 
-        fun getPreviousVideoId() = getId(ITEMS[nextIndex].url).also {
-            nextIndex--;
-            if (nextIndex < 0) nextIndex = ITEMS.size - 1
+        fun getPreviousVideo():QueueItem  {
+            index--;
+            if (index < 0) index = ITEMS.size - 1
+            return ITEMS[index]
         }
-
-        fun getId(url: String) = url.substring(url.indexOf("?v=") + 3)
     }
 }

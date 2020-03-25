@@ -10,6 +10,7 @@ class CastPlayerState constructor(
     val listeners: MutableList<CastPlayerContract.PresenterExternal.Listener> = mutableListOf(),
     var playState: PlayerStateUi = PlayerStateUi.UNKNOWN,
     var positionMs: Long = 0,
+    var seekPositionMs: Long = 0,
     var durationMs: Long = 0,
     var title: String = ""
 ) : ViewModel()

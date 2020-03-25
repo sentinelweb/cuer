@@ -10,6 +10,7 @@ interface CastPlayerContract {
         fun onTrackBackPressed()
         fun onTrackFwdPressed()
         fun onSeekChanged(ratio: Float)
+        fun onSeekFinished()
     }
 
     interface PresenterExternal {
@@ -28,11 +29,9 @@ interface CastPlayerContract {
         interface Listener {
             fun playPressed()
             fun pausePressed()
-            fun seekBackPressed()
-            fun seekFwdPressed()
             fun trackBackPressed()
             fun trackFwdPressed()
-            fun onSeekChanged(ratio: Float)
+            fun onSeekChanged(positionMs: Long)
         }
     }
 
@@ -47,6 +46,7 @@ interface CastPlayerContract {
         fun setBuffering()
         fun showMessage(msg:String)
         fun setTitle(title:String)
+        fun updateSeekPosition(ratio: Float)
     }
 
     enum class ConnectionState {

@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.app.util.cast.ui
 
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi.*
+import kotlin.math.max
+import kotlin.math.min
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
@@ -25,11 +27,17 @@ class CastPlayerPresenter(
     }
 
     override fun onSeekBackPressed() {
-        state.listeners.forEach { it.seekBackPressed() }
+        if (state.durationMs > 0) {
+            state.listeners.forEach { it.onSeekChanged(max(0, state.positionMs - 30000)) }
+        }
     }
 
     override fun onSeekFwdPressed() {
-        state.listeners.forEach { it.seekFwdPressed() }
+        if (state.durationMs > 0) {
+            state.listeners.forEach {
+                it.onSeekChanged(min(state.durationMs, state.positionMs + 30000))
+            }
+        }
     }
 
     override fun onTrackBackPressed() {
@@ -41,7 +49,15 @@ class CastPlayerPresenter(
     }
 
     override fun onSeekChanged(ratio: Float) {
-        state.listeners.forEach { it.onSeekChanged(ratio) }
+        if (state.durationMs > 0) {
+            state.seekPositionMs = (ratio * state.durationMs).toLong()
+            view.setCurrentSecond("${state.seekPositionMs / 1000} s") // todo map time
+        }
+    }
+
+    override fun onSeekFinished() {
+        state.listeners.forEach { it.onSeekChanged(state.seekPositionMs) }
+        state.seekPositionMs = 0
     }
 
     override fun initMediaRouteButton() {
@@ -75,6 +91,9 @@ class CastPlayerPresenter(
     override fun setCurrentSecond(second: Float) {
         state.positionMs = (second * 1000).toLong()
         view.setCurrentSecond("${state.positionMs / 1000} s") // todo map time
+        if (state.durationMs > 0) {
+            view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
+        }
     }
 
     override fun setDuration(duration: Float) {

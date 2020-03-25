@@ -12,7 +12,8 @@ class YouTubePlayerListener constructor(
 ) : AbstractYouTubePlayerListener(), CastPlayerContract.PresenterExternal.Listener {
 
     private var youTubePlayer: YouTubePlayer? = null
-    val idProvider = Queue.VideoIdProvider() // todo remove & make queue interface
+    val idProvider = Queue.VideoProvider() // todo remove & make queue interface
+    var currentItem : Queue.QueueItem? = null // todo move to player?
     init {
         playerUi.addListener(this)
     }
@@ -24,7 +25,13 @@ class YouTubePlayerListener constructor(
 
     override fun onReady(youTubePlayer: YouTubePlayer) {
         this.youTubePlayer = youTubePlayer
-        youTubePlayer.loadVideo(idProvider.getNextVideoId(), 0f)
+        currentItem = idProvider.getNextVideo()
+        loadCurrentVideo()
+    }
+
+    private fun loadCurrentVideo() {
+        youTubePlayer?.loadVideo(currentItem?.getId()!!, 0f)
+        playerUi.setTitle(currentItem?.title!!)
     }
 
     override fun onApiChange(youTubePlayer: YouTubePlayer) {
@@ -40,10 +47,12 @@ class YouTubePlayerListener constructor(
     }
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-    override fun onPlaybackQualityChange(youTubePlayer: YouTubePlayer, q: PlaybackQuality) {}
+    override fun onPlaybackQualityChange(youTubePlayer: YouTubePlayer, q: PlaybackQuality) {
+    }
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-    override fun onPlaybackRateChange(youTubePlayer: YouTubePlayer, r: PlaybackRate) {}
+    override fun onPlaybackRateChange(youTubePlayer: YouTubePlayer, r: PlaybackRate) {
+    }
 
     override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerState) {
         when (state) {
@@ -61,7 +70,9 @@ class YouTubePlayerListener constructor(
         playerUi.setDuration(duration)
     }
 
-    override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {}
+    override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
+        // todo get video info
+    }
 
     override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {}
 
@@ -73,17 +84,17 @@ class YouTubePlayerListener constructor(
         youTubePlayer?.pause()
     }
 
-    override fun seekBackPressed() {}
-
-    override fun seekFwdPressed() {}
-
     override fun trackBackPressed() {
-        youTubePlayer?.loadVideo(idProvider.getPreviousVideoId(), 0f)
+        currentItem = idProvider.getPreviousVideo()
+        loadCurrentVideo()
     }
 
     override fun trackFwdPressed() {
-        youTubePlayer?.loadVideo(idProvider.getNextVideoId(), 0f)
+        currentItem = idProvider.getNextVideo()
+        loadCurrentVideo()
     }
 
-    override fun onSeekChanged(ratio: Float) {}
+    override fun onSeekChanged(positionMs: Long) {
+        youTubePlayer?.seekTo(positionMs / 1000f)
+    }
 }

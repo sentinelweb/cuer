@@ -39,7 +39,9 @@ class CastPlayerFragment() : Fragment(R.layout.cast_player_view), CastPlayerCont
             }
 
             override fun onStartTrackingTouch(view: SeekBar) {}
-            override fun onStopTrackingTouch(view: SeekBar) {}
+            override fun onStopTrackingTouch(view: SeekBar) {
+                presenter.onSeekFinished()
+            }
         })
     }
 
@@ -83,6 +85,10 @@ class CastPlayerFragment() : Fragment(R.layout.cast_player_view), CastPlayerCont
 
     override fun setTitle(title: String) {
         cast_player_title.text = title
+    }
+
+    override fun updateSeekPosition(ratio: Float) {
+        cast_player_seek.progress = (ratio * cast_player_seek.max).toInt()
     }
 
     companion object {
