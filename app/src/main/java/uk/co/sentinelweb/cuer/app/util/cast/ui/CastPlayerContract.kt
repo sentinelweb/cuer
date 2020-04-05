@@ -25,6 +25,7 @@ interface CastPlayerContract {
         fun error(msg:String)
         fun setTitle(title:String)
         fun reset()
+        fun restoreState()
 
         interface Listener {
             fun playPressed()

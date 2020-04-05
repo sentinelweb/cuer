@@ -1,7 +1,5 @@
 package uk.co.sentinelweb.cuer.ui.queue.dummy
 
-import java.util.*
-
 /**
  * Helper class for providing sample content for user interfaces created by
  * Android template wizards.
@@ -28,10 +26,6 @@ object Queue {
         QueueItem(
             "https://www.youtube.com/watch?v=c2_t3M_vSsg",
             "Responding to a Pandemic: The Myth of Sisyphus"
-        ),
-        QueueItem(
-            "https://www.youtube.com/watch?v=52nqjrCs57s",
-            "Why You Can't FOCUS - And How To Fix That"
         ),
         QueueItem(
             "https://www.youtube.com/watch?v=6a2dLVx8THA",
@@ -64,20 +58,24 @@ object Queue {
         QueueItem(
             "https://www.youtube.com/watch?v=GNGvqjwich0&t=73s",
             "The Marketplace of Ideas: A Critique"
+        ),
+        QueueItem(
+            "https://www.youtube.com/watch?v=52nqjrCs57s",
+            "Why You Can't FOCUS - And How To Fix That"
         )
     )
 
     class VideoProvider() {
         private var index = -1
 
-        fun getNextVideo():QueueItem  {
-            index++;
+        fun getNextVideo(): QueueItem {
+            index++
             if (index >= ITEMS.size) index = 0
             return ITEMS[index]
         }
 
-        fun getPreviousVideo():QueueItem  {
-            index--;
+        fun getPreviousVideo(): QueueItem {
+            index--
             if (index < 0) index = ITEMS.size - 1
             return ITEMS[index]
         }

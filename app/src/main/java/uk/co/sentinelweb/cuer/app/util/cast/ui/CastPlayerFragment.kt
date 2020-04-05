@@ -1,37 +1,51 @@
 package uk.co.sentinelweb.cuer.app.util.cast.ui
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.cast_player_view.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 
-class CastPlayerFragment() : Fragment(R.layout.cast_player_view), CastPlayerContract.View {
+class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 
     private val presenter: CastPlayerContract.Presenter by currentScope.inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
 
+    private var _binding: CastPlayerViewBinding? = null
+    private val binding get() = _binding!!
+
     override val presenterExternal: CastPlayerContract.PresenterExternal
         get() = presenter as CastPlayerContract.PresenterExternal
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        /* init */ presenter
+        _binding = CastPlayerViewBinding.inflate(layoutInflater)
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        cast_player_play.setOnClickListener { presenter.onPlayPressed() }
-        cast_player_pause.setOnClickListener { presenter.onPausePressed() }
-        cast_player_seek_back.setOnClickListener { presenter.onSeekBackPressed() }
-        cast_player_seek_forward.setOnClickListener { presenter.onSeekFwdPressed() }
-        cast_player_track_last.setOnClickListener { presenter.onTrackBackPressed() }
-        cast_player_track_next.setOnClickListener { presenter.onTrackFwdPressed() }
-        cast_player_seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.castPlayerPlay.setOnClickListener { presenter.onPlayPressed() }
+        binding.castPlayerPause.setOnClickListener { presenter.onPausePressed() }
+        binding.castPlayerSeekBack.setOnClickListener { presenter.onSeekBackPressed() }
+        binding.castPlayerSeekForward.setOnClickListener { presenter.onSeekFwdPressed() }
+        binding.castPlayerTrackLast.setOnClickListener { presenter.onTrackBackPressed() }
+        binding.castPlayerTrackNext.setOnClickListener { presenter.onTrackFwdPressed() }
+        binding.castPlayerSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
                     presenter.onSeekChanged(progress.toFloat() / seekBar.max)
@@ -45,38 +59,43 @@ class CastPlayerFragment() : Fragment(R.layout.cast_player_view), CastPlayerCont
         })
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun initMediaRouteButton() {
-        chromeCastWrapper.initMediaRouteButton(media_route_button)
+        chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
     }
 
     override fun setConnectionText(text: String) {
-        cast_player_status_text.text = text
+        binding.castPlayerStatusText.text = text
     }
 
     override fun setCurrentSecond(second: String) {
-        cast_player_current_time.text = second
+        binding.castPlayerCurrentTime.text = second
     }
 
     override fun setDuration(duration: String) {
-        cast_player_duration.text = duration
+        binding.castPlayerDuration.text = duration
     }
 
     override fun setPlaying() {
-        cast_player_play.isVisible = false
-        cast_player_pause.isVisible = true
-        cast_player_buffering.isVisible = false
+        binding.castPlayerPlay.isVisible = false
+        binding.castPlayerPause.isVisible = true
+        binding.castPlayerBuffering.isVisible = false
     }
 
     override fun setPaused() {
-        cast_player_play.isVisible = true
-        cast_player_pause.isVisible = false
-        cast_player_buffering.isVisible = false
+        binding.castPlayerPlay.isVisible = true
+        binding.castPlayerPause.isVisible = false
+        binding.castPlayerBuffering.isVisible = false
     }
 
     override fun setBuffering() {
-        cast_player_play.isVisible = false
-        cast_player_pause.isVisible = false
-        cast_player_buffering.isVisible = true
+        binding.castPlayerPlay.isVisible = false
+        binding.castPlayerPause.isVisible = false
+        binding.castPlayerBuffering.isVisible = true
     }
 
     override fun showMessage(msg: String) {
@@ -84,11 +103,11 @@ class CastPlayerFragment() : Fragment(R.layout.cast_player_view), CastPlayerCont
     }
 
     override fun setTitle(title: String) {
-        cast_player_title.text = title
+        binding.castPlayerTitle.text = title
     }
 
     override fun updateSeekPosition(ratio: Float) {
-        cast_player_seek.progress = (ratio * cast_player_seek.max).toInt()
+        binding.castPlayerSeek.progress = (ratio * binding.castPlayerSeek.max).toInt()
     }
 
     companion object {

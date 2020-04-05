@@ -116,4 +116,9 @@ class CastPlayerPresenter(
         state.durationMs = 0L.apply { view.setDuration(this.toString()) }
         view.setPaused()
     }
+
+    override fun restoreState() {
+        view.setTitle(state.title)
+        // todo restore state
+    }
 }

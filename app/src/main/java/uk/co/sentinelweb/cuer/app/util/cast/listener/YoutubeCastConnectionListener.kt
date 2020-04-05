@@ -4,29 +4,47 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsend
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
 
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState
 
 class YoutubeCastConnectionListener constructor(
-    private val player: CastPlayerContract.PresenterExternal,
     private val creator: YoutubePlayerContextCreator
 ) : ChromecastConnectionListener {
 
-    private var youTubePlayerListener:YouTubePlayerListener? = null
+    var playerUi: CastPlayerContract.PresenterExternal? = null
+        get() = field
+        set(value) {
+            field = value
+            youTubePlayerListener?.playerUi = field
+            field?.let {
+                restoreState()
+            }
+        }
+
+    private var youTubePlayerListener: YouTubePlayerListener? = null
+    private var connectionState: ConnectionState? = null
+    private var chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext? = null
 
     override fun onChromecastConnecting() {
-        player.setConnectionState(CastPlayerContract.ConnectionState.CC_CONNECTING)
+        connectionState = ConnectionState.CC_CONNECTING.also { playerUi?.setConnectionState(it) }
     }
 
     override fun onChromecastDisconnected() {
-        player.setConnectionState(CastPlayerContract.ConnectionState.CC_DISCONNECTED)
-        youTubePlayerListener?.cleanup()
+        connectionState = ConnectionState.CC_DISCONNECTED.also { playerUi?.setConnectionState(it) }
+        //chromecastYouTubePlayerContext?.release()
+        youTubePlayerListener?.onDisconnected()
         youTubePlayerListener = null
     }
 
-
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        player.setConnectionState(CastPlayerContract.ConnectionState.CC_CONNECTED)
-        youTubePlayerListener = creator.createListener(player).apply {
-            chromecastYouTubePlayerContext.initialize(this)
+        connectionState = ConnectionState.CC_CONNECTED.also { playerUi?.setConnectionState(it) }
+        this.chromecastYouTubePlayerContext = chromecastYouTubePlayerContext // same context object as in ChromecastYouTubePlayerContextWrapper
+        youTubePlayerListener = creator.createListener().also {
+            chromecastYouTubePlayerContext.initialize(it)
+            it.playerUi = playerUi
         }
+    }
+
+    private fun restoreState() {
+        connectionState?.apply { playerUi?.setConnectionState(this) }
     }
 }

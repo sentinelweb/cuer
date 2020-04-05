@@ -58,6 +58,16 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        presenter.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop()
+    }
+
     private fun initChromeCast() {
         presenter.setCastContext(CastContext.getSharedInstance(this))
     }
