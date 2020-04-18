@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.di
 
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.db.DatabaseModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
@@ -31,4 +32,5 @@ object Modules {
     val allModules = listOf(utilModule)
         .plus(wrapperModule)
         .plus(scopedModules)
+        .plus(DatabaseModule.dbModule)
 }

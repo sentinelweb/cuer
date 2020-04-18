@@ -10,7 +10,7 @@ ext {
     app_applicationId="uk.co.sentinelweb.cuer.app"
     app_compileSdkVersion=29
     app_targetSdkVersion=29
-    app_minSdkVersion=21
+    app_minSdkVersion=26
     app_buildToolsVersion="29.0.2"
 
     // deps

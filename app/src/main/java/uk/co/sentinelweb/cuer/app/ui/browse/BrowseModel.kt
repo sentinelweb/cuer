@@ -7,7 +7,7 @@ data class BrowseModel constructor(
 ) {
     data class BrowseItemModel constructor(
         val url: String,
-        val type: MediaDomain.MediaType,
+        val type: MediaDomain.MediaTypeDomain,
         val title: String,
         val length: String,
         val positon: String

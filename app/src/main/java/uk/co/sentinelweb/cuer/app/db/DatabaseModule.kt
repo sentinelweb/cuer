@@ -1,0 +1,17 @@
+package uk.co.sentinelweb.cuer.app.db
+
+import androidx.room.Room
+import org.koin.android.ext.koin.androidApplication
+import org.koin.dsl.module
+
+object DatabaseModule {
+    val dbModule = module {
+        single {
+            Room.databaseBuilder(
+                androidApplication(),
+                AppDatabase::class.java, "cuer_database"
+            ).build()
+        }
+
+    }
+}

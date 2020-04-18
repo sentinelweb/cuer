@@ -7,10 +7,10 @@ class PlaylistModelMapper constructor() {
         domain.items.map {
             PlaylistModel.PlaylistItemModel(
                 it.media.url.toString(),
-                it.media.type,
-                it.media.title,
-                "${(it.media.lengthMs / 1000)}s",
-                "${(it.media.positonMs / 1000)}s"
+                it.media.mediaType,
+                it.media.title ?: "-",
+                it.media.duration?.let { "${(it / 1000)}s" } ?: "-",
+                it.media.positon?.let { "${(it / 1000)}s" } ?: "-"
             )
         }
     )
