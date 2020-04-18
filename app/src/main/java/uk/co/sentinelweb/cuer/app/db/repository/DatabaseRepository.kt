@@ -11,4 +11,6 @@ interface DatabaseRepository<Domain> {
     suspend fun delete(domain:Domain)
 
     interface Filter
+
+    suspend fun save(domains: List<Domain>)
 }

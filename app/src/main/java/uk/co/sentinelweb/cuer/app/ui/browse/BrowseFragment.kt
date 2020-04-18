@@ -7,9 +7,9 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 
-class BrowseFragment : Fragment(R.layout.browse_fragment) {
+class BrowseFragment : Fragment(R.layout.browse_fragment), BrowseContract.View {
 
-    private val presenter: BrowsePresenter by currentScope.inject()
+    private val presenter: BrowseContract.Presenter by currentScope.inject()
 
     companion object {
 

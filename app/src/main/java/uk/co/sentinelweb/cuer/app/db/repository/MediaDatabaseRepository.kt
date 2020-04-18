@@ -12,6 +12,12 @@ class MediaDatabaseRepository constructor(
     override suspend fun save(domain: MediaDomain) {
         domain
             .let { mediaMapper.map(it) }
+            .also { mediaDao.insertAll(listOf(it)) }
+    }
+
+    override suspend fun save(domains: List<MediaDomain>) {
+        domains
+            .map { mediaMapper.map(it) }
             .also { mediaDao.insertAll(it) }
     }
 
@@ -30,9 +36,10 @@ class MediaDatabaseRepository constructor(
                 mediaDao
                     .findByMediaId(filter.mediaId)
                     .let { listOf(mediaMapper.map(it)) }
-            else -> mediaDao
-                .getAll()
-                .map { mediaMapper.map(it) }
+            else ->
+                mediaDao
+                    .getAll()
+                    .map { mediaMapper.map(it) }
         }
     }
 

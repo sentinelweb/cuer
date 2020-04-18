@@ -25,6 +25,9 @@ ext {
     ver_mediarouter='1.1.0'
     ver_appcompat='1.1.0'
 
+    // deps debug
+    ver_stetho='1.5.1'
+
     // deps test
     ver_junit='4.12'
     ver_mockk='1.9.3'
@@ -75,33 +78,38 @@ android {
 }
 
 dependencies {
+    // project
     implementation project(":domain")
     implementation project(":net")
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // deps
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
     implementation "androidx.appcompat:appcompat:$ver_appcompat"
     implementation "androidx.core:core-ktx:$ver_core_ktx"
     implementation "com.google.android.material:material:$ver_material"
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
+
+    //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"
     implementation "androidx.navigation:navigation-ui-ktx:$ver_navigation"
     implementation "androidx.navigation:navigation-fragment:$ver_navigation"
     implementation "androidx.navigation:navigation-ui:$ver_navigation"
 
+    // koin
     implementation  "org.koin:koin-core:$ver_koin"
     implementation "org.koin:koin-androidx-scope:$ver_koin"
     implementation  "org.koin:koin-android-viewmodel:$ver_koin"
 
+    // room
     implementation "androidx.room:room-runtime:$ver_room"
     kapt "androidx.room:room-compiler:$ver_room"
-    // optional - Kotlin Extensions and Coroutines support for Room
     implementation "androidx.room:room-ktx:$ver_room"
-    // optional - RxJava support for Room
-    // implementation "androidx.room:room-rxjava2:$ver_room"
-    // Test helpers
-    testImplementation "androidx.room:room-testing:$ver_room"
 
+    // debug
+    implementation "com.facebook.stetho:stetho:$ver_stetho"
+    implementation "com.facebook.stetho:stetho-okhttp3:$ver_stetho"
 
     // cc sender
     implementation "com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:$ver_chromecast_sender"
@@ -112,6 +120,7 @@ dependencies {
     testImplementation "org.koin:koin-test:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
+    testImplementation "androidx.room:room-testing:$ver_room"
 
     androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"

@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.domain
 import java.time.Instant
 
 data class MediaDomain(
-    val id: String,
+    val id: String?,
     val url: String,
     val mediaId: String,
     val mediaType: MediaTypeDomain,

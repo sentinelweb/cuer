@@ -18,7 +18,7 @@ import java.time.Instant
     InstantTypeConverter::class
 )
 data class MediaEntity(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     val id: Int,
 
     @ColumnInfo(name = "url")

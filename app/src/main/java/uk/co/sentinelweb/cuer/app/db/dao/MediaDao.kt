@@ -21,7 +21,7 @@ interface MediaDao {
     fun findByMediaId(mediaId: String): MediaEntity
 
     @Insert
-    fun insertAll(vararg medias: MediaEntity)
+    fun insertAll(medias: List<MediaEntity>)
 
     @Delete
     fun delete(media: MediaEntity)

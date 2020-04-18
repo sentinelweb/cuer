@@ -10,6 +10,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.util.provider.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
 
 object Modules {
     private val scopedModules = listOf(
@@ -21,7 +23,8 @@ object Modules {
     )
 
     private val utilModule = module {
-
+        factory { CoroutineContextProvider() }
+        factory { StethoWrapper(androidApplication()) }
     }
 
     private val wrapperModule = module {

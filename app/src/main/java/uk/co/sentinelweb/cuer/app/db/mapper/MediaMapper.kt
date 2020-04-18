@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class MediaMapper() {
     fun map(domain: MediaDomain): MediaEntity = MediaEntity(
-        id = domain.id.toInt(),
+        id = domain.id?.toInt() ?: 0,
         url = domain.url,
         mediaId = domain.mediaId,
         mediaType = domain.mediaType,

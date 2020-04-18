@@ -6,8 +6,11 @@ import java.time.Instant
 class InstantTypeConverter {
 
     @TypeConverter
-    fun toDb(mt: Instant): String = mt.toString()
+    fun toDb(mt: Instant?): String = mt?.toString() ?: "null"
 
     @TypeConverter
-    fun fromDb(mt: String): Instant = Instant.parse(mt)
+    fun fromDb(mt: String): Instant? = when (mt) {
+        "null" -> null
+        else -> mt.let { Instant.parse(it) }
+    }
 }
