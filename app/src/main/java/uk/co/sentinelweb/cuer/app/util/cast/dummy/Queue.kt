@@ -22,7 +22,7 @@ object Queue {
     /**
      * An array of sample (dummy) items.
      */
-    val ITEMS: List<QueueItem> = listOf(
+    val ITEMS: MutableList<QueueItem> = mutableListOf(
         QueueItem(
             "https://www.youtube.com/watch?v=c2_t3M_vSsg",
             "Responding to a Pandemic: The Myth of Sisyphus"

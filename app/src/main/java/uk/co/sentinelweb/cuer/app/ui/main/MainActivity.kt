@@ -18,6 +18,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
+import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
 
 class MainActivity : AppCompatActivity(), MainContract.View {
 
@@ -57,10 +58,15 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             chromeCastWrapper.checkPlayServices(this, SERVICES_REQUEST_CODE, this::initChromeCast)
         }
     }
-
+    var ctr = 0
     override fun onStart() {
         super.onStart()
         presenter.onStart()
+        intent.getStringExtra("YTID")?.let {
+            Queue.ITEMS.add(0,Queue.QueueItem("https://www.youtube.com/watch?v=$it","Shared video${ctr}"))
+            ctr++
+        }
+
     }
 
     override fun onStop() {
