@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import uk.co.sentinelweb.cuer.app.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 data class PlaylistModel constructor(
     val items: List<PlaylistItemModel>

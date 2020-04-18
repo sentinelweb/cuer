@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.player
 
-import uk.co.sentinelweb.cuer.app.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class PlayerModelMapper constructor() {
     fun map(domain: MediaDomain): PlayerModel =

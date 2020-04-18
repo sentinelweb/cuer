@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import uk.co.sentinelweb.cuer.app.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistModelMapper constructor() {
     fun map(domain: PlaylistDomain): PlaylistModel = PlaylistModel(

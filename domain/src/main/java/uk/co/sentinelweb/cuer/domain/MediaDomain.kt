@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.domain
+package uk.co.sentinelweb.cuer.domain
 
 import java.net.URL
 import java.time.Instant

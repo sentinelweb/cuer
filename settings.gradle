@@ -1,3 +1,5 @@
 include ':prototype'
 rootProject.name='Cuer'
 include ':app'
+include ':net'
+include ':domain'
