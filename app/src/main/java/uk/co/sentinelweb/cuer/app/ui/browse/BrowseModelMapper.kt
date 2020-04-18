@@ -1,16 +1,17 @@
 package uk.co.sentinelweb.cuer.app.ui.browse
 
-import uk.co.sentinelweb.cuer.app.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class BrowseModelMapper constructor() {
+
     fun map(domain: List<MediaDomain>): BrowseModel = BrowseModel(
         domain.map {
             BrowseModel.BrowseItemModel(
-                it.url.toString(),
-                it.type,
-                it.title,
-                "${(it.lengthMs / 1000)}s",
-                "${(it.positonMs / 1000)}s"
+                it.url,
+                it.mediaType,
+                it.title ?: "-",
+                it.duration?.let { "${(it / 1000)}s" } ?: "-",
+                it.positon?.let { "${(it / 1000)}s" } ?: "-"
             )
         }
     )

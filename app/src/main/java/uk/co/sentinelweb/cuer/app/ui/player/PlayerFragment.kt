@@ -7,9 +7,9 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 
-class PlayerFragment : Fragment(R.layout.player_fragment) {
+class PlayerFragment : Fragment(R.layout.player_fragment), PlayerContract.View {
 
-    private val presenter: PlayerPresenter by currentScope.inject()
+    private val presenter: PlayerContract.Presenter by currentScope.inject()
 
     companion object {
 
@@ -17,9 +17,8 @@ class PlayerFragment : Fragment(R.layout.player_fragment) {
         val fragmentModule = module {
             scope(named<PlayerFragment>()) {
                 scoped<PlayerContract.View> { getSource() }
-                scoped<PlayerContract.Presenter> { PlayerPresenter(get(), get(), get(), get()) }
+                scoped<PlayerContract.Presenter> { PlayerPresenter(get(), get(), get()) }
                 scoped { PlayerModelMapper() }
-                scoped { PlayerRepository() }
                 viewModel { PlayerState() }
             }
         }
