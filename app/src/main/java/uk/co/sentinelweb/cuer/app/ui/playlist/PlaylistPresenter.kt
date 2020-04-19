@@ -37,6 +37,15 @@ class PlaylistPresenter(
             }
     }
 
+    override fun loadList() {
+        jobs.add(CoroutineScope(contextProvider.Main).launch {
+            val list = async(contextProvider.IO) { repository.loadList(null) }.await()
+            list
+                .map { mediaDomain -> modelMapper.map(mediaDomain) }
+                .also { view.setList(it) }
+        })
+    }
+
     private fun saveList(it: List<MediaDomain>) {
         // TODO find the better way to do this
         jobs.add(CoroutineScope(contextProvider.Main).launch {

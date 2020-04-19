@@ -5,7 +5,6 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="?attr/actionBarSize"
     >
     <!-- player -->
 <!--    <uk.co.sentinelweb.cuer.app.util.cast.PlayerControlsView-->
@@ -16,16 +15,6 @@
 <!--        android:visibility="gone"-->
 <!--        app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"-->
 <!--        />-->
-
-    <fragment
-        android:id="@+id/cast_player_fragment"
-        android:name="uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
-        />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav_view"
@@ -53,4 +42,13 @@
         app:navGraph="@navigation/bottom_navigation"
         />
 
+    <fragment
+        android:id="@+id/cast_player_fragment"
+        android:name="uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

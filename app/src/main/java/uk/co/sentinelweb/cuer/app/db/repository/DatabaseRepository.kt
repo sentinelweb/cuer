@@ -6,7 +6,7 @@ interface DatabaseRepository<Domain> {
 
     suspend fun load(id:Int):Domain
 
-    suspend fun loadList(filter:Filter):List<Domain>
+    suspend fun loadList(filter:Filter? = null):List<Domain>
 
     suspend fun delete(domain:Domain)
 

@@ -9,11 +9,9 @@ import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 object DatabaseModule {
     val dbModule = module {
         single {
-            Room.databaseBuilder(
-                androidApplication(),
-                AppDatabase::class.java, "cuer_database"
-            ).build()
+            get<RoomWrapper>().createDb()
         }
+        single {  RoomWrapper(androidApplication()) }
         factory { MediaDatabaseRepository(get<AppDatabase>().mediaDao(), get()) }
         factory { MediaMapper() }
     }

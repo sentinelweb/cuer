@@ -99,7 +99,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     }
 
     override fun showMessage(msg: String) {
-        Snackbar.make(view!!,msg,Snackbar.LENGTH_LONG).show()
+        Snackbar.make(requireView(), msg,Snackbar.LENGTH_LONG).show()
     }
 
     override fun setTitle(title: String) {
