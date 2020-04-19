@@ -9,6 +9,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListModule
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.share.LinkScanner
+import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
@@ -22,12 +24,14 @@ object Modules {
         BrowseFragment.fragmentModule,
         MainActivity.activityModule,
         CastPlayerFragment.viewModule,
-        ItemListModule.listModule
+        ItemListModule.listModule,
+        ShareActivity.activityModule
     )
 
     private val utilModule = module {
         factory { CoroutineContextProvider() }
         factory { StethoWrapper(androidApplication()) }
+        factory { LinkScanner() }
     }
 
     private val wrapperModule = module {

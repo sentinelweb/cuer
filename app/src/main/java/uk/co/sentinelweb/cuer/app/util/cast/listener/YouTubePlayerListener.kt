@@ -7,7 +7,12 @@ import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi
 import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
 
-class YouTubePlayerListener : AbstractYouTubePlayerListener(), CastPlayerContract.PresenterExternal.Listener {
+class YouTubePlayerListener : AbstractYouTubePlayerListener(),
+    CastPlayerContract.PresenterExternal.Listener {
+
+    private var youTubePlayer: YouTubePlayer? = null
+    val idProvider = Queue.VideoProvider() // todo remove & make queue interface
+    var currentItem: Queue.QueueItem? = null // todo move to player?
 
     var playerUi: CastPlayerContract.PresenterExternal? = null
         get() = field
@@ -29,9 +34,6 @@ class YouTubePlayerListener : AbstractYouTubePlayerListener(), CastPlayerContrac
         it?.reset()
     }
 
-    private var youTubePlayer: YouTubePlayer? = null
-    val idProvider = Queue.VideoProvider() // todo remove & make queue interface
-    var currentItem: Queue.QueueItem? = null // todo move to player?
 
     // region AbstractYouTubePlayerListener
     override fun onReady(youTubePlayer: YouTubePlayer) {
