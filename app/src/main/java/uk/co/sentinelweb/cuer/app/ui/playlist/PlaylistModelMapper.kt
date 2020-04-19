@@ -1,17 +1,28 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlaylistModelMapper constructor() {
     fun map(domain: PlaylistDomain): PlaylistModel = PlaylistModel(
         domain.items.map {
-            PlaylistModel.PlaylistItemModel(
-                it.media.url.toString(),
-                it.media.mediaType,
-                it.media.title ?: "-",
-                it.media.duration?.let { "${(it / 1000)}s" } ?: "-",
-                it.media.positon?.let { "${(it / 1000)}s" } ?: "-"
-            )
+            map(it)
         }
     )
+
+    fun map(it: PlaylistItemDomain): PlaylistModel.PlaylistItemModel {
+        val media = it.media
+        return map(media)
+    }
+
+    fun map(media: MediaDomain): PlaylistModel.PlaylistItemModel {
+        return PlaylistModel.PlaylistItemModel(
+            media.url,
+            media.mediaType,
+            media.title ?: "-",
+            media.duration?.let { "${(it / 1000)}s" } ?: "-",
+            media.positon?.let { "${(it / 1000)}s" } ?: "-"
+        )
+    }
 }

@@ -6,4 +6,10 @@
     <dimen name="player_button_icon_size">40dp</dimen>
     <dimen name="player_button_size">48dp</dimen>
 
+    <dimen name="list_item_padding">4dp</dimen>
+    <dimen name="list_item_margin">8dp</dimen>
+    <dimen name="list_item_elevation">2dp</dimen>
+    <dimen name="list_item_swipe_dismiss_dist">100dp</dimen>
+    <dimen name="list_item_swipe_dismiss_toerance">4dp</dimen>
+    <dimen name="list_item_height">76dp</dimen>
 </resources>

@@ -26,7 +26,7 @@ class MediaDatabaseRepository constructor(
             .let { mediaMapper.map(it) }
 
 
-    override suspend fun loadList(filter: DatabaseRepository.Filter): List<MediaDomain> {
+    override suspend fun loadList(filter: DatabaseRepository.Filter?): List<MediaDomain> {
         return when (filter) {
             is IdListFilter ->
                 mediaDao
