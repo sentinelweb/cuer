@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.klink.ui.common.itemlist.item
+package uk.co.sentinelweb.cuer.app.ui.common.itemlist.item
 
 import android.content.Context
 import android.util.AttributeSet

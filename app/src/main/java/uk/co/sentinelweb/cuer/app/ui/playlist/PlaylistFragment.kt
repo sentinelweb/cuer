@@ -12,8 +12,8 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.klink.ui.common.itemlist.item.ItemContract
-import uk.co.sentinelweb.klink.ui.common.itemlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
 
 class PlaylistFragment :
     Fragment(R.layout.playlist_fragment),

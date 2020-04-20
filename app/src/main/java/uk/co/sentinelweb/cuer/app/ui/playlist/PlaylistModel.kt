@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.klink.ui.common.itemlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
 
 data class PlaylistModel constructor(
     val items: List<PlaylistItemModel>

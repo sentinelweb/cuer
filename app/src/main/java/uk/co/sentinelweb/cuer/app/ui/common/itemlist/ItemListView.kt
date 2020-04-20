@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.klink.ui.common.itemlist
+package uk.co.sentinelweb.cuer.app.ui.common.itemlist
 
 import android.content.Context
 import android.util.AttributeSet
@@ -15,9 +15,8 @@ import org.koin.dsl.module
 import org.koin.ext.getOrCreateScope
 import org.koin.ext.scope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
-import uk.co.sentinelweb.klink.ui.common.itemlist.item.ItemContract
-import uk.co.sentinelweb.klink.ui.common.itemlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemFactory
 
 /**
  * This is a false list linerlayout in scrollview (for small data sizes)
@@ -68,9 +67,7 @@ class ItemListView constructor(
         val viewModule = module {
             scope(named<ItemListView>()) {
                 scoped<ItemListContract.View> { getSource() }
-                scoped<ItemListContract.Presenter> { ItemListPresenter(get()) }
-                scoped { PlayerModelMapper() }
-                scoped { PlayerModelMapper() }
+                scoped<ItemListContract.Presenter> { ItemListPresenter(get(), get()) }
                 viewModel { ItemListState() }
             }
         }

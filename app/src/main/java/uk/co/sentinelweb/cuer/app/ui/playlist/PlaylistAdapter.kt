@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistAdapter.ItemViewHolder
-import uk.co.sentinelweb.klink.ui.common.itemlist.item.ItemContract
-import uk.co.sentinelweb.klink.ui.common.itemlist.item.ItemFactory
-import uk.co.sentinelweb.klink.ui.common.itemlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
 
 class PlaylistAdapter constructor(
     private val itemFactory: ItemFactory,

@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.util.provider.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListView
 
 object Modules {
     private val scopedModules = listOf(
@@ -25,7 +26,8 @@ object Modules {
         MainActivity.activityModule,
         CastPlayerFragment.viewModule,
         ItemListModule.listModule,
-        ShareActivity.activityModule
+        ShareActivity.activityModule,
+        ItemListView.viewModule
     )
 
     private val utilModule = module {
@@ -44,5 +46,4 @@ object Modules {
         .plus(wrapperModule)
         .plus(scopedModules)
         .plus(DatabaseModule.dbModule)
-        .plus(ItemListModule.listModule)
 }
