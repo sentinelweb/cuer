@@ -8,18 +8,16 @@ import android.widget.FrameLayout
 import kotlinx.android.synthetic.main.view_item_list.view.*
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.KoinComponent
-import org.koin.android.scope.currentScope
-import org.koin.core.get
 import org.koin.core.qualifier.named
+import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import org.koin.ext.getOrCreateScope
-import org.koin.ext.scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemFactory
 
 /**
- * This is a false list linerlayout in scrollview (for small data sizes)
+ * This is a simple list linerlayout in scrollview (for small data sizes)
  */
 class ItemListView constructor(
     c: Context,
@@ -29,17 +27,13 @@ class ItemListView constructor(
     KoinComponent {
 
     val presenter: ItemListContract.Presenter
-    val itemFactory: ItemFactory
+    private val scope: Scope  by lazy { this.getOrCreateScope() }
+    private val itemFactory: ItemFactory
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_item_list, this, true)
-        // TODO check this works !!!
-        val scope = this.getOrCreateScope()
-// Get scoped instances from `a`
         presenter = scope.get()
         itemFactory = scope.get()
-//        presenter = injector.createPresenter(this )
-//        itemFactory = injector.itemFactory()
     }
 
     override fun addItem(interactions: ItemContract.Interactions): ItemContract.Presenter {

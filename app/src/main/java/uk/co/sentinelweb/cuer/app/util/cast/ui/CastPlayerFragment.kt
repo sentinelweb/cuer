@@ -24,8 +24,8 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding!!
 
-    override val presenterExternal: CastPlayerContract.PresenterExternal
-        get() = presenter as CastPlayerContract.PresenterExternal
+    override val playerControls: CastPlayerContract.PlayerControls
+        get() = presenter as CastPlayerContract.PlayerControls
 
     override fun onCreateView(
         inflater: LayoutInflater,

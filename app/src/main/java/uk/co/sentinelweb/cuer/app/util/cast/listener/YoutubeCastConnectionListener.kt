@@ -10,7 +10,7 @@ class YoutubeCastConnectionListener constructor(
     private val creator: YoutubePlayerContextCreator
 ) : ChromecastConnectionListener {
 
-    var playerUi: CastPlayerContract.PresenterExternal? = null
+    var playerUi: CastPlayerContract.PlayerControls? = null
         get() = field
         set(value) {
             field = value

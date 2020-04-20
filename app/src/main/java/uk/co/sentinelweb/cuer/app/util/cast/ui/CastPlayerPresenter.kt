@@ -8,44 +8,44 @@ import kotlin.math.min
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
     private val state: CastPlayerState
-) : CastPlayerContract.Presenter, CastPlayerContract.PresenterExternal {
+) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls {
 
-    override fun addListener(l: CastPlayerContract.PresenterExternal.Listener) {
+    override fun addListener(l: CastPlayerContract.PlayerControls.Listener) {
         state.listeners.add(l)
     }
 
-    override fun removeListener(l: CastPlayerContract.PresenterExternal.Listener) {
+    override fun removeListener(l: CastPlayerContract.PlayerControls.Listener) {
         state.listeners.remove(l)
     }
 
     override fun onPlayPressed() {
-        state.listeners.forEach { it.playPressed() }
+        state.listeners.forEach { it.play() }
     }
 
     override fun onPausePressed() {
-        state.listeners.forEach { it.pausePressed() }
+        state.listeners.forEach { it.pause() }
     }
 
     override fun onSeekBackPressed() {
         if (state.durationMs > 0) {
-            state.listeners.forEach { it.onSeekChanged(max(0, state.positionMs - 30000)) }
+            state.listeners.forEach { it.seekTo(max(0, state.positionMs - 30000)) }
         }
     }
 
     override fun onSeekFwdPressed() {
         if (state.durationMs > 0) {
             state.listeners.forEach {
-                it.onSeekChanged(min(state.durationMs, state.positionMs + 30000))
+                it.seekTo(min(state.durationMs, state.positionMs + 30000))
             }
         }
     }
 
     override fun onTrackBackPressed() {
-        state.listeners.forEach { it.trackBackPressed() }
+        state.listeners.forEach { it.trackBack() }
     }
 
     override fun onTrackFwdPressed() {
-        state.listeners.forEach { it.trackFwdPressed() }
+        state.listeners.forEach { it.trackFwd() }
     }
 
     override fun onSeekChanged(ratio: Float) {
@@ -56,7 +56,7 @@ class CastPlayerPresenter(
     }
 
     override fun onSeekFinished() {
-        state.listeners.forEach { it.onSeekChanged(state.seekPositionMs) }
+        state.listeners.forEach { it.seekTo(state.seekPositionMs) }
         state.seekPositionMs = 0
     }
 

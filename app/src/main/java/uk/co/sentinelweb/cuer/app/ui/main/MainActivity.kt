@@ -8,7 +8,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.cast.framework.CastContext
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
@@ -69,7 +68,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initChromeCast() {
-        presenter.setCastContext(CastContext.getSharedInstance(this))
+        presenter.setCastContext(chromeCastWrapper.getCastContext())
     }
 
     companion object {
@@ -79,11 +78,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         val activityModule = module {
             scope(named<MainActivity>()) {
                 scoped<MainContract.View> { getSource() }
-                scoped<MainContract.Presenter> { MainPresenter(get(), get(), get(), get()) }
+                scoped<MainContract.Presenter> { MainPresenter(get(), get(), get(), get(), get(),get()) }
                 scoped {
                     (getSource<MainActivity>()
                         .supportFragmentManager
-                        .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).presenterExternal
+                        .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).playerControls
                 }
                 viewModel { MainState() }
             }

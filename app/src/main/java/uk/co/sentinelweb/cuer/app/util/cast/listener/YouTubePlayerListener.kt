@@ -8,13 +8,13 @@ import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi
 import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
 
 class YouTubePlayerListener : AbstractYouTubePlayerListener(),
-    CastPlayerContract.PresenterExternal.Listener {
+    CastPlayerContract.PlayerControls.Listener {
 
     private var youTubePlayer: YouTubePlayer? = null
     val idProvider = Queue.VideoProvider() // todo remove & make queue interface
     var currentItem: Queue.QueueItem? = null // todo move to player?
 
-    var playerUi: CastPlayerContract.PresenterExternal? = null
+    var playerUi: CastPlayerContract.PlayerControls? = null
         get() = field
         set(value) {
             value?.let {
@@ -24,12 +24,12 @@ class YouTubePlayerListener : AbstractYouTubePlayerListener(),
         }
 
     // todo fix this - not clean
-    private fun setupPlayer(it: CastPlayerContract.PresenterExternal) {
+    private fun setupPlayer(it: CastPlayerContract.PlayerControls) {
         it.addListener(this)
         it.restoreState()
     }
 
-    private fun cleanupPlayer(it: CastPlayerContract.PresenterExternal?) {
+    private fun cleanupPlayer(it: CastPlayerContract.PlayerControls?) {
         it?.removeListener(this)
         it?.reset()
     }
@@ -103,25 +103,25 @@ class YouTubePlayerListener : AbstractYouTubePlayerListener(),
     // endregion
 
     // region  CastPlayerContract.PresenterExternal.Listener
-    override fun playPressed() {
+    override fun play() {
         youTubePlayer?.play()
     }
 
-    override fun pausePressed() {
+    override fun pause() {
         youTubePlayer?.pause()
     }
 
-    override fun trackBackPressed() {
+    override fun trackBack() {
         currentItem = idProvider.getPreviousVideo()
         loadCurrentVideo()
     }
 
-    override fun trackFwdPressed() {
+    override fun trackFwd() {
         currentItem = idProvider.getNextVideo()
         loadCurrentVideo()
     }
 
-    override fun onSeekChanged(positionMs: Long) {
+    override fun seekTo(positionMs: Long) {
         youTubePlayer?.seekTo(positionMs / 1000f)
     }
     // endregion
@@ -131,6 +131,5 @@ class YouTubePlayerListener : AbstractYouTubePlayerListener(),
         youTubePlayer = null
         playerUi?.reset()
         playerUi = null
-
     }
 }

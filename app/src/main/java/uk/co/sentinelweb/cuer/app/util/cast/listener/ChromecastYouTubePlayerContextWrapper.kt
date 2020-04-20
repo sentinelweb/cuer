@@ -7,7 +7,7 @@ class ChromecastYouTubePlayerContextWrapper(
     private val context: ChromecastYouTubePlayerContext,
     private val listener: YoutubeCastConnectionListener
 ) {
-    var playerUi: CastPlayerContract.PresenterExternal? = null
+    var playerUi: CastPlayerContract.PlayerControls? = null
         get() = field
         set(value) {
             field = value

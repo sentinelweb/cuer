@@ -8,6 +8,7 @@ interface MainContract {
         fun setCastContext(castContext: CastContext)
         fun onStart()
         fun onStop()
+        fun onPlayServicesOk()
     }
 
     interface View {

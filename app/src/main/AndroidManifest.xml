@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="uk.co.sentinelweb.cuer.app">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
     <application
         android:name=".CuerApp"
         android:allowBackup="true"
@@ -58,6 +60,12 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.cast.YoutubeCastService"
+            android:foregroundServiceType="mediaPlayback"
+            />
+
     </application>
 
 </manifest>
