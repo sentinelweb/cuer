@@ -13,6 +13,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.scope.Scope
 import org.koin.ext.getOrCreateScope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 
 class YoutubeCastService : Service(), KoinComponent {
@@ -74,6 +75,9 @@ class YoutubeCastService : Service(), KoinComponent {
     }
 
     override fun onBind(p0: Intent?): IBinder? = null
+    fun pullYoutubeContext(): ChromecastYouTubePlayerContextWrapper? {
+        return controller.pullYoutubeContext()
+    }
 
     companion object {
         private const val FOREGROUND_ID = 34563
@@ -83,6 +87,4 @@ class YoutubeCastService : Service(), KoinComponent {
 
         fun instance() : YoutubeCastService? = _instance
     }
-
-
 }

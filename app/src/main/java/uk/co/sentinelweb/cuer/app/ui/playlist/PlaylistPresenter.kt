@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.util.provider.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -19,38 +21,47 @@ class PlaylistPresenter(
     internal var jobs = mutableListOf<Job>()
 
     override fun initialise() {
-
-        Queue.ITEMS
-            .map { MediaDomain(
-                url = it.url,
-                mediaId =  it.getId(),
-                title = it.title,
-                platform = YOUTUBE,
-                description = null,
-                dateLastPlayed = null,
-                duration = null,
-                mediaType = VIDEO,
-                id = null,
-                positon = null
-            )}.also {
-                saveList(it)
-            }
+        initList()
     }
 
     override fun loadList() {
-        jobs.add(CoroutineScope(contextProvider.Main).launch {
-            val list = async(contextProvider.IO) { repository.loadList(null) }.await()
-            list
-                .map { mediaDomain -> modelMapper.map(mediaDomain) }
+        jobs.add(contextProvider.MainScope.launch {
+            repository
+                .loadList(null)
+                .map {  modelMapper.map(it) }
                 .also { view.setList(it) }
         })
     }
 
-    private fun saveList(it: List<MediaDomain>) {
-        // TODO find the better way to do this
-        jobs.add(CoroutineScope(contextProvider.Main).launch {
-            async(contextProvider.IO) { repository.save(it) }.await()
+    private fun initList() {
+        jobs.add(contextProvider.MainScope.launch {
+            val count = repository.count()
+            if (count == 0) {
+                Queue.ITEMS
+                    .map { map(it) }
+                    .also {
+                        repository.save(it)
+                    }
+                    .also {
+                        loadList()
+                    }
+            }
         })
+    }
+
+    private fun map(it: Queue.QueueItem): MediaDomain {
+        return MediaDomain(
+            url = it.url,
+            mediaId = it.getId(),
+            title = it.title,
+            platform = YOUTUBE,
+            description = null,
+            dateLastPlayed = null,
+            duration = null,
+            mediaType = VIDEO,
+            id = null,
+            positon = null
+        )
     }
 
 }

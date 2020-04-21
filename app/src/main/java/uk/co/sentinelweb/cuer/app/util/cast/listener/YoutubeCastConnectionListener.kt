@@ -51,4 +51,8 @@ class YoutubeCastConnectionListener constructor(
     fun isConnected():Boolean {
         return connectionState == ConnectionState.CC_CONNECTED
     }
+
+    fun destroy() {
+        chromecastYouTubePlayerContext?.release()
+    }
 }

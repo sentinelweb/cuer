@@ -9,7 +9,8 @@ object YoutubeCastServiceModule {
     val serviceModule = module {
         factory { YoutubeCastServiceManager(androidApplication()) }
         scope(named<YoutubeCastService>()) {
-            scoped { YoutubeCastServiceController(getSource(), get(), get()) }
+            scoped { YoutubeCastServiceController(getSource(), get(), get(),get()) }
+            scoped { YoutubeCastServiceState() }
         }
     }
 }

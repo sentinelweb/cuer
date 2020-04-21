@@ -17,6 +17,8 @@ class YoutubeCastServiceManager constructor(
 
     fun get():YoutubeCastService? = YoutubeCastService.instance()
 
+    fun isRunning():Boolean = YoutubeCastService.instance() != null
+
     private fun intent() = Intent(app, YoutubeCastService::class.java)
 
 }

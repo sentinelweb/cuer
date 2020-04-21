@@ -9,26 +9,36 @@ import java.lang.IllegalStateException
 class YoutubeCastServiceController constructor(
     private val service:YoutubeCastService,
     private val creator: YoutubePlayerContextCreator,
-    private val chromeCastWrapper: ChromeCastWrapper
+    private val chromeCastWrapper: ChromeCastWrapper,
+    private val state: YoutubeCastServiceState
+
 ) {
-    private var wrapper: ChromecastYouTubePlayerContextWrapper? = null
 
     private val control = Control()
 
     fun initialise() {
-        wrapper = creator.createContext(chromeCastWrapper.getCastContext()).apply {
-            //playerUi = control
-        }
+//        wrapper = creator.createContext(chromeCastWrapper.getCastContext()).apply {
+//            //playerUi = control
+//        }
 
     }
 
     fun destroy() {
-        wrapper = null
+//        wrapper = null
+        state.youtubePlayerContext?.destroy()
+        state.youtubePlayerContext = null
     }
 
     fun pause() {
         // doesnt work - may have to retain the one ChromecastYouTubePlayerContextWrapper
         control.listeners.get(0).pause()
+    }
+
+    fun pullYoutubeContext():ChromecastYouTubePlayerContextWrapper?  {
+        val wrapper = state.youtubePlayerContext
+        state.youtubePlayerContext = null
+        state.youtubePlayerContext?.playerUi = null
+        return wrapper
     }
 
     inner class Control() :CastPlayerContract.PlayerControls {

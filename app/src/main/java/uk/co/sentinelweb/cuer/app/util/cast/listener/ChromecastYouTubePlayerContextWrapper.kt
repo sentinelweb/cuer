@@ -17,4 +17,9 @@ class ChromecastYouTubePlayerContextWrapper(
     fun isConnected():Boolean {
         return listener.isConnected()
     }
+
+    fun destroy() {
+        playerUi = null
+        listener.destroy()
+    }
 }
