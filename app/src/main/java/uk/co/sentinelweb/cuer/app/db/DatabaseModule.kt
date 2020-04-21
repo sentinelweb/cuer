@@ -12,7 +12,7 @@ object DatabaseModule {
             get<RoomWrapper>().createDb()
         }
         single {  RoomWrapper(androidApplication()) }
-        factory { MediaDatabaseRepository(get<AppDatabase>().mediaDao(), get()) }
+        factory { MediaDatabaseRepository(get<AppDatabase>().mediaDao(), get(), get()) }
         factory { MediaMapper() }
     }
 }

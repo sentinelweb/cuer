@@ -6,8 +6,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionStat
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi
 
 class CastPlayerState constructor(
-    var connectionState: ConnectionState = CC_DISCONNECTED,
-    val listeners: MutableList<CastPlayerContract.PresenterExternal.Listener> = mutableListOf(),
+    val listeners: MutableList<CastPlayerContract.PlayerControls.Listener> = mutableListOf(),
     var playState: PlayerStateUi = PlayerStateUi.UNKNOWN,
     var positionMs: Long = 0,
     var seekPositionMs: Long = 0,

@@ -11,6 +11,9 @@ interface MediaDao {
     @Query("SELECT * FROM media")
     fun getAll(): List<MediaEntity>
 
+    @Query("SELECT count() FROM media")
+    fun count(): Int
+
     @Query("SELECT * FROM media WHERE id IN (:mediaIds)")
     fun loadAllByIds(mediaIds: IntArray): List<MediaEntity>
 

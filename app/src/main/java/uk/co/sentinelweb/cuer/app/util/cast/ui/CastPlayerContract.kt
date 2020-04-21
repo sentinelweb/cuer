@@ -13,31 +13,31 @@ interface CastPlayerContract {
         fun onSeekFinished()
     }
 
-    interface PresenterExternal {
+    interface PlayerControls {
 
         fun initMediaRouteButton()
         fun setConnectionState(connState: ConnectionState)
         fun setPlayerState(playState: PlayerStateUi)
         fun addListener(l: Listener)
         fun removeListener(l: Listener)
-        fun setCurrentSecond(second: Float)// todo ms long
-        fun setDuration(duration: Float)// todo ms long
+        fun setCurrentSecond(second: Float) // todo ms long
+        fun setDuration(duration: Float) // todo ms long
         fun error(msg:String)
         fun setTitle(title:String)
         fun reset()
         fun restoreState()
 
         interface Listener {
-            fun playPressed()
-            fun pausePressed()
-            fun trackBackPressed()
-            fun trackFwdPressed()
-            fun onSeekChanged(positionMs: Long)
+            fun play()
+            fun pause()
+            fun trackBack()
+            fun trackFwd()
+            fun seekTo(positionMs: Long)
         }
     }
 
     interface View {
-        val presenterExternal: PresenterExternal
+        val playerControls: PlayerControls
         fun initMediaRouteButton()
         fun setConnectionText(text: String)
         fun setCurrentSecond(second: String)

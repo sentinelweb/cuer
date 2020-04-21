@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextWrapper
 
 class MainState constructor(
-    // todo will need to disconnect/reconnect the view on config change
-    var youtubePlayerContext: ChromecastYouTubePlayerContextWrapper? = null
+    var youtubePlayerContext: ChromecastYouTubePlayerContextWrapper? = null,
+    var playServicesAvailable: Boolean = false,
+    var playServiceCheckDone: Boolean = false
 ) : ViewModel()
 
