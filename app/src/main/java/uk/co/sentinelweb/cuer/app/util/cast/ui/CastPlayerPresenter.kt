@@ -65,7 +65,6 @@ class CastPlayerPresenter(
     }
 
     override fun setConnectionState(connState: CastPlayerContract.ConnectionState) {
-        state.connectionState = connState
         view.setConnectionText(
             when (connState) {
                 CC_DISCONNECTED -> "X"
@@ -76,7 +75,6 @@ class CastPlayerPresenter(
     }
 
     override fun setPlayerState(playState: CastPlayerContract.PlayerStateUi) {
-        state.playState = playState
         when (playState) {
             UNKNOWN -> view.setPaused() // todo better state
             UNSTARTED -> view.setPaused() // todo better state

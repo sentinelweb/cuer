@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.db.DatabaseModule
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListModule
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListView
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
@@ -17,9 +18,9 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.util.provider.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListView
+import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
 
 object Modules {
     private val scopedModules = listOf(
@@ -46,6 +47,7 @@ object Modules {
         factory { ToastWrapper(androidApplication()) }
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }
+        factory { LogWrapper() }
     }
 
     val allModules = listOf(utilModule)

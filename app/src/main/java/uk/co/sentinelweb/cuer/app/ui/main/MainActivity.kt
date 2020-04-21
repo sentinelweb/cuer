@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         val appBarConfiguration = AppBarConfiguration(setOf(R.id.bottom_navigation))
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        presenter.initChromecast()
+        presenter.initialise()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -45,7 +45,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun checkPlayServices() {
         // can't use CastContext until I'm sure the user has GooglePlayServices
-        chromeCastWrapper.checkPlayServices(this, SERVICES_REQUEST_CODE, presenter::onPlayServicesOk)
+        chromeCastWrapper.checkPlayServices(
+            this,
+            SERVICES_REQUEST_CODE,
+            presenter::onPlayServicesOk
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -53,7 +57,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
         // rerun check which definitely should pass here
         if (requestCode == SERVICES_REQUEST_CODE) {
-            chromeCastWrapper.checkPlayServices(this, SERVICES_REQUEST_CODE, presenter::onPlayServicesOk)
+            chromeCastWrapper.checkPlayServices(
+                this,
+                SERVICES_REQUEST_CODE,
+                presenter::onPlayServicesOk
+            )
         }
     }
 
@@ -74,7 +82,17 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         val activityModule = module {
             scope(named<MainActivity>()) {
                 scoped<MainContract.View> { getSource() }
-                scoped<MainContract.Presenter> { MainPresenter(get(), get(), get(), get(), get(),get()) }
+                scoped<MainContract.Presenter> {
+                    MainPresenter(
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get()
+                    )
+                }
                 scoped {
                     (getSource<MainActivity>()
                         .supportFragmentManager

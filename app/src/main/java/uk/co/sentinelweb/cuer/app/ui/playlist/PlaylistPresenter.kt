@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.util.provider.CoroutineContextProvider
@@ -28,7 +27,7 @@ class PlaylistPresenter(
         jobs.add(contextProvider.MainScope.launch {
             repository
                 .loadList(null)
-                .map {  modelMapper.map(it) }
+                .map { modelMapper.map(it) }
                 .also { view.setList(it) }
         })
     }
@@ -39,12 +38,8 @@ class PlaylistPresenter(
             if (count == 0) {
                 Queue.ITEMS
                     .map { map(it) }
-                    .also {
-                        repository.save(it)
-                    }
-                    .also {
-                        loadList()
-                    }
+                    .also { repository.save(it) }
+                    .also { loadList() }
             }
         })
     }

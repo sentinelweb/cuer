@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerCont
 
 class MainState constructor(
     var youtubePlayerContext: ChromecastYouTubePlayerContextWrapper? = null,
-    var playServiceAvailable:Boolean = false
+    var playServicesAvailable: Boolean = false,
+    var playServiceCheckDone: Boolean = false
 ) : ViewModel()
 

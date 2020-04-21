@@ -13,17 +13,19 @@ import org.koin.core.KoinComponent
 import org.koin.core.scope.Scope
 import org.koin.ext.getOrCreateScope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.service.cast.notif.player.PlayerControlsNotificationPresenter
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextWrapper
+import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 
 class YoutubeCastService : Service(), KoinComponent {
 
-    private lateinit var scope : Scope
-    private lateinit var controller : YoutubeCastServiceController
+    private lateinit var scope: Scope
+    private lateinit var controller: YoutubeCastServiceController
     private val toastWrapper: ToastWrapper by inject()
     private val notif: NotificationWrapper by inject()
 
-    private lateinit var notifChannelId:String // todo move to appstate
+    private lateinit var notifChannelId: String // todo move to appstate
 
     override fun onCreate() {
         super.onCreate()
@@ -34,11 +36,19 @@ class YoutubeCastService : Service(), KoinComponent {
         controller.initialise()
         // toastWrapper.showToast("Service created")
         notifChannelId = notif.createChannelId()// todo create earlier?
-        startForeground(FOREGROUND_ID,notification())
+        startForeground(FOREGROUND_ID, notification())
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // toastWrapper.showToast("Service destroyed")
+        controller.destroy()
+        _instance = null
     }
 
     // todo move to wrapper
-    fun notification():Notification {
+    private fun notification(): Notification {
         val snoozeIntent = Intent(this, YoutubeCastService::class.java).apply {
             action = ACTION_PAUSE
             putExtra(EXTRA_NOTIFICATION_ID, 0)
@@ -67,24 +77,27 @@ class YoutubeCastService : Service(), KoinComponent {
         return START_NOT_STICKY
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // toastWrapper.showToast("Service destroyed")
-        controller.destroy()
-        _instance = null
-    }
 
     override fun onBind(p0: Intent?): IBinder? = null
-    fun pullYoutubeContext(): ChromecastYouTubePlayerContextWrapper? {
+
+    fun popYoutubeContext(): ChromecastYouTubePlayerContextWrapper? {
         return controller.pullYoutubeContext()
+    }
+
+    fun pushYoutubeContext(youtubePlayerContext: ChromecastYouTubePlayerContextWrapper) {
+        controller.pushYoutubeContext(youtubePlayerContext)
+    }
+
+    fun getPlayerControls():CastPlayerContract.PlayerControls {
+        return PlayerControlsNotificationPresenter()
     }
 
     companion object {
         private const val FOREGROUND_ID = 34563
         private const val NOTIF_ID = 34564
         private const val ACTION_PAUSE = "pause"
-        private var _instance : YoutubeCastService? = null
+        private var _instance: YoutubeCastService? = null
 
-        fun instance() : YoutubeCastService? = _instance
+        fun instance(): YoutubeCastService? = _instance
     }
 }

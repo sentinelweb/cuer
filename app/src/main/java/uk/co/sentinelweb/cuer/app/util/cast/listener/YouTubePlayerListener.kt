@@ -7,7 +7,9 @@ import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi
 import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
 
-class YouTubePlayerListener : AbstractYouTubePlayerListener(),
+class YouTubePlayerListener constructor(
+    private val state: YouTubePlayerListenerState
+) : AbstractYouTubePlayerListener(),
     CastPlayerContract.PlayerControls.Listener {
 
     private var youTubePlayer: YouTubePlayer? = null
@@ -26,7 +28,10 @@ class YouTubePlayerListener : AbstractYouTubePlayerListener(),
     // todo fix this - not clean
     private fun setupPlayer(it: CastPlayerContract.PlayerControls) {
         it.addListener(this)
-        it.restoreState()
+        it.setTitle(state.title)
+        it.setPlayerState(state.playState)
+        it.setDuration(state.durationSec)
+        it.setCurrentSecond(state.positionSec)
     }
 
     private fun cleanupPlayer(it: CastPlayerContract.PlayerControls?) {
@@ -43,7 +48,8 @@ class YouTubePlayerListener : AbstractYouTubePlayerListener(),
 
     private fun loadCurrentVideo() {
         youTubePlayer?.loadVideo(currentItem?.getId()!!, 0f)
-        playerUi?.setTitle(currentItem?.title!!)
+        state.title = currentItem?.title ?: currentItem?.url ?: ""
+        playerUi?.setTitle(state.title)
     }
 
     override fun onApiChange(youTubePlayer: YouTubePlayer) {
@@ -52,6 +58,7 @@ class YouTubePlayerListener : AbstractYouTubePlayerListener(),
 
     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
         this.youTubePlayer = youTubePlayer
+        state.positionSec = second
         playerUi?.setCurrentSecond(second)
     }
 
@@ -72,22 +79,27 @@ class YouTubePlayerListener : AbstractYouTubePlayerListener(),
 
     }
 
-    override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerState) {
+    override fun onStateChange(
+        youTubePlayer: YouTubePlayer,
+        @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+        playerState: PlayerState
+    ) {
         this.youTubePlayer = youTubePlayer
-
-        when (state) {
-            PlayerState.ENDED -> playerUi?.setPlayerState(PlayerStateUi.ENDED)
-            PlayerState.PAUSED -> playerUi?.setPlayerState(PlayerStateUi.PAUSED)
-            PlayerState.PLAYING -> playerUi?.setPlayerState(PlayerStateUi.PLAYING)
-            PlayerState.BUFFERING -> playerUi?.setPlayerState(PlayerStateUi.BUFFERING)
-            PlayerState.UNSTARTED -> playerUi?.setPlayerState(PlayerStateUi.UNSTARTED)//resetUi()
-            PlayerState.UNKNOWN -> playerUi?.setPlayerState(PlayerStateUi.UNKNOWN)
-            PlayerState.VIDEO_CUED -> playerUi?.setPlayerState(PlayerStateUi.VIDEO_CUED)
+        state.playState = when (playerState) {
+            PlayerState.ENDED -> PlayerStateUi.ENDED
+            PlayerState.PAUSED -> PlayerStateUi.PAUSED
+            PlayerState.PLAYING -> PlayerStateUi.PLAYING
+            PlayerState.BUFFERING -> PlayerStateUi.BUFFERING
+            PlayerState.UNSTARTED -> PlayerStateUi.UNSTARTED
+            PlayerState.UNKNOWN -> PlayerStateUi.UNKNOWN
+            PlayerState.VIDEO_CUED -> PlayerStateUi.VIDEO_CUED
         }
+        playerUi?.setPlayerState(state.playState)
     }
 
     override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
         this.youTubePlayer = youTubePlayer
+        state.positionSec = duration
         playerUi?.setDuration(duration)
     }
 
