@@ -13,4 +13,8 @@ class ChromecastYouTubePlayerContextWrapper(
             field = value
             listener.playerUi = field
         }
+
+    fun isConnected():Boolean {
+        return listener.isConnected()
+    }
 }

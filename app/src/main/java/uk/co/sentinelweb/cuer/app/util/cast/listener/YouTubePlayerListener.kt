@@ -34,7 +34,6 @@ class YouTubePlayerListener : AbstractYouTubePlayerListener(),
         it?.reset()
     }
 
-
     // region AbstractYouTubePlayerListener
     override fun onReady(youTubePlayer: YouTubePlayer) {
         this.youTubePlayer = youTubePlayer

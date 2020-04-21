@@ -36,13 +36,13 @@ class MainPresenter(
     }
 
     override fun onStart() {
-        serviceManager.start()
+        //serviceManager.start()
         state.youtubePlayerContext?.playerUi = playerPresenter
         Log.d(TAG,"onStart()")
     }
 
     override fun onStop() {
-        serviceManager.stop()
+        //serviceManager.stop()
         state.youtubePlayerContext?.playerUi = null
         Log.d(TAG,"onStop()")
     }
@@ -50,6 +50,5 @@ class MainPresenter(
     companion object {
         val TAGP = "CuerLog"
         private val TAG = "$TAGP${MainPresenter::class.java.simpleName}"
-
     }
 }

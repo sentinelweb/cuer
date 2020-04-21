@@ -10,6 +10,10 @@ class YoutubeCastConnectionListener constructor(
     private val creator: YoutubePlayerContextCreator
 ) : ChromecastConnectionListener {
 
+    private var youTubePlayerListener: YouTubePlayerListener? = null
+    private var connectionState: ConnectionState? = null
+    private var chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext? = null
+
     var playerUi: CastPlayerContract.PlayerControls? = null
         get() = field
         set(value) {
@@ -19,10 +23,6 @@ class YoutubeCastConnectionListener constructor(
                 restoreState()
             }
         }
-
-    private var youTubePlayerListener: YouTubePlayerListener? = null
-    private var connectionState: ConnectionState? = null
-    private var chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext? = null
 
     override fun onChromecastConnecting() {
         connectionState = ConnectionState.CC_CONNECTING.also { playerUi?.setConnectionState(it) }
@@ -46,5 +46,9 @@ class YoutubeCastConnectionListener constructor(
 
     private fun restoreState() {
         connectionState?.apply { playerUi?.setConnectionState(this) }
+    }
+
+    fun isConnected():Boolean {
+        return connectionState == ConnectionState.CC_CONNECTED
     }
 }

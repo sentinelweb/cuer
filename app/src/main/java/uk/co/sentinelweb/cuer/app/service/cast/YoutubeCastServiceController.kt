@@ -17,7 +17,7 @@ class YoutubeCastServiceController constructor(
 
     fun initialise() {
         wrapper = creator.createContext(chromeCastWrapper.getCastContext()).apply {
-            playerUi = control
+            //playerUi = control
         }
 
     }
