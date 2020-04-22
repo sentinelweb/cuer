@@ -5,6 +5,10 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
+import uk.co.sentinelweb.cuer.app.queue.MediaToPlaylistItemMapper
+import uk.co.sentinelweb.cuer.app.queue.QueueMediator
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListModule
@@ -39,11 +43,17 @@ object Modules {
         factory { CoroutineContextProvider() }
         factory { LinkScanner() }
         single { CuerAppState() }
+        single<QueueMediatorContract.Mediator> { QueueMediator(
+            state = QueueMediatorState(),
+            repository = get(),
+            mediaMapper = MediaToPlaylistItemMapper(),
+            contextProvider = get()
+        ) }
     }
 
     private val wrapperModule = module {
         factory { ChromeCastWrapper(androidApplication()) }
-        factory { YoutubePlayerContextCreator() }
+        factory { YoutubePlayerContextCreator(get()) }
         factory { ToastWrapper(androidApplication()) }
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }
@@ -53,6 +63,5 @@ object Modules {
     val allModules = listOf(utilModule)
         .plus(wrapperModule)
         .plus(scopedModules)
-
         .plus(DatabaseModule.dbModule)
 }

@@ -7,9 +7,10 @@ class LinkScanner {
 
     fun scan(uriString: String): MediaDomain? {
         val uri = URI(uriString)
-        if (uri.host.toLowerCase().endsWith("youtu.be")) {
-            return createYt(uriString, uri.path)
-        } else if (uri.query != null && uri.host.toLowerCase().endsWith("youtube.com")) {
+        val host = uri.host.toLowerCase()
+        if (host.endsWith("youtu.be")) {
+            return createYt(uriString, uri.path.substring(1))
+        } else if (uri.query != null && host.endsWith("youtube.com")) {
             return parseQuery(uri.query)
                 .firstOrNull { it[0] == "v" }
                 ?.let {
