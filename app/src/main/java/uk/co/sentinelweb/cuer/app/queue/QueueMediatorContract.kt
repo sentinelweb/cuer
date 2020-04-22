@@ -19,6 +19,7 @@ interface QueueMediatorContract {
         fun getPlayList(): PlaylistDomain?
         fun addProducerListener(l: ProducerListener)
         fun removeProducerListener(l: ProducerListener)
+        fun removeItem(playlistItemDomain: PlaylistItemDomain)
     }
 
     interface ConsumerListener {

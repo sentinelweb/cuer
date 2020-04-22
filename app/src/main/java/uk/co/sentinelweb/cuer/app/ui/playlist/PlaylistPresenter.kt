@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
 import uk.co.sentinelweb.cuer.domain.MediaDomain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
 
 class PlaylistPresenter(
@@ -46,16 +47,22 @@ class PlaylistPresenter(
     }
 
     override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
-        toastWrapper.showToast("left: ${item.topText}")
+        // toastWrapper.showToast("left: ${item.topText}")
+        getDomainPlaylistItem(item)?.run {
+            queue.removeItem(this)
+        }
     }
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
-        queue.getPlayList()
+        getDomainPlaylistItem(item)?.run {
+            queue.onItemSelected(this)
+        }
+    }
+
+    private fun getDomainPlaylistItem(item: PlaylistModel.PlaylistItemModel): PlaylistItemDomain? {
+        return queue.getPlayList()
             ?.items
             ?.first { it.media.url == item.url }
-            ?.run {
-                queue.onItemSelected(this)
-            }
     }
 
     private fun initListCheck() {
@@ -90,8 +97,7 @@ class PlaylistPresenter(
     }
 
     private fun updateListContent(list: PlaylistDomain) {
-        list
-            .items
+        list.items
             .map { modelMapper.map(it) }
             .also { view.setList(it) }
     }

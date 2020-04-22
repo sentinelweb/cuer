@@ -81,6 +81,13 @@ class QueueMediator constructor(
 
     override fun getCurrentItem(): PlaylistItemDomain? = state.currentPlaylistItem
 
+    override fun removeItem(playlistItemDomain: PlaylistItemDomain) {
+        state.jobs.add(contextProvider.MainScope.launch {
+            repository.delete(playlistItemDomain.media)
+            refreshQueue()
+        })
+    }
+
     override fun refreshQueue() {
         state.jobs.add(contextProvider.MainScope.launch {
             // todo preserve position by checking current item
