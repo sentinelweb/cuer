@@ -39,8 +39,8 @@ class ItemView constructor(c: Context, a: AttributeSet?) : FrameLayout(c, a), It
                     override fun isSwiping(left: Boolean, offset: Float) {
                         val outSideTolerance = abs(offset) > resources.getDimension(R.dimen.list_item_swipe_dismiss_toerance)
                         if (outSideTolerance) {
-                            swipe_label_delete.fade(!left)
-                            swipe_label_keep.fade(left)
+                            swipe_label_right.fade(!left)
+                            swipe_label_left.fade(left)
                         }
                     }
 
@@ -61,8 +61,8 @@ class ItemView constructor(c: Context, a: AttributeSet?) : FrameLayout(c, a), It
     }
 
     private fun resetBackground() {
-        swipe_label_delete.fade(false)
-        swipe_label_keep.fade(false)
+        swipe_label_right.fade(false)
+        swipe_label_left.fade(false)
     }
 
     override fun setIconResource(iconRes: Int) {
