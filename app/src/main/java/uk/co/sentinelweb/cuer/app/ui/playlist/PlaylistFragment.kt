@@ -22,13 +22,17 @@ class PlaylistFragment :
 
     private val presenter: PlaylistContract.Presenter by currentScope.inject()
     private val adapter: PlaylistAdapter by currentScope.inject()
-    private val toastWrapper: ToastWrapper by inject()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         presenter.initialise()
         playlist_list.layoutManager = LinearLayoutManager(context)
         playlist_list.adapter = adapter
+    }
+
+    override fun onDestroyView() {
+        presenter.destroy()
+        super.onDestroyView()
     }
 
     override fun onResume() {
@@ -38,19 +42,19 @@ class PlaylistFragment :
     override fun setList(list: List<ItemModel>) {
         playlist_swipe.isRefreshing = false
         adapter.data = list
-        playlist_swipe.setOnRefreshListener { presenter.loadList() }
+        playlist_swipe.setOnRefreshListener { presenter.refreshList() }
     }
 
     override fun onClick(item: ItemModel) {
-        toastWrapper.showToast("click: ${item.topText}")
+        presenter.onItemClicked(item as PlaylistModel.PlaylistItemModel)
     }
 
     override fun onRightSwipe(item: ItemModel) {
-        toastWrapper.showToast("right: ${item.topText}")
+        presenter.onItemSwipeRight(item as PlaylistModel.PlaylistItemModel)
     }
 
     override fun onLeftSwipe(item: ItemModel) {
-        toastWrapper.showToast("left: ${item.topText}")
+        presenter.onItemSwipeLeft(item as PlaylistModel.PlaylistItemModel)
     }
 
     companion object {
@@ -58,7 +62,7 @@ class PlaylistFragment :
         val fragmentModule = module {
             scope(named<PlaylistFragment>()) {
                 scoped<PlaylistContract.View> { getSource() }
-                scoped<PlaylistContract.Presenter> { PlaylistPresenter(get(), get(), get(), get(), get()) }
+                scoped<PlaylistContract.Presenter> { PlaylistPresenter(get(), get(), get(), get(), get(), get(), get()) }
                 scoped { PlaylistModelMapper() }
                 scoped { PlaylistAdapter(get(), getSource()) }
                 viewModel { PlaylistState() }

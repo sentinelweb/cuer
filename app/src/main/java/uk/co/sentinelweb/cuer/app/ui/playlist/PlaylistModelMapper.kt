@@ -17,9 +17,10 @@ class PlaylistModelMapper constructor() {
     }
 
     fun map(media: MediaDomain): PlaylistModel.PlaylistItemModel {
-        val top = media.title ?: media.url
-        val bottom = if (media.title == null) "" else media.url
+        val top = media.title ?: "No title"
+        val bottom = media.url
         return PlaylistModel.PlaylistItemModel(
+            media.id.toString(),
             bottom,
             media.mediaType,
             top,

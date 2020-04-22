@@ -3,18 +3,19 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants.*
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi
-import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-class YouTubePlayerListener constructor(
-    private val state: YouTubePlayerListenerState
+class YouTubePlayerListener(
+    private val state: YouTubePlayerListenerState,
+    private val queue: QueueMediatorContract.Mediator
 ) : AbstractYouTubePlayerListener(),
-    CastPlayerContract.PlayerControls.Listener {
+    CastPlayerContract.PlayerControls.Listener,
+    QueueMediatorContract.ConsumerListener {
 
     private var youTubePlayer: YouTubePlayer? = null
-    val idProvider = Queue.VideoProvider() // todo remove & make queue interface
-    var currentItem: Queue.QueueItem? = null // todo move to player?
 
     var playerUi: CastPlayerContract.PlayerControls? = null
         get() = field
@@ -24,6 +25,10 @@ class YouTubePlayerListener constructor(
             } ?: cleanupPlayer(field)
             field = value
         }
+
+    init {
+        queue.addConsumerListener(this)
+    }
 
     // todo fix this - not clean
     private fun setupPlayer(it: CastPlayerContract.PlayerControls) {
@@ -39,17 +44,26 @@ class YouTubePlayerListener constructor(
         it?.reset()
     }
 
+    fun onDisconnected() {
+        youTubePlayer?.removeListener(this)
+        youTubePlayer = null
+        playerUi?.reset()
+        playerUi = null
+        queue.removeConsumerListener(this)
+    }
+
+    private fun loadVideo(item: PlaylistItemDomain?) {
+        item?.let {
+            youTubePlayer?.loadVideo(item.media.mediaId, 0f)
+            state.title = item.media.title ?: item.media.url
+            playerUi?.setTitle(state.title)
+        } ?: playerUi?.reset()
+    }
+
     // region AbstractYouTubePlayerListener
     override fun onReady(youTubePlayer: YouTubePlayer) {
         this.youTubePlayer = youTubePlayer
-        currentItem = idProvider.getNextVideo()
-        loadCurrentVideo()
-    }
-
-    private fun loadCurrentVideo() {
-        youTubePlayer?.loadVideo(currentItem?.getId()!!, 0f)
-        state.title = currentItem?.title ?: currentItem?.url ?: ""
-        playerUi?.setTitle(state.title)
+        loadVideo(queue.getCurrentItem())
     }
 
     override fun onApiChange(youTubePlayer: YouTubePlayer) {
@@ -70,7 +84,6 @@ class YouTubePlayerListener constructor(
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun onPlaybackQualityChange(youTubePlayer: YouTubePlayer, q: PlaybackQuality) {
         this.youTubePlayer = youTubePlayer
-
     }
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
@@ -123,13 +136,11 @@ class YouTubePlayerListener constructor(
     }
 
     override fun trackBack() {
-        currentItem = idProvider.getPreviousVideo()
-        loadCurrentVideo()
+        queue.lastItem()
     }
 
     override fun trackFwd() {
-        currentItem = idProvider.getNextVideo()
-        loadCurrentVideo()
+        queue.nextItem()
     }
 
     override fun seekTo(positionMs: Long) {
@@ -137,10 +148,9 @@ class YouTubePlayerListener constructor(
     }
     // endregion
 
-    fun onDisconnected() {
-        youTubePlayer?.removeListener(this)
-        youTubePlayer = null
-        playerUi?.reset()
-        playerUi = null
+    // region  QueueMediatorContract.ConsumerListener
+    override fun onItemChanged() {
+        loadVideo(queue.getCurrentItem())
     }
+    // endregion
 }

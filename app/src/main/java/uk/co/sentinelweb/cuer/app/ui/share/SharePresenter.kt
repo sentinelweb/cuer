@@ -19,11 +19,9 @@ class SharePresenter constructor(
         linkScanner
             .scan(uriString)
             ?.let {
-                val updated = jobs.add(CoroutineScope(contextProvider.Main).launch {
-                    async(contextProvider.IO) {
-                        repository.save(it)
-                        repository.loadList(MediaDatabaseRepository.MediaIdFilter(it.mediaId))[0]
-                    }.await()
+                jobs.add(CoroutineScope(contextProvider.Main).launch {
+                    repository.save(it)
+                    repository.loadList(MediaDatabaseRepository.MediaIdFilter(it.mediaId))[0]
                     view.launchYoutubeVideo(it.mediaId)
                     view.exit()
                 })

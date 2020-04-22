@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
+import java.lang.IllegalStateException
 
 class YoutubeCastServiceController constructor(
     private val service: YoutubeCastService,
@@ -38,6 +39,7 @@ class YoutubeCastServiceController constructor(
     }
 
     fun pushYoutubeContext(youtubePlayerContext: ChromecastYouTubePlayerContextWrapper) {
+        if (state.youtubePlayerContext != null) throw IllegalStateException("wrapper is already connected to service")
         state.youtubePlayerContext = youtubePlayerContext
         state.youtubePlayerContext?.playerUi = service.getPlayerControls()
     }
