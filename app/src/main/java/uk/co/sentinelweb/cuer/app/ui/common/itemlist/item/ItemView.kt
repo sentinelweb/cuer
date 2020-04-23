@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import com.squareup.picasso.Picasso
 // todo view binding
 import kotlinx.android.synthetic.main.view_media_item.view.*
 import kotlinx.android.synthetic.main.view_swipe_item.view.*
@@ -83,5 +84,9 @@ class ItemView constructor(c: Context, a: AttributeSet?) : FrameLayout(c, a), It
 
     override fun setPresenter(itemPresenter: ItemContract.Presenter) {
         presenter = itemPresenter
+    }
+
+    override fun setIconUrl(url: String) {
+        Picasso.get().load(url).into(listitem_icon)
     }
 }

@@ -62,7 +62,7 @@ class PlaylistFragment :
         val fragmentModule = module {
             scope(named<PlaylistFragment>()) {
                 scoped<PlaylistContract.View> { getSource() }
-                scoped<PlaylistContract.Presenter> { PlaylistPresenter(get(), get(), get(), get(), get(), get(), get()) }
+                scoped<PlaylistContract.Presenter> { PlaylistPresenter(get(), get(), get(), get(), get(), get(), get(), get()) }
                 scoped { PlaylistModelMapper() }
                 scoped { PlaylistAdapter(get(), getSource()) }
                 viewModel { PlaylistState() }

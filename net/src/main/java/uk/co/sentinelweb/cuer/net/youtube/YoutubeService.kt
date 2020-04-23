@@ -1,0 +1,16 @@
+package uk.co.sentinelweb.cuer.net.youtube
+
+import retrofit2.http.GET
+import retrofit2.http.Query
+import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubeVideosDto
+
+internal interface YoutubeService {
+    // doc page : https://developers.google.com/youtube/v3/docs/videos/list
+    // e.g. : https://www.googleapis.com/youtube/v3/videos?part=id,player,contentDetails,snippet,statistics,recordingDetails&id=8nhPVOM97Jg,fY7M3pzXdUo&key=xxx
+    @GET("videos")
+    suspend fun getVideoInfos(
+         @Query("id") ids: String,
+         @Query("part") parts:String,
+         @Query("key") key:String
+     ): YoutubeVideosDto
+}

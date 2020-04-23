@@ -6,11 +6,15 @@ import java.time.Instant
 class InstantTypeConverter {
 
     @TypeConverter
-    fun toDb(mt: Instant?): String = mt?.toString() ?: "null"
+    fun toDb(mt: Instant?): String = mt?.toString() ?: NULL_REPRESENTATION
 
     @TypeConverter
     fun fromDb(mt: String): Instant? = when (mt) {
-        "null" -> null
+        NULL_REPRESENTATION -> null
         else -> mt.let { Instant.parse(it) }
+    }
+
+    companion object {
+        private val NULL_REPRESENTATION = "null"
     }
 }

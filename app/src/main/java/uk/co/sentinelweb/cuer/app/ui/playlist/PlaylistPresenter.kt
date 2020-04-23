@@ -5,12 +5,13 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.util.provider.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
 import uk.co.sentinelweb.cuer.domain.MediaDomain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeVideosInteractor
 import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
 
 class PlaylistPresenter(
@@ -20,7 +21,8 @@ class PlaylistPresenter(
     private val modelMapper: PlaylistModelMapper,
     private val contextProvider: CoroutineContextProvider,
     private val queue: QueueMediatorContract.Mediator,
-    private val toastWrapper: ToastWrapper
+    private val toastWrapper: ToastWrapper,
+    private val ytInteractor: YoutubeVideosInteractor
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
     override fun initialise() {
@@ -71,6 +73,8 @@ class PlaylistPresenter(
             if (count == 0) {
                 Queue.ITEMS
                     .map { mapQueueToMedia(it) }
+                    .map { it.mediaId }
+                    .let { ytInteractor.videos(it) }
                     .also { repository.save(it) }
                     .also { loadList() }
             }

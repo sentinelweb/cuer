@@ -9,6 +9,7 @@ interface ItemContract {
         fun setIconResource(@DrawableRes iconRes:Int)
         fun setCheckedVisible(checked:Boolean)
         fun setPresenter(itemPresenter: Presenter)
+        fun setIconUrl(url: String)
     }
 
     interface Presenter {

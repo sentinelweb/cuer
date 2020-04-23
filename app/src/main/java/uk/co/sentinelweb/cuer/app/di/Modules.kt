@@ -5,6 +5,7 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
+import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.queue.MediaToPlaylistItemMapper
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -21,10 +22,12 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
-import uk.co.sentinelweb.cuer.app.util.provider.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
+import uk.co.sentinelweb.cuer.net.NetModule
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
 object Modules {
     private val scopedModules = listOf(
@@ -60,8 +63,14 @@ object Modules {
         factory { LogWrapper() }
     }
 
+    private val appNetModule = module {
+        factory<YoutubeApiKeyProvider> { CuerYoutubeApiKeyProvider() }
+    }
+
     val allModules = listOf(utilModule)
         .plus(wrapperModule)
         .plus(scopedModules)
+        .plus(appNetModule)
         .plus(DatabaseModule.dbModule)
+        .plus(NetModule.netModule)
 }
