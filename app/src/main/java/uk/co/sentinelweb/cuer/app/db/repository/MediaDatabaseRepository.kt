@@ -31,7 +31,6 @@ class MediaDatabaseRepository constructor(
             .let { mediaMapper.map(it) }
     }
 
-
     override suspend fun loadList(filter: DatabaseRepository.Filter?)
             : List<MediaDomain> = withContext(coProvider.IO) {
         when (filter) {
