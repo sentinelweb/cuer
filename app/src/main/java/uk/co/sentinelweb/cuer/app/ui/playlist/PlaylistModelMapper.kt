@@ -25,7 +25,8 @@ class PlaylistModelMapper constructor() {
             media.mediaType,
             top,
             media.duration?.let { "${(it / 1000)}s" } ?: "-",
-            media.positon?.let { "${(it / 1000)}s" } ?: "-"
+            media.positon?.let { "${(it / 1000)}s" } ?: "-",
+            media.thumbNail?.url
         )
     }
 }

@@ -22,11 +22,12 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
-import uk.co.sentinelweb.cuer.app.util.provider.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
 import uk.co.sentinelweb.cuer.net.NetModule
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
 object Modules {
     private val scopedModules = listOf(
@@ -63,7 +64,7 @@ object Modules {
     }
 
     private val appNetModule = module {
-        factory { CuerYoutubeApiKeyProvider() }
+        factory<YoutubeApiKeyProvider> { CuerYoutubeApiKeyProvider() }
     }
 
     val allModules = listOf(utilModule)

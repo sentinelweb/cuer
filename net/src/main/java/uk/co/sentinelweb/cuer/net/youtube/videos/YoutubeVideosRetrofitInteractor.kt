@@ -1,9 +1,10 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.net.YoutubeVideosInteractor
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeVideosInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
-import uk.co.sentinelweb.cuer.net.youtube.YoutubePart
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import java.io.IOException
 
@@ -13,9 +14,11 @@ internal class YoutubeVideosRetrofitInteractor constructor(
     private val mapper: YoutubeVideoMediaDomainMapper
 ) : YoutubeVideosInteractor {
 
-    suspend override fun videos(ids: List<String>, parts: List<YoutubePart>): List<MediaDomain> {
+    suspend override fun videos(ids: List<String>, parts: List<YoutubePart>): List<MediaDomain>  = withContext(
+       Dispatchers.IO
+    ) {
         try {
-            return service.getVideoInfos(
+            service.getVideoInfos(
                 ids = ids.joinToString(separator = ","),
                 parts = parts.map { it.part }.joinToString(separator = ","),
                 key = keyProvider.key

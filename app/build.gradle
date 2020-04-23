@@ -46,6 +46,7 @@ android {
 dependencies {
     // project
     implementation project(":domain")
+    implementation project(":core")
     implementation project(":net")
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -56,6 +57,7 @@ dependencies {
     implementation "com.google.android.material:material:$ver_material"
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
+    implementation "com.squareup.picasso:picasso:$ver_picasso"
 
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"

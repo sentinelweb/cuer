@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.net.youtube
+package uk.co.sentinelweb.cuer.net.youtube.videos
 
 enum class YoutubePart(val part:String, val cost:Int, val requireAuth: Boolean) {
     ID("id",0,false),

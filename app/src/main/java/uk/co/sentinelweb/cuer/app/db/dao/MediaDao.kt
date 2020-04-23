@@ -20,7 +20,7 @@ interface MediaDao {
     @Query("SELECT * FROM media WHERE id == :id")
     fun load(id: Int): MediaEntity
 
-    @Query("SELECT * FROM media WHERE mediaId LIKE :mediaId LIMIT 1")
+    @Query("SELECT * FROM media WHERE media_id LIKE :mediaId LIMIT 1")
     fun findByMediaId(mediaId: String): MediaEntity
 
     @Insert

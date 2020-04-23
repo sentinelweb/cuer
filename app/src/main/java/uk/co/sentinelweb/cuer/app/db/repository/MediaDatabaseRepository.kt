@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.db.repository
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.dao.MediaDao
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
-import uk.co.sentinelweb.cuer.app.util.provider.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class MediaDatabaseRepository constructor(

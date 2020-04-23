@@ -2,16 +2,17 @@ package uk.co.sentinelweb.cuer.app.db.typeconverter
 
 import androidx.room.TypeConverter
 import java.time.Instant
+import java.time.LocalDateTime
 
-class InstantTypeConverter {
-
-    @TypeConverter
-    fun toDb(mt: Instant?): String = mt?.toString() ?: NULL_REPRESENTATION
+class LocalDateTimeTypeConverter {
 
     @TypeConverter
-    fun fromDb(mt: String): Instant? = when (mt) {
+    fun toDb(mt: LocalDateTime?): String = mt?.toString() ?: NULL_REPRESENTATION
+
+    @TypeConverter
+    fun fromDb(mt: String): LocalDateTime? = when (mt) {
         NULL_REPRESENTATION -> null
-        else -> mt.let { Instant.parse(it) }
+        else -> mt.let { LocalDateTime.parse(it) }
     }
 
     companion object {

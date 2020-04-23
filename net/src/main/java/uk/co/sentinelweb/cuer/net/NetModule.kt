@@ -4,6 +4,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.net.retrofit.RetrofitBuilder
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeVideosInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubeVideoMediaDomainMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubeVideosRetrofitInteractor
 

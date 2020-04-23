@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.provider
+package uk.co.sentinelweb.cuer.core.providers
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

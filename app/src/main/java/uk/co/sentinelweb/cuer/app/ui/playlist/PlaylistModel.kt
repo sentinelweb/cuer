@@ -13,12 +13,14 @@ data class PlaylistModel constructor(
         val type: MediaDomain.MediaTypeDomain,
         val title: String,
         val length: String,
-        val positon: String
+        val positon: String,
+        override val thumbNailUrl: String?
     ) : ItemModel(
         id,
         title,
         url,
         false,
-        R.drawable.ic_play_black
+        R.drawable.ic_play_black,
+        thumbNailUrl
     )
 }

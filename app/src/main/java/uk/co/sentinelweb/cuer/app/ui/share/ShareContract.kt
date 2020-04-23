@@ -9,7 +9,7 @@ interface ShareContract {
 
     interface View {
         fun exit()
-        fun launchYoutubeVideo(youtubeId: String)
+        fun gotoMain(youtubeId: String?)
         fun error(msg: String)
     }
 }

@@ -4,6 +4,7 @@ apply plugin: "org.jetbrains.kotlin.jvm"
 
 dependencies {
     api project(":domain")
+    api project(":core")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core"
@@ -24,7 +25,6 @@ dependencies {
 }
 
 test {
-    print CUER_YOUTUBE_API_KEY
     systemProperty 'CUER_YOUTUBE_API_KEY', "xxxx"//"$CUER_YOUTUBE_API_KEY"
 }
 

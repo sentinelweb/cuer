@@ -47,7 +47,7 @@ class PlaylistAdapter constructor(
     override fun getItemCount(): Int = data.size
 
     companion object {
-        private val UNKNOWN_ITEM = ItemModel("0", "top", "bottom", false, R.drawable.ic_play_black)
+        private val UNKNOWN_ITEM = ItemModel("0", "top", "bottom", false, R.drawable.ic_play_black, null)
     }
 
 }

@@ -10,7 +10,11 @@ class ItemPresenter (
         view.setTopText(item.topText)
         view.setBottomText(item.bottomText)
         view.setCheckedVisible(item.checkIcon)
-        view.setIconResource(item.iconRes)
+        item.thumbNailUrl
+            ?.apply { view.setIconUrl(this) }
+            ?:item.iconRes
+                ?.apply { view.setIconResource(this) }
+
         state.item = item
     }
 

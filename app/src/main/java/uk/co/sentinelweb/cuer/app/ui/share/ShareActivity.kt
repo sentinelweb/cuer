@@ -45,10 +45,10 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         finish()
     }
 
-    override fun launchYoutubeVideo(youtubeId: String) {
+    override fun gotoMain(youtubeId: String?) {
         startActivity(
             Intent(this, MainActivity::class.java).apply {
-                putExtra("YTID", youtubeId)
+                youtubeId?.let { putExtra("YTID", it) }
             })
     }
 
@@ -58,7 +58,15 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         val activityModule = module {
             scope(named<ShareActivity>()) {
                 scoped<ShareContract.View> { getSource() }
-                scoped<ShareContract.Presenter> { SharePresenter(get(), get(), get(), get()) }
+                scoped<ShareContract.Presenter> {
+                    SharePresenter(
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get()
+                    )
+                }
             }
         }
     }
