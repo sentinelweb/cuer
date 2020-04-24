@@ -13,7 +13,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.scope.Scope
 import org.koin.ext.getOrCreateScope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.service.cast.notif.player.PlayerControlsNotificationPresenter
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper

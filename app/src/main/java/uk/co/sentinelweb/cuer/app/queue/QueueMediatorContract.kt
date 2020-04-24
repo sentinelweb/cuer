@@ -8,7 +8,7 @@ interface QueueMediatorContract {
 
     interface Mediator {
         fun onItemSelected(playlistItem: PlaylistItemDomain)
-        fun updateMediaItem(domain: MediaDomain)
+        fun updateMediaItem(media: MediaDomain)
         fun addConsumerListener(l: ConsumerListener)
         fun removeConsumerListener(l: ConsumerListener)
         fun destroy()
@@ -20,6 +20,7 @@ interface QueueMediatorContract {
         fun addProducerListener(l: ProducerListener)
         fun removeProducerListener(l: ProducerListener)
         fun removeItem(playlistItemDomain: PlaylistItemDomain)
+        fun onTrackEnded(media: MediaDomain?)
     }
 
     interface ConsumerListener {

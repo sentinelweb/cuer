@@ -14,6 +14,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.util.wrapper.AlertDialogWrapper
 
 class PlaylistFragment :
     Fragment(R.layout.playlist_fragment),
@@ -22,6 +23,11 @@ class PlaylistFragment :
 
     private val presenter: PlaylistContract.Presenter by currentScope.inject()
     private val adapter: PlaylistAdapter by currentScope.inject()
+    private val alertWrapper: AlertDialogWrapper by currentScope.inject()
+
+    override fun showAlert(msg: String) {
+        alertWrapper.showMessage("Alert", msg)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -65,6 +71,7 @@ class PlaylistFragment :
                 scoped<PlaylistContract.Presenter> { PlaylistPresenter(get(), get(), get(), get(), get(), get(), get(), get()) }
                 scoped { PlaylistModelMapper() }
                 scoped { PlaylistAdapter(get(), getSource()) }
+                scoped { AlertDialogWrapper(getSource()) }
                 viewModel { PlaylistState() }
             }
         }
