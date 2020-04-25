@@ -6,11 +6,13 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Abs
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi
+import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class YouTubePlayerListener(
     private val state: YouTubePlayerListenerState,
-    private val queue: QueueMediatorContract.Mediator
+    private val queue: QueueMediatorContract.Mediator,
+    private val log: LogWrapper
 ) : AbstractYouTubePlayerListener(),
     CastPlayerContract.PlayerControls.Listener,
     QueueMediatorContract.ConsumerListener {
@@ -27,6 +29,7 @@ class YouTubePlayerListener(
         }
 
     init {
+        log.tag = "YouTubePlayer"
         queue.addConsumerListener(this)
     }
 
@@ -126,6 +129,7 @@ class YouTubePlayerListener(
 
     override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
         this.youTubePlayer = youTubePlayer
+        log.d("Got id: $videoId")
     }
 
     override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {

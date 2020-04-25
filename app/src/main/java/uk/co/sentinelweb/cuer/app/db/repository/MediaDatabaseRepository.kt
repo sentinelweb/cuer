@@ -26,9 +26,9 @@ class MediaDatabaseRepository constructor(
         true
     }
 
-    override suspend fun load(id: Int): MediaDomain = withContext(coProvider.IO) {
+    override suspend fun load(id: Int): MediaDomain? = withContext(coProvider.IO) {
         mediaDao.load(id)
-            .let { mediaMapper.map(it) }
+            ?.let { mediaMapper.map(it) }
     }
 
     override suspend fun loadList(filter: DatabaseRepository.Filter?)
@@ -41,7 +41,8 @@ class MediaDatabaseRepository constructor(
             is MediaIdFilter ->
                 mediaDao
                     .findByMediaId(filter.mediaId)
-                    .let { listOf(mediaMapper.map(it)) }
+                    ?.let { listOf(mediaMapper.map(it)) }
+                    ?: listOf()
             else ->
                 mediaDao
                     .getAll()

@@ -6,7 +6,7 @@ interface DatabaseRepository<Domain> {
 
     suspend fun save(domains: List<Domain>): Boolean
 
-    suspend fun load(id: Int): Domain
+    suspend fun load(id: Int): Domain?
 
     suspend fun loadList(filter: Filter? = null): List<Domain>
 

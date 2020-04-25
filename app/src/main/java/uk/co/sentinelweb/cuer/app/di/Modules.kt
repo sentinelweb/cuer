@@ -52,7 +52,8 @@ object Modules {
                 state = QueueMediatorState(),
                 repository = get(),
                 mediaMapper = MediaToPlaylistItemMapper(),
-                contextProvider = get()
+                contextProvider = get(),
+                castWrapper = get()
             )
         }
         single { ChromecastYouTubePlayerContextHolder(get(), get()) }
@@ -60,7 +61,7 @@ object Modules {
 
     private val wrapperModule = module {
         factory { ChromeCastWrapper(androidApplication()) }
-        factory { YoutubePlayerContextCreator(get()) }
+        factory { YoutubePlayerContextCreator(get(), get()) }
         factory { ToastWrapper(androidApplication()) }
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }

@@ -60,11 +60,12 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
                 scoped<ShareContract.View> { getSource() }
                 scoped<ShareContract.Presenter> {
                     SharePresenter(
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get()
+                        view = get(),
+                        repository = get(),
+                        linkScanner = get(),
+                        contextProvider = get(),
+                        ytInteractor = get(),
+                        toast = get()
                     )
                 }
             }

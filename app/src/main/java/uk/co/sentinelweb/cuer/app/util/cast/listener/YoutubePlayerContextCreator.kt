@@ -3,9 +3,11 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 import com.google.android.gms.cast.framework.CastContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 
 class YoutubePlayerContextCreator constructor(
-    private val queue: QueueMediatorContract.Mediator
+    private val queue: QueueMediatorContract.Mediator,
+    private val log: LogWrapper
 ) {
 
     fun createContext(
@@ -18,5 +20,5 @@ class YoutubePlayerContextCreator constructor(
         )
     }
 
-    fun createListener() = YouTubePlayerListener(YouTubePlayerListenerState(), queue)
+    fun createListener() = YouTubePlayerListener(YouTubePlayerListenerState(), queue, log)
 }
