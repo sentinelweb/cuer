@@ -75,6 +75,13 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         presenter.onStop()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+    }
+
+    override fun isRecreating() = isChangingConfigurations
+
     companion object {
         private val SERVICES_REQUEST_CODE = 1
 
@@ -84,7 +91,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                 scoped<MainContract.View> { getSource() }
                 scoped<MainContract.Presenter> {
                     MainPresenter(
-                        get(),
                         get(),
                         get(),
                         get(),

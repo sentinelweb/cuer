@@ -1,8 +1,6 @@
 package uk.co.sentinelweb.cuer.app.util.cast.ui
 
 import androidx.lifecycle.ViewModel
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.CC_DISCONNECTED
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi
 
 class CastPlayerState constructor(
@@ -11,5 +9,6 @@ class CastPlayerState constructor(
     var positionMs: Long = 0,
     var seekPositionMs: Long = 0,
     var durationMs: Long = 0,
-    var title: String = ""
+    var title: String = "",
+    var isDestroyed: Boolean = false
 ) : ViewModel()

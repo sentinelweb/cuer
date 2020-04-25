@@ -8,11 +8,15 @@ class YoutubeCastServiceManager constructor(
 ) {
 
     fun start() {
-        app.startForegroundService(intent())
+        if (!isRunning()) {
+            app.startForegroundService(intent())
+        }
     }
 
     fun stop() {
-        app.stopService(intent())
+        if (isRunning()) {
+            app.stopService(intent())
+        }
     }
 
     fun get():YoutubeCastService? = YoutubeCastService.instance()

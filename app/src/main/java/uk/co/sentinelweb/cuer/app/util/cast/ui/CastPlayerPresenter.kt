@@ -10,6 +10,14 @@ class CastPlayerPresenter(
     private val state: CastPlayerState
 ) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls {
 
+    override fun initialise() {
+        state.isDestroyed = false
+    }
+
+    override fun onDestroyView() {
+        state.isDestroyed = true
+    }
+
     override fun addListener(l: CastPlayerContract.PlayerControls.Listener) {
         state.listeners.add(l)
     }
@@ -109,10 +117,12 @@ class CastPlayerPresenter(
     }
 
     override fun reset() {
-        state.title = "".apply { view.setTitle(this) }
-        state.positionMs = 0L.apply { view.setCurrentSecond(this.toString()) }
-        state.durationMs = 0L.apply { view.setDuration(this.toString()) }
-        view.setPaused()
+        if (!state.isDestroyed) {
+            state.title = "No media".apply { view.setTitle(this) }
+            state.positionMs = 0L.apply { view.setCurrentSecond(this.toString()) }
+            state.durationMs = 0L.apply { view.setDuration(this.toString()) }
+            view.setPaused()
+        }
     }
 
     override fun restoreState() {

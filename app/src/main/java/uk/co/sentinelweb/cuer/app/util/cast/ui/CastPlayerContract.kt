@@ -11,6 +11,8 @@ interface CastPlayerContract {
         fun onTrackFwdPressed()
         fun onSeekChanged(ratio: Float)
         fun onSeekFinished()
+        fun onDestroyView()
+        fun initialise()
     }
 
     interface PlayerControls {
