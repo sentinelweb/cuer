@@ -78,14 +78,6 @@ class YoutubeCastService : Service(), KoinComponent {
 
 
     override fun onBind(p0: Intent?): IBinder? = null
-//
-//    fun popYoutubeContext(): ChromecastYouTubePlayerContextWrapper? {
-//        return controller.pullYoutubeContext()
-//    }
-//
-//    fun pushYoutubeContext(youtubePlayerContext: ChromecastYouTubePlayerContextWrapper) {
-//        controller.pushYoutubeContext(youtubePlayerContext)
-//    }
 
     fun getPlayerControls():CastPlayerContract.PlayerControls {
         return PlayerControlsNotificationPresenter()

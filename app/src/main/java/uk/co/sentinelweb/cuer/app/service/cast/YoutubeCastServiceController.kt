@@ -11,9 +11,7 @@ class YoutubeCastServiceController constructor(
 ) {
 
     fun initialise() {
-//        wrapper = creator.createContext(chromeCastWrapper.getCastContext()).apply {
-//            //playerUi = control
-//        }
+
     }
 
     fun destroy() {
@@ -23,21 +21,6 @@ class YoutubeCastServiceController constructor(
     }
 
     fun pause() {
-        // doesnt work - may have to retain the one ChromecastYouTubePlayerContextWrapper
-        //control.listeners.get(0).pause()
     }
 
-//    fun pullYoutubeContext(): ChromecastYouTubePlayerContextWrapper? {
-//        val wrapper = state.youtubePlayerContext
-//        state.youtubePlayerContext = null
-//        state.youtubePlayerContext?.playerUi = null
-//        return wrapper
-//    }
-//
-//    fun pushYoutubeContext(youtubePlayerContext: ChromecastYouTubePlayerContextWrapper) {
-//        if (state.youtubePlayerContext != null) throw IllegalStateException("wrapper is already connected to service")
-//        state.youtubePlayerContext = youtubePlayerContext
-//        state.youtubePlayerContext?.playerUi = service.getPlayerControls()
-//
-//    }
 }
