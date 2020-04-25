@@ -5,6 +5,8 @@ import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistDomainMode.LOOP
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistDomainMode.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class QueueMediator constructor(
@@ -24,15 +26,16 @@ class QueueMediator constructor(
     }
 
     override fun onItemSelected(playlistItem: PlaylistItemDomain) {
-        // todo if item not in queue? add it? or exception .. not sure
-        state.queuePosition = state.currentPlayList
-            ?.items
-            ?.indexOfFirst { it.media.url == playlistItem.media.url }
-            ?: 0
-        updateCurrentItem()
+        if (playlistItem != state.currentPlaylistItem) {
+            state.queuePosition = state.currentPlayList
+                ?.items
+                ?.indexOfFirst { it.media.url == playlistItem.media.url }
+                ?: throw IllegalStateException("playlistItem not in playlist")
+            updateCurrentItem()
+        }
     }
 
-    override fun updateMediaItem(domain: MediaDomain) {
+    override fun updateMediaItem(media: MediaDomain) {
         // update media and playlist
     }
 
@@ -57,12 +60,16 @@ class QueueMediator constructor(
     }
 
     override fun nextItem() {
-        state.queuePosition++
-        // todo if loop, shuffle, etc
-        if (state.queuePosition == state.currentPlayList!!.items.size) {
-            state.queuePosition = 0
+        if (state.currentPlayList?.mode == LOOP || state.currentPlayList?.mode == SINGLE) {
+            state.queuePosition++
+            if (state.queuePosition == state.currentPlayList!!.items.size
+            ) {
+                state.queuePosition = 0
+            }
         }
-        updateCurrentItem()
+        if (state.queuePosition < state.currentPlayList!!.items.size) {
+            updateCurrentItem()
+        }
     }
 
     override fun lastItem() {
@@ -86,6 +93,10 @@ class QueueMediator constructor(
             repository.delete(playlistItemDomain.media)
             refreshQueue()
         })
+    }
+
+    override fun onTrackEnded(media: MediaDomain?) {
+        nextItem()
     }
 
     override fun refreshQueue() {

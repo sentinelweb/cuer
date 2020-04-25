@@ -6,9 +6,13 @@ interface MainContract {
         fun onStart()
         fun onStop()
         fun onPlayServicesOk()
+        fun onDestroy()
+
     }
 
     interface View {
         fun checkPlayServices()
+        fun isRecreating(): Boolean
+        fun showMessage(msg: String)
     }
 }

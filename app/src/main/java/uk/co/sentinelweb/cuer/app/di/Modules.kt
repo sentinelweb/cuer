@@ -20,12 +20,13 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.share.LinkScanner
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
+import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
@@ -46,12 +47,15 @@ object Modules {
         factory { CoroutineContextProvider() }
         factory { LinkScanner() }
         single { CuerAppState() }
-        single<QueueMediatorContract.Mediator> { QueueMediator(
-            state = QueueMediatorState(),
-            repository = get(),
-            mediaMapper = MediaToPlaylistItemMapper(),
-            contextProvider = get()
-        ) }
+        single<QueueMediatorContract.Mediator> {
+            QueueMediator(
+                state = QueueMediatorState(),
+                repository = get(),
+                mediaMapper = MediaToPlaylistItemMapper(),
+                contextProvider = get()
+            )
+        }
+        single { ChromecastYouTubePlayerContextHolder(get(), get()) }
     }
 
     private val wrapperModule = module {

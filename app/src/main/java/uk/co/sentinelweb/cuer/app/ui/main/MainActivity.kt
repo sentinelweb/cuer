@@ -17,11 +17,13 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
 class MainActivity : AppCompatActivity(), MainContract.View {
 
     private val presenter: MainContract.Presenter by currentScope.inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
+    private val snackBarWrapper: SnackbarWrapper by currentScope.inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +77,17 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         presenter.onStop()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+    }
+
+    override fun isRecreating() = isChangingConfigurations
+
+    override fun showMessage(msg: String) {
+        snackBarWrapper.show(msg)
+    }
+
     companion object {
         private val SERVICES_REQUEST_CODE = 1
 
@@ -89,7 +102,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                         get(),
                         get(),
                         get(),
-                        get(),
                         get()
                     )
                 }
@@ -99,6 +111,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                         .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).playerControls
                 }
                 viewModel { MainState() }
+                scoped { SnackbarWrapper(getSource()) }
             }
         }
     }

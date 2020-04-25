@@ -16,5 +16,6 @@ interface PlaylistContract {
 
     interface View {
         fun setList(list: List<ItemModel>)
+        fun showAlert(msg: String)
     }
 }

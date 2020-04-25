@@ -32,7 +32,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        /* init */ presenter
+        presenter.initialise()
         _binding = CastPlayerViewBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -61,6 +61,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        presenter.onDestroyView()
         _binding = null
     }
 

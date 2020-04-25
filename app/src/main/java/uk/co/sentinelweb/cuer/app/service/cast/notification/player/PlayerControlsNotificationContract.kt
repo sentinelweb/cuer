@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.service.cast.notif.player
+package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 

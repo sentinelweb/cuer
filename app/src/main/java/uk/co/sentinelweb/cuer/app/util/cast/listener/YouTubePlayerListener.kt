@@ -33,7 +33,7 @@ class YouTubePlayerListener(
     // todo fix this - not clean
     private fun setupPlayer(it: CastPlayerContract.PlayerControls) {
         it.addListener(this)
-        it.setTitle(state.title)
+        it.setTitle(state.currentMedia?.title ?: "No Media")
         it.setPlayerState(state.playState)
         it.setDuration(state.durationSec)
         it.setCurrentSecond(state.positionSec)
@@ -55,9 +55,14 @@ class YouTubePlayerListener(
     private fun loadVideo(item: PlaylistItemDomain?) {
         item?.let {
             youTubePlayer?.loadVideo(item.media.mediaId, 0f)
-            state.title = item.media.title ?: item.media.url
-            playerUi?.setTitle(state.title)
+            updateStateForMedia(item)
         } ?: playerUi?.reset()
+    }
+
+    private fun updateStateForMedia(item: PlaylistItemDomain): Unit? {
+        state.currentMedia = item.media
+        val displayTitle = item.media.title ?: item.media.url
+        return playerUi?.setTitle(displayTitle)
     }
 
     // region AbstractYouTubePlayerListener
@@ -108,17 +113,19 @@ class YouTubePlayerListener(
             PlayerState.VIDEO_CUED -> PlayerStateUi.VIDEO_CUED
         }
         playerUi?.setPlayerState(state.playState)
+        if (state.playState == PlayerStateUi.ENDED) {
+            queue.onTrackEnded(state.currentMedia)
+        }
     }
 
     override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
         this.youTubePlayer = youTubePlayer
-        state.positionSec = duration
+        state.durationSec = duration
         playerUi?.setDuration(duration)
     }
 
     override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
         this.youTubePlayer = youTubePlayer
-        // todo get video info
     }
 
     override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {
