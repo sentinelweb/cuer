@@ -62,7 +62,8 @@ class QueueMediator constructor(
     override fun nextItem() {
         if (state.currentPlayList?.mode == LOOP || state.currentPlayList?.mode == SINGLE) {
             state.queuePosition++
-            if (state.queuePosition == state.currentPlayList!!.items.size
+            if (state.currentPlayList?.mode == LOOP &&
+                state.queuePosition >= state.currentPlayList!!.items.size
             ) {
                 state.queuePosition = 0
             }
