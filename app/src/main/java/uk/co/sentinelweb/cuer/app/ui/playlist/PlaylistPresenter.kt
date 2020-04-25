@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
@@ -22,7 +23,8 @@ class PlaylistPresenter(
     private val contextProvider: CoroutineContextProvider,
     private val queue: QueueMediatorContract.Mediator,
     private val toastWrapper: ToastWrapper,
-    private val ytInteractor: YoutubeVideosInteractor
+    private val ytInteractor: YoutubeVideosInteractor,
+    private val ytContextHolder: ChromecastYouTubePlayerContextHolder
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
     override fun initialise() {
@@ -56,6 +58,10 @@ class PlaylistPresenter(
     }
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
+        if (!(ytContextHolder.get()?.isConnected() ?: false)) {
+            view.showAlert("Please connect to a chromecast")
+            return
+        }
         getDomainPlaylistItem(item)?.run {
             queue.onItemSelected(this)
         }

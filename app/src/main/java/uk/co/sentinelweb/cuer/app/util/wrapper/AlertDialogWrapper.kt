@@ -1,9 +1,9 @@
 package uk.co.sentinelweb.cuer.app.util.wrapper
 
+import android.app.Activity
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 
-class AlertDialogWrapper constructor(val activity:AppCompatActivity) {
+class AlertDialogWrapper constructor(val activity: Activity) {
 
     fun showMessage(title: String, text: String, okTapped: () -> Unit = {}): Unit = AlertDialog
         .Builder(activity)

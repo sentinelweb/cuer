@@ -26,12 +26,13 @@ class QueueMediator constructor(
     }
 
     override fun onItemSelected(playlistItem: PlaylistItemDomain) {
-        // todo if item not in queue? add it? or exception .. not sure
-        state.queuePosition = state.currentPlayList
-            ?.items
-            ?.indexOfFirst { it.media.url == playlistItem.media.url }
-            ?: 0
-        updateCurrentItem()
+        if (playlistItem != state.currentPlaylistItem) {
+            state.queuePosition = state.currentPlayList
+                ?.items
+                ?.indexOfFirst { it.media.url == playlistItem.media.url }
+                ?: throw IllegalStateException("playlistItem not in playlist")
+            updateCurrentItem()
+        }
     }
 
     override fun updateMediaItem(media: MediaDomain) {
