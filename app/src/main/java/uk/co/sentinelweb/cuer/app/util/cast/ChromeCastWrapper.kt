@@ -35,6 +35,7 @@ class ChromeCastWrapper(val application: Application) {// TODO check change to c
 
     fun getCastContext() : CastContext = CastContext.getSharedInstance(application)
 
+    // from: https://code.tutsplus.com/tutorials/google-play-services-google-cast-v3-and-media--cms-26893
     fun getRemoteClient() =
         CastContext.getSharedInstance(application).sessionManager.currentCastSession?.remoteMediaClient
 

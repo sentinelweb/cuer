@@ -5,11 +5,12 @@ import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 interface PlayerControlsNotificationContract {
 
     interface Presenter : CastPlayerContract.PlayerControls {
-
+        fun show()
     }
 
     interface View {
 
+        fun showNotification()
     }
 
 }

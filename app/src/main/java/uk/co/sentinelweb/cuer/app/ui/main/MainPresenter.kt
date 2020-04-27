@@ -72,11 +72,10 @@ class MainPresenter(
     override fun onDestroy() {
         if (ytContextHolder.isCreated() && !ytContextHolder.get()!!.isConnected()) {
             ytContextHolder.destroy()
-        } else {
-            if (!view.isRecreating()) {
-                ytServiceManager.start()
-            }
+        } else if (!view.isRecreating()) {
+            ytServiceManager.start()
         }
+
 //        if (state.youtubePlayerContext!!.isConnected()) {
 //            // move to service
 //            log.d("onStop(): push cxt to svc state_cxt:${state.youtubePlayerContext}, controls:${playerControls}")

@@ -2,9 +2,16 @@ package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 
-class PlayerControlsNotificationPresenter : PlayerControlsNotificationContract.Presenter {
+class PlayerControlsNotificationPresenter constructor(
+    private val view: PlayerControlsNotificationContract.View
+) : PlayerControlsNotificationContract.Presenter {
+
     override fun initMediaRouteButton() {
 
+    }
+
+    override fun show() {
+        view.showNotification()
     }
 
     override fun setConnectionState(connState: CastPlayerContract.ConnectionState) {

@@ -86,6 +86,7 @@ class QueueMediator constructor(
 
     private fun updateCurrentItem() {
         state.currentPlaylistItem = state.currentPlayList!!.items[state.queuePosition]
+        // doesnt work at all!!
         //castWrapper.getRemoteClient()?.load(castWrapper.buildMediaInfo(state.currentPlaylistItem!!.media))
         consumerListeners.forEach { it.onItemChanged() }
     }

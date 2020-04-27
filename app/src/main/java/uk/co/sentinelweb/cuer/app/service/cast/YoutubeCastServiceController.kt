@@ -1,17 +1,23 @@
 package uk.co.sentinelweb.cuer.app.service.cast
 
-import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
-import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
+import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 
 class YoutubeCastServiceController constructor(
     private val service: YoutubeCastService,
-    private val creator: YoutubePlayerContextCreator,
-    private val chromeCastWrapper: ChromeCastWrapper,
-    private val state: YoutubeCastServiceState
+    private val state: YoutubeCastServiceState,
+    private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val notification: PlayerControlsNotificationContract.Presenter
 ) {
-
     fun initialise() {
+        notification.show()
+    }
 
+    fun handleAction(action: String?) {
+        if (ACTION_PAUSE == action) {
+            //controller.pause()
+            // notification.
+        }
     }
 
     fun destroy() {
@@ -23,4 +29,8 @@ class YoutubeCastServiceController constructor(
     fun pause() {
     }
 
+    companion object {
+        private const val NOTIF_ID = 34564
+        private const val ACTION_PAUSE = "pause"
+    }
 }
