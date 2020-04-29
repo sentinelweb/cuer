@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
@@ -53,15 +54,16 @@ object Modules {
                 repository = get(),
                 mediaMapper = MediaToPlaylistItemMapper(),
                 contextProvider = get(),
-                castWrapper = get()
+                mediaSessionManager = get()
             )
         }
         single { ChromecastYouTubePlayerContextHolder(get(), get()) }
+        factory { MediaSessionManager(get(), androidApplication(), get()) }
     }
 
     private val wrapperModule = module {
         factory { ChromeCastWrapper(androidApplication()) }
-        factory { YoutubePlayerContextCreator(get(), get()) }
+        factory { YoutubePlayerContextCreator(get(), get(), get()) }
         factory { ToastWrapper(androidApplication()) }
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }

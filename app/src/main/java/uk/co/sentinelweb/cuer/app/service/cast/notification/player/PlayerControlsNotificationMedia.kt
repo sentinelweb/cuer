@@ -11,9 +11,12 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_PLAY
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPB
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPF
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_TRACKB
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import androidx.media.app.NotificationCompat as MediaNotificationCompat
 
-class PlayerControlsNotification constructor(
+class PlayerControlsNotificationMedia constructor(
     private val service: YoutubeCastService,
     private val appState: CuerAppState
 ) : PlayerControlsNotificationContract.View {
@@ -25,8 +28,8 @@ class PlayerControlsNotification constructor(
         val playPendingIntent: PendingIntent = pendingIntent(ACTION_PLAY)
         val skipfPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPF)
         val skipbPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPB)
-//        val trackfPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKF)
-//        val trackbPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKB)
+        val trackfPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKF)
+        val trackbPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKB)
 
         val contentIntent = Intent(service, MainActivity::class.java)
         val contentPendingIntent: PendingIntent =
@@ -38,38 +41,34 @@ class PlayerControlsNotification constructor(
         )
             .setDefaults(Notification.DEFAULT_ALL)
             .setSmallIcon(R.drawable.ic_player_fast_rewind_black)
-            .setContentTitle("service")
-            .setContentText("content")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(System.currentTimeMillis())
+            .setStyle(
+                MediaNotificationCompat.MediaStyle()
+                    .setShowActionsInCompactView(2) // #2: pause or play button
+                    .setMediaSession(appState.mediaSession!!.sessionToken)
+            )
+            .setContentTitle(appState.currentMedia?.title ?: "No title")
+            .setContentText(appState.currentMedia?.description ?: "No description")
+            //.setLargeIcon(albumArtBitmap) // todo cache bitmap
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
         builder.addAction(
-                R.drawable.ic_player_pause_black,
-                "+30s",
-                skipfPendingIntent
-            )
-
-        if (isPlaying) {
-            builder.addAction(
-                R.drawable.ic_player_pause_black,
-                "Pause",
-                pausePendingIntent
-            )
-        } else {
-            builder.addAction(
-                R.drawable.ic_player_pause_black,
-                "Play",
-                playPendingIntent
-            )
-        }
-        builder.addAction(
-            R.drawable.ic_player_pause_black,
+            R.drawable.ic_player_skip_previous_black,
             "-30s",
-            skipbPendingIntent
-        )
+            trackbPendingIntent
+        ) // #0
+        builder.addAction(R.drawable.ic_player_fast_rewind_black, "-30s", skipbPendingIntent) // #1
+        if (isPlaying) { // #2
+            builder.addAction(R.drawable.ic_player_pause_black, "Pause", pausePendingIntent)
+        } else {
+            builder.addAction(R.drawable.ic_player_play_arrow_black, "Play", playPendingIntent)
+        }
+        builder.addAction(R.drawable.ic_player_fast_forward_black, "+30s", skipfPendingIntent) // #3
+        builder.addAction(R.drawable.ic_player_skip_next_black, "-30s", trackfPendingIntent) // #4
+
         return builder.build()
     }
 

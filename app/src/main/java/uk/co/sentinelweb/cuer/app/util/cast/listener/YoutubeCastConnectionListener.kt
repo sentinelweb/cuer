@@ -5,9 +5,11 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsend
 
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 
 class YoutubeCastConnectionListener constructor(
-    private val creator: YoutubePlayerContextCreator
+    private val creator: YoutubePlayerContextCreator,
+    private val mediaSessionManager: MediaSessionManager
 ) : ChromecastConnectionListener {
 
     private var youTubePlayerListener: YouTubePlayerListener? = null
@@ -28,20 +30,23 @@ class YoutubeCastConnectionListener constructor(
         connectionState = ConnectionState.CC_CONNECTING.also { playerUi?.setConnectionState(it) }
     }
 
-    override fun onChromecastDisconnected() {
-        connectionState = ConnectionState.CC_DISCONNECTED.also { playerUi?.setConnectionState(it) }
-        //chromecastYouTubePlayerContext?.release()
-        youTubePlayerListener?.onDisconnected()
-        youTubePlayerListener = null
-    }
-
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
         connectionState = ConnectionState.CC_CONNECTED.also { playerUi?.setConnectionState(it) }
         this.chromecastYouTubePlayerContext = chromecastYouTubePlayerContext // same context object as in ChromecastYouTubePlayerContextWrapper
         youTubePlayerListener = creator.createListener().also {
             chromecastYouTubePlayerContext.initialize(it)
             it.playerUi = playerUi
+
         }
+        mediaSessionManager.createMediaSession()
+    }
+
+    override fun onChromecastDisconnected() {
+        connectionState = ConnectionState.CC_DISCONNECTED.also { playerUi?.setConnectionState(it) }
+        //chromecastYouTubePlayerContext?.release()
+        youTubePlayerListener?.onDisconnected()
+        youTubePlayerListener = null
+        mediaSessionManager.destroyMediaSession()
     }
 
     private fun restoreState() {

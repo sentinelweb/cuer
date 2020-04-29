@@ -57,6 +57,7 @@ dependencies {
     implementation "com.google.android.material:material:$ver_material"
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
+    //implementation "androidx.med:$ver_lifecycle_extensions"
     implementation "com.squareup.picasso:picasso:$ver_picasso"
 
     //navigation
@@ -83,6 +84,11 @@ dependencies {
     implementation "com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:$ver_chromecast_sender"
     // this is not needed to use the library, but it provides the very useful MediaRouteButton.
     implementation "androidx.mediarouter:mediarouter:$ver_mediarouter"
+
+    implementation "androidx.core:core:$ver_androidx_core"
+    implementation "androidx.media:media:$ver_androidx_media"
+    // https://mvnrepository.com/artifact/androidx.media2/media2-session
+    //implementation 'androidx.media2:media2-session:1.0.3'
 
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"

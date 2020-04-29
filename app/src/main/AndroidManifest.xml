@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="uk.co.sentinelweb.cuer.app">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".CuerApp"
@@ -64,7 +64,20 @@
         <service
             android:name=".service.cast.YoutubeCastService"
             android:foregroundServiceType="mediaPlayback"
-            />
+            android:exported="false">
+            <!-- might need to make another broadcast receiver to receive events this will
+            start the service while the activity is running -->
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </service>
+
+        <!-- media button receiver -->
+        <receiver android:name="androidx.media.session.MediaButtonReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

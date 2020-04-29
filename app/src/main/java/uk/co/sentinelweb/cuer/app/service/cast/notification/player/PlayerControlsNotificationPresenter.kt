@@ -24,6 +24,10 @@ class PlayerControlsNotificationPresenter constructor(
                 listeners.forEach { it.seekTo(state.positionMs + 30000) }
             ACTION_SKIPB ->
                 listeners.forEach { it.seekTo(state.positionMs - 30000) }
+            ACTION_TRACKB ->
+                listeners.forEach { it.trackBack() }
+            ACTION_TRACKF ->
+                listeners.forEach { it.trackFwd() }
         }
     }
 

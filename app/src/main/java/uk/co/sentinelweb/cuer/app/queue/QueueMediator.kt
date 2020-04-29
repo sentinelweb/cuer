@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.queue
 
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -15,7 +15,7 @@ class QueueMediator constructor(
     private val repository: MediaDatabaseRepository,
     private val mediaMapper: MediaToPlaylistItemMapper,
     private val contextProvider: CoroutineContextProvider,
-    private val castWrapper: ChromeCastWrapper
+    private val mediaSessionManager: MediaSessionManager
 ) : QueueMediatorContract.Mediator {
 
     private val consumerListeners: MutableList<QueueMediatorContract.ConsumerListener> =
@@ -86,8 +86,9 @@ class QueueMediator constructor(
 
     private fun updateCurrentItem() {
         state.currentPlaylistItem = state.currentPlayList!!.items[state.queuePosition]
-        // doesnt work at all!!
-        //castWrapper.getRemoteClient()?.load(castWrapper.buildMediaInfo(state.currentPlaylistItem!!.media))
+        state.currentPlaylistItem?.apply {
+            mediaSessionManager.setMedia(media)
+        }
         consumerListeners.forEach { it.onItemChanged() }
     }
 
