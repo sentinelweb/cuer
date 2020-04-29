@@ -7,17 +7,15 @@ class YoutubeCastServiceController constructor(
     private val service: YoutubeCastService,
     private val state: YoutubeCastServiceState,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
-    private val notification: PlayerControlsNotificationContract.Presenter
+    private val notification: PlayerControlsNotificationContract.PresenterExternal
 ) {
     fun initialise() {
         notification.show()
+        ytContextHolder.get()!!.playerUi = notification
     }
 
     fun handleAction(action: String?) {
-        if (ACTION_PAUSE == action) {
-            //controller.pause()
-            // notification.
-        }
+        notification.handleAction(action)
     }
 
     fun destroy() {
@@ -26,11 +24,6 @@ class YoutubeCastServiceController constructor(
 //        state.youtubePlayerContext = null
     }
 
-    fun pause() {
-    }
-
     companion object {
-        private const val NOTIF_ID = 34564
-        private const val ACTION_PAUSE = "pause"
     }
 }

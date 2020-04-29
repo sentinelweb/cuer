@@ -4,13 +4,18 @@ import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 
 interface PlayerControlsNotificationContract {
 
-    interface Presenter : CastPlayerContract.PlayerControls {
+    interface PresenterExternal : CastPlayerContract.PlayerControls {
         fun show()
+        fun handleAction(action: String?)
+    }
+
+    interface Presenter {
+
     }
 
     interface View {
 
-        fun showNotification()
+        fun showNotification(isPlaying: Boolean)
     }
 
 }

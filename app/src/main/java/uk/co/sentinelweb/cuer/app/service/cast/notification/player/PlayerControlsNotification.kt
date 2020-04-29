@@ -7,6 +7,12 @@ import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_PAUSE
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_PLAY
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPB
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPF
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_TRACKB
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 
 class PlayerControlsNotification constructor(
@@ -16,19 +22,19 @@ class PlayerControlsNotification constructor(
 
     // todo try this (media notif) https://developer.android.com/training/notify-user/expanded#media-style
     // or this (custom layout) https://stackoverflow.com/questions/41888161/how-to-create-a-custom-notification-layout-in-android
-    private fun buildNotification(): Notification {
-        val pauseIntent = Intent(service, YoutubeCastService::class.java).apply {
-            action = ACTION_PAUSE
-            putExtra(Notification.EXTRA_NOTIFICATION_ID, 0)
-        }
-        val pausePendingIntent: PendingIntent =
-            PendingIntent.getService(service, 0, pauseIntent, 0)
+    private fun buildNotification(isPlaying: Boolean): Notification {
+        val pausePendingIntent: PendingIntent = pendingIntent(ACTION_PAUSE)
+        val playPendingIntent: PendingIntent = pendingIntent(ACTION_PLAY)
+        val skipfPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPF)
+        val skipbPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPB)
+        val trackfPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKF)
+        val trackbPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKB)
 
         val contentIntent = Intent(service, MainActivity::class.java)
         val contentPendingIntent: PendingIntent =
             PendingIntent.getActivity(service, 0, contentIntent, 0)
 
-        return NotificationCompat.Builder(
+        val builder = NotificationCompat.Builder(
             service,
             appState.notificationChannelId!!// todo show error
         )
@@ -39,31 +45,51 @@ class PlayerControlsNotification constructor(
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(System.currentTimeMillis())
+            .setOngoing(true)
             .setContentIntent(contentPendingIntent)
             .addAction(
                 R.drawable.ic_player_pause_black,
-                "Pause",
-                pausePendingIntent
+                "+30s",
+                skipfPendingIntent
             )
-            .addAction(
+
+        if (isPlaying) {
+            builder.addAction(
                 R.drawable.ic_player_pause_black,
                 "Pause",
                 pausePendingIntent
             )
-            .addAction(
+        } else {
+            builder.addAction(
                 R.drawable.ic_player_pause_black,
-                "Pause",
-                pausePendingIntent
+                "Play",
+                playPendingIntent
             )
-            .build()
+        }
+        builder.addAction(
+            R.drawable.ic_player_pause_black,
+            "-30s",
+            skipbPendingIntent
+        )
+        return builder.build()
     }
 
-    override fun showNotification() {
-        service.startForeground(FOREGROUND_ID, buildNotification())
+    private fun pendingIntent(action: String): PendingIntent {
+        val intent = Intent(service, YoutubeCastService::class.java).apply {
+            this.action = action
+            putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
+        }
+        val pendingIntent: PendingIntent =
+            PendingIntent.getService(service, 0, intent, 0)
+        return pendingIntent
+    }
+
+    override fun showNotification(isPlaying: Boolean) {
+        service.startForeground(FOREGROUND_ID, buildNotification(isPlaying))
     }
 
     companion object {
-        private const val ACTION_PAUSE = "pause"
-        private const val FOREGROUND_ID = 34563
+
+        const val FOREGROUND_ID = 34563
     }
 }

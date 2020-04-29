@@ -6,6 +6,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationState
 
 object YoutubeCastServiceModule {
 
@@ -14,8 +15,12 @@ object YoutubeCastServiceModule {
         scope(named<YoutubeCastService>()) {
             scoped { YoutubeCastServiceController(getSource(), get(), get(), get()) }
             scoped { YoutubeCastServiceState() }
+            scoped { PlayerControlsNotificationPresenter(get(), get(), get()) }
+            scoped<PlayerControlsNotificationContract.PresenterExternal> {
+                get<PlayerControlsNotificationPresenter>()
+            }
             scoped<PlayerControlsNotificationContract.Presenter> {
-                PlayerControlsNotificationPresenter(get())
+                get<PlayerControlsNotificationPresenter>()
             }
             scoped<PlayerControlsNotificationContract.View> {
                 PlayerControlsNotification(
@@ -23,6 +28,7 @@ object YoutubeCastServiceModule {
                     get()
                 )
             }
+            scoped { PlayerControlsNotificationState() }
         }
     }
 }

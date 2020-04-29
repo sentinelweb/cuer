@@ -90,7 +90,8 @@ class CastPlayerPresenter(
             PLAYING -> view.setPlaying()
             PAUSED -> view.setPaused()
             BUFFERING -> view.setBuffering()
-            VIDEO_CUED -> TODO()
+            VIDEO_CUED -> {
+            }
         }
     }
 

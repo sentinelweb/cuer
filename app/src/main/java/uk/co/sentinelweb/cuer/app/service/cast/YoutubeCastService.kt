@@ -40,6 +40,8 @@ class YoutubeCastService : Service(), KoinComponent {
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // intent can be null with start sticky - it might make sense to handle this and the wrapper
+        // can be re-created when a null intent is received (and doesn't exist already)
         controller.handleAction(intent?.action)
         return START_NOT_STICKY
     }
