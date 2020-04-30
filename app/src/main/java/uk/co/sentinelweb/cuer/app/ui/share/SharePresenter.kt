@@ -45,7 +45,7 @@ class SharePresenter constructor(
 
     private fun skipExists() {
         view.exit()
-        toast.showToast("We have it already ...")
+        toast.show("We have it already ...")
     }
 
     private fun unableExit(uri: String) {

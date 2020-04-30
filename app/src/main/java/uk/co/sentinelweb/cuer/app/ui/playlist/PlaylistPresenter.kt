@@ -47,7 +47,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel) {
-        toastWrapper.showToast("right: ${item.topText}")
+        toastWrapper.show("right: ${item.topText}")
     }
 
     override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {

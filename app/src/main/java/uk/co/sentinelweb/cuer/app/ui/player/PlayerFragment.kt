@@ -24,15 +24,15 @@ class PlayerFragment : Fragment(R.layout.player_fragment), PlayerContract.View {
         // this code is just to test the item list - can be removed
         player_list_test.presenter.setInteractions(object: ItemContract.Interactions{
             override fun onClick(item: ItemModel) {
-                toastWrapper.showToast("click: ${item.topText}")
+                toastWrapper.show("click: ${item.topText}")
             }
 
             override fun onRightSwipe(item: ItemModel) {
-                toastWrapper.showToast("right: ${item.topText}")
+                toastWrapper.show("right: ${item.topText}")
             }
 
             override fun onLeftSwipe(item: ItemModel) {
-                toastWrapper.showToast("left: ${item.topText}")
+                toastWrapper.show("left: ${item.topText}")
             }
         })
         player_list_test.presenter.bind(

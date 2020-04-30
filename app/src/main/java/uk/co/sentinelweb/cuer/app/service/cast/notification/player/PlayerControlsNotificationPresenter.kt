@@ -73,7 +73,7 @@ class PlayerControlsNotificationPresenter constructor(
     }
 
     override fun error(msg: String) {
-        toastWrapper.showToast(msg)
+        toastWrapper.show(msg)
     }
 
     override fun setTitle(title: String) {

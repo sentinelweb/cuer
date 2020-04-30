@@ -2,14 +2,18 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
+import com.roche.mdas.util.wrapper.ToastWrapper
 
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState
+import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 
 class YoutubeCastConnectionListener constructor(
     private val creator: YoutubePlayerContextCreator,
-    private val mediaSessionManager: MediaSessionManager
+    private val mediaSessionManager: MediaSessionManager,
+    private val toast: ToastWrapper
+
 ) : ChromecastConnectionListener {
 
     private var youTubePlayerListener: YouTubePlayerListener? = null
@@ -27,22 +31,31 @@ class YoutubeCastConnectionListener constructor(
         }
 
     override fun onChromecastConnecting() {
-        connectionState = ConnectionState.CC_CONNECTING.also { playerUi?.setConnectionState(it) }
+        connectionState = CC_CONNECTING.also { playerUi?.setConnectionState(it) }
     }
 
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        connectionState = ConnectionState.CC_CONNECTED.also { playerUi?.setConnectionState(it) }
-        this.chromecastYouTubePlayerContext = chromecastYouTubePlayerContext // same context object as in ChromecastYouTubePlayerContextWrapper
-        youTubePlayerListener = creator.createListener().also {
-            chromecastYouTubePlayerContext.initialize(it)
-            it.playerUi = playerUi
-
+        if (connectionState == CC_CONNECTED) {
+            toast.show("CUER: There may be a chromecast problem - you can stop the connection using google home if you have issues")
         }
+        connectionState = CC_CONNECTED.also { playerUi?.setConnectionState(it) }
+        this.chromecastYouTubePlayerContext =
+            chromecastYouTubePlayerContext // same context object as in ChromecastYouTubePlayerContextWrapper
+        youTubePlayerListener?.let {
+            it.playerUi = playerUi
+        } ?: setupPlayerListener()
         mediaSessionManager.createMediaSession()
     }
 
+    private fun setupPlayerListener() {
+        youTubePlayerListener = creator.createListener().also {
+            chromecastYouTubePlayerContext?.initialize(it)
+            it.playerUi = playerUi
+        }
+    }
+
     override fun onChromecastDisconnected() {
-        connectionState = ConnectionState.CC_DISCONNECTED.also { playerUi?.setConnectionState(it) }
+        connectionState = CC_DISCONNECTED.also { playerUi?.setConnectionState(it) }
         //chromecastYouTubePlayerContext?.release()
         youTubePlayerListener?.onDisconnected()
         youTubePlayerListener = null
@@ -54,7 +67,7 @@ class YoutubeCastConnectionListener constructor(
     }
 
     fun isConnected():Boolean {
-        return connectionState == ConnectionState.CC_CONNECTED
+        return connectionState == CC_CONNECTED
     }
 
     fun destroy() {

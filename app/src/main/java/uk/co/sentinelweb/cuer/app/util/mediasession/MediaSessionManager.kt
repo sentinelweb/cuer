@@ -19,11 +19,13 @@ class MediaSessionManager constructor(
     }
 
     fun createMediaSession() {
-        appState.mediaSession = MediaSessionCompat(context, "CuerService")
-            .apply {
-                setCallback(CuerMediaSessionCallback())
-                isActive = true
-            }
+        if (appState.mediaSession == null) {
+            appState.mediaSession = MediaSessionCompat(context, "CuerService")
+                .apply {
+                    setCallback(CuerMediaSessionCallback())
+                    isActive = true
+                }
+        }
     }
 
     fun destroyMediaSession() {
