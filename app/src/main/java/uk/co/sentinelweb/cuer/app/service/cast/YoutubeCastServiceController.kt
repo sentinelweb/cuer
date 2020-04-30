@@ -12,8 +12,8 @@ class YoutubeCastServiceController constructor(
     private val appState: CuerAppState
 ) {
     fun initialise() {
-        notification.show()
         ytContextHolder.get()!!.playerUi = notification
+        notification.show()
     }
 
     fun handleAction(action: String?) {

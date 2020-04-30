@@ -31,7 +31,6 @@ class YoutubeCastService : Service(), KoinComponent {
         controller.initialise()
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         // toastWrapper.showToast("Service destroyed")
@@ -39,9 +38,8 @@ class YoutubeCastService : Service(), KoinComponent {
         _instance = null
     }
 
-    // Note1: intent can be null with start sticky - it might make sense to handle this and the wrapper
+    // Note 1: intent can be null with start sticky - it might make sense to handle this and the wrapper
     // can be re-created when a null intent is received (and doesn't exist already)
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // this routes media buttons to the MediaSessionCompat
         if (intent?.action == Intent.ACTION_MEDIA_BUTTON) {

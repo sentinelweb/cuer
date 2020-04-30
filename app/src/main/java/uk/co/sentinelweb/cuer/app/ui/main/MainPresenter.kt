@@ -67,13 +67,14 @@ class MainPresenter(
     override fun onStop() {
         log.d("onStop()")
         ytContextHolder.get()?.playerUi = null
+        if (!view.isRecreating()) {
+            ytServiceManager.start()
+        }
     }
 
     override fun onDestroy() {
         if (ytContextHolder.isCreated() && !ytContextHolder.get()!!.isConnected()) {
             ytContextHolder.destroy()
-        } else if (!view.isRecreating()) {
-            ytServiceManager.start()
         }
 
 //        if (state.youtubePlayerContext!!.isConnected()) {
