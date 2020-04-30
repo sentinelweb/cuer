@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 
-class PlayerControlsNotification constructor(
+class PlayerControlsNotificationBasic constructor(
     private val service: YoutubeCastService,
     private val appState: CuerAppState
 ) : PlayerControlsNotificationContract.View {
@@ -37,7 +37,7 @@ class PlayerControlsNotification constructor(
             appState.castNotificationChannelId!! // todo show error
         )
             .setDefaults(Notification.DEFAULT_ALL)
-            .setSmallIcon(R.drawable.ic_player_fast_rewind_black)
+            .setSmallIcon(R.drawable.ic_notif_status_cast_conn_white)
             .setContentTitle("service")
             .setContentText("content")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

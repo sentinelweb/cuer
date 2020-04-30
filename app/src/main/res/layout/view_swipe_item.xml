@@ -13,8 +13,8 @@
         android:text="@string/right"
         android:textColor="@color/white"
         android:gravity="left|center_vertical"
-        android:drawableLeft="@drawable/ic_done_white_24dp"
-        android:paddingRight="@dimen/list_item_margin"
+        android:drawableLeft="@drawable/ic_item_tick_white"
+        android:paddingLeft="@dimen/list_item_swipe_margin"
         tools:ignore="RtlHardcoded,RtlSymmetry"
         android:alpha="0"
     />
@@ -28,8 +28,8 @@
         android:textColor="@color/white"
         android:drawablePadding="4dp"
         android:gravity="right|center_vertical"
-        android:drawableRight="@drawable/ic_delete_sweep_white_24dp"
-        android:paddingLeft="@dimen/list_item_margin"
+        android:drawableRight="@drawable/ic_item_delete_white"
+        android:paddingRight="@dimen/list_item_swipe_margin"
         tools:ignore="RtlHardcoded,RtlSymmetry"
         android:alpha="0"
     />

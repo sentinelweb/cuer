@@ -37,8 +37,8 @@ class PlayerFragment : Fragment(R.layout.player_fragment), PlayerContract.View {
         })
         player_list_test.presenter.bind(
             listOf(
-                ItemModel("","top","bottom",false,R.drawable.ic_play_black, null),
-                ItemModel("","top2","bottom2",false,R.drawable.ic_browse_black, null),
+                ItemModel("", "top", "bottom", false, R.drawable.ic_nav_play_black, null),
+                ItemModel("", "top2", "bottom2", false, R.drawable.ic_nav_browse_black, null),
                 ItemModel("","top3","bottom3",false,R.drawable.ic_player_fast_forward_black, null),
                 ItemModel("","top4","bottom4",false,R.drawable.ic_player_fast_rewind_black, null)
             )

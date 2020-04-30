@@ -39,7 +39,7 @@ class ChromeCastWrapper(val application: Application) {// TODO check change to c
     fun getRemoteClient() =
         CastContext.getSharedInstance(application).sessionManager.currentCastSession?.remoteMediaClient
 
-    fun buildMediaInfo(media: MediaDomain): MediaInfo {
+    fun buildCastMediaInfo(media: MediaDomain): MediaInfo {
         val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE)
 
         metadata.putString(MediaMetadata.KEY_TITLE, media.title)

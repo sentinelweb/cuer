@@ -40,7 +40,7 @@ class PlayerControlsNotificationMedia constructor(
             appState.castNotificationChannelId!! // todo show error
         )
             .setDefaults(Notification.DEFAULT_ALL)
-            .setSmallIcon(R.drawable.ic_player_fast_rewind_black)
+            .setSmallIcon(R.drawable.ic_notif_status_cast_conn_white)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(System.currentTimeMillis())
@@ -55,20 +55,25 @@ class PlayerControlsNotificationMedia constructor(
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
-        builder.addAction(
-            R.drawable.ic_player_skip_previous_black,
-            "-30s",
-            trackbPendingIntent
-        ) // #0
-        builder.addAction(R.drawable.ic_player_fast_rewind_black, "-30s", skipbPendingIntent) // #1
+        builder.addAction(R.drawable.ic_notif_track_b_black, "Prev", trackbPendingIntent) // #0
+        builder.addAction(R.drawable.ic_notif_fast_rewind_black, "-30s", skipbPendingIntent) // #1
         if (isPlaying) { // #2
-            builder.addAction(R.drawable.ic_player_pause_black, "Pause", pausePendingIntent)
+            builder.addAction(R.drawable.ic_notif_pause_black, "Pause", pausePendingIntent)
         } else {
-            builder.addAction(R.drawable.ic_player_play_arrow_black, "Play", playPendingIntent)
+            builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
         }
-        builder.addAction(R.drawable.ic_player_fast_forward_black, "+30s", skipfPendingIntent) // #3
-        builder.addAction(R.drawable.ic_player_skip_next_black, "-30s", trackfPendingIntent) // #4
-
+        builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent) // #3
+        builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
+        builder.addAction(
+            R.drawable.ic_notif_close_white,
+            "Close",
+            contentPendingIntent
+        ) // #5 todo disconnect
+        builder.addAction(
+            R.drawable.ic_notif_unstarred_black,
+            "Star",
+            contentPendingIntent
+        ) // #6 todo star function
         return builder.build()
     }
 
