@@ -30,7 +30,7 @@ class YoutubeVideoMediaDomainMapper {
         publishedAt?.let {
             LocalDateTime.parse(
                 publishedAt,
-                DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS'Z'")
+                DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SS[S]'Z'")
             )
         }
 

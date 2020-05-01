@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import com.roche.mdas.util.wrapper.ToastWrapper
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
@@ -27,7 +26,7 @@ class PlaylistPresenter(
     private val ytInteractor: YoutubeVideosInteractor,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
-    val jobs: MutableList<Job> = mutableListOf()
+
 
     override fun initialise() {
         initListCheck()
@@ -44,18 +43,12 @@ class PlaylistPresenter(
     }
 
     override fun setFocusId(videoId: String) {
-        getIndexByVideoId(videoId)?.apply {
-            view.scrollToItem(this)
-        } ?: saveFocusId(videoId)
-    }
-
-    private fun saveFocusId(videoId: String) {
         state.focusItemId = videoId
     }
 
     override fun destroy() {
-        jobs.forEach { it.cancel() }
-        jobs.clear()
+        state.jobs.forEach { it.cancel() }
+        state.jobs.clear()
         queue.removeProducerListener(this)
     }
 
@@ -93,7 +86,7 @@ class PlaylistPresenter(
     }
 
     private fun initListCheck() {
-        jobs.add(contextProvider.MainScope.launch {
+        state.jobs.add(contextProvider.MainScope.launch {
             val count = repository.count()
             if (count == 0) {
                 Queue.ITEMS
@@ -129,10 +122,10 @@ class PlaylistPresenter(
         list.items
             .map { modelMapper.map(it) }
             .also { view.setList(it) }
+
         state.focusItemId?.let {
             getIndexByVideoId(it)?.apply {
                 view.scrollToItem(this)
-                state.focusItemId = null
             }
         }
     }
