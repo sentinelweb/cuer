@@ -12,10 +12,12 @@ interface PlaylistContract {
         fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel)
         fun onItemClicked(item: PlaylistModel.PlaylistItemModel)
         fun refreshList()
+        fun setFocusId(videoId: String)
     }
 
     interface View {
         fun setList(list: List<ItemModel>)
         fun showAlert(msg: String)
+        fun scrollToItem(index: Int)
     }
 }

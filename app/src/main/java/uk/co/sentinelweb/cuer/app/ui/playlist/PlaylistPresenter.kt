@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import com.roche.mdas.util.wrapper.ToastWrapper
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
@@ -26,10 +27,12 @@ class PlaylistPresenter(
     private val ytInteractor: YoutubeVideosInteractor,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
+    val jobs: MutableList<Job> = mutableListOf()
 
     override fun initialise() {
         initListCheck()
         queue.addProducerListener(this)
+        queue.refreshQueue()
     }
 
     override fun loadList() {
@@ -40,9 +43,19 @@ class PlaylistPresenter(
         queue.refreshQueue()
     }
 
+    override fun setFocusId(videoId: String) {
+        getIndexByVideoId(videoId)?.apply {
+            view.scrollToItem(this)
+        } ?: saveFocusId(videoId)
+    }
+
+    private fun saveFocusId(videoId: String) {
+        state.focusItemId = videoId
+    }
+
     override fun destroy() {
-        state.jobs.forEach { it.cancel() }
-        state.jobs.clear()
+        jobs.forEach { it.cancel() }
+        jobs.clear()
         queue.removeProducerListener(this)
     }
 
@@ -67,6 +80,12 @@ class PlaylistPresenter(
         }
     }
 
+    private fun getIndexByVideoId(videoId: String): Int? {
+        return queue.getPlayList()
+            ?.items
+            ?.indexOfFirst { it.media.mediaId == videoId }
+    }
+
     private fun getDomainPlaylistItem(item: PlaylistModel.PlaylistItemModel): PlaylistItemDomain? {
         return queue.getPlayList()
             ?.items
@@ -74,7 +93,7 @@ class PlaylistPresenter(
     }
 
     private fun initListCheck() {
-        state.jobs.add(contextProvider.MainScope.launch {
+        jobs.add(contextProvider.MainScope.launch {
             val count = repository.count()
             if (count == 0) {
                 Queue.ITEMS
@@ -110,6 +129,12 @@ class PlaylistPresenter(
         list.items
             .map { modelMapper.map(it) }
             .also { view.setList(it) }
+        state.focusItemId?.let {
+            getIndexByVideoId(it)?.apply {
+                view.scrollToItem(this)
+                state.focusItemId = null
+            }
+        }
     }
 
 }

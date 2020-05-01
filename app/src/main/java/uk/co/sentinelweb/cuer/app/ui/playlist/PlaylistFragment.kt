@@ -9,6 +9,7 @@ import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
@@ -39,6 +40,9 @@ class PlaylistFragment :
     override fun onResume() {
         super.onResume()
         presenter.loadList()
+        activity?.intent?.getStringExtra(Const.EXTRA_YTID)?.let {
+            presenter.setFocusId(it)
+        }
     }
     // endregion
 
@@ -51,6 +55,10 @@ class PlaylistFragment :
 
     override fun showAlert(msg: String) {
         alertWrapper.showMessage("Alert", msg)
+    }
+
+    override fun scrollToItem(index: Int) {
+        playlist_list.scrollToPosition(index)
     }
     //endregion
 
