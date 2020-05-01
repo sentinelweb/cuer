@@ -55,6 +55,7 @@ interface CastPlayerContract {
         fun setTitle(title:String)
         fun updateSeekPosition(ratio: Float)
         fun setImage(url: String)
+        fun clearImage()
     }
 
     enum class ConnectionState {

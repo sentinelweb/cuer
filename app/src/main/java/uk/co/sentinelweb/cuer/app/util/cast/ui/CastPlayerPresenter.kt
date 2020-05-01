@@ -9,7 +9,8 @@ import kotlin.math.min
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
-    private val state: CastPlayerState
+    private val state: CastPlayerState,
+    private val mapper: CastPlayerUiMapper
 ) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls {
 
     override fun initialise() {
@@ -101,7 +102,7 @@ class CastPlayerPresenter(
 
     override fun setCurrentSecond(second: Float) {
         state.positionMs = (second * 1000).toLong()
-        view.setCurrentSecond("${state.positionMs / 1000} s") // todo map time
+        view.setCurrentSecond(mapper.formatTime(state.positionMs))
         if (state.durationMs > 0) {
             view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
         }
@@ -109,7 +110,7 @@ class CastPlayerPresenter(
 
     override fun setDuration(duration: Float) {
         state.durationMs = (duration * 1000).toLong()
-        view.setDuration("${state.durationMs / 1000} s") // todo map time
+        view.setDuration(mapper.formatTime(state.durationMs))
     }
 
     override fun error(msg: String) {
@@ -124,8 +125,9 @@ class CastPlayerPresenter(
     override fun reset() {
         if (!state.isDestroyed) {
             state.title = "No media".apply { view.setTitle(this) }
-            state.positionMs = 0L.apply { view.setCurrentSecond(this.toString()) }
-            state.durationMs = 0L.apply { view.setDuration(this.toString()) }
+            state.positionMs = 0L.apply { view.setCurrentSecond("") }
+            state.durationMs = 0L.apply { view.setDuration("") }
+            view.clearImage()
             view.setPaused()
         }
     }

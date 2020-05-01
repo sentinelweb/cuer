@@ -101,7 +101,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     }
 
     override fun showMessage(msg: String) {
-        Snackbar.make(requireView(), msg,Snackbar.LENGTH_LONG).show()
+        Snackbar.make(requireView(), msg, Snackbar.LENGTH_LONG).show()
     }
 
     override fun setTitle(title: String) {
@@ -110,6 +110,10 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 
     override fun setImage(url: String) {
         Picasso.get().load(url).into(binding.castPlayerImage)
+    }
+
+    override fun clearImage() {
+        binding.castPlayerImage.setImageResource(0)
     }
 
     override fun updateSeekPosition(ratio: Float) {
@@ -121,7 +125,8 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         val viewModule = module {
             scope(named<CastPlayerFragment>()) {
                 scoped<CastPlayerContract.View> { getSource() }
-                scoped<CastPlayerContract.Presenter> { CastPlayerPresenter(get(), get()) }
+                scoped<CastPlayerContract.Presenter> { CastPlayerPresenter(get(), get(), get()) }
+                scoped { CastPlayerUiMapper() }
                 viewModel { CastPlayerState() }
             }
         }
