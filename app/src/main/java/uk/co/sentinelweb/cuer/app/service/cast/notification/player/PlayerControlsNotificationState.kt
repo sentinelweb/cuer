@@ -1,9 +1,9 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 data class PlayerControlsNotificationState(
-    var playState: PlayerStateUi = PlayerStateUi.UNKNOWN,
+    var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
     var positionMs: Long = 0,
     var seekPositionMs: Long = 0,
     var durationMs: Long = 0,

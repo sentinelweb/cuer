@@ -14,6 +14,8 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_TRACKB
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import androidx.media.app.NotificationCompat as MediaNotificationCompat
 
 class PlayerControlsNotificationMedia constructor(
@@ -23,7 +25,7 @@ class PlayerControlsNotificationMedia constructor(
 
     // todo try this (media notif) https://developer.android.com/training/notify-user/expanded#media-style
     // or this (custom layout) https://stackoverflow.com/questions/41888161/how-to-create-a-custom-notification-layout-in-android
-    private fun buildNotification(isPlaying: Boolean): Notification {
+    private fun buildNotification(state: PlayerStateDomain): Notification {
         val pausePendingIntent: PendingIntent = pendingIntent(ACTION_PAUSE)
         val playPendingIntent: PendingIntent = pendingIntent(ACTION_PLAY)
         val skipfPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPF)
@@ -57,10 +59,16 @@ class PlayerControlsNotificationMedia constructor(
 
         builder.addAction(R.drawable.ic_notif_track_b_black, "Prev", trackbPendingIntent) // #0
         builder.addAction(R.drawable.ic_notif_fast_rewind_black, "-30s", skipbPendingIntent) // #1
-        if (isPlaying) { // #2
-            builder.addAction(R.drawable.ic_notif_pause_black, "Pause", pausePendingIntent)
-        } else {
-            builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
+        when (state) {
+            PLAYING ->
+                builder.addAction(R.drawable.ic_notif_pause_black, "Pause", pausePendingIntent)
+            PAUSED ->
+                builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
+            BUFFERING ->
+                builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", pausePendingIntent)
+            ERROR ->
+                builder.addAction(R.drawable.ic_notif_buffer_black, "Error", contentPendingIntent)
+            else -> Unit
         }
         builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent) // #3
         builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
@@ -82,13 +90,11 @@ class PlayerControlsNotificationMedia constructor(
             this.action = action
             putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
         }
-        val pendingIntent: PendingIntent =
-            PendingIntent.getService(service, 0, intent, 0)
-        return pendingIntent
+        return PendingIntent.getService(service, 0, intent, 0)
     }
 
-    override fun showNotification(isPlaying: Boolean) {
-        service.startForeground(FOREGROUND_ID, buildNotification(isPlaying))
+    override fun showNotification(state: PlayerStateDomain) {
+        service.startForeground(FOREGROUND_ID, buildNotification(state))
     }
 
     companion object {

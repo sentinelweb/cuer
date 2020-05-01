@@ -1,7 +1,8 @@
 package uk.co.sentinelweb.cuer.app.util.cast.ui
 
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.*
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi.*
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -82,7 +83,7 @@ class CastPlayerPresenter(
         )
     }
 
-    override fun setPlayerState(playState: CastPlayerContract.PlayerStateUi) {
+    override fun setPlayerState(playState: PlayerStateDomain) {
         when (playState) {
             UNKNOWN -> view.setPaused() // todo better state
             UNSTARTED -> view.setPaused() // todo better state
@@ -90,7 +91,9 @@ class CastPlayerPresenter(
             PLAYING -> view.setPlaying()
             PAUSED -> view.setPaused()
             BUFFERING -> view.setBuffering()
-            VIDEO_CUED -> {
+            VIDEO_CUED -> Unit
+            ERROR -> {
+                view.setPaused(); view.showMessage("An error occurred")
             }
         }
     }

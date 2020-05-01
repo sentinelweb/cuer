@@ -13,7 +13,6 @@ class YoutubeCastConnectionListener constructor(
     private val creator: YoutubePlayerContextCreator,
     private val mediaSessionManager: MediaSessionManager,
     private val toast: ToastWrapper
-
 ) : ChromecastConnectionListener {
 
     private var youTubePlayerListener: YouTubePlayerListener? = null
@@ -37,6 +36,11 @@ class YoutubeCastConnectionListener constructor(
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
         if (connectionState == CC_CONNECTED) {
             toast.show("CUER: There may be a chromecast problem - you can stop the connection using google home if you have issues")
+            // taking a punt on this if it work too often then maybe try something else - e.g. a dialog
+            chromecastYouTubePlayerContext.release()
+            connectionState = CC_DISCONNECTED.also { playerUi?.setConnectionState(it) }
+            mediaSessionManager.destroyMediaSession()
+            return
         }
         connectionState = CC_CONNECTED.also { playerUi?.setConnectionState(it) }
         this.chromecastYouTubePlayerContext =

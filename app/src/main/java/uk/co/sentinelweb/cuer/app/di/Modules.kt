@@ -23,7 +23,9 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
@@ -58,7 +60,9 @@ object Modules {
             )
         }
         single { ChromecastYouTubePlayerContextHolder(get(), get()) }
-        factory { MediaSessionManager(get(), androidApplication(), get()) }
+        factory { MediaSessionManager(get(), androidApplication(), get(), get(), get()) }
+        factory { MediaMetadataMapper() }
+        factory { PlaybackStateMapper() }
     }
 
     private val wrapperModule = module {

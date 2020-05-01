@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 interface PlayerControlsNotificationContract {
 
@@ -14,8 +15,7 @@ interface PlayerControlsNotificationContract {
     }
 
     interface View {
-
-        fun showNotification(isPlaying: Boolean)
+        fun showNotification(state: PlayerStateDomain)
     }
 
 }

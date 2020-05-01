@@ -5,13 +5,15 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class YouTubePlayerListener(
     private val state: YouTubePlayerListenerState,
     private val queue: QueueMediatorContract.Mediator,
+    private val mediaSessionManager: MediaSessionManager,
     private val log: LogWrapper
 ) : AbstractYouTubePlayerListener(),
     CastPlayerContract.PlayerControls.Listener,
@@ -82,6 +84,8 @@ class YouTubePlayerListener(
         this.youTubePlayer = youTubePlayer
         state.positionSec = second
         playerUi?.setCurrentSecond(second)
+        state.currentMedia = state.currentMedia!!.copy(positon = (second * 1000).toLong())
+        mediaSessionManager.updatePlaybackState(state.currentMedia, state.playState)
     }
 
     override fun onError(youTubePlayer: YouTubePlayer, error: PlayerError) {
@@ -97,7 +101,6 @@ class YouTubePlayerListener(
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun onPlaybackRateChange(youTubePlayer: YouTubePlayer, r: PlaybackRate) {
         this.youTubePlayer = youTubePlayer
-
     }
 
     override fun onStateChange(
@@ -107,16 +110,17 @@ class YouTubePlayerListener(
     ) {
         this.youTubePlayer = youTubePlayer
         state.playState = when (playerState) {
-            PlayerState.ENDED -> PlayerStateUi.ENDED
-            PlayerState.PAUSED -> PlayerStateUi.PAUSED
-            PlayerState.PLAYING -> PlayerStateUi.PLAYING
-            PlayerState.BUFFERING -> PlayerStateUi.BUFFERING
-            PlayerState.UNSTARTED -> PlayerStateUi.UNSTARTED
-            PlayerState.UNKNOWN -> PlayerStateUi.UNKNOWN
-            PlayerState.VIDEO_CUED -> PlayerStateUi.VIDEO_CUED
+            PlayerState.ENDED -> PlayerStateDomain.ENDED
+            PlayerState.PAUSED -> PlayerStateDomain.PAUSED
+            PlayerState.PLAYING -> PlayerStateDomain.PLAYING
+            PlayerState.BUFFERING -> PlayerStateDomain.BUFFERING
+            PlayerState.UNSTARTED -> PlayerStateDomain.UNSTARTED
+            PlayerState.UNKNOWN -> PlayerStateDomain.UNKNOWN
+            PlayerState.VIDEO_CUED -> PlayerStateDomain.VIDEO_CUED
         }
         playerUi?.setPlayerState(state.playState)
-        if (state.playState == PlayerStateUi.ENDED) {
+        mediaSessionManager.updatePlaybackState(state.currentMedia, state.playState)
+        if (state.playState == PlayerStateDomain.ENDED) {
             queue.onTrackEnded(state.currentMedia)
         }
     }

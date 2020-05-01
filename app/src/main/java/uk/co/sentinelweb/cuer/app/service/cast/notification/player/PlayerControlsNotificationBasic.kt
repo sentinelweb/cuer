@@ -12,6 +12,8 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPB
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 
 class PlayerControlsNotificationBasic constructor(
     private val service: YoutubeCastService,
@@ -20,7 +22,7 @@ class PlayerControlsNotificationBasic constructor(
 
     // todo try this (media notif) https://developer.android.com/training/notify-user/expanded#media-style
     // or this (custom layout) https://stackoverflow.com/questions/41888161/how-to-create-a-custom-notification-layout-in-android
-    private fun buildNotification(isPlaying: Boolean): Notification {
+    private fun buildNotification(state: PlayerStateDomain): Notification {
         val pausePendingIntent: PendingIntent = pendingIntent(ACTION_PAUSE)
         val playPendingIntent: PendingIntent = pendingIntent(ACTION_PLAY)
         val skipfPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPF)
@@ -46,30 +48,20 @@ class PlayerControlsNotificationBasic constructor(
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
-        builder.addAction(
-                R.drawable.ic_player_pause_black,
-                "+30s",
-                skipfPendingIntent
-            )
+        builder.addAction(R.drawable.ic_player_pause_black, "+30s", skipfPendingIntent)
 
-        if (isPlaying) {
-            builder.addAction(
-                R.drawable.ic_player_pause_black,
-                "Pause",
-                pausePendingIntent
-            )
-        } else {
-            builder.addAction(
-                R.drawable.ic_player_pause_black,
-                "Play",
-                playPendingIntent
-            )
+        when (state) {
+            PLAYING ->
+                builder.addAction(R.drawable.ic_notif_pause_black, "Pause", pausePendingIntent)
+            PAUSED ->
+                builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
+            BUFFERING ->
+                builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", playPendingIntent)
+            ERROR ->
+                builder.addAction(R.drawable.ic_notif_buffer_black, "Error", contentPendingIntent)
+            else -> Unit
         }
-        builder.addAction(
-            R.drawable.ic_player_pause_black,
-            "-30s",
-            skipbPendingIntent
-        )
+        builder.addAction(R.drawable.ic_player_pause_black, "-30s", skipbPendingIntent)
         return builder.build()
     }
 
@@ -83,8 +75,8 @@ class PlayerControlsNotificationBasic constructor(
         return pendingIntent
     }
 
-    override fun showNotification(isPlaying: Boolean) {
-        service.startForeground(FOREGROUND_ID, buildNotification(isPlaying))
+    override fun showNotification(state: PlayerStateDomain) {
+        service.startForeground(FOREGROUND_ID, buildNotification(state))
     }
 
     companion object {

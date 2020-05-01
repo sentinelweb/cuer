@@ -24,5 +24,6 @@ class YoutubePlayerContextCreator constructor(
         )
     }
 
-    fun createListener() = YouTubePlayerListener(YouTubePlayerListenerState(), queue, log)
+    fun createListener() =
+        YouTubePlayerListener(YouTubePlayerListenerState(), queue, mediaSessionManager, log)
 }

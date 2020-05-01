@@ -5,6 +5,8 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.PresenterExternal
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerControls.Listener
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 
 class PlayerControlsNotificationPresenter constructor(
     private val view: PlayerControlsNotificationContract.View,
@@ -32,27 +34,23 @@ class PlayerControlsNotificationPresenter constructor(
     }
 
     override fun show() {
-        view.showNotification(true)
+        view.showNotification(PLAYING)
     }
 
     override fun setConnectionState(connState: CastPlayerContract.ConnectionState) {
 
     }
 
-    override fun setPlayerState(playState: CastPlayerContract.PlayerStateUi) {
+    override fun setPlayerState(playState: PlayerStateDomain) {
         when (playState) {
-            CastPlayerContract.PlayerStateUi.UNKNOWN -> {
-            }
-            CastPlayerContract.PlayerStateUi.UNSTARTED -> {
-            }
-            CastPlayerContract.PlayerStateUi.ENDED -> {
-            }
-            CastPlayerContract.PlayerStateUi.PLAYING -> view.showNotification(true)
-            CastPlayerContract.PlayerStateUi.PAUSED -> view.showNotification(false)
-            CastPlayerContract.PlayerStateUi.BUFFERING -> {
-            }
-            CastPlayerContract.PlayerStateUi.VIDEO_CUED -> {
-            }
+            UNKNOWN -> Unit
+            UNSTARTED -> Unit
+            ENDED -> Unit
+            PLAYING -> view.showNotification(playState)
+            PAUSED -> view.showNotification(playState)
+            BUFFERING -> view.showNotification(playState)
+            VIDEO_CUED -> Unit
+            ERROR -> view.showNotification(playState)
         }
     }
 

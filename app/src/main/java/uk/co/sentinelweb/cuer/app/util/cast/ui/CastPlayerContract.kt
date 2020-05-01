@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.cast.ui
 
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+
 interface CastPlayerContract {
 
     interface Presenter {
@@ -15,11 +17,11 @@ interface CastPlayerContract {
         fun initialise()
     }
 
+    // todo think about this maybe sub with android MediaControl interface
     interface PlayerControls {
-
         fun initMediaRouteButton()
         fun setConnectionState(connState: ConnectionState)
-        fun setPlayerState(playState: PlayerStateUi)
+        fun setPlayerState(playState: PlayerStateDomain)
         fun addListener(l: Listener)
         fun removeListener(l: Listener)
         fun setCurrentSecond(second: Float) // todo ms long
@@ -56,7 +58,4 @@ interface CastPlayerContract {
         CC_DISCONNECTED, CC_CONNECTING, CC_CONNECTED,
     }
 
-    enum class PlayerStateUi {
-        UNKNOWN, UNSTARTED, ENDED, PLAYING, PAUSED, BUFFERING, VIDEO_CUED
-    }
 }
