@@ -13,7 +13,6 @@ class YoutubeCastServiceController constructor(
 ) {
     fun initialise() {
         ytContextHolder.get()!!.playerUi = notification
-        notification.show()
     }
 
     fun handleAction(action: String?) {
@@ -21,9 +20,9 @@ class YoutubeCastServiceController constructor(
     }
 
     fun destroy() {
-//        wrapper = null
-//        state.youtubePlayerContext?.destroy()
-//        state.youtubePlayerContext = null
+        if (ytContextHolder.get()!!.playerUi == notification) {
+            ytContextHolder.get()!!.destroy()
+        }
     }
 
     companion object {

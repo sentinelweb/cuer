@@ -8,6 +8,14 @@
     android:background="@color/red_100"
     >
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cast_player_image"
+        android:layout_width="64dp"
+        android:layout_height="48dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
     <FrameLayout
         android:id="@+id/cast_player_center"
         android:layout_width="wrap_content"

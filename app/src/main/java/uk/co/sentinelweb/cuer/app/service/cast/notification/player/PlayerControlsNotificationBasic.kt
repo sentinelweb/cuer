@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
+import android.graphics.Bitmap
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
@@ -12,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPB
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 
@@ -20,9 +22,24 @@ class PlayerControlsNotificationBasic constructor(
     private val appState: CuerAppState
 ) : PlayerControlsNotificationContract.View {
 
+    override fun showNotification(
+        state: PlayerStateDomain,
+        media: MediaDomain?,
+        bitmap: Bitmap?
+    ) {
+        service.startForeground(
+            PlayerControlsNotificationMedia.FOREGROUND_ID,
+            buildNotification(state, media, bitmap)
+        )
+    }
+
     // todo try this (media notif) https://developer.android.com/training/notify-user/expanded#media-style
     // or this (custom layout) https://stackoverflow.com/questions/41888161/how-to-create-a-custom-notification-layout-in-android
-    private fun buildNotification(state: PlayerStateDomain): Notification {
+    private fun buildNotification(
+        state: PlayerStateDomain,
+        media: MediaDomain?,
+        bitmap: Bitmap?
+    ): Notification {
         val pausePendingIntent: PendingIntent = pendingIntent(ACTION_PAUSE)
         val playPendingIntent: PendingIntent = pendingIntent(ACTION_PLAY)
         val skipfPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPF)
@@ -40,13 +57,15 @@ class PlayerControlsNotificationBasic constructor(
         )
             .setDefaults(Notification.DEFAULT_ALL)
             .setSmallIcon(R.drawable.ic_notif_status_cast_conn_white)
-            .setContentTitle("service")
-            .setContentText("content")
+            .setContentTitle(media?.title ?: "No title")
+            .setContentText(media?.description ?: "No description")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(System.currentTimeMillis())
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
+
+        bitmap?.apply { builder.setLargeIcon(this) }
 
         builder.addAction(R.drawable.ic_player_pause_black, "+30s", skipfPendingIntent)
 
@@ -73,10 +92,6 @@ class PlayerControlsNotificationBasic constructor(
         val pendingIntent: PendingIntent =
             PendingIntent.getService(service, 0, intent, 0)
         return pendingIntent
-    }
-
-    override fun showNotification(state: PlayerStateDomain) {
-        service.startForeground(FOREGROUND_ID, buildNotification(state))
     }
 
     companion object {

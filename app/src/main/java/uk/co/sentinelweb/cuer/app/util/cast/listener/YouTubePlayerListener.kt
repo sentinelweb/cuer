@@ -36,17 +36,18 @@ class YouTubePlayerListener(
     }
 
     // todo fix this - not clean
-    private fun setupPlayer(it: CastPlayerContract.PlayerControls) {
-        it.addListener(this)
-        it.setTitle(state.currentMedia?.title ?: "No Media")
-        it.setPlayerState(state.playState)
-        it.setDuration(state.durationSec)
-        it.setCurrentSecond(state.positionSec)
+    private fun setupPlayer(controls: CastPlayerContract.PlayerControls) {
+        controls.addListener(this)
+        controls.setTitle(state.currentMedia?.title ?: "No Media")
+        controls.setPlayerState(state.playState)
+        controls.setDuration(state.durationSec)
+        controls.setCurrentSecond(state.positionSec)
+        state.currentMedia?.apply { controls.setMedia(this) }
     }
 
-    private fun cleanupPlayer(it: CastPlayerContract.PlayerControls?) {
-        it?.removeListener(this)
-        it?.reset()
+    private fun cleanupPlayer(controls: CastPlayerContract.PlayerControls?) {
+        controls?.removeListener(this)
+        controls?.reset()
     }
 
     fun onDisconnected() {
@@ -64,10 +65,9 @@ class YouTubePlayerListener(
         } ?: playerUi?.reset()
     }
 
-    private fun updateStateForMedia(item: PlaylistItemDomain): Unit? {
+    private fun updateStateForMedia(item: PlaylistItemDomain) {
         state.currentMedia = item.media
-        val displayTitle = item.media.title ?: item.media.url
-        return playerUi?.setTitle(displayTitle)
+        playerUi?.setMedia(item.media)
     }
 
     // region AbstractYouTubePlayerListener
@@ -84,7 +84,7 @@ class YouTubePlayerListener(
         this.youTubePlayer = youTubePlayer
         state.positionSec = second
         playerUi?.setCurrentSecond(second)
-        state.currentMedia = state.currentMedia!!.copy(positon = (second * 1000).toLong())
+        state.currentMedia = state.currentMedia?.copy(positon = (second * 1000).toLong())
         mediaSessionManager.updatePlaybackState(state.currentMedia, state.playState)
     }
 

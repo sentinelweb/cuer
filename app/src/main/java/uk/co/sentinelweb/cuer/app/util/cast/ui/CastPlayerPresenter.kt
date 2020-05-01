@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.cast.ui
 
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import kotlin.math.max
@@ -132,5 +133,9 @@ class CastPlayerPresenter(
     override fun restoreState() {
         view.setTitle(state.title)
         // todo restore state
+    }
+
+    override fun setMedia(media: MediaDomain) {
+        media.thumbNail?.url?.apply { view.setImage(this) }
     }
 }

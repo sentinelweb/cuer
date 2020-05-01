@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.util.cast.ui
 
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 interface CastPlayerContract {
@@ -30,6 +31,7 @@ interface CastPlayerContract {
         fun setTitle(title:String)
         fun reset()
         fun restoreState()
+        fun setMedia(media: MediaDomain)
 
         interface Listener {
             fun play()
@@ -52,6 +54,7 @@ interface CastPlayerContract {
         fun showMessage(msg:String)
         fun setTitle(title:String)
         fun updateSeekPosition(ratio: Float)
+        fun setImage(url: String)
     }
 
     enum class ConnectionState {
