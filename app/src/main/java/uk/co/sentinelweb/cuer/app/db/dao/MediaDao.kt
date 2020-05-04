@@ -18,10 +18,10 @@ interface MediaDao {
     fun loadAllByIds(mediaIds: IntArray): List<MediaEntity>
 
     @Query("SELECT * FROM media WHERE id == :id")
-    fun load(id: Int): MediaEntity
+    fun load(id: Int): MediaEntity?
 
     @Query("SELECT * FROM media WHERE media_id LIKE :mediaId LIMIT 1")
-    fun findByMediaId(mediaId: String): MediaEntity
+    fun findByMediaId(mediaId: String): MediaEntity?
 
     @Insert
     fun insertAll(medias: List<MediaEntity>)

@@ -8,6 +8,7 @@ import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.picasso.Picasso
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
@@ -100,11 +101,19 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     }
 
     override fun showMessage(msg: String) {
-        Snackbar.make(requireView(), msg,Snackbar.LENGTH_LONG).show()
+        Snackbar.make(requireView(), msg, Snackbar.LENGTH_LONG).show()
     }
 
     override fun setTitle(title: String) {
         binding.castPlayerTitle.text = title
+    }
+
+    override fun setImage(url: String) {
+        Picasso.get().load(url).into(binding.castPlayerImage)
+    }
+
+    override fun clearImage() {
+        binding.castPlayerImage.setImageResource(0)
     }
 
     override fun updateSeekPosition(ratio: Float) {
@@ -116,7 +125,8 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         val viewModule = module {
             scope(named<CastPlayerFragment>()) {
                 scoped<CastPlayerContract.View> { getSource() }
-                scoped<CastPlayerContract.Presenter> { CastPlayerPresenter(get(), get()) }
+                scoped<CastPlayerContract.Presenter> { CastPlayerPresenter(get(), get(), get()) }
+                scoped { CastPlayerUiMapper() }
                 viewModel { CastPlayerState() }
             }
         }

@@ -21,5 +21,6 @@ class ChromecastYouTubePlayerContextWrapper(
     fun destroy() {
         playerUi = null
         listener.destroy()
+        context.release()
     }
 }

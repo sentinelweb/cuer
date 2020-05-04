@@ -8,6 +8,14 @@
     android:background="@color/red_100"
     >
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cast_player_image"
+        android:layout_width="64dp"
+        android:layout_height="48dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
     <FrameLayout
         android:id="@+id/cast_player_center"
         android:layout_width="wrap_content"
@@ -21,7 +29,7 @@
             android:id="@+id/cast_player_play"
             android:layout_width="@dimen/player_button_size"
             android:layout_height="@dimen/player_button_size"
-            android:src="@drawable/ic_player_play_arrow_black"
+            android:src="@drawable/ic_player_play_black"
             />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -34,8 +42,9 @@
 
         <ProgressBar
             android:id="@+id/cast_player_buffering"
-            android:layout_width="@dimen/player_button_size"
-            android:layout_height="@dimen/player_button_size"
+            android:layout_width="@dimen/player_button_icon_size"
+            android:layout_height="@dimen/player_button_icon_size"
+            android:padding="4dp"
             />
     </FrameLayout>
 
@@ -61,7 +70,7 @@
         android:id="@+id/cast_player_track_last"
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
-        android:src="@drawable/ic_player_skip_previous_black"
+        android:src="@drawable/ic_player_skip_b_black"
         app:layout_constraintRight_toLeftOf="@id/cast_player_seek_back"
         app:layout_constraintTop_toTopOf="parent"
         />
@@ -70,7 +79,7 @@
         android:id="@+id/cast_player_track_next"
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
-        android:src="@drawable/ic_player_skip_next_black"
+        android:src="@drawable/ic_player_skip_f_black"
         app:layout_constraintLeft_toRightOf="@id/cast_player_seek_forward"
         app:layout_constraintTop_toTopOf="parent"
         />
@@ -82,6 +91,7 @@
         app:layout_constraintRight_toLeftOf="@id/media_route_button"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="-"
+        android:visibility="gone"
         />
 
     <androidx.mediarouter.app.MediaRouteButton
@@ -111,8 +121,9 @@
         android:layout_height="wrap_content"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:ellipsize="end"
+        android:ellipsize="marquee"
         android:gravity="center"
+        android:singleLine="true"
         app:layout_constraintTop_toBottomOf="@id/cast_player_center"
         app:layout_constraintLeft_toRightOf="@+id/cast_player_current_time"
         app:layout_constraintRight_toLeftOf="@+id/cast_player_duration"

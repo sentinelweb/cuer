@@ -11,9 +11,17 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubeVideosRetrofitInteractor
 object NetModule {
 
     val netModule = module {
-        single {RetrofitBuilder()}
-        single (named(ServiceType.YOUTUBE)) {get<RetrofitBuilder>().buildYoutubeClient()}
-        single {get<RetrofitBuilder>().buildYoutubeService(get(named(ServiceType.YOUTUBE)))}
-        factory<YoutubeVideosInteractor> { YoutubeVideosRetrofitInteractor(get(), get(), YoutubeVideoMediaDomainMapper()) }
+        single { RetrofitBuilder() }
+        single(named(ServiceType.YOUTUBE)) { get<RetrofitBuilder>().buildYoutubeClient() }
+        single { get<RetrofitBuilder>().buildYoutubeService(get(named(ServiceType.YOUTUBE))) }
+        factory<YoutubeVideosInteractor> {
+            YoutubeVideosRetrofitInteractor(
+                service = get(),
+                keyProvider = get(),
+                mapper = get(),
+                coContext = get()
+            )
+        }
+        factory { YoutubeVideoMediaDomainMapper(get()) }
     }
 }

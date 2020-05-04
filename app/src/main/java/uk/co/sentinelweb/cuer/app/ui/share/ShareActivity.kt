@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import org.koin.android.scope.currentScope
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 
@@ -48,7 +49,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
     override fun gotoMain(youtubeId: String?) {
         startActivity(
             Intent(this, MainActivity::class.java).apply {
-                youtubeId?.let { putExtra("YTID", it) }
+                youtubeId?.let { putExtra(Const.EXTRA_YTID, it) }
             })
     }
 
@@ -60,11 +61,12 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
                 scoped<ShareContract.View> { getSource() }
                 scoped<ShareContract.Presenter> {
                     SharePresenter(
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get()
+                        view = get(),
+                        repository = get(),
+                        linkScanner = get(),
+                        contextProvider = get(),
+                        ytInteractor = get(),
+                        toast = get()
                     )
                 }
             }

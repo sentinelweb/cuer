@@ -84,6 +84,9 @@ dependencies {
     // this is not needed to use the library, but it provides the very useful MediaRouteButton.
     implementation "androidx.mediarouter:mediarouter:$ver_mediarouter"
 
+    implementation "androidx.core:core:$ver_androidx_core"
+    implementation "androidx.media:media:$ver_androidx_media"
+
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"

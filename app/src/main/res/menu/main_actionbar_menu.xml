@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/test_item"
-        android:icon="@drawable/ic_player_play_arrow_black"
+        android:icon="@drawable/ic_player_play_black"
         android:title="@string/menu_play"
         app:iconTint="@color/white"
         app:showAsAction="always"

@@ -27,9 +27,11 @@ class PlaylistPresenter(
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
+
     override fun initialise() {
         initListCheck()
         queue.addProducerListener(this)
+        queue.refreshQueue()
     }
 
     override fun loadList() {
@@ -40,6 +42,10 @@ class PlaylistPresenter(
         queue.refreshQueue()
     }
 
+    override fun setFocusId(videoId: String) {
+        state.focusItemId = videoId
+    }
+
     override fun destroy() {
         state.jobs.forEach { it.cancel() }
         state.jobs.clear()
@@ -47,7 +53,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel) {
-        toastWrapper.showToast("right: ${item.topText}")
+        toastWrapper.show("right: ${item.topText}")
     }
 
     override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
@@ -65,6 +71,12 @@ class PlaylistPresenter(
         getDomainPlaylistItem(item)?.run {
             queue.onItemSelected(this)
         }
+    }
+
+    private fun getIndexByVideoId(videoId: String): Int? {
+        return queue.getPlayList()
+            ?.items
+            ?.indexOfFirst { it.media.mediaId == videoId }
     }
 
     private fun getDomainPlaylistItem(item: PlaylistModel.PlaylistItemModel): PlaylistItemDomain? {
@@ -110,6 +122,12 @@ class PlaylistPresenter(
         list.items
             .map { modelMapper.map(it) }
             .also { view.setList(it) }
+
+        state.focusItemId?.let {
+            getIndexByVideoId(it)?.apply {
+                view.scrollToItem(this)
+            }
+        }
     }
 
 }

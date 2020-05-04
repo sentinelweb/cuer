@@ -1,26 +1,31 @@
 package uk.co.sentinelweb.cuer.app.service.cast
 
-import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
-import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
+import uk.co.sentinelweb.cuer.app.CuerAppState
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
+import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 
 class YoutubeCastServiceController constructor(
     private val service: YoutubeCastService,
-    private val creator: YoutubePlayerContextCreator,
-    private val chromeCastWrapper: ChromeCastWrapper,
-    private val state: YoutubeCastServiceState
+    private val state: YoutubeCastServiceState,
+    private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val notification: PlayerControlsNotificationContract.PresenterExternal,
+    private val appState: CuerAppState
 ) {
-
     fun initialise() {
+        ytContextHolder.get()!!.playerUi = notification
+    }
 
+    fun handleAction(action: String?) {
+        notification.handleAction(action)
     }
 
     fun destroy() {
-//        wrapper = null
-//        state.youtubePlayerContext?.destroy()
-//        state.youtubePlayerContext = null
+        notification.destroy()
+        if (ytContextHolder.get()!!.playerUi == notification) {
+            ytContextHolder.get()!!.destroy()
+        }
     }
 
-    fun pause() {
+    companion object {
     }
-
 }

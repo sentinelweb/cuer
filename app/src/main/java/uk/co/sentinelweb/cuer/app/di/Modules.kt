@@ -23,10 +23,13 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
@@ -44,7 +47,6 @@ object Modules {
     )
 
     private val utilModule = module {
-        factory { CoroutineContextProvider() }
         factory { LinkScanner() }
         single { CuerAppState() }
         single<QueueMediatorContract.Mediator> {
@@ -52,15 +54,19 @@ object Modules {
                 state = QueueMediatorState(),
                 repository = get(),
                 mediaMapper = MediaToPlaylistItemMapper(),
-                contextProvider = get()
+                contextProvider = get(),
+                mediaSessionManager = get()
             )
         }
         single { ChromecastYouTubePlayerContextHolder(get(), get()) }
+        factory { MediaSessionManager(get(), androidApplication(), get(), get(), get()) }
+        factory { MediaMetadataMapper() }
+        factory { PlaybackStateMapper() }
     }
 
     private val wrapperModule = module {
         factory { ChromeCastWrapper(androidApplication()) }
-        factory { YoutubePlayerContextCreator(get()) }
+        factory { YoutubePlayerContextCreator(get(), get(), get(), get(), get()) }
         factory { ToastWrapper(androidApplication()) }
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }
@@ -77,4 +83,5 @@ object Modules {
         .plus(appNetModule)
         .plus(DatabaseModule.dbModule)
         .plus(NetModule.netModule)
+        .plus(CoreModule.objectModule)
 }

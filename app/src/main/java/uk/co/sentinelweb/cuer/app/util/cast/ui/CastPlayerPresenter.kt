@@ -1,13 +1,16 @@
 package uk.co.sentinelweb.cuer.app.util.cast.ui
 
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.*
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerStateUi.*
+import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import kotlin.math.max
 import kotlin.math.min
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
-    private val state: CastPlayerState
+    private val state: CastPlayerState,
+    private val mapper: CastPlayerUiMapper
 ) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls {
 
     override fun initialise() {
@@ -82,7 +85,7 @@ class CastPlayerPresenter(
         )
     }
 
-    override fun setPlayerState(playState: CastPlayerContract.PlayerStateUi) {
+    override fun setPlayerState(playState: PlayerStateDomain) {
         when (playState) {
             UNKNOWN -> view.setPaused() // todo better state
             UNSTARTED -> view.setPaused() // todo better state
@@ -90,13 +93,16 @@ class CastPlayerPresenter(
             PLAYING -> view.setPlaying()
             PAUSED -> view.setPaused()
             BUFFERING -> view.setBuffering()
-            VIDEO_CUED -> TODO()
+            VIDEO_CUED -> Unit
+            ERROR -> {
+                view.setPaused(); view.showMessage("An error occurred")
+            }
         }
     }
 
     override fun setCurrentSecond(second: Float) {
         state.positionMs = (second * 1000).toLong()
-        view.setCurrentSecond("${state.positionMs / 1000} s") // todo map time
+        view.setCurrentSecond(mapper.formatTime(state.positionMs))
         if (state.durationMs > 0) {
             view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
         }
@@ -104,7 +110,7 @@ class CastPlayerPresenter(
 
     override fun setDuration(duration: Float) {
         state.durationMs = (duration * 1000).toLong()
-        view.setDuration("${state.durationMs / 1000} s") // todo map time
+        view.setDuration(mapper.formatTime(state.durationMs))
     }
 
     override fun error(msg: String) {
@@ -119,8 +125,9 @@ class CastPlayerPresenter(
     override fun reset() {
         if (!state.isDestroyed) {
             state.title = "No media".apply { view.setTitle(this) }
-            state.positionMs = 0L.apply { view.setCurrentSecond(this.toString()) }
-            state.durationMs = 0L.apply { view.setDuration(this.toString()) }
+            state.positionMs = 0L.apply { view.setCurrentSecond("") }
+            state.durationMs = 0L.apply { view.setDuration("") }
+            view.clearImage()
             view.setPaused()
         }
     }
@@ -128,5 +135,9 @@ class CastPlayerPresenter(
     override fun restoreState() {
         view.setTitle(state.title)
         // todo restore state
+    }
+
+    override fun setMedia(media: MediaDomain) {
+        media.thumbNail?.url?.apply { view.setImage(this) }
     }
 }

@@ -6,6 +6,10 @@ class LogWrapper {
 
     var tag = APP_TAG
 
+    fun tag(obj: Any) {
+        tag = obj::class.java.simpleName
+    }
+
     fun d(msg:String) = Log.d(tag, msg)
 
     fun e(msg:String, t:Throwable? = null) = Log.e(tag, msg, t)

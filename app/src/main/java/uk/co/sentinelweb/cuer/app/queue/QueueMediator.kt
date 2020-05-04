@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.queue
 
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -13,7 +14,8 @@ class QueueMediator constructor(
     private val state: QueueMediatorState,
     private val repository: MediaDatabaseRepository,
     private val mediaMapper: MediaToPlaylistItemMapper,
-    private val contextProvider: CoroutineContextProvider
+    private val contextProvider: CoroutineContextProvider,
+    private val mediaSessionManager: MediaSessionManager
 ) : QueueMediatorContract.Mediator {
 
     private val consumerListeners: MutableList<QueueMediatorContract.ConsumerListener> =
@@ -57,6 +59,7 @@ class QueueMediator constructor(
 
     override fun destroy() {
         // might not be needed if singleton
+        // save queue position
     }
 
     override fun nextItem() {
@@ -84,8 +87,13 @@ class QueueMediator constructor(
 
     private fun updateCurrentItem() {
         state.currentPlaylistItem = state.currentPlayList!!.items[state.queuePosition]
+        state.currentPlaylistItem?.apply {
+            mediaSessionManager.setMedia(media)
+        }
         consumerListeners.forEach { it.onItemChanged() }
     }
+
+    override fun getPlayList(): PlaylistDomain? = state.currentPlayList
 
     override fun getCurrentItem(): PlaylistItemDomain? = state.currentPlaylistItem
 
@@ -114,6 +122,4 @@ class QueueMediator constructor(
                 }
         })
     }
-
-    override fun getPlayList(): PlaylistDomain? = state.currentPlayList
 }
