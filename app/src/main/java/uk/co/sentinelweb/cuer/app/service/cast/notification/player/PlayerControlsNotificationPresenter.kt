@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.PresenterExternal
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerControls.Listener
+import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -16,7 +17,9 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 class PlayerControlsNotificationPresenter constructor(
     private val view: PlayerControlsNotificationContract.View,
     private val state: PlayerControlsNotificationState,
-    private val toastWrapper: ToastWrapper
+    private val toastWrapper: ToastWrapper,
+    private val log: LogWrapper
+
 ) : PresenterExternal, Presenter {
 
     private val listeners: MutableList<Listener> = mutableListOf()
@@ -108,6 +111,7 @@ class PlayerControlsNotificationPresenter constructor(
         }
         state.media = media
         updateNotification()
+        log.d("got media: $media")
     }
 
     override fun initMediaRouteButton() {
