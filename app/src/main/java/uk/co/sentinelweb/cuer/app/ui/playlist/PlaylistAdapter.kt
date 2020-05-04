@@ -1,22 +1,37 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MotionEventCompat
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.roche.mdas.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.helper.ItemTouchHelperAdapter
+import uk.co.sentinelweb.cuer.app.ui.common.itemlist.helper.SimpleItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemDiffCallback
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistAdapter.ItemViewHolder
+import java.util.*
 
 
 class PlaylistAdapter constructor(
     private val itemFactory: ItemFactory,
-    private val interactions: ItemContract.Interactions
-) : RecyclerView.Adapter<ItemViewHolder>() {
+    private val interactions: ItemContract.Interactions,
+    private val toast: ToastWrapper,
+    recyclerView: RecyclerView
+) : RecyclerView.Adapter<ItemViewHolder>(), ItemTouchHelperAdapter {
+    // todo creator?
+    private val itemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(this))
+
+    init {
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
 
     var data: List<ItemModel> = listOf()
         get() = field
@@ -39,6 +54,15 @@ class PlaylistAdapter constructor(
     @Override
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder.itemPresenter.update(data.get(position))
+
+        // Start a drag whenever the handle view it touched
+        holder.itemView.setOnTouchListener { v, event ->
+            // todo fix
+            if (MotionEventCompat.getActionMasked(event) === MotionEvent.ACTION_DOWN) {
+                itemTouchHelper.startDrag(holder)
+            }
+            false
+        }
     }
 
     class ItemViewHolder(val itemPresenter: ItemContract.Presenter, view: View) :
@@ -46,9 +70,14 @@ class PlaylistAdapter constructor(
 
     override fun getItemCount(): Int = data.size
 
-    companion object {
-        private val UNKNOWN_ITEM =
-            ItemModel("0", "top", "bottom", false, R.drawable.ic_nav_play_black, null)
+    override fun onItemDismiss(position: Int) {
+        toast.show("dismissed: $position")
+    }
+
+    override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
+        Collections.swap(data, fromPosition, toPosition)
+        notifyItemMoved(fromPosition, toPosition)
+        return true
     }
 
 }

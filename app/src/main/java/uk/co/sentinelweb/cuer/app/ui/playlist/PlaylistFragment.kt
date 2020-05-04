@@ -24,6 +24,8 @@ class PlaylistFragment :
     private val adapter: PlaylistAdapter by currentScope.inject()
     private val alertWrapper: AlertDialogWrapper by currentScope.inject()
 
+    private val recyclerView by lazy { playlist_list }
+
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,6 +62,7 @@ class PlaylistFragment :
     override fun scrollToItem(index: Int) {
         playlist_list.scrollToPosition(index)
     }
+
     //endregion
 
     // region ItemContract.Interactions
@@ -95,7 +98,14 @@ class PlaylistFragment :
                     )
                 }
                 scoped { PlaylistModelMapper() }
-                scoped { PlaylistAdapter(get(), getSource()) }
+                scoped {
+                    PlaylistAdapter(
+                        get(),
+                        getSource(),
+                        get(),
+                        get<PlaylistFragment>().recyclerView
+                    )
+                }
                 scoped { AlertDialogWrapper((getSource() as Fragment).requireActivity()) }
                 viewModel { PlaylistState() }
             }
