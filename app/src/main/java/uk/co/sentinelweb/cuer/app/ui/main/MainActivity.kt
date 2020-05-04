@@ -78,8 +78,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         presenter.onDestroy()
+        super.onDestroy()
     }
 
     override fun isRecreating() = isChangingConfigurations

@@ -86,8 +86,6 @@ dependencies {
 
     implementation "androidx.core:core:$ver_androidx_core"
     implementation "androidx.media:media:$ver_androidx_media"
-    // https://mvnrepository.com/artifact/androidx.media2/media2-session
-    //implementation 'androidx.media2:media2-session:1.0.3'
 
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"

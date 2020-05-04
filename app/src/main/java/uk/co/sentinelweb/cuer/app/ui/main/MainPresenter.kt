@@ -34,10 +34,6 @@ class MainPresenter(
 
     private fun initialiseCastContext() {
         ytContextHolder.create()
-
-//        state.youtubePlayerContext = creator.createContext(chromeCastWrapper.getCastContext())
-//        state.youtubePlayerContext?.playerUi = playerControls
-//        log.d("initialiseCastContext()")
     }
 
 
@@ -48,20 +44,6 @@ class MainPresenter(
             initialiseCastContext()
         }
         ytContextHolder.get()?.playerUi = playerControls
-//        if (ytServiceManager.isRunning()) {
-//            log.d("onStart():svc.isRunning state_cxt:${state.youtubePlayerContext}, controls:${playerControls}")
-//            state.youtubePlayerContext = ytServiceManager
-//                .get()!!
-//                .popYoutubeContext()!!
-//            log.d("onStart():svc.isRunning from svc state_cxt:${state.youtubePlayerContext} existing controls:${state.youtubePlayerContext?.playerUi}")
-//            state.youtubePlayerContext?.playerUi = playerControls
-//            ytServiceManager.stop()
-//        } else {
-//            log.d("onStart():svc.isNotRunning state_cxt:${state.youtubePlayerContext}, controls:${playerControls}")
-//            if (state.youtubePlayerContext == null && state.playServicesAvailable) {
-//                initialiseCastContext()
-//            }
-//        }
     }
 
     override fun onStop() {
@@ -76,25 +58,7 @@ class MainPresenter(
         }
     }
 
-    override fun onDestroy() {
-
-
-//        if (state.youtubePlayerContext!!.isConnected()) {
-//            // move to service
-//            log.d("onStop(): push cxt to svc state_cxt:${state.youtubePlayerContext}, controls:${playerControls}")
-//            state.youtubePlayerContext!!.playerUi = null
-//            val playerContext = state.youtubePlayerContext
-//            state.youtubePlayerContext = null
-////            ytServiceManager.start {// try moving to onStop before switch start might happen in same thread
-////                ytServiceManager.get()!!.pushYoutubeContext(playerContext!!)
-////            }
-//        } else {
-//            // kill everything
-//            log.d("onStop(): destroy state_cxt:${state.youtubePlayerContext}, controls:${playerControls}")
-//            state.youtubePlayerContext!!.playerUi = null
-//            state.youtubePlayerContext!!.destroy()
-//        }
-    }
+    override fun onDestroy() = Unit
 
     companion object {
         val TAGP = "CuerLog"

@@ -20,6 +20,7 @@ class YoutubeCastServiceController constructor(
     }
 
     fun destroy() {
+        notification.destroy()
         if (ytContextHolder.get()!!.playerUi == notification) {
             ytContextHolder.get()!!.destroy()
         }
