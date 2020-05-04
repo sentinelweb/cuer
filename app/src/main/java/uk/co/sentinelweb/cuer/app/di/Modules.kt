@@ -66,7 +66,7 @@ object Modules {
 
     private val wrapperModule = module {
         factory { ChromeCastWrapper(androidApplication()) }
-        factory { YoutubePlayerContextCreator(get(), get(), get(), get()) }
+        factory { YoutubePlayerContextCreator(get(), get(), get(), get(), get()) }
         factory { ToastWrapper(androidApplication()) }
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }

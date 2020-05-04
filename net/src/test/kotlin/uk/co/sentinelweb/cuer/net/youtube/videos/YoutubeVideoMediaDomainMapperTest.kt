@@ -60,6 +60,5 @@ class YoutubeVideoMediaDomainMapperTest {
             assertNull(domain.positon)
             assertNull(domain.id)
         }
-
     }
 }

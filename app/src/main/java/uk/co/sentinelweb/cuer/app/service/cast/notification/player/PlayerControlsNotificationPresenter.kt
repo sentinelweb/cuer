@@ -35,6 +35,7 @@ class PlayerControlsNotificationPresenter constructor(
                 listeners.forEach { it.trackBack() }
             ACTION_TRACKF ->
                 listeners.forEach { it.trackFwd() }
+            else -> Unit
         }
     }
 
