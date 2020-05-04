@@ -59,6 +59,7 @@ class QueueMediator constructor(
 
     override fun destroy() {
         // might not be needed if singleton
+        // save queue position
     }
 
     override fun nextItem() {
@@ -92,6 +93,8 @@ class QueueMediator constructor(
         consumerListeners.forEach { it.onItemChanged() }
     }
 
+    override fun getPlayList(): PlaylistDomain? = state.currentPlayList
+
     override fun getCurrentItem(): PlaylistItemDomain? = state.currentPlaylistItem
 
     override fun removeItem(playlistItemDomain: PlaylistItemDomain) {
@@ -119,6 +122,4 @@ class QueueMediator constructor(
                 }
         })
     }
-
-    override fun getPlayList(): PlaylistDomain? = state.currentPlayList
 }
