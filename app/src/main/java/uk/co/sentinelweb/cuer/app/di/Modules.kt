@@ -29,7 +29,7 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
@@ -47,7 +47,6 @@ object Modules {
     )
 
     private val utilModule = module {
-        factory { CoroutineContextProvider() }
         factory { LinkScanner() }
         single { CuerAppState() }
         single<QueueMediatorContract.Mediator> {
@@ -84,4 +83,5 @@ object Modules {
         .plus(appNetModule)
         .plus(DatabaseModule.dbModule)
         .plus(NetModule.netModule)
+        .plus(CoreModule.objectModule)
 }

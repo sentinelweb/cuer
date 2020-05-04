@@ -35,39 +35,12 @@ class YouTubePlayerListener(
         queue.addConsumerListener(this)
     }
 
-    // todo fix this - not clean
-    private fun setupPlayer(controls: CastPlayerContract.PlayerControls) {
-        controls.addListener(this)
-        controls.setTitle(state.currentMedia?.title ?: "No Media")
-        controls.setPlayerState(state.playState)
-        controls.setDuration(state.durationSec)
-        controls.setCurrentSecond(state.positionSec)
-        state.currentMedia?.apply { controls.setMedia(this) }
-    }
-
-    private fun cleanupPlayer(controls: CastPlayerContract.PlayerControls?) {
-        controls?.removeListener(this)
-        controls?.reset()
-    }
-
     fun onDisconnected() {
         youTubePlayer?.removeListener(this)
         youTubePlayer = null
         playerUi?.reset()
         playerUi = null
         queue.removeConsumerListener(this)
-    }
-
-    private fun loadVideo(item: PlaylistItemDomain?) {
-        item?.let {
-            youTubePlayer?.loadVideo(item.media.mediaId, 0f)
-            updateStateForMedia(item)
-        } ?: playerUi?.reset()
-    }
-
-    private fun updateStateForMedia(item: PlaylistItemDomain) {
-        state.currentMedia = item.media
-        playerUi?.setMedia(item.media)
     }
 
     // region AbstractYouTubePlayerListener
@@ -143,23 +116,43 @@ class YouTubePlayerListener(
 
     // region  CastPlayerContract.PresenterExternal.Listener
     override fun play() {
-        youTubePlayer?.play()
+        try {
+            youTubePlayer?.play()
+        } catch (e: Exception) {
+            handleError(e)
+        }
     }
 
     override fun pause() {
-        youTubePlayer?.pause()
+        try {
+            youTubePlayer?.pause()
+        } catch (e: Exception) {
+            handleError(e)
+        }
     }
 
     override fun trackBack() {
-        queue.lastItem()
+        try {
+            queue.lastItem()
+        } catch (e: Exception) {
+            handleError(e)
+        }
     }
 
     override fun trackFwd() {
-        queue.nextItem()
+        try {
+            queue.nextItem()
+        } catch (e: Exception) {
+            handleError(e)
+        }
     }
 
     override fun seekTo(positionMs: Long) {
-        youTubePlayer?.seekTo(positionMs / 1000f)
+        try {
+            youTubePlayer?.seekTo(positionMs / 1000f)
+        } catch (e: Exception) {
+            handleError(e)
+        }
     }
     // endregion
 
@@ -168,4 +161,36 @@ class YouTubePlayerListener(
         loadVideo(queue.getCurrentItem())
     }
     // endregion
+
+    private fun handleError(e: Exception) {
+        playerUi?.error("Error: ${e.message ?: "Unknown - check log"}")
+        log.e("Error playing", e)
+    }
+
+    private fun loadVideo(item: PlaylistItemDomain?) {
+        item?.let {
+            youTubePlayer?.loadVideo(item.media.mediaId, 0f)
+            updateStateForMedia(item)
+        } ?: playerUi?.reset()
+    }
+
+    private fun updateStateForMedia(item: PlaylistItemDomain) {
+        state.currentMedia = item.media
+        playerUi?.setMedia(item.media)
+    }
+
+    // todo fix this - not clean
+    private fun setupPlayer(controls: CastPlayerContract.PlayerControls) {
+        controls.addListener(this)
+        controls.setTitle(state.currentMedia?.title ?: "No Media")
+        controls.setPlayerState(state.playState)
+        controls.setDuration(state.durationSec)
+        controls.setCurrentSecond(state.positionSec)
+        state.currentMedia?.apply { controls.setMedia(this) }
+    }
+
+    private fun cleanupPlayer(controls: CastPlayerContract.PlayerControls?) {
+        controls?.removeListener(this)
+        controls?.reset()
+    }
 }

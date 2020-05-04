@@ -57,7 +57,6 @@ dependencies {
     implementation "com.google.android.material:material:$ver_material"
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
-    //implementation "androidx.med:$ver_lifecycle_extensions"
     implementation "com.squareup.picasso:picasso:$ver_picasso"
 
     //navigation

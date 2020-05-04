@@ -1,12 +1,12 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos
 
+import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
-class YoutubeVideoMediaDomainMapper {
+class YoutubeVideoMediaDomainMapper(
+    private val dateTimeMapper: DateTimeMapper
+) {
     fun map(dto: YoutubeVideosDto): List<MediaDomain> =
         dto.items.map {
             MediaDomain(
@@ -17,20 +17,18 @@ class YoutubeVideoMediaDomainMapper {
                 mediaType = MediaDomain.MediaTypeDomain.VIDEO,
                 platform = MediaDomain.PlatformDomain.YOUTUBE,
                 mediaId = it.id,
-                duration = parseDuration(it.contentDetails?.duration),
-                thumbNail = mapImage(it.snippet?.thumbnails?.let { it.medium ?: it.standard }),
-                image = mapImage(it.snippet?.thumbnails?.let { it.maxres ?: it.high }),
+                duration = it.contentDetails?.duration
+                    ?.let { dur -> dateTimeMapper.mapDuration(dur) }
+                    ?: -1,
+                thumbNail = mapImage(it.snippet?.thumbnails
+                    ?.let { thumbnailsDto -> thumbnailsDto.medium ?: thumbnailsDto.standard }
+                ),
+                image = mapImage(it.snippet?.thumbnails
+                    ?.let { thumbnailsDto -> thumbnailsDto.maxres ?: thumbnailsDto.high }
+                ),
                 channelId = it.snippet?.channelId,
                 channelTitle = it.snippet?.channelTitle,
-                published = parseLocalDateTime(it.snippet?.publishedAt)
-            )
-        }
-
-    private fun parseLocalDateTime(publishedAt: String?): LocalDateTime? =
-        publishedAt?.let {
-            LocalDateTime.parse(
-                publishedAt,
-                DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SS[S]'Z'")
+                published = it.snippet?.publishedAt?.let { ts -> dateTimeMapper.mapTimestamp(ts) }
             )
         }
 
@@ -42,10 +40,5 @@ class YoutubeVideoMediaDomainMapper {
                 it.height
             )
         }
-
-    private fun parseDuration(duration: String?): Long =
-        duration?.let {
-            Duration.parse(duration).toMillis()
-        } ?: -1
 
 }
