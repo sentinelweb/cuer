@@ -12,8 +12,6 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListModule
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListView
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
@@ -40,9 +38,7 @@ object Modules {
         BrowseFragment.fragmentModule,
         MainActivity.activityModule,
         CastPlayerFragment.viewModule,
-        ItemListModule.listModule,
         ShareActivity.activityModule,
-        ItemListView.viewModule,
         YoutubeCastServiceModule.serviceModule
     )
 

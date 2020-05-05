@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 
 interface PlaylistContract {
 

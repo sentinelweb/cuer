@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.playlist_fragment.*
 import org.koin.android.scope.currentScope
@@ -11,20 +12,22 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.util.wrapper.AlertDialogWrapper
 
 class PlaylistFragment :
     Fragment(R.layout.playlist_fragment),
     PlaylistContract.View,
-    ItemContract.Interactions {
+    ItemContract.Interactions,
+    ItemContract.ItemMoveInteractions {
 
     private val presenter: PlaylistContract.Presenter by currentScope.inject()
     private val adapter: PlaylistAdapter by currentScope.inject()
     private val alertWrapper: AlertDialogWrapper by currentScope.inject()
-
-    private val recyclerView by lazy { playlist_list }
+    private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
 
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -32,6 +35,7 @@ class PlaylistFragment :
         presenter.initialise()
         playlist_list.layoutManager = LinearLayoutManager(context)
         playlist_list.adapter = adapter
+        itemTouchHelper.attachToRecyclerView(playlist_list)
     }
 
     override fun onDestroyView() {
@@ -63,6 +67,15 @@ class PlaylistFragment :
         playlist_list.scrollToPosition(index)
     }
 
+    //endregion
+
+    // region ItemContract.Interactions
+    override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
+        // todo make move in queue
+        //Collections.swap(data, fromPosition, toPosition)
+        adapter.notifyItemMoved(fromPosition, toPosition)
+        return true
+    }
     //endregion
 
     // region ItemContract.Interactions
@@ -98,15 +111,11 @@ class PlaylistFragment :
                     )
                 }
                 scoped { PlaylistModelMapper() }
-                scoped {
-                    PlaylistAdapter(
-                        get(),
-                        getSource(),
-                        get(),
-                        get<PlaylistFragment>().recyclerView
-                    )
-                }
+                scoped { PlaylistAdapter(get(), getSource()) }
+                scoped { ItemTouchHelperCallback(getSource()) }
+                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { AlertDialogWrapper((getSource() as Fragment).requireActivity()) }
+                scoped { ItemFactory() }
                 viewModel { PlaylistState() }
             }
         }

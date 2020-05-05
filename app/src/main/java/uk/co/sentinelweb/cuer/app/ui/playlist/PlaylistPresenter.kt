@@ -27,7 +27,6 @@ class PlaylistPresenter(
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
-
     override fun initialise() {
         initListCheck()
         queue.addProducerListener(this)

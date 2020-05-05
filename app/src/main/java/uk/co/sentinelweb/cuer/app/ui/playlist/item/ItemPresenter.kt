@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.common.itemlist.item
+package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
 class ItemPresenter (
         val view: ItemContract.View,
