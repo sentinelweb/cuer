@@ -6,7 +6,7 @@
     android:layout_height="@dimen/list_item_height">
 
     <TextView
-        android:id="@+id/swipe_label_right"
+        android:id="@id/swipe_label_right"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/green_600"
@@ -20,7 +20,7 @@
     />
 
     <TextView
-        android:id="@+id/swipe_label_left"
+        android:id="@id/swipe_label_left"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/red_600"
@@ -34,5 +34,4 @@
         android:alpha="0"
     />
 
-    <include layout="@layout/view_media_item" />
 </FrameLayout>

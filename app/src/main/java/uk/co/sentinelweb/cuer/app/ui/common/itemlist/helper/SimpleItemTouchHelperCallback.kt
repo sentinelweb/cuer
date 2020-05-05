@@ -35,9 +35,9 @@ import uk.co.sentinelweb.klink.util.extension.fade
  */
 class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter) :
     ItemTouchHelper.Callback() {
-
+    var allowDrag = true
     override fun isLongPressDragEnabled(): Boolean {
-        return true
+        return false
     }
 
     override fun isItemViewSwipeEnabled(): Boolean {
@@ -55,7 +55,7 @@ class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter
             val swipeFlags = 0
             makeMovementFlags(dragFlags, swipeFlags)
         } else {
-            val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            val dragFlags = if (allowDrag) ItemTouchHelper.UP or ItemTouchHelper.DOWN else 0
             val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
             makeMovementFlags(dragFlags, swipeFlags)
         }
@@ -80,6 +80,10 @@ class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter
         mAdapter.onItemDismiss(viewHolder.adapterPosition)
     }
 
+    override fun getBoundingBoxMargin(): Int {
+        return super.getBoundingBoxMargin()
+    }
+
     override fun onChildDraw(
         c: Canvas,
         recyclerView: RecyclerView,
@@ -102,8 +106,6 @@ class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter
             if (outSideTolerance) {
                 viewHolder.itemView.findViewById<View>(R.id.swipe_label_right).fade(!left)
                 viewHolder.itemView.findViewById<View>(R.id.swipe_label_left).fade(left)
-//                viewHolder.itemView.findViewById<View>(R.id.swipe_label_right).isVisible = !left
-//                viewHolder.itemView.findViewById<View>(R.id.swipe_label_left).isVisible = left
             }
         } else {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)

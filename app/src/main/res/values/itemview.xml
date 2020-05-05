@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ItemView">
+        <attr name="swipe_layout" format="reference" />
+        <attr name="content_layout" format="reference" />
+    </declare-styleable>
+    <item name="swipe_label_right" type="id" />
+    <item name="swipe_label_left" type="id" />
+    <item name="listitem" type="id" />
+</resources>

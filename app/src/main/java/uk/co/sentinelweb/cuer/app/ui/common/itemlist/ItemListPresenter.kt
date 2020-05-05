@@ -19,18 +19,18 @@ class ItemListPresenter constructor(
         view.show(itemlist.size > 0)
         itemlist.forEachIndexed{ idx, model ->
             val itemPresenter: ItemContract.Presenter
-            if (state.listItem.size <= idx) {
+            if (state.listItems.size <= idx) {
                 itemPresenter = view.addItem(interactions)
-                state.listItem.add(itemPresenter)
+                state.listItems.add(itemPresenter)
             } else {
-                itemPresenter = state.listItem.get(idx)
+                itemPresenter = state.listItems.get(idx)
             }
             itemPresenter.update(model)
         }
-        Log.e("ItemListPresenter", "bind list ${state.listItem.size} ${state.listItem.size}")
+        Log.e("ItemListPresenter", "bind list ${state.listItems.size} ${state.listItems.size}")
         val modelSize = itemlist.size
-        while (state.listItem.size > modelSize) {
-            state.listItem.removeAt(modelSize)
+        while (state.listItems.size > modelSize) {
+            state.listItems.removeAt(modelSize)
         }
         view.clearFrom(modelSize)
     }

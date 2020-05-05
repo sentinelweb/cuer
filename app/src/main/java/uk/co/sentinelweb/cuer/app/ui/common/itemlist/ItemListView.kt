@@ -41,7 +41,7 @@ class ItemListView constructor(
     }
 
     override fun show(b: Boolean) {
-        url_list_scroll.visibility = if (b) View.VISIBLE else View.GONE
+        common_list_scroll.visibility = if (b) View.VISIBLE else View.GONE
     }
 
     override fun clearFrom(index: Int) {

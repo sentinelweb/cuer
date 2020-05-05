@@ -26,8 +26,10 @@ class PlaylistAdapter constructor(
     private val toast: ToastWrapper,
     recyclerView: RecyclerView
 ) : RecyclerView.Adapter<ItemViewHolder>(), ItemTouchHelperAdapter {
+    private val simpleItemTouchHelperCallback = SimpleItemTouchHelperCallback(this)
+
     // todo creator?
-    private val itemTouchHelper = ItemTouchHelper(SimpleItemTouchHelperCallback(this))
+    private val itemTouchHelper = ItemTouchHelper(simpleItemTouchHelperCallback)
 
     init {
         itemTouchHelper.attachToRecyclerView(recyclerView)
@@ -44,7 +46,7 @@ class PlaylistAdapter constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.view_media_list_item, parent, false)
+            .inflate(R.layout.view_playlist_item, parent, false)
         return ItemViewHolder(
             itemFactory.createPresenter(view as ItemContract.View, interactions),
             view
@@ -56,9 +58,9 @@ class PlaylistAdapter constructor(
         holder.itemPresenter.update(data.get(position))
 
         // Start a drag whenever the handle view it touched
-        holder.itemView.setOnTouchListener { v, event ->
+        holder.itemView.findViewById<View>(R.id.listitem_overflow).setOnTouchListener { v, event ->
             // todo fix
-            if (MotionEventCompat.getActionMasked(event) === MotionEvent.ACTION_DOWN) {
+            if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
                 itemTouchHelper.startDrag(holder)
             }
             false

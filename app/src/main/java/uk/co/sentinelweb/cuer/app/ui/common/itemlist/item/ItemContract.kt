@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.common.itemlist.item
 import androidx.annotation.DrawableRes
 
 interface ItemContract {
+
     interface View {
         fun setTopText(text:String)
         fun setBottomText(text:String)

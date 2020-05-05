@@ -4,26 +4,44 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.content.withStyledAttributes
 import com.squareup.picasso.Picasso
 // todo view binding
-import kotlinx.android.synthetic.main.view_media_item.view.*
-import kotlinx.android.synthetic.main.view_swipe_item.view.*
+import kotlinx.android.synthetic.main.view_playlist_content.view.*
+import kotlinx.android.synthetic.main.view_playlist_swipe.view.*
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.klink.util.extension.fade
 import kotlin.math.abs
 
 
-class ItemView constructor(c: Context, a: AttributeSet?) : FrameLayout(c, a), ItemContract.View {
+class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLayout(c, a, def),
+    ItemContract.View {
+
+    constructor(c: Context, a: AttributeSet?) : this(c, a, 0)
 
     private lateinit var presenter: ItemContract.Presenter
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_swipe_item, this, true)
+        context
+            .withStyledAttributes(a, R.styleable.ItemView, def) {
+                val swipeLayoutRes =
+                    getResourceId(R.styleable.ItemView_swipe_layout, R.layout.view_playlist_swipe)
+                val contentLayoutRes = getResourceId(
+                    R.styleable.ItemView_content_layout,
+                    R.layout.view_playlist_content
+                )
+                val swipeLayout = LayoutInflater.from(context)
+                    .inflate(swipeLayoutRes, this@ItemView, true) as ViewGroup
+                LayoutInflater.from(context).inflate(contentLayoutRes, swipeLayout, true)
+            }
+
         listitem.setOnClickListener({
             presenter.doClick()
         })
-        // this is disabled fpr the mopment but if i need the linearLayout version might be best to have it for that
+
+        // this is disabled fpr the moment but if i need the linearLayout version might be best to have it for that
         //swipeToDismissTouchListener()
     }
 
