@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.common.itemlist.item
+package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
 import androidx.recyclerview.widget.DiffUtil
 
@@ -6,6 +6,7 @@ class ItemDiffCallback(
     var newItems: List<ItemModel>,
     var oldItems: List<ItemModel>
 ) : DiffUtil.Callback() {
+
     override fun getOldListSize(): Int {
         return oldItems.size
     }

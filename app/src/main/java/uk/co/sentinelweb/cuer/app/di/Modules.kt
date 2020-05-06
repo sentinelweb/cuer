@@ -12,8 +12,6 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListModule
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListView
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
@@ -23,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.util.helper.PlaylistMutator
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
@@ -40,9 +39,7 @@ object Modules {
         BrowseFragment.fragmentModule,
         MainActivity.activityModule,
         CastPlayerFragment.viewModule,
-        ItemListModule.listModule,
         ShareActivity.activityModule,
-        ItemListView.viewModule,
         YoutubeCastServiceModule.serviceModule
     )
 
@@ -55,13 +52,15 @@ object Modules {
                 repository = get(),
                 mediaMapper = MediaToPlaylistItemMapper(),
                 contextProvider = get(),
-                mediaSessionManager = get()
+                mediaSessionManager = get(),
+                playlistMutator = get()
             )
         }
         single { ChromecastYouTubePlayerContextHolder(get(), get()) }
         factory { MediaSessionManager(get(), androidApplication(), get(), get(), get()) }
         factory { MediaMetadataMapper() }
         factory { PlaybackStateMapper() }
+        factory { PlaylistMutator() }
     }
 
     private val wrapperModule = module {

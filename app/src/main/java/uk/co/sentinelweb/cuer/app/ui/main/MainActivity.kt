@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         super.onCreateOptionsMenu(menu)
-        menuInflater.inflate(R.menu.main_actionbar_menu, menu)
+        menuInflater.inflate(R.menu.main_actionbar, menu)
         return true
     }
 

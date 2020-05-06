@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 // from https://github.com/romannurik/Android-SwipeToDismiss/blob/master/src/com/example/android/swipedismiss/SwipeDismissTouchListener.java
-package uk.co.sentinelweb.cuer.app.ui.common.itemlist.item;
+package uk.co.sentinelweb.cuer.app.ui.playlist.item.old;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

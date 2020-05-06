@@ -24,13 +24,4 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
-    <uk.co.sentinelweb.cuer.app.ui.common.itemlist.ItemListView
-        android:background="@color/amber_300"
-        android:id="@+id/player_list_test"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxHeight="200dp"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

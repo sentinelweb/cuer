@@ -1,9 +1,9 @@
-package uk.co.sentinelweb.cuer.app.ui.common.itemlist.item
+package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
-class ItemPresenter (
-        val view: ItemContract.View,
-        val interactions: ItemContract.Interactions,
-        val state: ItemState
+class ItemPresenter(
+    val view: ItemContract.View,
+    val interactions: ItemContract.Interactions,
+    val state: ItemState
 ) : ItemContract.Presenter {
 
     override fun update(item: ItemModel) {
@@ -12,9 +12,9 @@ class ItemPresenter (
         view.setCheckedVisible(item.checkIcon)
         item.thumbNailUrl
             ?.apply { view.setIconUrl(this) }
-            ?:item.iconRes
+            ?: item.iconRes
                 ?.apply { view.setIconResource(this) }
-
+            ?: view.setIconResource(0)
         state.item = item
     }
 
@@ -28,6 +28,22 @@ class ItemPresenter (
 
     override fun doRight() {
         interactions.onRightSwipe(state.item!!)
+    }
+
+    override fun doPlay(external: Boolean) {
+        interactions.onPlay(state.item!!, external)
+    }
+
+    override fun doShowChannel() {
+        interactions.onShowChannel(state.item!!)
+    }
+
+    override fun doStar() {
+        interactions.onStar(state.item!!)
+    }
+
+    override fun doShare() {
+        interactions.onShare(state.item!!)
     }
 
 }

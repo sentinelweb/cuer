@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="uk.co.sentinelweb.cuer.app">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -7,6 +8,7 @@
     <application
         android:name=".CuerApp"
         android:allowBackup="true"
+        android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -19,7 +21,8 @@
 
         <activity
             android:name=".ui.main.MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,16 +32,18 @@
 
         <activity
             android:name=".ui.share.ShareActivity"
-            android:label="@string/app_name">
-            <!--            <nav-graph android:value="@navigation/deeplink" />-->
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
 
+            <!-- <nav-graph android:value="@navigation/deeplink" /> -->
 
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="image/*" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -47,26 +52,38 @@
 
                 <data android:scheme="http" />
                 <data android:scheme="https" />
-                <!--                <data android:host="youtube.com" />-->
+                <!-- <data android:host="youtube.com" /> -->
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.View" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.ytplayer.YoutubeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_fullscreen"
+            android:screenOrientation="landscape"
+            android:theme="@style/FullscreenTheme"
+            tools:ignore="LockedOrientationActivity">
+        </activity>
+
         <service
             android:name=".service.cast.YoutubeCastService"
-            android:foregroundServiceType="mediaPlayback"
-            android:exported="false">
-            <!-- might need to make another broadcast receiver to receive events this will
-            start the service while the activity is running -->
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback">
+
+            <!--
+            might need to make another broadcast receiver to receive events this will
+            start the service while the activity is running
+            -->
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
@@ -78,7 +95,6 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

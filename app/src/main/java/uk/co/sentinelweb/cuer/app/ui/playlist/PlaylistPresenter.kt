@@ -6,6 +6,8 @@ import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
@@ -24,9 +26,11 @@ class PlaylistPresenter(
     private val queue: QueueMediatorContract.Mediator,
     private val toastWrapper: ToastWrapper,
     private val ytInteractor: YoutubeVideosInteractor,
-    private val ytContextHolder: ChromecastYouTubePlayerContextHolder
-) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
+    private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val ytJavaApi: YoutubeJavaApiWrapper,
+    private val shareWrapper: ShareWrapper
 
+) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
     override fun initialise() {
         initListCheck()
@@ -35,7 +39,7 @@ class PlaylistPresenter(
     }
 
     override fun loadList() {
-        updateListContent(queue.getPlayList() ?: Const.EMPTY_PLAYLIST)
+        updateListContent(queue.getPlaylist() ?: Const.EMPTY_PLAYLIST)
     }
 
     override fun refreshList() {
@@ -57,30 +61,70 @@ class PlaylistPresenter(
     }
 
     override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
-        // toastWrapper.showToast("left: ${item.topText}")
         getDomainPlaylistItem(item)?.run {
             queue.removeItem(this)
         }
     }
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
-        if (!(ytContextHolder.get()?.isConnected() ?: false)) {
-            view.showAlert("Please connect to a chromecast")
-            return
-        }
         getDomainPlaylistItem(item)?.run {
-            queue.onItemSelected(this)
+            if (!(ytContextHolder.get()?.isConnected() ?: false)) {
+                toastWrapper.show("No chromecast -> playing locally")
+                view.playLocal(this.media)
+            } else {
+                queue.onItemSelected(this)
+            }
         }
     }
 
+    override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
+        if (external) {
+            if (ytJavaApi.canLaunchVideo()) {
+                getDomainPlaylistItem(item)?.run {
+                    ytJavaApi.launchVideo(this.media)
+                } ?: toastWrapper.show("can't find video")
+            } else {
+                toastWrapper.show("can't launch video")
+            }
+        } else {
+            getDomainPlaylistItem(item)?.run {
+                view.playLocal(this.media)
+            }
+        }
+    }
+
+    override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
+        if (ytJavaApi.canLaunchChannel()) {
+            getDomainPlaylistItem(item)?.run {
+                ytJavaApi.launchChannel(this.media)
+            } ?: toastWrapper.show("can't find video")
+        } else {
+            toastWrapper.show("can't launch channel")
+        }
+    }
+
+    override fun onItemStar(item: PlaylistModel.PlaylistItemModel) {
+        toastWrapper.show("todo: star ${item.id}")
+    }
+
+    override fun onItemShare(item: PlaylistModel.PlaylistItemModel) {
+        getDomainPlaylistItem(item)?.run {
+            shareWrapper.share(this.media)
+        }
+    }
+
+    override fun moveItem(fromPosition: Int, toPosition: Int) {
+        queue.moveItem(fromPosition, toPosition)
+    }
+
     private fun getIndexByVideoId(videoId: String): Int? {
-        return queue.getPlayList()
+        return queue.getPlaylist()
             ?.items
             ?.indexOfFirst { it.media.mediaId == videoId }
     }
 
     private fun getDomainPlaylistItem(item: PlaylistModel.PlaylistItemModel): PlaylistItemDomain? {
-        return queue.getPlayList()
+        return queue.getPlaylist()
             ?.items
             ?.first { it.media.url == item.url }
     }

@@ -133,7 +133,7 @@ class YouTubePlayerListener(
 
     override fun trackBack() {
         try {
-            queue.lastItem()
+            queue.previousItem()
         } catch (e: Exception) {
             handleError(e)
         }

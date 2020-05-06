@@ -5,7 +5,7 @@ import android.widget.Toast
 
 class ToastWrapper(private val context: Context) {
 
-    fun show(msg: String) {
-        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+    fun show(msg: String, dur: Int = Toast.LENGTH_LONG) {
+        Toast.makeText(context, msg, dur).show()
     }
 }

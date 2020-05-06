@@ -2,7 +2,9 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.playlist_fragment.*
 import org.koin.android.scope.currentScope
@@ -11,18 +13,26 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AlertDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class PlaylistFragment :
     Fragment(R.layout.playlist_fragment),
     PlaylistContract.View,
-    ItemContract.Interactions {
+    ItemContract.Interactions,
+    ItemContract.ItemMoveInteractions {
 
     private val presenter: PlaylistContract.Presenter by currentScope.inject()
     private val adapter: PlaylistAdapter by currentScope.inject()
     private val alertWrapper: AlertDialogWrapper by currentScope.inject()
+    private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
 
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -30,6 +40,7 @@ class PlaylistFragment :
         presenter.initialise()
         playlist_list.layoutManager = LinearLayoutManager(context)
         playlist_list.adapter = adapter
+        itemTouchHelper.attachToRecyclerView(playlist_list)
     }
 
     override fun onDestroyView() {
@@ -60,6 +71,19 @@ class PlaylistFragment :
     override fun scrollToItem(index: Int) {
         playlist_list.scrollToPosition(index)
     }
+
+    override fun playLocal(media: MediaDomain) {
+        YoutubeActivity.start(requireContext(), media.mediaId)
+    }
+    //endregion
+
+    // region ItemContract.Interactions
+    override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
+        presenter.moveItem(fromPosition, toPosition)
+        // shows the move while dragging
+        adapter.notifyItemMoved(fromPosition, toPosition)
+        return true
+    }
     //endregion
 
     // region ItemContract.Interactions
@@ -74,6 +98,22 @@ class PlaylistFragment :
     override fun onLeftSwipe(item: ItemModel) {
         presenter.onItemSwipeLeft(item as PlaylistModel.PlaylistItemModel)
     }
+
+    override fun onPlay(item: ItemModel, external: Boolean) {
+        presenter.onItemPlay(item as PlaylistModel.PlaylistItemModel, external)
+    }
+
+    override fun onShowChannel(item: ItemModel) {
+        presenter.onItemShowChannel(item as PlaylistModel.PlaylistItemModel)
+    }
+
+    override fun onStar(item: ItemModel) {
+        presenter.onItemStar(item as PlaylistModel.PlaylistItemModel)
+    }
+
+    override fun onShare(item: ItemModel) {
+        presenter.onItemShare(item as PlaylistModel.PlaylistItemModel)
+    }
     //endregion
 
     companion object {
@@ -83,20 +123,27 @@ class PlaylistFragment :
                 scoped<PlaylistContract.View> { getSource() }
                 scoped<PlaylistContract.Presenter> {
                     PlaylistPresenter(
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get()
+                        view = get(),
+                        state = get(),
+                        repository = get(),
+                        modelMapper = get(),
+                        contextProvider = get(),
+                        queue = get(),
+                        toastWrapper = get(),
+                        ytInteractor = get(),
+                        ytContextHolder = get(),
+                        ytJavaApi = get(),
+                        shareWrapper = get()
                     )
                 }
                 scoped { PlaylistModelMapper() }
                 scoped { PlaylistAdapter(get(), getSource()) }
+                scoped { ItemTouchHelperCallback(getSource()) }
+                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { AlertDialogWrapper((getSource() as Fragment).requireActivity()) }
+                scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
+                scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
+                scoped { ItemFactory() }
                 viewModel { PlaylistState() }
             }
         }

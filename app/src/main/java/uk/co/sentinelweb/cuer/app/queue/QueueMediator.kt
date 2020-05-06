@@ -2,12 +2,11 @@ package uk.co.sentinelweb.cuer.app.queue
 
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.util.helper.PlaylistMutator
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistDomainMode.LOOP
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistDomainMode.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class QueueMediator constructor(
@@ -15,7 +14,8 @@ class QueueMediator constructor(
     private val repository: MediaDatabaseRepository,
     private val mediaMapper: MediaToPlaylistItemMapper,
     private val contextProvider: CoroutineContextProvider,
-    private val mediaSessionManager: MediaSessionManager
+    private val mediaSessionManager: MediaSessionManager,
+    private val playlistMutator: PlaylistMutator
 ) : QueueMediatorContract.Mediator {
 
     private val consumerListeners: MutableList<QueueMediatorContract.ConsumerListener> =
@@ -28,13 +28,13 @@ class QueueMediator constructor(
     }
 
     override fun onItemSelected(playlistItem: PlaylistItemDomain) {
-        if (playlistItem != state.currentPlaylistItem) {
-            state.queuePosition = state.currentPlayList
-                ?.items
-                ?.indexOfFirst { it.media.url == playlistItem.media.url }
-                ?: throw IllegalStateException("playlistItem not in playlist")
-            updateCurrentItem()
-        }
+        state.currentPlaylist
+            ?.takeIf { playlistItem != state.currentPlaylistItem }
+            ?.let {
+                state.currentPlaylist = playlistMutator.playItem(it, playlistItem)
+                updateCurrentItem()
+            }
+
     }
 
     override fun updateMediaItem(media: MediaDomain) {
@@ -63,37 +63,31 @@ class QueueMediator constructor(
     }
 
     override fun nextItem() {
-        if (state.currentPlayList?.mode == LOOP || state.currentPlayList?.mode == SINGLE) {
-            state.queuePosition++
-            if (state.currentPlayList?.mode == LOOP &&
-                state.queuePosition >= state.currentPlayList!!.items.size
-            ) {
-                state.queuePosition = 0
+        state.currentPlaylist?.let { currentPlaylist ->
+            state.currentPlaylist = playlistMutator.gotoNextItem(currentPlaylist)
+            if (state.currentPlaylist?.currentIndex ?: 0 < currentPlaylist.items.size) {
+                updateCurrentItem()
             }
         }
-        if (state.queuePosition < state.currentPlayList!!.items.size) {
+    }
+
+    override fun previousItem() {
+        state.currentPlaylist?.let { currentPlaylist ->
+            state.currentPlaylist = playlistMutator.gotoPreviousItem(currentPlaylist)
             updateCurrentItem()
         }
     }
 
-    override fun lastItem() {
-        state.queuePosition--
-        // todo if loop, shuffle, etc
-        if (state.queuePosition < 0) {
-            state.queuePosition = state.currentPlayList!!.items.size - 1
-        }
-        updateCurrentItem()
-    }
-
     private fun updateCurrentItem() {
-        state.currentPlaylistItem = state.currentPlayList!!.items[state.queuePosition]
+        state.currentPlaylistItem =
+            state.currentPlaylist!!.items[state.currentPlaylist!!.currentIndex]
         state.currentPlaylistItem?.apply {
             mediaSessionManager.setMedia(media)
         }
         consumerListeners.forEach { it.onItemChanged() }
     }
 
-    override fun getPlayList(): PlaylistDomain? = state.currentPlayList
+    override fun getPlaylist(): PlaylistDomain? = state.currentPlaylist
 
     override fun getCurrentItem(): PlaylistItemDomain? = state.currentPlaylistItem
 
@@ -108,15 +102,26 @@ class QueueMediator constructor(
         nextItem()
     }
 
+    override fun moveItem(fromPosition: Int, toPosition: Int) {
+        state.currentPlaylist = state.currentPlaylist?.let {
+            playlistMutator.moveItem(it, fromPosition, toPosition)
+            // todo save playlist
+        }
+    }
+
     override fun refreshQueue() {
         state.jobs.add(contextProvider.MainScope.launch {
-            // todo preserve position by checking current item
             repository
                 .loadList(null)
                 .also { state.mediaList = it }
-                .map { mediaMapper.map(it) }
-                .let { PlaylistDomain(items = it) }
-                .also { state.currentPlayList = it }
+                .map { mediaMapper.mapToPlaylistItem(it) }
+                .let {
+                    PlaylistDomain(
+                        items = it,
+                        currentIndex = state.currentPlaylist?.currentIndex ?: 0
+                    )
+                }
+                .also { state.currentPlaylist = it }
                 .also { playlist ->
                     producerListeners.forEach { l -> l.onPlaylistUpdated(playlist) }
                 }

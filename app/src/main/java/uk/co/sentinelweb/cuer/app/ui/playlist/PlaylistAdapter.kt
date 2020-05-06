@@ -1,17 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemDiffCallback
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistAdapter.ItemViewHolder
-
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.*
 
 class PlaylistAdapter constructor(
     private val itemFactory: ItemFactory,
@@ -28,12 +20,7 @@ class PlaylistAdapter constructor(
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.view_media_list_item, parent, false)
-        return ItemViewHolder(
-            itemFactory.createPresenter(view as ItemContract.View, interactions),
-            view
-        )
+        return itemFactory.createItemViewHolder(parent, interactions)
     }
 
     @Override
@@ -41,14 +28,6 @@ class PlaylistAdapter constructor(
         holder.itemPresenter.update(data.get(position))
     }
 
-    class ItemViewHolder(val itemPresenter: ItemContract.Presenter, view: View) :
-        RecyclerView.ViewHolder(view)
-
     override fun getItemCount(): Int = data.size
-
-    companion object {
-        private val UNKNOWN_ITEM =
-            ItemModel("0", "top", "bottom", false, R.drawable.ic_nav_play_black, null)
-    }
 
 }

@@ -16,12 +16,11 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/playlist_list"
-            android:name="uk.co.sentinelweb.rememe.ui.memelist.MemeListFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="LinearLayoutManager"
             tools:context=".ui.memelist.MemeListFragment"
-            tools:listitem="@layout/view_media_item"
+            tools:listitem="@layout/view_playlist_item"
             />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.itemlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 data class PlaylistModel constructor(
@@ -20,7 +19,7 @@ data class PlaylistModel constructor(
         title,
         url,
         false,
-        R.drawable.ic_nav_play_black,
+        0,
         thumbNailUrl
     )
 }
