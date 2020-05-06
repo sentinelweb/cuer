@@ -68,9 +68,9 @@ dependencies {
     implementation "androidx.navigation:navigation-ui:$ver_navigation"
 
     // koin
-    implementation  "org.koin:koin-core:$ver_koin"
+    implementation "org.koin:koin-core:$ver_koin"
     implementation "org.koin:koin-androidx-scope:$ver_koin"
-    implementation  "org.koin:koin-android-viewmodel:$ver_koin"
+    implementation "org.koin:koin-android-viewmodel:$ver_koin"
 
     // room
     implementation "androidx.room:room-runtime:$ver_room"

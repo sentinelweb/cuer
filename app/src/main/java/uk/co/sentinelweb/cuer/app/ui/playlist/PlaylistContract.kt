@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 interface PlaylistContract {
 
@@ -24,5 +25,6 @@ interface PlaylistContract {
         fun setList(list: List<ItemModel>)
         fun showAlert(msg: String)
         fun scrollToItem(index: Int)
+        fun playLocal(media: MediaDomain)
     }
 }

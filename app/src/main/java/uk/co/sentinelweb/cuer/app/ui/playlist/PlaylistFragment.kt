@@ -17,9 +17,11 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AlertDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class PlaylistFragment :
     Fragment(R.layout.playlist_fragment),
@@ -70,6 +72,9 @@ class PlaylistFragment :
         playlist_list.scrollToPosition(index)
     }
 
+    override fun playLocal(media: MediaDomain) {
+        YoutubeActivity.start(requireContext(), media.mediaId)
+    }
     //endregion
 
     // region ItemContract.Interactions

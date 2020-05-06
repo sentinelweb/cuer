@@ -61,19 +61,19 @@ class PlaylistPresenter(
     }
 
     override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
-        // toastWrapper.showToast("left: ${item.topText}")
         getDomainPlaylistItem(item)?.run {
             queue.removeItem(this)
         }
     }
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
-        if (!(ytContextHolder.get()?.isConnected() ?: false)) {
-            view.showAlert("Please connect to a chromecast")
-            return
-        }
         getDomainPlaylistItem(item)?.run {
-            queue.onItemSelected(this)
+            if (!(ytContextHolder.get()?.isConnected() ?: false)) {
+                toastWrapper.show("No chromecast -> playing locally")
+                view.playLocal(this.media)
+            } else {
+                queue.onItemSelected(this)
+            }
         }
     }
 
@@ -87,7 +87,9 @@ class PlaylistPresenter(
                 toastWrapper.show("can't launch video")
             }
         } else {
-            toastWrapper.show("todo: play local ${item.id}")
+            getDomainPlaylistItem(item)?.run {
+                view.playLocal(this.media)
+            }
         }
     }
 

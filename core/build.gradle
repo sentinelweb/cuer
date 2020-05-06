@@ -4,7 +4,7 @@ apply plugin: "org.jetbrains.kotlin.jvm"
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core"
 
     // koin

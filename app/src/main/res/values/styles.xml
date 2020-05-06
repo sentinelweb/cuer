@@ -9,7 +9,7 @@
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
     </style>
 
-    <style name="ItemView"/>
+    <style name="ItemView" />
 
     <style name="ItemView.TopText" parent="@style/TextAppearance.AppCompat.Small">
         <item name="android:textSize">16sp</item>
@@ -30,5 +30,15 @@
     <style name="ContextMenu" parent="Widget.AppCompat.PopupMenu">
         <item name="android:textColor">@color/menu_text</item>
         <item name="android:iconTint">@color/menu_icon_tint</item>
+    </style>
+
+    <style name="FullscreenTheme" parent="AppTheme">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+    </style>
+
+    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/grey_800</item>
     </style>
 </resources>
