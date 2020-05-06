@@ -6,6 +6,7 @@ class ItemDiffCallback(
     var newItems: List<ItemModel>,
     var oldItems: List<ItemModel>
 ) : DiffUtil.Callback() {
+
     override fun getOldListSize(): Int {
         return oldItems.size
     }

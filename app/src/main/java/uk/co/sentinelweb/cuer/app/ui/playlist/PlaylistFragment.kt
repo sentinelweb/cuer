@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.util.wrapper.AlertDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeApiWrapper
 
 class PlaylistFragment :
     Fragment(R.layout.playlist_fragment),
@@ -115,15 +117,16 @@ class PlaylistFragment :
                 scoped<PlaylistContract.View> { getSource() }
                 scoped<PlaylistContract.Presenter> {
                     PlaylistPresenter(
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get()
+                        view = get(),
+                        state = get(),
+                        repository = get(),
+                        modelMapper = get(),
+                        contextProvider = get(),
+                        queue = get(),
+                        toastWrapper = get(),
+                        ytInteractor = get(),
+                        ytContextHolder = get(),
+                        ytApi = get()
                     )
                 }
                 scoped { PlaylistModelMapper() }
@@ -131,6 +134,7 @@ class PlaylistFragment :
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { AlertDialogWrapper((getSource() as Fragment).requireActivity()) }
+                scoped { YoutubeApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory() }
                 viewModel { PlaylistState() }
             }

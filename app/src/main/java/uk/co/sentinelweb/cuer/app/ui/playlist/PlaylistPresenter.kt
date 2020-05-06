@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
@@ -24,7 +25,9 @@ class PlaylistPresenter(
     private val queue: QueueMediatorContract.Mediator,
     private val toastWrapper: ToastWrapper,
     private val ytInteractor: YoutubeVideosInteractor,
-    private val ytContextHolder: ChromecastYouTubePlayerContextHolder
+    private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val ytApi: YoutubeApiWrapper
+
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
     override fun initialise() {
@@ -74,14 +77,26 @@ class PlaylistPresenter(
 
     override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
         if (external) {
-            toastWrapper.show("play external ${item.id}")
+            if (ytApi.canLaunchVideo()) {
+                getDomainPlaylistItem(item)?.run {
+                    ytApi.launchVideo(this.media)
+                }
+            } else {
+                toastWrapper.show("can't launch video")
+            }
         } else {
             toastWrapper.show("play ${item.id}")
         }
     }
 
     override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
-        toastWrapper.show("show channel ${item.id}")
+        if (ytApi.canLaunchChannel()) {
+            getDomainPlaylistItem(item)?.run {
+                ytApi.launchChannel(this.media)
+            }
+        } else {
+            toastWrapper.show("can't launch channel")
+        }
     }
 
     override fun onItemStar(item: PlaylistModel.PlaylistItemModel) {
