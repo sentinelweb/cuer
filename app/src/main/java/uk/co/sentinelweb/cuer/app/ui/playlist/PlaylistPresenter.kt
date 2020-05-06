@@ -72,6 +72,26 @@ class PlaylistPresenter(
         }
     }
 
+    override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
+        if (external) {
+            toastWrapper.show("play external ${item.id}")
+        } else {
+            toastWrapper.show("play ${item.id}")
+        }
+    }
+
+    override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
+        toastWrapper.show("show channel ${item.id}")
+    }
+
+    override fun onItemStar(item: PlaylistModel.PlaylistItemModel) {
+        toastWrapper.show("star ${item.id}")
+    }
+
+    override fun onItemShare(item: PlaylistModel.PlaylistItemModel) {
+        toastWrapper.show("share ${item.id}")
+    }
+
     private fun getIndexByVideoId(videoId: String): Int? {
         return queue.getPlayList()
             ?.items

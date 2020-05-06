@@ -18,12 +18,20 @@ interface ItemContract {
         fun doClick()
         fun doLeft()
         fun doRight()
+        fun doPlay(external: Boolean)
+        fun doShowChannel()
+        fun doStar()
+        fun doShare()
     }
 
     interface Interactions {
         fun onClick(item: ItemModel)
         fun onRightSwipe(item: ItemModel)
         fun onLeftSwipe(item: ItemModel)
+        fun onPlay(item: ItemModel, external: Boolean)
+        fun onShowChannel(item: ItemModel)
+        fun onStar(item: ItemModel)
+        fun onShare(item: ItemModel)
     }
 
     interface ItemTouchHelperViewHolder {

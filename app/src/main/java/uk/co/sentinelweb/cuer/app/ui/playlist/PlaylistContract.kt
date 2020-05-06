@@ -8,11 +8,15 @@ interface PlaylistContract {
         fun initialise()
         fun loadList()
         fun destroy()
+        fun refreshList()
+        fun setFocusId(videoId: String)
         fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel)
         fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel)
         fun onItemClicked(item: PlaylistModel.PlaylistItemModel)
-        fun refreshList()
-        fun setFocusId(videoId: String)
+        fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean)
+        fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel)
+        fun onItemStar(item: PlaylistModel.PlaylistItemModel)
+        fun onItemShare(item: PlaylistModel.PlaylistItemModel)
     }
 
     interface View {

@@ -72,6 +72,16 @@
             app:layout_constraintLeft_toLeftOf="@id/listitem_icon"
             />
 
+        <View
+            android:id="@+id/listitem_overflow_click"
+            android:layout_width="48dp"
+            android:layout_height="0dp"
+            android:background="?selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
         <TextView
             android:id="@+id/listitem_top"
             style="@style/ItemView.TopText"
@@ -80,7 +90,7 @@
             android:maxLines="1"
             android:padding="4dp"
             app:layout_constraintLeft_toRightOf="@id/listitem_icon"
-            app:layout_constraintRight_toLeftOf="@id/listitem_overflow"
+            app:layout_constraintRight_toLeftOf="@id/listitem_overflow_img"
             app:layout_constraintTop_toTopOf="parent"
             />
 
@@ -93,12 +103,12 @@
             android:padding="4dp"
             android:textColor="@color/grey_600"
             app:layout_constraintLeft_toRightOf="@id/listitem_icon"
-            app:layout_constraintRight_toLeftOf="@id/listitem_overflow"
+            app:layout_constraintRight_toLeftOf="@id/listitem_overflow_img"
             app:layout_constraintTop_toBottomOf="@id/listitem_top"
             />
 
         <ImageView
-            android:id="@+id/listitem_overflow"
+            android:id="@+id/listitem_overflow_img"
             android:layout_width="16dp"
             android:layout_height="0dp"
             android:contentDescription="@null"

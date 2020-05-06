@@ -11,9 +11,9 @@
     <!--        app:showAsAction="always"/>-->
 
     <item
-        android:id="@+id/test_item"
-        android:icon="@drawable/ic_player_play_black"
-        android:title="@string/menu_play"
+        android:id="@+id/filter"
+        android:icon="@drawable/ic_filter_list_white"
+        android:title="@string/menu_filter"
         app:iconTint="@color/white"
         app:showAsAction="always"
         />

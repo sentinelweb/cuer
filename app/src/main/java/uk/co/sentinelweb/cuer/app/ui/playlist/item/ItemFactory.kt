@@ -28,7 +28,7 @@ class ItemFactory {
 
     private fun createView(parent: ViewGroup): ItemContract.View {
         val inflate = LayoutInflater.from(parent.context)
-            .inflate(R.layout.view_playlist_swipe, parent, false)
+            .inflate(R.layout.view_playlist_item, parent, false)
         return inflate as ItemContract.View
     }
 

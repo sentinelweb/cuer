@@ -90,6 +90,22 @@ class PlaylistFragment :
     override fun onLeftSwipe(item: ItemModel) {
         presenter.onItemSwipeLeft(item as PlaylistModel.PlaylistItemModel)
     }
+
+    override fun onPlay(item: ItemModel, external: Boolean) {
+        presenter.onItemPlay(item as PlaylistModel.PlaylistItemModel, external)
+    }
+
+    override fun onShowChannel(item: ItemModel) {
+        presenter.onItemShowChannel(item as PlaylistModel.PlaylistItemModel)
+    }
+
+    override fun onStar(item: ItemModel) {
+        presenter.onItemStar(item as PlaylistModel.PlaylistItemModel)
+    }
+
+    override fun onShare(item: ItemModel) {
+        presenter.onItemShare(item as PlaylistModel.PlaylistItemModel)
+    }
     //endregion
 
     companion object {
