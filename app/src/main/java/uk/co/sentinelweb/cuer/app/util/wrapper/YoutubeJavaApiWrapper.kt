@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.youtube.player.YouTubeIntents
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
-class YoutubeApiWrapper(
+class YoutubeJavaApiWrapper(
     private val activity: AppCompatActivity
 ) {
     fun canLaunchChannel() = YouTubeIntents.canResolveChannelIntent(activity)
@@ -15,4 +15,9 @@ class YoutubeApiWrapper(
 
     fun launchVideo(media: MediaDomain) =
         activity.startActivity(YouTubeIntents.createPlayVideoIntent(activity, media.mediaId))
+
+    companion object {
+        fun channelUrl(media: MediaDomain) = "https://www.youtube.com/channel/${media.channelId}"
+        fun videoUrl(media: MediaDomain) = "https://www.youtube.com/watch?v=${media.mediaId}"
+    }
 }

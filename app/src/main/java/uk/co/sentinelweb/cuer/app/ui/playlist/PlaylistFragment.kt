@@ -18,7 +18,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.util.wrapper.AlertDialogWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeApiWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 
 class PlaylistFragment :
     Fragment(R.layout.playlist_fragment),
@@ -126,7 +127,8 @@ class PlaylistFragment :
                         toastWrapper = get(),
                         ytInteractor = get(),
                         ytContextHolder = get(),
-                        ytApi = get()
+                        ytJavaApi = get(),
+                        shareWrapper = get()
                     )
                 }
                 scoped { PlaylistModelMapper() }
@@ -134,7 +136,8 @@ class PlaylistFragment :
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { AlertDialogWrapper((getSource() as Fragment).requireActivity()) }
-                scoped { YoutubeApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
+                scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
+                scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory() }
                 viewModel { PlaylistState() }
             }

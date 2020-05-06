@@ -6,7 +6,8 @@ import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeApiWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
@@ -26,7 +27,8 @@ class PlaylistPresenter(
     private val toastWrapper: ToastWrapper,
     private val ytInteractor: YoutubeVideosInteractor,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
-    private val ytApi: YoutubeApiWrapper
+    private val ytJavaApi: YoutubeJavaApiWrapper,
+    private val shareWrapper: ShareWrapper
 
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
@@ -77,34 +79,36 @@ class PlaylistPresenter(
 
     override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
         if (external) {
-            if (ytApi.canLaunchVideo()) {
+            if (ytJavaApi.canLaunchVideo()) {
                 getDomainPlaylistItem(item)?.run {
-                    ytApi.launchVideo(this.media)
-                }
+                    ytJavaApi.launchVideo(this.media)
+                } ?: toastWrapper.show("can't find video")
             } else {
                 toastWrapper.show("can't launch video")
             }
         } else {
-            toastWrapper.show("play ${item.id}")
+            toastWrapper.show("todo: play local ${item.id}")
         }
     }
 
     override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
-        if (ytApi.canLaunchChannel()) {
+        if (ytJavaApi.canLaunchChannel()) {
             getDomainPlaylistItem(item)?.run {
-                ytApi.launchChannel(this.media)
-            }
+                ytJavaApi.launchChannel(this.media)
+            } ?: toastWrapper.show("can't find video")
         } else {
             toastWrapper.show("can't launch channel")
         }
     }
 
     override fun onItemStar(item: PlaylistModel.PlaylistItemModel) {
-        toastWrapper.show("star ${item.id}")
+        toastWrapper.show("todo: star ${item.id}")
     }
 
     override fun onItemShare(item: PlaylistModel.PlaylistItemModel) {
-        toastWrapper.show("share ${item.id}")
+        getDomainPlaylistItem(item)?.run {
+            shareWrapper.share(this.media)
+        }
     }
 
     override fun moveItem(fromPosition: Int, toPosition: Int) {
