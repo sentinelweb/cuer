@@ -5,9 +5,10 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import java.time.Instant
 
 class MediaToPlaylistItemMapper {
-    fun map(media: MediaDomain): PlaylistItemDomain = PlaylistItemDomain(
-        media,
-        Instant.now(),
-        0
+
+    fun mapToPlaylistItem(media: MediaDomain): PlaylistItemDomain = PlaylistItemDomain(
+        media = media,
+        dateAdded = Instant.now(),// todo
+        order = 0 // todo
     )
 }

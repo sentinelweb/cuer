@@ -71,8 +71,8 @@ class PlaylistFragment :
 
     // region ItemContract.Interactions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-        // todo make move in queue
-        //Collections.swap(data, fromPosition, toPosition)
+        presenter.moveItem(fromPosition, toPosition)
+        // shows the move while dragging
         adapter.notifyItemMoved(fromPosition, toPosition)
         return true
     }

@@ -13,14 +13,15 @@ interface QueueMediatorContract {
         fun removeConsumerListener(l: ConsumerListener)
         fun destroy()
         fun nextItem()
-        fun lastItem()
+        fun previousItem()
         fun getCurrentItem(): PlaylistItemDomain?
         fun refreshQueue()
-        fun getPlayList(): PlaylistDomain?
+        fun getPlaylist(): PlaylistDomain?
         fun addProducerListener(l: ProducerListener)
         fun removeProducerListener(l: ProducerListener)
         fun removeItem(playlistItemDomain: PlaylistItemDomain)
         fun onTrackEnded(media: MediaDomain?)
+        fun moveItem(fromPosition: Int, toPosition: Int)
     }
 
     interface ConsumerListener {

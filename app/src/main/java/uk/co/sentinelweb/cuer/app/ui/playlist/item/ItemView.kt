@@ -65,6 +65,8 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     fun resetBackground() {
         swipe_label_right.fade(false)
         swipe_label_left.fade(false)
+        listitem.translationX = 0f
+        listitem.alpha = 1f
     }
 
     override fun setIconResource(iconRes: Int) {

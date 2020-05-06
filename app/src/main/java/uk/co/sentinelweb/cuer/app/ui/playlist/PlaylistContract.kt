@@ -17,6 +17,7 @@ interface PlaylistContract {
         fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel)
         fun onItemStar(item: PlaylistModel.PlaylistItemModel)
         fun onItemShare(item: PlaylistModel.PlaylistItemModel)
+        fun moveItem(fromPosition: Int, toPosition: Int)
     }
 
     interface View {

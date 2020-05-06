@@ -53,6 +53,8 @@ dependencies {
     // deps
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
     implementation "androidx.appcompat:appcompat:$ver_appcompat"
+    implementation "androidx.core:core:$ver_androidx_core"
+    implementation "androidx.annotation:annotation:$ver_androidx_annotation"
     implementation "androidx.core:core-ktx:$ver_core_ktx"
     implementation "com.google.android.material:material:$ver_material"
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
@@ -84,7 +86,6 @@ dependencies {
     // this is not needed to use the library, but it provides the very useful MediaRouteButton.
     implementation "androidx.mediarouter:mediarouter:$ver_mediarouter"
 
-    implementation "androidx.core:core:$ver_androidx_core"
     implementation "androidx.media:media:$ver_androidx_media"
 
     testImplementation "junit:junit:$ver_junit"

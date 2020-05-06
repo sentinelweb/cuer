@@ -23,7 +23,6 @@ class PlaylistAdapter constructor(
         return itemFactory.createItemViewHolder(parent, interactions)
     }
 
-
     @Override
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder.itemPresenter.update(data.get(position))

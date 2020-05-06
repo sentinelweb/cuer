@@ -34,7 +34,7 @@ class PlaylistPresenter(
     }
 
     override fun loadList() {
-        updateListContent(queue.getPlayList() ?: Const.EMPTY_PLAYLIST)
+        updateListContent(queue.getPlaylist() ?: Const.EMPTY_PLAYLIST)
     }
 
     override fun refreshList() {
@@ -92,14 +92,18 @@ class PlaylistPresenter(
         toastWrapper.show("share ${item.id}")
     }
 
+    override fun moveItem(fromPosition: Int, toPosition: Int) {
+        queue.moveItem(fromPosition, toPosition)
+    }
+
     private fun getIndexByVideoId(videoId: String): Int? {
-        return queue.getPlayList()
+        return queue.getPlaylist()
             ?.items
             ?.indexOfFirst { it.media.mediaId == videoId }
     }
 
     private fun getDomainPlaylistItem(item: PlaylistModel.PlaylistItemModel): PlaylistItemDomain? {
-        return queue.getPlayList()
+        return queue.getPlaylist()
             ?.items
             ?.first { it.media.url == item.url }
     }
