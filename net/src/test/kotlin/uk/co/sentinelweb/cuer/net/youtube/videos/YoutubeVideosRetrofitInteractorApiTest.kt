@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos
 
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -13,14 +14,20 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeVideosInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
-// this runs the real API for manual testing (keep test ignored)
+
+/**
+ * This runs the real API for manual testing (keep test ignored)
+ *
+ * the system property only gets picked up when running from command line
+ *
+ * TO RUN FROM AS : set -DCUER_YOUTUBE_API_KEY=api in configuration
+ */
 class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
 
     private lateinit var mockService: YoutubeService
 
     private var keyProvider = object : YoutubeApiKeyProvider {
-        // todo paste key or get system property to work
-        override val key: String = "xxx" //System.getProperty("CUER_YOUTUBE_API_KEY")
+        override val key: String = System.getProperty("CUER_YOUTUBE_API_KEY")
     }
 
     private lateinit var sut: YoutubeVideosInteractor
@@ -41,10 +48,12 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
     @Test
     fun videos() {
         runBlocking {
-            sut.videos(
+            val actual = sut.videos(
                 listOf("8nhPVOM97Jg", "fY7M3pzXdUo"),
                 listOf(ID, SNIPPET, CONTENT_DETAILS, PLAYER)
             )
+            assertEquals("8nhPVOM97Jg", actual[0].mediaId)
+            assertEquals("fY7M3pzXdUo", actual[1].mediaId)
         }
     }
 }

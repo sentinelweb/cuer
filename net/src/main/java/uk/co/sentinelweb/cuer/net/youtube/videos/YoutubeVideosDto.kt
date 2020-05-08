@@ -1,14 +1,18 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class YoutubeVideosDto constructor(
     val items: List<VideoDto>
 ) {
+    @Serializable
     data class VideoDto constructor(
         val id: String,
         val snippet: SnippetDto?, // optional field (declared as part)
         val contentDetails: ContentDto? // optional field (declared as part)
     ) {
-
+        @Serializable
         data class SnippetDto constructor(
             val title: String,
             val description: String,
@@ -18,6 +22,7 @@ data class YoutubeVideosDto constructor(
             val thumbnails:ThumbnailsDto
 
         ) {
+            @Serializable
             data class ThumbnailsDto constructor(
                 val default: ThumbnailDto?,
                 val medium: ThumbnailDto?,
@@ -25,6 +30,7 @@ data class YoutubeVideosDto constructor(
                 val standard: ThumbnailDto?,
                 val maxres: ThumbnailDto?
             ) {
+                @Serializable
                 data class ThumbnailDto constructor(
                     val url: String,
                     val width: Int,
@@ -33,6 +39,7 @@ data class YoutubeVideosDto constructor(
             }
         }
 
+        @Serializable
         data class ContentDto constructor(
             val duration: String,
             val definition: String

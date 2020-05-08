@@ -36,7 +36,7 @@ class SharePresenter constructor(
                         ?.firstOrNull()
                         ?.also { repository.save(it) }
                         ?.also {
-                            view.gotoMain(it.mediaId)
+                            view.gotoMain(it)
                             view.exit()
                         } ?: skipExists()
                 })

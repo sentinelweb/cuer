@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlinx-serialization'
 
 android {
     compileSdkVersion project.properties.app_compileSdkVersion as int
@@ -28,8 +29,6 @@ android {
 
 // To inline the bytecode built with JVM target 1.8 into
 // bytecode that is being built with JVM target 1.6. (e.g. navArgs)
-
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -52,6 +51,7 @@ dependencies {
 
     // deps
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$ver_kotlinx_serialization_runtime"
     implementation "androidx.appcompat:appcompat:$ver_appcompat"
     implementation "androidx.core:core:$ver_androidx_core"
     implementation "androidx.annotation:annotation:$ver_androidx_annotation"

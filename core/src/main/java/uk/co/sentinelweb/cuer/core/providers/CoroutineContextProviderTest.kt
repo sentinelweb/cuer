@@ -9,5 +9,4 @@ class CoroutineContextProviderTest() : CoroutineContextProvider() {
     override val IO: CoroutineContext = Dispatchers.Unconfined
     override val MainScope: CoroutineScope = CoroutineScope(Dispatchers.Unconfined)
     override val IOScope: CoroutineScope = CoroutineScope(Dispatchers.Unconfined)
-
 }

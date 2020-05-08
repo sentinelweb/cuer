@@ -4,12 +4,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.serialization.UnstableDefault
 import org.koin.android.scope.currentScope
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.util.extension.serialise
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class ShareActivity : AppCompatActivity(), ShareContract.View {
 
@@ -46,10 +49,14 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         finish()
     }
 
-    override fun gotoMain(youtubeId: String?) {
+    @UnstableDefault
+    override fun gotoMain(media: MediaDomain?) {
         startActivity(
             Intent(this, MainActivity::class.java).apply {
-                youtubeId?.let { putExtra(Const.EXTRA_YTID, it) }
+                media?.let {
+                    putExtra(Const.EXTRA_YTID, it.mediaId)
+                    putExtra(Const.EXTRA_MEDIA, it.serialise())
+                }
             })
     }
 

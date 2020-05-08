@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
+import uk.co.sentinelweb.cuer.domain.MediaDomain
+
 
 interface ShareContract {
 
@@ -9,7 +11,7 @@ interface ShareContract {
 
     interface View {
         fun exit()
-        fun gotoMain(youtubeId: String?)
+        fun gotoMain(media: MediaDomain?)
         fun error(msg: String)
     }
 }

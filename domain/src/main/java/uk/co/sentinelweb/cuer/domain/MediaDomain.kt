@@ -1,8 +1,11 @@
 package uk.co.sentinelweb.cuer.domain
 
+import kotlinx.serialization.ContextualSerialization
+import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.time.LocalDateTime
 
+@Serializable
 data class MediaDomain(
     val id: String?,
     val url: String,
@@ -12,13 +15,15 @@ data class MediaDomain(
     val title: String? = null,
     val duration: Long? = null,
     val positon: Long? = null,
-    val dateLastPlayed: Instant? = null,
+    @ContextualSerialization val dateLastPlayed: Instant? = null,
     val description: String? = null,
-    val published: LocalDateTime? = null,
+    @ContextualSerialization val published: LocalDateTime? = null,
     val channelId: String? = null,
     val channelTitle: String? = null,
     val thumbNail: ImageDomain? = null,
-    val image: ImageDomain? = null
+    val image: ImageDomain? = null,
+    val starred: Boolean = false,
+    val archived: Boolean = false
 ) {
     enum class MediaTypeDomain {
         VIDEO, AUDIO, WEB
@@ -27,6 +32,5 @@ data class MediaDomain(
     enum class PlatformDomain {
         YOUTUBE, VIMEO, SOUNDCLOUD, WEB, OTHER
     }
-
 
 }
