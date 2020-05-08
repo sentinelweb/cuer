@@ -21,7 +21,9 @@ internal class RetrofitBuilder constructor() {
         .baseUrl(YOUTUBE_BASE)
         //.addConverterFactory(GsonConverterFactory.create())
         .addConverterFactory(
-            Json(JsonConfiguration(ignoreUnknownKeys = true)).asConverterFactory(CONTENT_TYPE)
+            Json(JsonConfiguration(ignoreUnknownKeys = true, isLenient = true)).asConverterFactory(
+                CONTENT_TYPE
+            )
         )
         .client(buildOkHttpClient())
         .build()

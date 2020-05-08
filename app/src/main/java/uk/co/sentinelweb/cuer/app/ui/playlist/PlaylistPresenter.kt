@@ -46,8 +46,8 @@ class PlaylistPresenter(
         queue.refreshQueue()
     }
 
-    override fun setFocusId(videoId: String) {
-        state.focusItemId = videoId
+    override fun setFocusMedia(mediaDomain: MediaDomain) {
+        state.addedMedia = mediaDomain
     }
 
     override fun destroy() {
@@ -61,13 +61,13 @@ class PlaylistPresenter(
     }
 
     override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
-        getDomainPlaylistItem(item)?.run {
+        getDomainPlaylistItem(item.url)?.run {
             queue.removeItem(this)
         }
     }
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
-        getDomainPlaylistItem(item)?.run {
+        getDomainPlaylistItem(item.url)?.run {
             if (!(ytContextHolder.get()?.isConnected() ?: false)) {
                 toastWrapper.show("No chromecast -> playing locally")
                 view.playLocal(this.media)
@@ -80,14 +80,14 @@ class PlaylistPresenter(
     override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
         if (external) {
             if (ytJavaApi.canLaunchVideo()) {
-                getDomainPlaylistItem(item)?.run {
+                getDomainPlaylistItem(item.url)?.run {
                     ytJavaApi.launchVideo(this.media)
                 } ?: toastWrapper.show("can't find video")
             } else {
                 toastWrapper.show("can't launch video")
             }
         } else {
-            getDomainPlaylistItem(item)?.run {
+            getDomainPlaylistItem(item.url)?.run {
                 view.playLocal(this.media)
             }
         }
@@ -95,7 +95,7 @@ class PlaylistPresenter(
 
     override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
         if (ytJavaApi.canLaunchChannel()) {
-            getDomainPlaylistItem(item)?.run {
+            getDomainPlaylistItem(item.url)?.run {
                 ytJavaApi.launchChannel(this.media)
             } ?: toastWrapper.show("can't find video")
         } else {
@@ -108,7 +108,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemShare(item: PlaylistModel.PlaylistItemModel) {
-        getDomainPlaylistItem(item)?.run {
+        getDomainPlaylistItem(item.url)?.run {
             shareWrapper.share(this.media)
         }
     }
@@ -117,16 +117,29 @@ class PlaylistPresenter(
         queue.moveItem(fromPosition, toPosition)
     }
 
+    override fun playNow(mediaDomain: MediaDomain) {
+        if (!(ytContextHolder.get()?.isConnected() ?: false)) {
+            toastWrapper.show("No chromecast -> playing locally")
+            view.playLocal(mediaDomain)
+        } else {
+            getDomainPlaylistItem(mediaDomain.url)?.let {
+                queue.onItemSelected(it)
+            } ?: run {
+                state.playAddedAfterRefresh = true
+            }
+        }
+    }
+
     private fun getIndexByVideoId(videoId: String): Int? {
         return queue.getPlaylist()
             ?.items
             ?.indexOfFirst { it.media.mediaId == videoId }
     }
 
-    private fun getDomainPlaylistItem(item: PlaylistModel.PlaylistItemModel): PlaylistItemDomain? {
+    private fun getDomainPlaylistItem(url: String): PlaylistItemDomain? {
         return queue.getPlaylist()
             ?.items
-            ?.first { it.media.url == item.url }
+            ?.firstOrNull() { it.media.url == url }
     }
 
     private fun initListCheck() {
@@ -167,10 +180,19 @@ class PlaylistPresenter(
             .map { modelMapper.map(it) }
             .also { view.setList(it) }
 
-        state.focusItemId?.let {
-            getIndexByVideoId(it)?.apply {
-                view.scrollToItem(this)
+        state.addedMedia?.let { added ->
+            if (state.playAddedAfterRefresh) {
+                getDomainPlaylistItem(added.url)?.let {
+                    queue.onItemSelected(it)
+                    state.addedMedia = null
+                    state.playAddedAfterRefresh = false
+                }
             }
+            getIndexByVideoId(added.mediaId)?.apply {
+                view.scrollToItem(this)
+                state.addedMedia = null
+            }
+
         }
     }
 

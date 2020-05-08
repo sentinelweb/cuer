@@ -55,12 +55,13 @@ class PlaylistFragment :
     override fun onResume() {
         super.onResume()
         presenter.loadList()
-        activity?.intent?.getStringExtra(Const.EXTRA_YTID)?.let {
-            presenter.setFocusId(it)
-        }
-        // example
         activity?.intent?.getStringExtra(Const.EXTRA_MEDIA)?.let {
-            val t = deserialiseMedia(it)
+            val media = deserialiseMedia(it)
+            presenter.setFocusMedia(media)
+            if (activity?.intent?.getBooleanExtra(Const.EXTRA_PLAY_NOW, false) ?: false) {
+                //?.takeIf { it }
+                presenter.playNow(media)
+            }
         }
     }
     // endregion
