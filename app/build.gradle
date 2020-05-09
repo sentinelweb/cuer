@@ -60,7 +60,7 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
     implementation "com.squareup.picasso:picasso:$ver_picasso"
-
+    implementation 'com.jakewharton:process-phoenix:2.0.0'
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"
     implementation "androidx.navigation:navigation-ui-ktx:$ver_navigation"
@@ -96,6 +96,7 @@ dependencies {
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
     testImplementation "androidx.room:room-testing:$ver_room"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test"
 
     androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"

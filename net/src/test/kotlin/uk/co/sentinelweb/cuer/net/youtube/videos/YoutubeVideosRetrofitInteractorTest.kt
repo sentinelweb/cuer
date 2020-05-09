@@ -12,7 +12,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.koin.core.KoinComponent
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProviderTest
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
@@ -59,7 +59,7 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
             service = mockService,
             keyProvider = mockKeyProvider,
             mapper = mockMapper,
-            coContext = CoroutineContextProviderTest()
+            coContext = CoroutineContextTestProvider()
         )
     }
 

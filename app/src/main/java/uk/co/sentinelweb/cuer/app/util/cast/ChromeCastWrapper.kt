@@ -17,7 +17,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import kotlin.math.min
 
 
-class ChromeCastWrapper(val application: Application) {// TODO check change to context
+class ChromeCastWrapper(private val application: Application) {
 
     fun initMediaRouteButton(view: View) {
         val mediaRouteButton = view as androidx.mediarouter.app.MediaRouteButton
