@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- Material theme only has one icon so no arrows for buttons -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -19,66 +19,80 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout="@layout/playlist_item_edit_fragment"
+        tools:ignore="FragmentTagUsage"
         />
 
     <Button
         android:id="@+id/add_return_button"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+        style="@style/Widget.MaterialComponents.Button.Icon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_button_back_black"
-        android:drawableEnd="@drawable/ic_button_add_black"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/white"
         android:elevation="@dimen/button_elevation"
-        android:text="Add Return"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+        android:text="@string/share_button_add_return"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_button_add_black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/add_forward_button"
         app:layout_constraintStart_toStartOf="parent"
 
         />
+    <!--    android:drawableStart="@drawable/ic_button_back_black"-->
+    <!--    android:drawableEnd="@drawable/ic_button_add_black"-->
 
     <Button
         android:id="@+id/reject_button"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+        style="@style/Widget.MaterialComponents.Button.Icon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:drawableEnd="@drawable/ic_button_reject_black"
-        android:drawableStart="@drawable/ic_button_back_black"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/white"
         android:elevation="@dimen/button_elevation"
-        android:text="Reject"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+        android:text="@string/share_button_reject"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_button_reject_black"
         app:layout_constraintBottom_toTopOf="@id/add_forward_button"
-        app:layout_constraintEnd_toEndOf="@id/add_return_button"
+        app:layout_constraintEnd_toStartOf="@id/play_now_button"
         app:layout_constraintStart_toStartOf="parent"
         />
+    <!--    android:drawableEnd="@drawable/ic_button_reject_black"-->
+    <!--    android:drawableStart="@drawable/ic_button_back_black"-->
 
     <Button
         android:id="@+id/play_now_button"
-        style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+        style="@style/Widget.MaterialComponents.Button.Icon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_button_play_black"
-        android:drawableEnd="@drawable/ic_button_forward_black"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/white"
         android:elevation="@dimen/button_elevation"
-        android:text="Play Now"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+        android:text="@string/share_button_play_now"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_button_play_black"
         app:layout_constraintBottom_toTopOf="@id/add_forward_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/add_return_button"
+        app:layout_constraintStart_toEndOf="@id/reject_button"
         />
+    <!--    android:drawableStart="@drawable/ic_button_play_black"-->
+    <!--    android:drawableEnd="@drawable/ic_button_forward_black"-->
 
     <Button
         android:id="@+id/add_forward_button"
-        style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+        style="@style/Widget.MaterialComponents.Button.Icon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_button_add_black"
-        android:drawableEnd="@drawable/ic_button_forward_black"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/white"
         android:elevation="@dimen/button_elevation"
-        android:text="Add to queue"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+        android:text="@string/share_button_add_to_queue"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_button_add_black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/add_return_button"
         />
+    <!--    android:drawableStart="@drawable/ic_button_add_black"-->
+    <!--    android:drawableEnd="@drawable/ic_button_forward_black"-->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
