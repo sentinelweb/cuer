@@ -42,6 +42,7 @@
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/ic_button_reject_black"
         android:drawableStart="@drawable/ic_button_back_black"
         android:elevation="@dimen/button_elevation"
         android:text="Reject"

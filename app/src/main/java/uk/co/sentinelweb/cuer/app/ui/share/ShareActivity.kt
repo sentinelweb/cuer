@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_share.*
-import kotlinx.serialization.UnstableDefault
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -61,7 +60,6 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         finish()
     }
 
-    @UnstableDefault
     override fun gotoMain(media: MediaDomain?, play: Boolean) {
         startActivity(
             Intent(this, MainActivity::class.java).apply {

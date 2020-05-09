@@ -79,13 +79,11 @@ class PlaylistPresenter(
 
     override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
         if (external) {
-            if (ytJavaApi.canLaunchVideo()) {
-                getDomainPlaylistItem(item.url)?.run {
-                    ytJavaApi.launchVideo(this.media)
-                } ?: toastWrapper.show("can't find video")
-            } else {
-                toastWrapper.show("can't launch video")
-            }
+            getDomainPlaylistItem(item.url)?.run {
+                if (!ytJavaApi.launchVideo(this.media)) {
+                    toastWrapper.show("can't launch video")
+                }
+            } ?: toastWrapper.show("can't find video")
         } else {
             getDomainPlaylistItem(item.url)?.run {
                 view.playLocal(this.media)
@@ -94,13 +92,11 @@ class PlaylistPresenter(
     }
 
     override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
-        if (ytJavaApi.canLaunchChannel()) {
-            getDomainPlaylistItem(item.url)?.run {
-                ytJavaApi.launchChannel(this.media)
-            } ?: toastWrapper.show("can't find video")
-        } else {
-            toastWrapper.show("can't launch channel")
-        }
+        getDomainPlaylistItem(item.url)?.run {
+            if (!ytJavaApi.launchChannel(this.media)) {
+                toastWrapper.show("can't launch channel")
+            }
+        } ?: toastWrapper.show("can't find video")
     }
 
     override fun onItemStar(item: PlaylistModel.PlaylistItemModel) {

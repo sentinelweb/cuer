@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.net.retrofit
 
 //import retrofit2.converter.gson.GsonConverterFactory
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import okhttp3.Interceptor
@@ -13,10 +12,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 
-
 internal class RetrofitBuilder constructor() {
 
-    @OptIn(UnstableDefault::class)
     internal fun buildYoutubeClient() = Retrofit.Builder()
         .baseUrl(YOUTUBE_BASE)
         //.addConverterFactory(GsonConverterFactory.create())
