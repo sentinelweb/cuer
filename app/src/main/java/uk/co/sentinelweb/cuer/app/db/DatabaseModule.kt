@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.db
 
-import androidx.room.Room
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
@@ -11,7 +10,7 @@ object DatabaseModule {
         single {
             get<RoomWrapper>().createDb()
         }
-        single {  RoomWrapper(androidApplication()) }
+        single { RoomWrapper(androidApplication()) }
         factory { MediaDatabaseRepository(get<AppDatabase>().mediaDao(), get(), get()) }
         factory { MediaMapper() }
     }

@@ -11,15 +11,17 @@ class ShareWrapper(
         Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(
-                Intent.EXTRA_TEXT, """Yo cheez, Check out this vid:
+                Intent.EXTRA_TEXT,
+                """Yo cheez, Check out this vid:
                 |
                 |${media.title}
                 |${media.url}
                 |
-                | by "${media.channelTitle}" (${YoutubeJavaApiWrapper.channelUrl(media)})
+                |by "${media.channelTitle}" (${YoutubeJavaApiWrapper.channelUrl(media)})
                 | 
-                | Sent via Cuer (https://twitter.com/cuerapp) @cuerapp
-            """.trimMargin()
+                |Sent via Cuer @cuerapp (https://twitter.com/cuerapp) 
+                |
+                """.trimMargin()
             )
             putExtra(Intent.EXTRA_SUBJECT, "Watch '${media.title}' by '${media.channelTitle}'")
             type = "text/plain"
