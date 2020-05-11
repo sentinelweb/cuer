@@ -14,11 +14,14 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.util.extension.serialise
+import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class ShareActivity : AppCompatActivity(), ShareContract.View {
 
     private val presenter: ShareContract.Presenter by currentScope.inject()
+    private val shareWrapper: ShareWrapper by currentScope.inject()
+
     private val editFragment by lazy {
         supportFragmentManager.findFragmentById(R.id.playlist_edit_fragment) as PlaylistItemEditFragment
     }
@@ -27,23 +30,8 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_share)
 
-        when (intent?.action) {
-            Intent.ACTION_SEND -> {
-                if (intent.data?.host?.endsWith("youtube.com") ?: false) {// todo move in
-                    presenter.fromShareUrl(intent.data.toString())
-                } else if (intent.clipData?.itemCount ?: 0 > 0) { // todo move in
-                    presenter.fromShareUrl(intent.clipData?.getItemAt(0)?.text.toString())
-                } else {
-                    intent.data?.let { presenter.fromShareUrl(it.toString()) }
-                }
-            }
-            Intent.ACTION_VIEW -> {
-                if (intent.data?.host?.endsWith("youtube.com") ?: false) {
-                    presenter.fromShareUrl(intent.data.toString())
-                } else {
-                    intent.data?.let { presenter.fromShareUrl(it.toString()) }
-                }
-            }
+        shareWrapper.getLinkFromIntent(intent) {
+            presenter.fromShareUrl(it)
         }
 
         add_return_button.setOnClickListener { presenter.onAddReturn() }
@@ -89,9 +77,11 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
                         ytInteractor = get(),
                         toast = get(),
                         queue = get(),
-                        state = get()
+                        state = get(),
+                        log = get()
                     )
                 }
+                scoped { ShareWrapper(getSource()) }
                 viewModel { ShareState() }
             }
         }

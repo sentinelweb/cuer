@@ -14,7 +14,7 @@ class LinkScanner {
             return parseQuery(uri.query)
                 .firstOrNull { it[0] == "v" }
                 ?.let {
-                    createYt(uriString, it[0])
+                    createYt(uriString, it[1])
                 }
         } else {
             return null

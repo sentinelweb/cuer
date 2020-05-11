@@ -31,4 +31,26 @@ class ShareWrapper(
             activity.startActivity(this)
         }
     }
+
+    // todo rewrite
+    fun getLinkFromIntent(intent: Intent, callback: (String) -> Unit) {
+        when (intent.action) {
+            Intent.ACTION_SEND -> {
+                if (intent.data?.host?.endsWith("youtube.com") ?: false) {
+                    callback(intent.data.toString())
+                } else if (intent.clipData?.itemCount ?: 0 > 0) {
+                    callback(intent.clipData?.getItemAt(0)?.text.toString())
+                } else {
+                    intent.data?.let { callback(it.toString()) }
+                }
+            }
+            Intent.ACTION_VIEW -> {
+                if (intent.data?.host?.endsWith("youtube.com") ?: false) {
+                    callback(intent.data.toString())
+                } else {
+                    intent.data?.let { callback(it.toString()) }
+                }
+            }
+        }
+    }
 }

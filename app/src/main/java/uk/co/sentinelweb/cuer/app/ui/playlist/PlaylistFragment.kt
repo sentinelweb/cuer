@@ -59,8 +59,8 @@ class PlaylistFragment :
             val media = deserialiseMedia(it)
             presenter.setFocusMedia(media)
             if (activity?.intent?.getBooleanExtra(Const.EXTRA_PLAY_NOW, false) ?: false) {
-                //?.takeIf { it }
                 presenter.playNow(media)
+                activity?.intent?.removeExtra(Const.EXTRA_PLAY_NOW)
             }
         }
     }

@@ -6,7 +6,11 @@
     >
 
     <deepLink
-        android:id="@+id/deepLink"
+        android:id="@+id/youtube"
         app:uri="https://www.youtube.com/watch?v={id}"
+        />
+    <deepLink
+        android:id="@+id/deepLinkMob"
+        app:uri="https://m.youtube.com/watch?v={id}"
         />
 </navigation>

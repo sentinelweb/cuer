@@ -3,15 +3,19 @@ package uk.co.sentinelweb.cuer.app.db.repository
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.dao.MediaDao
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class MediaDatabaseRepository constructor(
     private val mediaDao: MediaDao,
     private val mediaMapper: MediaMapper,
-    private val coProvider: CoroutineContextProvider
+    private val coProvider: CoroutineContextProvider,
+    private val log: LogWrapper
 ) : DatabaseRepository<MediaDomain> {
-
+    init {
+        log.tag = "MediaDatabaseRepository"
+    }
     override suspend fun save(domain: MediaDomain): Boolean = withContext(coProvider.IO) {
         domain
             .let { mediaMapper.map(it) }
@@ -33,7 +37,8 @@ class MediaDatabaseRepository constructor(
 
     override suspend fun loadList(filter: DatabaseRepository.Filter?)
             : List<MediaDomain> = withContext(coProvider.IO) {
-        when (filter) {
+        try {
+            when (filter) {
             is IdListFilter ->
                 mediaDao
                     .loadAllByIds(filter.ids.toIntArray())
@@ -47,6 +52,10 @@ class MediaDatabaseRepository constructor(
                 mediaDao
                     .getAll()
                     .map { mediaMapper.map(it) }
+        }
+        } catch (e: Throwable) {
+            log.e("couldn't load $filter", e)
+            listOf<MediaDomain>()
         }
     }
 

@@ -5,7 +5,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeVideosInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
@@ -17,30 +19,44 @@ class SharePresenter constructor(
     private val ytInteractor: YoutubeVideosInteractor,
     private val toast: ToastWrapper,
     private val queue: QueueMediatorContract.Mediator,
-    private val state: ShareState
+    private val state: ShareState,
+    private val log: LogWrapper
+
 ) : ShareContract.Presenter {
+    init {
+        log.tag = "SharePresenter"
+    }
 
     override fun fromShareUrl(uriString: String) {
         linkScanner
             .scan(uriString)
             ?.let { scannedMedia ->
                 state.jobs.add(CoroutineScope(contextProvider.Main).launch {
-                    scannedMedia.let {
-                        repository.loadList(MediaDatabaseRepository.MediaIdFilter(scannedMedia.mediaId))
-                    }.takeIf { it.isEmpty() }
-                        ?.run {
-                            ytInteractor.videos(
-                                ids = listOf(scannedMedia.mediaId),
-                                parts = listOf(ID, SNIPPET, CONTENT_DETAILS)
-                            )
-                        }
-                        ?.firstOrNull()
-                        ?.also {
-                            state.media = it
-                            view.setData(it)
-                        } ?: skipExists()
+                    loadOrInfo(scannedMedia)
+                        ?.also { loadMedia(it) }
+                        ?: errorLoading(scannedMedia.url)
                 })
             } ?: unableExit(uriString)
+    }
+
+    private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? = scannedMedia.let {
+        repository.loadList(MediaDatabaseRepository.MediaIdFilter(scannedMedia.mediaId))
+    }.firstOrNull()
+        ?: run {
+            try {
+                ytInteractor.videos(
+                    ids = listOf(scannedMedia.mediaId),
+                    parts = listOf(ID, SNIPPET, CONTENT_DETAILS)
+                )
+            } catch (e: Exception) {
+                log.d("Couldn't get info for item: ${scannedMedia.url}")
+                listOf<MediaDomain>()
+            }
+        }.firstOrNull()
+
+    private fun loadMedia(it: MediaDomain) {
+        state.media = it
+        view.setData(it)
     }
 
     override fun onAddReturn() {
@@ -79,9 +95,10 @@ class SharePresenter constructor(
         view.exit()
     }
 
-    private fun skipExists() {
+    private fun errorLoading(token: String) {
         view.exit()
-        toast.show("We have it already ...")
+        toast.show("Couldn't load item: $token")
+        log.d("Couldn't load item: $token")
     }
 
     private fun unableExit(uri: String) {

@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.SNIPPET
 
 interface YoutubeVideosInteractor {
 
+    @Throws(Exception::class)
     suspend fun videos(
         ids:List<String>,
         parts:List<YoutubePart> = listOf(ID, SNIPPET)

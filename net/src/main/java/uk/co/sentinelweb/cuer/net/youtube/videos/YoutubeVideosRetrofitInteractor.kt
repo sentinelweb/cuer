@@ -15,6 +15,7 @@ internal class YoutubeVideosRetrofitInteractor constructor(
     private val coContext: CoroutineContextProvider
 ) : YoutubeVideosInteractor {
 
+    @Throws(Exception::class)
     suspend override fun videos(ids: List<String>, parts: List<YoutubePart>): List<MediaDomain> =
         withContext(coContext.IO) {
             try {
