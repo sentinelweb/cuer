@@ -36,7 +36,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/add_forward_button"
         app:layout_constraintStart_toStartOf="parent"
-
         />
     <!--    android:drawableStart="@drawable/ic_button_back_black"-->
     <!--    android:drawableEnd="@drawable/ic_button_add_black"-->

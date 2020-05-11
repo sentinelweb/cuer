@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.share.LinkScanner
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
@@ -40,6 +41,7 @@ object Modules {
         MainActivity.activityModule,
         CastPlayerFragment.viewModule,
         ShareActivity.activityModule,
+        PlaylistItemEditFragment.fragmentModule,
         YoutubeCastServiceModule.serviceModule
     )
 

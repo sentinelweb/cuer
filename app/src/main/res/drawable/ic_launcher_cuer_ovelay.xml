@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/ic_launch_video_black_48dp" />
+    <item android:drawable="@drawable/ic_launch_video_primary" />
     <item
         android:bottom="14dp"
-        android:drawable="@drawable/ic_launch_playlist_black"
+        android:drawable="@drawable/ic_launch_playlist_primary"
         android:left="10dp"
         android:right="10dp"
         android:top="10dp"
         />
-    <!--    <item-->
-    <!--        android:drawable="@drawable/ic_launch_play_black"-->
-    <!--        android:left="0dp"-->
-    <!--        android:right="25dp"-->
-    <!--        android:top="8dp"-->
-    <!--        android:bottom="15dp"-->
-    <!--        />-->
 </layer-list>

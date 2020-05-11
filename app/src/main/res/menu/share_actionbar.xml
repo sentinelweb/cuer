@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <item
+        android:id="@+id/star"
+        android:icon="@drawable/ic_button_unstarred_white"
+        android:title="@string/menu_star"
+        app:iconTint="@color/white"
+        app:showAsAction="always"
+        />
+</menu>

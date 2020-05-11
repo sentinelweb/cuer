@@ -10,6 +10,15 @@
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
     </style>
 
+    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_accent</item>
+        <item name="android:popupMenuStyle">@style/ContextMenu</item>
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
     <style name="TextAppearance.App.Button" parent="TextAppearance.MaterialComponents.Button">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/white</item>
@@ -47,4 +56,29 @@
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/grey_800</item>
     </style>
+
+    <style name="TextAppearance"></style>
+
+    <style name="TextAppearance.App"></style>
+
+    <style name="TextAppearance.App.CollapsingToolbar">
+
+    </style>
+
+    <style name="TextAppearance.App.CollapsingToolbar.Expanded">
+        <item name="android:background">@color/purple_300</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:autoSizeMaxTextSize">32sp</item>
+        <item name="android:autoSizeMinTextSize">22sp</item>
+    </style>
+
+    <style name="TextAppearance.App.CollapsingToolbar.Collapsed">
+        <item name="android:background">@color/orange_500</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:autoSizeMaxTextSize">26sp</item>
+        <item name="android:autoSizeMinTextSize">20sp</item>
+    </style>
+
 </resources>
