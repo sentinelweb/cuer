@@ -8,7 +8,6 @@
         <item name="colorAccent">@color/color_accent</item>
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
-
     </style>
 
     <style name="TextAppearance.App.Button" parent="TextAppearance.MaterialComponents.Button">
