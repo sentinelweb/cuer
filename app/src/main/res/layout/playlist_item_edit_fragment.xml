@@ -24,7 +24,8 @@
             app:collapsedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Collapsed"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginBottom="28dp"
-            app:expandedTitleMarginStart="72dp"
+            app:expandedTitleMarginEnd="16dp"
+            app:expandedTitleMarginStart="16dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:statusBarScrim="?attr/colorPrimaryDark"
@@ -40,6 +41,22 @@
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7"
                 tools:src="@drawable/im_test_nietzche"
+                />
+
+            <ImageButton
+                android:id="@+id/ple_play_button"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:alpha="0.8"
+                android:background="@drawable/ic_ripple_play_background"
+                android:contentDescription="@null"
+                android:fitsSystemWindows="true"
+                android:scaleType="center"
+                android:src="@drawable/ic_player_play_black"
+                android:tint="@color/white"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.7"
                 />
 
             <View
@@ -60,9 +77,10 @@
                 android:elevation="0dp"
                 app:layout_collapseMode="pin"
                 app:layout_scrollFlags="scroll|enterAlways|snap"
-
                 app:menu="@menu/share_actionbar"
                 />
+
+
             <!--            app:title="SESSIONS: Miss Monique - Mimo Weekly Podcast #011 (2019)"-->
             <!--            android:background="@color/grey_300"-->
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -119,6 +137,7 @@
         app:layout_anchor="@id/ple_appbar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_button_unstarred_white"
+        app:tint="@color/white"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

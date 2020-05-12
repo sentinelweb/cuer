@@ -1,10 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.AppBarLayout
 import com.squareup.picasso.Picasso
@@ -19,12 +17,14 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 
-class PlaylistItemEditFragment : Fragment() {
+class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) {
 
     private val viewModel: PlaylistItemEditViewModel by currentScope.inject()
     private val log: LogWrapper by inject()
 
-    private val starMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.star) }
+    private val starMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_star) }
+    private val playMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_play) }
+
 
     init {
         log.tag = "PlaylistItemEditFragment"
@@ -35,11 +35,40 @@ class PlaylistItemEditFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.playlist_item_edit_fragment, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        ple_play_button.setOnClickListener { log.d("play clicked") }
+        starMenuItem.isVisible = false
+        playMenuItem.isVisible = false
+        ple_toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.share_star -> {
+                    // Handle favorite icon press
+                    true
+                }
+                else -> false
+            }
+        }
+        ple_appbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+
+            var isShow = false
+            var scrollRange = -1
+
+            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange()
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    isShow = true
+                    starMenuItem.isVisible = true
+                    playMenuItem.isVisible = true
+                } else if (isShow) {
+                    isShow = false
+                    starMenuItem.isVisible = false
+                    playMenuItem.isVisible = false
+                }
+            }
+        })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -53,39 +82,7 @@ class PlaylistItemEditFragment : Fragment() {
         }
         ple_title.setText(media.title)
         ple_desc.setText(media.description)
-        starMenuItem.isVisible = false
         ple_toolbar.title = media.title
-        ple_appbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
-
-            var isShow = false
-            var scrollRange = -1
-
-            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange()
-                }
-                log.d("scrollRange: $scrollRange :: verticalOffset:$verticalOffset :: isShow:$isShow")
-                if (scrollRange + verticalOffset == 0) {
-                    isShow = true
-                    //ple_toolbar.title = media.title
-                    starMenuItem.isVisible = true
-                } else if (isShow) {
-                    isShow = false
-                    //ple_toolbar.title = "--"
-                    starMenuItem.isVisible = false
-                }
-            }
-        })
-
-        ple_toolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.star -> {
-                    // Handle favorite icon press
-                    true
-                }
-                else -> false
-            }
-        }
     }
 
     companion object {

@@ -30,9 +30,6 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_share)
 
-        shareWrapper.getLinkFromIntent(intent) {
-            presenter.fromShareUrl(it)
-        }
 
         add_return_button.setOnClickListener { presenter.onAddReturn() }
         add_forward_button.setOnClickListener { presenter.onAddForward() }
@@ -46,6 +43,13 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
 
     override fun exit() {
         finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        shareWrapper.getLinkFromIntent(intent) {
+            presenter.fromShareUrl(it)
+        }
     }
 
     override fun gotoMain(media: MediaDomain?, play: Boolean) {
