@@ -13,4 +13,8 @@
         android:id="@+id/deepLinkMob"
         app:uri="https://m.youtube.com/watch?v={id}"
         />
+    <deepLink
+        android:id="@+id/deepLinkShort"
+        app:uri="https://youtu.be/{id}"
+        />
 </navigation>
