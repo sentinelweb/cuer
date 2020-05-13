@@ -9,16 +9,24 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.koin.core.KoinComponent
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.net.NetResult
+import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeVideosInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
+import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
+import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
 
+// todo test update and channels
 class YoutubeVideosRetrofitInteractorTest : KoinComponent {
 
     @MockK
@@ -28,24 +36,43 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
     private lateinit var mockKeyProvider: YoutubeApiKeyProvider
 
     @MockK
-    private lateinit var mockMapper: YoutubeVideoMediaDomainMapper
+    private lateinit var mockVideoMapper: YoutubeVideoMediaDomainMapper
+
+    @MockK
+    private lateinit var mockChannelMapper: YoutubeChannelDomainMapper
+
+    @MockK
+    private lateinit var mockErrorMapper: ErrorMapper
+
+    @MockK
+    private lateinit var mockLog: LogWrapper
 
     @Fixture
-    private lateinit var dto: YoutubeVideosDto
+    private lateinit var videosDto: YoutubeVideosDto
 
     @Fixture
-    private lateinit var domain: List<MediaDomain>
+    private lateinit var videosDomain: List<MediaDomain>
+
+    @Fixture
+    private lateinit var channelsDto: YoutubeChannelsDto
+
+    @Fixture
+    private lateinit var channelsDomain: List<ChannelDomain>
+
+
     private val fixtIds = listOf("8nhPVOM97Jg", "fY7M3pzXdUo")
     private val fixtParts = listOf(ID, SNIPPET, CONTENT_DETAILS, PLAYER)
 
-    private lateinit var sut: YoutubeVideosInteractor
+    private lateinit var sut: YoutubeInteractor
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         FixtureAnnotations.initFixtures(this)
 
-        every { mockMapper.map(dto) } returns domain
+        every { mockVideoMapper.map(videosDto) } returns videosDomain
+        every { mockChannelMapper.map(channelsDto) } returns channelsDomain
+        every { mockErrorMapper.log } returns mockLog
         every { mockKeyProvider.key } returns "key"
         coEvery {
             mockService.getVideoInfos(
@@ -53,23 +80,50 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
                 fixtParts.map { it.part }.joinToString(","),
                 "key"
             )
-        } returns dto
+        } returns videosDto
+        coEvery {
+            mockService.getChannelInfos(
+                fixtIds.joinToString(","),
+                fixtParts.map { it.part }.joinToString(","),
+                "key"
+            )
+        } returns channelsDto
 
-        sut = YoutubeVideosRetrofitInteractor(
+        sut = YoutubeRetrofitInteractor(
             service = mockService,
             keyProvider = mockKeyProvider,
-            mapper = mockMapper,
-            coContext = CoroutineContextTestProvider()
+            videoMapper = mockVideoMapper,
+            channelMapper = mockChannelMapper,
+            coContext = CoroutineContextTestProvider(),
+            errorMapper = mockErrorMapper
         )
     }
 
     @Test
     fun videos() {
+        every {
+            mockErrorMapper.map<List<MediaDomain>>(any(), any())
+        } returns NetResult.Error<List<MediaDomain>>(Exception("error"))
         runBlocking {
             val actual = sut.videos(fixtIds, fixtParts)
 
-            assertEquals(actual, domain)
-            verify { mockMapper.map(dto) }
+            assertTrue(actual.isSuccessful)
+            assertEquals(actual.data, videosDomain)
+            verify { mockVideoMapper.map(videosDto) }
+        }
+    }
+
+    @Test
+    fun channels() {
+        every {
+            mockErrorMapper.map<List<ChannelDomain>>(any(), any())
+        } returns NetResult.Error<List<ChannelDomain>>(Exception("error"))
+        runBlocking {
+            val actual = sut.channels(fixtIds, fixtParts)
+
+            assertTrue(actual.isSuccessful)
+            assertEquals(actual.data, channelsDomain)
+            verify { mockChannelMapper.map(channelsDto) }
         }
     }
 }

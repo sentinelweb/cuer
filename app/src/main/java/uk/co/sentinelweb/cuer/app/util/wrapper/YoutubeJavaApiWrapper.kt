@@ -24,7 +24,7 @@ class YoutubeJavaApiWrapper(
         canLaunchChannel()
             .takeIf { it }
             .also {
-                activity.startActivity(createChannelIntent(activity, media.channelId))
+                activity.startActivity(createChannelIntent(activity, media.channelData.id))
             } ?: false
 
 
@@ -60,7 +60,8 @@ class YoutubeJavaApiWrapper(
     }
 
     companion object {
-        fun channelUrl(media: MediaDomain) = "https://www.youtube.com/channel/${media.channelId}"
+        fun channelUrl(media: MediaDomain) =
+            "https://www.youtube.com/channel/${media.channelData.id}"
         fun videoUrl(media: MediaDomain) = "https://www.youtube.com/watch?v=${media.mediaId}"
         fun videoShortUrl(media: MediaDomain) = "https://youtu.be/${media.mediaId}"
     }

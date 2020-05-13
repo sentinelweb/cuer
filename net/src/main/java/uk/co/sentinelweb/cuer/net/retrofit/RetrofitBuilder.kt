@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 
 internal class RetrofitBuilder constructor() {
 
-    internal fun buildYoutubeClient() = Retrofit.Builder()
+    internal fun buildYoutubeClient(debug: Boolean = false) = Retrofit.Builder()
         .baseUrl(YOUTUBE_BASE)
         //.addConverterFactory(GsonConverterFactory.create())
         .addConverterFactory(
@@ -22,18 +22,20 @@ internal class RetrofitBuilder constructor() {
                 CONTENT_TYPE
             )
         )
-        .client(buildOkHttpClient())
+        .client(buildOkHttpClient(debug))
         .build()
 
-    private fun buildOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
+    private fun buildOkHttpClient(debug: Boolean = false): OkHttpClient {
+        val builder = OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
                 override fun log(message: String) {
                     println(message)
                 }
             }))
-            // .addInterceptor(PRINT_URL_INTERCEPTOR)
-            .build()
+        if (debug) {
+            builder.addInterceptor(PRINT_URL_INTERCEPTOR)
+        }
+        return builder.build()
     }
 
     internal fun buildYoutubeService(retrofit: Retrofit): YoutubeService =

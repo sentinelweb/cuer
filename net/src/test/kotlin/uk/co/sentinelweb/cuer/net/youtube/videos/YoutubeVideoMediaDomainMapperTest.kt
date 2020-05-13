@@ -10,8 +10,10 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
+import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
 import java.time.LocalDateTime
 
 class YoutubeVideoMediaDomainMapperTest {
@@ -43,8 +45,12 @@ class YoutubeVideoMediaDomainMapperTest {
         actual.forEachIndexed { index, domain ->
             assertEquals(domain.title, dto.items[index].snippet?.title)
             assertEquals(domain.description, dto.items[index].snippet?.description)
-            assertEquals(domain.channelId, dto.items[index].snippet?.channelId)
-            assertEquals(domain.channelTitle, dto.items[index].snippet?.channelTitle)
+            assertEquals(
+                domain.channelData, ChannelDomain(
+                    dto.items[index].snippet?.channelId ?: "",
+                    dto.items[index].snippet?.channelTitle
+                )
+            )
             assertEquals(domain.published, fixtDate)
             assertEquals(domain.duration, fixtDuration)
             assertEquals(domain.mediaId, dto.items[index].id)

@@ -2,17 +2,17 @@ package uk.co.sentinelweb.cuer.app.db.repository
 
 interface DatabaseRepository<Domain> {
 
-    suspend fun save(domain: Domain): Result<Boolean>
+    suspend fun save(domain: Domain): RepoResult<Boolean>
 
-    suspend fun save(domains: List<Domain>): Result<Boolean>
+    suspend fun save(domains: List<Domain>): RepoResult<Boolean>
 
-    suspend fun load(id: Int): Result<Domain>
+    suspend fun load(id: Int): RepoResult<Domain>
 
-    suspend fun loadList(filter: Filter? = null): Result<List<Domain>>
+    suspend fun loadList(filter: Filter? = null): RepoResult<List<Domain>>
 
-    suspend fun count(filter: Filter? = null): Result<Int>
+    suspend fun count(filter: Filter? = null): RepoResult<Int>
 
-    suspend fun delete(domain: Domain): Result<Boolean>
+    suspend fun delete(domain: Domain): RepoResult<Boolean>
 
     interface Filter
 }

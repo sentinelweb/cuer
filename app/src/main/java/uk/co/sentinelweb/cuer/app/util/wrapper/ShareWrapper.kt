@@ -17,13 +17,13 @@ class ShareWrapper(
                 |${media.title}
                 |${media.url}
                 |
-                |by "${media.channelTitle}" (${YoutubeJavaApiWrapper.channelUrl(media)})
+                |by "${media.channelData.title}" (${YoutubeJavaApiWrapper.channelUrl(media)})
                 | 
                 |Sent via Cuer @cuerapp (https://twitter.com/cuerapp) 
                 |
                 """.trimMargin()
             )
-            putExtra(Intent.EXTRA_SUBJECT, "Watch '${media.title}' by '${media.channelTitle}'")
+            putExtra(Intent.EXTRA_SUBJECT, "Watch '${media.title}' by '${media.channelData.title}'")
             type = "text/plain"
         }.let {
             Intent.createChooser(it, "Share Video: ${media.title}")

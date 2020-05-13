@@ -21,7 +21,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel
 import uk.co.sentinelweb.cuer.app.util.navigation.NavigationMapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 
@@ -110,7 +110,9 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
             .observe(this.viewLifecycleOwner, object : Observer<PlaylistItemEditModel> {
                 override fun onChanged(model: PlaylistItemEditModel) {
                     Picasso.get().load(model.imageUrl).into(ple_image)
+                    Picasso.get().load(model.channelThumbUrl).into(ple_author_image)
                     ple_title.setText(model.title)
+                    ple_author_title.setText(model.channelTitle)
                     ple_desc.setText(model.description)
                     ple_toolbar.title = model.title
                     ple_play_button.isVisible = model.canPlay

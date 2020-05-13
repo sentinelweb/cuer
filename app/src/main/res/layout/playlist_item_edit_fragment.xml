@@ -94,18 +94,55 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             tools:context=".ui.playlist_item_edit.PlaylistItemEditFragment"
             >
+
+            <ImageView
+                android:id="@+id/ple_author_image"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@color/purple_400"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/ple_author_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                app:layout_constraintStart_toEndOf="@id/ple_author_image"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Channel title"
+                />
+
+            <TextView
+                android:id="@+id/ple_author_desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:autoLink="web|email"
+                android:ellipsize="end"
+                android:linksClickable="true"
+                android:maxLines="2"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                app:layout_constraintStart_toEndOf="@id/ple_author_image"
+                app:layout_constraintTop_toBottomOf="@id/ple_author_title"
+                tools:text="Channel description http://www.yahoo.com descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel description"
+                />
 
             <TextView
                 android:id="@+id/ple_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ple_author_image"
                 tools:text="Playlist Item Edit Title"
                 />
 
@@ -113,7 +150,6 @@
                 android:id="@+id/ple_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:autoLink="web|email"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

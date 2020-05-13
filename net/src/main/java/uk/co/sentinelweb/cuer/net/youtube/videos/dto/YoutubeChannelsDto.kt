@@ -1,26 +1,25 @@
-package uk.co.sentinelweb.cuer.net.youtube.videos
+package uk.co.sentinelweb.cuer.net.youtube.videos.dto
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class YoutubeVideosDto constructor(
-    val items: List<VideoDto>
+data class YoutubeChannelsDto constructor(
+    val items: List<ItemDto>
 ) {
     @Serializable
-    data class VideoDto constructor(
+    data class ItemDto constructor(
         val id: String,
-        val snippet: SnippetDto?, // optional field (declared as part)
-        val contentDetails: ContentDto? = null// optional field (declared as part)
+        val snippet: SnippetDto? = null // optional field (declared as part)
+
     ) {
         @Serializable
         data class SnippetDto constructor(
             val title: String,
-            val description: String,
-            val channelId: String,
-            val channelTitle: String,
+            val description: String?,
+            val customUrl: String?,
+            val country: String,
             val publishedAt: String,
-            val thumbnails:ThumbnailsDto
-
+            val thumbnails: ThumbnailsDto
         ) {
             @Serializable
             data class ThumbnailsDto constructor(
@@ -38,11 +37,5 @@ data class YoutubeVideosDto constructor(
                 )
             }
         }
-
-        @Serializable
-        data class ContentDto constructor(
-            val duration: String,
-            val definition: String
-        )
     }
 }

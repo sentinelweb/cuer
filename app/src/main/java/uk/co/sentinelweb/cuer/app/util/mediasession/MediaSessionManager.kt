@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.util.mediasession
 import android.content.Context
 import android.support.v4.media.session.MediaSessionCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
-import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 

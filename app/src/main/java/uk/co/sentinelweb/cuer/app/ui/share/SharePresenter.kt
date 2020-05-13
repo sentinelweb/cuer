@@ -4,11 +4,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeVideosInteractor
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 class SharePresenter constructor(
@@ -16,13 +16,13 @@ class SharePresenter constructor(
     private val repository: MediaDatabaseRepository,
     private val linkScanner: LinkScanner,
     private val contextProvider: CoroutineContextProvider,
-    private val ytInteractor: YoutubeVideosInteractor,
+    private val ytInteractor: YoutubeInteractor,
     private val toast: ToastWrapper,
     private val queue: QueueMediatorContract.Mediator,
     private val state: ShareState,
     private val log: LogWrapper
-
 ) : ShareContract.Presenter {
+
     init {
         log.tag = "SharePresenter"
     }
@@ -44,16 +44,14 @@ class SharePresenter constructor(
     }.takeIf { it.isSuccessful }
         ?.let { it.data?.firstOrNull() }
         ?: run {
-            try {
-                ytInteractor.videos(
-                    ids = listOf(scannedMedia.mediaId),
-                    parts = listOf(ID, SNIPPET, CONTENT_DETAILS)
-                )
-            } catch (e: Exception) {
-                log.d("Couldn't get info for item: ${scannedMedia.url}")
-                listOf<MediaDomain>()
-            }
-        }.firstOrNull()
+            ytInteractor.videos(
+                ids = listOf(scannedMedia.mediaId),
+                parts = listOf(ID, SNIPPET, CONTENT_DETAILS)
+            ).takeIf { it.isSuccessful }
+                ?.let {
+                    it.data?.firstOrNull()
+                }
+        }
 
     private fun loadMedia(it: MediaDomain) {
         state.media = it

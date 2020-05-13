@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
 import uk.co.sentinelweb.cuer.domain.MediaDomain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeVideosInteractor
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
 
 class PlaylistPresenter(
@@ -25,7 +25,7 @@ class PlaylistPresenter(
     private val contextProvider: CoroutineContextProvider,
     private val queue: QueueMediatorContract.Mediator,
     private val toastWrapper: ToastWrapper,
-    private val ytInteractor: YoutubeVideosInteractor,
+    private val ytInteractor: YoutubeInteractor,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val shareWrapper: ShareWrapper
@@ -146,7 +146,8 @@ class PlaylistPresenter(
                     .map { mapQueueToMedia(it) }
                     .map { it.mediaId }
                     .let { ytInteractor.videos(it) }
-                    .also { repository.save(it) }
+                    .takeIf { it.isSuccessful }
+                    ?.also { it.data?.let { repository.save(it) } }
                     .also { loadList() }
             }
         })

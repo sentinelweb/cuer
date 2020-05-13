@@ -7,8 +7,8 @@ data class PlaylistItemEditModel constructor(
     val title: String?,
     val description: String?,
     val chips: List<ChipModel>,
-    val author: String?,
-    val authorImgUrl: String?,
+    val channelTitle: String?,
+    val channelThumbUrl: String?,
     val starred: Boolean,
     val canPlay: Boolean
 )
