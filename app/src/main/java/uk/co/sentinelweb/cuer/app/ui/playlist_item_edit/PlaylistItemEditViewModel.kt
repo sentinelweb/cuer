@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.LOCAL_PLAYER
+import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.WEB_LINK
+import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.LINK
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA_ID
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
@@ -40,6 +42,11 @@ class PlaylistItemEditViewModel constructor(
                 state.model = modelMapper.map(it)
                 _modelLiveData.value = state.model
             }
+    }
+
+    fun onLinkClick(urlString: String) {
+        _navigateLiveData.value =
+            NavigationModel(WEB_LINK, mapOf(LINK to urlString))
     }
 
 }

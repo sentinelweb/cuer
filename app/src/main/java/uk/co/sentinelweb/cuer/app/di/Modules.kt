@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.di
 
-import com.roche.mdas.util.wrapper.ToastWrapper
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.CuerAppState
@@ -25,10 +24,7 @@ import uk.co.sentinelweb.cuer.app.util.helper.PlaylistMutator
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.PhoenixWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider

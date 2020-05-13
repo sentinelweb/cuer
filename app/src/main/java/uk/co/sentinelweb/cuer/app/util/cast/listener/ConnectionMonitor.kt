@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.util.cast.listener
 
 import androidx.annotation.VisibleForTesting
-import com.roche.mdas.util.wrapper.ToastWrapper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -11,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.CC_CONNECTED
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.PhoenixWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 
 // todo  .. find a proper solution to kill the cast connection

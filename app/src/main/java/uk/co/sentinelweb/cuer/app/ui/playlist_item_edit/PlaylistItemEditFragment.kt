@@ -1,8 +1,12 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import android.os.Bundle
+import android.text.Spannable
+import android.text.method.LinkMovementMethod
+import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -16,9 +20,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.LOCAL_PLAYER
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA_ID
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
+import uk.co.sentinelweb.cuer.app.util.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
@@ -27,6 +29,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
 
     private val viewModel: PlaylistItemEditViewModel by currentScope.inject()
     private val log: LogWrapper by inject()
+    private val navMapper: NavigationMapper by inject()
 
     private val starMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_star) }
     private val playMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_play) }
@@ -48,6 +51,18 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         ple_star_fab.setOnClickListener { viewModel.onStarClick() }
         starMenuItem.isVisible = false
         playMenuItem.isVisible = false
+        ple_desc.setMovementMethod(object : LinkMovementMethod() {
+            override fun handleMovementKey(
+                widget: TextView?,
+                buffer: Spannable?,
+                keyCode: Int,
+                movementMetaState: Int,
+                event: KeyEvent?
+            ): Boolean {
+                buffer?.run { viewModel.onLinkClick(this.toString()) }
+                return true
+            }
+        })
         ple_toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.share_star -> {
@@ -113,11 +128,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
             .observe(this.viewLifecycleOwner,
                 object : Observer<NavigationModel> {
                     override fun onChanged(nav: NavigationModel) {
-                        when (nav.target) {
-                            LOCAL_PLAYER -> nav.params[MEDIA_ID]?.let {
-                                YoutubeActivity.start(requireContext(), it.toString())
-                            }
-                        }
+                        navMapper.map(nav)
                     }
                 }
             )
@@ -130,6 +141,12 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 viewModel { PlaylistItemEditViewModel(get(), get()) }
                 factory { PlaylistItemEditState() }
                 factory { PlaylistItemEditModelMapper() }
+                factory {
+                    NavigationMapper(
+                        activity = (getSource() as Fragment).requireActivity(),
+                        toastWrapper = get()
+                    )
+                }
             }
         }
     }

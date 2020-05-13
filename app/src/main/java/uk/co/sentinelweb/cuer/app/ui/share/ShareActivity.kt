@@ -9,8 +9,8 @@ import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.util.extension.serialise
@@ -53,11 +53,11 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
     }
 
     override fun gotoMain(media: MediaDomain?, play: Boolean) {
-        startActivity(
+        startActivity(// todo map in NavigationMapper
             Intent(this, MainActivity::class.java).apply {
                 media?.let {
-                    putExtra(Const.EXTRA_MEDIA, it.serialise())
-                    if (play) putExtra(Const.EXTRA_PLAY_NOW, true)
+                    putExtra(MEDIA.toString(), it.serialise())
+                    if (play) putExtra(MEDIA.toString(), true)
                 }
             })
     }

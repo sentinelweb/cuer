@@ -13,9 +13,9 @@
     <!-- This is the background for your button -->
     <item>
         <!-- Use the shape you want here -->
-        <shape android:shape="rectangle">
+        <shape android:shape="oval">
             <!-- Use the solid tag to define the background color you want -->
-            <solid android:color="@android:color/transparent" />
+            <solid android:color="@color/black_text_secondary" />
         </shape>
     </item>
 </ripple>

@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="64sp"
                 android:layout_gravity="bottom"
-                android:background="#99000000"
+                android:background="@color/black_text_secondary"
                 android:fitsSystemWindows="true"
                 />
 
@@ -80,9 +80,6 @@
                 app:menu="@menu/share_actionbar"
                 />
 
-
-            <!--            app:title="SESSIONS: Miss Monique - Mimo Weekly Podcast #011 (2019)"-->
-            <!--            android:background="@color/grey_300"-->
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -105,7 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -117,11 +114,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:autoLink="web|email"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ple_title"
-                tools:text="Playlist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description"
+                android:linksClickable="true"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                tools:text="Playlist Item http://www.google.com Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description"
                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,13 +4,13 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.media.session.MediaButtonReceiver
-import com.roche.mdas.util.wrapper.ToastWrapper
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 import org.koin.core.scope.Scope
 import org.koin.ext.getOrCreateScope
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 
 class YoutubeCastService : Service(), KoinComponent {
 
