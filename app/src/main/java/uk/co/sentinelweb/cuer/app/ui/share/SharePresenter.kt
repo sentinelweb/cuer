@@ -41,7 +41,8 @@ class SharePresenter constructor(
 
     private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? = scannedMedia.let {
         repository.loadList(MediaDatabaseRepository.MediaIdFilter(scannedMedia.mediaId))
-    }.firstOrNull()
+    }.takeIf { it.isSuccessful }
+        ?.let { it.data?.firstOrNull() }
         ?: run {
             try {
                 ytInteractor.videos(

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.queue
 
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.Result
 import uk.co.sentinelweb.cuer.app.util.helper.PlaylistMutator
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -113,16 +114,17 @@ class QueueMediator constructor(
         state.jobs.add(contextProvider.MainScope.launch {
             repository
                 .loadList(null)
-                .also { state.mediaList = it }
-                .map { mediaMapper.mapToPlaylistItem(it) }
-                .let {
+                .takeIf { it.isSuccessful && it is Result.Data }
+                ?.let { state.mediaList = it.data!!; it.data }
+                ?.map { mediaMapper.mapToPlaylistItem(it) }
+                ?.let {
                     PlaylistDomain(
                         items = it,
                         currentIndex = state.currentPlaylist?.currentIndex ?: 0
                     )
                 }
-                .also { state.currentPlaylist = it }
-                .also { playlist ->
+                ?.also { state.currentPlaylist = it }
+                ?.also { playlist ->
                     producerListeners.forEach { l -> l.onPlaylistUpdated(playlist) }
                 }
         })

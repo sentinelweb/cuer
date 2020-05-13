@@ -140,8 +140,8 @@ class PlaylistPresenter(
 
     private fun initListCheck() {
         state.jobs.add(contextProvider.MainScope.launch {
-            val count = repository.count()
-            if (count == 0) {
+            val result = repository.count()
+            if (result.isSuccessful && result.data == 0) {
                 Queue.ITEMS
                     .map { mapQueueToMedia(it) }
                     .map { it.mediaId }
