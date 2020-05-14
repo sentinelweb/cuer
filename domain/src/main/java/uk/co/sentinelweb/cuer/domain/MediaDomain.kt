@@ -29,8 +29,4 @@ data class MediaDomain(
         VIDEO, AUDIO, WEB
     }
 
-    enum class PlatformDomain {
-        YOUTUBE, VIMEO, SOUNDCLOUD, WEB, OTHER
-    }
-
 }

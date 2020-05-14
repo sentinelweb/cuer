@@ -10,6 +10,7 @@ data class PlaylistItemDomain(
     val media: MediaDomain,
     @ContextualSerialization val dateAdded: Instant,
     val order: Long,
+    val archived: Boolean = false,
     private val _tags: List<TagDomain>? = null
 ) {
     val tags: List<TagDomain>?
