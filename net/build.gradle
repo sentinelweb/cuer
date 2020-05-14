@@ -29,7 +29,6 @@ dependencies {
 
 test {
     systemProperty 'CUER_YOUTUBE_API_KEY', CUER_YOUTUBE_API_KEY
-    println "# test environment: " + systemProperties['CUER_YOUTUBE_API_KEY']
 }
 
 sourceCompatibility = ver_jdk

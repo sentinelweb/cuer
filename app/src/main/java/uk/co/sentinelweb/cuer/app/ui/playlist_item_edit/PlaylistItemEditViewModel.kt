@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.LOCAL_PLAYE
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.WEB_LINK
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.LINK
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA_ID
+import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class PlaylistItemEditViewModel constructor(
@@ -47,6 +48,10 @@ class PlaylistItemEditViewModel constructor(
     fun onLinkClick(urlString: String) {
         _navigateLiveData.value =
             NavigationModel(WEB_LINK, mapOf(LINK to urlString))
+    }
+
+    fun onSelectPlaylist(model: ChipModel) {
+
     }
 
 }

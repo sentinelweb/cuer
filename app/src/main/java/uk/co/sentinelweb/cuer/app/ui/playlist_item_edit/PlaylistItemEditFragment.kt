@@ -20,6 +20,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
+import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
 import uk.co.sentinelweb.cuer.app.util.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -30,6 +32,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     private val viewModel: PlaylistItemEditViewModel by currentScope.inject()
     private val log: LogWrapper by inject()
     private val navMapper: NavigationMapper by inject()
+    private val chipCreator: ChipCreator by currentScope.inject()
 
     private val starMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_star) }
     private val playMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_play) }
@@ -111,6 +114,18 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 override fun onChanged(model: PlaylistItemEditModel) {
                     Picasso.get().load(model.imageUrl).into(ple_image)
                     Picasso.get().load(model.channelThumbUrl).into(ple_author_image)
+                    ple_chips.removeAllViews() // todo reuse chip views
+                    model.chips.forEach { chipModel ->
+                        chipCreator.create(chipModel, ple_chips)?.apply {
+                            ple_chips.addView(this)
+                            when (chipModel.type) {
+                                PLAYLIST_SELECT -> {
+                                    setOnClickListener { viewModel.onSelectPlaylist(chipModel) }
+                                }
+                                else -> Unit
+                            }
+                        }
+                    }
                     ple_title.setText(model.title)
                     ple_author_title.setText(model.channelTitle)
                     ple_desc.setText(model.description)
@@ -148,6 +163,9 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         activity = (getSource() as Fragment).requireActivity(),
                         toastWrapper = get()
                     )
+                }
+                factory {
+                    ChipCreator((getSource() as Fragment).requireActivity())
                 }
             }
         }

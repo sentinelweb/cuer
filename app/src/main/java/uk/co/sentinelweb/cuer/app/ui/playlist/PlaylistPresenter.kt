@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
-import uk.co.sentinelweb.cuer.domain.MediaDomain.PlatformDomain.YOUTUBE
+import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor

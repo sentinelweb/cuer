@@ -7,7 +7,6 @@ class PlaylistItemEditModelMapper() {
     fun map(domain: MediaDomain) = PlaylistItemEditModel(
         title = domain.title,
         description = domain.description,
-        chips = listOf(),
         imageUrl = (domain.image ?: domain.thumbNail)?.url,
         channelTitle = domain.channelData.title,
         channelThumbUrl = (domain.channelData.thumbNail ?: domain.channelData.image)?.url,

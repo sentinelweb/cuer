@@ -7,6 +7,7 @@
     <dimen name="player_button_size">48dp</dimen>
 
     <dimen name="notif_button_icon_size">24dp</dimen>
+    <dimen name="chip_icon_size">16dp</dimen>
 
     <dimen name="list_item_padding">4dp</dimen>
     <dimen name="list_item_margin">8dp</dimen>

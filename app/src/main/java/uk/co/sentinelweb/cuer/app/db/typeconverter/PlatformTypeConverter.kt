@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.typeconverter
 
 import androidx.room.TypeConverter
-import uk.co.sentinelweb.cuer.domain.MediaDomain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
 class PlatformTypeConverter {
 
