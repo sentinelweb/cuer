@@ -68,6 +68,29 @@
                 android:fitsSystemWindows="true"
                 />
 
+            <View
+                android:id="@+id/ple_title_pos"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_gravity="bottom"
+                android:background="@color/color_primary"
+                android:fitsSystemWindows="true"
+                />
+
+            <TextView
+                android:id="@+id/ple_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="64dp"
+                android:background="@color/black_text_secondary"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@id/ple_author_image"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="1:00:00"
+                />
+
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/ple_toolbar"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
@@ -113,10 +136,23 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:ellipsize="end"
+                android:maxWidth="200dp"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                 app:layout_constraintStart_toEndOf="@id/ple_author_image"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Channel title"
+                />
+
+            <TextView
+                android:id="@+id/ple_pub_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                app:layout_constraintBaseline_toBaselineOf="@id/ple_author_title"
+                app:layout_constraintStart_toEndOf="@id/ple_author_title"
+                tools:text="23 Aug 2012"
                 />
 
             <TextView
@@ -131,6 +167,7 @@
                 android:maxLines="2"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                 app:layout_constraintStart_toEndOf="@id/ple_author_image"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ple_author_title"
                 tools:text="Channel description http://www.yahoo.com descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel description"
                 />
@@ -139,6 +176,7 @@
                 android:id="@+id/ple_chips_scroll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ple_author_image"
@@ -167,7 +205,7 @@
                 android:id="@+id/ple_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="4dp"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -177,7 +215,7 @@
 
             <TextView
                 android:id="@+id/ple_desc"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:autoLink="web|email"
                 app:layout_constraintEnd_toEndOf="parent"

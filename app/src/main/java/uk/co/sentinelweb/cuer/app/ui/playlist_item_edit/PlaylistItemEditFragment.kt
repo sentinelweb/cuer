@@ -143,6 +143,12 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                             }
                         }
                     }
+                    ple_pub_date.setText(model.pubDate)
+                    ple_duration.setText(model.durationText)
+                    model.position?.let { ratio ->
+                        ple_title_pos.layoutParams.width = (ratio * ple_title_bg.width).toInt()
+                    } ?: ple_title_pos.apply { isVisible = false }
+                    ple_pub_date.setText(model.pubDate)
                     ple_title.setText(model.title)
                     ple_author_title.setText(model.channelTitle)
                     ple_desc.setText(model.description)
@@ -205,7 +211,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     )
                 }
                 factory { PlaylistItemEditState() }
-                factory { PlaylistItemEditModelMapper() }
+                factory { PlaylistItemEditModelMapper(get()) }
                 factory {
                     NavigationMapper(
                         activity = (getSource() as Fragment).requireActivity(),

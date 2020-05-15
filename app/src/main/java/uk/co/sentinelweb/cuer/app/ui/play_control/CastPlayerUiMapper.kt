@@ -1,13 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
-import java.text.SimpleDateFormat
-import java.util.*
+import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
 
-class CastPlayerUiMapper {
-    private var sdf: SimpleDateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
-        .apply { timeZone = TimeZone.getTimeZone("GMT") }
-
+class CastPlayerUiMapper constructor(
+    private val dateTimeMapper: DateTimeMapper
+) {
     fun formatTime(ms: Long): String {
-        return sdf.format(Date(ms))
+        return dateTimeMapper.formatTime(ms)
     }
 }

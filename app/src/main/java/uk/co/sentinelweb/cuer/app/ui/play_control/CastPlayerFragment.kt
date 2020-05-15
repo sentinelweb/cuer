@@ -132,7 +132,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
                         get()
                     )
                 }
-                scoped { CastPlayerUiMapper() }
+                scoped { CastPlayerUiMapper(get()) }
                 viewModel { CastPlayerState() }
             }
         }

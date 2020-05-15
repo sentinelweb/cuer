@@ -12,6 +12,10 @@ data class PlaylistItemEditModel constructor(
     ),
     val channelTitle: String?,
     val channelThumbUrl: String?,
+    val pubDate: String?,
+    val durationText: String?,
+    val positionText: String?,
+    val position: Float?,
     val starred: Boolean,
     val canPlay: Boolean
 )
