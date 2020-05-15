@@ -1,6 +1,6 @@
-package uk.co.sentinelweb.cuer.app.util.cast.ui
+package uk.co.sentinelweb.cuer.app.ui.play_control
 
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*

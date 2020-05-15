@@ -2,11 +2,10 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
-
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 
 class YoutubeCastConnectionListener constructor(

@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.cast.ui
+package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -125,7 +125,13 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         val viewModule = module {
             scope(named<CastPlayerFragment>()) {
                 scoped<CastPlayerContract.View> { getSource() }
-                scoped<CastPlayerContract.Presenter> { CastPlayerPresenter(get(), get(), get()) }
+                scoped<CastPlayerContract.Presenter> {
+                    CastPlayerPresenter(
+                        get(),
+                        get(),
+                        get()
+                    )
+                }
                 scoped { CastPlayerUiMapper() }
                 viewModel { CastPlayerState() }
             }

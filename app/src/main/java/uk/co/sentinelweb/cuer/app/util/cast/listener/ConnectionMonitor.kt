@@ -5,9 +5,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.CC_CONNECTED
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState.CC_CONNECTED
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.PhoenixWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper

@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.cast.ui
+package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import java.text.SimpleDateFormat
 import java.util.*

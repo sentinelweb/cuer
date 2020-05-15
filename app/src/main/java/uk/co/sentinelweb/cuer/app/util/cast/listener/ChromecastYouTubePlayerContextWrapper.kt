@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.cast.listener
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 
 class ChromecastYouTubePlayerContextWrapper(
     private val context: ChromecastYouTubePlayerContext,
