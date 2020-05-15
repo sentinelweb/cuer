@@ -113,7 +113,6 @@ class MediaDatabaseRepository constructor(
             RepoResult.Error<Int>(e, msg)
         }
 
-    class NoFilter() : DatabaseRepository.Filter
     class IdListFilter(val ids: List<Int>) : DatabaseRepository.Filter
     class MediaIdFilter(val mediaId: String) : DatabaseRepository.Filter
 

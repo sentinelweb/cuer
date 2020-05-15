@@ -119,6 +119,7 @@ class QueueMediator constructor(
                 ?.map { mediaMapper.mapToPlaylistItem(it) }
                 ?.let {
                     PlaylistDomain(
+                        title = "Media",
                         items = it,
                         currentIndex = state.currentPlaylist?.currentIndex ?: 0
                     )

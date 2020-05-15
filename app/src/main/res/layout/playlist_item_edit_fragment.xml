@@ -151,13 +151,13 @@
                     android:orientation="horizontal"
                     >
 
-                    <include layout="@layout/tag_chip" />
+                    <!--                    <include layout="@layout/tag_chip" />-->
 
-                    <include layout="@layout/playlist_chip" />
+                    <!--                    <include layout="@layout/playlist_chip" />-->
 
-                    <include layout="@layout/playlist_chip_select" />
+                    <!--                    <include layout="@layout/playlist_chip_select" />-->
 
-                    <include layout="@layout/tag_chip_select" />
+                    <!--                    <include layout="@layout/tag_chip_select" />-->
 
                 </LinearLayout>
 

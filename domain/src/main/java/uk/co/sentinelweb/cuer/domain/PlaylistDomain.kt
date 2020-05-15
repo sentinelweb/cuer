@@ -8,6 +8,7 @@ import java.time.Instant
 @Serializable
 data class PlaylistDomain constructor(
     val id: String? = null,
+    val title: String,
     val items: List<PlaylistItemDomain>,
     val currentIndex: Int = 0,
     val mode: PlaylistDomainMode = SINGLE,
@@ -32,6 +33,8 @@ data class PlaylistDomain constructor(
         val type: PlaylistTypeDomain = PlaylistTypeDomain.USER,
         val platform: PlatformDomain = PlatformDomain.YOUTUBE,
         val updateUrl: String? = null,
+        val thumb: ImageDomain? = null,
+        val image: ImageDomain? = null,
         @ContextualSerialization val lastUpdate: Instant? = null,
         val updateInterval: Long? = null,
         val channelData: ChannelDomain? = null

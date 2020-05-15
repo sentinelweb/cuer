@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
@@ -7,6 +8,7 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -21,7 +23,10 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
+import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.util.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -33,9 +38,12 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     private val log: LogWrapper by inject()
     private val navMapper: NavigationMapper by inject()
     private val chipCreator: ChipCreator by currentScope.inject()
+    private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
 
     private val starMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_star) }
     private val playMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_play) }
+
+    private var dialog: AppCompatDialog? = null
 
     init {
         log.tag = "PlaylistItemEditFragment"
@@ -101,6 +109,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         })
         observeModel()
         observeNavigation()
+        observeDialog()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -109,8 +118,9 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     }
 
     private fun observeModel() {
-        viewModel.getModelObservable()
-            .observe(this.viewLifecycleOwner, object : Observer<PlaylistItemEditModel> {
+        viewModel.getModelObservable().observe(
+            this.viewLifecycleOwner,
+            object : Observer<PlaylistItemEditModel> {
                 override fun onChanged(model: PlaylistItemEditModel) {
                     Picasso.get().load(model.imageUrl).into(ple_image)
                     Picasso.get().load(model.channelThumbUrl).into(ple_author_image)
@@ -121,6 +131,13 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                             when (chipModel.type) {
                                 PLAYLIST_SELECT -> {
                                     setOnClickListener { viewModel.onSelectPlaylist(chipModel) }
+                                }
+                                PLAYLIST -> {
+                                    setOnCloseIconClickListener {
+                                        viewModel.onRemovePlaylist(
+                                            chipModel
+                                        )
+                                    }
                                 }
                                 else -> Unit
                             }
@@ -141,21 +158,52 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     }
 
     private fun observeNavigation() {
-        viewModel.getNavigationObservable()
-            .observe(this.viewLifecycleOwner,
-                object : Observer<NavigationModel> {
-                    override fun onChanged(nav: NavigationModel) {
-                        navMapper.map(nav)
+        viewModel.getNavigationObservable().observe(this.viewLifecycleOwner,
+            object : Observer<NavigationModel> {
+                override fun onChanged(nav: NavigationModel) {
+                    navMapper.map(nav)
+                }
+            }
+        )
+    }
+
+    private fun observeDialog() {
+        viewModel.getDialogObservable().observe(this.viewLifecycleOwner,
+            object : Observer<SelectDialogModel> {
+                override fun onChanged(model: SelectDialogModel) {
+                    dialog?.dismiss()
+                    dialog = selectDialogCreator.create(model, object :
+                        DialogInterface.OnMultiChoiceClickListener {
+                        override fun onClick(
+                            p0: DialogInterface?,
+                            which: Int,
+                            checked: Boolean
+                        ) {
+                            viewModel.onPlaylistSelected(which, checked)
+                        }
+                    }).apply {
+                        setButton(DialogInterface.BUTTON_POSITIVE, "OK") { d, _ ->
+                            d.dismiss()
+                        }
+                        setOnDismissListener { viewModel.onPlaylistDialogClose() }
+                        show()
                     }
                 }
-            )
+            }
+        )
     }
 
     companion object {
         @JvmStatic
         val fragmentModule = module {
             scope(named<PlaylistItemEditFragment>()) {
-                viewModel { PlaylistItemEditViewModel(get(), get()) }
+                viewModel {
+                    PlaylistItemEditViewModel(
+                        state = get(),
+                        modelMapper = get(),
+                        playlistRepo = get()
+                    )
+                }
                 factory { PlaylistItemEditState() }
                 factory { PlaylistItemEditModelMapper() }
                 factory {
@@ -166,6 +214,9 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 }
                 factory {
                     ChipCreator((getSource() as Fragment).requireActivity())
+                }
+                factory {
+                    SelectDialogCreator((getSource() as Fragment).requireActivity())
                 }
             }
         }
