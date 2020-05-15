@@ -176,6 +176,7 @@ class PlaylistPresenter(
         list.items
             .map { modelMapper.map(it) }
             .also { view.setList(it) }
+            .also { view.scrollToItem(it.size - 1) }
 
         state.addedMedia?.let { added ->
             if (state.playAddedAfterRefresh) {
@@ -185,11 +186,6 @@ class PlaylistPresenter(
                     state.playAddedAfterRefresh = false
                 }
             }
-            getIndexByVideoId(added.mediaId)?.apply {
-                view.scrollToItem(this)
-                state.addedMedia = null
-            }
-
         }
     }
 

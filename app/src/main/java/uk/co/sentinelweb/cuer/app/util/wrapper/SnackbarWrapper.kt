@@ -5,6 +5,6 @@ import com.google.android.material.snackbar.Snackbar
 
 class SnackbarWrapper constructor(private val a: Activity) {
 
-    fun show(msg: String, length: Int = Snackbar.LENGTH_SHORT) =
+    fun make(msg: String, length: Int = Snackbar.LENGTH_SHORT) =
         Snackbar.make(a.findViewById(android.R.id.content), msg, length)
 }

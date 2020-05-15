@@ -7,16 +7,13 @@ interface ShareContract {
 
     interface Presenter {
         fun fromShareUrl(uriString: String)
-        fun onAddReturn()
-        fun onAddForward()
-        fun onPlayNow()
-        fun onReject()
     }
 
     interface View {
         fun exit()
         fun gotoMain(media: MediaDomain?, play: Boolean = false)
-        fun setData(media: MediaDomain)
+        fun setData(model: ShareModel)
         fun error(msg: String)
+        fun warning(msg: String)
     }
 }

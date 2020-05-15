@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     override fun isRecreating() = isChangingConfigurations
 
     override fun showMessage(msg: String) {
-        snackBarWrapper.show(msg)
+        snackBarWrapper.make(msg)
     }
 
     companion object {

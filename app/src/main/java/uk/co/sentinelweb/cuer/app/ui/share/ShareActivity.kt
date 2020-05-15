@@ -2,8 +2,9 @@ package uk.co.sentinelweb.cuer.app.ui.share
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_share.*
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
@@ -11,16 +12,21 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA
+import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.PLAY_NOW
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.util.extension.serialise
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class ShareActivity : AppCompatActivity(), ShareContract.View {
 
     private val presenter: ShareContract.Presenter by currentScope.inject()
     private val shareWrapper: ShareWrapper by currentScope.inject()
+    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
+
+    private var snackbar: Snackbar? = null
 
     private val editFragment by lazy {
         supportFragmentManager.findFragmentById(R.id.playlist_edit_fragment) as PlaylistItemEditFragment
@@ -29,16 +35,18 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_share)
-
-
-        add_return_button.setOnClickListener { presenter.onAddReturn() }
-        add_forward_button.setOnClickListener { presenter.onAddForward() }
-        play_now_button.setOnClickListener { presenter.onPlayNow() }
-        reject_button.setOnClickListener { presenter.onReject() }
     }
 
     override fun error(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        snackbar?.dismiss()
+        snackbar = snackbarWrapper.make("ERROR: $msg")
+    }
+
+    override fun warning(msg: String) {
+        msg.apply {
+            share_warning.setText(msg)
+            share_warning.isVisible = true
+        }
     }
 
     override fun exit() {
@@ -57,13 +65,37 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
             Intent(this, MainActivity::class.java).apply {
                 media?.let {
                     putExtra(MEDIA.toString(), it.serialise())
-                    if (play) putExtra(MEDIA.toString(), true)
+                    if (play) putExtra(PLAY_NOW.toString(), true)
                 }
             })
     }
 
-    override fun setData(media: MediaDomain) {
-        editFragment.setData(media)
+    override fun setData(model: ShareModel) {
+        model.media?.apply { editFragment.setData(this) }
+
+        top_left_button.apply {
+            setOnClickListener { model.topLeftButtonAction() }
+            setText(model.topLeftButtonText)
+            setIconResource(model.topLeftButtonIcon)
+        }
+
+        bottom_left_button.apply {
+            setOnClickListener { model.bottomLeftButtonAction() }
+            setText(model.bottomLeftButtonText)
+            setIconResource(model.bottomLeftButtonIcon)
+        }
+
+        top_right_button.apply {
+            setOnClickListener { model.topRightButtonAction() }
+            top_right_button.setText(model.topRightButtonText)
+            top_right_button.setIconResource(model.topRightButtonIcon)
+        }
+
+        bottom_right_button.apply {
+            setOnClickListener { model.bottomRightButtonAction() }
+            setText(model.bottomRightButtonText)
+            setIconResource(model.bottomRightButtonIcon)
+        }
     }
 
     companion object {
@@ -82,10 +114,13 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
                         toast = get(),
                         queue = get(),
                         state = get(),
-                        log = get()
+                        log = get(),
+                        ytContextHolder = get(),
+                        res = get()
                     )
                 }
                 scoped { ShareWrapper(getSource()) }
+                scoped { SnackbarWrapper(getSource()) }
                 viewModel { ShareState() }
             }
         }

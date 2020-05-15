@@ -67,6 +67,7 @@ object Modules {
         factory { PhoenixWrapper(androidApplication()) }
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }
+        factory { ResourceWrapper(androidApplication()) }
         factory<LogWrapper> { AndroidLogWrapper() }
     }
 
