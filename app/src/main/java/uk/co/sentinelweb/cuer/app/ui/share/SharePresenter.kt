@@ -76,7 +76,7 @@ class SharePresenter constructor(
                 topRightButtonText = res.getString(R.string.share_button_play_now),
                 topRightButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 topLeftButtonAction = { finish(add = true, play = true, forward = false) },
-                topLeftButtonText = res.getString(R.string.share_button_play_now),
+                topLeftButtonText = if (isConnected) "Add Play & Return" else null,
                 topLeftButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 bottomRightButtonAction = { finish(add = true, play = false, forward = true) },
                 bottomRightButtonText = res.getString(R.string.share_button_add_to_queue),
@@ -93,7 +93,7 @@ class SharePresenter constructor(
                 topRightButtonText = res.getString(R.string.share_button_play_now),
                 topRightButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 topLeftButtonAction = { finish(add = false, play = true, forward = false) },
-                topLeftButtonText = res.getString(R.string.share_button_play_now),
+                topLeftButtonText = if (isConnected) "Play & Return" else null,
                 topLeftButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 bottomRightButtonAction = { finish(add = false, play = false, forward = true) },
                 bottomRightButtonText = "Go to app",
@@ -118,16 +118,23 @@ class SharePresenter constructor(
                 view.exit()
             } else {
                 val isConnected = ytContextHolder.get()?.isConnected() ?: false
-                if (isConnected) {
-                    queue.refreshQueue()
-                    //queue.onItemSelected()// todo
-                    if (play) {
-                        toast.show("TODO check playing")
+                state.media?.also {
+                    if (isConnected) {
+                        queue.refreshQueue {
+                            queue.getItemFor(it.url)
+                                ?.run { queue.onItemSelected(this) }
+                            view.exit()
+                        }
+                    } else {
+                        view.exit()
                     }
-                }
-                view.exit()
+                } ?: view.exit()
             }
         })
+    }
+
+    override fun onStop() {
+        state.jobs.forEach { it.cancel() }
     }
 
 

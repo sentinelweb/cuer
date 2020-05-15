@@ -110,7 +110,13 @@ class QueueMediator constructor(
         }
     }
 
-    override fun refreshQueue() {
+    override fun getItemFor(url: String): PlaylistItemDomain? {
+        return state.currentPlaylist
+            ?.items
+            ?.firstOrNull() { it.media.url == url }
+    }
+
+    override fun refreshQueue(after: (() -> Unit)?) {
         state.jobs.add(contextProvider.MainScope.launch {
             repository
                 .loadList(null)
@@ -127,6 +133,8 @@ class QueueMediator constructor(
                 ?.also { state.currentPlaylist = it }
                 ?.also { playlist ->
                     producerListeners.forEach { l -> l.onPlaylistUpdated(playlist) }
+                }?.also {
+                    after?.invoke()
                 }
         })
     }

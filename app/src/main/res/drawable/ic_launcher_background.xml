@@ -5,10 +5,10 @@
     >
 
     <gradient
-        android:endColor="@color/orange_500"
+        android:endColor="@color/white"
 
         android:gradientRadius="75%"
-        android:startColor="@color/yellow_100"
+        android:startColor="@color/white"
         android:type="radial"
         />
 

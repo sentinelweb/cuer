@@ -53,6 +53,11 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         finish()
     }
 
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop()
+    }
+
     override fun onResume() {
         super.onResume()
         shareWrapper.getLinkFromIntent(intent) {
@@ -74,24 +79,28 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         model.media?.apply { editFragment.setData(this) }
 
         top_left_button.apply {
+            isVisible = model.topLeftButtonText?.isNotBlank() ?: false
             setOnClickListener { model.topLeftButtonAction() }
             setText(model.topLeftButtonText)
             setIconResource(model.topLeftButtonIcon)
         }
 
         bottom_left_button.apply {
+            isVisible = model.bottomLeftButtonText?.isNotBlank() ?: false
             setOnClickListener { model.bottomLeftButtonAction() }
             setText(model.bottomLeftButtonText)
             setIconResource(model.bottomLeftButtonIcon)
         }
 
         top_right_button.apply {
+            isVisible = model.topRightButtonText?.isNotBlank() ?: false
             setOnClickListener { model.topRightButtonAction() }
             top_right_button.setText(model.topRightButtonText)
             top_right_button.setIconResource(model.topRightButtonIcon)
         }
 
         bottom_right_button.apply {
+            isVisible = model.bottomRightButtonText?.isNotBlank() ?: false
             setOnClickListener { model.bottomRightButtonAction() }
             setText(model.bottomRightButtonText)
             setIconResource(model.bottomRightButtonIcon)

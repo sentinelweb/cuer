@@ -13,7 +13,6 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
 
@@ -61,13 +60,13 @@ class PlaylistPresenter(
     }
 
     override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
-        getDomainPlaylistItem(item.url)?.run {
+        queue.getItemFor(item.url)?.run {
             queue.removeItem(this)
         }
     }
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
-        getDomainPlaylistItem(item.url)?.run {
+        queue.getItemFor(item.url)?.run {
             if (!(ytContextHolder.get()?.isConnected() ?: false)) {
                 toastWrapper.show("No chromecast -> playing locally")
                 view.playLocal(this.media)
@@ -79,20 +78,20 @@ class PlaylistPresenter(
 
     override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
         if (external) {
-            getDomainPlaylistItem(item.url)?.run {
+            queue.getItemFor(item.url)?.run {
                 if (!ytJavaApi.launchVideo(this.media)) {
                     toastWrapper.show("can't launch video")
                 }
             } ?: toastWrapper.show("can't find video")
         } else {
-            getDomainPlaylistItem(item.url)?.run {
+            queue.getItemFor(item.url)?.run {
                 view.playLocal(this.media)
             }
         }
     }
 
     override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
-        getDomainPlaylistItem(item.url)?.run {
+        queue.getItemFor(item.url)?.run {
             if (!ytJavaApi.launchChannel(this.media)) {
                 toastWrapper.show("can't launch channel")
             }
@@ -104,7 +103,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemShare(item: PlaylistModel.PlaylistItemModel) {
-        getDomainPlaylistItem(item.url)?.run {
+        queue.getItemFor(item.url)?.run {
             shareWrapper.share(this.media)
         }
     }
@@ -118,24 +117,12 @@ class PlaylistPresenter(
             toastWrapper.show("No chromecast -> playing locally")
             view.playLocal(mediaDomain)
         } else {
-            getDomainPlaylistItem(mediaDomain.url)?.let {
+            queue.getItemFor(mediaDomain.url)?.let {
                 queue.onItemSelected(it)
             } ?: run {
                 state.playAddedAfterRefresh = true
             }
         }
-    }
-
-    private fun getIndexByVideoId(videoId: String): Int? {
-        return queue.getPlaylist()
-            ?.items
-            ?.indexOfFirst { it.media.mediaId == videoId }
-    }
-
-    private fun getDomainPlaylistItem(url: String): PlaylistItemDomain? {
-        return queue.getPlaylist()
-            ?.items
-            ?.firstOrNull() { it.media.url == url }
     }
 
     private fun initListCheck() {
@@ -180,7 +167,7 @@ class PlaylistPresenter(
 
         state.addedMedia?.let { added ->
             if (state.playAddedAfterRefresh) {
-                getDomainPlaylistItem(added.url)?.let {
+                queue.getItemFor(added.url)?.let {
                     queue.onItemSelected(it)
                     state.addedMedia = null
                     state.playAddedAfterRefresh = false

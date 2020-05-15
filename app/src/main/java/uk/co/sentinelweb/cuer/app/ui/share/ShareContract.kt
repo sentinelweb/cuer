@@ -7,6 +7,7 @@ interface ShareContract {
 
     interface Presenter {
         fun fromShareUrl(uriString: String)
+        fun onStop()
     }
 
     interface View {
