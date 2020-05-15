@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.app.db.typeconverter.LocalDateTimeTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.MediaTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.PlatformTypeConverter
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import java.time.Instant
 import java.time.LocalDateTime
 

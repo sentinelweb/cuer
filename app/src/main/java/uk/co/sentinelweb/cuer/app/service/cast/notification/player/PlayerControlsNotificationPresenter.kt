@@ -2,14 +2,14 @@ package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import com.roche.mdas.util.wrapper.ToastWrapper
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Presenter
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.PresenterExternal
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.PlayerControls.Listener
-import uk.co.sentinelweb.cuer.app.util.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.PlayerControls.Listener
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*

@@ -10,7 +10,7 @@ interface PlaylistContract {
         fun loadList()
         fun destroy()
         fun refreshList()
-        fun setFocusId(videoId: String)
+        fun setFocusMedia(mediaDomain: MediaDomain)
         fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel)
         fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel)
         fun onItemClicked(item: PlaylistModel.PlaylistItemModel)
@@ -19,6 +19,7 @@ interface PlaylistContract {
         fun onItemStar(item: PlaylistModel.PlaylistItemModel)
         fun onItemShare(item: PlaylistModel.PlaylistItemModel)
         fun moveItem(fromPosition: Int, toPosition: Int)
+        fun playNow(mediaDomain: MediaDomain)
     }
 
     interface View {

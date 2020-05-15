@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlinx-serialization'
 
 android {
     compileSdkVersion project.properties.app_compileSdkVersion as int
@@ -28,8 +29,6 @@ android {
 
 // To inline the bytecode built with JVM target 1.8 into
 // bytecode that is being built with JVM target 1.6. (e.g. navArgs)
-
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -52,15 +51,17 @@ dependencies {
 
     // deps
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$ver_kotlinx_serialization_runtime"
     implementation "androidx.appcompat:appcompat:$ver_appcompat"
     implementation "androidx.core:core:$ver_androidx_core"
     implementation "androidx.annotation:annotation:$ver_androidx_annotation"
     implementation "androidx.core:core-ktx:$ver_core_ktx"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$ver_lifecycle_viewmodel_ktx"
     implementation "com.google.android.material:material:$ver_material"
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
     implementation "com.squareup.picasso:picasso:$ver_picasso"
-
+    implementation 'com.jakewharton:process-phoenix:2.0.0'
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"
     implementation "androidx.navigation:navigation-ui-ktx:$ver_navigation"
@@ -74,6 +75,9 @@ dependencies {
 
     // room
     implementation "androidx.room:room-runtime:$ver_room"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     kapt "androidx.room:room-compiler:$ver_room"
     implementation "androidx.room:room-ktx:$ver_room"
 
@@ -93,6 +97,7 @@ dependencies {
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
     testImplementation "androidx.room:room-testing:$ver_room"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test"
 
     androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"

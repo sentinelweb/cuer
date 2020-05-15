@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:inset="18dp"
+    >
+    <layer-list>
+        <item android:drawable="@drawable/ic_launch_video_primary" />
+        <item
+            android:bottom="12dp"
+            android:drawable="@drawable/ic_launch_playlist_primary"
+            android:left="8dp"
+            android:right="8dp"
+            android:top="8dp"
+            />
+    </layer-list>
+</inset>

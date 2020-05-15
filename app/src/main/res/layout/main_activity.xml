@@ -31,7 +31,7 @@
 
     <fragment
         android:id="@+id/cast_player_fragment"
-        android:name="uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment"
+        android:name="uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

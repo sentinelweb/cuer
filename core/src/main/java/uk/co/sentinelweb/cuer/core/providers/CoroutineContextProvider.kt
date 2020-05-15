@@ -9,6 +9,8 @@ import kotlin.coroutines.CoroutineContext
 open class CoroutineContextProvider {
     open val Main: CoroutineContext = Dispatchers.Main
     open val IO: CoroutineContext = Dispatchers.IO
+    open val Default: CoroutineContext = Dispatchers.Default
     open val MainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
     open val IOScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    open val DefaultScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 }

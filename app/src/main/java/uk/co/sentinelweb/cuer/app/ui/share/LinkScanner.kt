@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import java.net.URI
 
 class LinkScanner {
@@ -14,7 +15,7 @@ class LinkScanner {
             return parseQuery(uri.query)
                 .firstOrNull { it[0] == "v" }
                 ?.let {
-                    createYt(uriString, it[0])
+                    createYt(uriString, it[1])
                 }
         } else {
             return null
@@ -32,6 +33,6 @@ class LinkScanner {
         url = u,
         mediaId = mid,
         mediaType = MediaDomain.MediaTypeDomain.VIDEO,
-        platform = MediaDomain.PlatformDomain.YOUTUBE
+        platform = PlatformDomain.YOUTUBE
     )
 }

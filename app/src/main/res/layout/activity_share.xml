@@ -1,10 +1,111 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<?xml version="1.0" encoding="utf-8"?><!-- Material theme only has one icon so no arrows for buttons -->
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.share.ShareActivity"
     >
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <fragment
+        android:id="@+id/playlist_edit_fragment"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/share_warning"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout="@layout/playlist_item_edit_fragment"
+        tools:ignore="FragmentTagUsage"
+        />
+
+    <TextView
+        android:id="@+id/share_warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorPrimary"
+        android:padding="8dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/top_right_button"
+        tools:text="Video already in queue ..."
+        tools:visibility="visible"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/bottom_left_button"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/white"
+        android:elevation="@dimen/button_elevation"
+        android:text="@string/share_button_add_return"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_button_add_black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/bottom_right_button"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+    <!--    android:drawableStart="@drawable/ic_button_back_black"-->
+    <!--    android:drawableEnd="@drawable/ic_button_add_black"-->
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/top_left_button"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/white"
+        android:elevation="@dimen/button_elevation"
+        android:text="@string/share_button_reject"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_button_reject_black"
+        app:layout_constraintBottom_toTopOf="@id/bottom_right_button"
+        app:layout_constraintEnd_toStartOf="@id/top_right_button"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+    <!--    android:drawableEnd="@drawable/ic_button_reject_black"-->
+    <!--    android:drawableStart="@drawable/ic_button_back_black"-->
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/top_right_button"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/white"
+        android:elevation="@dimen/button_elevation"
+        android:text="@string/share_button_play_now"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_button_play_black"
+        app:layout_constraintBottom_toTopOf="@id/bottom_right_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/top_left_button"
+        />
+    <!--    android:drawableStart="@drawable/ic_button_play_black"-->
+    <!--    android:drawableEnd="@drawable/ic_button_forward_black"-->
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/bottom_right_button"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/white"
+        android:elevation="@dimen/button_elevation"
+        android:text="@string/share_button_add_to_queue"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_button_add_black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/bottom_left_button"
+        />
+    <!--    android:drawableStart="@drawable/ic_button_add_black"-->
+    <!--    android:drawableEnd="@drawable/ic_button_forward_black"-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

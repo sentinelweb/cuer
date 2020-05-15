@@ -15,8 +15,8 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
 class MainActivity : AppCompatActivity(), MainContract.View {
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     override fun isRecreating() = isChangingConfigurations
 
     override fun showMessage(msg: String) {
-        snackBarWrapper.show(msg)
+        snackBarWrapper.make(msg)
     }
 
     companion object {

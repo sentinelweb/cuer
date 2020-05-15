@@ -1,20 +1,19 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import com.roche.mdas.util.wrapper.ToastWrapper
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
-import uk.co.sentinelweb.cuer.domain.MediaDomain.PlatformDomain.YOUTUBE
+import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeVideosInteractor
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
 
 class PlaylistPresenter(
@@ -25,7 +24,7 @@ class PlaylistPresenter(
     private val contextProvider: CoroutineContextProvider,
     private val queue: QueueMediatorContract.Mediator,
     private val toastWrapper: ToastWrapper,
-    private val ytInteractor: YoutubeVideosInteractor,
+    private val ytInteractor: YoutubeInteractor,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val shareWrapper: ShareWrapper
@@ -46,8 +45,8 @@ class PlaylistPresenter(
         queue.refreshQueue()
     }
 
-    override fun setFocusId(videoId: String) {
-        state.focusItemId = videoId
+    override fun setFocusMedia(mediaDomain: MediaDomain) {
+        state.addedMedia = mediaDomain
     }
 
     override fun destroy() {
@@ -61,13 +60,13 @@ class PlaylistPresenter(
     }
 
     override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
-        getDomainPlaylistItem(item)?.run {
+        queue.getItemFor(item.url)?.run {
             queue.removeItem(this)
         }
     }
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
-        getDomainPlaylistItem(item)?.run {
+        queue.getItemFor(item.url)?.run {
             if (!(ytContextHolder.get()?.isConnected() ?: false)) {
                 toastWrapper.show("No chromecast -> playing locally")
                 view.playLocal(this.media)
@@ -79,28 +78,24 @@ class PlaylistPresenter(
 
     override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
         if (external) {
-            if (ytJavaApi.canLaunchVideo()) {
-                getDomainPlaylistItem(item)?.run {
-                    ytJavaApi.launchVideo(this.media)
-                } ?: toastWrapper.show("can't find video")
-            } else {
-                toastWrapper.show("can't launch video")
-            }
+            queue.getItemFor(item.url)?.run {
+                if (!ytJavaApi.launchVideo(this.media)) {
+                    toastWrapper.show("can't launch video")
+                }
+            } ?: toastWrapper.show("can't find video")
         } else {
-            getDomainPlaylistItem(item)?.run {
+            queue.getItemFor(item.url)?.run {
                 view.playLocal(this.media)
             }
         }
     }
 
     override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
-        if (ytJavaApi.canLaunchChannel()) {
-            getDomainPlaylistItem(item)?.run {
-                ytJavaApi.launchChannel(this.media)
-            } ?: toastWrapper.show("can't find video")
-        } else {
-            toastWrapper.show("can't launch channel")
-        }
+        queue.getItemFor(item.url)?.run {
+            if (!ytJavaApi.launchChannel(this.media)) {
+                toastWrapper.show("can't launch channel")
+            }
+        } ?: toastWrapper.show("can't find video")
     }
 
     override fun onItemStar(item: PlaylistModel.PlaylistItemModel) {
@@ -108,7 +103,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemShare(item: PlaylistModel.PlaylistItemModel) {
-        getDomainPlaylistItem(item)?.run {
+        queue.getItemFor(item.url)?.run {
             shareWrapper.share(this.media)
         }
     }
@@ -117,27 +112,29 @@ class PlaylistPresenter(
         queue.moveItem(fromPosition, toPosition)
     }
 
-    private fun getIndexByVideoId(videoId: String): Int? {
-        return queue.getPlaylist()
-            ?.items
-            ?.indexOfFirst { it.media.mediaId == videoId }
-    }
-
-    private fun getDomainPlaylistItem(item: PlaylistModel.PlaylistItemModel): PlaylistItemDomain? {
-        return queue.getPlaylist()
-            ?.items
-            ?.first { it.media.url == item.url }
+    override fun playNow(mediaDomain: MediaDomain) {
+        if (!(ytContextHolder.get()?.isConnected() ?: false)) {
+            toastWrapper.show("No chromecast -> playing locally")
+            view.playLocal(mediaDomain)
+        } else {
+            queue.getItemFor(mediaDomain.url)?.let {
+                queue.onItemSelected(it)
+            } ?: run {
+                state.playAddedAfterRefresh = true
+            }
+        }
     }
 
     private fun initListCheck() {
         state.jobs.add(contextProvider.MainScope.launch {
-            val count = repository.count()
-            if (count == 0) {
+            val result = repository.count()
+            if (result.isSuccessful && result.data == 0) {
                 Queue.ITEMS
                     .map { mapQueueToMedia(it) }
                     .map { it.mediaId }
                     .let { ytInteractor.videos(it) }
-                    .also { repository.save(it) }
+                    .takeIf { it.isSuccessful }
+                    ?.also { it.data?.let { repository.save(it) } }
                     .also { loadList() }
             }
         })
@@ -166,10 +163,15 @@ class PlaylistPresenter(
         list.items
             .map { modelMapper.map(it) }
             .also { view.setList(it) }
+            .also { view.scrollToItem(it.size - 1) }
 
-        state.focusItemId?.let {
-            getIndexByVideoId(it)?.apply {
-                view.scrollToItem(this)
+        state.addedMedia?.let { added ->
+            if (state.playAddedAfterRefresh) {
+                queue.getItemFor(added.url)?.let {
+                    queue.onItemSelected(it)
+                    state.addedMedia = null
+                    state.playAddedAfterRefresh = false
+                }
             }
         }
     }

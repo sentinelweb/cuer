@@ -7,7 +7,7 @@ class MediaMetadataMapper {
     fun map(domain: MediaDomain): MediaMetadataCompat {
         val builder = MediaMetadataCompat.Builder()
             .putText(MediaMetadataCompat.METADATA_KEY_TITLE, domain.title)
-            .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, domain.channelTitle)
+            .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, domain.channelData.title)
             .putText(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, domain.id.toString())
         domain.duration?.apply {
             builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, this)

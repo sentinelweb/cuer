@@ -1,4 +1,4 @@
-package com.roche.mdas.util.wrapper
+package uk.co.sentinelweb.cuer.app.util.wrapper
 
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity

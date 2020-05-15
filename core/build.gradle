@@ -4,7 +4,7 @@ apply plugin: "org.jetbrains.kotlin.jvm"
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core"
 
     // koin
@@ -17,5 +17,5 @@ dependencies {
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
 }
 
-sourceCompatibility = "7"
-targetCompatibility = "7"
+sourceCompatibility = ver_jdk
+targetCompatibility = ver_jdk

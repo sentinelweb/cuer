@@ -8,13 +8,13 @@ import android.view.View
 import com.google.android.youtube.player.YouTubeBaseActivity
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
-import com.roche.mdas.util.wrapper.ToastWrapper
 import kotlinx.android.synthetic.main.activity_youtube.*
 import org.koin.android.ext.android.inject
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA_ID
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
 /**
@@ -143,7 +143,7 @@ class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListen
         wasRestored: Boolean
     ) {
         if (!wasRestored) {
-            intent?.getStringExtra(Const.EXTRA_YTID)?.let {
+            intent?.getStringExtra(MEDIA_ID.toString())?.let {
                 player.cueVideo(it)
                 player.setShowFullscreenButton(false)
 
@@ -187,9 +187,10 @@ class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListen
     // endregion
 
     companion object {
+        // todo map in NavigationMapper
         fun start(c: Context, mediaId: String) = c.startActivity(
             Intent(c, YoutubeActivity::class.java).apply {
-                mediaId.let { putExtra(Const.EXTRA_YTID, it) }
+                mediaId.let { putExtra(MEDIA_ID.toString(), it) }
             })
 
         private const val RECOVERY_DIALOG_REQUEST = 1

@@ -1,12 +1,17 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
-import com.roche.mdas.util.wrapper.ToastWrapper
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeVideosInteractor
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 class SharePresenter constructor(
@@ -14,38 +19,129 @@ class SharePresenter constructor(
     private val repository: MediaDatabaseRepository,
     private val linkScanner: LinkScanner,
     private val contextProvider: CoroutineContextProvider,
-    private val ytInteractor: YoutubeVideosInteractor,
-    private val toast: ToastWrapper
+    private val ytInteractor: YoutubeInteractor,
+    private val toast: ToastWrapper,
+    private val queue: QueueMediatorContract.Mediator,
+    private val state: ShareState,
+    private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val log: LogWrapper,
+    private val res: ResourceWrapper
+
 ) : ShareContract.Presenter {
-    internal var jobs = mutableListOf<Job>()
+
+    init {
+        log.tag = "SharePresenter"
+    }
 
     override fun fromShareUrl(uriString: String) {
         linkScanner
             .scan(uriString)
             ?.let { scannedMedia ->
-                jobs.add(CoroutineScope(contextProvider.Main).launch {
-                    scannedMedia.let {
-                        repository.loadList(MediaDatabaseRepository.MediaIdFilter(scannedMedia.mediaId))
-                    }.takeIf { it.isEmpty() }
-                        ?.run {
-                            ytInteractor.videos(
-                                ids = listOf(scannedMedia.mediaId),
-                                parts = listOf(ID, SNIPPET, CONTENT_DETAILS)
-                            )
-                        }
-                        ?.firstOrNull()
-                        ?.also { repository.save(it) }
+                state.jobs.add(CoroutineScope(contextProvider.Main).launch {
+                    loadOrInfo(scannedMedia)
                         ?.also {
-                            view.gotoMain(it.mediaId)
-                            view.exit()
-                        } ?: skipExists()
+                            loadMedia(it)
+                            it.id?.apply { view.warning("Video already in queue ...") }
+                        }
+                        ?: errorLoading(scannedMedia.url)
                 })
             } ?: unableExit(uriString)
     }
 
-    private fun skipExists() {
+    private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? = scannedMedia.let {
+        repository.loadList(MediaDatabaseRepository.MediaIdFilter(scannedMedia.mediaId))
+    }.takeIf { it.isSuccessful }
+        ?.let { it.data?.firstOrNull() }
+        ?: run {
+            ytInteractor.videos(
+                ids = listOf(scannedMedia.mediaId),
+                parts = listOf(ID, SNIPPET, CONTENT_DETAILS)
+            ).takeIf { it.isSuccessful }
+                ?.let {
+                    it.data?.firstOrNull()
+                }
+        }
+
+    private fun loadMedia(it: MediaDomain) {
+        state.media = it
+        view.setData(mapShareModel())
+    }
+
+    private fun mapShareModel(): ShareModel {
+        val isConnected = ytContextHolder.get()?.isConnected() ?: false
+        val isNew = state.media?.id?.isBlank() ?: true
+        return if (isNew) {
+            ShareModel(
+                topRightButtonAction = { finish(add = true, play = true, forward = true) },
+                topRightButtonText = res.getString(R.string.share_button_play_now),
+                topRightButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
+                topLeftButtonAction = { finish(add = true, play = true, forward = false) },
+                topLeftButtonText = if (isConnected) "Add Play & Return" else null,
+                topLeftButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
+                bottomRightButtonAction = { finish(add = true, play = false, forward = true) },
+                bottomRightButtonText = res.getString(R.string.share_button_add_to_queue),
+                bottomRightButtonIcon = R.drawable.ic_button_add_black,
+                bottomLeftButtonAction = { finish(add = true, play = false, forward = false) },
+                bottomLeftButtonText = res.getString(R.string.share_button_add_return),
+                bottomLeftButtonIcon = R.drawable.ic_button_add_black,
+                media = state.media,
+                isNewVideo = isNew
+            )
+        } else {
+            ShareModel(
+                topRightButtonAction = { finish(add = false, play = true, forward = true) },
+                topRightButtonText = res.getString(R.string.share_button_play_now),
+                topRightButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
+                topLeftButtonAction = { finish(add = false, play = true, forward = false) },
+                topLeftButtonText = if (isConnected) "Play & Return" else null,
+                topLeftButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
+                bottomRightButtonAction = { finish(add = false, play = false, forward = true) },
+                bottomRightButtonText = "Go to app",
+                bottomRightButtonIcon = R.drawable.ic_button_forward_black,
+                bottomLeftButtonAction = { finish(add = false, play = false, forward = false) },
+                bottomLeftButtonText = "Return",
+                bottomLeftButtonIcon = R.drawable.ic_button_back_black,
+                media = state.media,
+                isNewVideo = isNew
+            )
+        }
+    }
+
+    private fun finish(add: Boolean, play: Boolean, forward: Boolean) {
+        state.jobs.add(CoroutineScope(contextProvider.Main).launch {
+            if (add) {
+                state.media
+                    ?.also { repository.save(it) }
+            }
+            if (forward) {
+                view.gotoMain(state.media, play)
+                view.exit()
+            } else {
+                val isConnected = ytContextHolder.get()?.isConnected() ?: false
+                state.media?.also {
+                    if (isConnected) {
+                        queue.refreshQueue {
+                            queue.getItemFor(it.url)
+                                ?.run { queue.onItemSelected(this) }
+                            view.exit()
+                        }
+                    } else {
+                        view.exit()
+                    }
+                } ?: view.exit()
+            }
+        })
+    }
+
+    override fun onStop() {
+        state.jobs.forEach { it.cancel() }
+    }
+
+
+    private fun errorLoading(token: String) {
         view.exit()
-        toast.show("We have it already ...")
+        toast.show("Couldn't load item: $token")
+        log.d("Couldn't load item: $token")
     }
 
     private fun unableExit(uri: String) {

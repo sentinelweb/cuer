@@ -30,4 +30,10 @@ class DateTimeMapperTest {
         sut.mapDuration("PT1M1S")
         sut.mapDuration("PT1H1M1S")
     }
+
+    @Test
+    fun formatTime() {
+        val actual = sut.formatTime(1000 * 60 * 60 * 18)
+        //assertEqual(actual, "18:00:00")
+    }
 }

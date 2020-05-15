@@ -7,19 +7,23 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.playlist_fragment.*
+import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA
+import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.PLAY_NOW
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
+import uk.co.sentinelweb.cuer.app.util.extension.deserialiseMedia
 import uk.co.sentinelweb.cuer.app.util.wrapper.AlertDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
@@ -32,6 +36,7 @@ class PlaylistFragment :
     private val presenter: PlaylistContract.Presenter by currentScope.inject()
     private val adapter: PlaylistAdapter by currentScope.inject()
     private val alertWrapper: AlertDialogWrapper by currentScope.inject()
+    private val toastWrapper: ToastWrapper by inject()
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
 
     // region Fragment
@@ -51,8 +56,14 @@ class PlaylistFragment :
     override fun onResume() {
         super.onResume()
         presenter.loadList()
-        activity?.intent?.getStringExtra(Const.EXTRA_YTID)?.let {
-            presenter.setFocusId(it)
+        // todo map in NavigationMapper
+        activity?.intent?.getStringExtra(MEDIA.toString())?.let {
+            val media = deserialiseMedia(it)
+            presenter.setFocusMedia(media)
+            if (activity?.intent?.getBooleanExtra(PLAY_NOW.toString(), false) ?: false) {
+                presenter.playNow(media)
+                activity?.intent?.removeExtra(PLAY_NOW.toString())
+            }
         }
     }
     // endregion

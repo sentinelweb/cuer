@@ -1,12 +1,27 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="colorAccent">@color/color_accent</item>
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_accent</item>
+        <item name="android:popupMenuStyle">@style/ContextMenu</item>
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="TextAppearance.App.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="ItemView" />
@@ -41,4 +56,23 @@
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/grey_800</item>
     </style>
+
+    <style name="TextAppearance" />
+
+    <style name="TextAppearance.App" />
+
+    <style name="TextAppearance.App.CollapsingToolbar" />
+
+    <style name="TextAppearance.App.CollapsingToolbar.Expanded">
+        <item name="android:background">@color/purple_300</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.App.CollapsingToolbar.Collapsed">
+        <item name="android:background">@color/orange_500</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
 </resources>
