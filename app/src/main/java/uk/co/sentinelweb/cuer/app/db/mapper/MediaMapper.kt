@@ -20,7 +20,7 @@ class MediaMapper() {
         thumbNail = mapImage(domain.thumbNail),
         image = mapImage(domain.image),
         channelTitle = domain.channelData.title,
-        channelId = domain.channelData.title,
+        channelId = domain.channelData.id,
         published = domain.published
     )
 
@@ -42,7 +42,6 @@ class MediaMapper() {
             id = entity.channelId ?: ""
         ),
         published = entity.published
-
     )
 
     private fun mapImage(thumbNail: ImageDomain?) =

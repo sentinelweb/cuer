@@ -6,13 +6,20 @@
     >
 
     <deepLink
-        android:id="@+id/youtube"
+        android:id="@+id/www_youtube"
         app:uri="https://www.youtube.com/watch?v={id}"
         />
+
+    <deepLink
+        android:id="@+id/youtube"
+        app:uri="https://youtube.com/watch?v={id}"
+        />
+
     <deepLink
         android:id="@+id/deepLinkMob"
         app:uri="https://m.youtube.com/watch?v={id}"
         />
+
     <deepLink
         android:id="@+id/deepLinkShort"
         app:uri="https://youtu.be/{id}"

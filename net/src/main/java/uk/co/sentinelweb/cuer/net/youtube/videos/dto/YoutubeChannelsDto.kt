@@ -10,7 +10,6 @@ data class YoutubeChannelsDto constructor(
     data class ItemDto constructor(
         val id: String,
         val snippet: SnippetDto? = null // optional field (declared as part)
-
     ) {
         @Serializable
         data class SnippetDto constructor(
