@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.wrapper
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
@@ -10,6 +11,7 @@ class ShareWrapper(
     fun share(media: MediaDomain) {
         Intent().apply {
             action = Intent.ACTION_SEND
+            data = Uri.parse(media.url)
             putExtra(
                 Intent.EXTRA_TEXT,
                 """Yo cheez, Check out this vid:
