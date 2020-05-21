@@ -113,22 +113,21 @@ class SharePresenter constructor(
                 state.media
                     ?.also { repository.save(it) }
             }
+            val isConnected = ytContextHolder.get()?.isConnected() ?: false
             if (forward) {
                 view.gotoMain(state.media, play)
                 view.exit()
-            } else {
-                val isConnected = ytContextHolder.get()?.isConnected() ?: false
-                state.media?.also {
-                    if (isConnected) {
+            } else { // return play is hidden for not connected
+                play.takeIf { it }
+                    ?.takeIf { isConnected }
+                    ?.let { state.media }
+                    ?.also {
                         queue.refreshQueue {
                             queue.getItemFor(it.url)
                                 ?.run { queue.onItemSelected(this) }
                             view.exit()
                         }
-                    } else {
-                        view.exit()
-                    }
-                } ?: view.exit()
+                    } ?: view.exit()
             }
         })
     }
@@ -139,13 +138,18 @@ class SharePresenter constructor(
 
 
     private fun errorLoading(token: String) {
+        "Couldn't get youtube info: $token".apply {
+            log.e(this)
+            toast.show(this)
+        }
         view.exit()
-        toast.show("Couldn't load item: $token")
-        log.d("Couldn't load item: $token")
     }
 
     private fun unableExit(uri: String) {
-        view.error("Unable to process link $uri")
+        "Unable to process link: $uri".apply {
+            log.e(this)
+            toast.show(this)
+        }
         view.exit()
     }
 
