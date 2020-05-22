@@ -8,6 +8,7 @@ interface ShareContract {
     interface Presenter {
         fun fromShareUrl(uriString: String)
         fun onStop()
+        fun linkError(clipText: String?)
     }
 
     interface View {

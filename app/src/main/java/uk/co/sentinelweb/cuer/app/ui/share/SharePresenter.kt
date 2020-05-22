@@ -45,7 +45,13 @@ class SharePresenter constructor(
                         }
                         ?: errorLoading(scannedMedia.url)
                 })
-            } ?: unableExit(uriString)
+            } ?: linkError(uriString)
+    }
+
+    override fun linkError(clipText: String?) {
+        clipText?.apply {
+            view.warning("Cannot add : ${this.substring(0, length.coerceAtMost(100))}")
+        } ?: view.warning("Nothing to add")
     }
 
     private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? = scannedMedia.let {
@@ -112,6 +118,7 @@ class SharePresenter constructor(
             if (add) {
                 state.media
                     ?.also { repository.save(it) }
+                    ?.also { queue.refreshQueue() }
             }
             val isConnected = ytContextHolder.get()?.isConnected() ?: false
             if (forward) {
@@ -122,11 +129,9 @@ class SharePresenter constructor(
                     ?.takeIf { isConnected }
                     ?.let { state.media }
                     ?.also {
-                        queue.refreshQueue {
                             queue.getItemFor(it.url)
                                 ?.run { queue.onItemSelected(this) }
                             view.exit()
-                        }
                     } ?: view.exit()
             }
         })
@@ -136,21 +141,11 @@ class SharePresenter constructor(
         state.jobs.forEach { it.cancel() }
     }
 
-
     private fun errorLoading(token: String) {
-        "Couldn't get youtube info: $token".apply {
+        "Couldn't get youtube info for $token".apply {
             log.e(this)
-            toast.show(this)
+            view.warning(this)
         }
-        view.exit()
-    }
-
-    private fun unableExit(uri: String) {
-        "Unable to process link: $uri".apply {
-            log.e(this)
-            toast.show(this)
-        }
-        view.exit()
     }
 
 }

@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.util.helper.PlaylistMutator
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
+import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -43,7 +44,7 @@ object Modules {
     )
 
     private val utilModule = module {
-        factory { LinkScanner() }
+        factory { LinkScanner(c = androidApplication(), log = get()) }
         single { CuerAppState() }
         single<QueueMediatorContract.Mediator> {
             QueueMediator(
@@ -60,6 +61,7 @@ object Modules {
         factory { MediaMetadataMapper() }
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
+        factory { SharingShortcutsManager() }
     }
 
     private val wrapperModule = module {

@@ -6,11 +6,13 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import uk.co.sentinelweb.cuer.app.di.Modules
+import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
 
 class CuerApp : Application() {
 
     private val stethoWrapper:StethoWrapper by inject()
+    private val sharingShortcutsManager: SharingShortcutsManager by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -26,5 +28,9 @@ class CuerApp : Application() {
         }
 
         stethoWrapper.init()
+        sharingShortcutsManager.apply {
+            removeAllDirectShareTargets(this@CuerApp)
+            pushDirectShareTargets(this@CuerApp)
+        }
     }
 }

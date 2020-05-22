@@ -1,8 +1,9 @@
-package uk.co.sentinelweb.cuer.app.util.wrapper
+package uk.co.sentinelweb.cuer.app.util.share
 
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class ShareWrapper(
@@ -29,6 +30,7 @@ class ShareWrapper(
             type = "text/plain"
         }.let {
             Intent.createChooser(it, "Share Video: ${media.title}")
+            //it // gives a different share sheet - a bit easier
         }.run {
             activity.startActivity(this)
         }
@@ -38,10 +40,13 @@ class ShareWrapper(
     fun getLinkFromIntent(intent: Intent, callback: (String) -> Unit) {
         when (intent.action) {
             Intent.ACTION_SEND -> {
+                // todo rewrite this
+                // https://stackoverflow.com/questions/37163227/android-chrome-shares-only-screenshot
+                // val link = intent.getStringExtra(Intent.EXTRA_TEXT);
                 if (intent.data?.host?.endsWith("youtube.com") ?: false) {
                     callback(intent.data.toString())
                 } else if (intent.clipData?.itemCount ?: 0 > 0) {
-                    callback(intent.clipData?.getItemAt(0)?.text.toString())
+                    callback(intent.clipData?.getItemAt(0)?.let { it.uri ?: it.text }.toString())
                 } else {
                     intent.data?.let { callback(it.toString()) }
                 }
