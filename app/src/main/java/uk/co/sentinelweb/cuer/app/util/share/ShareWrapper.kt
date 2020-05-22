@@ -36,28 +36,17 @@ class ShareWrapper(
         }
     }
 
-    // todo rewrite
     fun getLinkFromIntent(intent: Intent, callback: (String) -> Unit) {
-        when (intent.action) {
-            Intent.ACTION_SEND -> {
-                // todo rewrite this
-                // https://stackoverflow.com/questions/37163227/android-chrome-shares-only-screenshot
-                // val link = intent.getStringExtra(Intent.EXTRA_TEXT);
-                if (intent.data?.host?.endsWith("youtube.com") ?: false) {
-                    callback(intent.data.toString())
-                } else if (intent.clipData?.itemCount ?: 0 > 0) {
-                    callback(intent.clipData?.getItemAt(0)?.let { it.uri ?: it.text }.toString())
-                } else {
-                    intent.data?.let { callback(it.toString()) }
-                }
+        (intent.data?.toString()
+            ?.takeIf { it.startsWith("http") }
+            ?: intent.clipData
+                ?.takeIf { it.itemCount > 0 }
+                ?.let { it.getItemAt(0)?.let { it.uri ?: it.text }.toString() }
+                ?.takeIf { it.startsWith("http") }
+            ?: intent.getStringExtra(Intent.EXTRA_TEXT)
+                ?.takeIf { it.startsWith("http") })
+            ?.apply {
+                callback(this)
             }
-            Intent.ACTION_VIEW -> {
-                if (intent.data?.host?.endsWith("youtube.com") ?: false) {
-                    callback(intent.data.toString())
-                } else {
-                    intent.data?.let { callback(it.toString()) }
-                }
-            }
-        }
     }
 }

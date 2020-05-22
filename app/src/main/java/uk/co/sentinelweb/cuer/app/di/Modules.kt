@@ -16,7 +16,6 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
-import uk.co.sentinelweb.cuer.app.ui.share.LinkScanner
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -25,6 +24,8 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
+import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
+import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -44,7 +45,13 @@ object Modules {
     )
 
     private val utilModule = module {
-        factory { LinkScanner(c = androidApplication(), log = get()) }
+        factory {
+            LinkScanner(
+                c = androidApplication(),
+                log = get(),
+                mappers = urlMediaMappers
+            )
+        }
         single { CuerAppState() }
         single<QueueMediatorContract.Mediator> {
             QueueMediator(

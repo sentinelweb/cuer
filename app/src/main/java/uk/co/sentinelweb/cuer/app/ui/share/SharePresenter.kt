@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -49,9 +50,10 @@ class SharePresenter constructor(
     }
 
     override fun linkError(clipText: String?) {
+        log.e("cannot add url : $clipText")
         clipText?.apply {
-            view.warning("Cannot add : ${this.substring(0, length.coerceAtMost(100))}")
-        } ?: view.warning("Nothing to add")
+            view.warning("Cannot add : ${this.take(100)}")
+        } ?: view.warning("Nothing to add ...")
     }
 
     private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? = scannedMedia.let {
