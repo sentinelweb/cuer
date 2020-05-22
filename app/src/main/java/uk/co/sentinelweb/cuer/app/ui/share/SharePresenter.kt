@@ -53,7 +53,11 @@ class SharePresenter constructor(
         log.e("cannot add url : $clipText")
         clipText?.apply {
             view.warning("Cannot add : ${this.take(100)}")
-        } ?: view.warning("Nothing to add ...")
+            view.setData(mapEmptyState())
+        } ?: run {
+            view.warning("Nothing to add ...")
+            view.setData(mapEmptyState())
+        }
     }
 
     private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? = scannedMedia.let {
@@ -84,7 +88,7 @@ class SharePresenter constructor(
                 topRightButtonText = res.getString(R.string.share_button_play_now),
                 topRightButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 topLeftButtonAction = { finish(add = true, play = true, forward = false) },
-                topLeftButtonText = if (isConnected) "Add Play & Return" else null,
+                topLeftButtonText = if (isConnected) "Play / Return" else null,
                 topLeftButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 bottomRightButtonAction = { finish(add = true, play = false, forward = true) },
                 bottomRightButtonText = res.getString(R.string.share_button_add_to_queue),
@@ -101,7 +105,7 @@ class SharePresenter constructor(
                 topRightButtonText = res.getString(R.string.share_button_play_now),
                 topRightButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 topLeftButtonAction = { finish(add = false, play = true, forward = false) },
-                topLeftButtonText = if (isConnected) "Play & Return" else null,
+                topLeftButtonText = if (isConnected) "Play / Return" else null,
                 topLeftButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 bottomRightButtonAction = { finish(add = false, play = false, forward = true) },
                 bottomRightButtonText = "Go to app",
@@ -114,6 +118,24 @@ class SharePresenter constructor(
             )
         }
     }
+
+    private fun mapEmptyState() =
+        ShareModel(
+            topRightButtonAction = {},
+            topRightButtonText = null,
+            topRightButtonIcon = 0,
+            topLeftButtonAction = { },
+            topLeftButtonText = null,
+            topLeftButtonIcon = 0,
+            bottomRightButtonAction = { finish(add = false, play = false, forward = true) },
+            bottomRightButtonText = "Go to app",
+            bottomRightButtonIcon = R.drawable.ic_button_forward_black,
+            bottomLeftButtonAction = { finish(add = false, play = false, forward = false) },
+            bottomLeftButtonText = "Return",
+            bottomLeftButtonIcon = R.drawable.ic_button_back_black,
+            media = null,
+            isNewVideo = false
+        )
 
     private fun finish(add: Boolean, play: Boolean, forward: Boolean) {
         state.jobs.add(CoroutineScope(contextProvider.Main).launch {

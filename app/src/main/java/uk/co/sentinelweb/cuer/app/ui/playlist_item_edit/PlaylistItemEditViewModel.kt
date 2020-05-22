@@ -37,9 +37,13 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun setData(media: MediaDomain) {
-        state.media = media
-        state.media.also { update() }
+    fun setData(media: MediaDomain?) {
+        media?.let {
+            state.media = media
+            state.media.also { update() }
+        } ?: run {
+            _modelLiveData.value = modelMapper.mapEmpty()
+        }
     }
 
     fun onPlayVideoLocal() {
@@ -95,6 +99,5 @@ class PlaylistItemEditViewModel constructor(
         state.model = modelMapper.map(state.media!!, state.selectedPlaylists)
         _modelLiveData.value = state.model
     }
-
 
 }

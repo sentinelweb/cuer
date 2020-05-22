@@ -21,4 +21,8 @@
     <string name="share_button_play_now">Play Now</string>
     <string name="share_button_add_to_queue">Add to queue</string>
     <string name="select">Select &#8230;</string>
+
+    <string name="pie_empty_desc">We can only add youtube video links at the moment</string>
+    <string name="pie_playlist_dialog_title">Select Playlist</string>
+    <string name="pie_empty_title">Sorry &#8230; ❤</string>
 </resources>

@@ -95,7 +95,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
     }
 
     override fun setData(model: ShareModel) {
-        model.media?.apply { editFragment.setData(this) }
+        model.media.apply { editFragment.setData(this) }
 
         top_left_button.apply {
             isVisible = model.topLeftButtonText?.isNotBlank() ?: false

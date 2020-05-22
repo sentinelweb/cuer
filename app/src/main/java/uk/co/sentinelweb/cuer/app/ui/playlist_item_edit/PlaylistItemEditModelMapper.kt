@@ -1,7 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -12,7 +14,8 @@ import java.time.format.FormatStyle
 import java.util.*
 
 class PlaylistItemEditModelMapper(
-    private val dateTimeMapper: DateTimeMapper
+    private val dateTimeMapper: DateTimeMapper,
+    private val res: ResourceWrapper
 ) {
     var pattern: String = DateTimeFormatterBuilder
         .getLocalizedDateTimePattern(
@@ -45,13 +48,14 @@ class PlaylistItemEditModelMapper(
             ?.takeIf { domain.duration != null && domain.duration!! > 0L }
             ?.let { (it / domain.duration!!).toFloat() }
         ,
-        pubDate = pubDateFormatter.format(domain.published)
+        pubDate = pubDateFormatter.format(domain.published),
+        empty = false
     )
 
     fun mapSelection(all: List<PlaylistDomain>, selected: Set<PlaylistDomain>): SelectDialogModel =
         SelectDialogModel(
             type = SelectDialogModel.Type.PLAYLIST,
-            title = "Select Playlist",
+            title = res.getString(R.string.pie_playlist_dialog_title),
             items = all.map { playlist ->
                 SelectDialogModel.Item(
                     playlist.title,
@@ -60,5 +64,23 @@ class PlaylistItemEditModelMapper(
             }
         )
 
+    fun mapEmpty(): PlaylistItemEditModel = PlaylistItemEditModel(
+        title = res.getString(R.string.pie_empty_title),
+        imageUrl = EMPTY_IMAGE,
+        description = res.getString(R.string.pie_empty_desc),
+        pubDate = null,
+        position = -1f,
+        positionText = null,
+        durationText = null,
+        chips = listOf(),
+        channelTitle = null,
+        channelThumbUrl = null,
+        starred = false,
+        canPlay = false,
+        empty = true
+    )
 
+    companion object {
+        private const val EMPTY_IMAGE = "file:///android_asset/sad_puppy.jpg"
+    }
 }

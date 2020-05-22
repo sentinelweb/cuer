@@ -49,7 +49,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         log.tag = "PlaylistItemEditFragment"
     }
 
-    fun setData(media: MediaDomain) = viewModel.setData(media)
+    fun setData(media: MediaDomain?) = viewModel.setData(media)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,8 +98,9 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 }
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
-                    starMenuItem.isVisible = true
-                    playMenuItem.isVisible = true
+                    // only show the menu items for the non-empty state
+                    starMenuItem.isVisible = ple_star_fab.isVisible
+                    playMenuItem.isVisible = ple_star_fab.isVisible
                 } else if (isShow) {
                     isShow = false
                     starMenuItem.isVisible = false
@@ -122,6 +123,22 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
             this.viewLifecycleOwner,
             object : Observer<PlaylistItemEditModel> {
                 override fun onChanged(model: PlaylistItemEditModel) {
+                    ple_author_image.isVisible = !model.empty
+                    ple_play_button.isVisible = !model.empty
+                    ple_title_pos.isVisible = !model.empty
+                    ple_duration.isVisible = !model.empty
+                    ple_star_fab.isVisible = !model.empty
+                    starMenuItem.setVisible(!model.empty)
+                    playMenuItem.setVisible(!model.empty)
+                    Picasso.get().load(model.imageUrl).into(ple_image)
+                    ple_desc.setText(model.description)
+                    ple_title.setText(model.title)
+                    ple_toolbar.title = model.title
+
+                    if (model.empty) {
+                        return
+                    }
+
                     Picasso.get().load(model.imageUrl).into(ple_image)
                     Picasso.get().load(model.channelThumbUrl).into(ple_author_image)
                     ple_chips.removeAllViews() // todo reuse chip views
@@ -149,10 +166,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         ple_title_pos.layoutParams.width = (ratio * ple_title_bg.width).toInt()
                     } ?: ple_title_pos.apply { isVisible = false }
                     ple_pub_date.setText(model.pubDate)
-                    ple_title.setText(model.title)
                     ple_author_title.setText(model.channelTitle)
-                    ple_desc.setText(model.description)
-                    ple_toolbar.title = model.title
                     ple_play_button.isVisible = model.canPlay
                     val starIconResource =
                         if (model.starred) R.drawable.ic_button_starred_white
@@ -211,7 +225,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     )
                 }
                 factory { PlaylistItemEditState() }
-                factory { PlaylistItemEditModelMapper(get()) }
+                factory { PlaylistItemEditModelMapper(get(), get()) }
                 factory {
                     NavigationMapper(
                         activity = (getSource() as Fragment).requireActivity(),
