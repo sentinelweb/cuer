@@ -33,8 +33,7 @@ class YoutubeJavaApiWrapper(
             .takeIf { it }
             ?.also {
                 activity.startActivity(createPlayVideoIntent(activity, media.mediaId))
-            }
-            ?: false
+            } ?: false
 
     fun launchVideo(media: MediaDomain, forceFullScreen: Boolean, finishAfter: Boolean) =
         canLaunchVideoWithOptions()
@@ -48,9 +47,7 @@ class YoutubeJavaApiWrapper(
                         finishAfter
                     )
                 )
-            }
-            ?: launchVideo(media)
-
+            } ?: launchVideo(media)
 
     fun isApiAvailable() = when (isYouTubeApiServiceAvailable(activity)) {
         SUCCESS -> true

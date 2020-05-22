@@ -1,7 +1,9 @@
-package uk.co.sentinelweb.cuer.app.util.wrapper
+package uk.co.sentinelweb.cuer.app.util.share
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class ShareWrapper(
@@ -10,6 +12,7 @@ class ShareWrapper(
     fun share(media: MediaDomain) {
         Intent().apply {
             action = Intent.ACTION_SEND
+            data = Uri.parse(media.url)
             putExtra(
                 Intent.EXTRA_TEXT,
                 """Yo cheez, Check out this vid:
@@ -27,30 +30,23 @@ class ShareWrapper(
             type = "text/plain"
         }.let {
             Intent.createChooser(it, "Share Video: ${media.title}")
+            //it // gives a different share sheet - a bit easier
         }.run {
             activity.startActivity(this)
         }
     }
 
-    // todo rewrite
     fun getLinkFromIntent(intent: Intent, callback: (String) -> Unit) {
-        when (intent.action) {
-            Intent.ACTION_SEND -> {
-                if (intent.data?.host?.endsWith("youtube.com") ?: false) {
-                    callback(intent.data.toString())
-                } else if (intent.clipData?.itemCount ?: 0 > 0) {
-                    callback(intent.clipData?.getItemAt(0)?.text.toString())
-                } else {
-                    intent.data?.let { callback(it.toString()) }
-                }
+        (intent.data?.toString()
+            ?.takeIf { it.startsWith("http") }
+            ?: intent.clipData
+                ?.takeIf { it.itemCount > 0 }
+                ?.let { it.getItemAt(0)?.let { it.uri ?: it.text }.toString() }
+                ?.takeIf { it.startsWith("http") }
+            ?: intent.getStringExtra(Intent.EXTRA_TEXT)
+                ?.takeIf { it.startsWith("http") })
+            ?.apply {
+                callback(this)
             }
-            Intent.ACTION_VIEW -> {
-                if (intent.data?.host?.endsWith("youtube.com") ?: false) {
-                    callback(intent.data.toString())
-                } else {
-                    intent.data?.let { callback(it.toString()) }
-                }
-            }
-        }
     }
 }

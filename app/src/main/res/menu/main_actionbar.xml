@@ -11,10 +11,18 @@
     <!--        app:showAsAction="always"/>-->
 
     <item
-        android:id="@+id/filter"
-        android:icon="@drawable/ic_filter_list_white"
+        android:id="@+id/paste_add"
+        android:icon="@drawable/ic_menu_paste_add_black"
         android:title="@string/menu_filter"
         app:iconTint="@color/white"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
+        android:id="@+id/filter"
+        android:icon="@drawable/ic_menu_filter_list_white"
+        android:title="@string/menu_filter"
+        app:iconTint="@color/white"
+        app:showAsAction="ifRoom"
         />
 </menu>

@@ -1,5 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
+import android.app.Application
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.PLAY_N
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.util.extension.serialise
-import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
@@ -26,6 +29,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
     private val shareWrapper: ShareWrapper by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
 
+    private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
     private var snackbar: Snackbar? = null
 
     private val editFragment by lazy {
@@ -53,20 +57,35 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         finish()
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        if (hasFocus && intent.getBooleanExtra(EXTRA_PASTE, false)) {
+            clipboard.getPrimaryClip()
+                ?.getItemAt(0)
+                ?.text
+                ?.apply { presenter.fromShareUrl(this.toString()) }
+                ?: presenter.linkError(
+                    clipboard.getPrimaryClip()
+                        ?.getItemAt(0)?.text?.toString()
+                )
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!intent.getBooleanExtra(EXTRA_PASTE, false)) {
+            shareWrapper.getLinkFromIntent(intent) {
+                presenter.fromShareUrl(it)
+            }
+        }
+    }
+
     override fun onStop() {
         super.onStop()
         presenter.onStop()
     }
 
-    override fun onResume() {
-        super.onResume()
-        shareWrapper.getLinkFromIntent(intent) {
-            presenter.fromShareUrl(it)
-        }
-    }
-
     override fun gotoMain(media: MediaDomain?, play: Boolean) {
-        startActivity(// todo map in NavigationMapper
+        startActivity( // todo map in NavigationMapper
             Intent(this, MainActivity::class.java).apply {
                 media?.let {
                     putExtra(MEDIA.toString(), it.serialise())
@@ -76,7 +95,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
     }
 
     override fun setData(model: ShareModel) {
-        model.media?.apply { editFragment.setData(this) }
+        model.media.apply { editFragment.setData(this) }
 
         top_left_button.apply {
             isVisible = model.topLeftButtonText?.isNotBlank() ?: false
@@ -108,6 +127,17 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
     }
 
     companion object {
+
+        private const val EXTRA_PASTE = "paste"
+
+        fun intent(c: Context, paste: Boolean = false) =
+            Intent(c, ShareActivity::class.java).apply {
+                action = Intent.ACTION_VIEW
+                if (c is Application) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (paste) {
+                    putExtra(EXTRA_PASTE, true)
+                }
+            }
 
         @JvmStatic
         val activityModule = module {

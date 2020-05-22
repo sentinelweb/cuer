@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.main
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -16,6 +17,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
@@ -45,6 +47,13 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         return true
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.paste_add -> startActivity(ShareActivity.intent(this, true))
+            R.id.filter -> snackBarWrapper.make("Not implemented")
+        }
+        return super.onOptionsItemSelected(item)
+    }
     override fun checkPlayServices() {
         // can't use CastContext until I'm sure the user has GooglePlayServices
         chromeCastWrapper.checkPlayServices(
