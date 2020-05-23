@@ -70,7 +70,7 @@ class PlaylistPresenter(
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
         queue.getItemFor(item.url)?.run {
-            if (!(ytContextHolder.get()?.isConnected() ?: false)) {
+            if (!(ytContextHolder.isConnected())) {
                 toastWrapper.show("No chromecast -> playing locally")
                 view.playLocal(this.media)
             } else {
@@ -116,7 +116,7 @@ class PlaylistPresenter(
     }
 
     override fun playNow(mediaDomain: MediaDomain) {
-        if (!(ytContextHolder.get()?.isConnected() ?: false)) {
+        if (!(ytContextHolder.isConnected())) {
             toastWrapper.show("No chromecast -> playing locally")
             view.playLocal(mediaDomain)
         } else {

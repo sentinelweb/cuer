@@ -80,7 +80,7 @@ class SharePresenter constructor(
     }
 
     private fun mapShareModel(): ShareModel {
-        val isConnected = ytContextHolder.get()?.isConnected() ?: false
+        val isConnected = ytContextHolder.isConnected()
         val isNew = state.media?.id?.isBlank() ?: true
         return if (isNew) {
             ShareModel(
@@ -144,7 +144,7 @@ class SharePresenter constructor(
                     ?.also { repository.save(it) }
                     ?.also { queue.refreshQueue() }
             }
-            val isConnected = ytContextHolder.get()?.isConnected() ?: false
+            val isConnected = ytContextHolder.isConnected()
             if (forward) {
                 view.gotoMain(state.media, play)
                 view.exit()

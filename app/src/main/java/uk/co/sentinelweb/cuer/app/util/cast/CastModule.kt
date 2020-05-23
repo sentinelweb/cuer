@@ -23,7 +23,8 @@ object CastModule {
                 castWrapper = get(),
                 coCxtProvider = get(),
                 mediaSessionManager = get(),
-                phoenixWrapper = get()
+                phoenixWrapper = get(),
+                log = get()
             )
         }
     }

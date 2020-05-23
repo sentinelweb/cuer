@@ -11,9 +11,17 @@
     <!--        app:showAsAction="always"/>-->
 
     <item
+        android:id="@+id/restart_conn"
+        android:icon="@drawable/ic_menu_restart_conn_black"
+        android:title="@string/menu_restart"
+        app:iconTint="@color/white"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
         android:id="@+id/paste_add"
         android:icon="@drawable/ic_menu_paste_add_black"
-        android:title="@string/menu_filter"
+        android:title="@string/menu_paste"
         app:iconTint="@color/white"
         app:showAsAction="ifRoom"
         />
@@ -25,4 +33,5 @@
         app:iconTint="@color/white"
         app:showAsAction="ifRoom"
         />
+
 </menu>

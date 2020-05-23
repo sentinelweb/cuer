@@ -7,6 +7,7 @@ interface MainContract {
         fun onStop()
         fun onPlayServicesOk()
         fun onDestroy()
+        fun restartYtCastContext()
 
     }
 
