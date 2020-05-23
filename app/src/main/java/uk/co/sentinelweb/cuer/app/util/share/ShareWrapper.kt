@@ -15,16 +15,7 @@ class ShareWrapper(
             data = Uri.parse(media.url)
             putExtra(
                 Intent.EXTRA_TEXT,
-                """Yo cheez, Check out this vid:
-                |
-                |${media.title}
-                |${media.url}
-                |
-                |by "${media.channelData.title}" (${YoutubeJavaApiWrapper.channelUrl(media)})
-                | 
-                |Sent via Cuer @cuerapp (https://twitter.com/cuerapp) 
-                |
-                """.trimMargin()
+                shortMessage(media).trimMargin()
             )
             putExtra(Intent.EXTRA_SUBJECT, "Watch '${media.title}' by '${media.channelData.title}'")
             type = "text/plain"
@@ -34,6 +25,27 @@ class ShareWrapper(
         }.run {
             activity.startActivity(this)
         }
+    }
+
+    private fun fullMessage(media: MediaDomain): String {
+        return """Yo cheez, Check out this vid:
+                    |
+                    |${media.title}
+                    |${media.url}
+                    |
+                    |by "${media.channelData.title}" (${YoutubeJavaApiWrapper.channelUrl(media)})
+                    | 
+                    |Sent via Cuer @cuerapp (https://twitter.com/cuerapp) 
+                    |
+                    """
+    }
+
+    private fun shortMessage(media: MediaDomain): String {
+        return """${media.title}
+                    |${media.url}
+                    |
+                    |by "${media.channelData.title}" (${YoutubeJavaApiWrapper.channelUrl(media)})
+                    """
     }
 
     fun getLinkFromIntent(intent: Intent, callback: (String) -> Unit) {
