@@ -5,22 +5,24 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlaylistModelMapper constructor() {
+
     fun map(domain: PlaylistDomain): PlaylistModel = PlaylistModel(
-        domain.items.map {
-            map(it)
+        domain.items.mapIndexed { index, item ->
+            map(item, index)
         }
     )
 
-    fun map(it: PlaylistItemDomain): PlaylistModel.PlaylistItemModel {
+    private fun map(it: PlaylistItemDomain, index: Int): PlaylistModel.PlaylistItemModel {
         val media = it.media
-        return map(media)
+        return map(media, index)
     }
 
-    fun map(media: MediaDomain): PlaylistModel.PlaylistItemModel {
+    private fun map(media: MediaDomain, index: Int): PlaylistModel.PlaylistItemModel {
         val top = media.title ?: "No title"
         val bottom = media.url
         return PlaylistModel.PlaylistItemModel(
             media.id.toString(),
+            index,
             bottom,
             media.mediaType,
             top,

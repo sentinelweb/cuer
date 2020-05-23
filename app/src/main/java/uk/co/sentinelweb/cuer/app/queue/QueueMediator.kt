@@ -35,7 +35,6 @@ class QueueMediator constructor(
                 state.currentPlaylist = playlistMutator.playItem(it, playlistItem)
                 updateCurrentItem()
             }
-
     }
 
     override fun updateMediaItem(media: MediaDomain) {
@@ -99,6 +98,11 @@ class QueueMediator constructor(
         })
     }
 
+    override fun itemIndex(item: PlaylistItemDomain): Int? =
+        state.currentPlaylist
+            ?.items
+            ?.indexOfFirst { it.media.mediaId == item.media.mediaId }
+
     override fun onTrackEnded(media: MediaDomain?) {
         nextItem()
     }
@@ -127,7 +131,7 @@ class QueueMediator constructor(
                     PlaylistDomain(
                         title = "Media",
                         items = it,
-                        currentIndex = state.currentPlaylist?.currentIndex ?: 0
+                        currentIndex = state.currentPlaylist?.currentIndex ?: -1
                     )
                 }
                 ?.also { state.currentPlaylist = it }

@@ -29,9 +29,4 @@ class ItemDiffCallback(
         return oldItems[oldItemPosition] == newItems[newItemPosition]
     }
 
-    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-        //you can return particular field for changed item.
-        return super.getChangePayload(oldItemPosition, newItemPosition)
-    }
-
 }
