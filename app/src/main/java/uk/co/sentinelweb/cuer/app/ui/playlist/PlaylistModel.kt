@@ -8,6 +8,7 @@ data class PlaylistModel constructor(
 ) {
     data class PlaylistItemModel constructor(
         override val id: String,
+        val index: Int,
         val url: String,
         val type: MediaDomain.MediaTypeDomain,
         val title: String,

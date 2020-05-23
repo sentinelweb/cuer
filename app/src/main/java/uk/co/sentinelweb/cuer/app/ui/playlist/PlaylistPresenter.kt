@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.Const
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -34,11 +34,10 @@ class PlaylistPresenter(
     override fun initialise() {
         initListCheck()
         queue.addProducerListener(this)
-        queue.refreshQueue()
     }
 
     override fun loadList() {
-        updateListContent(queue.getPlaylist() ?: Const.EMPTY_PLAYLIST)
+        queue.refreshQueue()
     }
 
     override fun refreshList() {
@@ -60,9 +59,13 @@ class PlaylistPresenter(
     }
 
     override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
-        queue.getItemFor(item.url)?.run {
-            queue.removeItem(this)
-        }
+        state.jobs.add(contextProvider.MainScope.launch {
+            delay(400)
+            queue.getItemFor(item.url)?.run {
+                state.focusIndex = queue.itemIndex(this)
+                queue.removeItem(this)
+            }
+        })
     }
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
@@ -127,16 +130,15 @@ class PlaylistPresenter(
 
     private fun initListCheck() {
         state.jobs.add(contextProvider.MainScope.launch {
-            val result = repository.count()
-            if (result.isSuccessful && result.data == 0) {
-                Queue.ITEMS
-                    .map { mapQueueToMedia(it) }
-                    .map { it.mediaId }
-                    .let { ytInteractor.videos(it) }
-                    .takeIf { it.isSuccessful }
-                    ?.also { it.data?.let { repository.save(it) } }
-                    .also { loadList() }
-            }
+            repository.count()
+                .takeIf { it.isSuccessful && it.data == 0 }
+                ?.let { Queue.ITEMS }
+                ?.map { mapQueueToMedia(it) }
+                ?.map { it.mediaId }
+                ?.let { ytInteractor.videos(it) }
+                ?.takeIf { it.isSuccessful }
+                ?.also { it.data?.let { repository.save(it) } }
+                .also { loadList() }
         })
     }
 
@@ -160,10 +162,19 @@ class PlaylistPresenter(
     }
 
     private fun updateListContent(list: PlaylistDomain) {
-        list.items
-            .map { modelMapper.map(it) }
-            .also { view.setList(it) }
-            .also { view.scrollToItem(it.size - 1) }
+        list
+            .let { modelMapper.map(it) }
+            .also { view.setList(it.items) }
+            .also {
+                state.focusIndex?.apply {
+                    view.scrollToItem(this)
+                    state.focusIndex = null
+                } ?: run {
+                    view.scrollToItem(
+                        if (list.currentIndex > -1) list.currentIndex else list.items.size - 1
+                    )
+                }
+            }
 
         state.addedMedia?.let { added ->
             if (state.playAddedAfterRefresh) {

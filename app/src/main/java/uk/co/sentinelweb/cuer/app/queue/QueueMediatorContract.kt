@@ -23,6 +23,7 @@ interface QueueMediatorContract {
         fun onTrackEnded(media: MediaDomain?)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun getItemFor(url: String): PlaylistItemDomain?
+        fun itemIndex(item: PlaylistItemDomain): Int?
     }
 
     interface ConsumerListener {

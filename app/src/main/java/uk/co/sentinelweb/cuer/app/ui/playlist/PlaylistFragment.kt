@@ -80,7 +80,11 @@ class PlaylistFragment :
     }
 
     override fun scrollToItem(index: Int) {
-        playlist_list.scrollToPosition(index)
+        (playlist_list.layoutManager as LinearLayoutManager).run {
+            if (index !in this.findFirstCompletelyVisibleItemPosition()..this.findLastCompletelyVisibleItemPosition()) {
+                playlist_list.scrollToPosition(index)
+            }
+        }
     }
 
     override fun playLocal(media: MediaDomain) {
@@ -88,7 +92,7 @@ class PlaylistFragment :
     }
     //endregion
 
-    // region ItemContract.Interactions
+    // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
         presenter.moveItem(fromPosition, toPosition)
         // shows the move while dragging
@@ -107,7 +111,9 @@ class PlaylistFragment :
     }
 
     override fun onLeftSwipe(item: ItemModel) {
-        presenter.onItemSwipeLeft(item as PlaylistModel.PlaylistItemModel)
+        val playlistItemModel = item as PlaylistModel.PlaylistItemModel
+        adapter.notifyItemRemoved(playlistItemModel.index)
+        presenter.onItemSwipeLeft(playlistItemModel) // delays for animation
     }
 
     override fun onPlay(item: ItemModel, external: Boolean) {
