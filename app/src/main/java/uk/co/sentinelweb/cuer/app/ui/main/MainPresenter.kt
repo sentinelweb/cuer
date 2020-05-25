@@ -43,14 +43,14 @@ class MainPresenter(
         if (!ytContextHolder.isCreated() && state.playServicesAvailable) {
             initialiseCastContext()
         }
-        ytContextHolder.get()?.playerUi = playerControls
+        ytContextHolder.playerUi = playerControls
     }
 
     override fun onStop() {
         log.d("onStop()")
-        ytContextHolder.get()?.playerUi = null
+        ytContextHolder.playerUi = null
         if (!view.isRecreating()) {
-            if (ytContextHolder.isCreated() && !ytContextHolder.get()!!.isConnected()) {
+            if (ytContextHolder.isCreated() && !ytContextHolder.isConnected()) {
                 ytContextHolder.destroy()
             } else {
                 ytServiceManager.start()
@@ -58,10 +58,15 @@ class MainPresenter(
         }
     }
 
+    override fun restartYtCastContext() {
+        ytContextHolder.destroy()
+        ytContextHolder.create()
+    }
+
     override fun onDestroy() = Unit
 
     companion object {
         val TAGP = "CuerLog"
-        private val TAG = "$TAGP${MainPresenter::class.java.simpleName}"
     }
+
 }

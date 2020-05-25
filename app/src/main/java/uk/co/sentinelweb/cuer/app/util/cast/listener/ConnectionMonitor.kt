@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.PhoenixWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 // todo  .. find a proper solution to kill the cast connection
 // todo this class probably doesnt detect the error as expected ...
@@ -20,9 +21,18 @@ class ConnectionMonitor constructor(
     private val castWrapper: ChromeCastWrapper,
     private val coCxtProvider: CoroutineContextProvider,
     private val mediaSessionManager: MediaSessionManager,
-    private val phoenixWrapper: PhoenixWrapper
+    private val phoenixWrapper: PhoenixWrapper,
+    private val log: LogWrapper
 ) {
     private var timerJob: Job? = null
+    private val history = mutableListOf<String>()
+
+    var connectionState: CastPlayerContract.ConnectionState? = null
+        set(value) {
+            log.d("set state: $value")
+            history.add(value.toString())
+            field = value
+        }
 
     fun setTimer(stateProvider: () -> CastPlayerContract.ConnectionState?) {
         timerJob?.cancel()

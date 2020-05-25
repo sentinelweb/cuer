@@ -25,4 +25,6 @@
     <string name="pie_empty_desc">We can only add youtube video links at the moment</string>
     <string name="pie_playlist_dialog_title">Select Playlist</string>
     <string name="pie_empty_title">Sorry &#8230; ❤</string>
+    <string name="menu_paste">Paste</string>
+    <string name="menu_restart">Restart</string>
 </resources>

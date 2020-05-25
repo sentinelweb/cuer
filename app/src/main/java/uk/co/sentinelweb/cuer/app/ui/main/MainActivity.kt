@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         when (item.itemId) {
             R.id.paste_add -> startActivity(ShareActivity.intent(this, true))
             R.id.filter -> snackBarWrapper.make("Not implemented")
+            R.id.restart_conn -> presenter.restartYtCastContext()
         }
         return super.onOptionsItemSelected(item)
     }

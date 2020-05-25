@@ -30,13 +30,19 @@ class YoutubeCastConnectionListener constructor(
 
     override fun onChromecastConnecting() {
         connectionMonitor.setTimer({ connectionState })
-        connectionState = CC_CONNECTING.also { playerUi?.setConnectionState(it) }
+        connectionState = CC_CONNECTING.also {
+            playerUi?.setConnectionState(it)
+            connectionMonitor.connectionState = it
+        }
     }
 
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
         if (connectionMonitor.checkAlreadyConnected(connectionState)) return
 
-        connectionState = CC_CONNECTED.also { playerUi?.setConnectionState(it) }
+        connectionState = CC_CONNECTED.also {
+            playerUi?.setConnectionState(it)
+            connectionMonitor.connectionState = it
+        }
         youTubePlayerListener?.let {
             it.playerUi = playerUi
         } ?: setupPlayerListener(chromecastYouTubePlayerContext)
@@ -44,14 +50,17 @@ class YoutubeCastConnectionListener constructor(
     }
 
     private fun setupPlayerListener(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        youTubePlayerListener = creator.createListener().also {
+        youTubePlayerListener = creator.createPlayerListener().also {
             chromecastYouTubePlayerContext.initialize(it)
             it.playerUi = playerUi
         }
     }
 
     override fun onChromecastDisconnected() {
-        connectionState = CC_DISCONNECTED.also { playerUi?.setConnectionState(it) }
+        connectionState = CC_DISCONNECTED.also {
+            playerUi?.setConnectionState(it)
+            connectionMonitor.connectionState = it
+        }
         youTubePlayerListener?.onDisconnected()
         youTubePlayerListener = null
         mediaSessionManager.destroyMediaSession()
@@ -69,4 +78,5 @@ class YoutubeCastConnectionListener constructor(
         connectionMonitor.cancelTimer()
         castWrapper.killCurrentSession()
     }
+
 }

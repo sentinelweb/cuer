@@ -12,7 +12,7 @@ class YoutubeCastServiceController constructor(
     private val appState: CuerAppState
 ) {
     fun initialise() {
-        ytContextHolder.get()!!.playerUi = notification
+        ytContextHolder.playerUi = notification
     }
 
     fun handleAction(action: String?) {
@@ -21,8 +21,8 @@ class YoutubeCastServiceController constructor(
 
     fun destroy() {
         notification.destroy()
-        if (ytContextHolder.get()!!.playerUi == notification) {
-            ytContextHolder.get()!!.destroy()
+        if (ytContextHolder.playerUi == notification) {
+            ytContextHolder.destroy()
         }
     }
 

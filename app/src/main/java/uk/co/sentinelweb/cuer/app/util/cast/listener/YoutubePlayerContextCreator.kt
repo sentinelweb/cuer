@@ -15,22 +15,20 @@ class YoutubePlayerContextCreator constructor(
     private val connectionMonitor: ConnectionMonitor
 ) {
 
-
     fun createContext(
-        castContext: CastContext
-    ): ChromecastYouTubePlayerContextWrapper {
-        val listener = YoutubeCastConnectionListener(
-            this,
-            mediaSessionManager,
-            castWrapper,
-            connectionMonitor
-        )
-        return ChromecastYouTubePlayerContextWrapper(
-            ChromecastYouTubePlayerContext(castContext.sessionManager, listener),
-            listener
-        )
-    }
+        castContext: CastContext,
+        listener: YoutubeCastConnectionListener
+    ) = ChromecastYouTubePlayerContext(castContext.sessionManager, listener)
 
-    fun createListener() =
+
+    fun createConnectionListener() = YoutubeCastConnectionListener(
+        this,
+        mediaSessionManager,
+        castWrapper,
+        connectionMonitor
+    )
+
+    fun createPlayerListener() =
         YouTubePlayerListener(YouTubePlayerListenerState(), queue, mediaSessionManager, log)
+
 }
