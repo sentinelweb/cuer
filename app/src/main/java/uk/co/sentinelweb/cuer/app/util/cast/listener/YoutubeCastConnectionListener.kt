@@ -46,7 +46,8 @@ class YoutubeCastConnectionListener constructor(
         youTubePlayerListener?.let {
             it.playerUi = playerUi
         } ?: setupPlayerListener(chromecastYouTubePlayerContext)
-        mediaSessionManager.createMediaSession()
+
+        youTubePlayerListener?.apply { mediaSessionManager.createMediaSession(this) }
     }
 
     private fun setupPlayerListener(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
