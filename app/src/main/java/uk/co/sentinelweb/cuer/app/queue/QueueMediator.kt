@@ -25,7 +25,7 @@ class QueueMediator constructor(
         mutableListOf()
 
     init {
-        refreshQueue()
+        refreshQueueBackground()
     }
 
     override fun onItemSelected(playlistItem: PlaylistItemDomain) {
@@ -120,26 +120,30 @@ class QueueMediator constructor(
             ?.firstOrNull() { it.media.url == url }
     }
 
-    override fun refreshQueue(after: (() -> Unit)?) {
+    override fun refreshQueueBackground(after: (() -> Unit)?) {
         state.jobs.add(contextProvider.MainScope.launch {
-            repository
-                .loadList(null)
-                .takeIf { it.isSuccessful && it is RepoResult.Data }
-                ?.let { state.mediaList = it.data!!; it.data }
-                ?.map { mediaMapper.mapToPlaylistItem(it) }
-                ?.let {
-                    PlaylistDomain(
-                        title = "Media",
-                        items = it,
-                        currentIndex = state.currentPlaylist?.currentIndex ?: -1
-                    )
-                }
-                ?.also { state.currentPlaylist = it }
-                ?.also { playlist ->
-                    producerListeners.forEach { l -> l.onPlaylistUpdated(playlist) }
-                }?.also {
-                    after?.invoke()
-                }
+            refreshQueue(after)
         })
+    }
+
+    override suspend fun refreshQueue(after: (() -> Unit)?) {
+        repository
+            .loadList(null)
+            .takeIf { it.isSuccessful && it is RepoResult.Data }
+            ?.let { state.mediaList = it.data!!; it.data }
+            ?.map { mediaMapper.mapToPlaylistItem(it) }
+            ?.let {
+                PlaylistDomain(
+                    title = "Media",
+                    items = it,
+                    currentIndex = state.currentPlaylist?.currentIndex ?: -1
+                )
+            }
+            ?.also { state.currentPlaylist = it }
+            ?.also { playlist ->
+                producerListeners.forEach { l -> l.onPlaylistUpdated(playlist) }
+            }?.also {
+                after?.invoke()
+            }
     }
 }
