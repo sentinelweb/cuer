@@ -153,9 +153,10 @@ class SharePresenter constructor(
                     ?.takeIf { isConnected }
                     ?.let { state.media }
                     ?.also {
-                            queue.getItemFor(it.url)
-                                ?.run { queue.onItemSelected(this) }
-                            view.exit()
+                        queue.getItemFor(it.url)
+                            ?.run { queue.onItemSelected(this) }
+                            .run { view.exit() }
+
                     } ?: view.exit()
             }
         })

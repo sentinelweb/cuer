@@ -15,7 +15,6 @@ interface QueueMediatorContract {
         fun nextItem()
         fun previousItem()
         fun getCurrentItem(): PlaylistItemDomain?
-        fun refreshQueue(after: (() -> Unit)? = null)
         fun getPlaylist(): PlaylistDomain?
         fun addProducerListener(l: ProducerListener)
         fun removeProducerListener(l: ProducerListener)
@@ -24,6 +23,8 @@ interface QueueMediatorContract {
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun getItemFor(url: String): PlaylistItemDomain?
         fun itemIndex(item: PlaylistItemDomain): Int?
+        fun refreshQueueBackground(after: (() -> Unit)? = null)
+        suspend fun refreshQueue(after: (() -> Unit)? = null)
     }
 
     interface ConsumerListener {

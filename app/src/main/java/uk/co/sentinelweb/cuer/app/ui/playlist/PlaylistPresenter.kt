@@ -37,11 +37,11 @@ class PlaylistPresenter(
     }
 
     override fun loadList() {
-        queue.refreshQueue()
+        queue.refreshQueueBackground()
     }
 
     override fun refreshList() {
-        queue.refreshQueue()
+        queue.refreshQueueBackground()
     }
 
     override fun setFocusMedia(mediaDomain: MediaDomain) {
