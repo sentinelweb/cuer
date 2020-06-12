@@ -73,7 +73,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="4dp"
                 android:layout_gravity="bottom"
-                android:background="@color/color_primary"
+                android:background="@color/primary"
                 android:fitsSystemWindows="true"
                 />
 
@@ -231,15 +231,13 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/ple_star_fab"
-        style="@style/Widget.MaterialComponents.FloatingActionButton"
+        style="@style/FabButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        app:backgroundTint="@color/color_primary_dark"
         app:layout_anchor="@id/ple_appbar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_button_unstarred_white"
-        app:tint="@color/white"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

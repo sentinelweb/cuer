@@ -20,12 +20,16 @@ interface PlaylistContract {
         fun onItemShare(item: PlaylistModel.PlaylistItemModel)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun playNow(mediaDomain: MediaDomain)
+        fun scroll(direction: ScrollDirection)
     }
 
     interface View {
         fun setList(list: List<ItemModel>)
         fun showAlert(msg: String)
         fun scrollToItem(index: Int)
+        fun scrollTo(direction: ScrollDirection)
         fun playLocal(media: MediaDomain)
     }
+
+    enum class ScrollDirection { Up, Down, Top, Bottom }
 }

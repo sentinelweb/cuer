@@ -32,7 +32,7 @@ class ToolbarWrapper(
     }
 
     fun setStatusBarColorDefault() {
-        activity.window.statusBarColor = activity.getColor(R.color.color_primary_dark)
+        activity.window.statusBarColor = activity.getColor(R.color.primary_dark)
         activity.window.decorView.apply {
             systemUiVisibility = systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
         }

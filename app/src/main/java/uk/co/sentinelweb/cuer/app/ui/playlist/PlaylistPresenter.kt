@@ -79,6 +79,10 @@ class PlaylistPresenter(
         }
     }
 
+    override fun scroll(direction: PlaylistContract.ScrollDirection) {
+        view.scrollTo(direction)
+    }
+
     override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
         if (external) {
             queue.getItemFor(item.url)?.run {
