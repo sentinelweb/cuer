@@ -63,7 +63,7 @@ class PlaylistFragment :
 
     override fun onResume() {
         super.onResume()
-        presenter.loadList()
+
         // todo map in NavigationMapper
         activity?.intent?.getStringExtra(MEDIA.toString())?.let {
             val media = deserialiseMedia(it)
@@ -72,7 +72,7 @@ class PlaylistFragment :
                 presenter.playNow(media)
                 activity?.intent?.removeExtra(PLAY_NOW.toString())
             }
-        }
+        } ?: presenter.loadList()// queue refresh triggered from shareactivity
     }
     // endregion
 

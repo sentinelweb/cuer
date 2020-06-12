@@ -27,7 +27,6 @@ class SharePresenter constructor(
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val log: LogWrapper,
     private val res: ResourceWrapper
-
 ) : ShareContract.Presenter {
 
     init {
@@ -85,10 +84,12 @@ class SharePresenter constructor(
         return if (isNew) {
             ShareModel(
                 topRightButtonAction = { finish(add = true, play = true, forward = true) },
-                topRightButtonText = res.getString(R.string.share_button_play_now),
+                topRightButtonText = if (isConnected) res.getString(R.string.share_button_play_now) else res.getString(
+                    R.string.share_button_play_locally
+                ),
                 topRightButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 topLeftButtonAction = { finish(add = true, play = true, forward = false) },
-                topLeftButtonText = if (isConnected) "Play / Return" else null,
+                topLeftButtonText = if (isConnected) res.getString(R.string.share_button_play_return) else null,
                 topLeftButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 bottomRightButtonAction = { finish(add = true, play = false, forward = true) },
                 bottomRightButtonText = res.getString(R.string.share_button_add_to_queue),
@@ -102,16 +103,18 @@ class SharePresenter constructor(
         } else {
             ShareModel(
                 topRightButtonAction = { finish(add = false, play = true, forward = true) },
-                topRightButtonText = res.getString(R.string.share_button_play_now),
+                topRightButtonText = if (isConnected) res.getString(R.string.share_button_play_now) else res.getString(
+                    R.string.share_button_play_locally
+                ),
                 topRightButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 topLeftButtonAction = { finish(add = false, play = true, forward = false) },
-                topLeftButtonText = if (isConnected) "Play / Return" else null,
+                topLeftButtonText = if (isConnected) res.getString(R.string.share_button_play_return) else null,
                 topLeftButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
                 bottomRightButtonAction = { finish(add = false, play = false, forward = true) },
-                bottomRightButtonText = "Go to app",
+                bottomRightButtonText = res.getString(R.string.share_button_goto_item),
                 bottomRightButtonIcon = R.drawable.ic_button_forward_black,
                 bottomLeftButtonAction = { finish(add = false, play = false, forward = false) },
-                bottomLeftButtonText = "Return",
+                bottomLeftButtonText = res.getString(R.string.share_button_return),
                 bottomLeftButtonIcon = R.drawable.ic_button_back_black,
                 media = state.media,
                 isNewVideo = isNew
@@ -128,10 +131,10 @@ class SharePresenter constructor(
             topLeftButtonText = null,
             topLeftButtonIcon = 0,
             bottomRightButtonAction = { finish(add = false, play = false, forward = true) },
-            bottomRightButtonText = "Go to app",
+            bottomRightButtonText = res.getString(R.string.share_button_goto_app),
             bottomRightButtonIcon = R.drawable.ic_button_forward_black,
             bottomLeftButtonAction = { finish(add = false, play = false, forward = false) },
-            bottomLeftButtonText = "Return",
+            bottomLeftButtonText = res.getString(R.string.share_button_return),
             bottomLeftButtonIcon = R.drawable.ic_button_back_black,
             media = null,
             isNewVideo = false
