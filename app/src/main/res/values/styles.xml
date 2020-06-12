@@ -3,17 +3,18 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/color_primary</item>
-        <item name="colorPrimaryDark">@color/color_primary_dark</item>
-        <item name="colorAccent">@color/color_accent</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorControlNormal">@color/control_normal</item>
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/color_primary</item>
-        <item name="colorPrimaryDark">@color/color_primary_dark</item>
-        <item name="colorAccent">@color/color_accent</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
         <item name="android:windowTranslucentStatus">true</item>
@@ -73,6 +74,11 @@
         <item name="android:background">@color/orange_500</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="FabButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="backgroundTint">?colorPrimary</item>
+        <item name="tint">@color/fab_button_icon_tint</item>
     </style>
 
 </resources>

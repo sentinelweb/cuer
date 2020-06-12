@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="color_primary">@color/red_600</color>
-    <!--    color tool : http://paletton.com/ -->
-    <!--    <color name="color_primary_adj_45_left">#ca53c5</color>-->
-    <!--    <color name="color_primary_adj_45_right">#ffc069</color>-->
-    <!--    <color name="color_primary_triad_45_left">#5a9c67</color>-->
-    <!--    <color name="color_primary_triad_45_right">#dff967</color>-->
-    <color name="color_primary_dark">@color/red_900</color>
-    <color name="color_accent">@color/light_blue_700</color>
+    <color name="primary">@color/red_600</color>
+    <color name="primary_dark">@color/red_900</color>
+    <color name="accent">@color/light_blue_700</color>
+    <color name="control_normal">@color/white</color>
+
     <color name="text_light">@color/grey_400</color>
     <color name="text_normal">@color/grey_800</color>
     <color name="popup_menu_text">@color/grey_800</color>

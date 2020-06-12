@@ -114,9 +114,7 @@ class PlaylistFragment :
         (playlist_list.layoutManager as LinearLayoutManager).run {
             val useIndex = if (index > 0 && index < adapter.data.size) {
                 index
-            } else {
-                0
-            }
+            } else 0
 
             if (index !in this.findFirstCompletelyVisibleItemPosition()..this.findLastCompletelyVisibleItemPosition()) {
                 playlist_list.scrollToPosition(useIndex)
@@ -127,8 +125,8 @@ class PlaylistFragment :
     override fun playLocal(media: MediaDomain) {
         YoutubeActivity.start(requireContext(), media.mediaId)
     }
-
     //endregion
+
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
         presenter.moveItem(fromPosition, toPosition)
@@ -173,11 +171,6 @@ class PlaylistFragment :
     //endregion
 
     companion object {
-        val SCROLL_PAGE_UP = -1;
-        val SCROLL_PAGE_DOWN = -2;
-        val SCROLL_PAGE_TOP = -3;
-
-        val SCROLL_PAGE_BOTTOM = -2;
 
         @JvmStatic
         val fragmentModule = module {

@@ -27,4 +27,6 @@
     <string name="pie_empty_title">Sorry &#8230; ❤</string>
     <string name="menu_paste">Paste</string>
     <string name="menu_restart">Restart</string>
+    <string name="playlist_fab_up_contentdesc">Up</string>
+    <string name="playlist_fab_down_contentdesc">Down</string>
 </resources>
