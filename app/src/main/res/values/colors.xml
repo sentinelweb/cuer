@@ -10,6 +10,9 @@
     <color name="color_accent">@color/light_blue_700</color>
     <color name="text_light">@color/grey_400</color>
     <color name="text_normal">@color/grey_800</color>
-    <color name="menu_text">@color/grey_800</color>
-    <color name="menu_icon_tint">@color/grey_400</color>
+    <color name="popup_menu_text">@color/grey_800</color>
+    <color name="popup_menu_icon_tint">@color/grey_400</color>
+    <color name="fab_button_icon_tint">@color/white</color>
+    <color name="button_fg_tint">@color/white</color>
+    <color name="menu_button_icon_tint">@color/white</color>
 </resources>

@@ -43,8 +43,8 @@
     </style>
 
     <style name="ContextMenu" parent="Widget.AppCompat.PopupMenu">
-        <item name="android:textColor">@color/menu_text</item>
-        <item name="android:iconTint">@color/menu_icon_tint</item>
+        <item name="android:textColor">@color/popup_menu_text</item>
+        <item name="android:iconTint">@color/popup_menu_icon_tint</item>
     </style>
 
     <style name="FullscreenTheme" parent="AppTheme">

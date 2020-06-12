@@ -239,7 +239,7 @@
         app:layout_anchor="@id/ple_appbar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_button_unstarred_white"
-        app:tint="@color/white"
+        app:tint="@color/fab_button_icon_tint"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -8,34 +8,34 @@
         android:id="@+id/context_play"
         android:icon="@drawable/ic_menu_play_black"
         android:title="@string/menu_play"
-        app:iconTint="@color/menu_icon_tint"
+        app:iconTint="@color/popup_menu_icon_tint"
         />
 
     <item
         android:id="@+id/context_play_external"
         android:icon="@drawable/ic_menu_launch_black"
         android:title="@string/menu_play_yt"
-        app:iconTint="@color/menu_icon_tint"
+        app:iconTint="@color/popup_menu_icon_tint"
         />
 
     <item
         android:id="@+id/context_channel_external"
         android:icon="@drawable/ic_menu_subscriptions_black"
         android:title="@string/menu_channel_yt"
-        app:iconTint="@color/menu_icon_tint"
+        app:iconTint="@color/popup_menu_icon_tint"
         />
 
     <item
         android:id="@+id/context_star"
         android:icon="@drawable/ic_menu_unstarred_black"
         android:title="@string/menu_star"
-        app:iconTint="@color/menu_icon_tint"
+        app:iconTint="@color/popup_menu_icon_tint"
         />
 
     <item
         android:id="@+id/context_share"
         android:icon="@drawable/ic_menu_share_black"
         android:title="@string/menu_share"
-        app:iconTint="@color/menu_icon_tint"
+        app:iconTint="@color/popup_menu_icon_tint"
         />
 </menu>

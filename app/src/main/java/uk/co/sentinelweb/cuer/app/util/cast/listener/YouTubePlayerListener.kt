@@ -181,16 +181,20 @@ class YouTubePlayerListener(
 
     // todo fix this - not clean
     private fun setupPlayer(controls: CastPlayerContract.PlayerControls) {
-        controls.addListener(this)
-        controls.setTitle(state.currentMedia?.title ?: "No Media")
-        controls.setPlayerState(state.playState)
-        controls.setDuration(state.durationSec)
-        controls.setCurrentSecond(state.positionSec)
-        state.currentMedia?.apply { controls.setMedia(this) }
+        controls.apply {
+            addListener(this@YouTubePlayerListener)
+            setTitle(state.currentMedia?.title ?: "No Media")
+            setPlayerState(state.playState)
+            setDuration(state.durationSec)
+            setCurrentSecond(state.positionSec)
+            state.currentMedia?.apply { setMedia(this) }
+        }
     }
 
     private fun cleanupPlayer(controls: CastPlayerContract.PlayerControls?) {
-        controls?.removeListener(this)
-        controls?.reset()
+        controls?.apply {
+            removeListener(this@YouTubePlayerListener)
+            reset()
+        }
     }
 }

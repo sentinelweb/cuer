@@ -15,6 +15,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.PLAY_NOW
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
@@ -26,6 +27,9 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.AlertDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 class PlaylistFragment :
     Fragment(R.layout.playlist_fragment),
@@ -46,6 +50,10 @@ class PlaylistFragment :
         playlist_list.layoutManager = LinearLayoutManager(context)
         playlist_list.adapter = adapter
         itemTouchHelper.attachToRecyclerView(playlist_list)
+        playlist_fab_up.setOnClickListener { presenter.scroll(Up) }
+        playlist_fab_up.setOnLongClickListener { presenter.scroll(Top);true }
+        playlist_fab_down.setOnClickListener { presenter.scroll(Down) }
+        playlist_fab_down.setOnLongClickListener { presenter.scroll(Bottom);true }
     }
 
     override fun onDestroyView() {
@@ -79,10 +87,39 @@ class PlaylistFragment :
         alertWrapper.showMessage("Alert", msg)
     }
 
+    override fun scrollTo(direction: PlaylistContract.ScrollDirection) {
+        (playlist_list.layoutManager as LinearLayoutManager).run {
+            val itemsOnScreen =
+                this.findLastCompletelyVisibleItemPosition() - this.findFirstCompletelyVisibleItemPosition()
+
+            val useIndex = when (direction) {
+                Up -> max(this.findFirstCompletelyVisibleItemPosition() - itemsOnScreen, 0)
+                Down ->
+                    min(
+                        this.findLastCompletelyVisibleItemPosition() + itemsOnScreen,
+                        adapter.data.size - 1
+                    )
+                Top -> 0
+                Bottom -> adapter.data.size - 1
+            }
+            if (abs(this.findLastCompletelyVisibleItemPosition() - useIndex) > 20)
+                playlist_list.scrollToPosition(useIndex)
+            else {
+                playlist_list.smoothScrollToPosition(useIndex)
+            }
+        }
+    }
+
     override fun scrollToItem(index: Int) {
         (playlist_list.layoutManager as LinearLayoutManager).run {
+            val useIndex = if (index > 0 && index < adapter.data.size) {
+                index
+            } else {
+                0
+            }
+
             if (index !in this.findFirstCompletelyVisibleItemPosition()..this.findLastCompletelyVisibleItemPosition()) {
-                playlist_list.scrollToPosition(index)
+                playlist_list.scrollToPosition(useIndex)
             }
         }
     }
@@ -90,8 +127,8 @@ class PlaylistFragment :
     override fun playLocal(media: MediaDomain) {
         YoutubeActivity.start(requireContext(), media.mediaId)
     }
-    //endregion
 
+    //endregion
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
         presenter.moveItem(fromPosition, toPosition)
@@ -99,6 +136,7 @@ class PlaylistFragment :
         adapter.notifyItemMoved(fromPosition, toPosition)
         return true
     }
+
     //endregion
 
     // region ItemContract.Interactions
@@ -131,9 +169,16 @@ class PlaylistFragment :
     override fun onShare(item: ItemModel) {
         presenter.onItemShare(item as PlaylistModel.PlaylistItemModel)
     }
+
     //endregion
 
     companion object {
+        val SCROLL_PAGE_UP = -1;
+        val SCROLL_PAGE_DOWN = -2;
+        val SCROLL_PAGE_TOP = -3;
+
+        val SCROLL_PAGE_BOTTOM = -2;
+
         @JvmStatic
         val fragmentModule = module {
             scope(named<PlaylistFragment>()) {
@@ -164,5 +209,6 @@ class PlaylistFragment :
                 viewModel { PlaylistState() }
             }
         }
+
     }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -19,10 +19,40 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="LinearLayoutManager"
-            tools:context=".ui.memelist.MemeListFragment"
+            tools:context=".ui.playlist.PlaylistFragment"
             tools:listitem="@layout/view_playlist_item"
             />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</FrameLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/playlist_fab_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:layout_margin="16dp"
+        android:contentDescription="Up"
+        app:backgroundTint="?colorPrimary"
+        app:fabSize="mini"
+        app:layout_anchor="@+id/playlist_fab_down"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        app:srcCompat="@drawable/ic_button_up_black"
+        app:tint="@color/fab_button_icon_tint"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/playlist_fab_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="Down"
+        app:backgroundTint="?colorPrimary"
+        app:fabSize="mini"
+        app:layout_anchor="@+id/playlist_swipe"
+        app:layout_anchorGravity="bottom|right"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        app:srcCompat="@drawable/ic_button_down_black"
+        app:tint="@color/fab_button_icon_tint"
+        />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
