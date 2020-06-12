@@ -128,7 +128,7 @@ class PlaylistPresenter(
                 queue.onItemSelected(it)
             } ?: run {
                 state.playAddedAfterRefresh = true
-                queue.refreshQueueBackground() // int this case the ques isnt refeshed in share as it wasn't added
+                queue.refreshQueueBackground() // In this case the ques isn't refeshed in share as it wasn't added
             }
         }
     }
