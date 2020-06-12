@@ -8,6 +8,7 @@ data class PlaylistState constructor(
     var addedMedia: MediaDomain? = null,
     var playAddedAfterRefresh: Boolean = false,
     var focusIndex: Int? = null,
-    val jobs: MutableList<Job> = mutableListOf()
+    var lastFocusIndex: Int? = null,
+    val jobs: MutableList<Job> = mutableListOf(),
+    var deletedMedia: MediaDomain? = null
 ) : ViewModel()
-
