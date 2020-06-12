@@ -7,26 +7,40 @@
     <string name="menu_filter">Play</string>
     <string name="right">Right</string>
     <string name="left">Left</string>
+
+    <!-- menu -->
     <string name="menu_play">Play</string>
     <string name="menu_play_yt">Launch</string>
     <string name="menu_channel_yt">Go to channel</string>
     <string name="menu_star">Star</string>
     <string name="menu_share">Share</string>
+    <string name="menu_paste">Paste</string>
+    <string name="menu_restart">Restart</string>
 
-    <string name="title_activity_fullscreen">YoutubeFullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>
     <string name="share_button_reject">Reject</string>
     <string name="share_button_play_now">Play Now</string>
     <string name="share_button_add_to_queue">Add to queue</string>
     <string name="select">Select &#8230;</string>
+    <string name="share_button_play_locally">Play locally</string>
+    <string name="share_button_play_return">Play / Return</string>
+    <string name="share_button_goto_item">Go to item</string>
+    <string name="share_button_return">Return</string>
+    <string name="share_button_goto_app">Go to app</string>
 
+    <!-- playlist_item_edit -->
     <string name="pie_empty_desc">We can only add youtube video links at the moment</string>
     <string name="pie_playlist_dialog_title">Select Playlist</string>
     <string name="pie_empty_title">Sorry &#8230; ❤</string>
-    <string name="menu_paste">Paste</string>
-    <string name="menu_restart">Restart</string>
+
+    <!-- playlist fragemnt -->
     <string name="playlist_fab_up_contentdesc">Up</string>
     <string name="playlist_fab_down_contentdesc">Down</string>
+
+    <!-- local player -->
+    <string name="title_activity_fullscreen">YoutubeFullscreenActivity</string>
+
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

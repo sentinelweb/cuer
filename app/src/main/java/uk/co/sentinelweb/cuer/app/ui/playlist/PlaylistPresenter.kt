@@ -128,6 +128,7 @@ class PlaylistPresenter(
                 queue.onItemSelected(it)
             } ?: run {
                 state.playAddedAfterRefresh = true
+                queue.refreshQueueBackground() // In this case the ques isn't refeshed in share as it wasn't added
             }
         }
     }
@@ -173,22 +174,21 @@ class PlaylistPresenter(
                 state.focusIndex?.apply {
                     view.scrollToItem(this)
                     state.focusIndex = null
+                } ?: state.addedMedia?.let { added ->
+                    queue.getItemFor(added.url)?.let {
+                        view.scrollToItem(queue.itemIndex(it)!!)
+                        if (state.playAddedAfterRefresh) {
+                            queue.onItemSelected(it)
+                            state.playAddedAfterRefresh = false
+                        }
+                        state.addedMedia = null
+                    }
                 } ?: run {
                     view.scrollToItem(
                         if (list.currentIndex > -1) list.currentIndex else list.items.size - 1
                     )
                 }
             }
-
-        state.addedMedia?.let { added ->
-            if (state.playAddedAfterRefresh) {
-                queue.getItemFor(added.url)?.let {
-                    queue.onItemSelected(it)
-                    state.addedMedia = null
-                    state.playAddedAfterRefresh = false
-                }
-            }
-        }
     }
 
 }
