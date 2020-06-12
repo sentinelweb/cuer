@@ -84,13 +84,21 @@ class SharePresenter constructor(
         return if (isNew) {
             ShareModel(
                 topRightButtonAction = { finish(add = true, play = true, forward = true) },
-                topRightButtonText = if (isConnected) res.getString(R.string.share_button_play_now) else res.getString(
+                topRightButtonText = if (isConnected)
+                    res.getString(R.string.share_button_play_now)
+                else res.getString(
                     R.string.share_button_play_locally
                 ),
-                topRightButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
+                topRightButtonIcon = if (isConnected)
+                    R.drawable.ic_notif_status_cast_conn_white
+                else R.drawable.ic_button_play_black,
                 topLeftButtonAction = { finish(add = true, play = true, forward = false) },
-                topLeftButtonText = if (isConnected) res.getString(R.string.share_button_play_return) else null,
-                topLeftButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
+                topLeftButtonText = if (isConnected)
+                    res.getString(R.string.share_button_play_return)
+                else null,
+                topLeftButtonIcon = if (isConnected)
+                    R.drawable.ic_notif_status_cast_conn_white
+                else R.drawable.ic_button_play_black,
                 bottomRightButtonAction = { finish(add = true, play = false, forward = true) },
                 bottomRightButtonText = res.getString(R.string.share_button_add_to_queue),
                 bottomRightButtonIcon = R.drawable.ic_button_add_black,
@@ -103,13 +111,19 @@ class SharePresenter constructor(
         } else {
             ShareModel(
                 topRightButtonAction = { finish(add = false, play = true, forward = true) },
-                topRightButtonText = if (isConnected) res.getString(R.string.share_button_play_now) else res.getString(
-                    R.string.share_button_play_locally
-                ),
-                topRightButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
+                topRightButtonText = if (isConnected)
+                    res.getString(R.string.share_button_play_now)
+                else res.getString(R.string.share_button_play_locally),
+                topRightButtonIcon = if (isConnected)
+                    R.drawable.ic_notif_status_cast_conn_white
+                else R.drawable.ic_button_play_black,
                 topLeftButtonAction = { finish(add = false, play = true, forward = false) },
-                topLeftButtonText = if (isConnected) res.getString(R.string.share_button_play_return) else null,
-                topLeftButtonIcon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white else R.drawable.ic_button_play_black,
+                topLeftButtonText = if (isConnected)
+                    res.getString(R.string.share_button_play_return)
+                else null,
+                topLeftButtonIcon = if (isConnected)
+                    R.drawable.ic_notif_status_cast_conn_white
+                else R.drawable.ic_button_play_black,
                 bottomRightButtonAction = { finish(add = false, play = false, forward = true) },
                 bottomRightButtonText = res.getString(R.string.share_button_goto_item),
                 bottomRightButtonIcon = R.drawable.ic_button_forward_black,
