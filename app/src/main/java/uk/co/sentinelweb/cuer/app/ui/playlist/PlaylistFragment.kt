@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.playlist_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
@@ -23,7 +24,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.extension.deserialiseMedia
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.AlertDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -39,9 +40,11 @@ class PlaylistFragment :
 
     private val presenter: PlaylistContract.Presenter by currentScope.inject()
     private val adapter: PlaylistAdapter by currentScope.inject()
-    private val alertWrapper: AlertDialogWrapper by currentScope.inject()
+    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private val toastWrapper: ToastWrapper by inject()
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
+
+    private var snackbar: Snackbar? = null
 
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,7 +75,7 @@ class PlaylistFragment :
                 presenter.playNow(media)
                 activity?.intent?.removeExtra(PLAY_NOW.toString())
             }
-        } ?: presenter.loadList()// queue refresh triggered from shareactivity
+        } ?: presenter.loadList() // queue refresh triggered from shareactivity
     }
     // endregion
 
@@ -83,8 +86,12 @@ class PlaylistFragment :
         playlist_swipe.setOnRefreshListener { presenter.refreshList() }
     }
 
-    override fun showAlert(msg: String) {
-        alertWrapper.showMessage("Alert", msg)
+    override fun showDeleteUndo(msg: String) {
+        snackbar = snackbarWrapper.make(msg, length = Snackbar.LENGTH_LONG, actionText = "UNDO") {
+            presenter.undoDelete()
+            snackbar?.dismiss()
+        }
+        snackbar?.show()
     }
 
     override fun scrollTo(direction: PlaylistContract.ScrollDirection) {
@@ -195,7 +202,7 @@ class PlaylistFragment :
                 scoped { PlaylistAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped { AlertDialogWrapper((getSource() as Fragment).requireActivity()) }
+                scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory() }

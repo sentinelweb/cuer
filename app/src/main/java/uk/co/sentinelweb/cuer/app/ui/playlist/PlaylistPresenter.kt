@@ -62,8 +62,10 @@ class PlaylistPresenter(
         state.jobs.add(contextProvider.MainScope.launch {
             delay(400)
             queue.getItemFor(item.url)?.run {
+                state.deletedMedia = this.media
                 state.focusIndex = queue.itemIndex(this)
                 queue.removeItem(this)
+                view.showDeleteUndo("Deleted: ${media.title}")
             }
         })
     }
@@ -147,6 +149,17 @@ class PlaylistPresenter(
         })
     }
 
+    override fun undoDelete() {
+        state.deletedMedia?.run {
+            state.jobs.add(contextProvider.MainScope.launch {
+                repository.save(this@run)
+                state.focusIndex = state.lastFocusIndex
+                queue.refreshQueue()
+                state.deletedMedia = null
+            })
+        }
+    }
+
     private fun mapQueueToMedia(it: Queue.QueueItem): MediaDomain {
         return MediaDomain(
             url = it.url,
@@ -173,6 +186,7 @@ class PlaylistPresenter(
             .also {
                 state.focusIndex?.apply {
                     view.scrollToItem(this)
+                    state.lastFocusIndex = state.focusIndex
                     state.focusIndex = null
                 } ?: state.addedMedia?.let { added ->
                     queue.getItemFor(added.url)?.let {
@@ -190,5 +204,4 @@ class PlaylistPresenter(
                 }
             }
     }
-
 }

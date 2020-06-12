@@ -91,11 +91,9 @@ class QueueMediator constructor(
 
     override fun getCurrentItem(): PlaylistItemDomain? = state.currentPlaylistItem
 
-    override fun removeItem(playlistItemDomain: PlaylistItemDomain) {
-        state.jobs.add(contextProvider.MainScope.launch {
-            repository.delete(playlistItemDomain.media)
-            refreshQueue()
-        })
+    override suspend fun removeItem(playlistItemDomain: PlaylistItemDomain) {
+        repository.delete(playlistItemDomain.media)
+        refreshQueue()
     }
 
     override fun itemIndex(item: PlaylistItemDomain): Int? =

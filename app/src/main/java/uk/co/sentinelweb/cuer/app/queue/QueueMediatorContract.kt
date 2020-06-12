@@ -18,7 +18,7 @@ interface QueueMediatorContract {
         fun getPlaylist(): PlaylistDomain?
         fun addProducerListener(l: ProducerListener)
         fun removeProducerListener(l: ProducerListener)
-        fun removeItem(playlistItemDomain: PlaylistItemDomain)
+        suspend fun removeItem(playlistItemDomain: PlaylistItemDomain)
         fun onTrackEnded(media: MediaDomain?)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun getItemFor(url: String): PlaylistItemDomain?

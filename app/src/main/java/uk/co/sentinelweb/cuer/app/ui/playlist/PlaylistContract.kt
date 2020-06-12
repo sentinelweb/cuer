@@ -21,14 +21,15 @@ interface PlaylistContract {
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun playNow(mediaDomain: MediaDomain)
         fun scroll(direction: ScrollDirection)
+        fun undoDelete()
     }
 
     interface View {
         fun setList(list: List<ItemModel>)
-        fun showAlert(msg: String)
         fun scrollToItem(index: Int)
         fun scrollTo(direction: ScrollDirection)
         fun playLocal(media: MediaDomain)
+        fun showDeleteUndo(msg: String)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
