@@ -27,4 +27,17 @@
         android:label="@string/bottomnav_title_player"
         tools:layout="@layout/player_fragment"
         />
+
+    <fragment
+        android:id="@+id/navigation_settings_root"
+        android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefRootFragment"
+        android:label="@string/menu_settings"
+        />
+
+    <fragment
+        android:id="@+id/navigation_settings_backup"
+        android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment"
+        android:label="@string/nav_title_backup_settings"
+        />
+
 </navigation>

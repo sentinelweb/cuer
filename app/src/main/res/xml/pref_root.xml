@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:fragment="uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment"
+        app:summary="Data backup options"
+        app:title="@string/prefs_root_item_backup_title"
+        />
+
+</PreferenceScreen>

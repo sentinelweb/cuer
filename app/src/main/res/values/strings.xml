@@ -43,4 +43,8 @@
 
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="menu_settings">Settings</string>
+    <string name="prefs_root_item_backup_title">Backup</string>
+    <string name="nav_title_backup_settings">Backup settings</string>
+    <string name="pref_key_backup">backup</string>
 </resources>

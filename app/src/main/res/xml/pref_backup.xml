@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:key="@string/pref_key_backup"
+        app:summary="Back up the DB to a local JSON file"
+        app:title="Backup database"
+        />
+
+</PreferenceScreen>

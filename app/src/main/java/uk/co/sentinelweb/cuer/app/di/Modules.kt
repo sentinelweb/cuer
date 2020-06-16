@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
+import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -41,7 +42,8 @@ object Modules {
         CastPlayerFragment.viewModule,
         ShareActivity.activityModule,
         PlaylistItemEditFragment.fragmentModule,
-        YoutubeCastServiceModule.serviceModule
+        YoutubeCastServiceModule.serviceModule,
+        PrefBackupFragment.fragmentModule
     )
 
     private val utilModule = module {
