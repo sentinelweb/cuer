@@ -20,6 +20,7 @@ fun ImageDomain.serialise() = json.stringify(ImageDomain.serializer(), this)
 fun PlaylistItemDomain.serialise() = json.stringify(PlaylistItemDomain.serializer(), this)
 
 fun deserialiseMedia(input: String) = json.parse(MediaDomain.serializer(), input)
+fun deserialiseMediaList(input: String) = json.parse(MediaDomain.serializer().list, input)
 fun deserialisePlaylist(input: String) = json.parse(PlaylistDomain.serializer(), input)
 fun deserialiseImage(input: String) = json.parse(ImageDomain.serializer(), input)
 fun deserialisePlaylistItem(input: String) = json.parse(PlaylistItemDomain.serializer(), input)

@@ -25,41 +25,53 @@ class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupC
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         when (preference.key) {
             getString(R.string.pref_key_backup) -> presenter.backupDatabaseToJson()
-            getString(R.string.pref_key_restore) -> presenter.backupDatabaseToJson()
+            getString(R.string.pref_key_restore) -> openFile()
         }
 
         return super.onPreferenceTreeClick(preference)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == CREATE_FILE
-            && resultCode == Activity.RESULT_OK
-        ) {
-            data?.data?.also { uri ->
-                presenter.saveWriteData(uri.toString())
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == CREATE_FILE) {
+                data?.data?.also { uri ->
+                    presenter.saveWriteData(uri.toString())
+                }
+            } else if (requestCode == READ_FILE) {
+                data?.data?.also { uri ->
+                    presenter.restoreFile(uri.toString())
+                }
             }
         }
     }
 
     override fun promptForSaveLocation(fileName: String) {
-        val pickerInitialUri = this.activity?.getExternalFilesDir(null)
-            ?.apply { Uri.fromFile(File(this.absolutePath)) }
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/json"
+            type = BACKUP_MIME_TYPE
             putExtra(Intent.EXTRA_TITLE, fileName)
-
-            // Optionally, specify a URI for the directory that should be opened in
-            // the system file picker before your app creates the document.
-            pickerInitialUri?.let {
-                putExtra(DocumentsContract.EXTRA_INITIAL_URI, it)
-            }
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri())
         }
         startActivityForResult(intent, CREATE_FILE)
     }
 
+    private fun openFile() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = BACKUP_MIME_TYPE
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri())
+        }
+        startActivityForResult(intent, READ_FILE)
+    }
+
+    private fun initialUri() = this.activity
+        ?.getExternalFilesDir(null)
+        ?.apply { Uri.fromFile(File(this.absolutePath)) }
+
     companion object {
         private const val CREATE_FILE = 2
+        private const val READ_FILE = 3
+        private const val BACKUP_MIME_TYPE = "application/json"
 
         @JvmStatic
         val fragmentModule = module {

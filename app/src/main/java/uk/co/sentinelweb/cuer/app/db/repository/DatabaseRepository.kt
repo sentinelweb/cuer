@@ -14,5 +14,7 @@ interface DatabaseRepository<Domain> {
 
     suspend fun delete(domain: Domain): RepoResult<Boolean>
 
+    suspend fun deleteAll(): RepoResult<Boolean>
+
     interface Filter
 }

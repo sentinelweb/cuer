@@ -22,17 +22,17 @@ class MediaDatabaseRepository constructor(
 
     override suspend fun save(domain: MediaDomain): RepoResult<Boolean> =
         withContext(coProvider.IO) {
-        try {
-            domain
-                .let { mediaMapper.map(it) }
-                .also { mediaDao.insertAll(listOf(it)) }
-            Empty(true)
-        } catch (e: Exception) {
-            val msg = "couldn't save ${domain.url}"
-            log.e(msg, e)
-            RepoResult.Error<Boolean>(e, msg)
+            try {
+                domain
+                    .let { mediaMapper.map(it) }
+                    .also { mediaDao.insertAll(listOf(it)) }
+                Empty(true)
+            } catch (e: Exception) {
+                val msg = "couldn't save ${domain.url}"
+                log.e(msg, e)
+                RepoResult.Error<Boolean>(e, msg)
+            }
         }
-    }
 
     override suspend fun save(domains: List<MediaDomain>): RepoResult<Boolean> =
         withContext(coProvider.IO) {
@@ -64,7 +64,7 @@ class MediaDatabaseRepository constructor(
             : RepoResult<List<MediaDomain>> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is IdListFilter ->
+                is PlaylistDatabaseRepository.IdListFilter ->
                     mediaDao
                         .loadAllByIds(filter.ids.toIntArray())
                         .map { mediaMapper.map(it) }
@@ -90,17 +90,30 @@ class MediaDatabaseRepository constructor(
 
     override suspend fun delete(domain: MediaDomain): RepoResult<Boolean> =
         withContext(coProvider.IO) {
-        try {
-            domain
-                .let { mediaMapper.map(it) }
-                .also { mediaDao.delete(it) }
-            Empty(true)
-        } catch (e: Exception) {
-            val msg = "couldn't delete ${domain.id}"
-            log.e(msg, e)
-            RepoResult.Error<Boolean>(e, msg)
+            try {
+                domain
+                    .let { mediaMapper.map(it) }
+                    .also { mediaDao.delete(it) }
+                Empty(true)
+            } catch (e: Exception) {
+                val msg = "couldn't delete ${domain.id}"
+                log.e(msg, e)
+                RepoResult.Error<Boolean>(e, msg)
+            }
         }
-    }
+
+
+    override suspend fun deleteAll(): RepoResult<Boolean> =
+        withContext(coProvider.IO) {
+            try {
+                mediaDao.deleteAll()
+                Empty(true)
+            } catch (e: Exception) {
+                val msg = "couldn't delete all media"
+                log.e(msg, e)
+                RepoResult.Error<Boolean>(e, msg)
+            }
+        }
 
     override suspend fun count(filter: DatabaseRepository.Filter?): RepoResult<Int> =
         try {

@@ -5,6 +5,7 @@ interface PrefBackupContract {
     interface Presenter {
         fun backupDatabaseToJson()
         fun saveWriteData(uri: String)
+        fun restoreFile(uriString: String)
     }
 
     interface View {

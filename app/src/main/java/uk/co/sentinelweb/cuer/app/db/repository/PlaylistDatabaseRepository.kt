@@ -8,6 +8,7 @@ class PlaylistDatabaseRepository constructor(
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper
 ) : DatabaseRepository<PlaylistDomain> {
+
     override suspend fun save(domain: PlaylistDomain): RepoResult<Boolean> =
         RepoResult.Data.Empty<Boolean>()
 
@@ -32,6 +33,10 @@ class PlaylistDatabaseRepository constructor(
 
     override suspend fun delete(domain: PlaylistDomain): RepoResult<Boolean> =
         RepoResult.Data.Empty<Boolean>()
+
+    override suspend fun deleteAll(): RepoResult<Boolean> {
+        TODO("Not yet implemented")
+    }
 
     class IdListFilter(val ids: List<Int>) : DatabaseRepository.Filter
 }

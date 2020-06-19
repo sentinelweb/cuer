@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.settings
 
+import android.os.Build
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.util.backup.BackupFileManager
@@ -22,9 +23,17 @@ class PrefBackupPresenter constructor(
                 .backupData()
                 ?.also {
                     state.writeData = it
-                    view.promptForSaveLocation("cuer_backup.json")
+                    val device = Build.MODEL.replace(" ", "_")
+                    view.promptForSaveLocation("cuer_backup-$device.json")
                 }
             state.lastBackedUp = timeProvider.instant()
+        }
+    }
+
+    override fun restoreFile(uriString: String) {
+        state.viewModelScope.launch {
+            fileWrapper.readDataFromUri(uriString)
+                ?.let { backupManager.restoreData(it) }
         }
     }
 

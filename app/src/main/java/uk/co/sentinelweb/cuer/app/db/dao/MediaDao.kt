@@ -29,4 +29,7 @@ interface MediaDao {
     @Delete
     fun delete(media: MediaEntity)
 
+    @Query("DELETE FROM media")
+    fun deleteAll()
+
 }
