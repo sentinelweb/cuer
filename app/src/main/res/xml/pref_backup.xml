@@ -4,8 +4,14 @@
 
     <Preference
         app:key="@string/pref_key_backup"
-        app:summary="Back up the DB to a local JSON file"
+        app:summary="Back up the DB to a JSON file"
         app:title="Backup database"
+        />
+
+    <Preference
+        app:key="@string/pref_key_restore"
+        app:summary="Restore the DB from a JSON file"
+        app:title="Restore database"
         />
 
 </PreferenceScreen>

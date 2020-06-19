@@ -6,4 +6,3 @@ data class MainState constructor(
     var playServicesAvailable: Boolean = false,
     var playServiceCheckDone: Boolean = false
 ) : ViewModel()
-

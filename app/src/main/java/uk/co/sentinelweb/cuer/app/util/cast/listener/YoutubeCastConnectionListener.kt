@@ -11,8 +11,8 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 class YoutubeCastConnectionListener constructor(
     private val creator: YoutubePlayerContextCreator,
     private val mediaSessionManager: MediaSessionManager,
-    private val castWrapper: ChromeCastWrapper,
-    private val connectionMonitor: ConnectionMonitor
+    private val castWrapper: ChromeCastWrapper//,
+    //private val connectionMonitor: ConnectionMonitor
 ) : ChromecastConnectionListener {
 
     private var youTubePlayerListener: YouTubePlayerListener? = null
@@ -29,19 +29,19 @@ class YoutubeCastConnectionListener constructor(
         }
 
     override fun onChromecastConnecting() {
-        connectionMonitor.setTimer({ connectionState })
+        //connectionMonitor.setTimer({ connectionState })
         connectionState = CC_CONNECTING.also {
             playerUi?.setConnectionState(it)
-            connectionMonitor.connectionState = it
+            //connectionMonitor.connectionState = it
         }
     }
 
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        if (connectionMonitor.checkAlreadyConnected(connectionState)) return
+        //if (connectionMonitor.checkAlreadyConnected(connectionState)) return
 
         connectionState = CC_CONNECTED.also {
             playerUi?.setConnectionState(it)
-            connectionMonitor.connectionState = it
+            //connectionMonitor.connectionState = it
         }
         youTubePlayerListener?.let {
             it.playerUi = playerUi
@@ -60,7 +60,7 @@ class YoutubeCastConnectionListener constructor(
     override fun onChromecastDisconnected() {
         connectionState = CC_DISCONNECTED.also {
             playerUi?.setConnectionState(it)
-            connectionMonitor.connectionState = it
+            //connectionMonitor.connectionState = it
         }
         youTubePlayerListener?.onDisconnected()
         youTubePlayerListener = null
@@ -76,7 +76,7 @@ class YoutubeCastConnectionListener constructor(
     }
 
     fun destroy() {
-        connectionMonitor.cancelTimer()
+        //connectionMonitor.cancelTimer()
         castWrapper.killCurrentSession()
     }
 

@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.util.extension
 
+import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.modules.serializersModuleOf
@@ -13,6 +14,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 
 fun MediaDomain.serialise() = json.stringify(MediaDomain.serializer(), this)
+fun List<MediaDomain>.serialiseList() = json.stringify(MediaDomain.serializer().list, this)
 fun PlaylistDomain.serialise() = json.stringify(PlaylistDomain.serializer(), this)
 fun ImageDomain.serialise() = json.stringify(ImageDomain.serializer(), this)
 fun PlaylistItemDomain.serialise() = json.stringify(PlaylistItemDomain.serializer(), this)
@@ -32,4 +34,3 @@ private val json = Json(
         )
     )
 )
-

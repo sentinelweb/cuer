@@ -8,12 +8,13 @@ interface MainContract {
         fun onPlayServicesOk()
         fun onDestroy()
         fun restartYtCastContext()
-
     }
 
     interface View {
         fun checkPlayServices()
         fun isRecreating(): Boolean
         fun showMessage(msg: String)
+
     }
+
 }

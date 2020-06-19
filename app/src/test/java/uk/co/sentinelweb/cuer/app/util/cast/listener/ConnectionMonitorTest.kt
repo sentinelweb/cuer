@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.PhoenixWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 @ExperimentalCoroutinesApi
 class ConnectionMonitorTest {
@@ -33,6 +34,9 @@ class ConnectionMonitorTest {
 
     @MockK
     private lateinit var mockPhoenixWrapper: PhoenixWrapper
+
+    @MockK
+    private lateinit var mockLogWrapper: LogWrapper
 
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val coCxtProvider: CoroutineContextProvider =
@@ -50,7 +54,8 @@ class ConnectionMonitorTest {
                 castWrapper = mockCastWrapper,
                 mediaSessionManager = mockMediaSessionManager,
                 phoenixWrapper = mockPhoenixWrapper,
-                coCxtProvider = coCxtProvider
+                coCxtProvider = coCxtProvider,
+                log = mockLogWrapper
             )
         )
     }

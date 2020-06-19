@@ -24,8 +24,8 @@ class YoutubePlayerContextCreator constructor(
     fun createConnectionListener() = YoutubeCastConnectionListener(
         this,
         mediaSessionManager,
-        castWrapper,
-        connectionMonitor
+        castWrapper//,
+        //connectionMonitor
     )
 
     fun createPlayerListener() =

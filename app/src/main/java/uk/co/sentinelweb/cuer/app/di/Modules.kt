@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
+import uk.co.sentinelweb.cuer.app.util.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.helper.PlaylistMutator
@@ -71,6 +72,7 @@ object Modules {
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
+        factory { BackupFileManager(get(), get()) }
     }
 
     private val wrapperModule = module {
@@ -80,6 +82,7 @@ object Modules {
         factory { NotificationWrapper(androidApplication()) }
         factory { ResourceWrapper(androidApplication()) }
         factory<LogWrapper> { AndroidLogWrapper() }
+        factory { FileWrapper(androidApplication()) }
     }
 
     private val appNetModule = module {

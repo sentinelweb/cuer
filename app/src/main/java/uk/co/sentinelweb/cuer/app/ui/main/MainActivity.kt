@@ -75,15 +75,14 @@ class MainActivity :
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        // rerun check which definitely should pass here
         if (requestCode == SERVICES_REQUEST_CODE) {
             chromeCastWrapper.checkPlayServices(
                 this,
                 SERVICES_REQUEST_CODE,
                 presenter::onPlayServicesOk
             )
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
@@ -119,7 +118,7 @@ class MainActivity :
     }
 
     companion object {
-        private val SERVICES_REQUEST_CODE = 1
+        private const val SERVICES_REQUEST_CODE = 1
 
         @JvmStatic
         val activityModule = module {
