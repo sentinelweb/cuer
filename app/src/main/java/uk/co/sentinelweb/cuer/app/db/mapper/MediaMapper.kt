@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.mapper
 
+import uk.co.sentinelweb.cuer.app.db.entity.Image
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -19,8 +20,8 @@ class MediaMapper() {
         platform = domain.platform,
         thumbNail = mapImage(domain.thumbNail),
         image = mapImage(domain.image),
-        channelTitle = domain.channelData.title,
-        channelId = domain.channelData.id,
+//        channelTitle = domain.channelData.title,// todo fix
+//        channelId = domain.channelData.id,
         published = domain.published
     )
 
@@ -38,22 +39,22 @@ class MediaMapper() {
         thumbNail = mapImage(entity.thumbNail),
         image = mapImage(entity.image),
         channelData = ChannelDomain(
-            title = entity.channelTitle,
-            id = entity.channelId ?: ""
+            title = "",//entity.channelTitle,// todo fix
+            id = ""//entity.channelId ?: ""
         ),
         published = entity.published
     )
 
     private fun mapImage(thumbNail: ImageDomain?) =
         thumbNail?.let {
-            MediaEntity.Image(
+            Image(
                 it.url,
                 it.width,
                 it.height
             )
         }
 
-    private fun mapImage(thumbNail: MediaEntity.Image?) =
+    private fun mapImage(thumbNail: Image?) =
         thumbNail?.let {
             ImageDomain(
                 it.url,

@@ -110,8 +110,11 @@ dependencies {
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
     testImplementation "androidx.room:room-testing:$ver_room"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test"
-    testImplementation "androidx.room:room-testing:$ver_room"
-
+    testImplementation "org.robolectric:robolectric:$ver_robolectric"
+    testImplementation "androidx.test:core:$ver_androidx_test"
+    testImplementation "androidx.test:runner:$ver_androidx_test"
+    testImplementation "androidx.test:rules:$ver_androidx_test"
+    testImplementation "android.arch.core:core-testing:$ver_android_arch_test"
 
     androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"

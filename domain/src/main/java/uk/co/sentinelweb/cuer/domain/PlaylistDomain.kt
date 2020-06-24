@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.domain
 
 import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.Serializable
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistDomainMode.SINGLE
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import java.time.Instant
 
 @Serializable
@@ -11,14 +11,13 @@ data class PlaylistDomain constructor(
     val title: String,
     val items: List<PlaylistItemDomain>,
     val currentIndex: Int = -1,
-    val mode: PlaylistDomainMode = SINGLE,
-    val tags: List<TagDomain>? = null,
+    val mode: PlaylistModeDomain = SINGLE,
     val starred: Boolean = false,
     val archived: Boolean = false,
     val config: PlaylistConfigDomain = PlaylistConfigDomain()
 ) {
 
-    enum class PlaylistDomainMode {
+    enum class PlaylistModeDomain {
         SINGLE, LOOP, SHUFFLE
     }
 

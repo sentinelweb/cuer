@@ -30,13 +30,13 @@ class YoutubeJavaApiWrapperTest {
     fun launchChannel() {
         every { sut.canLaunchChannel() } returns true
         every {
-            YouTubeIntents.createChannelIntent(mockActivity, fixtMedia.channelId)
+            YouTubeIntents.createChannelIntent(mockActivity, fixtMedia.channelData.id)
         } returns mockIntent
 
         val actual = sut.launchChannel(fixtMedia)
 
         assertTrue(actual)
-        verify { YouTubeIntents.createChannelIntent(mockActivity, fixtMedia.channelId) }
+        verify { YouTubeIntents.createChannelIntent(mockActivity, fixtMedia.channelData.id) }
         verify { mockActivity.startActivity(mockIntent) }
     }
 
