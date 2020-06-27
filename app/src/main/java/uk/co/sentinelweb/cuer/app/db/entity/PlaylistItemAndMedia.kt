@@ -6,7 +6,7 @@ import androidx.room.Relation
 data class PlaylistItemAndMedia(
     @Relation(
         parentColumn = "id",
-        entityColumn = "mediaId"
+        entityColumn = "media_id"
     )
     val item: PlaylistItemEntity,
     @Embedded val media: MediaEntity

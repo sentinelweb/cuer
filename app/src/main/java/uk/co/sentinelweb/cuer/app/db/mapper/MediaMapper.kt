@@ -1,12 +1,14 @@
 package uk.co.sentinelweb.cuer.app.db.mapper
 
-import uk.co.sentinelweb.cuer.app.db.entity.Image
+import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
-import uk.co.sentinelweb.cuer.domain.ChannelDomain
-import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
-class MediaMapper() {
+class MediaMapper(
+    private val imageMapper: ImageMapper,
+    private val channelMapper: ChannelMapper
+
+) {
     fun map(domain: MediaDomain): MediaEntity = MediaEntity(
         id = domain.id?.toInt() ?: 0,
         url = domain.url,
@@ -18,48 +20,28 @@ class MediaMapper() {
         dateLastPlayed = domain.dateLastPlayed,
         description = domain.description,
         platform = domain.platform,
-        thumbNail = mapImage(domain.thumbNail),
-        image = mapImage(domain.image),
-//        channelTitle = domain.channelData.title,// todo fix
-//        channelId = domain.channelData.id,
+        thumbNail = imageMapper.mapImage(domain.thumbNail),
+        image = imageMapper.mapImage(domain.image),
+        channelId = domain.channelData.id.toInt(),
         published = domain.published
     )
 
-    fun map(entity: MediaEntity): MediaDomain = MediaDomain(
-        id = entity.id.toString(),
-        url = entity.url,
-        mediaId = entity.mediaId,
-        mediaType = entity.mediaType,
-        title = entity.title,
-        duration = entity.duration,
-        positon = entity.positon,
-        dateLastPlayed = entity.dateLastPlayed,
-        description = entity.description,
-        platform = entity.platform,
-        thumbNail = mapImage(entity.thumbNail),
-        image = mapImage(entity.image),
-        channelData = ChannelDomain(
-            title = "",//entity.channelTitle,// todo fix
-            id = ""//entity.channelId ?: ""
-        ),
-        published = entity.published
+    fun map(entity: MediaAndChannel): MediaDomain = MediaDomain(
+        id = entity.media.id.toString(),
+        url = entity.media.url,
+        mediaId = entity.media.mediaId,
+        mediaType = entity.media.mediaType,
+        title = entity.media.title,
+        duration = entity.media.duration,
+        positon = entity.media.positon,
+        dateLastPlayed = entity.media.dateLastPlayed,
+        description = entity.media.description,
+        platform = entity.media.platform,
+        thumbNail = imageMapper.mapImage(entity.media.thumbNail),
+        image = imageMapper.mapImage(entity.media.image),
+        channelData = channelMapper.map(entity.channel),
+        published = entity.media.published
     )
 
-    private fun mapImage(thumbNail: ImageDomain?) =
-        thumbNail?.let {
-            Image(
-                it.url,
-                it.width,
-                it.height
-            )
-        }
 
-    private fun mapImage(thumbNail: Image?) =
-        thumbNail?.let {
-            ImageDomain(
-                it.url,
-                it.width,
-                it.height
-            )
-        }
 }

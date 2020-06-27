@@ -16,28 +16,18 @@ import org.robolectric.RobolectricTestRunner
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
-import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
-import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
 
 @RunWith(RobolectricTestRunner::class)
-class PlaylistDaoTest {
+class MediaDaoTest {
     private lateinit var database: AppDatabase
-    private lateinit var playlistDao: PlaylistDao
     private lateinit var mediaDao: MediaDao
     private lateinit var channelDao: ChannelDao
-    private lateinit var playlistItemDao: PlaylistItemDao
 
     @Fixture
-    private lateinit var playlist: PlaylistEntity
+    private lateinit var mediaEntity: MediaEntity
 
     @Fixture
-    private lateinit var playlistItem: PlaylistItemEntity
-
-    @Fixture
-    private lateinit var media: MediaEntity
-
-    @Fixture
-    private lateinit var channel: ChannelEntity
+    private lateinit var channelEntity: ChannelEntity
 
     @get:Rule
     var instantTaskExecutor = InstantTaskExecutorRule()
@@ -49,15 +39,11 @@ class PlaylistDaoTest {
         database =
             Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).allowMainThreadQueries()
                 .build()
-        playlistDao = database.playlistDao()
-        playlistItemDao = database.playlistItemDao()
         mediaDao = database.mediaDao()
         channelDao = database.channelDao()
 
-        playlistDao.insert(playlist)
-        playlistItemDao.insert(playlistItem.copy(playlistId = playlist.id, mediaId = media.id))
-        mediaDao.insertAll(listOf(media.copy(channelId = channel.id)))
-        channelDao.insertAll(listOf(channel))
+        mediaDao.insertAll(listOf(mediaEntity.copy(channelId = channelEntity.id)))
+        channelDao.insertAll(listOf(channelEntity))
     }
 
     @After
@@ -66,13 +52,11 @@ class PlaylistDaoTest {
     }
 
     @Test
-    fun getPlaylists() {
-        val actual = playlistDao.getPlaylists()
+    fun getAllMedia() {
+        val medias = mediaDao.getAll()
 
-        assertEquals(1, actual.size)
-        assertEquals(1, actual[0].items.size)
-        assertEquals(playlist.config, actual[0].playlist.config)
-        val mediaActual = mediaDao.load(actual[0].items[0].mediaId)
-        assertNotNull(mediaActual)
+        assertEquals(1, medias.size)
+        assertEquals(medias[0].media.channelId, medias[0].channel.id)
+        assertNotNull(medias[0].channel)
     }
 }

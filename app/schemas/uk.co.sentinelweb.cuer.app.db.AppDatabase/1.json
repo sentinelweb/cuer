@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5e2dee72f6c0a5187399c61de3a83064",
+    "identityHash": "dcaf0f6f573c6143dc94a7ec10d0cd03",
     "entities": [
       {
         "tableName": "playlist",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `currentIndex` INTEGER NOT NULL, `mode` TEXT NOT NULL, `flags` INTEGER NOT NULL, `type` TEXT NOT NULL, `platform` TEXT NOT NULL, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `currentIndex` INTEGER NOT NULL, `mode` TEXT NOT NULL, `flags` INTEGER NOT NULL, `type` TEXT NOT NULL, `platform` TEXT NOT NULL, `config_json` TEXT NOT NULL, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -41,6 +41,12 @@
           {
             "fieldPath": "platform",
             "columnName": "platform",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "config",
+            "columnName": "config_json",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -92,7 +98,7 @@
       },
       {
         "tableName": "playlist_item",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `url` TEXT NOT NULL, `mediaId` INTEGER NOT NULL, `order` INTEGER NOT NULL, `flags` INTEGER NOT NULL, `playlistId` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `media_id` INTEGER NOT NULL, `order` INTEGER NOT NULL, `flags` INTEGER NOT NULL, `playlist_id` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -101,14 +107,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "url",
-            "columnName": "url",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "mediaId",
-            "columnName": "mediaId",
+            "columnName": "media_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -126,7 +126,7 @@
           },
           {
             "fieldPath": "playlistId",
-            "columnName": "playlistId",
+            "columnName": "playlist_id",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -137,7 +137,41 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_playlist_item_order_playlist_id",
+            "unique": true,
+            "columnNames": [
+              "order",
+              "playlist_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_playlist_item_order_playlist_id` ON `${TABLE_NAME}` (`order`, `playlist_id`)"
+          },
+          {
+            "name": "index_playlist_item_playlist_id",
+            "unique": false,
+            "columnNames": [
+              "playlist_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_item_playlist_id` ON `${TABLE_NAME}` (`playlist_id`)"
+          },
+          {
+            "name": "index_playlist_item_media_id",
+            "unique": false,
+            "columnNames": [
+              "media_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_item_media_id` ON `${TABLE_NAME}` (`media_id`)"
+          },
+          {
+            "name": "index_playlist_item_flags",
+            "unique": false,
+            "columnNames": [
+              "flags"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_item_flags` ON `${TABLE_NAME}` (`flags`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -265,12 +299,61 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_media_media_id",
+            "unique": true,
+            "columnNames": [
+              "media_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_media_media_id` ON `${TABLE_NAME}` (`media_id`)"
+          },
+          {
+            "name": "index_media_type",
+            "unique": false,
+            "columnNames": [
+              "type"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_type` ON `${TABLE_NAME}` (`type`)"
+          },
+          {
+            "name": "index_media_title",
+            "unique": false,
+            "columnNames": [
+              "title"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_title` ON `${TABLE_NAME}` (`title`)"
+          },
+          {
+            "name": "index_media_description",
+            "unique": false,
+            "columnNames": [
+              "description"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_description` ON `${TABLE_NAME}` (`description`)"
+          },
+          {
+            "name": "index_media_channel_id",
+            "unique": false,
+            "columnNames": [
+              "channel_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_channel_id` ON `${TABLE_NAME}` (`channel_id`)"
+          },
+          {
+            "name": "index_media_flags",
+            "unique": false,
+            "columnNames": [
+              "flags"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_flags` ON `${TABLE_NAME}` (`flags`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
         "tableName": "channel",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `url` TEXT NOT NULL, `channel_id` TEXT NOT NULL, `title` TEXT, `description` TEXT, `custom_url` TEXT, `country` TEXT NOT NULL, `flags` INTEGER NOT NULL, `published` TEXT, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `remote_id` TEXT NOT NULL, `title` TEXT, `description` TEXT, `custom_url` TEXT, `country` TEXT, `platform` TEXT NOT NULL, `flags` INTEGER NOT NULL, `published` TEXT, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -279,14 +362,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "url",
-            "columnName": "url",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "channelId",
-            "columnName": "channel_id",
+            "fieldPath": "remoteId",
+            "columnName": "remote_id",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -311,6 +388,12 @@
           {
             "fieldPath": "country",
             "columnName": "country",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "platform",
+            "columnName": "platform",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -369,14 +452,23 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_channel_remote_id",
+            "unique": true,
+            "columnNames": [
+              "remote_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_channel_remote_id` ON `${TABLE_NAME}` (`remote_id`)"
+          }
+        ],
         "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5e2dee72f6c0a5187399c61de3a83064')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dcaf0f6f573c6143dc94a7ec10d0cd03')"
     ]
   }
 }

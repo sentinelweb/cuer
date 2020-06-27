@@ -14,6 +14,8 @@ data class PlaylistDomain constructor(
     val mode: PlaylistModeDomain = SINGLE,
     val starred: Boolean = false,
     val archived: Boolean = false,
+    val thumb: ImageDomain? = null,
+    val image: ImageDomain? = null,
     val config: PlaylistConfigDomain = PlaylistConfigDomain()
 ) {
 
@@ -28,12 +30,10 @@ data class PlaylistDomain constructor(
     }
 
     @Serializable
-    class PlaylistConfigDomain constructor(
+    data class PlaylistConfigDomain constructor(
         val type: PlaylistTypeDomain = PlaylistTypeDomain.USER,
         val platform: PlatformDomain = PlatformDomain.YOUTUBE,
         val updateUrl: String? = null,
-        val thumb: ImageDomain? = null,
-        val image: ImageDomain? = null,
         @ContextualSerialization val lastUpdate: Instant? = null,
         val updateInterval: Long? = null,
         val channelData: ChannelDomain? = null

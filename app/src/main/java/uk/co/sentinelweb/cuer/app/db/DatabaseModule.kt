@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.app.db
 
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
+import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
@@ -14,6 +16,8 @@ object DatabaseModule {
         single { RoomWrapper(androidApplication()) }
         factory { MediaDatabaseRepository(get<AppDatabase>().mediaDao(), get(), get(), get()) }
         factory { PlaylistDatabaseRepository(get(), get()) }
-        factory { MediaMapper() }
+        factory { MediaMapper(get(), get()) }
+        factory { ImageMapper() }
+        factory { ChannelMapper(get()) }
     }
 }

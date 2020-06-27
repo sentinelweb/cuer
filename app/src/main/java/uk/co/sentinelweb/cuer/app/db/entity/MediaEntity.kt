@@ -10,7 +10,17 @@ import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import java.time.Instant
 import java.time.LocalDateTime
 
-@Entity(tableName = "media")
+@Entity(
+    tableName = "media",
+    indices = arrayOf(
+        Index("media_id", unique = true),
+        Index("type"),
+        Index("title"),
+        Index("description"),
+        Index("channel_id"),
+        Index("flags")
+    )
+)
 @TypeConverters(
     MediaTypeConverter::class,
     PlatformTypeConverter::class,

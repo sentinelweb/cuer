@@ -14,7 +14,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
     InstantTypeConverter::class,
     LocalDateTimeTypeConverter::class,
     PlaylistModeTypeConverter::class,
-    PlaylistTypeTypeConverter::class
+    PlaylistTypeTypeConverter::class,
+    PlaylistConfigJsonTypeConverter::class
 
 )
 data class PlaylistEntity(
@@ -40,7 +41,10 @@ data class PlaylistEntity(
     val thumb: Image? = null,
 
     @Embedded(prefix = "image")
-    val image: Image? = null
+    val image: Image? = null,
+
+    @ColumnInfo(name = "config_json")
+    val config: PlaylistDomain.PlaylistConfigDomain = PlaylistDomain.PlaylistConfigDomain()
 ) {
     companion object {
         const val FLAG_STARRED = 1

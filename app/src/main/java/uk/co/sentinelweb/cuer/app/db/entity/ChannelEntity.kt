@@ -3,13 +3,15 @@ package uk.co.sentinelweb.cuer.app.db.entity
 import androidx.room.*
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.LocalDateTimeTypeConverter
-import uk.co.sentinelweb.cuer.app.db.typeconverter.MediaTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.PlatformTypeConverter
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import java.time.LocalDateTime
 
-@Entity(tableName = "channel")
+@Entity(
+    tableName = "channel",
+    indices = arrayOf(Index("remote_id", unique = true))
+)
 @TypeConverters(
-    MediaTypeConverter::class,
     PlatformTypeConverter::class,
     InstantTypeConverter::class,
     LocalDateTimeTypeConverter::class
@@ -18,11 +20,8 @@ data class ChannelEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
 
-    @ColumnInfo(name = "url")
-    val url: String,
-
-    @ColumnInfo(name = "channel_id")
-    val channelId: String,
+    @ColumnInfo(name = "remote_id")
+    val remoteId: String,
 
     @ColumnInfo(name = "title")
     val title: String?,
@@ -34,7 +33,10 @@ data class ChannelEntity(
     val customUrl: String?,
 
     @ColumnInfo(name = "country")
-    val country: String,
+    val country: String?,
+
+    @ColumnInfo(name = "platform")
+    val platform: PlatformDomain,
 
     @Embedded(prefix = "thumb")
     val thumbNail: Image?,

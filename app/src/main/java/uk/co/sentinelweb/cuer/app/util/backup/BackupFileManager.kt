@@ -2,9 +2,9 @@ package uk.co.sentinelweb.cuer.app.util.backup
 
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.util.extension.deserialiseMediaList
-import uk.co.sentinelweb.cuer.app.util.extension.serialiseList
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseMediaList
+import uk.co.sentinelweb.cuer.domain.ext.serialiseList
 
 class BackupFileManager constructor(
     private val repository: MediaDatabaseRepository,

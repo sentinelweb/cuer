@@ -18,10 +18,10 @@ import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.PLAY_NOW
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
-import uk.co.sentinelweb.cuer.app.util.extension.serialise
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class ShareActivity : AppCompatActivity(), ShareContract.View {
 

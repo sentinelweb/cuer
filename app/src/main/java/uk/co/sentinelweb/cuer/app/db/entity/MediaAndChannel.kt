@@ -4,10 +4,11 @@ import androidx.room.Embedded
 import androidx.room.Relation
 
 class MediaAndChannel(
+    @Embedded val media: MediaEntity,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "channelId"
+        parentColumn = "channel_id",
+        entityColumn = "id",
+        entity = ChannelEntity::class
     )
-    val media: MediaEntity,
-    @Embedded val channel: ChannelEntity
+    val channel: ChannelEntity
 )
