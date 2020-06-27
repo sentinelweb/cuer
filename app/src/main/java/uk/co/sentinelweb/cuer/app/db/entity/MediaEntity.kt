@@ -29,7 +29,7 @@ import java.time.LocalDateTime
 )
 data class MediaEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Long,
 
     @ColumnInfo(name = "url")
     val url: String,
@@ -62,7 +62,7 @@ data class MediaEntity(
     val published: LocalDateTime? = null,
 
     @ColumnInfo(name = "channel_id")
-    val channelId: Int? = null,
+    val channelId: Long? = null,
 
     @Embedded(prefix = "thumb")
     val thumbNail: Image?,
@@ -74,7 +74,7 @@ data class MediaEntity(
     val flags: Long = 0
 ) {
     companion object {
-        const val FLAG_STARRED = 1
-        const val FLAG_ARCHIVED = 2
+        const val FLAG_WATCHED = 1L
+        const val FLAG_STARRED = 2L
     }
 }

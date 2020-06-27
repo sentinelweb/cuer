@@ -2,16 +2,22 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "dcaf0f6f573c6143dc94a7ec10d0cd03",
+    "identityHash": "1f8b5d7cbc7ff4968a51cc24df7ace6e",
     "entities": [
       {
         "tableName": "playlist",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `currentIndex` INTEGER NOT NULL, `mode` TEXT NOT NULL, `flags` INTEGER NOT NULL, `type` TEXT NOT NULL, `platform` TEXT NOT NULL, `config_json` TEXT NOT NULL, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `currentIndex` INTEGER NOT NULL, `mode` TEXT NOT NULL, `flags` INTEGER NOT NULL, `type` TEXT NOT NULL, `config_json` TEXT NOT NULL, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -35,12 +41,6 @@
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "platform",
-            "columnName": "platform",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -93,12 +93,29 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_playlist_flags",
+            "unique": false,
+            "columnNames": [
+              "flags"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_flags` ON `${TABLE_NAME}` (`flags`)"
+          },
+          {
+            "name": "index_playlist_type",
+            "unique": false,
+            "columnNames": [
+              "type"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_type` ON `${TABLE_NAME}` (`type`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
         "tableName": "playlist_item",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `media_id` INTEGER NOT NULL, `order` INTEGER NOT NULL, `flags` INTEGER NOT NULL, `playlist_id` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `media_id` INTEGER NOT NULL, `order` INTEGER NOT NULL, `flags` INTEGER NOT NULL, `playlist_id` INTEGER NOT NULL, `date_added` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -128,6 +145,12 @@
             "fieldPath": "playlistId",
             "columnName": "playlist_id",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateAdded",
+            "columnName": "date_added",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -468,7 +491,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dcaf0f6f573c6143dc94a7ec10d0cd03')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1f8b5d7cbc7ff4968a51cc24df7ace6e')"
     ]
   }
 }

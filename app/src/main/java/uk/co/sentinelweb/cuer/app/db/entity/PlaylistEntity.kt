@@ -1,26 +1,31 @@
 package uk.co.sentinelweb.cuer.app.db.entity
 
 import androidx.room.*
-import uk.co.sentinelweb.cuer.app.db.typeconverter.*
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
-import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
+import uk.co.sentinelweb.cuer.app.db.typeconverter.PlaylistConfigJsonTypeConverter
+import uk.co.sentinelweb.cuer.app.db.typeconverter.PlaylistModeTypeConverter
+import uk.co.sentinelweb.cuer.app.db.typeconverter.PlaylistTypeTypeConverter
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 
-@Entity(tableName = "playlist")
+@Entity(
+    tableName = "playlist",
+    indices = arrayOf(
+        Index("flags"),
+        Index("type")
+    )
+)
 @TypeConverters(
-    PlatformTypeConverter::class,
-    InstantTypeConverter::class,
-    LocalDateTimeTypeConverter::class,
     PlaylistModeTypeConverter::class,
     PlaylistTypeTypeConverter::class,
     PlaylistConfigJsonTypeConverter::class
-
 )
 data class PlaylistEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Long,
+
+    @ColumnInfo(name = "title")
+    val title: String,
 
     @ColumnInfo(name = "currentIndex")
     val currentIndex: Int = -1,
@@ -34,9 +39,6 @@ data class PlaylistEntity(
     @ColumnInfo(name = "type")
     val type: PlaylistDomain.PlaylistTypeDomain = USER,
 
-    @ColumnInfo(name = "platform")
-    val platform: PlatformDomain = YOUTUBE,
-
     @Embedded(prefix = "thumb")
     val thumb: Image? = null,
 
@@ -47,7 +49,7 @@ data class PlaylistEntity(
     val config: PlaylistDomain.PlaylistConfigDomain = PlaylistDomain.PlaylistConfigDomain()
 ) {
     companion object {
-        const val FLAG_STARRED = 1
-        const val FLAG_ARCHIVED = 2
+        const val FLAG_STARRED = 1L
+        const val FLAG_ARCHIVED = 2L
     }
 }

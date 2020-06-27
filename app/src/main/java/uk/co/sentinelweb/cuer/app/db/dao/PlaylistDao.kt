@@ -1,23 +1,49 @@
 package uk.co.sentinelweb.cuer.app.db.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Transaction
+import androidx.room.*
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistAndItems
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 
 @Dao
 interface PlaylistDao {
 
+    @Query("SELECT count() FROM playlist")
+    suspend fun count(): Int
+
     @Transaction
     @Query("SELECT * FROM playlist")
-    fun getPlaylists(): List<PlaylistAndItems>
+    suspend fun getAllPlaylistsWithItems(): List<PlaylistAndItems>
 
-    @Insert
-    fun insertAll(medias: List<PlaylistEntity>)
+    @Query("SELECT * FROM playlist")
+    suspend fun getAllPlaylists(): List<PlaylistEntity>
 
-    @Insert
-    fun insert(playlist: PlaylistEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(playlists: List<PlaylistEntity>): List<Long>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(playlist: PlaylistEntity): Long
+
+    @Query("SELECT * FROM playlist WHERE id == :id")
+    suspend fun load(id: Long): PlaylistEntity?
+
+    @Query("SELECT * FROM playlist WHERE id IN (:playlistIds)")
+    suspend fun loadAllByIds(playlistIds: LongArray): List<PlaylistEntity>
+
+    @Transaction
+    @Query("SELECT * FROM playlist WHERE id == :id")
+    suspend fun loadWithItems(id: Long): PlaylistAndItems?
+
+    @Transaction
+    @Query("SELECT * FROM playlist WHERE id IN (:playlistIds)")
+    suspend fun loadAllByIdsWithItems(playlistIds: LongArray): List<PlaylistAndItems>
+
+
+    @Update
+    suspend fun update(playlist: PlaylistEntity)
+
+    @Delete
+    suspend fun delete(playlist: PlaylistEntity)
+
+    @Query("DELETE FROM playlist")
+    suspend fun deleteAll()
 }

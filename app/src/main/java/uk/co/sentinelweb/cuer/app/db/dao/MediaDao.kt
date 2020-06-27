@@ -8,30 +8,36 @@ import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
 interface MediaDao {
     @Transaction
     @Query("SELECT * FROM media")
-    fun getAll(): List<MediaAndChannel>
+    suspend fun getAll(): List<MediaAndChannel>
 
     @Query("SELECT count() FROM media")
-    fun count(): Int
+    suspend fun count(): Int
 
     @Transaction
     @Query("SELECT * FROM media WHERE id IN (:mediaIds)")
-    fun loadAllByIds(mediaIds: IntArray): List<MediaAndChannel>
+    suspend fun loadAllByIds(mediaIds: LongArray): List<MediaAndChannel>
 
     @Transaction
     @Query("SELECT * FROM media WHERE id == :id")
-    fun load(id: Int): MediaAndChannel?
+    suspend fun load(id: Long): MediaAndChannel?
 
     @Transaction
     @Query("SELECT * FROM media WHERE media_id LIKE :mediaId LIMIT 1")
-    fun findByMediaId(mediaId: String): MediaAndChannel?
+    suspend fun findByMediaId(mediaId: String): MediaAndChannel?
 
-    @Insert
-    fun insertAll(medias: List<MediaEntity>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(medias: List<MediaEntity>): List<Long>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(media: MediaEntity): Long
+
+    @Update
+    suspend fun update(media: MediaEntity)
 
     @Delete
-    fun delete(media: MediaEntity)
+    suspend fun delete(media: MediaEntity)
 
     @Query("DELETE FROM media")
-    fun deleteAll()
+    suspend fun deleteAll()
 
 }

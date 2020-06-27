@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.flextrade.jfixture.FixtureAnnotations
 import com.flextrade.jfixture.annotations.Fixture
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -42,8 +43,10 @@ class MediaDaoTest {
         mediaDao = database.mediaDao()
         channelDao = database.channelDao()
 
-        mediaDao.insertAll(listOf(mediaEntity.copy(channelId = channelEntity.id)))
-        channelDao.insertAll(listOf(channelEntity))
+        runBlocking {
+            mediaDao.insertAll(listOf(mediaEntity.copy(channelId = channelEntity.id)))
+            channelDao.insertAll(listOf(channelEntity))
+        }
     }
 
     @After
@@ -53,10 +56,11 @@ class MediaDaoTest {
 
     @Test
     fun getAllMedia() {
-        val medias = mediaDao.getAll()
-
-        assertEquals(1, medias.size)
-        assertEquals(medias[0].media.channelId, medias[0].channel.id)
-        assertNotNull(medias[0].channel)
+        runBlocking {
+            val medias = mediaDao.getAll()
+            assertEquals(1, medias.size)
+            assertEquals(medias[0].media.channelId, medias[0].channel.id)
+            assertNotNull(medias[0].channel)
+        }
     }
 }

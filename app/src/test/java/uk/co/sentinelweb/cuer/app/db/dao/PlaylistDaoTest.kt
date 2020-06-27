@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.flextrade.jfixture.FixtureAnnotations
 import com.flextrade.jfixture.annotations.Fixture
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -54,10 +55,12 @@ class PlaylistDaoTest {
         mediaDao = database.mediaDao()
         channelDao = database.channelDao()
 
-        playlistDao.insert(playlist)
-        playlistItemDao.insert(playlistItem.copy(playlistId = playlist.id, mediaId = media.id))
-        mediaDao.insertAll(listOf(media.copy(channelId = channel.id)))
-        channelDao.insertAll(listOf(channel))
+        runBlocking {
+            playlistDao.insert(playlist)
+            playlistItemDao.insert(playlistItem.copy(playlistId = playlist.id, mediaId = media.id))
+            mediaDao.insertAll(listOf(media.copy(channelId = channel.id)))
+            channelDao.insertAll(listOf(channel))
+        }
     }
 
     @After
@@ -66,13 +69,25 @@ class PlaylistDaoTest {
     }
 
     @Test
-    fun getPlaylists() {
-        val actual = playlistDao.getPlaylists()
+    fun getPlaylistsAndItems() {
+        runBlocking {
+            val actual = playlistDao.getAllPlaylistsWithItems()
 
-        assertEquals(1, actual.size)
-        assertEquals(1, actual[0].items.size)
-        assertEquals(playlist.config, actual[0].playlist.config)
-        val mediaActual = mediaDao.load(actual[0].items[0].mediaId)
-        assertNotNull(mediaActual)
+            assertEquals(1, actual.size)
+            assertEquals(1, actual[0].items.size)
+            assertEquals(playlist.config, actual[0].playlist.config)
+            val mediaActual = mediaDao.load(actual[0].items[0].mediaId)
+            assertNotNull(mediaActual)
+        }
+    }
+
+    @Test
+    fun getPlaylists() {
+        runBlocking {
+            val actual = playlistDao.getAllPlaylists()
+
+            assertEquals(1, actual.size)
+            assertEquals(playlist.config, actual[0].config)
+        }
     }
 }

@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
@@ -171,7 +172,8 @@ class PlaylistPresenter(
             duration = null,
             mediaType = VIDEO,
             id = null,
-            positon = null
+            positon = null,
+            channelData = ChannelDomain()// todo add real data
         )
     }
 

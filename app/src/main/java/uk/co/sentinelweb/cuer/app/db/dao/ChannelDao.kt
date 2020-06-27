@@ -7,30 +7,36 @@ import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
 interface ChannelDao {
     @Transaction
     @Query("SELECT * FROM channel")
-    fun getAll(): List<ChannelEntity>
+    suspend fun getAll(): List<ChannelEntity>
 
     @Query("SELECT count() FROM channel")
-    fun count(): Int
+    suspend fun count(): Int
 
     @Transaction
     @Query("SELECT * FROM channel WHERE id IN (:channelIds)")
-    fun loadAllByIds(channelIds: IntArray): List<ChannelEntity>
+    suspend fun loadAllByIds(channelIds: IntArray): List<ChannelEntity>
 
     @Transaction
     @Query("SELECT * FROM channel WHERE id == :id")
-    fun load(id: Int): ChannelEntity?
+    suspend fun load(id: Int): ChannelEntity?
 
     @Transaction
     @Query("SELECT * FROM channel WHERE remote_id LIKE :channelId LIMIT 1")
-    fun findByChannelId(channelId: String): ChannelEntity?
+    suspend fun findByChannelId(channelId: String): ChannelEntity?
 
-    @Insert
-    fun insertAll(channels: List<ChannelEntity>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(channels: List<ChannelEntity>): List<Long>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(channel: ChannelEntity): Long
+
+    @Update
+    suspend fun update(channel: ChannelEntity)
 
     @Delete
-    fun delete(channel: ChannelEntity)
+    suspend fun delete(channel: ChannelEntity)
 
     @Query("DELETE FROM channel")
-    fun deleteAll()
+    suspend fun deleteAll()
 
 }

@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 )
 data class ChannelEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Long,
 
     @ColumnInfo(name = "remote_id")
     val remoteId: String,
@@ -49,4 +49,8 @@ data class ChannelEntity(
 
     @ColumnInfo(name = "published")
     val published: LocalDateTime? = null
-)
+) {
+    companion object {
+        const val FLAG_STARRED = 1L
+    }
+}

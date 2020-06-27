@@ -2,9 +2,9 @@ package uk.co.sentinelweb.cuer.app.db.entity
 
 import androidx.room.*
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
-import uk.co.sentinelweb.cuer.app.db.typeconverter.LocalDateTimeTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.MediaTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.PlatformTypeConverter
+import java.time.Instant
 
 @Entity(
     tableName = "playlist_item",
@@ -18,16 +18,15 @@ import uk.co.sentinelweb.cuer.app.db.typeconverter.PlatformTypeConverter
 @TypeConverters(
     MediaTypeConverter::class,
     PlatformTypeConverter::class,
-    InstantTypeConverter::class,
-    LocalDateTimeTypeConverter::class
+    InstantTypeConverter::class
 )
 data class PlaylistItemEntity constructor(
 
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Long,
 
     @ColumnInfo(name = "media_id")
-    val mediaId: Int,
+    val mediaId: Long,
 
     @ColumnInfo(name = "order")
     val order: Long,
@@ -36,11 +35,13 @@ data class PlaylistItemEntity constructor(
     val flags: Long = 0,
 
     @ColumnInfo(name = "playlist_id")
-    val playlistId: Int
+    val playlistId: Long,
+
+    @ColumnInfo(name = "date_added")
+    val dateAdded: Instant
 
 ) {
     companion object {
-        const val FLAG_WATCHED = 1
-        const val FLAG_ARCHIVED = 2
+        const val FLAG_ARCHIVED = 1L
     }
 }

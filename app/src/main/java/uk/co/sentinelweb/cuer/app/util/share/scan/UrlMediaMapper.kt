@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.share.scan
 
 import android.net.Uri
+import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
@@ -26,7 +27,8 @@ private class YoutubeShortUrlMediaMapper : UrlMediaMapper {
                     url = uri.toString(),
                     mediaId = it.substring(1),
                     mediaType = MediaDomain.MediaTypeDomain.VIDEO,
-                    platform = PlatformDomain.YOUTUBE
+                    platform = PlatformDomain.YOUTUBE,
+                    channelData = ChannelDomain()// todo add real data
                 )
             }
             ?: throw IllegalArgumentException("Link format error: $uri")
@@ -45,6 +47,7 @@ private class YoutubeUrlMediaMapper : UrlMediaMapper {
             url = uri.toString(),
             mediaId = uri.getQueryParameters("v")[0],
             mediaType = MediaDomain.MediaTypeDomain.VIDEO,
-            platform = PlatformDomain.YOUTUBE
+            platform = PlatformDomain.YOUTUBE,
+            channelData = ChannelDomain()// todo add real data
         )
 }

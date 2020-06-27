@@ -18,11 +18,11 @@ data class MediaDomain(
     @ContextualSerialization val dateLastPlayed: Instant? = null,
     val description: String? = null,
     @ContextualSerialization val published: LocalDateTime? = null,
-    val channelData: ChannelDomain = ChannelDomain(),
+    val channelData: ChannelDomain,
     val thumbNail: ImageDomain? = null,
     val image: ImageDomain? = null,
-    val starred: Boolean = false,
-    val archived: Boolean = false
+    val watched: Boolean = false,
+    val starred: Boolean = false
 ) {
     enum class MediaTypeDomain {
         VIDEO, AUDIO, WEB

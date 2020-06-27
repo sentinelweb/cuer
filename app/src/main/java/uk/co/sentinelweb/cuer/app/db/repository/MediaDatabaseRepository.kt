@@ -20,7 +20,7 @@ class MediaDatabaseRepository constructor(
         log.tag = "MediaDatabaseRepository"
     }
 
-    override suspend fun save(domain: MediaDomain): RepoResult<Boolean> =
+    override suspend fun save(domain: MediaDomain, flat: Boolean): RepoResult<Boolean> =
         withContext(coProvider.IO) {
             try {
                 domain
@@ -34,7 +34,7 @@ class MediaDatabaseRepository constructor(
             }
         }
 
-    override suspend fun save(domains: List<MediaDomain>): RepoResult<Boolean> =
+    override suspend fun save(domains: List<MediaDomain>, flat: Boolean): RepoResult<Boolean> =
         withContext(coProvider.IO) {
             try {
                 domains
@@ -48,25 +48,26 @@ class MediaDatabaseRepository constructor(
             }
         }
 
-    override suspend fun load(id: Int): RepoResult<MediaDomain> = withContext(coProvider.IO) {
-        try {
-            mediaDao.load(id)!!
-                .let { mediaMapper.map(it) }
-                .let { Data(it) }
-        } catch (e: Exception) {
-            val msg = "couldn't load $id"
-            log.e(msg, e)
-            RepoResult.Error<MediaDomain>(e, msg)
+    override suspend fun load(id: Long, flat: Boolean): RepoResult<MediaDomain> =
+        withContext(coProvider.IO) {
+            try {
+                mediaDao.load(id)!!
+                    .let { mediaMapper.map(it) }
+                    .let { Data(it) }
+            } catch (e: Exception) {
+                val msg = "couldn't load $id"
+                log.e(msg, e)
+                RepoResult.Error<MediaDomain>(e, msg)
+            }
         }
-    }
 
     override suspend fun loadList(filter: DatabaseRepository.Filter?)
             : RepoResult<List<MediaDomain>> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is PlaylistDatabaseRepository.IdListFilter ->
+                is IdListFilter ->
                     mediaDao
-                        .loadAllByIds(filter.ids.toIntArray())
+                        .loadAllByIds(filter.ids.toLongArray())
                         .map { mediaMapper.map(it) }
                         .let { Data(it) }
                 is MediaIdFilter ->
@@ -102,7 +103,6 @@ class MediaDatabaseRepository constructor(
             }
         }
 
-
     override suspend fun deleteAll(): RepoResult<Boolean> =
         withContext(coProvider.IO) {
             try {
@@ -126,8 +126,7 @@ class MediaDatabaseRepository constructor(
             RepoResult.Error<Int>(e, msg)
         }
 
-    class IdListFilter(val ids: List<Int>) : DatabaseRepository.Filter
+    class IdListFilter(val ids: List<Long>) : DatabaseRepository.Filter
     class MediaIdFilter(val mediaId: String) : DatabaseRepository.Filter
-
 
 }

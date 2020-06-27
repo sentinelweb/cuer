@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.domain.ChannelDomain
 
 class ChannelMapper constructor(val imageMapper: ImageMapper) {
     fun map(domain: ChannelDomain): ChannelEntity = ChannelEntity(
-        id = domain.id.toInt(),
+        id = domain.id.toLong(),
         remoteId = domain.remoteId,
         title = domain.title,
         description = domain.description,
@@ -14,7 +14,7 @@ class ChannelMapper constructor(val imageMapper: ImageMapper) {
         platform = domain.platform,
         thumbNail = imageMapper.mapImage(domain.thumbNail),
         image = imageMapper.mapImage(domain.image),
-        flags = if (domain.starred) 1 else 0,
+        flags = if (domain.starred) ChannelEntity.FLAG_STARRED else 0,
         published = domain.published
     )
 
@@ -28,7 +28,7 @@ class ChannelMapper constructor(val imageMapper: ImageMapper) {
         platform = entity.platform,
         thumbNail = imageMapper.mapImage(entity.thumbNail),
         image = imageMapper.mapImage(entity.image),
-        starred = entity.flags and 1 == 1L,
+        starred = entity.flags and ChannelEntity.FLAG_STARRED == ChannelEntity.FLAG_STARRED,
         published = entity.published
     )
 }
