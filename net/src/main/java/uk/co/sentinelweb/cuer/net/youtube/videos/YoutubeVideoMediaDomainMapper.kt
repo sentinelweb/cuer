@@ -30,7 +30,7 @@ internal class YoutubeVideoMediaDomainMapper(
                     ?.let { thumbnailsDto -> thumbnailsDto.maxres ?: thumbnailsDto.high }
                 ),
                 channelData = ChannelDomain(
-                    id = it.snippet?.channelId ?: "",
+                    remoteId = it.snippet?.channelId ?: "",
                     title = it.snippet?.channelTitle
                 ),
                 published = it.snippet?.publishedAt?.let { ts -> dateTimeMapper.mapTimestamp(ts) }

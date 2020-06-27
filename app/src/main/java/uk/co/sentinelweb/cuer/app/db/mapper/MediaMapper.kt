@@ -25,7 +25,7 @@ class MediaMapper(
         platform = domain.platform,
         thumbNail = imageMapper.mapImage(domain.thumbNail),
         image = imageMapper.mapImage(domain.image),
-        channelId = domain.channelData.id.toLong(),
+        channelId = domain.channelData.id!!.toLong(),
         published = domain.published
     )
 

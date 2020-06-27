@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 @Serializable
-class ChannelDomain constructor(
-    val id: String = "",
-    val remoteId: String = "",
+data class ChannelDomain constructor(
+    val id: String? = null,
+    val remoteId: String? = null,
     val platform: PlatformDomain = PlatformDomain.YOUTUBE,
     val country: String? = null,
     val title: String? = null,

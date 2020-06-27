@@ -22,11 +22,11 @@ data class YoutubeChannelsDto constructor(
         ) {
             @Serializable
             data class ThumbnailsDto constructor(
-                val default: ThumbnailDto? = null,
-                val medium: ThumbnailDto? = null,
-                val high: ThumbnailDto? = null,
-                val standard: ThumbnailDto? = null,
-                val maxres: ThumbnailDto? = null
+                val default: ThumbnailDto?,
+                val medium: ThumbnailDto?,
+                val high: ThumbnailDto?,
+                val standard: ThumbnailDto?,
+                val maxres: ThumbnailDto?
             ) {
                 @Serializable
                 data class ThumbnailDto constructor(

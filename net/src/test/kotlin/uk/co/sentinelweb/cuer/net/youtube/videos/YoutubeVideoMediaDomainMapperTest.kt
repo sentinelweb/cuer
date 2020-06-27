@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
 import java.time.LocalDateTime
 
@@ -47,21 +48,21 @@ class YoutubeVideoMediaDomainMapperTest {
             assertEquals(domain.description, dto.items[index].snippet?.description)
             assertEquals(
                 domain.channelData, ChannelDomain(
-                    dto.items[index].snippet?.channelId ?: "",
-                    dto.items[index].snippet?.channelTitle
+                    remoteId = dto.items[index].snippet?.channelId ?: "",
+                    title = dto.items[index].snippet?.channelTitle ?: ""
                 )
             )
             assertEquals(domain.published, fixtDate)
             assertEquals(domain.duration, fixtDuration)
             assertEquals(domain.mediaId, dto.items[index].id)
             assertEquals(domain.mediaType, MediaDomain.MediaTypeDomain.VIDEO)
-            assertEquals(domain.platform, MediaDomain.PlatformDomain.YOUTUBE)
-            dto.items[index].snippet?.thumbnails?.medium?.apply {
+            assertEquals(domain.platform, PlatformDomain.YOUTUBE)
+            dto.items[index].snippet!!.thumbnails.medium!!.apply {
                 assertEquals(domain.thumbNail, ImageDomain(url, width, height))
-            } ?: throw Exception("Image test data broken")
-            dto.items[index].snippet?.thumbnails?.maxres?.apply {
+            }// ?: throw Exception("thumb test data broken")
+            dto.items[index].snippet!!.thumbnails.maxres!!.apply {
                 assertEquals(domain.image, ImageDomain(url, width, height))
-            } ?: throw Exception("Image test data broken")
+            }// ?: throw Exception("Image test data broken")
             assertNull(domain.dateLastPlayed)
             assertNull(domain.positon)
             assertNull(domain.id)

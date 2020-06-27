@@ -5,8 +5,8 @@ import uk.co.sentinelweb.cuer.domain.ChannelDomain
 
 class ChannelMapper constructor(val imageMapper: ImageMapper) {
     fun map(domain: ChannelDomain): ChannelEntity = ChannelEntity(
-        id = domain.id.toLong(),
-        remoteId = domain.remoteId,
+        id = domain.id!!.toLong(),
+        remoteId = domain.remoteId!!,
         title = domain.title,
         description = domain.description,
         customUrl = domain.customUrl,

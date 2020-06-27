@@ -11,7 +11,8 @@ internal class YoutubeChannelDomainMapper(
     fun map(dto: YoutubeChannelsDto): List<ChannelDomain> =
         dto.items.map {
             ChannelDomain(
-                id = it.id,
+                id = null,
+                remoteId = it.id,
                 title = it.snippet?.title,
                 description = it.snippet?.description,
                 thumbNail = mapImage(it.snippet?.thumbnails
