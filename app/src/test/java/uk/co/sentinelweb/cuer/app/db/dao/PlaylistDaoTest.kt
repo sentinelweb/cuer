@@ -65,6 +65,7 @@ class PlaylistDaoTest {
 
     @After
     fun tearDown() {
+        database.clearAllTables()
         database.close()
     }
 

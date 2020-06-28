@@ -1,8 +1,12 @@
 package uk.co.sentinelweb.cuer.app.db.mapper
 
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
-import uk.co.sentinelweb.cuer.app.db.entity.*
+import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
+import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
+import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
+import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity.Companion.FLAG_ARCHIVED
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlaylistItemMapper(
@@ -21,9 +25,6 @@ class PlaylistItemMapper(
     fun map(entity: PlaylistItemEntity, media: MediaAndChannel): PlaylistItemDomain =
         map(entity, media.media, media.channel)
 
-    fun map(entity: PlaylistItemAndMedia, channelEntity: ChannelEntity): PlaylistItemDomain =
-        map(entity.item, entity.media, channelEntity)
-
     fun map(
         entity: PlaylistItemEntity,
         mediaEntity: MediaEntity,
@@ -31,6 +32,18 @@ class PlaylistItemMapper(
     ): PlaylistItemDomain = PlaylistItemDomain(
         id = entity.id.toString(),
         media = mediaMapper.map(mediaEntity, channelEntity),// todo enforce consistency better
+        order = entity.order,
+        archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
+        dateAdded = entity.dateAdded,
+        playlistId = entity.playlistId
+    )
+
+    fun map(
+        entity: PlaylistItemEntity,
+        mediaDomain: MediaDomain
+    ): PlaylistItemDomain = PlaylistItemDomain(
+        id = entity.id.toString(),
+        media = mediaDomain,
         order = entity.order,
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
         dateAdded = entity.dateAdded,

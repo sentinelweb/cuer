@@ -26,7 +26,9 @@ class MediaMapper(
         thumbNail = imageMapper.mapImage(domain.thumbNail),
         image = imageMapper.mapImage(domain.image),
         channelId = domain.channelData.id!!.toLong(),
-        published = domain.published
+        published = domain.published,
+        flags = if (domain.watched) FLAG_WATCHED else 0 +
+                if (domain.starred) FLAG_STARRED else 0
     )
 
     fun map(entity: MediaEntity, channelEntity: ChannelEntity): MediaDomain = MediaDomain(

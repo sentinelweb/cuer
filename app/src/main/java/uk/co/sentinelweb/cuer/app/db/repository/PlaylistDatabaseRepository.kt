@@ -110,8 +110,6 @@ class PlaylistDatabaseRepository constructor(
                         else playlistDao
                             .loadAllByIdsWithItems(filter.ids.toLongArray())
                             .map { mapDeep(it) }
-
-//                    is AllFilter -> // todo
                     else ->
                         playlistDao
                             .getAllPlaylists()
@@ -167,22 +165,38 @@ class PlaylistDatabaseRepository constructor(
         }
 
     // region PlaylistItemDomain
-    suspend fun savePlaylistItem(item: PlaylistItemDomain): RepoResult<Boolean> =
+    suspend fun savePlaylistItem(item: PlaylistItemDomain): RepoResult<PlaylistItemDomain> =
         withContext(coProvider.IO) {
             try {
                 item
                     .let { playlistItemMapper.map(item) }
-                    .also {
-                        if (it.id != INITIAL_ID) playlistItemDao.update(it)
-                        else {
-                            playlistItemDao.insert(it)
+                    .let {
+                        if (it.id != INITIAL_ID) {
+                            playlistItemDao.update(it); it
+                        } else {
+                            val id = playlistItemDao.insert(it)
+                            it.copy(id = id)
                         }
                     }
-                RepoResult.Data.Empty(true)
+                    .let { playlistItemMapper.map(it, item.media) }
+                    .let { RepoResult.Data(it) }
             } catch (e: Exception) {
                 val msg = "couldn't save playlist item"
                 log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
+                RepoResult.Error<PlaylistItemDomain>(e, msg)
+            }
+        }
+
+    suspend fun loadPlaylistItem(id: Long): RepoResult<PlaylistItemDomain> =
+        withContext(coProvider.IO) {
+            try {
+                playlistItemDao.load(id)!!
+                    .let { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
+                    .let { RepoResult.Data(it) }
+            } catch (e: Exception) {
+                val msg = "couldn't save playlist item"
+                log.e(msg, e)
+                RepoResult.Error<PlaylistItemDomain>(e, msg)
             }
         }
 
@@ -201,6 +215,5 @@ class PlaylistDatabaseRepository constructor(
         }
     // endregion
 
-    class AllFilter(val flat: Boolean = true) : DatabaseRepository.Filter
     class IdListFilter(val ids: List<Long>, val flat: Boolean = true) : DatabaseRepository.Filter
 }
