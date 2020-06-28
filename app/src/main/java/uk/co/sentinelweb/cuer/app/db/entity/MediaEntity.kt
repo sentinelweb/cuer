@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.entity
 
 import androidx.room.*
+import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.LocalDateTimeTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.MediaTypeConverter
@@ -29,7 +30,7 @@ import java.time.LocalDateTime
 )
 data class MediaEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
+    val id: Long = INITIAL_ID,
 
     @ColumnInfo(name = "url")
     val url: String,

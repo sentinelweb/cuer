@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.dao
 
 import androidx.room.*
-import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
 
 @Dao
@@ -14,7 +13,7 @@ interface PlaylistItemDao {
     suspend fun insert(playlistItem: PlaylistItemEntity): Long
 
     @Update
-    suspend fun update(playlist: PlaylistEntity)
+    suspend fun update(playlist: PlaylistItemEntity)
 
     @Delete
     suspend fun delete(playlistItem: PlaylistItemEntity)

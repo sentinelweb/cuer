@@ -1,7 +1,10 @@
 package uk.co.sentinelweb.cuer.app.db.mapper
 
+import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
+import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_ARCHIVED
+import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
@@ -10,11 +13,11 @@ class PlaylistMapper(
     private val playlistItemMapper: PlaylistItemMapper
 ) {
     fun map(domain: PlaylistDomain): PlaylistEntity = PlaylistEntity(
-        id = domain.id?.toLong() ?: 0,
+        id = domain.id?.toLong() ?: INITIAL_ID,
         currentIndex = domain.currentIndex, // todo enforce consistency better
         config = domain.config,
-        flags = if (domain.archived) PlaylistEntity.FLAG_ARCHIVED else 0 +
-                if (domain.starred) PlaylistEntity.FLAG_STARRED else 0,
+        flags = if (domain.archived) FLAG_ARCHIVED else 0 +
+                if (domain.starred) FLAG_STARRED else 0,
         image = imageMapper.mapImage(domain.image),
         thumb = imageMapper.mapImage(domain.thumb),
         mode = domain.mode,
@@ -27,8 +30,8 @@ class PlaylistMapper(
         medias: List<MediaAndChannel>?
     ): PlaylistDomain = PlaylistDomain(
         id = entity.id.toString(),
-        archived = entity.flags and PlaylistEntity.FLAG_ARCHIVED == PlaylistEntity.FLAG_ARCHIVED,
-        starred = entity.flags and PlaylistEntity.FLAG_ARCHIVED == PlaylistEntity.FLAG_ARCHIVED,
+        archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
+        starred = entity.flags and FLAG_STARRED == FLAG_STARRED,
         items = items
             ?.map {
                 playlistItemMapper.map(

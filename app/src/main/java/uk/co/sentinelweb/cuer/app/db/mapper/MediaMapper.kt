@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.mapper
 
+import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
 import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
@@ -10,10 +11,9 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 class MediaMapper(
     private val imageMapper: ImageMapper,
     private val channelMapper: ChannelMapper
-
 ) {
     fun map(domain: MediaDomain): MediaEntity = MediaEntity(
-        id = domain.id?.toLong() ?: 0,
+        id = domain.id?.toLong() ?: INITIAL_ID,
         url = domain.url,
         mediaId = domain.mediaId,
         mediaType = domain.mediaType,

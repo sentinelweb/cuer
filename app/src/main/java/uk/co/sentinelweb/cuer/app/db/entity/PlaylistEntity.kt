@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.entity
 
 import androidx.room.*
+import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.typeconverter.PlaylistConfigJsonTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.PlaylistModeTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.PlaylistTypeTypeConverter
@@ -22,7 +23,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 )
 data class PlaylistEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
+    val id: Long = INITIAL_ID,
 
     @ColumnInfo(name = "title")
     val title: String,

@@ -20,31 +20,34 @@ class MediaDatabaseRepository constructor(
         log.tag = "MediaDatabaseRepository"
     }
 
-    override suspend fun save(domain: MediaDomain, flat: Boolean): RepoResult<Boolean> =
+    override suspend fun save(domain: MediaDomain, flat: Boolean): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             try {
                 domain
                     .let { mediaMapper.map(it) }
-                    .also { mediaDao.insertAll(listOf(it)) }
-                Empty(true)
+                    .let { mediaDao.insert(it) }
+                    .let { Data(domain.copy(id = it.toString())) }
             } catch (e: Exception) {
                 val msg = "couldn't save ${domain.url}"
                 log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
+                RepoResult.Error<MediaDomain>(e, msg)
             }
         }
 
-    override suspend fun save(domains: List<MediaDomain>, flat: Boolean): RepoResult<Boolean> =
+    override suspend fun save(
+        domains: List<MediaDomain>,
+        flat: Boolean
+    ): RepoResult<List<MediaDomain>> =
         withContext(coProvider.IO) {
             try {
                 domains
                     .map { mediaMapper.map(it) }
-                    .also { mediaDao.insertAll(it) }
-                Empty(true)
+                    .let { mediaDao.insertAll(it) }
+                    .let { idlist -> Data(domains.mapIndexed { i, m -> m.copy(id = idlist[i].toString()) }) }
             } catch (e: Exception) {
                 val msg = "couldn't save ${domains.map { it.url }}"
                 log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
+                RepoResult.Error<List<MediaDomain>>(e, msg)
             }
         }
 
@@ -65,7 +68,7 @@ class MediaDatabaseRepository constructor(
             : RepoResult<List<MediaDomain>> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is IdListFilter ->
+                is PlaylistDatabaseRepository.IdListFilter ->
                     mediaDao
                         .loadAllByIds(filter.ids.toLongArray())
                         .map { mediaMapper.map(it) }

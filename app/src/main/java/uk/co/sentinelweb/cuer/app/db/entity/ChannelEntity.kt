@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.entity
 
 import androidx.room.*
+import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.LocalDateTimeTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.PlatformTypeConverter
@@ -18,7 +19,7 @@ import java.time.LocalDateTime
 )
 data class ChannelEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
+    val id: Long = INITIAL_ID,
 
     @ColumnInfo(name = "remote_id")
     val remoteId: String,
