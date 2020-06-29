@@ -18,9 +18,9 @@ import org.robolectric.RobolectricTestRunner
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.mapper.*
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository.IdListFilter
-import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
+import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -29,13 +29,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
  */
 @RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
-class PlaylistDatabaseRepositoryTest {
+class PlaylistDatabaseRepositoryIntegrationTest {
     private lateinit var database: AppDatabase
-
-    //    private lateinit var playlistDao: PlaylistDao
-//    private lateinit var mediaDao: MediaDao
-//    private lateinit var channelDao: ChannelDao
-//    private lateinit var playlistItemDao: PlaylistItemDao
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val coCxtProvider: CoroutineContextProvider =
         CoroutineContextTestProvider(testCoroutineDispatcher)
@@ -56,6 +51,8 @@ class PlaylistDatabaseRepositoryTest {
     @get:Rule
     var instantTaskExecutor = InstantTaskExecutorRule()
 
+    private val systemLogWrapper = SystemLogWrapper()
+
     @Before
     fun setUp() {
         FixtureAnnotations.initFixtures(this)
@@ -70,7 +67,7 @@ class PlaylistDatabaseRepositoryTest {
             playlistItemDao = database.playlistItemDao(),
             playlistItemMapper = playlistItemMapper,
             mediaDao = database.mediaDao(),
-            log = AndroidLogWrapper(),
+            log = systemLogWrapper,
             coProvider = coCxtProvider
         )
     }
@@ -85,9 +82,13 @@ class PlaylistDatabaseRepositoryTest {
     fun save() {
         runBlocking {
             val domain = playlist.copy(id = null, items = playlist.items.map { it.copy(id = null) })
-            val actual = sut.save(domain)
-            assertTrue(actual.isSuccessful)
-            assertEquals(actual.data, sut.load(actual.data!!.id!!.toLong()).data)
+            val saved = sut.save(domain)
+            assertTrue(saved.isSuccessful)
+            assertEquals(saved.data, sut.load(saved.data!!.id!!.toLong()).data)
+            systemLogWrapper.d(saved.data!!.toString())
+            // retest to see that id is preserved
+            val saved2 = sut.save(saved.data!!)
+            assertEquals(saved.data, saved2.data)
         }
     }
 

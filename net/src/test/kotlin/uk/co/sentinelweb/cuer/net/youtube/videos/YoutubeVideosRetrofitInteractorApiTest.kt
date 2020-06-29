@@ -58,8 +58,8 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
                 listOf(ID, SNIPPET, CONTENT_DETAILS, PLAYER)
             )
             assertNotNull(actual.data)
-            assertEquals("8nhPVOM97Jg", actual.data!![0].mediaId)
-            assertEquals("fY7M3pzXdUo", actual.data!![1].mediaId)
+            assertEquals("8nhPVOM97Jg", actual.data!![0].remoteId)
+            assertEquals("fY7M3pzXdUo", actual.data!![1].remoteId)
         }
     }
 

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1f8b5d7cbc7ff4968a51cc24df7ace6e",
+    "identityHash": "e092f857b3e135670a64c2dca3fe4597",
     "entities": [
       {
         "tableName": "playlist",
@@ -477,12 +477,45 @@
         },
         "indices": [
           {
-            "name": "index_channel_remote_id",
+            "name": "index_channel_remote_id_platform",
             "unique": true,
+            "columnNames": [
+              "remote_id",
+              "platform"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_channel_remote_id_platform` ON `${TABLE_NAME}` (`remote_id`, `platform`)"
+          },
+          {
+            "name": "index_channel_remote_id",
+            "unique": false,
             "columnNames": [
               "remote_id"
             ],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_channel_remote_id` ON `${TABLE_NAME}` (`remote_id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_channel_remote_id` ON `${TABLE_NAME}` (`remote_id`)"
+          },
+          {
+            "name": "index_channel_platform",
+            "unique": false,
+            "columnNames": [
+              "platform"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_channel_platform` ON `${TABLE_NAME}` (`platform`)"
+          },
+          {
+            "name": "index_channel_title",
+            "unique": false,
+            "columnNames": [
+              "title"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_channel_title` ON `${TABLE_NAME}` (`title`)"
+          },
+          {
+            "name": "index_channel_flags",
+            "unique": false,
+            "columnNames": [
+              "flags"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_channel_flags` ON `${TABLE_NAME}` (`flags`)"
           }
         ],
         "foreignKeys": []
@@ -491,7 +524,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1f8b5d7cbc7ff4968a51cc24df7ace6e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e092f857b3e135670a64c2dca3fe4597')"
     ]
   }
 }

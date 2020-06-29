@@ -41,7 +41,7 @@ class PlaylistItemEditModelMapper(
             }
         },
         starred = domain.starred,
-        canPlay = domain.mediaId.isNotEmpty(),
+        canPlay = domain.remoteId.isNotEmpty(),
         durationText = domain.duration?.let { dateTimeMapper.formatTime(it) },
         positionText = domain.positon?.let { dateTimeMapper.formatTime(it) },
         position = domain.positon

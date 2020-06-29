@@ -15,7 +15,7 @@ class MediaMapper(
     fun map(domain: MediaDomain): MediaEntity = MediaEntity(
         id = domain.id?.toLong() ?: INITIAL_ID,
         url = domain.url,
-        mediaId = domain.mediaId,
+        mediaId = domain.remoteId,
         mediaType = domain.mediaType,
         title = domain.title,
         duration = domain.duration,
@@ -34,7 +34,7 @@ class MediaMapper(
     fun map(entity: MediaEntity, channelEntity: ChannelEntity): MediaDomain = MediaDomain(
         id = entity.id.toString(),
         url = entity.url,
-        mediaId = entity.mediaId,
+        remoteId = entity.mediaId,
         mediaType = entity.mediaType,
         title = entity.title,
         duration = entity.duration,

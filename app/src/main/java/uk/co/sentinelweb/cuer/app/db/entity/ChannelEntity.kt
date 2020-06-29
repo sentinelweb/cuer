@@ -10,7 +10,13 @@ import java.time.LocalDateTime
 
 @Entity(
     tableName = "channel",
-    indices = arrayOf(Index("remote_id", unique = true))
+    indices = [
+        Index("remote_id", "platform", unique = true),
+        Index("remote_id"),
+        Index("platform"),
+        Index("title"),
+        Index("flags")
+    ]
 )
 @TypeConverters(
     PlatformTypeConverter::class,

@@ -12,7 +12,16 @@ object DatabaseModule {
             get<RoomWrapper>().createDb()
         }
         single { RoomWrapper(androidApplication()) }
-        factory { MediaDatabaseRepository(get<AppDatabase>().mediaDao(), get(), get(), get()) }
+        factory {
+            MediaDatabaseRepository(
+                mediaDao = get<AppDatabase>().mediaDao(),
+                mediaMapper = get(),
+                channelDao = get(),
+                channelMapper = get(),
+                coProvider = get(),
+                log = get()
+            )
+        }
         factory {
             PlaylistDatabaseRepository(
                 get<AppDatabase>().playlistDao(),

@@ -24,6 +24,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun playlistItemDao(): PlaylistItemDao
 
     companion object {
-        const val INITIAL_ID = -1L
+        const val INITIAL_ID = 0L
     }
 }

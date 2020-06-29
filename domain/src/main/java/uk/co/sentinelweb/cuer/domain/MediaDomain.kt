@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 data class MediaDomain(
     val id: String?,
     val url: String,
-    val mediaId: String,
+    val remoteId: String,
     val mediaType: MediaTypeDomain,
     val platform: PlatformDomain,
     val title: String? = null,

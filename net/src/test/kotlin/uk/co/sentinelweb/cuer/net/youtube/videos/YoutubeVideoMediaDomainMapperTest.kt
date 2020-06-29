@@ -49,12 +49,13 @@ class YoutubeVideoMediaDomainMapperTest {
             assertEquals(
                 domain.channelData, ChannelDomain(
                     remoteId = dto.items[index].snippet?.channelId ?: "",
-                    title = dto.items[index].snippet?.channelTitle ?: ""
+                    title = dto.items[index].snippet?.channelTitle ?: "",
+                    platform = PlatformDomain.YOUTUBE
                 )
             )
             assertEquals(domain.published, fixtDate)
             assertEquals(domain.duration, fixtDuration)
-            assertEquals(domain.mediaId, dto.items[index].id)
+            assertEquals(domain.remoteId, dto.items[index].id)
             assertEquals(domain.mediaType, MediaDomain.MediaTypeDomain.VIDEO)
             assertEquals(domain.platform, PlatformDomain.YOUTUBE)
             dto.items[index].snippet!!.thumbnails.medium!!.apply {

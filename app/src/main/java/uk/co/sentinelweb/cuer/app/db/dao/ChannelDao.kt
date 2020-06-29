@@ -5,22 +5,18 @@ import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
 
 @Dao
 interface ChannelDao {
-    @Transaction
     @Query("SELECT * FROM channel")
     suspend fun getAll(): List<ChannelEntity>
 
     @Query("SELECT count() FROM channel")
     suspend fun count(): Int
 
-    @Transaction
     @Query("SELECT * FROM channel WHERE id IN (:channelIds)")
     suspend fun loadAllByIds(channelIds: IntArray): List<ChannelEntity>
 
-    @Transaction
     @Query("SELECT * FROM channel WHERE id == :id")
-    suspend fun load(id: Int): ChannelEntity?
+    suspend fun load(id: Long): ChannelEntity?
 
-    @Transaction
     @Query("SELECT * FROM channel WHERE remote_id LIKE :channelId LIMIT 1")
     suspend fun findByChannelId(channelId: String): ChannelEntity?
 

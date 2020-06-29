@@ -3,7 +3,8 @@ package uk.co.sentinelweb.cuer.app.util.share.scan
 import android.net.Uri
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
+import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 
 val urlMediaMappers = listOf(
     YoutubeShortUrlMediaMapper(),
@@ -25,10 +26,13 @@ private class YoutubeShortUrlMediaMapper : UrlMediaMapper {
                 MediaDomain(
                     id = null,
                     url = uri.toString(),
-                    mediaId = it.substring(1),
-                    mediaType = MediaDomain.MediaTypeDomain.VIDEO,
-                    platform = PlatformDomain.YOUTUBE,
-                    channelData = ChannelDomain()// todo add real data
+                    remoteId = it.substring(1),
+                    mediaType = VIDEO,
+                    platform = YOUTUBE,
+                    channelData = ChannelDomain( // todo add real data
+                        remoteId = null,
+                        platform = YOUTUBE
+                    )
                 )
             }
             ?: throw IllegalArgumentException("Link format error: $uri")
@@ -45,9 +49,12 @@ private class YoutubeUrlMediaMapper : UrlMediaMapper {
         MediaDomain(
             id = null,
             url = uri.toString(),
-            mediaId = uri.getQueryParameters("v")[0],
-            mediaType = MediaDomain.MediaTypeDomain.VIDEO,
-            platform = PlatformDomain.YOUTUBE,
-            channelData = ChannelDomain()// todo add real data
+            remoteId = uri.getQueryParameters("v")[0],
+            mediaType = VIDEO,
+            platform = YOUTUBE,
+            channelData = ChannelDomain( // todo add real data
+                remoteId = null,
+                platform = YOUTUBE
+            )
         )
 }

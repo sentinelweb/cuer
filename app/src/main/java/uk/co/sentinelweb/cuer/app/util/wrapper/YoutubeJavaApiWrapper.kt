@@ -32,7 +32,7 @@ class YoutubeJavaApiWrapper(
         canLaunchVideo()
             .takeIf { it }
             ?.also {
-                activity.startActivity(createPlayVideoIntent(activity, media.mediaId))
+                activity.startActivity(createPlayVideoIntent(activity, media.remoteId))
             } ?: false
 
     fun launchVideo(media: MediaDomain, forceFullScreen: Boolean, finishAfter: Boolean) =
@@ -42,7 +42,7 @@ class YoutubeJavaApiWrapper(
                 activity.startActivity(
                     createPlayVideoIntentWithOptions(
                         activity,
-                        media.mediaId,
+                        media.remoteId,
                         forceFullScreen,
                         finishAfter
                     )
@@ -59,7 +59,8 @@ class YoutubeJavaApiWrapper(
     companion object {
         fun channelUrl(media: MediaDomain) =
             "https://www.youtube.com/channel/${media.channelData.id}"
-        fun videoUrl(media: MediaDomain) = "https://www.youtube.com/watch?v=${media.mediaId}"
-        fun videoShortUrl(media: MediaDomain) = "https://youtu.be/${media.mediaId}"
+
+        fun videoUrl(media: MediaDomain) = "https://www.youtube.com/watch?v=${media.remoteId}"
+        fun videoShortUrl(media: MediaDomain) = "https://youtu.be/${media.remoteId}"
     }
 }

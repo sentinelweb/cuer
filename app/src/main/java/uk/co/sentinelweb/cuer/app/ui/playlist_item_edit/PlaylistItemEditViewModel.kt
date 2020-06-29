@@ -48,7 +48,7 @@ class PlaylistItemEditViewModel constructor(
 
     fun onPlayVideoLocal() {
         _navigateLiveData.value =
-            NavigationModel(LOCAL_PLAYER, mapOf(MEDIA_ID to state.media!!.mediaId))
+            NavigationModel(LOCAL_PLAYER, mapOf(MEDIA_ID to state.media!!.remoteId))
     }
 
     fun onStarClick() {

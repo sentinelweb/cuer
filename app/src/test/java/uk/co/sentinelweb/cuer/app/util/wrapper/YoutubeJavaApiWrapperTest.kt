@@ -44,13 +44,13 @@ class YoutubeJavaApiWrapperTest {
     fun launchVideo() {
         every { sut.canLaunchVideo() } returns true
         every {
-            YouTubeIntents.createPlayVideoIntent(mockActivity, fixtMedia.mediaId)
+            YouTubeIntents.createPlayVideoIntent(mockActivity, fixtMedia.remoteId)
         } returns mockIntent
 
         val actual = sut.launchVideo(fixtMedia)
 
         assertTrue(actual)
-        verify { YouTubeIntents.createPlayVideoIntent(mockActivity, fixtMedia.mediaId) }
+        verify { YouTubeIntents.createPlayVideoIntent(mockActivity, fixtMedia.remoteId) }
         verify { mockActivity.startActivity(mockIntent) }
     }
 
@@ -62,7 +62,7 @@ class YoutubeJavaApiWrapperTest {
         every {
             YouTubeIntents.createPlayVideoIntentWithOptions(
                 mockActivity,
-                fixtMedia.mediaId,
+                fixtMedia.remoteId,
                 fixtForceFullScreen,
                 fixtFinishAfter
             )
@@ -75,7 +75,7 @@ class YoutubeJavaApiWrapperTest {
         verify {
             YouTubeIntents.createPlayVideoIntentWithOptions(
                 mockActivity,
-                fixtMedia.mediaId,
+                fixtMedia.remoteId,
                 fixtForceFullScreen,
                 fixtFinishAfter
             )

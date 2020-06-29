@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.net.youtube.videos
 import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ImageDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
 
 internal class YoutubeChannelDomainMapper(
@@ -14,6 +15,7 @@ internal class YoutubeChannelDomainMapper(
                 id = null,
                 remoteId = it.id,
                 title = it.snippet?.title,
+                platform = PlatformDomain.YOUTUBE,
                 description = it.snippet?.description,
                 thumbNail = mapImage(it.snippet?.thumbnails
                     ?.let { thumbnailsDto -> thumbnailsDto.medium ?: thumbnailsDto.standard }

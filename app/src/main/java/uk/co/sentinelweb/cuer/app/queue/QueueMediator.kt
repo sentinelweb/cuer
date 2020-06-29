@@ -99,7 +99,7 @@ class QueueMediator constructor(
     override fun itemIndex(item: PlaylistItemDomain): Int? =
         state.currentPlaylist
             ?.items
-            ?.indexOfFirst { it.media.mediaId == item.media.mediaId }
+            ?.indexOfFirst { it.media.remoteId == item.media.remoteId }
 
     override fun onTrackEnded(media: MediaDomain?) {
         nextItem()

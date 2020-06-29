@@ -7,8 +7,8 @@ import java.time.LocalDateTime
 @Serializable
 data class ChannelDomain constructor(
     val id: String? = null,
-    val remoteId: String? = null,
-    val platform: PlatformDomain = PlatformDomain.YOUTUBE,
+    val remoteId: String?,
+    val platform: PlatformDomain,
     val country: String? = null,
     val title: String? = null,
     val customUrl: String? = null,

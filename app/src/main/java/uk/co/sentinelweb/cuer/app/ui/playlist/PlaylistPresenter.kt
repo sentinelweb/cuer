@@ -142,7 +142,7 @@ class PlaylistPresenter(
                 .takeIf { it.isSuccessful && it.data == 0 }
                 ?.let { Queue.ITEMS }
                 ?.map { mapQueueToMedia(it) }
-                ?.map { it.mediaId }
+                ?.map { it.remoteId }
                 ?.let { ytInteractor.videos(it) }
                 ?.takeIf { it.isSuccessful }
                 ?.also { it.data?.let { repository.save(it) } }
@@ -164,7 +164,7 @@ class PlaylistPresenter(
     private fun mapQueueToMedia(it: Queue.QueueItem): MediaDomain {
         return MediaDomain(
             url = it.url,
-            mediaId = it.getId(),
+            remoteId = it.getId(),
             title = it.title,
             platform = YOUTUBE,
             description = null,
@@ -173,7 +173,10 @@ class PlaylistPresenter(
             mediaType = VIDEO,
             id = null,
             positon = null,
-            channelData = ChannelDomain()// todo add real data
+            channelData = ChannelDomain(// todo add real data
+                remoteId = null,
+                platform = YOUTUBE
+            )
         )
     }
 
