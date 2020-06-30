@@ -13,9 +13,9 @@ class MediaMapper(
     private val channelMapper: ChannelMapper
 ) {
     fun map(domain: MediaDomain): MediaEntity = MediaEntity(
-        id = domain.id?.toLong() ?: INITIAL_ID,
+        id = domain.id ?: INITIAL_ID,
         url = domain.url,
-        mediaId = domain.remoteId,
+        mediaId = domain.platformId,
         mediaType = domain.mediaType,
         title = domain.title,
         duration = domain.duration,
@@ -32,9 +32,9 @@ class MediaMapper(
     )
 
     fun map(entity: MediaEntity, channelEntity: ChannelEntity): MediaDomain = MediaDomain(
-        id = entity.id.toString(),
+        id = entity.id,
         url = entity.url,
-        remoteId = entity.mediaId,
+        platformId = entity.mediaId,
         mediaType = entity.mediaType,
         title = entity.title,
         duration = entity.duration,

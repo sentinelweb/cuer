@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.settings
 import android.os.Build
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.util.backup.BackupFileManager
+import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.FileWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider

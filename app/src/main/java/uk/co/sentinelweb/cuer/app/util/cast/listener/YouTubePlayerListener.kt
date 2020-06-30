@@ -169,7 +169,7 @@ class YouTubePlayerListener(
 
     private fun loadVideo(item: PlaylistItemDomain?) {
         item?.let {
-            youTubePlayer?.loadVideo(item.media.remoteId, 0f)
+            youTubePlayer?.loadVideo(item.media.platformId, 0f)
             updateStateForMedia(item)
         } ?: playerUi?.reset()
     }

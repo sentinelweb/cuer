@@ -7,9 +7,9 @@ import java.time.LocalDateTime
 
 @Serializable
 data class MediaDomain(
-    val id: String?,
+    val id: Long?,
     val url: String,
-    val remoteId: String,
+    val platformId: String,
     val mediaType: MediaTypeDomain,
     val platform: PlatformDomain,
     val title: String? = null,

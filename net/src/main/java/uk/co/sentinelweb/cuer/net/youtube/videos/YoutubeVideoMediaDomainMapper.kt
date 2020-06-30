@@ -19,7 +19,7 @@ internal class YoutubeVideoMediaDomainMapper(
                 description = it.snippet?.description,
                 mediaType = MediaDomain.MediaTypeDomain.VIDEO,
                 platform = PlatformDomain.YOUTUBE,
-                remoteId = it.id,
+                platformId = it.id,
                 duration = it.contentDetails?.duration
                     ?.let { dur -> dateTimeMapper.mapDuration(dur) }
                     ?: -1,
@@ -30,7 +30,7 @@ internal class YoutubeVideoMediaDomainMapper(
                     ?.let { thumbnailsDto -> thumbnailsDto.maxres ?: thumbnailsDto.high }
                 ),
                 channelData = ChannelDomain( // todo fix
-                    remoteId = it.snippet?.channelId ?: "",
+                    platformId = it.snippet?.channelId ?: "",
                     title = it.snippet?.channelTitle,
                     platform = PlatformDomain.YOUTUBE
                 ),

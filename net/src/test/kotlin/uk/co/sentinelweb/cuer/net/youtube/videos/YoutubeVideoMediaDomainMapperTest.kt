@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos
 
 import com.flextrade.jfixture.FixtureAnnotations
+import com.flextrade.jfixture.JFixture
 import com.flextrade.jfixture.annotations.Fixture
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -25,7 +26,14 @@ class YoutubeVideoMediaDomainMapperTest {
     private lateinit var dto: YoutubeVideosDto
 
     @Fixture
+    private lateinit var fixtMedium: YoutubeVideosDto.VideoDto.SnippetDto.ThumbnailsDto.ThumbnailDto
+
+    @Fixture
+    private lateinit var fixMaxRes: YoutubeVideosDto.VideoDto.SnippetDto.ThumbnailsDto.ThumbnailDto
+
+    @Fixture
     private lateinit var fixtDate: LocalDateTime
+
     private var fixtDuration: Long = 234324L
 
     private lateinit var sut: YoutubeVideoMediaDomainMapper
@@ -33,13 +41,26 @@ class YoutubeVideoMediaDomainMapperTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-        FixtureAnnotations.initFixtures(this)
+        val fixture = JFixture()
+        FixtureAnnotations.initFixtures(this, fixture)
+
+        dto.copy(items = dto.items.map {
+            it.copy(
+                snippet = it.snippet!!.copy(
+                    thumbnails = it.snippet!!.thumbnails.copy(
+                        medium = fixtMedium,
+                        maxres = fixMaxRes
+                    )
+                )
+            )
+        })
         every { mockDateMapper.mapTimestamp(any()) } returns fixtDate
         every { mockDateMapper.mapDuration(any()) } returns fixtDuration
         sut = YoutubeVideoMediaDomainMapper(mockDateMapper)
     }
 
     @Test
+    // fixme test fails!
     fun map() {
         val actual = sut.map(dto)
 
@@ -48,22 +69,28 @@ class YoutubeVideoMediaDomainMapperTest {
             assertEquals(domain.description, dto.items[index].snippet?.description)
             assertEquals(
                 domain.channelData, ChannelDomain(
-                    remoteId = dto.items[index].snippet?.channelId ?: "",
+                    platformId = dto.items[index].snippet?.channelId ?: "",
                     title = dto.items[index].snippet?.channelTitle ?: "",
                     platform = PlatformDomain.YOUTUBE
                 )
             )
             assertEquals(domain.published, fixtDate)
             assertEquals(domain.duration, fixtDuration)
-            assertEquals(domain.remoteId, dto.items[index].id)
+            assertEquals(domain.platformId, dto.items[index].id)
             assertEquals(domain.mediaType, MediaDomain.MediaTypeDomain.VIDEO)
             assertEquals(domain.platform, PlatformDomain.YOUTUBE)
             dto.items[index].snippet!!.thumbnails.medium!!.apply {
-                assertEquals(domain.thumbNail, ImageDomain(url, width, height))
-            }// ?: throw Exception("thumb test data broken")
+                assertEquals(
+                    domain.thumbNail,
+                    ImageDomain(fixtMedium.url, fixtMedium.width, fixtMedium.height)
+                )
+            }
             dto.items[index].snippet!!.thumbnails.maxres!!.apply {
-                assertEquals(domain.image, ImageDomain(url, width, height))
-            }// ?: throw Exception("Image test data broken")
+                assertEquals(
+                    domain.image,
+                    ImageDomain(fixMaxRes.url, fixMaxRes.width, fixMaxRes.height)
+                )
+            }
             assertNull(domain.dateLastPlayed)
             assertNull(domain.positon)
             assertNull(domain.id)

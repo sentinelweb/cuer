@@ -48,7 +48,7 @@ class PlaylistItemEditViewModel constructor(
 
     fun onPlayVideoLocal() {
         _navigateLiveData.value =
-            NavigationModel(LOCAL_PLAYER, mapOf(MEDIA_ID to state.media!!.remoteId))
+            NavigationModel(LOCAL_PLAYER, mapOf(MEDIA_ID to state.media!!.platformId))
     }
 
     fun onStarClick() {
@@ -90,7 +90,7 @@ class PlaylistItemEditViewModel constructor(
     }
 
     fun onRemovePlaylist(chipModel: ChipModel) {
-        state.selectedPlaylists.find { it.id == chipModel.value }?.apply {
+        state.selectedPlaylists.find { it.id == chipModel.value?.toLong() }?.apply {
             state.selectedPlaylists.remove(this)
         }?.also { update() }
     }

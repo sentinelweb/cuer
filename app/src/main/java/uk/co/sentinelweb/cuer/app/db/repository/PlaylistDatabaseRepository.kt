@@ -121,9 +121,6 @@ class PlaylistDatabaseRepository constructor(
                 RepoResult.Error<List<PlaylistDomain>>(e, msg)
             }
         }
-//        listOf("Default", "Music", "Video", "News", "Philosophy", "Psychology", "Comedy")
-//            .map { PlaylistDomain(items = listOf(), title = it, id = it/* todo db key */) }
-//            .let { playlists -> RepoResult.Data(playlists) }
 
     override suspend fun count(filter: DatabaseRepository.Filter?): RepoResult<Int> =
         try {
@@ -174,8 +171,7 @@ class PlaylistDatabaseRepository constructor(
                         if (it.id != INITIAL_ID) {
                             playlistItemDao.update(it); it
                         } else {
-                            val id = playlistItemDao.insert(it)
-                            it.copy(id = id)
+                            it.copy(id = playlistItemDao.insert(it))
                         }
                     }
                     .let { playlistItemMapper.map(it, item.media) }

@@ -26,11 +26,11 @@ private class YoutubeShortUrlMediaMapper : UrlMediaMapper {
                 MediaDomain(
                     id = null,
                     url = uri.toString(),
-                    remoteId = it.substring(1),
+                    platformId = it.substring(1),
                     mediaType = VIDEO,
                     platform = YOUTUBE,
                     channelData = ChannelDomain( // todo add real data
-                        remoteId = null,
+                        platformId = null,
                         platform = YOUTUBE
                     )
                 )
@@ -49,11 +49,11 @@ private class YoutubeUrlMediaMapper : UrlMediaMapper {
         MediaDomain(
             id = null,
             url = uri.toString(),
-            remoteId = uri.getQueryParameters("v")[0],
+            platformId = uri.getQueryParameters("v")[0],
             mediaType = VIDEO,
             platform = YOUTUBE,
             channelData = ChannelDomain( // todo add real data
-                remoteId = null,
+                platformId = null,
                 platform = YOUTUBE
             )
         )

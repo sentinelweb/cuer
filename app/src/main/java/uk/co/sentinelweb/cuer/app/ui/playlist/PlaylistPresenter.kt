@@ -9,13 +9,8 @@ import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
-import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
-import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
 
 class PlaylistPresenter(
     private val view: PlaylistContract.View,
@@ -25,15 +20,12 @@ class PlaylistPresenter(
     private val contextProvider: CoroutineContextProvider,
     private val queue: QueueMediatorContract.Mediator,
     private val toastWrapper: ToastWrapper,
-    private val ytInteractor: YoutubeInteractor,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val shareWrapper: ShareWrapper
-
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
     override fun initialise() {
-        initListCheck()
         queue.addProducerListener(this)
     }
 
@@ -136,20 +128,6 @@ class PlaylistPresenter(
         }
     }
 
-    private fun initListCheck() {
-        state.jobs.add(contextProvider.MainScope.launch {
-            repository.count()
-                .takeIf { it.isSuccessful && it.data == 0 }
-                ?.let { Queue.ITEMS }
-                ?.map { mapQueueToMedia(it) }
-                ?.map { it.remoteId }
-                ?.let { ytInteractor.videos(it) }
-                ?.takeIf { it.isSuccessful }
-                ?.also { it.data?.let { repository.save(it) } }
-                .also { loadList() }
-        })
-    }
-
     override fun undoDelete() {
         state.deletedMedia?.run {
             state.jobs.add(contextProvider.MainScope.launch {
@@ -159,25 +137,6 @@ class PlaylistPresenter(
                 state.deletedMedia = null
             })
         }
-    }
-
-    private fun mapQueueToMedia(it: Queue.QueueItem): MediaDomain {
-        return MediaDomain(
-            url = it.url,
-            remoteId = it.getId(),
-            title = it.title,
-            platform = YOUTUBE,
-            description = null,
-            dateLastPlayed = null,
-            duration = null,
-            mediaType = VIDEO,
-            id = null,
-            positon = null,
-            channelData = ChannelDomain(// todo add real data
-                remoteId = null,
-                platform = YOUTUBE
-            )
-        )
     }
 
     override fun onPlaylistUpdated(list: PlaylistDomain) {

@@ -60,12 +60,12 @@ class SharePresenter constructor(
     }
 
     private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? = scannedMedia.let {
-        repository.loadList(MediaDatabaseRepository.MediaIdFilter(scannedMedia.remoteId))
+        repository.loadList(MediaDatabaseRepository.MediaIdFilter(scannedMedia.platformId))
     }.takeIf { it.isSuccessful }
         ?.let { it.data?.firstOrNull() }
         ?: run {
             ytInteractor.videos(
-                ids = listOf(scannedMedia.remoteId),
+                ids = listOf(scannedMedia.platformId),
                 parts = listOf(ID, SNIPPET, CONTENT_DETAILS)
             ).takeIf { it.isSuccessful }
                 ?.let {
@@ -80,7 +80,7 @@ class SharePresenter constructor(
 
     private fun mapShareModel(): ShareModel {
         val isConnected = ytContextHolder.isConnected()
-        val isNew = state.media?.id?.isBlank() ?: true
+        val isNew = (state.media?.id == null)
         return if (isNew) {
             ShareModel(
                 topRightButtonAction = { finish(add = true, play = true, forward = true) },

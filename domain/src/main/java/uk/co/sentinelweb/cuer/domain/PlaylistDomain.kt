@@ -7,7 +7,7 @@ import java.time.Instant
 
 @Serializable
 data class PlaylistDomain constructor(
-    val id: String? = null,
+    val id: Long? = null,
     val title: String,
     val items: List<PlaylistItemDomain>,
     val currentIndex: Int = -1,

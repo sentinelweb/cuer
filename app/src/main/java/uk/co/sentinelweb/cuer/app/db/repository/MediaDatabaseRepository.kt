@@ -149,8 +149,8 @@ class MediaDatabaseRepository constructor(
         }
 
     private suspend fun checkToSaveChannel(media: MediaDomain): MediaDomain =
-        if (media.channelData.id.isNullOrEmpty()) {
-            if (media.channelData.remoteId.isNullOrEmpty())
+        if (media.channelData.id == null) {
+            if (media.channelData.platformId.isNullOrEmpty())
                 throw InvalidObjectException("Channel data is missing remoteID")
             media.channelData
                 .let { channelMapper.map(it) }
@@ -158,7 +158,7 @@ class MediaDatabaseRepository constructor(
                     channelDao.findByChannelId(it.remoteId)?.id
                         ?: channelDao.insert(it)
                 }
-                .let { media.copy(channelData = media.channelData.copy(id = it.toString())) }
+                .let { media.copy(channelData = media.channelData.copy(id = it)) }
         } else media
 
     class IdListFilter(val ids: List<Long>) : DatabaseRepository.Filter

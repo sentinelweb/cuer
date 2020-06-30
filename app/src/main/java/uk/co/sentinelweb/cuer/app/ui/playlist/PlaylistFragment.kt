@@ -130,7 +130,7 @@ class PlaylistFragment :
     }
 
     override fun playLocal(media: MediaDomain) {
-        YoutubeActivity.start(requireContext(), media.remoteId)
+        YoutubeActivity.start(requireContext(), media.platformId)
     }
     //endregion
 
@@ -192,7 +192,6 @@ class PlaylistFragment :
                         contextProvider = get(),
                         queue = get(),
                         toastWrapper = get(),
-                        ytInteractor = get(),
                         ytContextHolder = get(),
                         ytJavaApi = get(),
                         shareWrapper = get()

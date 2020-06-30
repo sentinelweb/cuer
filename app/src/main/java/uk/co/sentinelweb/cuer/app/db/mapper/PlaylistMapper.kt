@@ -13,7 +13,7 @@ class PlaylistMapper(
     private val playlistItemMapper: PlaylistItemMapper
 ) {
     fun map(domain: PlaylistDomain): PlaylistEntity = PlaylistEntity(
-        id = domain.id?.toLong() ?: INITIAL_ID,
+        id = domain.id ?: INITIAL_ID,
         currentIndex = domain.currentIndex, // todo enforce consistency better
         config = domain.config,
         flags = if (domain.archived) FLAG_ARCHIVED else 0 +
@@ -29,7 +29,7 @@ class PlaylistMapper(
         items: List<PlaylistItemEntity>?,
         medias: List<MediaAndChannel>?
     ): PlaylistDomain = PlaylistDomain(
-        id = entity.id.toString(),
+        id = entity.id,
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
         starred = entity.flags and FLAG_STARRED == FLAG_STARRED,
         items = items

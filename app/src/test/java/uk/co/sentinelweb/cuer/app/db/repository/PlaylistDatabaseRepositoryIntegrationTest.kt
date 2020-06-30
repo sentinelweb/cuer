@@ -156,8 +156,8 @@ class PlaylistDatabaseRepositoryIntegrationTest {
             val domain = playlistItem.copy(
                 id = null,
                 media = playlistItem.media.copy(
-                    id = "2",
-                    channelData = playlistItem.media.channelData.copy(id = "3", remoteId = "x")
+                    id = 2L,
+                    channelData = playlistItem.media.channelData.copy(id = 3L, platformId = "x")
                 )
             )
 
@@ -175,7 +175,7 @@ class PlaylistDatabaseRepositoryIntegrationTest {
         runBlocking {
             val domain = playlistItem.copy(
                 id = null,
-                media = playlistItem.media.copy(id = "2")
+                media = playlistItem.media.copy(id = 2L)
             )
 
             val actual = sut.savePlaylistItem(domain)

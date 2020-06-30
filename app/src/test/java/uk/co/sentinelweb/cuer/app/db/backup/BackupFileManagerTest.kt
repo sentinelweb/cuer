@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.backup
+package uk.co.sentinelweb.cuer.app.db.backup
 
 import org.junit.Before
 import org.junit.Test

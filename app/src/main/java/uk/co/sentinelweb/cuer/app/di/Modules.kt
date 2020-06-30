@@ -4,6 +4,7 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
+import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.queue.MediaToPlaylistItemMapper
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
@@ -18,7 +19,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
-import uk.co.sentinelweb.cuer.app.util.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.helper.PlaylistMutator

@@ -13,7 +13,7 @@ class PlaylistItemMapper(
     private val mediaMapper: MediaMapper
 ) {
     fun map(domain: PlaylistItemDomain): PlaylistItemEntity = PlaylistItemEntity(
-        id = domain.id?.toLong() ?: AppDatabase.INITIAL_ID,
+        id = domain.id ?: AppDatabase.INITIAL_ID,
         mediaId = domain.media.id!!.toLong(),// todo enforce consistency better
         order = domain.order,
         flags = if (domain.archived) FLAG_ARCHIVED else 0,
@@ -30,7 +30,7 @@ class PlaylistItemMapper(
         mediaEntity: MediaEntity,
         channelEntity: ChannelEntity
     ): PlaylistItemDomain = PlaylistItemDomain(
-        id = entity.id.toString(),
+        id = entity.id,
         media = mediaMapper.map(mediaEntity, channelEntity),// todo enforce consistency better
         order = entity.order,
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
@@ -42,7 +42,7 @@ class PlaylistItemMapper(
         entity: PlaylistItemEntity,
         mediaDomain: MediaDomain
     ): PlaylistItemDomain = PlaylistItemDomain(
-        id = entity.id.toString(),
+        id = entity.id,
         media = mediaDomain,
         order = entity.order,
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,

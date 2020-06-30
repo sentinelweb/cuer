@@ -6,7 +6,7 @@ import java.time.Instant
 
 @Serializable
 data class PlaylistItemDomain(
-    val id: String? = null,
+    val id: Long? = null,
     val media: MediaDomain,
     @ContextualSerialization val dateAdded: Instant,
     val order: Long,

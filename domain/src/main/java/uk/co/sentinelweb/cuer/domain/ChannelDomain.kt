@@ -6,8 +6,8 @@ import java.time.LocalDateTime
 
 @Serializable
 data class ChannelDomain constructor(
-    val id: String? = null,
-    val remoteId: String?,
+    val id: Long? = null,
+    val platformId: String?,
     val platform: PlatformDomain,
     val country: String? = null,
     val title: String? = null,

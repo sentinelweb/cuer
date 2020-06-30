@@ -13,7 +13,7 @@ internal class YoutubeChannelDomainMapper(
         dto.items.map {
             ChannelDomain(
                 id = null,
-                remoteId = it.id,
+                platformId = it.id,
                 title = it.snippet?.title,
                 platform = PlatformDomain.YOUTUBE,
                 description = it.snippet?.description,

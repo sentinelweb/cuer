@@ -102,7 +102,7 @@ class MediaDatabaseRepositoryIntegrationTest {
         runBlocking {
             val domain1 = fixtMedia.copy(
                 title = "new",
-                remoteId = "xxxxxxx"//,
+                platformId = "xxxxxxx"//,
                 //channelData = domain.channelData.copy(remoteId = "yyyyyyyy") // commented out tests duplicate channel
             )
             val domains = listOf(fixtMedia, domain1)
@@ -173,7 +173,7 @@ class MediaDatabaseRepositoryIntegrationTest {
             // verify
             assertTrue(resultCount.isSuccessful && resultCount.data!! == 1)
 
-            val resultSave1 = sut.save(fixtMedia.copy(remoteId = "x"))
+            val resultSave1 = sut.save(fixtMedia.copy(platformId = "x"))
             assertTrue(resultSave1.isSuccessful)
 
             // test
@@ -192,7 +192,7 @@ class MediaDatabaseRepositoryIntegrationTest {
             val result = sut.loadChannel(insertId)
             assertTrue(result.isSuccessful)
 
-            assertEquals(fixtChannel.copy(id = insertId.toString()), result.data)
+            assertEquals(fixtChannel.copy(id = insertId), result.data)
         }
     }
 
@@ -201,7 +201,7 @@ class MediaDatabaseRepositoryIntegrationTest {
         assertEquals(expected.description, actual.description)
         assertEquals(expected.dateLastPlayed, actual.dateLastPlayed)
         assertEquals(expected.duration, actual.duration)
-        assertEquals(expected.remoteId, actual.remoteId)
+        assertEquals(expected.platformId, actual.platformId)
         assertEquals(expected.image, actual.image)
         assertEquals(expected.thumbNail, actual.thumbNail)
         assertEquals(expected.mediaType, actual.mediaType)
@@ -216,7 +216,7 @@ class MediaDatabaseRepositoryIntegrationTest {
         assertEquals(expected.channelData.image, actual.channelData.image)
         assertEquals(expected.channelData.thumbNail, actual.channelData.thumbNail)
         assertEquals(expected.channelData.platform, actual.channelData.platform)
-        assertEquals(expected.channelData.remoteId, actual.channelData.remoteId)
+        assertEquals(expected.channelData.platformId, actual.channelData.platformId)
         assertEquals(expected.channelData.starred, actual.channelData.starred)
         assertEquals(expected.channelData.title, actual.channelData.title)
         assertEquals(expected.channelData.published, actual.channelData.published)

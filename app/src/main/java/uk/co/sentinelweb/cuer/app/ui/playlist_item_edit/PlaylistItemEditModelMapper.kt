@@ -37,11 +37,14 @@ class PlaylistItemEditModelMapper(
         channelThumbUrl = (domain.channelData.thumbNail ?: domain.channelData.image)?.url,
         chips = mutableListOf(ChipModel(ChipModel.Type.PLAYLIST_SELECT)).apply {
             selectedPlaylists.forEachIndexed { index, playlist ->
-                add(index, ChipModel(ChipModel.Type.PLAYLIST, playlist.title, playlist.id))
+                add(
+                    index,
+                    ChipModel(ChipModel.Type.PLAYLIST, playlist.title, playlist.id.toString())
+                )
             }
         },
         starred = domain.starred,
-        canPlay = domain.remoteId.isNotEmpty(),
+        canPlay = domain.platformId.isNotEmpty(),
         durationText = domain.duration?.let { dateTimeMapper.formatTime(it) },
         positionText = domain.positon?.let { dateTimeMapper.formatTime(it) },
         position = domain.positon
