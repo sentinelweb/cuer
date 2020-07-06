@@ -21,4 +21,5 @@
     <dimen name="menu_icon_size">24dp</dimen>
     <dimen name="button_elevation">1dp</dimen>
     <dimen name="share_button_width">250dp</dimen>
+    <dimen name="pref_icon_size">36dp</dimen>
 </resources>

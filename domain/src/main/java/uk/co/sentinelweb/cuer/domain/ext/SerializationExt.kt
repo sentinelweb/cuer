@@ -54,6 +54,10 @@ fun deserialisePlaylist(input: String) = json.parse(
     PlaylistDomain.serializer(), input
 )
 
+fun deserialisePlaylistList(input: String) = json.parse(
+    PlaylistDomain.serializer().list, input
+)
+
 fun deserialisePlaylistConfig(input: String) = json.parse(
     PlaylistDomain.PlaylistConfigDomain.serializer(), input
 )

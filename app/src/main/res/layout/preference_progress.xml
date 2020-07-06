@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProgressBar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/preference_progress"
+    style="?android:attr/progressBarStyleHorizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="-7dp"
+    android:backgroundTint="@color/white"
+    android:indeterminate="true"
+    android:indeterminateTint="?colorPrimaryDark"
+    android:max="100"
+    android:visibility="invisible"
+    />

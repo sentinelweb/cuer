@@ -5,6 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.DocumentsContract
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ProgressBar
+import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.koin.android.scope.currentScope
@@ -12,14 +17,30 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import java.io.File
 
 class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupContract.View {
 
     private val presenter: PrefBackupContract.Presenter by currentScope.inject()
+    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
+    private lateinit var progress: ProgressBar
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_backup, rootKey)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        checkToAddProgress()
+    }
+
+    private fun checkToAddProgress() {
+        if (!::progress.isInitialized) {
+            progress = LayoutInflater.from(activity)
+                .inflate(R.layout.preference_progress, (view as ViewGroup), false) as ProgressBar
+            (view as ViewGroup).addView(progress, 0)
+        }
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
@@ -55,6 +76,14 @@ class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupC
         startActivityForResult(intent, CREATE_FILE)
     }
 
+    override fun showProgress(b: Boolean) {
+        progress.visibility = if (b) View.VISIBLE else View.INVISIBLE
+    }
+
+    override fun showMessage(msg: String) {
+        snackbarWrapper.make(msg).show()
+    }
+
     private fun openFile() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -87,6 +116,7 @@ class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupC
                         fileWrapper = get()
                     )
                 }
+                scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
                 viewModel { PrefBackupState() }
             }
         }

@@ -5,6 +5,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
+import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.queue.MediaToPlaylistItemMapper
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
@@ -72,7 +73,8 @@ object Modules {
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
-        factory { BackupFileManager(get(), get()) }
+        factory { BackupFileManager(get(), get(), get(), get()) }
+        factory { ParserFactory() }
     }
 
     private val wrapperModule = module {

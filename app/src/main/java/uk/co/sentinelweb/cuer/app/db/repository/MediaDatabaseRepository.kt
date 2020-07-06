@@ -161,6 +161,18 @@ class MediaDatabaseRepository constructor(
                 .let { media.copy(channelData = media.channelData.copy(id = it)) }
         } else media
 
+    suspend fun deleteAllChannels(): RepoResult<Boolean> =
+        withContext(coProvider.IO) {
+            try {
+                channelDao.deleteAll()
+                Empty(true)
+            } catch (e: Exception) {
+                val msg = "couldn't delete all channels"
+                log.e(msg, e)
+                RepoResult.Error<Boolean>(e, msg)
+            }
+        }
+
     class IdListFilter(val ids: List<Long>) : DatabaseRepository.Filter
     class MediaIdFilter(val mediaId: String) : DatabaseRepository.Filter
 

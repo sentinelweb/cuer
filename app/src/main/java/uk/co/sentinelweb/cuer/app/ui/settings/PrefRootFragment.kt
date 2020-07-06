@@ -8,6 +8,7 @@ class PrefRootFragment constructor() : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_root, rootKey)
+
     }
     
 }

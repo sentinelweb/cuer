@@ -1,28 +1,43 @@
 package uk.co.sentinelweb.cuer.app.db.backup
 
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.db.backup.version.BackupFileModel
+import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
+import uk.co.sentinelweb.cuer.app.db.backup.version.jsonBackupSerialzer
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.domain.ext.deserialiseMediaList
-import uk.co.sentinelweb.cuer.domain.ext.serialiseList
 
 class BackupFileManager constructor(
-    private val repository: MediaDatabaseRepository,
-    private val contextProvider: CoroutineContextProvider
+    private val mediaRepository: MediaDatabaseRepository,
+    private val playlistRepository: PlaylistDatabaseRepository,
+    private val contextProvider: CoroutineContextProvider,
+    private val parserFactory: ParserFactory
+
 ) {
 
     suspend fun backupData() = withContext(contextProvider.IO) {
-        repository.loadList()
-            .takeIf { it.isSuccessful }
-            ?.data
-            ?.serialiseList()
+        BackupFileModel(
+            version = 2,
+            medias = mediaRepository.loadList().data!!,
+            playlists = playlistRepository.loadList().data!!
+        ).let {
+            jsonBackupSerialzer.stringify(BackupFileModel.serializer(), it)
+        }
     }
 
     suspend fun restoreData(data: String) = withContext(contextProvider.IO) {
-        repository.deleteAll()
+        val backupFileModel = parserFactory.create(data).parse(data)
+
+        mediaRepository.deleteAll()
             .takeIf { it.isSuccessful }
-            ?.let { deserialiseMediaList(data) }
-            ?.let { repository.save(it) }
+            ?.let { mediaRepository.deleteAllChannels() }
+            ?.takeIf { it.isSuccessful }
+            ?.let { mediaRepository.save(backupFileModel.medias) }
+            ?.takeIf { it.isSuccessful }
+            ?.let { playlistRepository.deleteAll() }
+            ?.takeIf { it.isSuccessful }
+            ?.let { playlistRepository.save(backupFileModel.playlists) }
             ?.isSuccessful
             ?: false
     }

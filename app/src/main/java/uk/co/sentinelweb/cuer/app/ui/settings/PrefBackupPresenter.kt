@@ -19,21 +19,33 @@ class PrefBackupPresenter constructor(
 
     override fun backupDatabaseToJson() {
         state.viewModelScope.launch {
+            view.showProgress(true)
             backupManager
                 .backupData()
-                ?.also {
+                .also {
                     state.writeData = it
                     val device = Build.MODEL.replace(" ", "_")
                     view.promptForSaveLocation("cuer_backup-$device.json")
+                    view.showProgress(false)
                 }
             state.lastBackedUp = timeProvider.instant()
         }
     }
 
     override fun restoreFile(uriString: String) {
+        view.showProgress(true)
         state.viewModelScope.launch {
             fileWrapper.readDataFromUri(uriString)
                 ?.let { backupManager.restoreData(it) }
+                .let { success ->
+                    if (success ?: false) {
+                        view.showMessage("Restore successful")
+                    } else {
+                        view.showMessage("Restore did NOT succceed")
+                    }
+                    view.showProgress(false)
+                }
+
         }
     }
 

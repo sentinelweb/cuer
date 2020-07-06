@@ -10,5 +10,7 @@ interface PrefBackupContract {
 
     interface View {
         fun promptForSaveLocation(fileName: String)
+        fun showProgress(b: Boolean)
+        fun showMessage(msg: String)
     }
 }
