@@ -54,7 +54,6 @@ class DatabaseInitializer constructor(
                 listOf(
                     "Default",
                     "Music",
-                    "Video",
                     "News",
                     "Philosophy",
                     "Psychology",
@@ -66,25 +65,22 @@ class DatabaseInitializer constructor(
             ?.takeIf { it.isSuccessful }?.data
             ?: playlistRepository.loadList().data!!
 
-
-    private fun mapQueueToMedia(it: QueueItem): MediaDomain {
-        return MediaDomain(
-            url = it.url,
-            platformId = it.getId(),
-            title = it.title,
-            platform = PlatformDomain.YOUTUBE,
-            description = null,
-            dateLastPlayed = null,
-            duration = null,
-            mediaType = MediaDomain.MediaTypeDomain.VIDEO,
-            id = null,
-            positon = null,
-            channelData = ChannelDomain(// todo add real data
-                platformId = null,
-                platform = PlatformDomain.YOUTUBE
-            )
+    private fun mapQueueToMedia(it: QueueItem) = MediaDomain(
+        url = it.url,
+        platformId = it.getId(),
+        title = it.title,
+        platform = PlatformDomain.YOUTUBE,
+        description = null,
+        dateLastPlayed = null,
+        duration = null,
+        mediaType = MediaDomain.MediaTypeDomain.VIDEO,
+        id = null,
+        positon = null,
+        channelData = ChannelDomain(// todo add real data
+            platformId = null,
+            platform = PlatformDomain.YOUTUBE
         )
-    }
+    )
 
     /**
      * A dummy item representing a piece of content.
@@ -96,7 +92,6 @@ class DatabaseInitializer constructor(
         override fun toString(): String = "$title - $url"
         fun getId() = url.substring(url.indexOf("?v=") + 3)
     }
-
 
     /**
      * An array of sample (dummy) items.

@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.db.backup.version.v1
 
-
 private typealias MediaDomainV1 = MediaDomain
 private typealias MediaTypeDomainV1 = MediaDomain.MediaTypeDomain
 private typealias ChannelDomainV1 = ChannelDomain

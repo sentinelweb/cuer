@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA_
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 
 class PlaylistItemEditViewModel constructor(
@@ -64,25 +65,36 @@ class PlaylistItemEditViewModel constructor(
 
     fun onSelectPlaylist(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
         viewModelScope.launch {
-            playlistRepo.loadList(null)
+            playlistRepo
+                .loadList(null)
                 .takeIf { it.isSuccessful }
                 ?.data?.apply {
                     state.allPlaylists = this
                     _selectModelLiveData.value =
-                        modelMapper.mapSelection(this, state.selectedPlaylists)
+                        modelMapper.mapPlaylistSelectionForDialog(this, state.selectedPlaylists)
                 }
-
         }
     }
 
     fun onPlaylistSelected(index: Int, checked: Boolean) {
-        state.allPlaylists?.get(index)?.apply {
-            if (checked) {
-                state.selectedPlaylists.add(this)
-            } else {
-                state.selectedPlaylists.remove(this)
-            }
-        }?.also { update() }
+        if (index < state.allPlaylists?.size ?: 0) {
+            state.allPlaylists?.get(index)?.apply {
+                if (checked) {
+                    state.selectedPlaylists.add(this)
+                } else {
+                    state.selectedPlaylists.remove(this)
+                }
+            }?.also { update() }
+        } else {
+            // _navigateLiveData.value = NavigationModel(PLAYLIST_CREATE, mapOf())
+            _selectModelLiveData.value =
+                SelectDialogModel(SelectDialogModel.Type.PLAYLIST_ADD, "Create playlist")
+        }
+    }
+
+    fun onPlaylistSelected(domain: PlaylistDomain) {
+        state.selectedPlaylists.add(domain)
+        update()
     }
 
     fun onPlaylistDialogClose() {

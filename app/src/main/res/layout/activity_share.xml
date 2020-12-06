@@ -51,8 +51,6 @@
         app:layout_constraintEnd_toStartOf="@id/bottom_right_button"
         app:layout_constraintStart_toStartOf="parent"
         />
-    <!--    android:drawableStart="@drawable/ic_button_back_black"-->
-    <!--    android:drawableEnd="@drawable/ic_button_add_black"-->
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/top_left_button"
@@ -69,8 +67,6 @@
         app:layout_constraintEnd_toStartOf="@id/top_right_button"
         app:layout_constraintStart_toStartOf="parent"
         />
-    <!--    android:drawableEnd="@drawable/ic_button_reject_black"-->
-    <!--    android:drawableStart="@drawable/ic_button_back_black"-->
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/top_right_button"
@@ -87,8 +83,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/top_left_button"
         />
-    <!--    android:drawableStart="@drawable/ic_button_play_black"-->
-    <!--    android:drawableEnd="@drawable/ic_button_forward_black"-->
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/bottom_right_button"
@@ -105,7 +99,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/bottom_left_button"
         />
-    <!--    android:drawableStart="@drawable/ic_button_add_black"-->
-    <!--    android:drawableEnd="@drawable/ic_button_forward_black"-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

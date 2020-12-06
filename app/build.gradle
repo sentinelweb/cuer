@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlinx-serialization'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion project.properties.app_compileSdkVersion as int
@@ -72,6 +73,7 @@ dependencies {
     implementation "com.google.android.material:material:$ver_material"
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
+
     implementation "com.squareup.picasso:picasso:$ver_picasso"
     implementation "com.jakewharton:process-phoenix:$ver_process_phoenix"
     implementation "androidx.preference:preference-ktx:$ver_preference"
@@ -104,6 +106,22 @@ dependencies {
 
     implementation "androidx.media:media:$ver_androidx_media"
 
+    // FIREBASE
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:26.1.1')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    // Declare the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-storage-ktx'
+    implementation 'com.firebaseui:firebase-ui-storage:7.1.1'
+    //implementation 'com.google.firebase:firebase-storage-ktx:19.2.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
+    implementation 'com.github.bumptech.glide:glide:4.11.0'// todo extract version
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
@@ -118,5 +136,11 @@ dependencies {
 
     androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
+    androidTestImplementation "org.koin:koin-test:$ver_koin"
+    androidTestImplementation "io.mockk:mockk:$ver_mockk"
+    androidTestImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
+    androidTestImplementation "androidx.test:core:$ver_androidx_test"
+    androidTestImplementation "androidx.test:runner:$ver_androidx_test"
+    androidTestImplementation "androidx.test:rules:$ver_androidx_test"
 
 }

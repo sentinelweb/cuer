@@ -24,7 +24,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class ShareActivity : AppCompatActivity(), ShareContract.View {
-
+    // todo add navigation here
     private val presenter: ShareContract.Presenter by currentScope.inject()
     private val shareWrapper: ShareWrapper by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
@@ -52,6 +52,18 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
             share_warning.isVisible = true
         }
     }
+
+//    override fun showPlaylistEdit() {
+//        // todo remove this and just make a text edit in the item edit
+//        supportFragmentManager.beginTransaction().apply {
+//            val playlistEditFragment = PlaylistEditFragment()
+//            add(playlistEditFragment,"pedit")
+//            remove(editFragment)
+//            show(playlistEditFragment)
+//            commit()
+//        }
+//
+//    }
 
     override fun exit() {
         finish()
@@ -155,12 +167,18 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
                         state = get(),
                         log = get(),
                         ytContextHolder = get(),
-                        res = get()
+                        mapper = get()
                     )
                 }
                 scoped { ShareWrapper(getSource()) }
                 scoped { SnackbarWrapper(getSource()) }
                 viewModel { ShareState() }
+                scoped {
+                    ShareModelMapper(
+                        ytContextHolder = get(),
+                        res = get()
+                    )
+                }
             }
         }
     }

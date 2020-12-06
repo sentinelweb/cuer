@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.app.db.repository
 
+import androidx.room.Transaction
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.dao.ChannelDao
 import uk.co.sentinelweb.cuer.app.db.dao.MediaDao
 import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
@@ -19,13 +21,15 @@ class MediaDatabaseRepository constructor(
     private val channelDao: ChannelDao,
     private val channelMapper: ChannelMapper,
     private val coProvider: CoroutineContextProvider,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val database: AppDatabase
 ) : DatabaseRepository<MediaDomain> {
 
     init {
         log.tag = "MediaDatabaseRepository"
     }
 
+    @Transaction
     override suspend fun save(domain: MediaDomain, flat: Boolean): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             try {
@@ -44,7 +48,7 @@ class MediaDatabaseRepository constructor(
     override suspend fun save(domains: List<MediaDomain>, flat: Boolean)
             : RepoResult<List<MediaDomain>> =
         withContext(coProvider.IO) {
-            try {
+            try { // todo exec in transaction
                 domains
                     .map { checkToSaveChannel(it) }
                     .map { mediaMapper.map(it) }

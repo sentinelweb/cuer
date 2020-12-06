@@ -32,11 +32,18 @@
     <!-- playlist_item_edit -->
     <string name="pie_empty_desc">We can only add youtube video links at the moment</string>
     <string name="pie_playlist_dialog_title">Select Playlist</string>
+    <string name="pie_add_playlist_dialog_title">Create Playlist</string>
     <string name="pie_empty_title">Sorry &#8230; ❤</string>
 
     <!-- playlist fragemnt -->
     <string name="playlist_fab_up_contentdesc">Up</string>
     <string name="playlist_fab_down_contentdesc">Down</string>
+
+    <!-- playlist edit fragemnt -->
+    <string name="pe_fragment_title">Edit playlist</string>
+    <string name="pe_fragment_title_add">Create playlist</string>
+    <string name="pe_title">Title</string>
+    <string name="pe_create">Create</string>
 
     <!-- local player -->
     <string name="title_activity_fullscreen">YoutubeFullscreenActivity</string>
@@ -48,4 +55,6 @@
     <string name="nav_title_backup_settings">Backup settings</string>
     <string name="pref_key_backup">backup</string>
     <string name="pref_key_restore">restore</string>
+    <string name="pe_default_display_title">Enter a title …</string>
+    <string name="pe_error_title_blank">Add a title</string>
 </resources>

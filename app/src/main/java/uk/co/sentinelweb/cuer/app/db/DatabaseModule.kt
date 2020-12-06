@@ -20,7 +20,8 @@ object DatabaseModule {
                 channelDao = get<AppDatabase>().channelDao(),
                 channelMapper = get(),
                 coProvider = get(),
-                log = get()
+                log = get(),
+                database = get()
             )
         }
         factory {

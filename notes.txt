@@ -1,0 +1,3 @@
+launch share
+
+adb shell am start -a android.intent.action.SEND -n uk.co.sentinelweb.cuer.app/.ui.share.ShareActivity -d https://youtu.be/rtEhFynXRhA

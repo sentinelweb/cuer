@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
 import androidx.core.view.isVisible
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.google.android.material.appbar.AppBarLayout
@@ -27,16 +28,18 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.util.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 
 class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) {
 
     private val viewModel: PlaylistItemEditViewModel by currentScope.inject()
     private val log: LogWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navMapper: NavigationMapper by currentScope.inject()
     private val chipCreator: ChipCreator by currentScope.inject()
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
 
@@ -44,6 +47,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     private val playMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_play) }
 
     private var dialog: AppCompatDialog? = null
+    private var createPlaylistDialog: DialogFragment? = null
 
     init {
         log.tag = "PlaylistItemEditFragment"
@@ -181,7 +185,9 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         viewModel.getNavigationObservable().observe(this.viewLifecycleOwner,
             object : Observer<NavigationModel> {
                 override fun onChanged(nav: NavigationModel) {
-                    navMapper.map(nav)
+                    when (nav.target) {
+                        else -> navMapper.map(nav)
+                    }
                 }
             }
         )
@@ -192,21 +198,52 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
             object : Observer<SelectDialogModel> {
                 override fun onChanged(model: SelectDialogModel) {
                     dialog?.dismiss()
-                    dialog = selectDialogCreator.create(model, object :
-                        DialogInterface.OnMultiChoiceClickListener {
-                        override fun onClick(
-                            p0: DialogInterface?,
-                            which: Int,
-                            checked: Boolean
-                        ) {
-                            viewModel.onPlaylistSelected(which, checked)
+                    createPlaylistDialog?.let {
+                        val ft = childFragmentManager.beginTransaction()
+                        ft.hide(it)
+                        ft.commit()
+                    }
+                    when (model.type) {
+                        SelectDialogModel.Type.PLAYLIST -> dialog =
+                            selectDialogCreator.create(model, object :
+                                DialogInterface.OnMultiChoiceClickListener {
+                                override fun onClick(
+                                    p0: DialogInterface?,
+                                    which: Int,
+                                    checked: Boolean
+                                ) {
+                                    viewModel.onPlaylistSelected(which, checked)
+                                }
+                            }).apply {
+                                setButton(DialogInterface.BUTTON_POSITIVE, "OK") { d, _ ->
+                                    d.dismiss()
+                                }
+                                setOnDismissListener { viewModel.onPlaylistDialogClose() }
+                                show()
+                            }
+
+                        SelectDialogModel.Type.PLAYLIST_ADD -> {
+//                            createPlaylistDialog = PlaylistEditFragment.newInstance(null).also{
+//                                it.show(childFragmentManager, CREATE_PLAYLIST_TAG)
+//                            }
+                            createPlaylistDialog = PlaylistEditFragment.newInstance(null).apply {
+                                listener = object : PlaylistEditFragment.Listener {
+                                    override fun onPlaylistCommit(domain: PlaylistDomain?) {
+                                        domain?.apply { viewModel.onPlaylistSelected(this) }
+                                        this@PlaylistItemEditFragment.childFragmentManager.beginTransaction()
+                                            .apply {
+                                                createPlaylistDialog?.let { hide(it) }
+                                                commit()
+                                            }
+                                    }
+                                }
+                            }
+                            createPlaylistDialog?.show(
+                                childFragmentManager,
+                                CREATE_PLAYLIST_TAG
+                            ) // fragmentManager!!
                         }
-                    }).apply {
-                        setButton(DialogInterface.BUTTON_POSITIVE, "OK") { d, _ ->
-                            d.dismiss()
-                        }
-                        setOnDismissListener { viewModel.onPlaylistDialogClose() }
-                        show()
+                        else -> Unit
                     }
                 }
             }
@@ -214,6 +251,9 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     }
 
     companion object {
+
+        private val CREATE_PLAYLIST_TAG = "pe_dialog"
+
         @JvmStatic
         val fragmentModule = module {
             scope(named<PlaylistItemEditFragment>()) {

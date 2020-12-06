@@ -7,6 +7,7 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.di.Modules
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
 
@@ -15,6 +16,7 @@ class CuerApp : Application() {
     private val stethoWrapper:StethoWrapper by inject()
     private val sharingShortcutsManager: SharingShortcutsManager by inject()
     private val databaseInit: DatabaseInitializer by inject()
+    private val firebaseWrapper: FirebaseWrapper by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -36,5 +38,7 @@ class CuerApp : Application() {
         }
 
         databaseInit.initDatabase()
+
+        firebaseWrapper.init()
     }
 }

@@ -17,11 +17,13 @@ import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.helper.PlaylistMutator
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
@@ -44,6 +46,7 @@ object Modules {
         CastPlayerFragment.viewModule,
         ShareActivity.activityModule,
         PlaylistItemEditFragment.fragmentModule,
+        PlaylistEditFragment.fragmentModule,
         YoutubeCastServiceModule.serviceModule,
         PrefBackupFragment.fragmentModule
     )
@@ -99,4 +102,5 @@ object Modules {
         .plus(NetModule.netModule)
         .plus(CoreModule.objectModule)
         .plus(CastModule.castModule)
+        .plus(FirebaseModule.fbModule)
 }

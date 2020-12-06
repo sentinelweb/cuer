@@ -55,16 +55,26 @@ class PlaylistItemEditModelMapper(
         empty = false
     )
 
-    fun mapSelection(all: List<PlaylistDomain>, selected: Set<PlaylistDomain>): SelectDialogModel =
+    fun mapPlaylistSelectionForDialog(
+        all: List<PlaylistDomain>,
+        selected: Set<PlaylistDomain>
+    ): SelectDialogModel =
         SelectDialogModel(
             type = SelectDialogModel.Type.PLAYLIST,
             title = res.getString(R.string.pie_playlist_dialog_title),
             items = all.map { playlist ->
                 SelectDialogModel.Item(
                     playlist.title,
-                    selected = (selected.find { sel -> playlist.title == sel.title } != null)
+                    selected = (selected.find { sel -> playlist.title == sel.title } != null),
+                    selectable = true
                 )
-            }
+            }.plus(
+                SelectDialogModel.Item(
+                    "Add playlist ...",
+                    selected = false,
+                    selectable = false
+                )
+            )
         )
 
     fun mapEmpty(): PlaylistItemEditModel = PlaylistItemEditModel(
