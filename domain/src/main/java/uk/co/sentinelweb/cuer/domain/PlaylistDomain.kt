@@ -9,11 +9,12 @@ import java.time.Instant
 data class PlaylistDomain constructor(
     val id: Long? = null,
     val title: String,
-    val items: List<PlaylistItemDomain>,
+    val items: List<PlaylistItemDomain> = listOf(),
     val currentIndex: Int = -1,
     val mode: PlaylistModeDomain = SINGLE,
     val starred: Boolean = false,
     val archived: Boolean = false,
+    val default: Boolean = false,
     val thumb: ImageDomain? = null,
     val image: ImageDomain? = null,
     val config: PlaylistConfigDomain = PlaylistConfigDomain()

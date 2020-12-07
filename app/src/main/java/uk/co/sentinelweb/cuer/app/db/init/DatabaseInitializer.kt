@@ -47,20 +47,30 @@ class DatabaseInitializer constructor(
         )
     }
 
-    private suspend fun initPlaylists(): List<PlaylistDomain> =
+    suspend fun initPlaylists(): List<PlaylistDomain> =
         playlistRepository.count()
             .takeIf { it.isSuccessful && it.data == 0 }
             ?.let {
                 listOf(
-                    "Default",
-                    "Music",
-                    "News",
-                    "Philosophy",
-                    "Psychology",
-                    "Comedy"
+                    DEFAULT_PLAYLIST,
+                    PlaylistDomain(
+                        title = "Music",
+                        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-cottonbro-4088009-600.jpg")
+                    ),
+                    PlaylistDomain(
+                        title = "News",
+                        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-brotin-biswas-518543-600.jpg")
+                    ),
+                    PlaylistDomain(
+                        title = "Philosophy",
+                        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-matheus-bertelli-2674271-600.jpg")
+                    ),
+                    PlaylistDomain(
+                        title = "Comedy",
+                        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-tim-mossholder-1115680-600.jpg")
+                    )
                 )
             }
-            ?.map { PlaylistDomain(items = listOf(), title = it) }
             ?.let { playlistRepository.save(it) }
             ?.takeIf { it.isSuccessful }?.data
             ?: playlistRepository.loadList().data!!
@@ -138,4 +148,12 @@ class DatabaseInitializer constructor(
             "Why You Can't FOCUS - And How To Fix That"
         )
     )
+
+    companion object {
+        val DEFAULT_PLAYLIST = PlaylistDomain(
+            title = "Default",
+            image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-freestocksorg-34407-600.jpg"),
+            default = true
+        )
+    }
 }

@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.app.db.dao.MediaDao
 import uk.co.sentinelweb.cuer.app.db.dao.PlaylistDao
 import uk.co.sentinelweb.cuer.app.db.dao.PlaylistItemDao
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistAndItems
+import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistMapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -110,6 +111,13 @@ class PlaylistDatabaseRepository constructor(
                         else playlistDao
                             .loadAllByIdsWithItems(filter.ids.toLongArray())
                             .map { mapDeep(it) }
+                    is DefaultFilter ->
+                        if (filter.flat) playlistDao
+                            .loadAllByFlags(PlaylistEntity.FLAG_DEFAULT)
+                            .map { playlistMapper.map(it, null, null) }
+                        else playlistDao
+                            .loadAllByFlagsWithItems(PlaylistEntity.FLAG_DEFAULT)
+                            .map { mapDeep(it) }
                     else ->
                         playlistDao
                             .getAllPlaylists()
@@ -183,6 +191,42 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
+    suspend fun savePlaylistItems(items: List<PlaylistItemDomain>): RepoResult<List<PlaylistItemDomain>> =
+        withContext(coProvider.IO) {
+            try {
+                val checkOrderAndPlaylist: MutableSet<String> = mutableSetOf()
+                items
+                    .apply {
+                        forEach {
+                            val key = "${it.order}:${it.playlistId}"
+                            if (checkOrderAndPlaylist.contains(key)) throw IllegalStateException("order / playlist is not unique")
+                            else checkOrderAndPlaylist.add(key)
+                        }
+                    }
+                    .map { playlistItemMapper.map(it) }
+                    .map {
+                        if (it.id != INITIAL_ID) {
+                            playlistItemDao.update(it); it
+                        } else {
+                            it.copy(id = playlistItemDao.insert(it))
+                        }
+                    }
+                    .map { savedItem ->
+                        playlistItemMapper.map(
+                            savedItem,
+                            items.find { it.media.id == savedItem.mediaId }
+                                ?.media
+                                ?: throw IllegalStateException("Media id saved incorrectly")
+                        )
+                    }
+                    .let { RepoResult.Data(it) }
+            } catch (e: Exception) {
+                val msg = "couldn't save playlist items"
+                log.e(msg, e)
+                RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
+            }
+        }
+
     suspend fun loadPlaylistItem(id: Long): RepoResult<PlaylistItemDomain> =
         withContext(coProvider.IO) {
             try {
@@ -212,4 +256,5 @@ class PlaylistDatabaseRepository constructor(
     // endregion
 
     class IdListFilter(val ids: List<Long>, val flat: Boolean = true) : DatabaseRepository.Filter
+    class DefaultFilter(val flat: Boolean = true) : DatabaseRepository.Filter
 }

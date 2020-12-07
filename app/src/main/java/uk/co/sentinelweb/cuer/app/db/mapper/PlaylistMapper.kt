@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_ARCHIVED
+import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_DEFAULT
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -17,7 +18,8 @@ class PlaylistMapper(
         currentIndex = domain.currentIndex, // todo enforce consistency better
         config = domain.config,
         flags = if (domain.archived) FLAG_ARCHIVED else 0 +
-                if (domain.starred) FLAG_STARRED else 0,
+                if (domain.starred) FLAG_STARRED else 0 +
+                        if (domain.default) FLAG_DEFAULT else 0,
         image = imageMapper.mapImage(domain.image),
         thumb = imageMapper.mapImage(domain.thumb),
         mode = domain.mode,
@@ -32,6 +34,7 @@ class PlaylistMapper(
         id = entity.id,
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
         starred = entity.flags and FLAG_STARRED == FLAG_STARRED,
+        default = entity.flags and FLAG_DEFAULT == FLAG_DEFAULT,
         items = items
             ?.map {
                 playlistItemMapper.map(

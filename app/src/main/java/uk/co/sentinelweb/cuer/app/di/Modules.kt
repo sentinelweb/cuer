@@ -29,7 +29,7 @@ import uk.co.sentinelweb.cuer.app.util.helper.PlaylistMutator
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPrefs
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
@@ -80,7 +80,7 @@ object Modules {
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
-        factory { BackupFileManager(get(), get(), get(), get()) }
+        factory { BackupFileManager(get(), get(), get(), get(), get(), get(), get()) }
         factory { ParserFactory() }
     }
 
@@ -92,8 +92,8 @@ object Modules {
         factory { ResourceWrapper(androidApplication()) }
         factory<LogWrapper> { AndroidLogWrapper() }
         factory { FileWrapper(androidApplication()) }
-        single(named<GeneralPrefs>()) {
-            SharedPrefsWrapper(GeneralPrefs::class.java, androidApplication())
+        single(named<GeneralPreferences>()) {
+            SharedPrefsWrapper(GeneralPreferences::class.java, androidApplication())
         }
     }
 

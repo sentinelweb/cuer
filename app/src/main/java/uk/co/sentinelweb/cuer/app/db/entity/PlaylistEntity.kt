@@ -52,5 +52,6 @@ data class PlaylistEntity(
     companion object {
         const val FLAG_STARRED = 1L
         const val FLAG_ARCHIVED = 2L
+        const val FLAG_DEFAULT = 4L
     }
 }

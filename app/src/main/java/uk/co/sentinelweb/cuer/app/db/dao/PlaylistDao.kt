@@ -29,6 +29,9 @@ interface PlaylistDao {
     @Query("SELECT * FROM playlist WHERE id IN (:playlistIds)")
     suspend fun loadAllByIds(playlistIds: LongArray): List<PlaylistEntity>
 
+    @Query("SELECT * FROM playlist WHERE flags & :flags == :flags")
+    suspend fun loadAllByFlags(flags: Long): List<PlaylistEntity>
+
     @Transaction
     @Query("SELECT * FROM playlist WHERE id == :id")
     suspend fun loadWithItems(id: Long): PlaylistAndItems?
@@ -36,6 +39,10 @@ interface PlaylistDao {
     @Transaction
     @Query("SELECT * FROM playlist WHERE id IN (:playlistIds)")
     suspend fun loadAllByIdsWithItems(playlistIds: LongArray): List<PlaylistAndItems>
+
+    @Transaction
+    @Query("SELECT * FROM playlist WHERE flags & :flags == :flags")
+    suspend fun loadAllByFlagsWithItems(flags: Long): List<PlaylistAndItems>
 
 
     @Update
