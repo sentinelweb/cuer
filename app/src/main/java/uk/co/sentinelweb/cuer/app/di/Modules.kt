@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.di
 
 import org.koin.android.ext.koin.androidApplication
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
@@ -28,6 +29,8 @@ import uk.co.sentinelweb.cuer.app.util.helper.PlaylistMutator
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPrefs
+import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
@@ -89,6 +92,9 @@ object Modules {
         factory { ResourceWrapper(androidApplication()) }
         factory<LogWrapper> { AndroidLogWrapper() }
         factory { FileWrapper(androidApplication()) }
+        single(named<GeneralPrefs>()) {
+            SharedPrefsWrapper(GeneralPrefs::class.java, androidApplication())
+        }
     }
 
     private val appNetModule = module {
