@@ -16,15 +16,16 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import java.time.Instant
+import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 
 
 class PlaylistItemEditViewModel constructor(
     private val state: PlaylistItemEditState,
     private val modelMapper: PlaylistItemEditModelMapper,
     private val playlistRepo: PlaylistDatabaseRepository,
-    private val mediaRepo: MediaDatabaseRepository
+    private val mediaRepo: MediaDatabaseRepository,
+    private val itemCreator: PlaylistItemCreator
+
 ) : ViewModel() {
 
     private val _modelLiveData: MutableLiveData<PlaylistItemEditModel> = MutableLiveData()
@@ -126,12 +127,7 @@ class PlaylistItemEditViewModel constructor(
                 state.media = savedMedia
                 state.selectedPlaylists.forEach { playlist ->
                     playlistRepo.savePlaylistItem(
-                        PlaylistItemDomain(
-                            media = savedMedia,
-                            dateAdded = Instant.now(),
-                            playlistId = playlist.id,
-                            order = System.currentTimeMillis()
-                        )
+                        itemCreator.buildPlayListItem(savedMedia, playlist)
                     )
                 }
             }

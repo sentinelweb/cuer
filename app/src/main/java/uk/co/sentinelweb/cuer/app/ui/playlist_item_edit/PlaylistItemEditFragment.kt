@@ -267,7 +267,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         state = get(),
                         modelMapper = get(),
                         playlistRepo = get(),
-                        mediaRepo = get()
+                        mediaRepo = get(),
+                        itemCreator = get()
                     )
                 }
                 factory { PlaylistItemEditState() }

@@ -34,6 +34,7 @@ import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.di.DomainModule
 import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
@@ -101,6 +102,7 @@ object Modules {
         .plus(DatabaseModule.dbModule)
         .plus(NetModule.netModule)
         .plus(CoreModule.objectModule)
+        .plus(DomainModule.objectModule)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
 }

@@ -7,4 +7,6 @@ class TimeProvider {
     fun instant() = Instant.now()
 
     fun localDateTime() = LocalDateTime.now()
+
+    fun currentTimeMillis() = System.currentTimeMillis()
 }
