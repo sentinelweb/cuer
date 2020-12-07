@@ -80,9 +80,21 @@ class SharePresenter constructor(
     private fun finish(add: Boolean, play: Boolean, forward: Boolean) {
         state.jobs.add(CoroutineScope(contextProvider.Main).launch {
             if (add) {
-                state.media
-                    ?.also { repository.save(it) }
-                    ?.also { queue.refreshQueue() }
+                view.commitPlaylistItems()
+                queue.refreshQueue()
+
+//                state.media
+//                    ?.let { repository.save(it) }
+//                    ?.takeIf { it.isSuccessful }
+//                    ?.also { queue.refreshQueue() }
+//                    ?.apply {
+//                        data?.let {
+//                            state.media = data
+//                            view.setData(mapper.mapShareModel(it, ::finish))
+//
+//                        }
+//
+//                    }
             }
             val isConnected = ytContextHolder.isConnected()
             if (forward) {

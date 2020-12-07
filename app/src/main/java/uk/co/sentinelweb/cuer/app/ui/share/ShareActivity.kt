@@ -138,6 +138,10 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         }
     }
 
+    override suspend fun commitPlaylistItems() {
+        editFragment.commitPlaylistItems()
+    }
+
     companion object {
 
         private const val EXTRA_PASTE = "paste"

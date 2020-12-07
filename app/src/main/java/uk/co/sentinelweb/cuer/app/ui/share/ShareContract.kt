@@ -17,5 +17,6 @@ interface ShareContract {
         fun setData(model: ShareModel)
         fun error(msg: String)
         fun warning(msg: String)
+        suspend fun commitPlaylistItems()
     }
 }

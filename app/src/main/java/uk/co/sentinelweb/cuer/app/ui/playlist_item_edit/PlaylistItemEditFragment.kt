@@ -151,7 +151,11 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                             ple_chips.addView(this)
                             when (chipModel.type) {
                                 PLAYLIST_SELECT -> {
-                                    setOnClickListener { viewModel.onSelectPlaylist(chipModel) }
+                                    setOnClickListener {
+                                        viewModel.onSelectPlaylistChipClick(
+                                            chipModel
+                                        )
+                                    }
                                 }
                                 PLAYLIST -> {
                                     setOnCloseIconClickListener {
@@ -223,9 +227,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                             }
 
                         SelectDialogModel.Type.PLAYLIST_ADD -> {
-//                            createPlaylistDialog = PlaylistEditFragment.newInstance(null).also{
-//                                it.show(childFragmentManager, CREATE_PLAYLIST_TAG)
-//                            }
                             createPlaylistDialog = PlaylistEditFragment.newInstance(null).apply {
                                 listener = object : PlaylistEditFragment.Listener {
                                     override fun onPlaylistCommit(domain: PlaylistDomain?) {
@@ -250,6 +251,10 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         )
     }
 
+    suspend fun commitPlaylistItems() {
+        viewModel.commitPlaylistItems()
+    }
+
     companion object {
 
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
@@ -261,7 +266,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     PlaylistItemEditViewModel(
                         state = get(),
                         modelMapper = get(),
-                        playlistRepo = get()
+                        playlistRepo = get(),
+                        mediaRepo = get()
                     )
                 }
                 factory { PlaylistItemEditState() }

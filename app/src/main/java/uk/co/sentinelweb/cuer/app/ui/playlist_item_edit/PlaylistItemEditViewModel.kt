@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.LOCAL_PLAYER
@@ -15,12 +16,15 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import java.time.Instant
 
 
 class PlaylistItemEditViewModel constructor(
     private val state: PlaylistItemEditState,
     private val modelMapper: PlaylistItemEditModelMapper,
-    private val playlistRepo: PlaylistDatabaseRepository
+    private val playlistRepo: PlaylistDatabaseRepository,
+    private val mediaRepo: MediaDatabaseRepository
 ) : ViewModel() {
 
     private val _modelLiveData: MutableLiveData<PlaylistItemEditModel> = MutableLiveData()
@@ -39,6 +43,7 @@ class PlaylistItemEditViewModel constructor(
     }
 
     fun setData(media: MediaDomain?) {
+        // todo choose default playlist(s) - default flag or most recent
         media?.let {
             state.media = media
             state.media.also { update() }
@@ -63,12 +68,13 @@ class PlaylistItemEditViewModel constructor(
             NavigationModel(WEB_LINK, mapOf(LINK to urlString))
     }
 
-    fun onSelectPlaylist(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
+    fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
         viewModelScope.launch {
             playlistRepo
                 .loadList(null)
                 .takeIf { it.isSuccessful }
                 ?.data?.apply {
+                    // todo prioritize ordering by usage
                     state.allPlaylists = this
                     _selectModelLiveData.value =
                         modelMapper.mapPlaylistSelectionForDialog(this, state.selectedPlaylists)
@@ -110,6 +116,25 @@ class PlaylistItemEditViewModel constructor(
     private fun update() {
         state.model = modelMapper.map(state.media!!, state.selectedPlaylists)
         _modelLiveData.value = state.model
+    }
+
+    suspend fun commitPlaylistItems() {
+        state.media
+            ?.let { mediaRepo.save(it) }
+            ?.takeIf { it.isSuccessful }
+            ?.data?.let { savedMedia ->
+                state.media = savedMedia
+                state.selectedPlaylists.forEach { playlist ->
+                    playlistRepo.savePlaylistItem(
+                        PlaylistItemDomain(
+                            media = savedMedia,
+                            dateAdded = Instant.now(),
+                            playlistId = playlist.id,
+                            order = System.currentTimeMillis()
+                        )
+                    )
+                }
+            }
     }
 
 }
