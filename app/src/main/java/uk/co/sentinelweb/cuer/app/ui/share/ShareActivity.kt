@@ -43,7 +43,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
 
     override fun error(msg: String) {
         snackbar?.dismiss()
-        snackbar = snackbarWrapper.make("ERROR: $msg")
+        snackbar = snackbarWrapper.make("ERROR: $msg").apply { show() }
     }
 
     override fun warning(msg: String) {

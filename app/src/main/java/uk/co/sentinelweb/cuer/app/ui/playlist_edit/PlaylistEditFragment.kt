@@ -1,10 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_edit
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
@@ -70,7 +68,17 @@ class PlaylistEditFragment constructor(private val id: Long?) : DialogFragment()
                 else -> false
             }
         }
-        pe_image.setOnClickListener { viewModel.onImageClick() }
+        //pe_image.setOnClickListener { viewModel.onImageClick() }
+
+        pe_image.setOnTouchListener @SuppressLint("ClickableViewAccessibility") { iv, e ->
+            when (e.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    viewModel.onImageClick(e.x > iv.width / 2)
+                    true
+                }
+                else -> true
+            }
+        }
         pe_commit_button.setOnClickListener { viewModel.onCommitClick() }
         pe_title_edit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
         pe_appbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {

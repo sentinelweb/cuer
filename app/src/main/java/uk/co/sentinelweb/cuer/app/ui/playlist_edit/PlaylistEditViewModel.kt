@@ -66,9 +66,9 @@ class PlaylistEditViewModel constructor(
         )
     }
 
-    fun onImageClick() {
+    fun onImageClick(forward: Boolean) {
         state.playlist.image?.let {
-            imageProvider.getNextImage(it) { next ->
+            imageProvider.getNextImage(it, forward) { next ->
                 if (next != null) {
                     state.playlist = state.playlist.copy(image = next)
                     update()

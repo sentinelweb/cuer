@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.LOCAL_PLAYER
 import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.WEB_LINK
@@ -120,12 +121,20 @@ class PlaylistItemEditViewModel constructor(
     }
 
     suspend fun commitPlaylistItems() {
+        val selectedPlaylists = if (state.selectedPlaylists.size > 0) {
+            state.selectedPlaylists
+        } else {
+            playlistRepo.loadList(PlaylistDatabaseRepository.DefaultFilter())
+                .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
+                ?.data
+                ?: throw NoDefaultPlaylistException()
+        }
         state.media
             ?.let { mediaRepo.save(it) }
             ?.takeIf { it.isSuccessful }
             ?.data?.let { savedMedia ->
                 state.media = savedMedia
-                state.selectedPlaylists.forEach { playlist ->
+                selectedPlaylists.forEach { playlist ->
                     playlistRepo.savePlaylistItem(
                         itemCreator.buildPlayListItem(savedMedia, playlist)
                     )

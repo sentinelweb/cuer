@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.share
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
@@ -79,37 +80,31 @@ class SharePresenter constructor(
 
     private fun finish(add: Boolean, play: Boolean, forward: Boolean) {
         state.jobs.add(CoroutineScope(contextProvider.Main).launch {
-            if (add) {
-                view.commitPlaylistItems()
-                queue.refreshQueue()
-
-//                state.media
-//                    ?.let { repository.save(it) }
-//                    ?.takeIf { it.isSuccessful }
-//                    ?.also { queue.refreshQueue() }
-//                    ?.apply {
-//                        data?.let {
-//                            state.media = data
-//                            view.setData(mapper.mapShareModel(it, ::finish))
-//
-//                        }
-//
-//                    }
-            }
-            val isConnected = ytContextHolder.isConnected()
-            if (forward) {
-                view.gotoMain(state.media, play)
-                view.exit()
-            } else { // return play is hidden for not connected
-                play.takeIf { it }
-                    ?.takeIf { isConnected }
-                    ?.let { state.media }
-                    ?.also {
-                        queue.getItemFor(it.url)
-                            ?.run { queue.onItemSelected(this) }
-                            .run { view.exit() }
-
-                    } ?: view.exit()
+            try {
+                if (add) {
+                    view.commitPlaylistItems()
+                    queue.refreshQueue()
+                }
+                val isConnected = ytContextHolder.isConnected()
+                if (forward) {
+                    view.gotoMain(state.media, play)
+                    view.exit()
+                } else { // return play is hidden for not connected
+                    play.takeIf { it }
+                        ?.takeIf { isConnected }
+                        ?.let { state.media }
+                        ?.also {
+                            queue.getItemFor(it.url)
+                                ?.run { queue.onItemSelected(this) }
+                                .run { view.exit() }
+                        } ?: view.exit()
+                }
+            } catch (t: Throwable) {
+                when (t) {
+                    is NoDefaultPlaylistException -> // todo make a dialog or just create the playlist
+                        view.error("No default playlist - select a playlist to save the item")
+                    else -> view.error(t.message ?: (t::class.java.simpleName + " error ... sorry"))
+                }
             }
         })
     }
