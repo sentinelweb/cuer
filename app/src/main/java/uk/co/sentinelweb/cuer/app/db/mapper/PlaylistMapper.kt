@@ -41,7 +41,7 @@ class PlaylistMapper(
                     it,
                     medias!!.find { media -> media.media.id == it.mediaId }!!
                 )
-            }
+            }?.sortedBy { it.order }
             ?: listOf(),
         mode = entity.mode,
         thumb = imageMapper.mapImage(entity.thumb),

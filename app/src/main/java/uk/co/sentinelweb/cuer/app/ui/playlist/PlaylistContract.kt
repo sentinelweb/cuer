@@ -22,10 +22,11 @@ interface PlaylistContract {
         fun playNow(mediaDomain: MediaDomain)
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
+        fun commitMove()
     }
 
     interface View {
-        fun setList(list: List<ItemModel>)
+        fun setList(list: List<ItemModel>, animate: Boolean = true)
         fun scrollToItem(index: Int)
         fun scrollTo(direction: ScrollDirection)
         fun playLocal(media: MediaDomain)

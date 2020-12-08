@@ -68,7 +68,8 @@ class MediaDatabaseRepositoryIntegrationTest {
             channelDao = database.channelDao(),
             channelMapper = channelMapper,
             log = log,
-            coProvider = coCxtProvider
+            coProvider = coCxtProvider,
+            database = database
         )
 
         fixtMedia = fixtMedia.copy(

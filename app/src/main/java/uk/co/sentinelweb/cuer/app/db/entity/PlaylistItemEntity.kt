@@ -10,7 +10,7 @@ import java.time.Instant
 @Entity(
     tableName = "playlist_item",
     indices = arrayOf(
-        Index("order", "playlist_id", unique = true),
+        Index("order", "playlist_id"),
         Index("playlist_id"),
         Index("media_id"),
         Index("flags")

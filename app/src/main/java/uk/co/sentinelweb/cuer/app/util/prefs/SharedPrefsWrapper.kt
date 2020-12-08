@@ -18,9 +18,11 @@ class SharedPrefsWrapper<T : Field> constructor(
         prefs = app.getSharedPreferences(clazz.simpleName, MODE_PRIVATE)
     }
 
-    fun getLong(field: T, def: Long) {
-        prefs.getLong(field.fname, def)
-    }
+    fun getLong(field: T, def: Long): Long = prefs.getLong(field.fname, def)
+
+    fun getLong(field: T): Long? =
+        if (prefs.contains(field.fname)) prefs.getLong(field.fname, 0)
+        else null
 
     fun putLong(value: Long, field: T) {
         prefs.edit().putLong(field.fname, value).apply()

@@ -4,7 +4,7 @@ class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
     val state: ItemState
-) : ItemContract.Presenter {
+) : ItemContract.Presenter, ItemContract.External {
 
     override fun update(item: ItemModel) {
         view.setTopText(item.topText)

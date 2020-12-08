@@ -14,14 +14,17 @@ interface ItemContract {
     }
 
     interface Presenter {
-        fun update(item: ItemModel)
         fun doClick()
-        fun doLeft()
-        fun doRight()
         fun doPlay(external: Boolean)
         fun doShowChannel()
         fun doStar()
         fun doShare()
+    }
+
+    interface External {
+        fun update(item: ItemModel)
+        fun doLeft()
+        fun doRight()
     }
 
     interface Interactions {
@@ -45,6 +48,7 @@ interface ItemContract {
 
     interface ItemMoveInteractions {
         fun onItemMove(fromPosition: Int, toPosition: Int): Boolean
+        fun onItemClear()
     }
 
 }

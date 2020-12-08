@@ -20,7 +20,7 @@ class ItemFactory {
     private fun createPresenter(
         view: ItemContract.View,
         interactions: ItemContract.Interactions
-    ): ItemContract.Presenter {
+    ): ItemContract.External {
         val itemPresenter = ItemPresenter(view, interactions, ItemState())
         view.setPresenter(itemPresenter)
         return itemPresenter

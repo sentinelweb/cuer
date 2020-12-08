@@ -1,10 +1,9 @@
-package uk.co.sentinelweb.cuer.app.util.helper
+package uk.co.sentinelweb.cuer.domain.mutator
 
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.LOOP
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import java.util.*
 
 class PlaylistMutator {
     // do i have to change the current index? yes
@@ -14,8 +13,11 @@ class PlaylistMutator {
     // todo update order
     fun moveItem(domain: PlaylistDomain, fromPosition: Int, toPosition: Int): PlaylistDomain {
         if (fromPosition != toPosition) {
-            Collections.swap(domain.items, fromPosition, toPosition)
-            val movingItem = domain.items[toPosition]
+            //Collections.swap(domain.items, fromPosition, toPosition)
+
+            val items = domain.items.toMutableList()
+            val movingItem = items.removeAt(fromPosition)
+            items.add(/*if (fromPosition<toPosition) toPosition-1 else */toPosition, movingItem)
             var newCurrentIndex = domain.currentIndex
 
             @Suppress("ConvertTwoComparisonsToRangeCheck")
@@ -23,22 +25,26 @@ class PlaylistMutator {
                 if (toPosition <= domain.currentIndex && fromPosition > domain.currentIndex) {
                     newCurrentIndex++
                     when (toPosition) {
-                        0 -> domain.items[1].order - 1000L
-                        else -> (domain.items[toPosition + 1].order + domain.items[toPosition - 1].order) / 2L
+                        0 -> items[1].order - 1000L
+                        else -> (items[toPosition + 1].order + items[toPosition - 1].order) / 2L
                     }
                 } else if (toPosition >= domain.currentIndex && fromPosition < domain.currentIndex) {
                     newCurrentIndex--
                     when (toPosition) {
-                        domain.items.size - 1 -> domain.items[domain.items.size - 2].order + 1000L
-                        else -> (domain.items[toPosition + 1].order + domain.items[toPosition - 1].order) / 2L
+                        items.size - 1 -> items[items.size - 2].order + 1000L
+                        else -> (items[toPosition + 1].order + items[toPosition - 1].order) / 2L
                     }
                 } else {
-                    movingItem.order
+                    when (toPosition) {
+                        0 -> items[1].order - 1000L
+                        items.size - 1 -> items[items.size - 2].order + 1000L
+                        else -> (items[toPosition + 1].order + items[toPosition - 1].order) / 2L
+                    }
                 }
-            val newItems = domain.items.toMutableList().apply {
+            items.apply {
                 set(toPosition, movingItem.copy(order = newOrder))
             }
-            return domain.copy(items = newItems, currentIndex = newCurrentIndex)
+            return domain.copy(items = items, currentIndex = newCurrentIndex)
         }
         return domain
     }

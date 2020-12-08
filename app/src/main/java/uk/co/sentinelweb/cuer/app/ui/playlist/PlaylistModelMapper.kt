@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -13,22 +12,18 @@ class PlaylistModelMapper constructor() {
     )
 
     private fun map(it: PlaylistItemDomain, index: Int): PlaylistModel.PlaylistItemModel {
-        val media = it.media
-        return map(media, index)
-    }
-
-    private fun map(media: MediaDomain, index: Int): PlaylistModel.PlaylistItemModel {
-        val top = media.title ?: "No title"
-        val bottom = media.url
+        val top = it.media.title ?: "No title"
+        val bottom = it.media.url
         return PlaylistModel.PlaylistItemModel(
-            media.id.toString(),
+            it.id,
             index,
             bottom,
-            media.mediaType,
+            it.media.mediaType,
             top,
-            media.duration?.let { "${(it / 1000)}s" } ?: "-",
-            media.positon?.let { "${(it / 1000)}s" } ?: "-",
-            media.thumbNail?.url
+            it.media.duration?.let { "${it / 1000}s" } ?: "-",
+            it.media.positon?.let { "${it / 1000}s" } ?: "-",
+            it.media.thumbNail?.url
         )
     }
+
 }

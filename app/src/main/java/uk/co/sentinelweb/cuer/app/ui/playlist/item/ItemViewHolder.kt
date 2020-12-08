@@ -4,7 +4,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 class ItemViewHolder(
-    val itemPresenter: ItemContract.Presenter, private val view: ItemView
+    val itemPresenter: ItemContract.External, private val view: ItemView
 ) : RecyclerView.ViewHolder(view),
     ItemContract.ItemTouchHelperViewHolder {
 

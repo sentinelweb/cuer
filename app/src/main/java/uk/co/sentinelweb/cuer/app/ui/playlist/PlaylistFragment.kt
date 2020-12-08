@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -80,9 +81,9 @@ class PlaylistFragment :
     // endregion
 
     // region PlaylistContract.View
-    override fun setList(list: List<ItemModel>) {
+    override fun setList(list: List<ItemModel>, animate: Boolean) {
         playlist_swipe.isRefreshing = false
-        adapter.data = list
+        adapter.setData(list, animate)
         playlist_swipe.setOnRefreshListener { presenter.refreshList() }
     }
 
@@ -142,6 +143,9 @@ class PlaylistFragment :
         return true
     }
 
+    override fun onItemClear() {
+        presenter.commitMove()
+    }
     //endregion
 
     // region ItemContract.Interactions
@@ -188,13 +192,17 @@ class PlaylistFragment :
                         view = get(),
                         state = get(),
                         repository = get(),
+                        playlistRepository = get(),
                         modelMapper = get(),
                         contextProvider = get(),
-                        queue = get(),
+                        //queue = get(),
                         toastWrapper = get(),
                         ytContextHolder = get(),
                         ytJavaApi = get(),
-                        shareWrapper = get()
+                        shareWrapper = get(),
+                        prefsWrapper = get(named<GeneralPreferences>()),
+                        playlistMutator = get(),
+                        log = get()
                     )
                 }
                 scoped { PlaylistModelMapper() }

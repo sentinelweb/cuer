@@ -32,7 +32,7 @@ class PlaylistDatabaseRepository constructor(
                     .let { playlistMapper.map(it) }
                     .let { playlistDao.insert(it) }
                     .also { insertId = it }
-                    .takeIf { flat }
+                    .takeIf { !flat }
                     ?.let { playlistId -> domain.items.map { it.copy(playlistId = playlistId) } }
                     ?.map { item -> playlistItemMapper.map(item) }
                     ?.let { playlistItemEntities -> playlistItemDao.insertAll(playlistItemEntities) }
@@ -56,7 +56,7 @@ class PlaylistDatabaseRepository constructor(
                     .map { playlistMapper.map(it) }
                     .let { playlistDao.insertAll(it) }
                     .also { insertIds = it }
-                    .takeIf { flat }
+                    .takeIf { !flat }
                     ?.mapIndexed { index, playlistId -> domains[index] to playlistId }
                     ?.map { (playlist, playlistId) ->
                         playlist.items
@@ -175,9 +175,11 @@ class PlaylistDatabaseRepository constructor(
             try {
                 item
                     .let { playlistItemMapper.map(item) }
-                    .let {
+                    .also {
                         if (it.id != INITIAL_ID) {
-                            playlistItemDao.update(it); it
+                            playlistItemDao.load(it.id)?.run {
+                                playlistItemDao.update(it)
+                            } ?: it.copy(id = playlistItemDao.insert(it))
                         } else {
                             it.copy(id = playlistItemDao.insert(it))
                         }

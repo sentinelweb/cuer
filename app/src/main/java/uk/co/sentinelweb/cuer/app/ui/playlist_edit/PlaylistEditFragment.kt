@@ -68,7 +68,6 @@ class PlaylistEditFragment constructor(private val id: Long?) : DialogFragment()
                 else -> false
             }
         }
-        //pe_image.setOnClickListener { viewModel.onImageClick() }
 
         pe_image.setOnTouchListener @SuppressLint("ClickableViewAccessibility") { iv, e ->
             when (e.actionMasked) {

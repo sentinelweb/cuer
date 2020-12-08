@@ -121,6 +121,7 @@ class ItemTouchHelperCallback(
         super.clearView(recyclerView, viewHolder)
         viewHolder.itemView.alpha = ALPHA_FULL
         (viewHolder as? ItemTouchHelperViewHolder)?.apply { onItemClear() }
+        interactions.onItemClear()
     }
 
     companion object {

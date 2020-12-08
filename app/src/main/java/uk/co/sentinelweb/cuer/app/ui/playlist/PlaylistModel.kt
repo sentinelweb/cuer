@@ -7,7 +7,7 @@ data class PlaylistModel constructor(
     val items: List<PlaylistItemModel>
 ) {
     data class PlaylistItemModel constructor(
-        override val id: String,
+        override val id: Long?,
         val index: Int,
         val url: String,
         val type: MediaDomain.MediaTypeDomain,
