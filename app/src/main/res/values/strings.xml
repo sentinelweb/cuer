@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Cuer</string>
     <string name="bottomnav_title_browse">Browse</string>
+    <string name="bottomnav_title_playlists">Playlists</string>
     <string name="bottomnav_title_playlist">Playlist</string>
     <string name="bottomnav_title_player">Player</string>
     <string name="media_route_menu_title">Cast on</string>
@@ -44,6 +45,7 @@
     <string name="pe_fragment_title_add">Create playlist</string>
     <string name="pe_title">Title</string>
     <string name="pe_create">Create</string>
+    <string name="pe_save">Save</string>
 
     <!-- local player -->
     <string name="title_activity_fullscreen">YoutubeFullscreenActivity</string>

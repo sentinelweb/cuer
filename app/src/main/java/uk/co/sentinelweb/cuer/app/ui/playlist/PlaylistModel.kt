@@ -6,8 +6,8 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 data class PlaylistModel constructor(
     val items: List<PlaylistItemModel>
 ) {
-    data class PlaylistItemModel constructor(
-        override val id: Long?,
+    data class PlaylistItemModel constructor(// todo remove this
+        override val id: Long,
         val index: Int,
         val url: String,
         val type: MediaDomain.MediaTypeDomain,

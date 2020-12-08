@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -13,7 +14,7 @@ import org.koin.android.ext.android.inject
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA_ID
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
@@ -56,6 +57,7 @@ class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListen
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
+    @SuppressLint("ClickableViewAccessibility")
     private val mDelayHideTouchListener = View.OnTouchListener { _, _ ->
         if (AUTO_HIDE) {
             delayedHide(AUTO_HIDE_DELAY_MILLIS)

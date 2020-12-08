@@ -3,11 +3,11 @@ package uk.co.sentinelweb.cuer.app.util.navigation
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.LOCAL_PLAYER
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.WEB_LINK
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.LINK
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.LINK
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.WEB_LINK
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 

@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.playlist.item
+package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

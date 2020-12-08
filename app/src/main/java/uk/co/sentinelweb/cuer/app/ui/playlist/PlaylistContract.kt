@@ -7,7 +7,6 @@ interface PlaylistContract {
 
     interface Presenter {
         fun initialise()
-        fun loadList()
         fun destroy()
         fun refreshList()
         fun setFocusMedia(mediaDomain: MediaDomain)
@@ -23,6 +22,7 @@ interface PlaylistContract {
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
         fun commitMove()
+        fun setPlaylist(it: Long)
     }
 
     interface View {

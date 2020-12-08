@@ -8,5 +8,6 @@ data class PlaylistEditModel constructor(
     val imageUrl: String?,
     val thumbUrl: String?,
     val starred: Boolean,
+    val button: String?,
     val validation: ValidatorModel?
 )

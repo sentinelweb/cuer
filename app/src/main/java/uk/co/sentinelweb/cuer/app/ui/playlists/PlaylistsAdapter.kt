@@ -1,16 +1,16 @@
-package uk.co.sentinelweb.cuer.app.ui.playlist
+package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemViewHolder
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemViewHolder
 
 
-class PlaylistAdapter constructor(
+class PlaylistsAdapter constructor(
     private val itemFactory: ItemFactory,
     private val interactions: ItemContract.Interactions
 ) : RecyclerView.Adapter<ItemViewHolder>() {
@@ -30,21 +30,23 @@ class PlaylistAdapter constructor(
                     this._data
                 )
             ).apply {
-                this@PlaylistAdapter._data = data
+                this@PlaylistsAdapter._data = data
                 // this stops random scrolling out of view
                 val recyclerViewState = recyclerView.layoutManager?.onSaveInstanceState()
-                dispatchUpdatesTo(this@PlaylistAdapter)
+                dispatchUpdatesTo(this@PlaylistsAdapter)
                 recyclerView.layoutManager?.onRestoreInstanceState(recyclerViewState)
             }
         } else {
-            this@PlaylistAdapter._data = data
+            this@PlaylistsAdapter._data = data
             notifyDataSetChanged()
         }
 
     }
+
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemViewHolder {
         return itemFactory.createItemViewHolder(parent, interactions)
     }

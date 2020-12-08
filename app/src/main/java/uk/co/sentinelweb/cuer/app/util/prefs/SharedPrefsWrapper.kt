@@ -24,7 +24,7 @@ class SharedPrefsWrapper<T : Field> constructor(
         if (prefs.contains(field.fname)) prefs.getLong(field.fname, 0)
         else null
 
-    fun putLong(value: Long, field: T) {
+    fun putLong(field: T, value: Long) {
         prefs.edit().putLong(field.fname, value).apply()
     }
 
@@ -32,7 +32,7 @@ class SharedPrefsWrapper<T : Field> constructor(
         prefs.getInt(field.fname, def)
     }
 
-    fun putInt(value: Int, field: T) {
+    fun putInt(field: T, value: Int) {
         prefs.edit().putInt(field.fname, value).apply()
     }
 
@@ -40,7 +40,7 @@ class SharedPrefsWrapper<T : Field> constructor(
         prefs.getString(field.fname, def)
     }
 
-    fun putString(value: String, field: T) {
+    fun putString(field: T, value: String) {
         prefs.edit().putString(field.fname, value).apply()
     }
 
@@ -48,7 +48,7 @@ class SharedPrefsWrapper<T : Field> constructor(
         prefs.getBoolean(field.fname, def)
     }
 
-    fun putBoolean(value: Boolean, field: T) {
+    fun putBoolean(field: T, value: Boolean) {
         prefs.edit().putBoolean(field.fname, value).apply()
     }
 }

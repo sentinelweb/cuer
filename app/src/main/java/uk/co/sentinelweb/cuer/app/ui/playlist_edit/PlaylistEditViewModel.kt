@@ -67,14 +67,12 @@ class PlaylistEditViewModel constructor(
     }
 
     fun onImageClick(forward: Boolean) {
-        state.playlist.image?.let {
-            imageProvider.getNextImage(it, forward) { next ->
+            imageProvider.getNextImage(state.playlist.image, forward) { next ->
                 if (next != null) {
                     state.playlist = state.playlist.copy(image = next)
                     update()
                 }
             }
-        }
     }
 
     fun onTitleChanged(text: String) {

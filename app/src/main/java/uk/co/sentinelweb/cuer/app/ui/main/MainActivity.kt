@@ -19,6 +19,8 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
@@ -27,7 +29,8 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 class MainActivity :
     AppCompatActivity(),
     MainContract.View,
-    PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+    PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
+    NavigationProvider {
 
     private val presenter: MainContract.Presenter by currentScope.inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
@@ -114,6 +117,10 @@ class MainActivity :
             getString(R.string.prefs_root_item_backup_title) -> navController.navigate(R.id.navigation_settings_backup)
         }
         return true
+    }
+
+    override fun navigate(destination: NavigationModel) {
+
     }
 
     companion object {

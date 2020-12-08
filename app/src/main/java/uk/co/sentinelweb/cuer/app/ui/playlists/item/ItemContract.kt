@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.playlist.item
+package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import androidx.annotation.DrawableRes
 
@@ -16,7 +16,6 @@ interface ItemContract {
     interface Presenter {
         fun doClick()
         fun doPlay(external: Boolean)
-        fun doShowChannel()
         fun doStar()
         fun doShare()
     }
@@ -32,7 +31,6 @@ interface ItemContract {
         fun onRightSwipe(item: ItemModel)
         fun onLeftSwipe(item: ItemModel)
         fun onPlay(item: ItemModel, external: Boolean)
-        fun onShowChannel(item: ItemModel)
         fun onStar(item: ItemModel)
         fun onShare(item: ItemModel)
     }

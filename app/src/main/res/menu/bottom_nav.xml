@@ -3,19 +3,25 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_browse"
+        android:id="@id/navigation_browse"
         android:icon="@drawable/ic_nav_browse_black"
         android:title="@string/bottomnav_title_browse"
         />
 
     <item
-        android:id="@+id/navigation_playlist"
+        android:id="@id/navigation_playlists"
+        android:icon="@drawable/ic_nav_playlists_black"
+        android:title="@string/bottomnav_title_playlists"
+        />
+
+    <item
+        android:id="@id/navigation_playlist"
         android:icon="@drawable/ic_nav_playlist_black"
         android:title="@string/bottomnav_title_playlist"
         />
 
     <item
-        android:id="@+id/navigation_player"
+        android:id="@id/navigation_player"
         android:icon="@drawable/ic_nav_play_black"
         android:title="@string/bottomnav_title_player"
         />

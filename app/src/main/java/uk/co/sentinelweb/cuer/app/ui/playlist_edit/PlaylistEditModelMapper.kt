@@ -14,6 +14,7 @@ class PlaylistEditModelMapper constructor(
         starred = domain.starred,
         imageUrl = domain.image?.url,
         thumbUrl = domain.thumb?.url,
+        button = res.getString(domain.id?.let { R.string.pe_save } ?: R.string.pe_create),
         validation = validator.validate(domain)
     )
 

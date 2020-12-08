@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsFragment
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
@@ -44,6 +45,7 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 object Modules {
     private val scopedModules = listOf(
         PlaylistFragment.fragmentModule,
+        PlaylistsFragment.fragmentModule,
         PlayerFragment.fragmentModule,
         BrowseFragment.fragmentModule,
         MainActivity.activityModule,

@@ -14,21 +14,22 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.PLAY_NOW
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.ext.deserialiseMedia
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -37,13 +38,14 @@ class PlaylistFragment :
     Fragment(R.layout.playlist_fragment),
     PlaylistContract.View,
     ItemContract.Interactions,
-    ItemContract.ItemMoveInteractions {
+    ItemBaseContract.ItemMoveInteractions {
 
     private val presenter: PlaylistContract.Presenter by currentScope.inject()
     private val adapter: PlaylistAdapter by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private val toastWrapper: ToastWrapper by inject()
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
+    private val log: LogWrapper by inject()
 
     private var snackbar: Snackbar? = null
 
@@ -68,15 +70,22 @@ class PlaylistFragment :
     override fun onResume() {
         super.onResume()
 
+        arguments?.getBoolean(PLAY_NOW.toString())?.also {
+            log.d("Play playlist")
+        }
+        arguments?.getLong(PLAYLIST_ID.toString())?.also {
+            presenter.setPlaylist(it)
+        }
         // todo map in NavigationMapper
-        activity?.intent?.getStringExtra(MEDIA.toString())?.let {
-            val media = deserialiseMedia(it)
-            presenter.setFocusMedia(media)
-            if (activity?.intent?.getBooleanExtra(PLAY_NOW.toString(), false) ?: false) {
-                presenter.playNow(media)
-                activity?.intent?.removeExtra(PLAY_NOW.toString())
-            }
-        } ?: presenter.loadList() // queue refresh triggered from shareactivity
+        // fixme this should be done somewhere higher - mainactivity - focus should happen automatically
+//        activity?.intent?.getStringExtra(MEDIA.toString())?.let {
+//            val media = deserialiseMedia(it)
+//            presenter.setFocusMedia(media)
+//            if (activity?.intent?.getBooleanExtra(PLAY_NOW.toString(), false) ?: false) {
+//                presenter.playNow(media)
+//                activity?.intent?.removeExtra(PLAY_NOW.toString())
+//            }
+//        } ?: presenter.refreshList() // queue refresh triggered from shareactivity
     }
     // endregion
 
@@ -207,7 +216,11 @@ class PlaylistFragment :
                 }
                 scoped { PlaylistModelMapper() }
                 scoped { PlaylistAdapter(get(), getSource()) }
-                scoped { ItemTouchHelperCallback(getSource()) }
+                scoped {
+                    ItemTouchHelperCallback(
+                        getSource()
+                    )
+                }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }

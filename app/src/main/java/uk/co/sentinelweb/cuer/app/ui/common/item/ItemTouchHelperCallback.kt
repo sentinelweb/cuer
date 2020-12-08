@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.co.sentinelweb.cuer.app.ui.playlist.item
+package uk.co.sentinelweb.cuer.app.ui.common.item
 
 import android.graphics.Canvas
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract.ItemTouchHelperViewHolder
-import uk.co.sentinelweb.klink.util.extension.fade
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract.ItemTouchHelperViewHolder
+import uk.co.sentinelweb.cuer.app.util.extension.fade
 
 /**
  * https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf
@@ -33,7 +33,7 @@ import uk.co.sentinelweb.klink.util.extension.fade
  * @author Paul Burke (ipaulpro)
  */
 class ItemTouchHelperCallback(
-    private val interactions: ItemContract.ItemMoveInteractions
+    private val interactions: ItemBaseContract.ItemMoveInteractions
 ) : ItemTouchHelper.Callback() {
 
     private var swipingLeft: Boolean? = null
@@ -119,7 +119,8 @@ class ItemTouchHelperCallback(
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
-        viewHolder.itemView.alpha = ALPHA_FULL
+        viewHolder.itemView.alpha =
+            ALPHA_FULL
         (viewHolder as? ItemTouchHelperViewHolder)?.apply { onItemClear() }
         interactions.onItemClear()
     }

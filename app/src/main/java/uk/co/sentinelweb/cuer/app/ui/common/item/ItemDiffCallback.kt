@@ -1,10 +1,10 @@
-package uk.co.sentinelweb.cuer.app.ui.playlist.item
+package uk.co.sentinelweb.cuer.app.ui.common.item
 
 import androidx.recyclerview.widget.DiffUtil
 
 class ItemDiffCallback(
-    var newItems: List<ItemModel>,
-    var oldItems: List<ItemModel>
+    var newItems: List<ItemBaseModel>,
+    var oldItems: List<ItemBaseModel>
 ) : DiffUtil.Callback() {
 
     override fun getOldListSize(): Int {
@@ -19,7 +19,7 @@ class ItemDiffCallback(
         oldItemPosition: Int,
         newItemPosition: Int
     ): Boolean {
-        return oldItems[oldItemPosition].id === newItems[newItemPosition].id
+        return oldItems[oldItemPosition].id == newItems[newItemPosition].id
     }
 
     override fun areContentsTheSame(

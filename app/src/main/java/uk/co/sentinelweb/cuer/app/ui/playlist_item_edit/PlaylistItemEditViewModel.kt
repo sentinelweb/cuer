@@ -8,13 +8,13 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.LOCAL_PLAYER
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.Navigate.WEB_LINK
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.LINK
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA_ID
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.LINK
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.WEB_LINK
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
@@ -56,7 +56,10 @@ class PlaylistItemEditViewModel constructor(
 
     fun onPlayVideoLocal() {
         _navigateLiveData.value =
-            NavigationModel(LOCAL_PLAYER, mapOf(MEDIA_ID to state.media!!.platformId))
+            NavigationModel(
+                LOCAL_PLAYER,
+                mapOf(MEDIA_ID to state.media!!.platformId)
+            )
     }
 
     fun onStarClick() {
@@ -67,7 +70,10 @@ class PlaylistItemEditViewModel constructor(
 
     fun onLinkClick(urlString: String) {
         _navigateLiveData.value =
-            NavigationModel(WEB_LINK, mapOf(LINK to urlString))
+            NavigationModel(
+                WEB_LINK,
+                mapOf(LINK to urlString)
+            )
     }
 
     fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {

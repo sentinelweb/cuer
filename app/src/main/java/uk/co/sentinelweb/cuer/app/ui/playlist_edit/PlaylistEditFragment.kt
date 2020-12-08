@@ -7,22 +7,23 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.playlist_edit_fragment.*
-import kotlinx.android.synthetic.main.playlist_item_edit_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 
-class PlaylistEditFragment constructor(private val id: Long?) : DialogFragment() {
+class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFragment() {
 
     private val viewModel: PlaylistEditViewModel by currentScope.inject()
     private val log: LogWrapper by inject()
@@ -32,7 +33,7 @@ class PlaylistEditFragment constructor(private val id: Long?) : DialogFragment()
 
     private var lastImageUrl: String? = null
 
-    internal lateinit var listener: Listener
+    internal var listener: Listener? = null
 
     interface Listener {
         fun onPlaylistCommit(domain: PlaylistDomain?)
@@ -92,7 +93,7 @@ class PlaylistEditFragment constructor(private val id: Long?) : DialogFragment()
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    starMenuItem.isVisible = ple_star_fab.isVisible
+                    starMenuItem.isVisible = pe_star_fab.isVisible
                 } else if (isShow) {
                     isShow = false
                     starMenuItem.isVisible = false
@@ -101,17 +102,14 @@ class PlaylistEditFragment constructor(private val id: Long?) : DialogFragment()
         })
         observeModel()
         observeDomain()
-        viewModel.setData(id)
     }
 
-    private fun observeDomain() {
-        viewModel.getDomainObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<PlaylistDomain> {
-                override fun onChanged(domain: PlaylistDomain) {
-                    listener.onPlaylistCommit(domain)
-                }
-            })
+    override fun onResume() {
+        super.onResume()
+
+        arguments?.getLong(NavigationModel.Param.PLAYLIST_ID.toString())?.also {
+            viewModel.setData(it)
+        } ?: run { id?.let { viewModel.setData(it) } }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -135,9 +133,10 @@ class PlaylistEditFragment constructor(private val id: Long?) : DialogFragment()
                         else R.drawable.ic_button_unstarred_white
                     starMenuItem.setIcon(starIconResource)
                     pe_star_fab.setImageResource(starIconResource)
+                    model.button?.apply { pe_commit_button.text = this }
                     model.imageUrl?.let {
                         if (lastImageUrl != it) {
-                            Glide.with(pe_image.context /* context */)
+                            Glide.with(pe_image.context)
                                 .load(imageProvider.makeRef(it))
                                 .into(pe_image)
                         }
@@ -156,6 +155,17 @@ class PlaylistEditFragment constructor(private val id: Long?) : DialogFragment()
                             pe_title.error = null
                         }
                     }
+                }
+            })
+    }
+
+    private fun observeDomain() {
+        viewModel.getDomainObservable().observe(
+            this.viewLifecycleOwner,
+            object : Observer<PlaylistDomain> {
+                override fun onChanged(domain: PlaylistDomain) {
+                    listener?.onPlaylistCommit(domain)
+                        ?: findNavController().popBackStack()
                 }
             })
     }

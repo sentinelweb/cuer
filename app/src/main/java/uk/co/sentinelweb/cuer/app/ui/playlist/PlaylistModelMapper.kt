@@ -15,7 +15,7 @@ class PlaylistModelMapper constructor() {
         val top = it.media.title ?: "No title"
         val bottom = it.media.url
         return PlaylistModel.PlaylistItemModel(
-            it.id,
+            it.id!!,
             index,
             bottom,
             it.media.mediaType,

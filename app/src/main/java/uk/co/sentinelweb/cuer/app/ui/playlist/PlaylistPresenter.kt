@@ -37,11 +37,7 @@ class PlaylistPresenter(
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
     override fun initialise() {
-        refreshPlaylist()
-    }
-
-    override fun loadList() {
-        refreshPlaylist()
+        //refreshPlaylist()
     }
 
     override fun refreshList() {
@@ -153,6 +149,11 @@ class PlaylistPresenter(
         }
         state.dragFrom = null
         state.dragTo = null
+    }
+
+    override fun setPlaylist(it: Long) {
+        prefsWrapper.putLong(SELECTED_PLAYLIST_ID, it)
+        refreshPlaylist()
     }
 
     override fun playNow(mediaDomain: MediaDomain) {

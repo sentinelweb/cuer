@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.playlist.item
+package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 // todo view binding
 import android.annotation.SuppressLint
@@ -11,18 +11,22 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.view_playlist_item.view.*
+import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.view_playlists_item.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.context.KoinContextHandler.get
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.extension.fade
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 
 
 class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLayout(c, a, def),
-    ItemContract.View {
+    ItemContract.View, KoinComponent {
 
     constructor(c: Context, a: AttributeSet?) : this(c, a, 0)
 
     private lateinit var presenter: ItemContract.Presenter
+    private var imageProvider: FirebaseDefaultImageProvider = get().get()// todo use inject
 
     val itemView: View
         get() = listitem
@@ -43,15 +47,15 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         val wrapper = ContextThemeWrapper(context, R.style.ContextMenu)
         //val wrapper = context
         val popup = PopupMenu(wrapper, listitem_overflow_click)
-        popup.inflate(R.menu.playlist_context)
+        popup.inflate(R.menu.playlists_context)
         popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem): Boolean {
                 when (item.itemId) {
-                    R.id.playlist_context_play -> presenter.doPlay(false)
-                    R.id.playlist_context_play_external -> presenter.doPlay(true)
-                    R.id.playlist_context_channel_external -> presenter.doShowChannel()
-                    R.id.playlist_context_star -> presenter.doStar()
-                    R.id.playlist_context_share -> presenter.doShare()
+                    R.id.playlists_context_play -> presenter.doPlay(false)
+                    R.id.playlists_context_play_external -> presenter.doPlay(true)
+//                    R.id.context_channel_external -> presenter.doShowChannel()
+                    R.id.playlists_context_star -> presenter.doStar()
+                    R.id.playlists_context_share -> presenter.doShare()
                 }
                 return true
             }
@@ -90,7 +94,9 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     }
 
     override fun setIconUrl(url: String) {
-        Picasso.get().load(url).into(listitem_icon)
+        Glide.with(listitem_icon.context)
+            .load(imageProvider.makeRef(url))
+            .into(listitem_icon)
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////

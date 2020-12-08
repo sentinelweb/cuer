@@ -32,10 +32,6 @@ class PlaylistPresenter1(
         queue.addProducerListener(this)
     }
 
-    override fun loadList() {
-        queue.refreshQueueBackground()
-    }
-
     override fun refreshList() {
         queue.refreshQueueBackground()
     }
@@ -143,6 +139,10 @@ class PlaylistPresenter1(
     }
 
     override fun commitMove() {
+        TODO("Not yet implemented")
+    }
+
+    override fun setPlaylist(it: Long) {
         TODO("Not yet implemented")
     }
 

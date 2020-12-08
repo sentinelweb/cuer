@@ -44,23 +44,24 @@ class FirebaseDefaultImageProvider constructor(
     }
 
     fun getNextImage(
-        current: ImageDomain,
+        current: ImageDomain?,
         forward: Boolean = true,
         callback: (ImageDomain?) -> Unit
     ) {
         if (isInitialised) {
-            listStorageRef
-                .find { ref: StorageReference ->
-                    current.url.endsWith(ref.path)
+            (listStorageRef
+                .takeIf { current != null }
+                ?.find { ref: StorageReference ->
+                    current?.url?.endsWith(ref.path) ?: false
                 }
                 ?.let { listStorageRef.indexOf(it) }
-                ?.let { cIndex -> if (forward) wrapInc(cIndex) else wrapDec(cIndex) }
-                ?.let {
+                ?: 0)
+                .let { cIndex -> if (forward) wrapInc(cIndex) else wrapDec(cIndex) }
+                .let {
                     listStorageRef[it].apply {
                         callback(ImageDomain(url = "$root$path", width = null, height = null))
                     }
                 }
-                ?: callback(null)
 
         } else {
             checkToInit()
