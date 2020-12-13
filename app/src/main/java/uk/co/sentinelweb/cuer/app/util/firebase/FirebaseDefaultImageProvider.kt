@@ -33,7 +33,7 @@ class FirebaseDefaultImageProvider constructor(
 
                 }
             }
-            addOnFailureListener { ex -> log.e("Couldn't init ") }
+            addOnFailureListener { ex -> log.e("Couldn't init ", ex) }
         }
     }
 

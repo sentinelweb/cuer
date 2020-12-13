@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 
 interface ItemContract {
@@ -11,6 +12,7 @@ interface ItemContract {
         fun setCheckedVisible(checked: Boolean)
         fun setPresenter(itemPresenter: Presenter)
         fun setIconUrl(url: String)
+        fun setBackground(@ColorRes backgroundColor: Int)
     }
 
     interface Presenter {
@@ -22,7 +24,7 @@ interface ItemContract {
     }
 
     interface External {
-        fun update(item: ItemModel)
+        fun update(item: ItemModel, highlightPlaying: Boolean)
         fun doLeft()
         fun doRight()
     }

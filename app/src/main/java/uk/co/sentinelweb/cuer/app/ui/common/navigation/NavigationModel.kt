@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.common.navigation
 
+import android.os.Bundle
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 
 data class NavigationModel constructor(
@@ -25,17 +26,28 @@ data class NavigationModel constructor(
         SHARE(listOf(MEDIA)),
         PLAYLIST_EDIT(listOf(PLAYLIST_ID)),
         PLAYLIST_CREATE(listOf()),
-        //PLAYLIST_FRAGMENT(listOf(PLAYLIST_ID, PLAY_NOW))
+        PLAYLIST_FRAGMENT(listOf(PLAYLIST_ID, PLAY_NOW)),
+        PLAYLISTS_FRAGMENT(listOf()),
+        BROWSE_FRAGMENT(listOf()),
+        PLAYER_FRAGMENT(listOf())
 
     }
 
-    // todo add types as a calss field - verify types in init
+    // todo add types as a class field - verify types in init
     enum class Param {
         MEDIA_ID, /* String */
         CHANNEL_ID, /* String */
         MEDIA, /* MediaDomain */
         LINK, /* String */
         PLAY_NOW, /* Boolean */
-        PLAYLIST_ID /* Boolean */
+        PLAYLIST_ID, /* Long */
+        PLAYLIST_ITEM_ID, /* Long */
+        ;
+
+        fun getLong(b: Bundle?) = b?.getLong(toString())
+        fun getBoolean(b: Bundle?) = b?.getBoolean(toString())
+        fun getString(b: Bundle?) = b?.getString(toString())
     }
+
+
 }

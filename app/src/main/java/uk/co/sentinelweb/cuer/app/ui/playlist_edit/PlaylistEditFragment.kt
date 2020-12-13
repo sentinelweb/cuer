@@ -109,7 +109,7 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
 
         arguments?.getLong(NavigationModel.Param.PLAYLIST_ID.toString())?.also {
             viewModel.setData(it)
-        } ?: run { id?.let { viewModel.setData(it) } }
+        } ?: run { id.let { viewModel.setData(it) } }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

@@ -14,7 +14,8 @@ object CastModule {
                 log = get(),
                 mediaSessionManager = get(),
                 castWrapper = get(),
-                connectionMonitor = get()
+                connectionMonitor = get(),
+                timeProvider = get()
             )
         }
         factory {

@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModel
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.SELECTED_PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -74,7 +74,7 @@ class PlaylistsPresenter(
     }
 
     override fun onItemPlay(item: ItemModel, external: Boolean) {
-        toastWrapper.show("right: ${item.title}")
+        view.gotoPlaylist(item.id, true)
     }
 
     override fun onItemStar(item: ItemModel) {
@@ -117,6 +117,10 @@ class PlaylistsPresenter(
         refreshPlaylist()
     }
 
+    override fun onItemChanged() {
+
+    }
+
     private fun refreshPlaylist() {
         state.viewModelScope.launch { executeRefresh(false) }
     }
@@ -133,7 +137,7 @@ class PlaylistsPresenter(
             .takeIf { focusCurent }
             ?.let {
                 state.playlists.apply {
-                    prefsWrapper.getLong(SELECTED_PLAYLIST_ID)
+                    prefsWrapper.getLong(CURRENT_PLAYLIST_ID)
                         ?.let { focusId -> view.scrollToItem(indexOf(find { it.id == focusId })) }
                 }
             }

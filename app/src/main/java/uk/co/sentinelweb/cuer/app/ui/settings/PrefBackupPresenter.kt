@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.settings
 
 import android.os.Build
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.FileWrapper
@@ -38,14 +39,18 @@ class PrefBackupPresenter constructor(
             fileWrapper.readDataFromUri(uriString)
                 ?.let { backupManager.restoreData(it) }
                 .let { success ->
-                    if (success ?: false) {
-                        view.showMessage("Restore successful")
+                    val msg = if (success ?: false) {
+                        "Restore successful"
                     } else {
-                        view.showMessage("Restore did NOT succceed")
+                        "Restore did NOT succceed"
                     }
-                    view.showProgress(false)
+                    if (isActive) {
+                        view.showMessage(msg)
+                        view.showProgress(false)
+                    } else {
+                        toastWrapper.show(msg)
+                    }
                 }
-
         }
     }
 

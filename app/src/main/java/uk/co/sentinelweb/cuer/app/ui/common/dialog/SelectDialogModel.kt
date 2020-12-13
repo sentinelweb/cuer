@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.common.dialog
 
 data class SelectDialogModel constructor(
     val type: Type,
+    val multi: Boolean,
     val title: String,
     val items: List<Item> = listOf()
 ) {

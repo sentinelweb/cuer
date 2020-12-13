@@ -83,8 +83,10 @@ class PlaylistMutator {
         playlistItem: PlaylistItemDomain
     ): PlaylistDomain {
         return playList.let {
-            it.copy(currentIndex = it.items
-                .indexOfFirst { it.media.url == playlistItem.media.url }
+            it.copy(
+                currentIndex = it.items.indexOfFirst {
+                    it.media.url == playlistItem.media.url
+                }
             )
         }
     }

@@ -1,6 +1,26 @@
 package uk.co.sentinelweb.cuer.domain.ext
 
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+
+fun PlaylistDomain.currentItem() = if (currentIndex > -1 && currentIndex < items.size) {
+    items[currentIndex]
+} else null
+
+fun PlaylistDomain.itemWitId(id: Long?) = items.find { it.id == id }
+
+fun PlaylistDomain.indexOfItem(item: PlaylistItemDomain): Int? {
+    return indexOfItemId(item.id)
+}
+
+fun PlaylistDomain.indexOfItemId(id1: Long?): Int? {
+    return id1?.let {
+        val indexOfFirst = items.indexOfFirst { it.id == id1 }
+        return if (indexOfFirst > -1) {
+            indexOfFirst
+        } else null
+    }
+}
 
 fun PlaylistDomain.scanOrder(): StringBuilder {
     var lastorder = -1L
@@ -18,3 +38,4 @@ fun PlaylistDomain.scanOrder(): StringBuilder {
         .append("]")
     return orderString
 }
+

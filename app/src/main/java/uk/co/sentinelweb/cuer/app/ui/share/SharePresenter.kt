@@ -21,7 +21,7 @@ class SharePresenter constructor(
     private val contextProvider: CoroutineContextProvider,
     private val ytInteractor: YoutubeInteractor,
     private val toast: ToastWrapper,
-    private val queue: QueueMediatorContract.Mediator,
+    private val queue: QueueMediatorContract.Producer,
     private val state: ShareState,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val log: LogWrapper,
@@ -85,19 +85,20 @@ class SharePresenter constructor(
                     view.commitPlaylistItems()
                     queue.refreshQueue()
                 }
-                val isConnected = ytContextHolder.isConnected()
+                //val isConnected = ytContextHolder.isConnected()
                 if (forward) {
                     view.gotoMain(state.media, play)
                     view.exit()
                 } else { // return play is hidden for not connected
-                    play.takeIf { it }
-                        ?.takeIf { isConnected }
-                        ?.let { state.media }
-                        ?.also {
-                            queue.getItemFor(it.url)
-                                ?.run { queue.onItemSelected(this) }
-                                .run { view.exit() }
-                        } ?: view.exit()
+                    // todo fix this when queue built
+//                    play.takeIf { it }
+//                        ?.takeIf { isConnected }
+//                        ?.let { state.media }
+//                        ?.also {
+//                            queue.getItemFor(it.url)
+//                                ?.run { queue.onItemSelected(this) }
+//                                .run { view.exit() }
+//                        } ?: view.exit()
                 }
             } catch (t: Throwable) {
                 when (t) {

@@ -23,7 +23,9 @@
         <action
             android:id="@+id/action_goto_playlist"
             app:destination="@id/navigation_playlist"
+            app:launchSingleTop="true"
             />
+
         <action
             android:id="@+id/action_edit_playlist"
             app:destination="@id/navigation_playlist_edit"

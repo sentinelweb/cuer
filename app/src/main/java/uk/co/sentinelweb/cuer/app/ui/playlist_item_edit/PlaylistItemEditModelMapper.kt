@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -54,28 +53,6 @@ class PlaylistItemEditModelMapper(
         pubDate = pubDateFormatter.format(domain.published),
         empty = false
     )
-
-    fun mapPlaylistSelectionForDialog(
-        all: List<PlaylistDomain>,
-        selected: Set<PlaylistDomain>
-    ): SelectDialogModel =
-        SelectDialogModel(
-            type = SelectDialogModel.Type.PLAYLIST,
-            title = res.getString(R.string.pie_playlist_dialog_title),
-            items = all.map { playlist ->
-                SelectDialogModel.Item(
-                    playlist.title,
-                    selected = (selected.find { sel -> playlist.title == sel.title } != null),
-                    selectable = true
-                )
-            }.plus(
-                SelectDialogModel.Item(
-                    "Add playlist ...",
-                    selected = false,
-                    selectable = false
-                )
-            )
-        )
 
     fun mapEmpty(): PlaylistItemEditModel = PlaylistItemEditModel(
         title = res.getString(R.string.pie_empty_title),

@@ -46,6 +46,7 @@ class MainActivity :
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(setOf(R.id.bottom_navigation))
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         bottom_nav_view.setupWithNavController(navController)
         presenter.initialise()

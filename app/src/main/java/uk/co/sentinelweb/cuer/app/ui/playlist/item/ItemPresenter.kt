@@ -1,12 +1,17 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
+import uk.co.sentinelweb.cuer.app.R
+
 class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
     val state: ItemState
 ) : ItemContract.Presenter, ItemContract.External {
 
-    override fun update(item: ItemModel) {
+    override fun update(
+        item: ItemModel,
+        highlightPlaying: Boolean
+    ) {
         view.setTopText(item.topText)
         view.setBottomText(item.bottomText)
         view.setCheckedVisible(item.checkIcon)
@@ -15,6 +20,7 @@ class ItemPresenter(
             ?: item.iconRes
                 ?.apply { view.setIconResource(this) }
             ?: view.setIconResource(0)
+        view.setBackground(if (highlightPlaying) R.color.playing_item_background else R.color.white)
         state.item = item
     }
 

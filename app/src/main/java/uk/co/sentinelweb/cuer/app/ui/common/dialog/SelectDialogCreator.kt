@@ -24,4 +24,18 @@ class SelectDialogCreator(
             .create()
     }
 
+    fun create(
+        model: SelectDialogModel,
+        listener: DialogInterface.OnClickListener
+    ): AlertDialog {
+        return MaterialAlertDialogBuilder(context)
+            .setTitle(model.title)
+            .setSingleChoiceItems(
+                model.items.map { it.name }.toTypedArray(),
+                model.items.indexOfFirst { it.selected },
+                listener
+            )
+            .create()
+    }
+
 }

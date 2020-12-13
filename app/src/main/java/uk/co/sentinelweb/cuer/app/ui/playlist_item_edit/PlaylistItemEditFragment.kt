@@ -211,11 +211,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         SelectDialogModel.Type.PLAYLIST -> dialog =
                             selectDialogCreator.create(model, object :
                                 DialogInterface.OnMultiChoiceClickListener {
-                                override fun onClick(
-                                    p0: DialogInterface?,
-                                    which: Int,
-                                    checked: Boolean
-                                ) {
+                                override fun onClick(p0: DialogInterface?, which: Int, checked: Boolean) {
                                     viewModel.onPlaylistSelected(which, checked)
                                 }
                             }).apply {
@@ -231,18 +227,11 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                                 listener = object : PlaylistEditFragment.Listener {
                                     override fun onPlaylistCommit(domain: PlaylistDomain?) {
                                         domain?.apply { viewModel.onPlaylistSelected(this) }
-                                        this@PlaylistItemEditFragment.childFragmentManager.beginTransaction()
-                                            .apply {
-                                                createPlaylistDialog?.let { hide(it) }
-                                                commit()
-                                            }
+                                        createPlaylistDialog?.dismissAllowingStateLoss()
                                     }
                                 }
                             }
-                            createPlaylistDialog?.show(
-                                childFragmentManager,
-                                CREATE_PLAYLIST_TAG
-                            ) // fragmentManager!!
+                            createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
                         }
                         else -> Unit
                     }
@@ -268,21 +257,22 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         modelMapper = get(),
                         playlistRepo = get(),
                         mediaRepo = get(),
-                        itemCreator = get()
+                        itemCreator = get(),
+                        playlistDialogModelCreator = get()
                     )
                 }
-                factory { PlaylistItemEditState() }
-                factory { PlaylistItemEditModelMapper(get(), get()) }
-                factory {
+                scoped { PlaylistItemEditState() }
+                scoped { PlaylistItemEditModelMapper(get(), get()) }
+                scoped {
                     NavigationMapper(
                         activity = (getSource() as Fragment).requireActivity(),
                         toastWrapper = get()
                     )
                 }
-                factory {
+                scoped {
                     ChipCreator((getSource() as Fragment).requireActivity())
                 }
-                factory {
+                scoped {
                     SelectDialogCreator((getSource() as Fragment).requireActivity())
                 }
             }

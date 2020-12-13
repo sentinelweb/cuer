@@ -6,15 +6,18 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Abs
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class YouTubePlayerListener(
     private val state: YouTubePlayerListenerState,
-    private val queue: QueueMediatorContract.Mediator,
+    private val queue: QueueMediatorContract.Consumer,
     private val mediaSessionManager: MediaSessionManager,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val timeProvider: TimeProvider
+
 ) : AbstractYouTubePlayerListener(),
     CastPlayerContract.PlayerControls.Listener,
     QueueMediatorContract.ConsumerListener {
@@ -46,7 +49,7 @@ class YouTubePlayerListener(
     // region AbstractYouTubePlayerListener
     override fun onReady(youTubePlayer: YouTubePlayer) {
         this.youTubePlayer = youTubePlayer
-        loadVideo(queue.getCurrentItem())
+        loadVideo(queue.currentItem)
     }
 
     override fun onApiChange(youTubePlayer: YouTubePlayer) {
@@ -57,8 +60,17 @@ class YouTubePlayerListener(
         this.youTubePlayer = youTubePlayer
         state.positionSec = second
         playerUi?.setCurrentSecond(second)
-        state.currentMedia = state.currentMedia?.copy(positon = (second * 1000).toLong())
+        state.currentMedia = state.currentMedia?.copy(positon = (second * 1000).toLong())?.also {
+            updateMedia(true)
+        }
         mediaSessionManager.updatePlaybackState(state.currentMedia, state.playState)
+    }
+
+    private fun updateMedia(throttle: Boolean) {
+        if (!throttle || timeProvider.currentTimeMillis() - state.lastUpdateMedia > 3000) {
+            state.currentMedia?.apply { queue.updateMediaItem(this) }
+            state.lastUpdateMedia = timeProvider.currentTimeMillis()
+        }
     }
 
     override fun onError(youTubePlayer: YouTubePlayer, error: PlayerError) {
@@ -102,6 +114,9 @@ class YouTubePlayerListener(
         this.youTubePlayer = youTubePlayer
         state.durationSec = duration
         playerUi?.setDuration(duration)
+        state.currentMedia = state.currentMedia?.copy(duration = (duration * 1000L).toLong())?.also {
+            updateMedia(false)
+        }
     }
 
     override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
@@ -158,7 +173,7 @@ class YouTubePlayerListener(
 
     // region  QueueMediatorContract.ConsumerListener
     override fun onItemChanged() {
-        loadVideo(queue.getCurrentItem())
+        loadVideo(queue.currentItem)
     }
     // endregion
 
@@ -170,13 +185,10 @@ class YouTubePlayerListener(
     private fun loadVideo(item: PlaylistItemDomain?) {
         item?.let {
             youTubePlayer?.loadVideo(item.media.platformId, 0f)
-            updateStateForMedia(item)
+            state.currentMedia = item.media
+            playerUi?.setMedia(item.media)
+            item.media.positon?.apply { if (this > 0) youTubePlayer?.seekTo(this / 100f) }
         } ?: playerUi?.reset()
-    }
-
-    private fun updateStateForMedia(item: PlaylistItemDomain) {
-        state.currentMedia = item.media
-        playerUi?.setMedia(item.media)
     }
 
     // todo fix this - not clean

@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.ColorRes
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -93,46 +94,8 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         Picasso.get().load(url).into(listitem_icon)
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //init {
-    // this is disabled for the moment but if I need the linearLayout version might be best to have it for that
-    // swipeToDismissTouchListener()
-    //}
-
-//    private fun swipeToDismissTouchListener() {
-//        listitem.setOnTouchListener(swipeDismissTouchListener)
-//    }
-//
-//    private val swipeDismissTouchListener = SwipeDismissTouchListener(
-//        listitem,
-//        object : SwipeDismissTouchListener.DismissCallbacks {
-//
-//            override fun onDismissCancel() {
-//                resetBackground()
-//            }
-//
-//            override fun isSwiping(left: Boolean, offset: Float) {
-//                val outSideTolerance =
-//                    abs(offset) > resources.getDimension(R.dimen.list_item_swipe_dismiss_toerance)
-//                if (outSideTolerance) {
-//                    swipe_label_right.fade(!left)
-//                    swipe_label_left.fade(left)
-//                }
-//            }
-//
-//            override fun canDismiss(): Boolean {
-//                return true
-//            }
-//
-//            override fun onDismiss(left: Boolean) {
-//                if (left) {
-//                    presenter.doLeft()
-//                } else {
-//                    presenter.doRight()
-//                }
-//                resetBackground()
-//            }
-//        })
-
+    override fun setBackground(@ColorRes backgroundColor: Int) {
+        listitem.setBackgroundResource(backgroundColor)
+    }
 
 }

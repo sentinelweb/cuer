@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.util.prefs
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
@@ -24,8 +25,9 @@ class SharedPrefsWrapper<T : Field> constructor(
         if (prefs.contains(field.fname)) prefs.getLong(field.fname, 0)
         else null
 
+    @SuppressLint("ApplySharedPref") //
     fun putLong(field: T, value: Long) {
-        prefs.edit().putLong(field.fname, value).apply()
+        prefs.edit().putLong(field.fname, value).commit()
     }
 
     fun getInt(field: T, def: Int) {
@@ -50,5 +52,9 @@ class SharedPrefsWrapper<T : Field> constructor(
 
     fun putBoolean(field: T, value: Boolean) {
         prefs.edit().putBoolean(field.fname, value).apply()
+    }
+
+    fun remove(field: T) {
+        prefs.edit().remove(field.fname).apply()
     }
 }

@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
@@ -57,6 +58,10 @@ object Modules {
         PrefBackupFragment.fragmentModule
     )
 
+    private val uiModule = module {
+        factory { PlaylistSelectDialogModelCreator(get(), get()) }
+    }
+
     private val utilModule = module {
         factory {
             LinkScanner(
@@ -66,16 +71,20 @@ object Modules {
             )
         }
         single { CuerAppState() }
-        single<QueueMediatorContract.Mediator> {
+
+        single<QueueMediatorContract.Producer> {
             QueueMediator(
                 state = QueueMediatorState(),
                 repository = get(),
+                playlistRepository = get(),
                 mediaMapper = MediaToPlaylistItemMapper(),
                 contextProvider = get(),
                 mediaSessionManager = get(),
-                playlistMutator = get()
+                playlistMutator = get(),
+                prefsWrapper = get(named<GeneralPreferences>())
             )
         }
+        single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }
         single { ChromecastYouTubePlayerContextHolder(get(), get()) }
         factory { MediaSessionManager(get(), androidApplication(), get(), get(), get()) }
         factory { MediaMetadataMapper() }
@@ -104,6 +113,7 @@ object Modules {
     }
 
     val allModules = listOf(utilModule)
+        .plus(uiModule)
         .plus(wrapperModule)
         .plus(scopedModules)
         .plus(appNetModule)

@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.LINK
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA_ID
@@ -24,6 +25,7 @@ class PlaylistItemEditViewModel constructor(
     private val state: PlaylistItemEditState,
     private val modelMapper: PlaylistItemEditModelMapper,
     private val playlistRepo: PlaylistDatabaseRepository,
+    private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator,
     private val mediaRepo: MediaDatabaseRepository,
     private val itemCreator: PlaylistItemCreator
 
@@ -78,15 +80,12 @@ class PlaylistItemEditViewModel constructor(
 
     fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
         viewModelScope.launch {
-            playlistRepo
-                .loadList(null)
-                .takeIf { it.isSuccessful }
-                ?.data?.apply {
-                    // todo prioritize ordering by usage
-                    state.allPlaylists = this
-                    _selectModelLiveData.value =
-                        modelMapper.mapPlaylistSelectionForDialog(this, state.selectedPlaylists)
-                }
+            playlistDialogModelCreator.loadPlaylists {
+                // todo prioritize ordering by usage
+                state.allPlaylists = it
+                _selectModelLiveData.value =
+                    playlistDialogModelCreator.mapPlaylistSelectionForDialog(it, state.selectedPlaylists, true)
+            }
         }
     }
 
@@ -100,9 +99,8 @@ class PlaylistItemEditViewModel constructor(
                 }
             }?.also { update() }
         } else {
-            // _navigateLiveData.value = NavigationModel(PLAYLIST_CREATE, mapOf())
             _selectModelLiveData.value =
-                SelectDialogModel(SelectDialogModel.Type.PLAYLIST_ADD, "Create playlist")
+                SelectDialogModel(SelectDialogModel.Type.PLAYLIST_ADD, false, "Create playlist")
         }
     }
 

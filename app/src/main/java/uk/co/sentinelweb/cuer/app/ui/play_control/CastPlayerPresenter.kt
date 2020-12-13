@@ -22,7 +22,9 @@ class CastPlayerPresenter(
     }
 
     override fun addListener(l: CastPlayerContract.PlayerControls.Listener) {
-        state.listeners.add(l)
+        if (!state.listeners.contains(l)) {
+            state.listeners.add(l)
+        }
     }
 
     override fun removeListener(l: CastPlayerContract.PlayerControls.Listener) {

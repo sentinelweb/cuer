@@ -22,6 +22,12 @@ class PlaylistAdapter constructor(
     val data: List<ItemModel>
         get() = _data
 
+    var highlightItem: Int? = null
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
     fun setData(data: List<ItemModel>, animate: Boolean = true) {
         if (animate) {
             DiffUtil.calculateDiff(
@@ -51,7 +57,7 @@ class PlaylistAdapter constructor(
 
     @Override
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.itemPresenter.update(_data.get(position))
+        holder.itemPresenter.update(_data.get(position), position == highlightItem)
     }
 
     override fun getItemCount(): Int = _data.size

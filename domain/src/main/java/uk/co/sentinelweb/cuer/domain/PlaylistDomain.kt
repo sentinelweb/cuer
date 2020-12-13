@@ -10,7 +10,7 @@ data class PlaylistDomain constructor(
     val id: Long? = null,
     val title: String,
     val items: List<PlaylistItemDomain> = listOf(),
-    val currentIndex: Int = -1,
+    val currentIndex: Int = 0, // todo make nullable
     val mode: PlaylistModeDomain = SINGLE,
     val starred: Boolean = false,
     val archived: Boolean = false,
