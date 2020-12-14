@@ -43,7 +43,8 @@ object DatabaseModule {
                 mediaRepository = get(),
                 playlistRepository = get(),
                 timeProvider = get(),
-                contextProvider = get()
+                contextProvider = get(),
+                log = get()
             )
         }
         factory { println("PlaylistMapper"); PlaylistMapper(get(), get()) }

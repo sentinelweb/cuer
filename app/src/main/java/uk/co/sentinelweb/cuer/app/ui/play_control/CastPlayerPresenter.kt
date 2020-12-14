@@ -144,6 +144,5 @@ class CastPlayerPresenter(
         media.title?.let { view.setTitle(it) }
         state.durationMs = media.duration ?: 0L
         view.setDuration(mapper.formatTime(state.durationMs))
-
     }
 }

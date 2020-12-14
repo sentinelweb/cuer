@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.currentItem
+import uk.co.sentinelweb.cuer.domain.ext.indexOfItemId
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 class QueueMediator constructor(
@@ -32,6 +33,8 @@ class QueueMediator constructor(
         get() = state.currentItem?.let { item -> state.playlist?.items?.indexOfFirst { item.id == it.id } }
     override val playlist: PlaylistDomain?
         get() = state.playlist
+    override val playlistId: Long?
+        get() = state.playlistId
 
     private val consumerListeners: MutableList<ConsumerListener> = mutableListOf()
     private val producerListeners: MutableList<ProducerListener> = mutableListOf()
@@ -41,13 +44,37 @@ class QueueMediator constructor(
         refreshQueueBackground()
     }
 
-    override fun onItemSelected(playlistItem: PlaylistItemDomain) {
+    override fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean) {
         state.playlist
-            ?.takeIf { playlistItem != state.currentItem }
+            ?.takeIf { playlistItem != state.currentItem || forcePlay }
             ?.let {
                 state.playlist = playlistMutator.playItem(it, playlistItem)
                 updateCurrentItem()
             }
+    }
+
+    override suspend fun playNow(playlistId: Long, playlistItemId: Long?) {
+        playlistRepository.load(playlistId, false)
+            .takeIf { it.isSuccessful }
+            ?.data
+            ?.let {
+                playNow(it, playlistItemId)
+            }
+    }
+
+    override suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?) {
+        playlist.indexOfItemId(playlistItemId)?.let { foundIndex ->
+            playlist.let {
+                it.copy(currentIndex = foundIndex).apply {
+                    playlistRepository.save(it, false)
+                }
+            }
+        }?.also {
+            prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
+            refreshQueueFrom(playlist)
+            playNow()
+
+        }
     }
 
     override fun playNow() {
@@ -160,9 +187,13 @@ class QueueMediator constructor(
         // if the playlist is the same then don't change the current item
         if (state.playlist?.id != playlistDomain.id) {
             state.playlistId = playlistDomain.id
-            state.currentItem = if (playlistDomain.currentIndex > -1) {
-                playlistDomain.items[playlistDomain.currentIndex]
-            } else null
+            state.currentItem =
+                if (playlistDomain.currentIndex > -1
+                    && playlistDomain.items.size > 0
+                    && playlistDomain.currentIndex < playlistDomain.items.size
+                ) {
+                    playlistDomain.items[playlistDomain.currentIndex]
+                } else null
         } else {
             state.currentItem = state.currentItem
                 ?.let { item -> playlistDomain.items.find { it.id == item.id } }

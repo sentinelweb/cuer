@@ -5,6 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlinx-serialization'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion project.properties.app_compileSdkVersion as int
@@ -54,6 +55,10 @@ android {
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
 
+    packagingOptions {
+        exclude 'META-INF/AL2.0'
+        exclude 'META-INF/LGPL2.1'
+    }
 }
 
 dependencies {
@@ -115,13 +120,18 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.firebaseui:firebase-ui-storage:7.1.1'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
     //implementation 'com.google.firebase:firebase-storage-ktx:19.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    implementation 'com.github.bumptech.glide:glide:4.11.0'// todo extract version
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
-    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+//    implementation 'com.github.bumptech.glide:glide:4.11.0'// todo extract version
+//    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+//    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-debug:$ver_coroutines_core"
 
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"

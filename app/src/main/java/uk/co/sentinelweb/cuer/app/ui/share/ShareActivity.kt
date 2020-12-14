@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -174,7 +175,8 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
                         state = get(),
                         log = get(),
                         ytContextHolder = get(),
-                        mapper = get()
+                        mapper = get(),
+                        prefsWrapper = get(named<GeneralPreferences>())
                     )
                 }
                 scoped { ShareWrapper(getSource()) }

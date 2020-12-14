@@ -43,6 +43,14 @@ class PlaylistPresenter(
     private val isQueuedPlaylist: Boolean
         get() = state.playlist?.let { queue.playlist?.id == state.playlist?.id } ?: false
 
+    private fun queueExecIf(
+        block: QueueMediatorContract.Producer.() -> Unit,
+        elseBlock: (QueueMediatorContract.Producer.() -> Unit)? = null
+    ) {
+        if (isQueuedPlaylist) block(queue)
+        else elseBlock?.let { it(queue) }
+    }
+
     private fun queueExecIf(block: QueueMediatorContract.Producer.() -> Unit) {
         if (isQueuedPlaylist) block(queue)
     }
@@ -129,7 +137,7 @@ class PlaylistPresenter(
                     view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
                         state.playlist?.let {
                             queue.refreshQueueFrom(it)
-                            queue.onItemSelected(itemDomain)
+                            queue.onItemSelected(itemDomain, true)
                         }
                     }))
                 }
@@ -202,26 +210,21 @@ class PlaylistPresenter(
     }
 
     override fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean) {
-        // todo make a lib to get the current item from index & index from item
         state.viewModelScope.launch {
             plId?.apply {
                 state.playlistId = plId
                 executeRefresh()
 
-                state.playlist?.indexOfItemId(plItemId)?.also { foundIndex ->
-                    state.playlist = state.playlist?.let {
-                        it.copy(currentIndex = foundIndex).apply {
-                            playlistRepository.save(it, false)
-                        }
-                    }
-                }
-
                 if (playNow) {
                     state.playlist?.apply {
-                        prefsWrapper.putLong(CURRENT_PLAYLIST_ID, plId)
-                        queue.refreshQueueFrom(this)
-                        //currentItem()?.apply { queue.onItemSelected(this) }
-                        queue.playNow()
+                        queue.playNow(this, plItemId)
+                        state.playlist = queue.playlist?.copy()
+                    }
+                } else {
+                    state.playlist?.apply {
+                        indexOfItemId(plItemId)?.also { foundIndex ->
+                            view.scrollToItem(foundIndex)
+                        }
                     }
                 }
                 queueExecIf {

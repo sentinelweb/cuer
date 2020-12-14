@@ -7,6 +7,8 @@ import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -28,7 +30,8 @@ class SharePresenter constructor(
     private val state: ShareState,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val log: LogWrapper,
-    private val mapper: ShareModelMapper
+    private val mapper: ShareModelMapper,
+    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
 ) : ShareContract.Presenter {
 
     init {
@@ -98,26 +101,36 @@ class SharePresenter constructor(
                     view.commitPlaylistItems()
                     queue.refreshQueue()
                 }
-                //val isConnected = ytContextHolder.isConnected()
-                if (forward) {
-                    val media: PlaylistItemDomain? = if (add)
-                        view.getPlaylistItems()[0]
-                    else {
-                        state.playlistItems?.get(0)
+                val isConnected = ytContextHolder.isConnected()
+                val playlistItemList: List<PlaylistItemDomain>? = if (add)
+                    view.getPlaylistItems()
+                else {
+                    state.playlistItems
+                }
+                val size = playlistItemList?.size ?: 0
+                val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYLIST_ID)
+                val playlistItem: PlaylistItemDomain? = if (size == 1) {
+                    playlistItemList?.get(0)
+                } else if (size > 1) {
+                    val indexOfFirst = playlistItemList?.indexOfFirst { it.playlistId == currentPlaylistId }
+                    playlistItemList?.get(
+                        indexOfFirst?.let { if (it > -1) it else 0 } ?: 0
+                    )
+                } else null
 
-                    }
-                    view.gotoMain(media, play)
+                if (forward) {
+                    view.gotoMain(playlistItem, play)
                     view.exit()
                 } else { // return play is hidden for not connected
-                    // todo fix this when queue built
-//                    play.takeIf { it }
-//                        ?.takeIf { isConnected }
-//                        ?.let { state.media }
-//                        ?.also {
-//                            queue.getItemFor(it.url)
-//                                ?.run { queue.onItemSelected(this) }
-//                                .run { view.exit() }
-//                        } ?: view.exit()
+                    playlistItem
+                        ?.takeIf { play }
+                        ?.takeIf { isConnected }
+                        ?.let { pli ->
+                            pli.playlistId?.let { itemPlaylistId ->
+                                queue.playNow(itemPlaylistId, pli.id)
+                            } ?: throw IllegalArgumentException("Item had no playlist")
+                        }
+                    view.exit()
                 }
             } catch (t: Throwable) {
                 when (t) {

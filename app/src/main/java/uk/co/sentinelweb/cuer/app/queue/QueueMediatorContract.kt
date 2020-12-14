@@ -11,10 +11,11 @@ interface QueueMediatorContract {
         val currentItem: PlaylistItemDomain?
         val currentItemIndex: Int?
         val playlist: PlaylistDomain?
+        val playlistId: Long?
     }
 
     interface Producer : Shared {
-        fun onItemSelected(playlistItem: PlaylistItemDomain)
+        fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean = false)
         fun addProducerListener(l: ProducerListener)
         fun removeProducerListener(l: ProducerListener)
         fun destroy()
@@ -23,6 +24,8 @@ interface QueueMediatorContract {
         fun itemRemoved(playlistItemDomain: PlaylistItemDomain)
         suspend fun refreshQueue()//after: (() -> Unit)? = null
         fun playNow()
+        suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?)
+        suspend fun playNow(playlistId: Long, playlistItemId: Long?)
     }
 
     interface Consumer : Shared {

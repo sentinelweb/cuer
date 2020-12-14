@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
@@ -13,7 +14,8 @@ class DatabaseInitializer constructor(
     private val contextProvider: CoroutineContextProvider,
     private val playlistRepository: PlaylistDatabaseRepository,
     private val mediaRepository: MediaDatabaseRepository,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val log: LogWrapper
 ) {
 
     fun initDatabase() {
@@ -31,6 +33,11 @@ class DatabaseInitializer constructor(
                     playlist to result.data?.let { mediaRepository.save(it) }
                 }
                 ?.let { (playlist, result) -> makePlaylistItems(playlist, result?.data!!) }
+                ?.let {
+                    playlistRepository.savePlaylistItems(it)
+                }
+                ?.takeIf { result -> result.isSuccessful }
+                ?: throw ExceptionInInitializerError("failed to init database")
         }
     }
 
@@ -68,6 +75,10 @@ class DatabaseInitializer constructor(
                     PlaylistDomain(
                         title = "Comedy",
                         image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-tim-mossholder-1115680-600.jpg")
+                    ),
+                    PlaylistDomain(
+                        title = "Meditation",
+                        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-emily-hopper-1359000-600.jpg")
                     )
                 )
             }
