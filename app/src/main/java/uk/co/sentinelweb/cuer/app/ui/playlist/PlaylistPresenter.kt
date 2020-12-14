@@ -202,7 +202,8 @@ class PlaylistPresenter(
                 }
             }
         } else {
-            toastWrapper.show("Move failed ..")
+            //toastWrapper.show("Move failed ..")
+            log.d("commitMove: Move failed .. ")
             refreshPlaylist()
         }
         state.dragFrom = null

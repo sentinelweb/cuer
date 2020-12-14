@@ -31,7 +31,7 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
 
     private val starMenuItem: MenuItem by lazy { pe_toolbar.menu.findItem(R.id.share_star) }
 
-    private var lastImageUrl: String? = null
+    //private var lastImageUrl: String? = null
 
     internal var listener: Listener? = null
 
@@ -135,13 +135,14 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
                     pe_star_fab.setImageResource(starIconResource)
                     model.button?.apply { pe_commit_button.text = this }
                     model.imageUrl?.let {
-                        if (lastImageUrl != it) {
-                            Glide.with(pe_image.context)
-                                .load(imageProvider.makeRef(it))
-                                .into(pe_image)
-                        }
+                        //if (lastImageUrl != it) {
+                        Glide.with(pe_image.context)
+                            .load(imageProvider.makeRef(it))
+                            .into(pe_image)
+                        //Picasso.get().load(model.imageUrl).into(ple_image)
+                        //}
                     }
-                    lastImageUrl = model.imageUrl
+                    //lastImageUrl = model.imageUrl
                     model.validation?.apply {
                         pe_commit_button.isEnabled = valid
                         if (!valid) {
