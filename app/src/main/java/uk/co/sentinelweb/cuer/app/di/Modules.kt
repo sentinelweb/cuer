@@ -8,7 +8,6 @@ import uk.co.sentinelweb.cuer.app.db.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
-import uk.co.sentinelweb.cuer.app.queue.MediaToPlaylistItemMapper
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
@@ -77,7 +76,6 @@ object Modules {
                 state = QueueMediatorState(),
                 repository = get(),
                 playlistRepository = get(),
-                mediaMapper = MediaToPlaylistItemMapper(),
                 contextProvider = get(),
                 mediaSessionManager = get(),
                 playlistMutator = get(),

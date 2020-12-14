@@ -175,13 +175,14 @@ class PlaylistDatabaseRepository constructor(
             try {
                 item
                     .let { playlistItemMapper.map(item) }
-                    .also {
-                        if (it.id != INITIAL_ID) {
-                            playlistItemDao.load(it.id)?.run {
-                                playlistItemDao.update(it)
-                            } ?: it.copy(id = playlistItemDao.insert(it))
+                    .let { itemEntity ->
+                        if (itemEntity.id != INITIAL_ID) {
+                            // check record exists
+                            playlistItemDao.load(itemEntity.id)?.run {
+                                playlistItemDao.update(itemEntity); itemEntity
+                            } ?: itemEntity.copy(id = playlistItemDao.insert(itemEntity))
                         } else {
-                            it.copy(id = playlistItemDao.insert(it))
+                            itemEntity.copy(id = playlistItemDao.insert(itemEntity))
                         }
                     }
                     .let { playlistItemMapper.map(it, item.media) }
@@ -242,6 +243,21 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
+    suspend fun loadPlaylistItems(filter: DatabaseRepository.Filter): RepoResult<List<PlaylistItemDomain>> =
+        withContext(coProvider.IO) {
+            try {
+                when (filter) {
+                    is MediaIdListFilter -> playlistItemDao.loadItemsByMediaId(filter.ids)
+                        .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
+                    else -> listOf()
+                }.let { RepoResult.Data(it) }
+            } catch (e: Exception) {
+                val msg = "couldn't save playlist item"
+                log.e(msg, e)
+                RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
+            }
+        }
+
     suspend fun delete(domain: PlaylistItemDomain): RepoResult<Boolean> =
         withContext(coProvider.IO) {
             try {
@@ -258,5 +274,6 @@ class PlaylistDatabaseRepository constructor(
     // endregion
 
     class IdListFilter(val ids: List<Long>, val flat: Boolean = true) : DatabaseRepository.Filter
+    class MediaIdListFilter(val ids: List<Long>, val flat: Boolean = true) : DatabaseRepository.Filter
     class DefaultFilter(val flat: Boolean = true) : DatabaseRepository.Filter
 }

@@ -12,6 +12,5 @@ data class PlaylistState constructor(
     var lastFocusIndex: Int? = null, // used for undo
     var dragFrom: Int? = null,
     var dragTo: Int? = null,
-    var allPlaylists: List<PlaylistDomain>? = null,
     var selectedPlaylistItem: PlaylistItemDomain? = null
 ) : ViewModel()

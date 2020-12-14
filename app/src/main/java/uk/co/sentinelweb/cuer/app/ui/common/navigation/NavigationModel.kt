@@ -42,6 +42,7 @@ data class NavigationModel constructor(
         PLAY_NOW, /* Boolean */
         PLAYLIST_ID, /* Long */
         PLAYLIST_ITEM_ID, /* Long */
+        PLAYLIST_ITEM, /* PlaylistItemDomain */
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(toString())

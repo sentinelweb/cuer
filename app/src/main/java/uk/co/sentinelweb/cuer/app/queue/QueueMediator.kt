@@ -20,15 +20,11 @@ class QueueMediator constructor(
     private val state: QueueMediatorState,
     private val repository: MediaDatabaseRepository,
     private val playlistRepository: PlaylistDatabaseRepository,
-    private val mediaMapper: MediaToPlaylistItemMapper,
     private val contextProvider: CoroutineContextProvider,
     private val mediaSessionManager: MediaSessionManager,
     private val playlistMutator: PlaylistMutator,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
 ) : QueueMediatorContract.Producer, QueueMediatorContract.Consumer {
-
-    private val consumerListeners: MutableList<ConsumerListener> = mutableListOf()
-    private val producerListeners: MutableList<ProducerListener> = mutableListOf()
 
     override val currentItem: PlaylistItemDomain?
         get() = state.currentItem
@@ -36,6 +32,9 @@ class QueueMediator constructor(
         get() = state.currentItem?.let { item -> state.playlist?.items?.indexOfFirst { item.id == it.id } }
     override val playlist: PlaylistDomain?
         get() = state.playlist
+
+    private val consumerListeners: MutableList<ConsumerListener> = mutableListOf()
+    private val producerListeners: MutableList<ProducerListener> = mutableListOf()
 
     init {
         state.playlistId = prefsWrapper.getLong(CURRENT_PLAYLIST_ID)

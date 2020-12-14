@@ -14,13 +14,13 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class ShareActivity : AppCompatActivity(), ShareContract.View {
@@ -96,11 +96,11 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         presenter.onStop()
     }
 
-    override fun gotoMain(media: MediaDomain?, play: Boolean) {
+    override fun gotoMain(media: PlaylistItemDomain?, play: Boolean) {
         startActivity( // todo map in NavigationMapper
             Intent(this, MainActivity::class.java).apply {
                 media?.let {
-                    putExtra(MEDIA.toString(), it.serialise())
+                    putExtra(PLAYLIST_ITEM.toString(), it.serialise())
                     if (play) putExtra(PLAY_NOW.toString(), true)
                 }
             })
@@ -142,6 +142,8 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         editFragment.commitPlaylistItems()
     }
 
+    override fun getPlaylistItems(): List<PlaylistItemDomain> = editFragment.getPlaylistItems()
+
     companion object {
 
         private const val EXTRA_PASTE = "paste"
@@ -163,6 +165,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
                     SharePresenter(
                         view = get(),
                         repository = get(),
+                        playlistRepository = get(),
                         linkScanner = get(),
                         contextProvider = get(),
                         ytInteractor = get(),

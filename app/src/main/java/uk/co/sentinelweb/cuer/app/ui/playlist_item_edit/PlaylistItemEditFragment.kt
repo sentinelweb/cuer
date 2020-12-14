@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
@@ -25,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -199,8 +199,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
 
     private fun observeDialog() {
         viewModel.getDialogObservable().observe(this.viewLifecycleOwner,
-            object : Observer<SelectDialogModel> {
-                override fun onChanged(model: SelectDialogModel) {
+            object : Observer<DialogModel> {
+                override fun onChanged(model: DialogModel) {
                     dialog?.dismiss()
                     createPlaylistDialog?.let {
                         val ft = childFragmentManager.beginTransaction()
@@ -208,21 +208,11 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         ft.commit()
                     }
                     when (model.type) {
-                        SelectDialogModel.Type.PLAYLIST -> dialog =
-                            selectDialogCreator.create(model, object :
-                                DialogInterface.OnMultiChoiceClickListener {
-                                override fun onClick(p0: DialogInterface?, which: Int, checked: Boolean) {
-                                    viewModel.onPlaylistSelected(which, checked)
-                                }
-                            }).apply {
-                                setButton(DialogInterface.BUTTON_POSITIVE, "OK") { d, _ ->
-                                    d.dismiss()
-                                }
-                                setOnDismissListener { viewModel.onPlaylistDialogClose() }
+                        DialogModel.Type.PLAYLIST -> dialog =
+                            selectDialogCreator.createMulti(model as SelectDialogModel).apply {
                                 show()
                             }
-
-                        SelectDialogModel.Type.PLAYLIST_ADD -> {
+                        DialogModel.Type.PLAYLIST_ADD -> {
                             createPlaylistDialog = PlaylistEditFragment.newInstance(null).apply {
                                 listener = object : PlaylistEditFragment.Listener {
                                     override fun onPlaylistCommit(domain: PlaylistDomain?) {
@@ -244,6 +234,9 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         viewModel.commitPlaylistItems()
     }
 
+    fun getPlaylistItems() = viewModel.getCommittedItems()
+
+
     companion object {
 
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
@@ -258,7 +251,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         playlistRepo = get(),
                         mediaRepo = get(),
                         itemCreator = get(),
-                        playlistDialogModelCreator = get()
+                        playlistDialogModelCreator = get(),
+                        log = get()
                     )
                 }
                 scoped { PlaylistItemEditState() }

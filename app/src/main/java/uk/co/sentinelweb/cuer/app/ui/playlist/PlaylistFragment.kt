@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +15,8 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
@@ -52,6 +53,7 @@ class PlaylistFragment :
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
     private val log: LogWrapper by inject()
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
+    private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
 
     private var snackbar: Snackbar? = null
 
@@ -78,12 +80,6 @@ class PlaylistFragment :
     override fun onResume() {
         super.onResume()
 
-//        arguments?.getLong(PLAYLIST_ID)?.also {
-//            presenter.setPlaylist(it)
-//        }
-//        arguments?.getBoolean(NavigationModel.Param.PLAY_NOW.toString())?.also {
-//            log.d("Play playlist")
-//        }
         presenter.setPlaylistData(
             PLAYLIST_ID.getLong(arguments),
             PLAYLIST_ITEM_ID.getLong(arguments),
@@ -166,25 +162,24 @@ class PlaylistFragment :
     }
 
     override fun showPlaylistSelector(model: SelectDialogModel) {
-        selectDialogCreator.create(model, object :
-            DialogInterface.OnClickListener {
-            override fun onClick(p0: DialogInterface, which: Int) {
-                presenter.onPlaylistSelected(which)
-                p0.dismiss()
-            }
-        }).apply { show() }
+        selectDialogCreator.createSingle(model).apply { show() }
     }
 
     override fun showPlaylistCreateDialog() {
+        createPlaylistDialog?.dismissAllowingStateLoss()
         createPlaylistDialog = PlaylistEditFragment.newInstance(null).apply {
             listener = object : PlaylistEditFragment.Listener {
                 override fun onPlaylistCommit(domain: PlaylistDomain?) {
                     domain?.apply { presenter.onPlaylistSelected(this) }
-                    createPlaylistDialog?.dismissAllowingStateLoss() // todo check
+                    createPlaylistDialog?.dismissAllowingStateLoss()
                 }
             }
         }
         createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
+    }
+
+    override fun showAlertDialog(model: AlertDialogModel) {
+        alertDialogCreator.create(model).show()
     }
     //endregion
 
@@ -260,7 +255,7 @@ class PlaylistFragment :
                         playlistDialogModelCreator = get()
                     )
                 }
-                scoped { PlaylistModelMapper() }
+                scoped { PlaylistModelMapper(res = get()) }
                 scoped { PlaylistAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
@@ -269,6 +264,7 @@ class PlaylistFragment :
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory() }
                 scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
+                scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
                 viewModel { PlaylistState() }
             }
         }

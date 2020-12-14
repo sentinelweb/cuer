@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -23,11 +24,14 @@ class PlaylistSelectDialogModelCreator constructor(
     fun mapPlaylistSelectionForDialog(
         all: List<PlaylistDomain>,
         selected: Set<PlaylistDomain>,
-        multi: Boolean = false
+        multi: Boolean = false,
+        itemClick: (Int, Boolean) -> Unit,
+        confirm: (() -> Unit)? = null,
+        dismiss: () -> Unit = {}
     ) = SelectDialogModel(
-        type = SelectDialogModel.Type.PLAYLIST,
+        type = DialogModel.Type.PLAYLIST,
         multi = multi,
-        title = res.getString(R.string.pie_playlist_dialog_title),
+        title = res.getString(R.string.playlist_dialog_title),
         items = all.map { playlist ->
             SelectDialogModel.Item(
                 playlist.title,
@@ -36,10 +40,13 @@ class PlaylistSelectDialogModelCreator constructor(
             )
         }.plus(
             SelectDialogModel.Item(
-                "Add playlist ...",
+                res.getString(R.string.playlist_dialog_add_playlist),
                 selected = false,
                 selectable = false
             )
-        )
+        ),
+        itemClick = itemClick,
+        confirm = confirm,
+        dismiss = dismiss
     )
 }

@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -24,7 +25,6 @@ interface PlaylistContract {
         fun undoDelete()
         fun commitMove()
         fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean)
-        fun onPlaylistSelected(which: Int)
         fun onPlaylistSelected(playlist: PlaylistDomain)
     }
 
@@ -38,6 +38,7 @@ interface PlaylistContract {
         fun setSubTitle(subtitle: String)
         fun showPlaylistSelector(model: SelectDialogModel)
         fun showPlaylistCreateDialog()
+        fun showAlertDialog(model: AlertDialogModel)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }

@@ -8,6 +8,8 @@
     <string name="menu_filter">Play</string>
     <string name="right">Right</string>
     <string name="left">Left</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
     <!-- menu -->
     <string name="menu_play">Play</string>
@@ -32,7 +34,7 @@
 
     <!-- playlist_item_edit -->
     <string name="pie_empty_desc">We can only add youtube video links at the moment</string>
-    <string name="pie_playlist_dialog_title">Select Playlist</string>
+    <string name="playlist_dialog_title">Select Playlist</string>
     <string name="pie_add_playlist_dialog_title">Create Playlist</string>
     <string name="pie_empty_title">Sorry &#8230; ❤</string>
 
@@ -41,6 +43,8 @@
     <string name="playlist_fab_down_contentdesc">Down</string>
     <string name="pl_item_delete"> Delete </string>
     <string name="pl_item_move"> Move </string>
+    <string name="playlist_change_dialog_title">Change playlist?</string>
+    <string name="playlist_change_dialog_message">This will change the current playlist …</string>
 
     <!-- playlist edit fragemnt -->
     <string name="pe_fragment_title">Edit playlist</string>
@@ -61,5 +65,6 @@
     <string name="pref_key_restore">restore</string>
     <string name="pe_default_display_title">Enter a title …</string>
     <string name="pe_error_title_blank">Add a title</string>
+    <string name="playlist_dialog_add_playlist">Add playlist …</string>
 
 </resources>

@@ -9,13 +9,14 @@ import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.LINK
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.WEB_LINK
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
@@ -27,17 +28,17 @@ class PlaylistItemEditViewModel constructor(
     private val playlistRepo: PlaylistDatabaseRepository,
     private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator,
     private val mediaRepo: MediaDatabaseRepository,
-    private val itemCreator: PlaylistItemCreator
-
+    private val itemCreator: PlaylistItemCreator,
+    private val log: LogWrapper
 ) : ViewModel() {
 
     private val _modelLiveData: MutableLiveData<PlaylistItemEditModel> = MutableLiveData()
-    private val _selectModelLiveData: MutableLiveData<SelectDialogModel> = MutableLiveData()
+    private val _selectModelLiveData: MutableLiveData<DialogModel> = MutableLiveData()
     private val _navigateLiveData: MutableLiveData<NavigationModel> = MutableLiveData()
 
     fun getModelObservable(): LiveData<PlaylistItemEditModel> = _modelLiveData
     fun getNavigationObservable(): LiveData<NavigationModel> = _navigateLiveData
-    fun getDialogObservable(): LiveData<SelectDialogModel> = _selectModelLiveData
+    fun getDialogObservable(): LiveData<DialogModel> = _selectModelLiveData
 
     @Suppress("RedundantOverride") // for note
     override fun onCleared() {
@@ -48,13 +49,29 @@ class PlaylistItemEditViewModel constructor(
 
     fun setData(media: MediaDomain?) {
         // todo choose default playlist(s) - default flag or most recent
-        media?.let {
-            state.media = media
-            state.media.also { update() }
-        } ?: run {
-            _modelLiveData.value = modelMapper.mapEmpty()
+        viewModelScope.launch {
+            media?.let {
+                state.media = media
+                media.id?.let {
+                    state.selectedPlaylists.addAll(getPlaylistsForMediaId(it))
+                }
+                update()
+            } ?: run {
+                _modelLiveData.value = modelMapper.mapEmpty()
+            }
         }
     }
+
+    private suspend fun getPlaylistsForMediaId(mediaId: Long): List<PlaylistDomain> =
+        playlistRepo.loadPlaylistItems(PlaylistDatabaseRepository.MediaIdListFilter(listOf(mediaId)))
+            .takeIf { it.isSuccessful }
+            ?.data
+            ?.also { log.d("Playlist Items = ${it.map { it.playlistId }}") }
+            ?.let { playlistRepo.loadList(PlaylistDatabaseRepository.IdListFilter(it.map { it.playlistId!! }, flat = false)) }
+            ?.takeIf { it.isSuccessful }
+            ?.data
+            ?: listOf()
+
 
     fun onPlayVideoLocal() {
         _navigateLiveData.value =
@@ -84,7 +101,12 @@ class PlaylistItemEditViewModel constructor(
                 // todo prioritize ordering by usage
                 state.allPlaylists = it
                 _selectModelLiveData.value =
-                    playlistDialogModelCreator.mapPlaylistSelectionForDialog(it, state.selectedPlaylists, true)
+                    playlistDialogModelCreator.mapPlaylistSelectionForDialog(
+                        it, state.selectedPlaylists, true,
+                        this@PlaylistItemEditViewModel::onPlaylistSelected,
+                        { },
+                        this@PlaylistItemEditViewModel::onPlaylistDialogClose
+                    )
             }
         }
     }
@@ -100,7 +122,7 @@ class PlaylistItemEditViewModel constructor(
             }?.also { update() }
         } else {
             _selectModelLiveData.value =
-                SelectDialogModel(SelectDialogModel.Type.PLAYLIST_ADD, false, "Create playlist")
+                DialogModel(DialogModel.Type.PLAYLIST_ADD, "Create playlist")
         }
     }
 
@@ -133,17 +155,19 @@ class PlaylistItemEditViewModel constructor(
                 ?.data
                 ?: throw NoDefaultPlaylistException()
         }
-        state.media
+        state.committedItems = state.media
             ?.let { mediaRepo.save(it) }
             ?.takeIf { it.isSuccessful }
             ?.data?.let { savedMedia ->
                 state.media = savedMedia
-                selectedPlaylists.forEach { playlist ->
+                selectedPlaylists.mapNotNull { playlist ->
                     playlistRepo.savePlaylistItem(
                         itemCreator.buildPlayListItem(savedMedia, playlist)
-                    )
+                    ).data
                 }
-            }
+            } ?: listOf()
     }
+
+    fun getCommittedItems() = state.committedItems ?: listOf()
 
 }

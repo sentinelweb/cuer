@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,11 +21,13 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
 class MainActivity :
     AppCompatActivity(),
@@ -102,6 +105,21 @@ class MainActivity :
     override fun onDestroy() {
         presenter.onDestroy()
         super.onDestroy()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.getStringExtra(PLAYLIST_ITEM.toString())?.let {
+            val item = deserialisePlaylistItem(it)
+            navController.navigate(
+                R.id.navigation_playlist, bundleOf(
+                    PLAYLIST_ID.toString() to item.playlistId,
+                    PLAYLIST_ITEM_ID.toString() to item.id,
+                    PLAY_NOW.toString() to intent.getBooleanExtra(PLAY_NOW.toString(), false)
+                )
+            )
+        }
+        intent?.removeExtra(PLAY_NOW.toString())
     }
 
     override fun isRecreating() = isChangingConfigurations

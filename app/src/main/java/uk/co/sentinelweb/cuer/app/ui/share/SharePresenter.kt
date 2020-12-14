@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.share
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -11,12 +12,14 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 class SharePresenter constructor(
     private val view: ShareContract.View,
     private val repository: MediaDatabaseRepository,
+    private val playlistRepository: PlaylistDatabaseRepository,
     private val linkScanner: LinkScanner,
     private val contextProvider: CoroutineContextProvider,
     private val ytInteractor: YoutubeInteractor,
@@ -39,8 +42,17 @@ class SharePresenter constructor(
                 state.jobs.add(CoroutineScope(contextProvider.Main).launch {
                     loadOrInfo(scannedMedia)
                         ?.also {
-                            loadMedia(it)
-                            it.id?.apply { view.warning("Video already in queue ...") }
+                            state.media = it
+                            if (it.id != null) {
+                                state.playlistItems =
+                                    playlistRepository.loadPlaylistItems(PlaylistDatabaseRepository.MediaIdListFilter(listOf(it.id!!)))
+                                        .takeIf { it.isSuccessful }
+                                        ?.data
+                            }
+                            mapDisplayModel()
+                            if (!(state.model?.isNewVideo ?: true)) {
+                                view.warning("Video already in queue ...")
+                            }
                         }
                         ?: errorLoading(scannedMedia.url)
                 })
@@ -73,9 +85,10 @@ class SharePresenter constructor(
                     }
             }
 
-    private fun loadMedia(it: MediaDomain) {
-        state.media = it
-        view.setData(mapper.mapShareModel(it, ::finish))
+    private fun mapDisplayModel() {
+        state.model = mapper.mapShareModel(state.media, state.playlistItems, ::finish).apply {
+            view.setData(this)
+        }
     }
 
     private fun finish(add: Boolean, play: Boolean, forward: Boolean) {
@@ -87,7 +100,13 @@ class SharePresenter constructor(
                 }
                 //val isConnected = ytContextHolder.isConnected()
                 if (forward) {
-                    view.gotoMain(state.media, play)
+                    val media: PlaylistItemDomain? = if (add)
+                        view.getPlaylistItems()[0]
+                    else {
+                        state.playlistItems?.get(0)
+
+                    }
+                    view.gotoMain(media, play)
                     view.exit()
                 } else { // return play is hidden for not connected
                     // todo fix this when queue built

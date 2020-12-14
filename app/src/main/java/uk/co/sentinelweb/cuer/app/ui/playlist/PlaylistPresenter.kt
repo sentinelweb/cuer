@@ -48,8 +48,6 @@ class PlaylistPresenter(
     }
 
     override fun initialise() {
-        //prefsWrapper.remove(CURRENT_PLAYLIST_ID)
-        //refreshPlaylist()
         queue.addProducerListener(this)
         state.playlistId = prefsWrapper.getLong(CURRENT_PLAYLIST_ID)
     }
@@ -63,20 +61,24 @@ class PlaylistPresenter(
     }
 
     override fun destroy() {
-//        state.jobs.forEach { it.cancel() }
-//        state.jobs.clear()
         queue.removeProducerListener(this)
     }
 
     override fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel) {
-        //toastWrapper.show("right: ${item.topText}")
         state.viewModelScope.launch {
             state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
-            playlistDialogModelCreator.loadPlaylists {
-                // todo prioritize ordering by usage
-                state.allPlaylists = it
+            playlistDialogModelCreator.loadPlaylists { allPlaylists ->
                 view.showPlaylistSelector(
-                    playlistDialogModelCreator.mapPlaylistSelectionForDialog(it, setOf(state.playlist!!), false)
+                    playlistDialogModelCreator.mapPlaylistSelectionForDialog(allPlaylists, setOf(state.playlist!!), false,
+                        { which, _ ->
+                            if (which < allPlaylists.size) {
+                                allPlaylists[which].id?.let {
+                                    moveItemToPlaylist(it)
+                                }
+                            } else {
+                                view.showPlaylistCreateDialog()
+                            }
+                        })
                 )
             }
         }
@@ -84,16 +86,6 @@ class PlaylistPresenter(
 
     override fun onPlaylistSelected(playlist: PlaylistDomain) {
         playlist.id?.let { moveItemToPlaylist(it) }
-    }
-
-    override fun onPlaylistSelected(which: Int) {
-        if (which < state.allPlaylists?.size ?: 0) {
-            state.allPlaylists?.get(which)?.id?.let {
-                moveItemToPlaylist(it)
-            }
-        } else {
-            view.showPlaylistCreateDialog()
-        }
     }
 
     private fun moveItemToPlaylist(it: Long) {
@@ -131,8 +123,16 @@ class PlaylistPresenter(
                 toastWrapper.show("No chromecast -> playing locally")
                 view.playLocal(itemDomain.media)
             } else {
-                queueExecIf { onItemSelected(itemDomain) }
-//                queue.onItemSelected(this)
+                if (isQueuedPlaylist) {
+                    queue.onItemSelected(itemDomain)
+                } else {
+                    view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
+                        state.playlist?.let {
+                            queue.refreshQueueFrom(it)
+                            queue.onItemSelected(itemDomain)
+                        }
+                    }))
+                }
             }
         } // todo error
     }
@@ -232,21 +232,6 @@ class PlaylistPresenter(
         }
     }
 
-//    override fun playNow(item: PlaylistItemDomain) {
-//        if (!(ytContextHolder.isConnected())) {
-//            toastWrapper.show("No chromecast -> playing locally")
-//            view.playLocal(mediaDomain)
-//        } else {
-//            queue.execIf { onItemSelected() }
-////            queue.getItemFor(mediaDomain.url)?.let {
-////                queue.onItemSelected(it)
-////            } ?: run {
-////                state.playAddedAfterRefresh = true
-////                queue.refreshQueueBackground() // In this case the ques isn't refeshed in share as it wasn't added
-////            }
-//        }
-//    }
-
     override fun undoDelete() {
         state.deletedPlaylistItem?.let { itemDomain ->
             state.viewModelScope.launch {
@@ -305,30 +290,4 @@ class PlaylistPresenter(
             log.e("Error loading playlist", e)
         }
     }
-
-//    private fun updateListContent(list: PlaylistDomain) {
-//        list
-//            .let { modelMapper.map(it) }
-//            .also { view.setList(it.items) }
-//            .also {
-//                state.focusIndex?.apply {
-//                    view.scrollToItem(this)
-//                    state.lastFocusIndex = state.focusIndex
-//                    state.focusIndex = null
-//                } ?: state.addedMedia?.let { added ->
-//                    queue.getItemFor(added.url)?.let {
-//                        view.scrollToItem(queue.itemIndex(it)!!)
-//                        if (state.playAddedAfterRefresh) {
-//                            queue.onItemSelected(it)
-//                            state.playAddedAfterRefresh = false
-//                        }
-//                        state.addedMedia = null
-//                    }
-//                } ?: run {
-//                    view.scrollToItem(
-//                        if (list.currentIndex > -1) list.currentIndex else list.items.size - 1
-//                    )
-//                }
-//            }
-//    }
 }
