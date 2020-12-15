@@ -53,6 +53,7 @@ class MainActivity :
         setupActionBarWithNavController(navController, appBarConfiguration)
         bottom_nav_view.setupWithNavController(navController)
         presenter.initialise()
+        // getSharedPreferences("robsPrefs",0).edit().putLong("ddd",6L).commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

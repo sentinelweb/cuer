@@ -138,6 +138,7 @@ class PlaylistPresenter(
                 } else {
                     view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
                         state.playlist?.let {
+                            prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
                             queue.refreshQueueFrom(it)
                             queue.onItemSelected(itemDomain, true)
                         }
@@ -237,6 +238,8 @@ class PlaylistPresenter(
                     view.highlightPlayingItem(queue.currentItemIndex)
                     currentItemIndex?.apply { view.scrollToItem(this) }
                 }
+            } ?: run {
+                executeRefresh()
             }
         }
     }

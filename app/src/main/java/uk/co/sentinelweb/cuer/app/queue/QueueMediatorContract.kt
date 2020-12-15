@@ -39,6 +39,7 @@ interface QueueMediatorContract {
 
     interface ConsumerListener {
         fun onItemChanged()
+        fun onPlaylistUpdated()
     }
 
     interface ProducerListener {

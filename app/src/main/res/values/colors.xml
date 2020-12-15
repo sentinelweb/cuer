@@ -13,5 +13,5 @@
     <color name="button_fg_tint">@color/white</color>
     <color name="menu_button_icon_tint">@color/white</color>
 
-    <color name="playing_item_background">@color/blue_100</color>
+    <color name="playing_item_background">@color/red_50</color>
 </resources>

@@ -199,9 +199,10 @@ class QueueMediator constructor(
                 ?.let { item -> playlistDomain.items.find { it.id == item.id } }
         }
         state.playlist = playlistDomain
+        consumerListeners.forEach { it.onPlaylistUpdated() }
     }
 
-    override suspend fun refreshQueue() {//after: (() -> Unit)?
+    override suspend fun refreshQueue() {
         (state.playlistId
             ?.let { playlistRepository.load(it) }
             ?.takeIf { it.isSuccessful }
@@ -211,37 +212,6 @@ class QueueMediator constructor(
                 ?.data?.get(0))
             ?.also { refreshQueueFrom(it) }
             ?: throw IllegalStateException("Could not load a playlist")
-
-
-//        repository
-//            .loadList(null)
-//            .takeIf { it.isSuccessful && it is RepoResult.Data }
-//            ?.let { state.mediaList = it.data!!; it.data }
-//            ?.map { mediaMapper.mapToPlaylistItem(it) }
-//            ?.let {
-//                PlaylistDomain(
-//                    title = "Media",
-//                    items = it,
-//                    currentIndex = state.currentPlaylist?.currentIndex ?: -1
-//                )
-//            }
-//            ?.also { state.currentPlaylist = it }
-//            ?.also { playlist ->
-//                producerListeners.forEach { l -> l.onPlaylistUpdated(playlist) }
-//            }?.also {
-//                after?.invoke()
-//            }
     }
-
-//    override fun itemIndex(item: PlaylistItemDomain): Int? =
-//        state.currentPlaylist
-//            ?.items
-//            ?.indexOfFirst { it.media.platformId == item.media.platformId }
-
-//    override fun getItemFor(url: String): PlaylistItemDomain? {
-//        return state.currentPlaylist
-//            ?.items
-//            ?.firstOrNull() { it.media.url == url }
-//    }
 
 }

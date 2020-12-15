@@ -2,21 +2,20 @@ package uk.co.sentinelweb.cuer.app.util.prefs
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 interface Field {
     val fname: String
 }
 
 class SharedPrefsWrapper<T : Field> constructor(
-    clazz: Class<T>,
-    app: Application
+    private val clazz: Class<T>,
+    private val app: Application,
+    private val log: LogWrapper
 ) {
-    private val prefs: SharedPreferences
-
-    init {
-        prefs = app.getSharedPreferences(clazz.simpleName, MODE_PRIVATE)
+    private val prefs: SharedPreferences by lazy {
+        app.getSharedPreferences(clazz.simpleName, 0)
     }
 
     fun getLong(field: T, def: Long): Long = prefs.getLong(field.fname, def)
@@ -25,7 +24,7 @@ class SharedPrefsWrapper<T : Field> constructor(
         if (prefs.contains(field.fname)) prefs.getLong(field.fname, 0)
         else null
 
-    @SuppressLint("ApplySharedPref") //
+    @SuppressLint("ApplySharedPref")
     fun putLong(field: T, value: Long) {
         prefs.edit().putLong(field.fname, value).commit()
     }

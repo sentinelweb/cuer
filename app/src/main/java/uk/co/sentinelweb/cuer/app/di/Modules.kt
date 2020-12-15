@@ -102,7 +102,7 @@ object Modules {
         factory<LogWrapper> { AndroidLogWrapper() }
         factory { FileWrapper(androidApplication()) }
         single(named<GeneralPreferences>()) {
-            SharedPrefsWrapper(GeneralPreferences::class.java, androidApplication())
+            SharedPrefsWrapper(GeneralPreferences::class.java, androidApplication(), get())
         }
     }
 

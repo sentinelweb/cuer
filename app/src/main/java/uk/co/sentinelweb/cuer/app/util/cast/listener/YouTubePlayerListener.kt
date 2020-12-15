@@ -17,7 +17,6 @@ class YouTubePlayerListener(
     private val mediaSessionManager: MediaSessionManager,
     private val log: LogWrapper,
     private val timeProvider: TimeProvider
-
 ) : AbstractYouTubePlayerListener(),
     CastPlayerContract.PlayerControls.Listener,
     QueueMediatorContract.ConsumerListener {
@@ -178,6 +177,10 @@ class YouTubePlayerListener(
     override fun onItemChanged() {
         loadVideo(queue.currentItem)
     }
+
+    override fun onPlaylistUpdated() {
+
+    }
     // endregion
 
     private fun handleError(e: Exception) {
@@ -198,13 +201,9 @@ class YouTubePlayerListener(
     private fun setupPlayer(controls: CastPlayerContract.PlayerControls) {
         controls.apply {
             addListener(this@YouTubePlayerListener)
-            setTitle(state.currentMedia?.title ?: "No Media")
-            setPlayerState(state.playState)
-            setDuration(state.durationSec)
-            setCurrentSecond(state.positionSec)
-            state.currentMedia?.apply { setMedia(this) }
         }
     }
+
 
     private fun cleanupPlayer(controls: CastPlayerContract.PlayerControls?) {
         controls?.apply {

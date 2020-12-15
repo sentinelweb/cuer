@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -116,6 +117,14 @@ class PlayerControlsNotificationPresenter constructor(
         state.media = media
         updateNotification()
         log.d("got media: $media")
+    }
+
+    override fun setPlaylistName(name: String) {
+        state.playlistName = name
+    }
+
+    override fun setPlaylistImage(image: ImageDomain?) {
+        // not needed here
     }
 
     override fun initMediaRouteButton() {
