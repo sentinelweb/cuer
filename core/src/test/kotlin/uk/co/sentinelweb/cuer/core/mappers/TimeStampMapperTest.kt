@@ -3,8 +3,8 @@ package uk.co.sentinelweb.cuer.core.mappers
 import org.junit.Before
 import org.junit.Test
 
-class DateTimeMapperTest {
-    private val sut = DateTimeMapper()
+class TimeStampMapperTest {
+    private val sut = TimeStampMapper()
 
     @Before
     fun setUp() {
@@ -23,7 +23,6 @@ class DateTimeMapperTest {
 
     }
 
-
     @Test
     fun mapDuration() {
         sut.mapDuration("PT1S")
@@ -31,9 +30,4 @@ class DateTimeMapperTest {
         sut.mapDuration("PT1H1M1S")
     }
 
-    @Test
-    fun formatTime() {
-        val actual = sut.formatTime(1000 * 60 * 60 * 18)
-        //assertEqual(actual, "18:00:00")
-    }
 }

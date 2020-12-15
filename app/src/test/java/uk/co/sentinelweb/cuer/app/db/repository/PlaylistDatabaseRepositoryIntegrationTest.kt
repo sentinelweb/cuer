@@ -45,6 +45,7 @@ class PlaylistDatabaseRepositoryIntegrationTest {
     private val channelMapper = ChannelMapper(imageMapper)
     private val mediaMapper = MediaMapper(imageMapper, channelMapper)
     private val playlistItemMapper = PlaylistItemMapper(mediaMapper)
+    private lateinit var mediaRepo: MediaDatabaseRepository
 
     private lateinit var sut: PlaylistDatabaseRepository
 
@@ -58,9 +59,18 @@ class PlaylistDatabaseRepositoryIntegrationTest {
         FixtureAnnotations.initFixtures(this)
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         database =
-            Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).allowMainThreadQueries()
+            Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                .allowMainThreadQueries()
                 .build()
-
+        mediaRepo = MediaDatabaseRepository(
+            mediaDao = database.mediaDao(),
+            channelDao = database.channelDao(),
+            log = systemLogWrapper,
+            database = database,
+            channelMapper = channelMapper,
+            mediaMapper = mediaMapper,
+            coProvider = coCxtProvider
+        )
         sut = PlaylistDatabaseRepository(
             playlistDao = database.playlistDao(),
             playlistMapper = PlaylistMapper(imageMapper, playlistItemMapper),
@@ -70,6 +80,9 @@ class PlaylistDatabaseRepositoryIntegrationTest {
             log = systemLogWrapper,
             coProvider = coCxtProvider
         )
+        runBlocking {
+            mediaRepo.save(playlist.items.map { it.media.copy(channelData = it.media.channelData.copy(id = null)) })
+        }
     }
 
     @After
@@ -97,11 +110,12 @@ class PlaylistDatabaseRepositoryIntegrationTest {
         runBlocking {
             val domain = playlist.copy(id = null, items = playlist.items.map { it.copy(id = null) })
             val domain1 = domain.copy()
-            val actual = sut.save(listOf(domain, domain1))
-            assertTrue(actual.isSuccessful)
+            val domains = listOf(domain, domain1)
+            val saved = sut.save(domains)
+            assertTrue(saved.isSuccessful)
             assertEquals(
-                actual.data,
-                sut.loadList(IdListFilter(actual.data!!.map { it.id!!.toLong() })).data
+                saved.data,
+                sut.loadList(IdListFilter(saved.data!!.map { it.id!!.toLong() }, flat = false)).data
             )
         }
     }
@@ -130,6 +144,7 @@ class PlaylistDatabaseRepositoryIntegrationTest {
     fun delete() {
         runBlocking {
             val domain = playlist.copy(id = null, items = playlist.items.map { it.copy(id = null) })
+
             val actual = sut.save(domain)
             assertTrue(actual.isSuccessful)
 

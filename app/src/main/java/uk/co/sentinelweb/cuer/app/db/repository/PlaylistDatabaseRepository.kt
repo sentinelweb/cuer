@@ -118,10 +118,18 @@ class PlaylistDatabaseRepository constructor(
                         else playlistDao
                             .loadAllByFlagsWithItems(PlaylistEntity.FLAG_DEFAULT)
                             .map { mapDeep(it) }
+                    is AllFilter ->
+                        if (filter.flat) playlistDao
+                            .getAllPlaylists()
+                            .map { playlistMapper.map(it, null, null) }
+                        else playlistDao
+                            .getAllPlaylistsWithItems()
+                            .map { mapDeep(it) }
                     else ->
                         playlistDao
                             .getAllPlaylists()
                             .map { playlistMapper.map(it, null, null) }
+
                 }.let { RepoResult.Data(it) }
             } catch (e: Throwable) {
                 val msg = "couldn't load $filter"
@@ -243,13 +251,14 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
-    suspend fun loadPlaylistItems(filter: DatabaseRepository.Filter): RepoResult<List<PlaylistItemDomain>> =
+    suspend fun loadPlaylistItems(filter: DatabaseRepository.Filter? = null): RepoResult<List<PlaylistItemDomain>> =
         withContext(coProvider.IO) {
             try {
                 when (filter) {
                     is MediaIdListFilter -> playlistItemDao.loadItemsByMediaId(filter.ids)
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
-                    else -> listOf()
+                    else -> playlistItemDao.loadItems()
+                        .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                 }.let { RepoResult.Data(it) }
             } catch (e: Exception) {
                 val msg = "couldn't save playlist item"
@@ -276,4 +285,5 @@ class PlaylistDatabaseRepository constructor(
     class IdListFilter(val ids: List<Long>, val flat: Boolean = true) : DatabaseRepository.Filter
     class MediaIdListFilter(val ids: List<Long>, val flat: Boolean = true) : DatabaseRepository.Filter
     class DefaultFilter(val flat: Boolean = true) : DatabaseRepository.Filter
+    class AllFilter(val flat: Boolean = true) : DatabaseRepository.Filter
 }

@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos
 
-import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
 
 internal class YoutubeVideoMediaDomainMapper(
-    private val dateTimeMapper: DateTimeMapper
+    private val timeStampMapper: TimeStampMapper
 ) {
     fun map(dto: YoutubeVideosDto): List<MediaDomain> =
         dto.items.map {
@@ -21,7 +21,7 @@ internal class YoutubeVideoMediaDomainMapper(
                 platform = PlatformDomain.YOUTUBE,
                 platformId = it.id,
                 duration = it.contentDetails?.duration
-                    ?.let { dur -> dateTimeMapper.mapDuration(dur) }
+                    ?.let { dur -> timeStampMapper.mapDuration(dur) }
                     ?: -1,
                 thumbNail = mapImage(it.snippet?.thumbnails
                     ?.let { thumbnailsDto -> thumbnailsDto.medium ?: thumbnailsDto.standard }
@@ -34,7 +34,7 @@ internal class YoutubeVideoMediaDomainMapper(
                     title = it.snippet?.channelTitle,
                     platform = PlatformDomain.YOUTUBE
                 ),
-                published = it.snippet?.publishedAt?.let { ts -> dateTimeMapper.mapTimestamp(ts) }
+                published = it.snippet?.publishedAt?.let { ts -> timeStampMapper.mapTimestamp(ts) }
             )
         }
 

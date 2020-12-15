@@ -13,7 +13,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 
 val jsonBackupSerialzer = Json(
-    JsonConfiguration.Stable.copy(prettyPrint = true),
+    JsonConfiguration.Stable.copy(prettyPrint = true, isLenient = true, ignoreUnknownKeys = true, encodeDefaults = false),
     context = serializersModuleOf(
         mapOf(
             PlaylistItemDomain::class to PlaylistItemDomain.serializer(),

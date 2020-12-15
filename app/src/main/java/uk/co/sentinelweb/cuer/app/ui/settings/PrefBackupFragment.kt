@@ -113,7 +113,9 @@ class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupC
                         toastWrapper = get(),
                         backupManager = get(),
                         timeProvider = get(),
-                        fileWrapper = get()
+                        fileWrapper = get(),
+                        timeStampMapper = get(),
+                        log = get()
                     )
                 }
                 scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }

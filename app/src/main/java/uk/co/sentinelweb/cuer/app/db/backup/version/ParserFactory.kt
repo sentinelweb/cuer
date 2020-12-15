@@ -4,6 +4,7 @@ import androidx.annotation.VisibleForTesting
 import uk.co.sentinelweb.cuer.app.db.backup.version.v1.V1Mapper
 import uk.co.sentinelweb.cuer.app.db.backup.version.v1.V1Parser
 import uk.co.sentinelweb.cuer.app.db.backup.version.v2.V2Parser
+import uk.co.sentinelweb.cuer.app.db.backup.version.v2.V3Parser
 import java.util.*
 
 class ParserFactory {
@@ -13,7 +14,8 @@ class ParserFactory {
         return when (version) {
             1 -> V1Parser(V1Mapper())
             2 -> V2Parser()
-            else -> throw InvalidPropertiesFormatException("Can't get version :(")
+            3 -> V3Parser()
+            else -> throw InvalidPropertiesFormatException("Can't get parser for version :(")
         }
     }
 

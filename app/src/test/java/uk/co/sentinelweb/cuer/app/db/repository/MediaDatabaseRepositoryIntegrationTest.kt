@@ -59,7 +59,8 @@ class MediaDatabaseRepositoryIntegrationTest {
         FixtureAnnotations.initFixtures(this)
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         database =
-            Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).allowMainThreadQueries()
+            Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                .allowMainThreadQueries()
                 .build()
 
         sut = MediaDatabaseRepository(

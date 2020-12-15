@@ -10,7 +10,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 class YoutubeVideoMediaDomainMapperTest {
     @MockK
-    private lateinit var mockDateMapper: DateTimeMapper
+    private lateinit var mockStampMapper: TimeStampMapper
 
     @Fixture
     private lateinit var dto: YoutubeVideosDto
@@ -44,7 +44,7 @@ class YoutubeVideoMediaDomainMapperTest {
         val fixture = JFixture()
         FixtureAnnotations.initFixtures(this, fixture)
 
-        dto.copy(items = dto.items.map {
+        dto = dto.copy(items = dto.items.map {
             it.copy(
                 snippet = it.snippet!!.copy(
                     thumbnails = it.snippet!!.thumbnails.copy(
@@ -54,9 +54,9 @@ class YoutubeVideoMediaDomainMapperTest {
                 )
             )
         })
-        every { mockDateMapper.mapTimestamp(any()) } returns fixtDate
-        every { mockDateMapper.mapDuration(any()) } returns fixtDuration
-        sut = YoutubeVideoMediaDomainMapper(mockDateMapper)
+        every { mockStampMapper.mapTimestamp(any<String>()) } returns fixtDate
+        every { mockStampMapper.mapDuration(any()) } returns fixtDuration
+        sut = YoutubeVideoMediaDomainMapper(mockStampMapper)
     }
 
     @Test

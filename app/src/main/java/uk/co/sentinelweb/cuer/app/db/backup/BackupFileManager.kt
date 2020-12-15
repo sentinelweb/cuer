@@ -23,48 +23,85 @@ class BackupFileManager constructor(
 
     suspend fun backupData() = withContext(contextProvider.IO) {
         BackupFileModel(
-            version = 2,
-            medias = mediaRepository.loadList().data!!,
-            playlists = playlistRepository.loadList().data!!
+            version = 3,
+            medias = listOf(),
+            playlists = playlistRepository.loadList(PlaylistDatabaseRepository.AllFilter(flat = false)).data!!
         ).let {
             jsonBackupSerialzer.stringify(BackupFileModel.serializer(), it)
         }
     }
 
-    suspend fun restoreData(data: String) = withContext(contextProvider.IO) {
+    suspend fun restoreData(data: String): Boolean = withContext(contextProvider.IO) {
         val backupFileModel = parserFactory.create(data).parse(data)
 
-        mediaRepository.deleteAll()
-            .takeIf { it.isSuccessful }
-            ?.let { mediaRepository.deleteAllChannels() }
-            ?.takeIf { it.isSuccessful }
-            ?.let { mediaRepository.save(backupFileModel.medias) }
-            ?.takeIf { it.isSuccessful }
-            ?.let { playlistRepository.deleteAll() }
-            ?.takeIf { it.isSuccessful }
-            ?.let { playlistRepository.save(backupFileModel.playlists) }
-            ?.isSuccessful
-            ?.let {
-                playlistRepository
-                    .loadList(PlaylistDatabaseRepository.DefaultFilter())
-                    .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
-                    ?.let { defPlaylistResult ->
-                        val orderBase = timeProvider.currentTimeMillis()
-                        backupFileModel.medias.mapIndexedNotNull { idx, item ->
-                            defPlaylistResult.data?.get(0)?.let { defPlist ->
-                                playlistItemCreator.buildPlayListItem(
-                                    item,
-                                    defPlist,
-                                    orderBase + (idx * 1000)
-                                )
-                            }
-                        }.let {
-                            playlistRepository.savePlaylistItems(it)
-                        }.isSuccessful
-//                            }
-                    } ?: true
-            }
-            ?: false
+        if (backupFileModel.version == 3) {
+            return@withContext mediaRepository.deleteAll()
+                .takeIf { it.isSuccessful }
+                ?.let { mediaRepository.deleteAllChannels() }
+                ?.takeIf { it.isSuccessful }
+                ?.let { playlistRepository.deleteAll() }
+                ?.takeIf { it.isSuccessful }
+                ?.let { mediaRepository.save(backupFileModel.medias) }
+                ?.takeIf { it.isSuccessful }
+                ?.data
+                ?.let { savedMedias ->
+                    val idLookup = savedMedias.map { it.platformId to it }.toMap()
+                    playlistRepository.save(
+                        backupFileModel.playlists.map {
+                            it.copy(
+                                items = it.items.map {
+                                    it.copy(
+                                        media = idLookup.get(it.media.platformId)
+                                            ?: throw IllegalArgumentException("ID lookup failed")
+                                    )
+                                }
+                            )
+                        }
+                    )
+                }
+                ?.takeIf { it.isSuccessful }
+                ?.isSuccessful
+                ?: false
+        } else {
+            return@withContext mediaRepository.deleteAll()
+                .takeIf { it.isSuccessful }
+                ?.let { mediaRepository.deleteAllChannels() }
+                ?.takeIf { it.isSuccessful }
+                ?.let { mediaRepository.save(backupFileModel.medias) }
+                ?.takeIf { it.isSuccessful }
+                ?.let { playlistRepository.deleteAll() }
+                ?.takeIf { it.isSuccessful }
+                ?.let {
+                    playlistRepository.save(backupFileModel.playlists).let {
+                        if (it.isSuccessful && it.data?.filter { it.default }?.size ?: 0 == 0) {
+                            playlistRepository.save(DatabaseInitializer.DEFAULT_PLAYLIST)
+                        } else it
+                    }
+                }
+                ?.takeIf { it.isSuccessful }
+                ?.let {
+                    playlistRepository
+                        .loadList(PlaylistDatabaseRepository.DefaultFilter())
+                        .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
+                        ?.let { defPlaylistResult ->
+                            val orderBase = timeProvider.currentTimeMillis()
+                            backupFileModel.medias.mapIndexedNotNull { idx, item ->
+                                defPlaylistResult.data?.get(0)?.let { defPlist ->
+                                    playlistItemCreator.buildPlayListItem(
+                                        item,
+                                        defPlist,
+                                        orderBase + (idx * 1000)
+                                    )
+                                }
+                            }.let {
+                                playlistRepository.savePlaylistItems(it)
+                            }.isSuccessful
+                        } ?: true
+                } ?: false
+        }
     }
 
+    companion object {
+        const val VERSION = 3
+    }
 }

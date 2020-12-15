@@ -7,7 +7,7 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.koin.core.KoinComponent
-import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
@@ -42,8 +42,8 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
         sut = YoutubeRetrofitInteractor(
             service = service,
             keyProvider = keyProvider,
-            videoMapper = YoutubeVideoMediaDomainMapper(DateTimeMapper()),
-            channelMapper = YoutubeChannelDomainMapper(DateTimeMapper()),
+            videoMapper = YoutubeVideoMediaDomainMapper(TimeStampMapper()),
+            channelMapper = YoutubeChannelDomainMapper(TimeStampMapper()),
             coContext = CoroutineContextProvider(),
             errorMapper = ErrorMapper(SystemLogWrapper())
         )
