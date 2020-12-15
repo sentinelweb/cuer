@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "071434554b0d872aee4615d53029f035",
+    "identityHash": "6373f56ba491695bbb6b762e2f5588ef",
     "entities": [
       {
         "tableName": "playlist",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `currentIndex` INTEGER NOT NULL, `mode` TEXT NOT NULL, `flags` INTEGER NOT NULL, `type` TEXT NOT NULL, `config_json` TEXT NOT NULL, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `currentIndex` INTEGER NOT NULL, `mode` TEXT NOT NULL, `flags` INTEGER NOT NULL, `type` TEXT NOT NULL, `parentId` INTEGER NOT NULL, `config_json` TEXT NOT NULL, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -42,6 +42,12 @@
             "fieldPath": "type",
             "columnName": "type",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parentId",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -524,7 +530,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '071434554b0d872aee4615d53029f035')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6373f56ba491695bbb6b762e2f5588ef')"
     ]
   }
 }

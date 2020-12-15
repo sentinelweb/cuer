@@ -40,6 +40,9 @@ data class PlaylistEntity(
     @ColumnInfo(name = "type")
     val type: PlaylistDomain.PlaylistTypeDomain = USER,
 
+    @ColumnInfo(name = "parentId")
+    val parentId: Long = -1,
+
     @Embedded(prefix = "thumb")
     val thumb: Image? = null,
 

@@ -12,7 +12,7 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.view_playlist_item.view.*
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.extension.fade
@@ -91,7 +91,10 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     }
 
     override fun setIconUrl(url: String) {
-        Picasso.get().load(url).into(listitem_icon)
+        //Picasso.get().load(url).into(listitem_icon)
+        Glide.with(listitem_icon)
+            .load(url)
+            .into(listitem_icon)
     }
 
     override fun setBackground(@ColorRes backgroundColor: Int) {

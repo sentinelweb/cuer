@@ -12,8 +12,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
 import com.google.android.material.appbar.AppBarLayout
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.playlist_item_edit_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
@@ -134,7 +134,10 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     ple_star_fab.isVisible = !model.empty
                     starMenuItem.setVisible(!model.empty)
                     playMenuItem.setVisible(!model.empty)
-                    Picasso.get().load(model.imageUrl).into(ple_image)
+                    //Picasso.get().load(model.imageUrl).into(ple_image)
+                    Glide.with(ple_image)
+                        .load(model.imageUrl)
+                        .into(ple_image)
                     ple_desc.setText(model.description)
                     ple_title.setText(model.title)
                     ple_toolbar.title = model.title
@@ -143,8 +146,11 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         return
                     }
 
-                    Picasso.get().load(model.imageUrl).into(ple_image)
-                    Picasso.get().load(model.channelThumbUrl).into(ple_author_image)
+                    //Picasso.get().load(model.imageUrl).into(ple_image)
+                    //Picasso.get().load(model.channelThumbUrl).into(ple_author_image)
+                    Glide.with(ple_author_image)
+                        .load(model.channelThumbUrl)
+                        .into(ple_author_image)
                     ple_chips.removeAllViews() // todo reuse chip views
                     model.chips.forEach { chipModel ->
                         chipCreator.create(chipModel, ple_chips)?.apply {

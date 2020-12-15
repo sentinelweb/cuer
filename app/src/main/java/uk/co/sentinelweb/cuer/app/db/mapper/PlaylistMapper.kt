@@ -23,7 +23,8 @@ class PlaylistMapper(
         image = imageMapper.mapImage(domain.image),
         thumb = imageMapper.mapImage(domain.thumb),
         mode = domain.mode,
-        title = domain.title
+        title = domain.title,
+        parentId = domain.parentId ?: -1
     )
 
     fun map(
@@ -48,7 +49,8 @@ class PlaylistMapper(
         image = imageMapper.mapImage(entity.image),
         config = entity.config,
         currentIndex = entity.currentIndex,
-        title = entity.title
+        title = entity.title,
+        parentId = entity.parentId.takeIf { it > -1L }
     )
 
 }

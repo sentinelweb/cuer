@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.picasso.Picasso
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
@@ -109,7 +109,10 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     }
 
     override fun setImage(url: String) {
-        Picasso.get().load(url).into(binding.castPlayerImage)
+        //Picasso.get().load(url).into(binding.castPlayerImage)
+        Glide.with(binding.castPlayerImage)
+            .load(url)
+            .into(binding.castPlayerImage)
     }
 
     override fun clearImage() {

@@ -47,24 +47,21 @@ class BackupFileManager constructor(
             ?.let {
                 playlistRepository
                     .loadList(PlaylistDatabaseRepository.DefaultFilter())
-                    .takeIf { it.isSuccessful && it.data?.size == 0 }
-                    ?.let {
-                        playlistRepository.save(DatabaseInitializer.DEFAULT_PLAYLIST)
-                            .takeIf { it.isSuccessful }
-                            ?.let { defPlaylistResult ->
-                                val orderBase = timeProvider.currentTimeMillis()
-                                backupFileModel.medias.mapIndexedNotNull { idx, item ->
-                                    defPlaylistResult.data?.let { defPlist ->
-                                        playlistItemCreator.buildPlayListItem(
-                                            item,
-                                            defPlist,
-                                            orderBase + (idx * 1000)
-                                        )
-                                    }
-                                }.let {
-                                    playlistRepository.savePlaylistItems(it)
-                                }.isSuccessful
+                    .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
+                    ?.let { defPlaylistResult ->
+                        val orderBase = timeProvider.currentTimeMillis()
+                        backupFileModel.medias.mapIndexedNotNull { idx, item ->
+                            defPlaylistResult.data?.get(0)?.let { defPlist ->
+                                playlistItemCreator.buildPlayListItem(
+                                    item,
+                                    defPlist,
+                                    orderBase + (idx * 1000)
+                                )
                             }
+                        }.let {
+                            playlistRepository.savePlaylistItems(it)
+                        }.isSuccessful
+//                            }
                     } ?: true
             }
             ?: false

@@ -20,15 +20,16 @@ class DatabaseInitializer constructor(
 
     fun initDatabase() {
         contextProvider.IOScope.launch {
-            mediaRepository.count()
+            (mediaRepository.count()
                 .takeIf { it.isSuccessful && it.data == 0 }
-                ?.let { initPlaylists() }
-                ?.let { it[0] to ITEMS }
-                ?.let { (playlist, items) -> playlist to items.map { mapQueueToMedia(it) } }
-                ?.let { (playlist, medias) ->
+                ?: let { return@launch })
+                .let { initPlaylists() }
+                .let { it[0] to ITEMS }
+                .let { (playlist, items) -> playlist to items.map { mapQueueToMedia(it) } }
+                .let { (playlist, medias) ->
                     playlist to ytInteractor.videos(medias.map { it.platformId })
                 }
-                ?.takeIf { (_, result) -> result.isSuccessful }
+                .takeIf { (_, result) -> result.isSuccessful }
                 ?.let { (playlist, result) ->
                     playlist to result.data?.let { mediaRepository.save(it) }
                 }

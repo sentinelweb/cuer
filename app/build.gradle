@@ -80,10 +80,8 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
 
-    implementation "com.squareup.picasso:picasso:$ver_picasso"
     implementation "com.jakewharton:process-phoenix:$ver_process_phoenix"
     implementation "androidx.preference:preference-ktx:$ver_preference"
-    // implementation 'androidx.legacy:legacy-support-v4:1.0.0' // not sure what this is for (possibly some room issue) commenting for now
 
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"
@@ -130,8 +128,6 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'// todo extract version
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
-
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-debug:$ver_coroutines_core"
 
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"

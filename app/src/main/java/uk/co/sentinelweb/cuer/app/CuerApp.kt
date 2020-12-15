@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app
 
 import android.app.Application
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.debug.DebugProbes
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -54,16 +53,13 @@ class CuerApp : Application() {
 
     @ExperimentalCoroutinesApi
     fun setDefaultExceptionHander() {
-        if (BuildConfig.DEBUG) {
-            DebugProbes.enableCreationStackTraces
-        }
         Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
-            DebugProbes.dumpCoroutines(System.err)
-            if (oldHandler != null) oldHandler.uncaughtException(
-                paramThread,
-                paramThrowable
-            )
-            else System.exit(2) //Prevents the service/app from freezing
+            if (oldHandler != null) oldHandler.uncaughtException(paramThread, paramThrowable)
+            else {
+                System.err.println(paramThread.state.toString())
+                paramThrowable.printStackTrace(System.err)
+                System.exit(0)
+            }
         }
     }
 }

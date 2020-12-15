@@ -15,7 +15,7 @@ object YoutubeCastServiceModule {
         scope(named<YoutubeCastService>()) {
             scoped { YoutubeCastServiceController(getSource(), get(), get(), get(), get()) }
             scoped { YoutubeCastServiceState() }
-            scoped { PlayerControlsNotificationPresenter(get(), get(), get(), get()) }
+            scoped { PlayerControlsNotificationPresenter(get(), get(), get(), get(), androidApplication()) }
             scoped<PlayerControlsNotificationContract.PresenterExternal> {
                 get<PlayerControlsNotificationPresenter>()
             }
