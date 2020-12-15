@@ -40,8 +40,6 @@ class PlaylistMutatorTest {
 
     @After
     fun tearDown() {
-
-
         println("------- end test ------------")
     }
 
@@ -149,6 +147,24 @@ class PlaylistMutatorTest {
         assertEquals(initialCurrentIndex, actual.currentIndex)
         assertEquals(fixMovedItem.id, actual.items[toPosition].id)
         assertEquals(actual.items[1].order - 1000, actual.items[toPosition].order)
+        assertScanOrder(actual)
+        actual.scanOrder().apply { println(this.toString()) }
+    }
+
+    @Test
+    fun `move current item changes index`() {
+        val initialCurrentIndex = 2
+        val fromPosition = 2
+        val toPosition = 8
+        val fixWithIndex = fixtPlaylist.copy(currentIndex = initialCurrentIndex)
+        val fixMovedItem = fixtPlaylist.items[fromPosition]
+
+        println("move: $fromPosition -> $toPosition")
+        val actual = sut.moveItem(fixWithIndex, fromPosition, toPosition)
+
+        assertEquals(toPosition, actual.currentIndex)
+        assertEquals(fixMovedItem.id, actual.items[toPosition].id)
+        assertEquals((actual.items[toPosition - 1].order + actual.items[toPosition + 1].order) / 2, actual.items[toPosition].order)
         assertScanOrder(actual)
         actual.scanOrder().apply { println(this.toString()) }
     }

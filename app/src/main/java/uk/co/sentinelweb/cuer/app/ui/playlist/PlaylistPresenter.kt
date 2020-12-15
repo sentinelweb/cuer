@@ -72,12 +72,13 @@ class PlaylistPresenter(
         queue.removeProducerListener(this)
     }
 
-    override fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel) {// move
         state.viewModelScope.launch {
             state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
             playlistDialogModelCreator.loadPlaylists { allPlaylists ->
                 view.showPlaylistSelector(
-                    playlistDialogModelCreator.mapPlaylistSelectionForDialog(allPlaylists, setOf(state.playlist!!), false,
+                    playlistDialogModelCreator.mapPlaylistSelectionForDialog(
+                        allPlaylists, setOf(state.playlist!!), false,
                         { which, _ ->
                             if (which < allPlaylists.size) {
                                 allPlaylists[which].id?.let {
@@ -103,6 +104,7 @@ class PlaylistPresenter(
                     playlistRepository.savePlaylistItem(this)
                 }
                 executeRefresh()
+
             }
         }
     }
@@ -198,7 +200,10 @@ class PlaylistPresenter(
                     playlistRepository.save(plist, false)
                         .takeIf { it.isSuccessful }
                         ?: toastWrapper.show("Couldn't save playlist")
-                    queueExecIf { refreshQueueFrom(plist) }
+                    queueExecIf {
+                        refreshQueueFrom(plist)
+                        view.highlightPlayingItem(currentItemIndex)
+                    }
                 }
             }
         } else {
@@ -278,7 +283,10 @@ class PlaylistPresenter(
                 })
                 .also { state.playlist = it }
                 ?.also {
-                    queueExecIf { refreshQueueFrom(it) }
+                    queueExecIf {
+                        refreshQueueFrom(it)
+                        view.highlightPlayingItem(currentItemIndex)
+                    }
                 }
                 .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
                 ?.let { modelMapper.map(it) }

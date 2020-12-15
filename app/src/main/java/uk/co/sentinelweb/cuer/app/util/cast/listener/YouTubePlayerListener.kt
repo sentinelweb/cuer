@@ -34,7 +34,7 @@ class YouTubePlayerListener(
         }
 
     init {
-        log.tag = "YouTubePlayer"
+        log.tag(this)
         queue.addConsumerListener(this)
     }
 
@@ -59,7 +59,10 @@ class YouTubePlayerListener(
     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
         this.youTubePlayer = youTubePlayer
         state.positionSec = second
-        playerUi?.setCurrentSecond(second)
+        if (timeProvider.currentTimeMillis() - state.lastUpdateUI > UI_UPDATE_INTERVAL) {
+            playerUi?.setCurrentSecond(second)
+            state.lastUpdateUI = timeProvider.currentTimeMillis()
+        }
         state.currentMedia = state.currentMedia?.copy(positon = (second * 1000).toLong())?.also {
             updateMedia(true)
         }
@@ -67,7 +70,7 @@ class YouTubePlayerListener(
     }
 
     private fun updateMedia(throttle: Boolean) {
-        if (!throttle || timeProvider.currentTimeMillis() - state.lastUpdateMedia > 3000) {
+        if (!throttle || timeProvider.currentTimeMillis() - state.lastUpdateMedia > DB_UPDATE_INTERVAL) {
             state.currentMedia?.apply { queue.updateMediaItem(this) }
             state.lastUpdateMedia = timeProvider.currentTimeMillis()
         }
@@ -187,7 +190,7 @@ class YouTubePlayerListener(
             youTubePlayer?.loadVideo(item.media.platformId, 0f)
             state.currentMedia = item.media
             playerUi?.setMedia(item.media)
-            item.media.positon?.apply { if (this > 0) youTubePlayer?.seekTo(this / 100f) }
+            item.media.positon?.apply { if (this > 0) youTubePlayer?.seekTo(this / 1000f) }
         } ?: playerUi?.reset()
     }
 
@@ -208,5 +211,10 @@ class YouTubePlayerListener(
             removeListener(this@YouTubePlayerListener)
             reset()
         }
+    }
+
+    companion object {
+        private const val UI_UPDATE_INTERVAL = 500
+        private const val DB_UPDATE_INTERVAL = 3000
     }
 }

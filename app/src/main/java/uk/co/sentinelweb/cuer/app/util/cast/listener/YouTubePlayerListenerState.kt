@@ -8,5 +8,6 @@ data class YouTubePlayerListenerState constructor(
     var positionSec: Float = 0f, // todo remove these mutate media
     var durationSec: Float = 0f, // todo remove these mutate media
     var currentMedia: MediaDomain? = null,
-    var lastUpdateMedia: Long = -1L
+    var lastUpdateMedia: Long = -1L,
+    var lastUpdateUI: Long = -1L
 )

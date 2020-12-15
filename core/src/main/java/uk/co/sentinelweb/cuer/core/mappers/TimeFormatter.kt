@@ -4,22 +4,31 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class TimeFormatter {
-    private val timeStampFormatter = DateTimeFormatter.ofPattern(TIME_PATTERN)
+    private val timeStampFormatterMillis = DateTimeFormatter.ofPattern(TIME_PATTERN_MILLIS)
+    private val timeStampFormatterSecs = DateTimeFormatter.ofPattern(TIME_PATTERN_SECS)
 
-    fun formatTime(date: LocalTime): String =
-        timeStampFormatter.format(date).strip00()
+    enum class Format { SECS, MILLIS }
 
-    fun formatTime(timeSecs: Float): String =
-        timeStampFormatter.format(LocalTime.ofNanoOfDay((timeSecs * 1_000_000_000).toLong())).strip00()
+    fun formatTime(date: LocalTime, format: Format = Format.SECS): String =
+        formatter().format(date).strip00()
 
-    fun formatNow(): String =
-        timeStampFormatter.format(LocalTime.now()).strip00()
+    fun formatTime(timeSecs: Float, format: Format = Format.SECS): String =
+        formatter().format(LocalTime.ofNanoOfDay((timeSecs * 1_000_000_000).toLong())).strip00()
 
-    fun formatMillis(l: Long): String =
-        timeStampFormatter.format(LocalTime.ofNanoOfDay(l * 1_000_000)).strip00()
+    fun formatNow(format: Format = Format.SECS): String =
+        formatter().format(LocalTime.now()).strip00()
 
-    fun formatFrom(time: LocalTime): String =
-        timeStampFormatter.format(LocalTime.now().minusNanos(time.toNanoOfDay())).strip00()
+    fun formatMillis(l: Long, format: Format = Format.MILLIS): String =
+        formatter().format(LocalTime.ofNanoOfDay(l * 1_000_000)).strip00()
+
+    fun formatFrom(time: LocalTime, format: Format = Format.SECS): String =
+        formatter().format(LocalTime.now().minusNanos(time.toNanoOfDay())).strip00()
+
+    private fun formatter(format: Format = Format.SECS) = when (format) {
+        Format.MILLIS -> timeStampFormatterMillis
+        Format.SECS -> timeStampFormatterSecs
+        else -> timeStampFormatterSecs
+    }
 
     private fun String.strip00() = this.let {
         var formatted = it
@@ -31,6 +40,10 @@ class TimeFormatter {
 
     companion object {
         // 00:00:36.150
-        private const val TIME_PATTERN = "HH:mm:ss.SSS"
+        private const val TIME_PATTERN_MILLIS = "HH:mm:ss.SSS"
+
+        // 00:00:36
+        private const val TIME_PATTERN_SECS = "HH:mm:ss"
     }
+
 }

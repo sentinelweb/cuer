@@ -41,6 +41,9 @@ class PlaylistMutator {
                         else -> (items[toPosition + 1].order + items[toPosition - 1].order) / 2L
                     }
                 }
+            if (fromPosition == domain.currentIndex) {
+                newCurrentIndex = toPosition
+            }
             items.apply {
                 set(toPosition, movingItem.copy(order = newOrder))
             }
