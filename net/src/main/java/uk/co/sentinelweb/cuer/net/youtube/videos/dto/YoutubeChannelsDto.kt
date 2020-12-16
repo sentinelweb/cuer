@@ -15,8 +15,8 @@ data class YoutubeChannelsDto constructor(
         data class SnippetDto constructor(
             val title: String,
             val description: String?,
-            val customUrl: String?,
-            val country: String,
+            val customUrl: String? = null,
+            val country: String? = null,
             val publishedAt: String,
             val thumbnails: ThumbnailsDto
         ) {

@@ -1,12 +1,15 @@
 <resources>
     <string name="app_name">Cuer</string>
     <string name="bottomnav_title_browse">Browse</string>
+    <string name="bottomnav_title_playlists">Playlists</string>
     <string name="bottomnav_title_playlist">Playlist</string>
     <string name="bottomnav_title_player">Player</string>
     <string name="media_route_menu_title">Cast on</string>
     <string name="menu_filter">Play</string>
     <string name="right">Right</string>
     <string name="left">Left</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
     <!-- menu -->
     <string name="menu_play">Play</string>
@@ -31,16 +34,37 @@
 
     <!-- playlist_item_edit -->
     <string name="pie_empty_desc">We can only add youtube video links at the moment</string>
-    <string name="pie_playlist_dialog_title">Select Playlist</string>
+    <string name="playlist_dialog_title">Select Playlist</string>
+    <string name="pie_add_playlist_dialog_title">Create Playlist</string>
     <string name="pie_empty_title">Sorry &#8230; ❤</string>
 
     <!-- playlist fragemnt -->
     <string name="playlist_fab_up_contentdesc">Up</string>
     <string name="playlist_fab_down_contentdesc">Down</string>
+    <string name="pl_item_delete"> Delete </string>
+    <string name="pl_item_move"> Move </string>
+    <string name="playlist_change_dialog_title">Change playlist?</string>
+    <string name="playlist_change_dialog_message">This will change the current playlist …</string>
+
+    <!-- playlist edit fragemnt -->
+    <string name="pe_fragment_title">Edit playlist</string>
+    <string name="pe_fragment_title_add">Create playlist</string>
+    <string name="pe_title">Title</string>
+    <string name="pe_create">Create</string>
+    <string name="pe_save">Save</string>
 
     <!-- local player -->
     <string name="title_activity_fullscreen">YoutubeFullscreenActivity</string>
 
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="menu_settings">Settings</string>
+    <string name="prefs_root_item_backup_title">Backup</string>
+    <string name="nav_title_backup_settings">Backup settings</string>
+    <string name="pref_key_backup">backup</string>
+    <string name="pref_key_restore">restore</string>
+    <string name="pe_default_display_title">Enter a title …</string>
+    <string name="pe_error_title_blank">Add a title</string>
+    <string name="playlist_dialog_add_playlist">Add playlist …</string>
+
 </resources>

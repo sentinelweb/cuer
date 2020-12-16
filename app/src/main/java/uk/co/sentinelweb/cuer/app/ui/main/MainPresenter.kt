@@ -64,9 +64,4 @@ class MainPresenter(
     }
 
     override fun onDestroy() = Unit
-
-    companion object {
-        val TAGP = "CuerLog"
-    }
-
 }

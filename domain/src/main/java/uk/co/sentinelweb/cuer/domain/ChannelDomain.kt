@@ -5,9 +5,13 @@ import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 @Serializable
-class ChannelDomain constructor(
-    val id: String = "",
+data class ChannelDomain constructor(
+    val id: Long? = null,
+    val platformId: String?,
+    val platform: PlatformDomain,
+    val country: String? = null,
     val title: String? = null,
+    val customUrl: String? = null,
     val description: String? = null,
     @ContextualSerialization val published: LocalDateTime? = null,
     val thumbNail: ImageDomain? = null,

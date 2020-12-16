@@ -3,7 +3,11 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.*
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemViewHolder
 
 
 class PlaylistAdapter constructor(
@@ -13,18 +17,37 @@ class PlaylistAdapter constructor(
 
     private lateinit var recyclerView: RecyclerView
 
-    var data: List<ItemModel> = listOf()
-        get() = field
+    private var _data: List<ItemModel> = listOf()
+
+    val data: List<ItemModel>
+        get() = _data
+
+    var highlightItem: Int? = null
         set(value) {
-            DiffUtil.calculateDiff(ItemDiffCallback(value, field)).apply {
-                field = value
+            field = value
+            notifyDataSetChanged()
+        }
+
+    fun setData(data: List<ItemModel>, animate: Boolean = true) {
+        if (animate) {
+            DiffUtil.calculateDiff(
+                ItemDiffCallback(
+                    data,
+                    this._data
+                )
+            ).apply {
+                this@PlaylistAdapter._data = data
                 // this stops random scrolling out of view
                 val recyclerViewState = recyclerView.layoutManager?.onSaveInstanceState()
                 dispatchUpdatesTo(this@PlaylistAdapter)
                 recyclerView.layoutManager?.onRestoreInstanceState(recyclerViewState)
             }
+        } else {
+            this@PlaylistAdapter._data = data
+            notifyDataSetChanged()
         }
 
+    }
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
     }
@@ -34,8 +57,8 @@ class PlaylistAdapter constructor(
 
     @Override
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.itemPresenter.update(data.get(position))
+        holder.itemPresenter.update(_data.get(position), position == highlightItem)
     }
 
-    override fun getItemCount(): Int = data.size
+    override fun getItemCount(): Int = _data.size
 }

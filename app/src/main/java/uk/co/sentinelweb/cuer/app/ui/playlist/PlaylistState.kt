@@ -1,14 +1,16 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.Job
-import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 data class PlaylistState constructor(
-    var addedMedia: MediaDomain? = null,
-    var playAddedAfterRefresh: Boolean = false,
+    var playlistId: Long? = null,
+    var playlist: PlaylistDomain? = null,
+    var deletedPlaylistItem: PlaylistItemDomain? = null,
     var focusIndex: Int? = null,
-    var lastFocusIndex: Int? = null,
-    val jobs: MutableList<Job> = mutableListOf(),
-    var deletedMedia: MediaDomain? = null
+    var lastFocusIndex: Int? = null, // used for undo
+    var dragFrom: Int? = null,
+    var dragTo: Int? = null,
+    var selectedPlaylistItem: PlaylistItemDomain? = null
 ) : ViewModel()

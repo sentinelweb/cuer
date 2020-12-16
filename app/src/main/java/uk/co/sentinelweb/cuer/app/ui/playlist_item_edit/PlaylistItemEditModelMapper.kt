@@ -2,9 +2,8 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.core.mappers.DateTimeMapper
+import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import java.time.chrono.IsoChronology
@@ -14,7 +13,7 @@ import java.time.format.FormatStyle
 import java.util.*
 
 class PlaylistItemEditModelMapper(
-    private val dateTimeMapper: DateTimeMapper,
+    private val timeFormater: TimeFormatter,
     private val res: ResourceWrapper
 ) {
     var pattern: String = DateTimeFormatterBuilder
@@ -37,13 +36,16 @@ class PlaylistItemEditModelMapper(
         channelThumbUrl = (domain.channelData.thumbNail ?: domain.channelData.image)?.url,
         chips = mutableListOf(ChipModel(ChipModel.Type.PLAYLIST_SELECT)).apply {
             selectedPlaylists.forEachIndexed { index, playlist ->
-                add(index, ChipModel(ChipModel.Type.PLAYLIST, playlist.title, playlist.id))
+                add(
+                    index,
+                    ChipModel(ChipModel.Type.PLAYLIST, playlist.title, playlist.id.toString())
+                )
             }
         },
         starred = domain.starred,
-        canPlay = domain.mediaId.isNotEmpty(),
-        durationText = domain.duration?.let { dateTimeMapper.formatTime(it) },
-        positionText = domain.positon?.let { dateTimeMapper.formatTime(it) },
+        canPlay = domain.platformId.isNotEmpty(),
+        durationText = domain.duration?.let { timeFormater.formatMillis(it, TimeFormatter.Format.SECS) },
+        positionText = domain.positon?.let { timeFormater.formatMillis(it, TimeFormatter.Format.SECS) },
         position = domain.positon
             ?.takeIf { domain.duration != null && domain.duration!! > 0L }
             ?.let { (it / domain.duration!!).toFloat() }
@@ -51,18 +53,6 @@ class PlaylistItemEditModelMapper(
         pubDate = pubDateFormatter.format(domain.published),
         empty = false
     )
-
-    fun mapSelection(all: List<PlaylistDomain>, selected: Set<PlaylistDomain>): SelectDialogModel =
-        SelectDialogModel(
-            type = SelectDialogModel.Type.PLAYLIST,
-            title = res.getString(R.string.pie_playlist_dialog_title),
-            items = all.map { playlist ->
-                SelectDialogModel.Item(
-                    playlist.title,
-                    selected = (selected.find { sel -> playlist.title == sel.title } != null)
-                )
-            }
-        )
 
     fun mapEmpty(): PlaylistItemEditModel = PlaylistItemEditModel(
         title = res.getString(R.string.pie_empty_title),

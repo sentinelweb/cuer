@@ -5,8 +5,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/red_100"
     >
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/primary_dark"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/primary_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_image"
@@ -16,6 +29,42 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
+
+
+    <LinearLayout
+        android:id="@+id/cast_player_playlist_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:translationX="10dp"
+        android:translationY="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/cast_player_image"
+        app:layout_constraintRight_toLeftOf="@id/cast_player_track_last"
+        >
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/cast_player_playlist_image"
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="@color/white"
+            android:padding="1dp"
+            android:src="@drawable/ic_nav_playlist_black"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/cast_player_playlist_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#ccffffff"
+            android:padding="2dp"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            tools:text="playlist"
+            />
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/cast_player_center"
@@ -28,21 +77,26 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/cast_player_play"
+            android:background="?selectableItemBackground"
             android:layout_width="@dimen/player_button_size"
             android:layout_height="@dimen/player_button_size"
+            android:padding="@dimen/player_button_padding"
             android:src="@drawable/ic_player_play_black"
             />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/cast_player_pause"
+            android:background="?selectableItemBackground"
             android:layout_width="@dimen/player_button_size"
             android:layout_height="@dimen/player_button_size"
+            android:padding="@dimen/player_button_padding"
             android:src="@drawable/ic_player_pause_black"
 
             />
 
         <ProgressBar
             android:id="@+id/cast_player_buffering"
+            android:background="?selectableItemBackground"
             android:layout_width="@dimen/player_button_icon_size"
             android:layout_height="@dimen/player_button_icon_size"
             android:padding="4dp"
@@ -52,36 +106,44 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_seek_back"
+        android:background="?selectableItemBackground"
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_fast_rewind_black"
+        android:padding="@dimen/player_button_padding"
         app:layout_constraintRight_toLeftOf="@id/cast_player_center"
         app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_seek_forward"
+        android:background="?selectableItemBackground"
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_fast_forward_black"
+        android:padding="@dimen/player_button_padding"
         app:layout_constraintLeft_toRightOf="@id/cast_player_center"
         app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_track_last"
+        android:background="?selectableItemBackground"
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_skip_b_black"
+        android:padding="@dimen/player_button_padding"
         app:layout_constraintRight_toLeftOf="@id/cast_player_seek_back"
         app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_track_next"
+        android:background="?selectableItemBackground"
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:src="@drawable/ic_player_skip_f_black"
+        android:padding="@dimen/player_button_padding"
         app:layout_constraintLeft_toRightOf="@id/cast_player_seek_forward"
         app:layout_constraintTop_toTopOf="parent"
         />
@@ -92,9 +154,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintRight_toLeftOf="@id/media_route_button"
         app:layout_constraintTop_toTopOf="parent"
+        android:padding="@dimen/player_button_padding"
         tools:text="-"
         android:visibility="gone"
         />
+
 
     <androidx.mediarouter.app.MediaRouteButton
         android:id="@+id/media_route_button"
@@ -148,6 +212,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="1000"
+        android:progressTint="@color/primary"
+        android:thumbTint="@color/primary"
         app:layout_constraintTop_toBottomOf="@id/cast_player_title"
         />
 

@@ -2,10 +2,12 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-data class PlaylistItemEditState constructor(
+data class PlaylistItemEditState(
     var model: PlaylistItemEditModel? = null,
     var media: MediaDomain? = null,
     val selectedPlaylists: MutableSet<PlaylistDomain> = mutableSetOf(),
-    var allPlaylists: List<PlaylistDomain>? = null
+    var allPlaylists: List<PlaylistDomain>? = null,
+    var committedItems: List<PlaylistItemDomain>? = null
 )

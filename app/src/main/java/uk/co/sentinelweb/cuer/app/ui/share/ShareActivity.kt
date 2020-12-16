@@ -14,17 +14,20 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.PLAY_NOW
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
-import uk.co.sentinelweb.cuer.app.util.extension.serialise
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class ShareActivity : AppCompatActivity(), ShareContract.View {
-
+    // todo add navigation here
     private val presenter: ShareContract.Presenter by currentScope.inject()
     private val shareWrapper: ShareWrapper by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
@@ -43,7 +46,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
 
     override fun error(msg: String) {
         snackbar?.dismiss()
-        snackbar = snackbarWrapper.make("ERROR: $msg")
+        snackbar = snackbarWrapper.make("ERROR: $msg").apply { show() }
     }
 
     override fun warning(msg: String) {
@@ -84,11 +87,12 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         presenter.onStop()
     }
 
-    override fun gotoMain(media: MediaDomain?, play: Boolean) {
+    override fun gotoMain(media: PlaylistItemDomain?, play: Boolean) {
         startActivity( // todo map in NavigationMapper
             Intent(this, MainActivity::class.java).apply {
                 media?.let {
-                    putExtra(MEDIA.toString(), it.serialise())
+                    putExtra(NavigationModel.Target::class.java.simpleName, PLAYLIST_FRAGMENT.toString())
+                    putExtra(PLAYLIST_ITEM.toString(), it.serialise())
                     if (play) putExtra(PLAY_NOW.toString(), true)
                 }
             })
@@ -126,6 +130,12 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         }
     }
 
+    override suspend fun commitPlaylistItems() {
+        editFragment.commitPlaylistItems()
+    }
+
+    override fun getPlaylistItems(): List<PlaylistItemDomain> = editFragment.getPlaylistItems()
+
     companion object {
 
         private const val EXTRA_PASTE = "paste"
@@ -147,6 +157,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
                     SharePresenter(
                         view = get(),
                         repository = get(),
+                        playlistRepository = get(),
                         linkScanner = get(),
                         contextProvider = get(),
                         ytInteractor = get(),
@@ -155,12 +166,19 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
                         state = get(),
                         log = get(),
                         ytContextHolder = get(),
-                        res = get()
+                        mapper = get(),
+                        prefsWrapper = get(named<GeneralPreferences>())
                     )
                 }
                 scoped { ShareWrapper(getSource()) }
                 scoped { SnackbarWrapper(getSource()) }
                 viewModel { ShareState() }
+                scoped {
+                    ShareModelMapper(
+                        ytContextHolder = get(),
+                        res = get()
+                    )
+                }
             }
         }
     }

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.playlists.PlaylistsFragment"
+    >
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/playlists_swipe"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/playlists_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="LinearLayoutManager"
+            tools:context=".ui.playlists.PlaylistsFragment"
+            tools:listitem="@layout/view_playlists_item"
+            />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+    <!--        android:id="@+id/playlist_fab_up"-->
+    <!--        style="@style/FabButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_gravity="top|end"-->
+    <!--        android:layout_margin="16dp"-->
+    <!--        android:contentDescription="@string/playlist_fab_up_contentdesc"-->
+    <!--        app:fabSize="mini"-->
+    <!--        app:layout_anchor="@+id/playlist_fab_down"-->
+    <!--        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"-->
+    <!--        app:srcCompat="@drawable/ic_button_up_black"-->
+    <!--        />-->
+
+    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+    <!--        android:id="@+id/playlist_fab_down"-->
+    <!--        style="@style/FabButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="16dp"-->
+    <!--        android:contentDescription="@string/playlist_fab_down_contentdesc"-->
+    <!--        app:fabSize="mini"-->
+    <!--        app:layout_anchor="@+id/playlist_swipe"-->
+    <!--        app:layout_anchorGravity="bottom|right"-->
+    <!--        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"-->
+    <!--        app:srcCompat="@drawable/ic_button_down_black"-->
+    <!--        />-->
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

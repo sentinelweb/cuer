@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.klink.util.extension
+package uk.co.sentinelweb.cuer.app.util.extension
 
 import android.animation.ObjectAnimator
 import android.view.View

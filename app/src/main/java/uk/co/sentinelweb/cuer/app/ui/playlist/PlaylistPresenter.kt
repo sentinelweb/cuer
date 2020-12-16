@@ -1,84 +1,152 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
-import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
-import uk.co.sentinelweb.cuer.ui.queue.dummy.Queue
+import uk.co.sentinelweb.cuer.domain.ext.indexOfItemId
+import uk.co.sentinelweb.cuer.domain.ext.itemWitId
+import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 class PlaylistPresenter(
     private val view: PlaylistContract.View,
     private val state: PlaylistState,
     private val repository: MediaDatabaseRepository,
+    private val playlistRepository: PlaylistDatabaseRepository,
     private val modelMapper: PlaylistModelMapper,
     private val contextProvider: CoroutineContextProvider,
-    private val queue: QueueMediatorContract.Mediator,
+    private val queue: QueueMediatorContract.Producer,
     private val toastWrapper: ToastWrapper,
-    private val ytInteractor: YoutubeInteractor,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val ytJavaApi: YoutubeJavaApiWrapper,
-    private val shareWrapper: ShareWrapper
-
+    private val shareWrapper: ShareWrapper,
+    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
+    private val playlistMutator: PlaylistMutator,
+    private val log: LogWrapper,
+    private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator,
+    private val timeProvider: TimeProvider
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
-    override fun initialise() {
-        initListCheck()
-        queue.addProducerListener(this)
+    private val isQueuedPlaylist: Boolean
+        get() = state.playlist?.let { queue.playlist?.id == state.playlist?.id } ?: false
+
+    private fun queueExecIf(
+        block: QueueMediatorContract.Producer.() -> Unit,
+        elseBlock: (QueueMediatorContract.Producer.() -> Unit)? = null
+    ) {
+        if (isQueuedPlaylist) block(queue)
+        else elseBlock?.let { it(queue) }
     }
 
-    override fun loadList() {
-        queue.refreshQueueBackground()
+    private fun queueExecIf(block: QueueMediatorContract.Producer.() -> Unit) {
+        if (isQueuedPlaylist) block(queue)
+    }
+
+    override fun initialise() {
+        queue.addProducerListener(this)
+        state.playlistId = prefsWrapper.getLong(CURRENT_PLAYLIST_ID)
     }
 
     override fun refreshList() {
-        queue.refreshQueueBackground()
+        refreshPlaylist()
     }
 
     override fun setFocusMedia(mediaDomain: MediaDomain) {
-        state.addedMedia = mediaDomain
+        //state.addedMedia = mediaDomain
     }
 
     override fun destroy() {
-        state.jobs.forEach { it.cancel() }
-        state.jobs.clear()
         queue.removeProducerListener(this)
     }
 
-    override fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel) {
-        toastWrapper.show("right: ${item.topText}")
+    override fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel) {// move
+        state.viewModelScope.launch {
+            state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
+            playlistDialogModelCreator.loadPlaylists { allPlaylists ->
+                view.showPlaylistSelector(
+                    playlistDialogModelCreator.mapPlaylistSelectionForDialog(
+                        allPlaylists, setOf(state.playlist!!), false,
+                        { which, _ ->
+                            if (which < allPlaylists.size) {
+                                allPlaylists[which].id?.let {
+                                    moveItemToPlaylist(it)
+                                }
+                            } else {
+                                view.showPlaylistCreateDialog()
+                            }
+                        })
+                )
+            }
+        }
+    }
+
+    override fun onPlaylistSelected(playlist: PlaylistDomain) {
+        playlist.id?.let { moveItemToPlaylist(it) }
+    }
+
+    private fun moveItemToPlaylist(it: Long) {
+        state.selectedPlaylistItem?.let { moveItem ->
+            state.viewModelScope.launch {
+                moveItem.copy(playlistId = it, order = timeProvider.currentTimeMillis())
+                    .apply { playlistRepository.savePlaylistItem(this) }
+                executeRefresh()
+
+            }
+        }
     }
 
     override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
-        state.jobs.add(contextProvider.MainScope.launch {
+        state.viewModelScope.launch {
             delay(400)
-            queue.getItemFor(item.url)?.run {
-                state.deletedMedia = this.media
-                state.focusIndex = queue.itemIndex(this)
-                queue.removeItem(this)
-                view.showDeleteUndo("Deleted: ${media.title}")
+            state.playlist?.items?.apply {
+                find { it.id == item.id }?.let { deleteItem ->
+                    state.deletedPlaylistItem = deleteItem
+                    playlistRepository.delete(deleteItem)
+                    queueExecIf { itemRemoved(deleteItem) }
+                    // todo check if media is on other playlist and delete if not?
+                    //repository.delete(deleteItem.media)
+                    view.showDeleteUndo("Deleted: ${deleteItem.media.title}")
+                    state.focusIndex = indexOf(deleteItem)
+                    executeRefresh()
+                }
             }
-        })
+        }
     }
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
-        queue.getItemFor(item.url)?.run {
+        state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
                 toastWrapper.show("No chromecast -> playing locally")
-                view.playLocal(this.media)
+                view.playLocal(itemDomain.media)
             } else {
-                queue.onItemSelected(this)
+                if (isQueuedPlaylist) {
+                    queue.onItemSelected(itemDomain)
+                } else {
+                    view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
+                        state.playlist?.let {
+                            prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
+                            queue.refreshQueueFrom(it)
+                            queue.onItemSelected(itemDomain, true)
+                        }
+                    }))
+                }
             }
-        }
+        } // todo error
     }
 
     override fun scroll(direction: PlaylistContract.ScrollDirection) {
@@ -86,22 +154,20 @@ class PlaylistPresenter(
     }
 
     override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
-        if (external) {
-            queue.getItemFor(item.url)?.run {
-                if (!ytJavaApi.launchVideo(this.media)) {
+        state.playlist?.itemWitId(item.id)?.let { itemDomain ->
+            if (external) {
+                if (!ytJavaApi.launchVideo(itemDomain.media)) {
                     toastWrapper.show("can't launch video")
                 }
-            } ?: toastWrapper.show("can't find video")
-        } else {
-            queue.getItemFor(item.url)?.run {
-                view.playLocal(this.media)
+            } else {
+                view.playLocal(itemDomain.media)
             }
-        }
+        } ?: toastWrapper.show("can't find video")
     }
 
     override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
-        queue.getItemFor(item.url)?.run {
-            if (!ytJavaApi.launchChannel(this.media)) {
+        state.playlist?.itemWitId(item.id)?.let { itemDomain ->
+            if (!ytJavaApi.launchChannel(itemDomain.media)) {
                 toastWrapper.show("can't launch channel")
             }
         } ?: toastWrapper.show("can't find video")
@@ -112,96 +178,132 @@ class PlaylistPresenter(
     }
 
     override fun onItemShare(item: PlaylistModel.PlaylistItemModel) {
-        queue.getItemFor(item.url)?.run {
-            shareWrapper.share(this.media)
+        state.playlist?.itemWitId(item.id)?.let { itemDomain ->
+            shareWrapper.share(itemDomain.media)
         }
     }
 
     override fun moveItem(fromPosition: Int, toPosition: Int) {
-        queue.moveItem(fromPosition, toPosition)
+        if (state.dragFrom == null) {
+            state.dragFrom = fromPosition
+        }
+        state.dragTo = toPosition
     }
 
-    override fun playNow(mediaDomain: MediaDomain) {
-        if (!(ytContextHolder.isConnected())) {
-            toastWrapper.show("No chromecast -> playing locally")
-            view.playLocal(mediaDomain)
+    override fun commitMove() {
+        if (state.dragFrom != null && state.dragTo != null) {
+            state.playlist = state.playlist?.let { playlist ->
+                playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!)
+            }?.also { plist ->
+                plist.let { modelMapper.map(it) }
+                    .also { view.setList(it.items, false) }
+            }?.also { plist ->
+                state.viewModelScope.launch {
+                    playlistRepository.save(plist, false)
+                        .takeIf { it.isSuccessful }
+                        ?: toastWrapper.show("Couldn't save playlist")
+                    queueExecIf {
+                        refreshQueueFrom(plist)
+                        view.highlightPlayingItem(currentItemIndex)
+                    }
+                }
+            }
         } else {
-            queue.getItemFor(mediaDomain.url)?.let {
-                queue.onItemSelected(it)
+            //toastWrapper.show("Move failed ..")
+            log.d("commitMove: Move failed .. ")
+            refreshPlaylist()
+        }
+        state.dragFrom = null
+        state.dragTo = null
+    }
+
+    override fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean) {
+        state.viewModelScope.launch {
+            plId?.apply {
+                state.playlistId = plId
+                executeRefresh()
+
+                if (playNow) {
+                    state.playlist?.apply {
+                        queue.playNow(this, plItemId)// todo current item isnt set properly in queue
+                        state.playlist = queue.playlist?.copy()
+                    }
+                } else {
+                    state.playlist?.apply {
+                        indexOfItemId(plItemId)?.also { foundIndex ->
+                            view.scrollToItem(foundIndex)
+                        }
+                    }
+                }
+                queueExecIf {
+                    view.highlightPlayingItem(queue.currentItemIndex)
+                    currentItemIndex?.apply { view.scrollToItem(this) }
+                }
             } ?: run {
-                state.playAddedAfterRefresh = true
-                queue.refreshQueueBackground() // In this case the ques isn't refeshed in share as it wasn't added
+                executeRefresh()
             }
         }
-    }
-
-    private fun initListCheck() {
-        state.jobs.add(contextProvider.MainScope.launch {
-            repository.count()
-                .takeIf { it.isSuccessful && it.data == 0 }
-                ?.let { Queue.ITEMS }
-                ?.map { mapQueueToMedia(it) }
-                ?.map { it.mediaId }
-                ?.let { ytInteractor.videos(it) }
-                ?.takeIf { it.isSuccessful }
-                ?.also { it.data?.let { repository.save(it) } }
-                .also { loadList() }
-        })
     }
 
     override fun undoDelete() {
-        state.deletedMedia?.run {
-            state.jobs.add(contextProvider.MainScope.launch {
-                repository.save(this@run)
+        state.deletedPlaylistItem?.let { itemDomain ->
+            state.viewModelScope.launch {
+                playlistRepository.savePlaylistItem(itemDomain)
                 state.focusIndex = state.lastFocusIndex
-                queue.refreshQueue()
-                state.deletedMedia = null
-            })
+                state.deletedPlaylistItem = null
+                executeRefresh()
+            }
         }
     }
 
-    private fun mapQueueToMedia(it: Queue.QueueItem): MediaDomain {
-        return MediaDomain(
-            url = it.url,
-            mediaId = it.getId(),
-            title = it.title,
-            platform = YOUTUBE,
-            description = null,
-            dateLastPlayed = null,
-            duration = null,
-            mediaType = VIDEO,
-            id = null,
-            positon = null
-        )
-    }
-
     override fun onPlaylistUpdated(list: PlaylistDomain) {
-        updateListContent(list)
+        refreshPlaylist()
     }
 
-    private fun updateListContent(list: PlaylistDomain) {
-        list
-            .let { modelMapper.map(it) }
-            .also { view.setList(it.items) }
-            .also {
-                state.focusIndex?.apply {
-                    view.scrollToItem(this)
-                    state.lastFocusIndex = state.focusIndex
-                    state.focusIndex = null
-                } ?: state.addedMedia?.let { added ->
-                    queue.getItemFor(added.url)?.let {
-                        view.scrollToItem(queue.itemIndex(it)!!)
-                        if (state.playAddedAfterRefresh) {
-                            queue.onItemSelected(it)
-                            state.playAddedAfterRefresh = false
-                        }
-                        state.addedMedia = null
+    override fun onItemChanged() {
+        queueExecIf {
+            currentItemIndex?.apply {
+                state.playlist = state.playlist?.copy(currentIndex = this)
+            } ?: throw IllegalStateException()
+            view.highlightPlayingItem(currentItemIndex)
+            currentItemIndex?.apply { view.scrollToItem(this) }
+        }
+    }
+
+    private fun refreshPlaylist() {
+        state.viewModelScope.launch { executeRefresh() }
+    }
+
+    private suspend fun executeRefresh() {
+        try {
+            (state.playlistId
+                ?.let { playlistRepository.load(it, flat = false) }
+                ?.takeIf { it.isSuccessful }
+                ?.data
+                ?: run {
+                    playlistRepository.loadList(PlaylistDatabaseRepository.DefaultFilter(flat = false))
+                        .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
+                        ?.data?.get(0)
+                })
+                .also { state.playlist = it }
+                ?.also {
+                    queueExecIf {
+                        refreshQueueFrom(it)
+                        view.highlightPlayingItem(currentItemIndex)
                     }
-                } ?: run {
-                    view.scrollToItem(
-                        if (list.currentIndex > -1) list.currentIndex else list.items.size - 1
-                    )
                 }
-            }
+                .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
+                ?.let { modelMapper.map(it) }
+                ?.also { view.setList(it.items) }
+                .also {
+                    state.focusIndex?.apply {
+                        view.scrollToItem(this)
+                        state.lastFocusIndex = state.focusIndex
+                        state.focusIndex = null
+                    }
+                }
+        } catch (e: Throwable) {
+            log.e("Error loading playlist", e)
+        }
     }
 }

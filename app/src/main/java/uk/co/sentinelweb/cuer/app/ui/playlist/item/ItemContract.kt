@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 
 interface ItemContract {
@@ -11,17 +12,21 @@ interface ItemContract {
         fun setCheckedVisible(checked: Boolean)
         fun setPresenter(itemPresenter: Presenter)
         fun setIconUrl(url: String)
+        fun setBackground(@ColorRes backgroundColor: Int)
     }
 
     interface Presenter {
-        fun update(item: ItemModel)
         fun doClick()
-        fun doLeft()
-        fun doRight()
         fun doPlay(external: Boolean)
         fun doShowChannel()
         fun doStar()
         fun doShare()
+    }
+
+    interface External {
+        fun update(item: ItemModel, highlightPlaying: Boolean)
+        fun doLeft()
+        fun doRight()
     }
 
     interface Interactions {
@@ -32,19 +37,6 @@ interface ItemContract {
         fun onShowChannel(item: ItemModel)
         fun onStar(item: ItemModel)
         fun onShare(item: ItemModel)
-    }
-
-    interface ItemTouchHelperViewHolder {
-        val contentView: android.view.View
-        val rightSwipeView: android.view.View
-        val leftSwipeView: android.view.View
-        fun onItemSelected()
-        fun onItemClear()
-        fun onItemSwiped(left: Boolean)
-    }
-
-    interface ItemMoveInteractions {
-        fun onItemMove(fromPosition: Int, toPosition: Int): Boolean
     }
 
 }

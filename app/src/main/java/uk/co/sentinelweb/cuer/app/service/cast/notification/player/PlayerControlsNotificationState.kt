@@ -11,5 +11,6 @@ data class PlayerControlsNotificationState(
     var durationMs: Long = 0,
     var title: String = "",
     var media: MediaDomain? = null,
-    var bitmap: Bitmap? = null
+    var bitmap: Bitmap? = null,
+    var playlistName: String = "none"
 )

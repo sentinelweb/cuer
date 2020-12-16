@@ -1,24 +1,29 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Presenter
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.PresenterExternal
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
+
 
 class PlayerControlsNotificationPresenter constructor(
     private val view: PlayerControlsNotificationContract.View,
     private val state: PlayerControlsNotificationState,
     private val toastWrapper: ToastWrapper,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val context: Context
 
 ) : PresenterExternal, Presenter {
 
@@ -64,17 +69,17 @@ class PlayerControlsNotificationPresenter constructor(
         state.bitmap?.let {
             view.showNotification(state.playState, state.media!!, it)
         } ?: state.media?.image?.let { image ->
-            Picasso.get().load(image.url).into(object : Target {
-                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                    state.bitmap = bitmap
-                    view.showNotification(state.playState, state.media, bitmap)
-                }
-
-                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-            })
+            Glide.with(context).asBitmap().load(image.url).into(BitmapLoadTarget())
         } ?: view.showNotification(state.playState, state.media, null)
+    }
+
+    inner class BitmapLoadTarget : CustomTarget<Bitmap?>() {
+        override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap?>?) {
+            state.bitmap = bitmap
+            view.showNotification(state.playState, state.media, bitmap)
+        }
+
+        override fun onLoadCleared(placeholder: Drawable?) {}
     }
 
     override fun addListener(l: Listener) {
@@ -112,6 +117,14 @@ class PlayerControlsNotificationPresenter constructor(
         state.media = media
         updateNotification()
         log.d("got media: $media")
+    }
+
+    override fun setPlaylistName(name: String) {
+        state.playlistName = name
+    }
+
+    override fun setPlaylistImage(image: ImageDomain?) {
+        // not needed here
     }
 
     override fun initMediaRouteButton() {

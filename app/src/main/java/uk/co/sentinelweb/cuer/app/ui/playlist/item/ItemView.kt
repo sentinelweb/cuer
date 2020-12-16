@@ -7,14 +7,15 @@ import android.util.AttributeSet
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.ColorRes
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.view_playlist_item.view.*
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.klink.util.extension.fade
+import uk.co.sentinelweb.cuer.app.util.extension.fade
 
 
 class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLayout(c, a, def),
@@ -47,11 +48,11 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem): Boolean {
                 when (item.itemId) {
-                    R.id.context_play -> presenter.doPlay(false)
-                    R.id.context_play_external -> presenter.doPlay(true)
-                    R.id.context_channel_external -> presenter.doShowChannel()
-                    R.id.context_star -> presenter.doStar()
-                    R.id.context_share -> presenter.doShare()
+                    R.id.playlist_context_play -> presenter.doPlay(false)
+                    R.id.playlist_context_play_external -> presenter.doPlay(true)
+                    R.id.playlist_context_channel_external -> presenter.doShowChannel()
+                    R.id.playlist_context_star -> presenter.doStar()
+                    R.id.playlist_context_share -> presenter.doShare()
                 }
                 return true
             }
@@ -90,49 +91,14 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     }
 
     override fun setIconUrl(url: String) {
-        Picasso.get().load(url).into(listitem_icon)
+        //Picasso.get().load(url).into(listitem_icon)
+        Glide.with(listitem_icon)
+            .load(url)
+            .into(listitem_icon)
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //init {
-    // this is disabled for the moment but if I need the linearLayout version might be best to have it for that
-    // swipeToDismissTouchListener()
-    //}
-
-//    private fun swipeToDismissTouchListener() {
-//        listitem.setOnTouchListener(swipeDismissTouchListener)
-//    }
-//
-//    private val swipeDismissTouchListener = SwipeDismissTouchListener(
-//        listitem,
-//        object : SwipeDismissTouchListener.DismissCallbacks {
-//
-//            override fun onDismissCancel() {
-//                resetBackground()
-//            }
-//
-//            override fun isSwiping(left: Boolean, offset: Float) {
-//                val outSideTolerance =
-//                    abs(offset) > resources.getDimension(R.dimen.list_item_swipe_dismiss_toerance)
-//                if (outSideTolerance) {
-//                    swipe_label_right.fade(!left)
-//                    swipe_label_left.fade(left)
-//                }
-//            }
-//
-//            override fun canDismiss(): Boolean {
-//                return true
-//            }
-//
-//            override fun onDismiss(left: Boolean) {
-//                if (left) {
-//                    presenter.doLeft()
-//                } else {
-//                    presenter.doRight()
-//                }
-//                resetBackground()
-//            }
-//        })
-
+    override fun setBackground(@ColorRes backgroundColor: Int) {
+        listitem.setBackgroundResource(backgroundColor)
+    }
 
 }

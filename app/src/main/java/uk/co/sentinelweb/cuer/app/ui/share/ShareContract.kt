@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
-import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 
 interface ShareContract {
@@ -13,9 +13,11 @@ interface ShareContract {
 
     interface View {
         fun exit()
-        fun gotoMain(media: MediaDomain?, play: Boolean = false)
+        fun gotoMain(media: PlaylistItemDomain?, play: Boolean = false)
         fun setData(model: ShareModel)
         fun error(msg: String)
         fun warning(msg: String)
+        suspend fun commitPlaylistItems()
+        fun getPlaylistItems(): List<PlaylistItemDomain>
     }
 }

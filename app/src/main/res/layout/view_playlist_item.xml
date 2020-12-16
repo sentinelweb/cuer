@@ -12,29 +12,29 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/green_600"
-        android:text="@string/right"
+        android:text="@string/pl_item_move"
         android:textColor="@color/white"
         android:gravity="left|center_vertical"
-        android:drawableLeft="@drawable/ic_item_tick_white"
         android:paddingLeft="@dimen/list_item_swipe_margin"
         tools:ignore="RtlHardcoded,RtlSymmetry"
         android:alpha="0"
-    />
+        app:drawableLeftCompat="@drawable/ic_nav_playlist_black"
+        />
 
     <TextView
         android:id="@+id/swipe_label_left"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/red_600"
-        android:text="@string/left"
+        android:text="@string/pl_item_delete"
         android:textColor="@color/white"
         android:drawablePadding="4dp"
         android:gravity="right|center_vertical"
-        android:drawableRight="@drawable/ic_item_delete_white"
         android:paddingRight="@dimen/list_item_swipe_margin"
         tools:ignore="RtlHardcoded,RtlSymmetry"
         android:alpha="0"
-    />
+        app:drawableRightCompat="@drawable/ic_item_delete_white"
+        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/listitem"
@@ -66,7 +66,7 @@
             android:layout_height="24dp"
             android:contentDescription="@null"
             android:src="@drawable/ic_item_tick_white"
-            android:tint="@color/green_700"
+            app:tint="@color/green_700"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/listitem_icon"
             app:layout_constraintLeft_toLeftOf="@id/listitem_icon"
@@ -114,7 +114,7 @@
             android:contentDescription="@null"
             android:scaleType="center"
             android:src="@drawable/ic_more_vert_black"
-            android:tint="@color/grey_300"
+            app:tint="@color/grey_300"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"

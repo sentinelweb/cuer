@@ -3,7 +3,7 @@
     <color name="primary">@color/red_600</color>
     <color name="primary_dark">@color/red_900</color>
     <color name="accent">@color/light_blue_700</color>
-    <color name="control_normal">@color/white</color>
+    <color name="control_normal">@color/grey_400</color>
 
     <color name="text_light">@color/grey_400</color>
     <color name="text_normal">@color/grey_800</color>
@@ -12,4 +12,6 @@
     <color name="fab_button_icon_tint">@color/white</color>
     <color name="button_fg_tint">@color/white</color>
     <color name="menu_button_icon_tint">@color/white</color>
+
+    <color name="playing_item_background">@color/red_50</color>
 </resources>

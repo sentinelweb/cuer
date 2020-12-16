@@ -6,13 +6,10 @@ import java.time.Instant
 
 @Serializable
 data class PlaylistItemDomain(
-    val id: String? = null,
+    val id: Long? = null,
     val media: MediaDomain,
     @ContextualSerialization val dateAdded: Instant,
     val order: Long,
     val archived: Boolean = false,
-    private val _tags: List<TagDomain>? = null
-) {
-    val tags: List<TagDomain>?
-        get() = _tags ?: media.tags
-}
+    val playlistId: Long? = null
+)

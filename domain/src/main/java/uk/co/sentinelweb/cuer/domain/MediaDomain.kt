@@ -7,9 +7,9 @@ import java.time.LocalDateTime
 
 @Serializable
 data class MediaDomain(
-    val id: String?,
+    val id: Long?,
     val url: String,
-    val mediaId: String,
+    val platformId: String,
     val mediaType: MediaTypeDomain,
     val platform: PlatformDomain,
     val title: String? = null,
@@ -18,12 +18,11 @@ data class MediaDomain(
     @ContextualSerialization val dateLastPlayed: Instant? = null,
     val description: String? = null,
     @ContextualSerialization val published: LocalDateTime? = null,
-    val channelData: ChannelDomain = ChannelDomain(),
+    val channelData: ChannelDomain,
     val thumbNail: ImageDomain? = null,
     val image: ImageDomain? = null,
-    val starred: Boolean = false,
-    val archived: Boolean = false,
-    val tags: List<TagDomain>? = null
+    val watched: Boolean = false,
+    val starred: Boolean = false
 ) {
     enum class MediaTypeDomain {
         VIDEO, AUDIO, WEB

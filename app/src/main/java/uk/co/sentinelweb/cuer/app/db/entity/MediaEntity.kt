@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.entity
 
 import androidx.room.*
+import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.LocalDateTimeTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.MediaTypeConverter
@@ -10,7 +11,17 @@ import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import java.time.Instant
 import java.time.LocalDateTime
 
-@Entity(tableName = "media")
+@Entity(
+    tableName = "media",
+    indices = arrayOf(
+        Index("media_id", unique = true),
+        Index("type"),
+        Index("title"),
+        Index("description"),
+        Index("channel_id"),
+        Index("flags")
+    )
+)
 @TypeConverters(
     MediaTypeConverter::class,
     PlatformTypeConverter::class,
@@ -19,7 +30,7 @@ import java.time.LocalDateTime
 )
 data class MediaEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Long = INITIAL_ID,
 
     @ColumnInfo(name = "url")
     val url: String,
@@ -52,20 +63,19 @@ data class MediaEntity(
     val published: LocalDateTime? = null,
 
     @ColumnInfo(name = "channel_id")
-    val channelId: String? = null,
+    val channelId: Long? = null,
 
-    @ColumnInfo(name = "channel_title")
-    val channelTitle: String? = null,
-
-    @Embedded(prefix =  "thumb")
+    @Embedded(prefix = "thumb")
     val thumbNail: Image?,
 
-    @Embedded(prefix =  "image")
-    val image: Image?
+    @Embedded(prefix = "image")
+    val image: Image?,
+
+    @ColumnInfo(name = "flags")
+    val flags: Long = 0
 ) {
-    data class Image constructor(
-        val url: String,
-        val width: Int?,
-        val height: Int?
-    )
+    companion object {
+        const val FLAG_WATCHED = 1L
+        const val FLAG_STARRED = 2L
+    }
 }

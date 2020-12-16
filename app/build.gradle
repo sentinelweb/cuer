@@ -3,6 +3,9 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlinx-serialization'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion project.properties.app_compileSdkVersion as int
@@ -18,6 +21,13 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "youtubeApiKey", "\"$CUER_YOUTUBE_API_KEY\""
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+
     }
 
     buildTypes {
@@ -27,19 +37,28 @@ android {
         }
     }
 
-// To inline the bytecode built with JVM target 1.8 into
-// bytecode that is being built with JVM target 1.6. (e.g. navArgs)
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     viewBinding {
         enabled = true
     }
 
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+
+//    packagingOptions {
+//        exclude 'META-INF/AL2.0'
+//        exclude 'META-INF/LGPL2.1'
+//    }
 }
 
 dependencies {
@@ -54,14 +73,19 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$ver_kotlinx_serialization_runtime"
     implementation "androidx.appcompat:appcompat:$ver_appcompat"
     implementation "androidx.core:core:$ver_androidx_core"
+    implementation "androidx.core:core-ktx:$ver_androidx_core"
     implementation "androidx.annotation:annotation:$ver_androidx_annotation"
-    implementation "androidx.core:core-ktx:$ver_core_ktx"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$ver_lifecycle_viewmodel_ktx"
     implementation "com.google.android.material:material:$ver_material"
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
-    implementation "com.squareup.picasso:picasso:$ver_picasso"
-    implementation 'com.jakewharton:process-phoenix:2.0.0'
+
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
+    implementation "com.jakewharton:process-phoenix:$ver_process_phoenix" // todo remove this with connectin monitor
+    implementation "androidx.preference:preference-ktx:$ver_preference"
+
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"
     implementation "androidx.navigation:navigation-ui-ktx:$ver_navigation"
@@ -75,9 +99,6 @@ dependencies {
 
     // room
     implementation "androidx.room:room-runtime:$ver_room"
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     kapt "androidx.room:room-compiler:$ver_room"
     implementation "androidx.room:room-ktx:$ver_room"
 
@@ -92,14 +113,43 @@ dependencies {
 
     implementation "androidx.media:media:$ver_androidx_media"
 
+    // FIREBASE
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:26.1.1')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    // Declare the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-storage-ktx'
+    implementation 'com.firebaseui:firebase-ui-storage:7.1.1'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
+
+    implementation 'com.github.bumptech.glide:glide:4.11.0'// todo extract version
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
     testImplementation "androidx.room:room-testing:$ver_room"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test"
+    testImplementation "org.robolectric:robolectric:$ver_robolectric"
+    testImplementation "androidx.test:core:$ver_androidx_test"
+    testImplementation "androidx.test:runner:$ver_androidx_test"
+    testImplementation "androidx.test:rules:$ver_androidx_test"
+    testImplementation "android.arch.core:core-testing:$ver_android_arch_test"
 
     androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
+    androidTestImplementation "org.koin:koin-test:$ver_koin"
+    androidTestImplementation "io.mockk:mockk:$ver_mockk"
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+    androidTestImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
+    androidTestImplementation "androidx.test:core:$ver_androidx_test"
+    androidTestImplementation "androidx.test:runner:$ver_androidx_test"
+    androidTestImplementation "androidx.test:rules:$ver_androidx_test"
 
 }

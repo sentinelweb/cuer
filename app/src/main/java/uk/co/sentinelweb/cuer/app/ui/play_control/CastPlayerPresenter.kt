@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -22,7 +23,9 @@ class CastPlayerPresenter(
     }
 
     override fun addListener(l: CastPlayerContract.PlayerControls.Listener) {
-        state.listeners.add(l)
+        if (!state.listeners.contains(l)) {
+            state.listeners.add(l)
+        }
     }
 
     override fun removeListener(l: CastPlayerContract.PlayerControls.Listener) {
@@ -139,9 +142,17 @@ class CastPlayerPresenter(
 
     override fun setMedia(media: MediaDomain) {
         media.thumbNail?.url?.apply { view.setImage(this) }
+        media.title?.apply { state.title = this }
         media.title?.let { view.setTitle(it) }
         state.durationMs = media.duration ?: 0L
         view.setDuration(mapper.formatTime(state.durationMs))
+    }
 
+    override fun setPlaylistName(name: String) {
+        view.setPlaylistName(name)
+    }
+
+    override fun setPlaylistImage(image: ImageDomain?) {
+        view.setPlaylistImage(image?.url)
     }
 }

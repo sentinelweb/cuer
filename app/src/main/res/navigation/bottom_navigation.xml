@@ -15,11 +15,55 @@
         />
 
     <fragment
+        android:id="@+id/navigation_playlists"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsFragment"
+        android:label="@string/bottomnav_title_playlists"
+        tools:layout="@layout/playlists_fragment"
+        >
+        <action
+            android:id="@+id/action_goto_playlist"
+            app:destination="@id/navigation_playlist"
+            app:launchSingleTop="true"
+            />
+
+        <action
+            android:id="@+id/action_edit_playlist"
+            app:destination="@id/navigation_playlist_edit"
+            />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_playlist_edit"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment"
+        android:label="@string/bottomnav_title_playlists"
+        tools:layout="@layout/playlist_edit_fragment"
+        >
+        <argument
+            android:name="PLAYLIST_ID"
+            android:defaultValue="-1L"
+            app:argType="long"
+            app:nullable="false"
+            />
+    </fragment>
+
+    <fragment
         android:id="@+id/navigation_playlist"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment"
         android:label="@string/bottomnav_title_playlist"
         tools:layout="@layout/playlist_fragment"
-        />
+        >
+        <argument
+            android:name="PLAYLIST_ID"
+            android:defaultValue="-1L"
+            app:argType="long"
+            app:nullable="false"
+            />
+        <argument
+            android:name="PLAY_NOW"
+            android:defaultValue="false"
+            app:argType="boolean"
+            />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_player"
@@ -27,4 +71,17 @@
         android:label="@string/bottomnav_title_player"
         tools:layout="@layout/player_fragment"
         />
+
+    <fragment
+        android:id="@+id/navigation_settings_root"
+        android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefRootFragment"
+        android:label="@string/menu_settings"
+        />
+
+    <fragment
+        android:id="@+id/navigation_settings_backup"
+        android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment"
+        android:label="@string/nav_title_backup_settings"
+        />
+
 </navigation>

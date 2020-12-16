@@ -6,7 +6,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core"
-
     // koin
     implementation  "org.koin:koin-core:$ver_koin"
 
@@ -14,6 +13,7 @@ dependencies {
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
 }
 

@@ -52,7 +52,7 @@ internal class YoutubeRetrofitInteractor constructor(
         medias: List<MediaDomain>
     ): NetResult<List<MediaDomain>> =
         withContext(coContext.IO) {
-            val idList = medias.map { it.channelData.id }.distinct()
+            val idList = medias.map { it.channelData.platformId!! }.distinct()
             try {
                 // note the items come out of order
                 channels(ids = idList)

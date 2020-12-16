@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,20 +15,27 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.MEDIA
-import uk.co.sentinelweb.cuer.app.ui.common.NavigationModel.NavigateParam.PLAY_NOW
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
-import uk.co.sentinelweb.cuer.app.util.extension.deserialiseMedia
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -36,15 +44,20 @@ class PlaylistFragment :
     Fragment(R.layout.playlist_fragment),
     PlaylistContract.View,
     ItemContract.Interactions,
-    ItemContract.ItemMoveInteractions {
+    ItemBaseContract.ItemMoveInteractions {
 
     private val presenter: PlaylistContract.Presenter by currentScope.inject()
     private val adapter: PlaylistAdapter by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private val toastWrapper: ToastWrapper by inject()
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
+    private val log: LogWrapper by inject()
+    private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
+    private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
 
     private var snackbar: Snackbar? = null
+
+    private var createPlaylistDialog: DialogFragment? = null
 
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,22 +80,18 @@ class PlaylistFragment :
     override fun onResume() {
         super.onResume()
 
-        // todo map in NavigationMapper
-        activity?.intent?.getStringExtra(MEDIA.toString())?.let {
-            val media = deserialiseMedia(it)
-            presenter.setFocusMedia(media)
-            if (activity?.intent?.getBooleanExtra(PLAY_NOW.toString(), false) ?: false) {
-                presenter.playNow(media)
-                activity?.intent?.removeExtra(PLAY_NOW.toString())
-            }
-        } ?: presenter.loadList() // queue refresh triggered from shareactivity
+        presenter.setPlaylistData(
+            PLAYLIST_ID.getLong(arguments),
+            PLAYLIST_ITEM_ID.getLong(arguments),
+            PLAY_NOW.getBoolean(arguments) ?: false
+        )
     }
     // endregion
 
     // region PlaylistContract.View
-    override fun setList(list: List<ItemModel>) {
+    override fun setList(list: List<ItemModel>, animate: Boolean) {
         playlist_swipe.isRefreshing = false
-        adapter.data = list
+        adapter.setData(list, animate)
         playlist_swipe.setOnRefreshListener { presenter.refreshList() }
     }
 
@@ -130,7 +139,37 @@ class PlaylistFragment :
     }
 
     override fun playLocal(media: MediaDomain) {
-        YoutubeActivity.start(requireContext(), media.mediaId)
+        YoutubeActivity.start(requireContext(), media.platformId)
+    }
+
+    override fun highlightPlayingItem(currentItemIndex: Int?) {
+        adapter.highlightItem = currentItemIndex
+    }
+
+    override fun setSubTitle(subtitle: String) {
+        // todo make better in ui upgrade
+        (activity as AppCompatActivity).supportActionBar?.setTitle(subtitle)
+    }
+
+    override fun showPlaylistSelector(model: SelectDialogModel) {
+        selectDialogCreator.createSingle(model).apply { show() }
+    }
+
+    override fun showPlaylistCreateDialog() {
+        createPlaylistDialog?.dismissAllowingStateLoss()
+        createPlaylistDialog = PlaylistEditFragment.newInstance(null).apply {
+            listener = object : PlaylistEditFragment.Listener {
+                override fun onPlaylistCommit(domain: PlaylistDomain?) {
+                    domain?.apply { presenter.onPlaylistSelected(this) }
+                    createPlaylistDialog?.dismissAllowingStateLoss()
+                }
+            }
+        }
+        createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
+    }
+
+    override fun showAlertDialog(model: AlertDialogModel) {
+        alertDialogCreator.create(model).show()
     }
     //endregion
 
@@ -142,6 +181,9 @@ class PlaylistFragment :
         return true
     }
 
+    override fun onItemClear() {
+        presenter.commitMove()
+    }
     //endregion
 
     // region ItemContract.Interactions
@@ -178,6 +220,7 @@ class PlaylistFragment :
     //endregion
 
     companion object {
+        private val CREATE_PLAYLIST_TAG = "pe_dialog"
 
         @JvmStatic
         val fragmentModule = module {
@@ -188,17 +231,22 @@ class PlaylistFragment :
                         view = get(),
                         state = get(),
                         repository = get(),
+                        playlistRepository = get(),
                         modelMapper = get(),
                         contextProvider = get(),
                         queue = get(),
                         toastWrapper = get(),
-                        ytInteractor = get(),
                         ytContextHolder = get(),
                         ytJavaApi = get(),
-                        shareWrapper = get()
+                        shareWrapper = get(),
+                        prefsWrapper = get(named<GeneralPreferences>()),
+                        playlistMutator = get(),
+                        log = get(),
+                        playlistDialogModelCreator = get(),
+                        timeProvider = get()
                     )
                 }
-                scoped { PlaylistModelMapper() }
+                scoped { PlaylistModelMapper(res = get()) }
                 scoped { PlaylistAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
@@ -206,6 +254,8 @@ class PlaylistFragment :
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory() }
+                scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
+                scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
                 viewModel { PlaylistState() }
             }
         }
