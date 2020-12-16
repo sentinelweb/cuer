@@ -13,16 +13,28 @@ class TimeFormatter {
         formatter().format(date).strip00()
 
     fun formatTime(timeSecs: Float, format: Format = Format.SECS): String =
-        formatter().format(LocalTime.ofNanoOfDay((timeSecs * 1_000_000_000).toLong())).strip00()
+        try {
+            formatter().format(LocalTime.ofNanoOfDay((timeSecs * 1_000_000_000).toLong())).strip00()
+        } catch (e: Exception) {
+            "-"
+        }
 
     fun formatNow(format: Format = Format.SECS): String =
         formatter().format(LocalTime.now()).strip00()
 
     fun formatMillis(l: Long, format: Format = Format.MILLIS): String =
-        formatter().format(LocalTime.ofNanoOfDay(l * 1_000_000)).strip00()
+        try {
+            formatter().format(LocalTime.ofNanoOfDay(l * 1_000_000)).strip00()
+        } catch (e: Exception) {
+            "-"
+        }
 
     fun formatFrom(time: LocalTime, format: Format = Format.SECS): String =
-        formatter().format(LocalTime.now().minusNanos(time.toNanoOfDay())).strip00()
+        try {
+            formatter().format(LocalTime.now().minusNanos(time.toNanoOfDay())).strip00()
+        } catch (e: Exception) {
+            "-"
+        }
 
     private fun formatter(format: Format = Format.SECS) = when (format) {
         Format.MILLIS -> timeStampFormatterMillis
