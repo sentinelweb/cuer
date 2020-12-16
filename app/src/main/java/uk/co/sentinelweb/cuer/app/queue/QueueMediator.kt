@@ -73,7 +73,6 @@ class QueueMediator constructor(
             prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
             refreshQueueFrom(playlist)
             playNow()
-
         }
     }
 

@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -37,7 +38,8 @@ class PlaylistPresenter(
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
     private val playlistMutator: PlaylistMutator,
     private val log: LogWrapper,
-    private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator
+    private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator,
+    private val timeProvider: TimeProvider
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
     private val isQueuedPlaylist: Boolean
@@ -100,9 +102,8 @@ class PlaylistPresenter(
     private fun moveItemToPlaylist(it: Long) {
         state.selectedPlaylistItem?.let { moveItem ->
             state.viewModelScope.launch {
-                moveItem.copy(playlistId = it).apply {
-                    playlistRepository.savePlaylistItem(this)
-                }
+                moveItem.copy(playlistId = it, order = timeProvider.currentTimeMillis())
+                    .apply { playlistRepository.savePlaylistItem(this) }
                 executeRefresh()
 
             }
@@ -224,7 +225,7 @@ class PlaylistPresenter(
 
                 if (playNow) {
                     state.playlist?.apply {
-                        queue.playNow(this, plItemId)
+                        queue.playNow(this, plItemId)// todo current item isnt set properly in queue
                         state.playlist = queue.playlist?.copy()
                     }
                 } else {

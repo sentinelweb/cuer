@@ -134,7 +134,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     ple_star_fab.isVisible = !model.empty
                     starMenuItem.setVisible(!model.empty)
                     playMenuItem.setVisible(!model.empty)
-                    //Picasso.get().load(model.imageUrl).into(ple_image)
                     Glide.with(ple_image)
                         .load(model.imageUrl)
                         .into(ple_image)
@@ -146,8 +145,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         return
                     }
 
-                    //Picasso.get().load(model.imageUrl).into(ple_image)
-                    //Picasso.get().load(model.channelThumbUrl).into(ple_author_image)
                     Glide.with(ple_author_image)
                         .load(model.channelThumbUrl)
                         .into(ple_author_image)
@@ -158,16 +155,12 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                             when (chipModel.type) {
                                 PLAYLIST_SELECT -> {
                                     setOnClickListener {
-                                        viewModel.onSelectPlaylistChipClick(
-                                            chipModel
-                                        )
+                                        viewModel.onSelectPlaylistChipClick(chipModel)
                                     }
                                 }
                                 PLAYLIST -> {
                                     setOnCloseIconClickListener {
-                                        viewModel.onRemovePlaylist(
-                                            chipModel
-                                        )
+                                        viewModel.onRemovePlaylist(chipModel)
                                     }
                                 }
                                 else -> Unit

@@ -55,10 +55,10 @@ android {
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
 
-    packagingOptions {
-        exclude 'META-INF/AL2.0'
-        exclude 'META-INF/LGPL2.1'
-    }
+//    packagingOptions {
+//        exclude 'META-INF/AL2.0'
+//        exclude 'META-INF/LGPL2.1'
+//    }
 }
 
 dependencies {
@@ -80,7 +80,10 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
 
-    implementation "com.jakewharton:process-phoenix:$ver_process_phoenix"
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
+    implementation "com.jakewharton:process-phoenix:$ver_process_phoenix" // todo remove this with connectin monitor
     implementation "androidx.preference:preference-ktx:$ver_preference"
 
     //navigation
@@ -121,9 +124,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
 
-    //implementation 'com.google.firebase:firebase-storage-ktx:19.2.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     implementation 'com.github.bumptech.glide:glide:4.11.0'// todo extract version
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'

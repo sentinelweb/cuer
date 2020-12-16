@@ -13,11 +13,9 @@ class PlaylistMutator {
     // todo update order
     fun moveItem(domain: PlaylistDomain, fromPosition: Int, toPosition: Int): PlaylistDomain {
         if (fromPosition != toPosition) {
-            //Collections.swap(domain.items, fromPosition, toPosition)
-
             val items = domain.items.toMutableList()
             val movingItem = items.removeAt(fromPosition)
-            items.add(/*if (fromPosition<toPosition) toPosition-1 else */toPosition, movingItem)
+            items.add(toPosition, movingItem)
             var newCurrentIndex = domain.currentIndex
 
             @Suppress("ConvertTwoComparisonsToRangeCheck")

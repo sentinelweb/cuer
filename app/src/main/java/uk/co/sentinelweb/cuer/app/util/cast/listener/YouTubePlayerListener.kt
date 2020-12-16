@@ -201,6 +201,11 @@ class YouTubePlayerListener(
     private fun setupPlayer(controls: CastPlayerContract.PlayerControls) {
         controls.apply {
             addListener(this@YouTubePlayerListener)
+            setTitle(state.currentMedia?.title ?: "No Media")
+            setPlayerState(state.playState)
+            setDuration(state.durationSec)
+            setCurrentSecond(state.positionSec)
+            state.currentMedia?.apply { setMedia(this) }
         }
     }
 

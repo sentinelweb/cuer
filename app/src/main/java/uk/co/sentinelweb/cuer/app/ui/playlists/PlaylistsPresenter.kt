@@ -41,13 +41,9 @@ class PlaylistsPresenter(
     }
 
     override fun destroy() {
-//        state.jobs.forEach { it.cancel() }
-//        state.jobs.clear()
-        //queue.removeProducerListener(this)
     }
 
     override fun onItemSwipeRight(item: ItemModel) {
-        //toastWrapper.show("right: ${item.title}")
         view.gotoEdit(item.id)
     }
 
@@ -69,7 +65,6 @@ class PlaylistsPresenter(
     }
 
     override fun onItemClicked(item: ItemModel) {
-        //toastWrapper.show("click: ${item.title}")
         view.gotoPlaylist(item.id, false)
     }
 

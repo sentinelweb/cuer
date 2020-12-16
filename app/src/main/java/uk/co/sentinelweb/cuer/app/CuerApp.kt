@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app
 
 import android.app.Application
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -22,7 +21,6 @@ class CuerApp : Application() {
     private val firebaseWrapper: FirebaseWrapper by inject()
     private val log: LogWrapper by inject()
 
-    @ExperimentalCoroutinesApi
     override fun onCreate() {
         super.onCreate()
 
@@ -51,7 +49,6 @@ class CuerApp : Application() {
 
     val oldHandler = Thread.getDefaultUncaughtExceptionHandler()
 
-    @ExperimentalCoroutinesApi
     fun setDefaultExceptionHander() {
         Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
             if (oldHandler != null) oldHandler.uncaughtException(paramThread, paramThrowable)

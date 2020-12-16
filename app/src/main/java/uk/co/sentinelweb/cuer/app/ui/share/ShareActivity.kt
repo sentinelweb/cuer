@@ -14,8 +14,10 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -54,18 +56,6 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         }
     }
 
-//    override fun showPlaylistEdit() {
-//        // todo remove this and just make a text edit in the item edit
-//        supportFragmentManager.beginTransaction().apply {
-//            val playlistEditFragment = PlaylistEditFragment()
-//            add(playlistEditFragment,"pedit")
-//            remove(editFragment)
-//            show(playlistEditFragment)
-//            commit()
-//        }
-//
-//    }
-
     override fun exit() {
         finish()
     }
@@ -101,6 +91,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         startActivity( // todo map in NavigationMapper
             Intent(this, MainActivity::class.java).apply {
                 media?.let {
+                    putExtra(NavigationModel.Target::class.java.simpleName, PLAYLIST_FRAGMENT.toString())
                     putExtra(PLAYLIST_ITEM.toString(), it.serialise())
                     if (play) putExtra(PLAY_NOW.toString(), true)
                 }

@@ -142,6 +142,7 @@ class CastPlayerPresenter(
 
     override fun setMedia(media: MediaDomain) {
         media.thumbNail?.url?.apply { view.setImage(this) }
+        media.title?.apply { state.title = this }
         media.title?.let { view.setTitle(it) }
         state.durationMs = media.duration ?: 0L
         view.setDuration(mapper.formatTime(state.durationMs))

@@ -85,16 +85,6 @@ class PlaylistFragment :
             PLAYLIST_ITEM_ID.getLong(arguments),
             PLAY_NOW.getBoolean(arguments) ?: false
         )
-        // todo map in NavigationMapper
-        // fixme this should be done somewhere higher - mainactivity - focus should happen automatically
-//        activity?.intent?.getStringExtra(MEDIA.toString())?.let {
-//            val media = deserialiseMedia(it)
-//            presenter.setFocusMedia(media)
-//            if (activity?.intent?.getBooleanExtra(PLAY_NOW.toString(), false) ?: false) {
-//                presenter.playNow(media)
-//                activity?.intent?.removeExtra(PLAY_NOW.toString())
-//            }
-//        } ?: presenter.refreshList() // queue refresh triggered from shareactivity
     }
     // endregion
 
@@ -252,7 +242,8 @@ class PlaylistFragment :
                         prefsWrapper = get(named<GeneralPreferences>()),
                         playlistMutator = get(),
                         log = get(),
-                        playlistDialogModelCreator = get()
+                        playlistDialogModelCreator = get(),
+                        timeProvider = get()
                     )
                 }
                 scoped { PlaylistModelMapper(res = get()) }
