@@ -54,11 +54,8 @@ class PlaylistsPresenter(
                 find { it.id == item.id }?.let { playlist ->
                     state.deletedPlaylist = playlist
                     playlistRepository.delete(playlist)
-                    // todo check if media is on other playlist and delete if not?
-                    //repository.delete(deleteItem.media)
                     view.showDeleteUndo("Deleted playlist: ${playlist.title}")
-                    //state.focusIndex = indexOf(playlist)
-                    executeRefresh(false)
+                    executeRefresh(false, false)
                 }
             }
         }
@@ -120,7 +117,7 @@ class PlaylistsPresenter(
         state.viewModelScope.launch { executeRefresh(false) }
     }
 
-    private suspend fun executeRefresh(focusCurent: Boolean) {
+    private suspend fun executeRefresh(focusCurrent: Boolean, animate: Boolean = true) {
         state.playlists = playlistRepository.loadList(null)
             .takeIf { it.isSuccessful }
             ?.data
@@ -128,8 +125,8 @@ class PlaylistsPresenter(
 
         state.playlists
             .let { modelMapper.map(it) }
-            .also { view.setList(it.items) }
-            .takeIf { focusCurent }
+            .also { view.setList(it.items, animate) }
+            .takeIf { focusCurrent }
             ?.let {
                 state.playlists.apply {
                     prefsWrapper.getLong(CURRENT_PLAYLIST_ID)

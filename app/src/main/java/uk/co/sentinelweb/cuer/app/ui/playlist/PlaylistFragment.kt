@@ -171,6 +171,10 @@ class PlaylistFragment :
     override fun showAlertDialog(model: AlertDialogModel) {
         alertDialogCreator.create(model).show()
     }
+
+    override fun resetItemsState() {
+        adapter.notifyDataSetChanged()
+    }
     //endregion
 
     // region ItemContract.ItemMoveInteractions
