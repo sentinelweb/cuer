@@ -5,9 +5,16 @@
     >
 
     <item
+        android:id="@+id/playlist_context_view"
+        android:icon="@drawable/ic_menu_info_black"
+        android:title="@string/playlist_item_menu_view"
+        app:iconTint="@color/popup_menu_icon_tint"
+        />
+
+    <item
         android:id="@+id/playlist_context_play"
         android:icon="@drawable/ic_menu_play_black"
-        android:title="@string/menu_play"
+        android:title="@string/playlist_item_menu_play"
         app:iconTint="@color/popup_menu_icon_tint"
         />
 
@@ -21,21 +28,21 @@
     <item
         android:id="@+id/playlist_context_channel_external"
         android:icon="@drawable/ic_menu_subscriptions_black"
-        android:title="@string/menu_channel_yt"
+        android:title="@string/playlist_item_menu_channel_yt"
         app:iconTint="@color/popup_menu_icon_tint"
         />
 
     <item
         android:id="@+id/playlist_context_star"
         android:icon="@drawable/ic_menu_unstarred_black"
-        android:title="@string/menu_star"
+        android:title="@string/playlist_item_menu_star"
         app:iconTint="@color/popup_menu_icon_tint"
         />
 
     <item
         android:id="@+id/playlist_context_share"
         android:icon="@drawable/ic_menu_share_black"
-        android:title="@string/menu_share"
+        android:title="@string/playlist_item_menu_share"
         app:iconTint="@color/popup_menu_icon_tint"
         />
 </menu>

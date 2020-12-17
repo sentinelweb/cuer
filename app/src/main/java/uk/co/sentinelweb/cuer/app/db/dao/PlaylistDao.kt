@@ -44,7 +44,6 @@ interface PlaylistDao {
     @Query("SELECT * FROM playlist WHERE flags & :flags == :flags")
     suspend fun loadAllByFlagsWithItems(flags: Long): List<PlaylistAndItems>
 
-
     @Update
     suspend fun update(playlist: PlaylistEntity)
 

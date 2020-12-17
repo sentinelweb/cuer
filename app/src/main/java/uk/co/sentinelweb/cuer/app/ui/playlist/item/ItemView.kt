@@ -48,6 +48,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem): Boolean {
                 when (item.itemId) {
+                    R.id.playlist_context_view -> presenter.doView()
                     R.id.playlist_context_play -> presenter.doPlay(false)
                     R.id.playlist_context_play_external -> presenter.doPlay(true)
                     R.id.playlist_context_channel_external -> presenter.doShowChannel()

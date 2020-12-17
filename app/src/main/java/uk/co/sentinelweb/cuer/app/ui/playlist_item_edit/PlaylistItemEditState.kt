@@ -7,7 +7,9 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 data class PlaylistItemEditState(
     var model: PlaylistItemEditModel? = null,
     var media: MediaDomain? = null,
-    val selectedPlaylists: MutableSet<PlaylistDomain> = mutableSetOf(),
-    var allPlaylists: List<PlaylistDomain>? = null,
-    var committedItems: List<PlaylistItemDomain>? = null
+    val selectedPlaylistIds: MutableSet<Long> = mutableSetOf(),
+    var allPlaylists: List<PlaylistDomain> = listOf(),
+    var committedItems: List<PlaylistItemDomain>? = null,
+    var playlistItem: PlaylistItemDomain? = null,
+    var playlistsChanged: Boolean = false
 )

@@ -13,6 +13,7 @@ import java.time.Instant
         Index("order", "playlist_id"),
         Index("playlist_id"),
         Index("media_id"),
+        Index("playlist_id", "media_id", unique = true),
         Index("flags")
     )
 )

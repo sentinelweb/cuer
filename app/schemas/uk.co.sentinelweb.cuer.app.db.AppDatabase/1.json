@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6373f56ba491695bbb6b762e2f5588ef",
+    "identityHash": "9e7a7bd8e8e706cc1badd25844c943ef",
     "entities": [
       {
         "tableName": "playlist",
@@ -191,6 +191,15 @@
               "media_id"
             ],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_item_media_id` ON `${TABLE_NAME}` (`media_id`)"
+          },
+          {
+            "name": "index_playlist_item_playlist_id_media_id",
+            "unique": true,
+            "columnNames": [
+              "playlist_id",
+              "media_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_playlist_item_playlist_id_media_id` ON `${TABLE_NAME}` (`playlist_id`, `media_id`)"
           },
           {
             "name": "index_playlist_item_flags",
@@ -530,7 +539,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6373f56ba491695bbb6b762e2f5588ef')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9e7a7bd8e8e706cc1badd25844c943ef')"
     ]
   }
 }

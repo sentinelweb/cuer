@@ -21,6 +21,7 @@ interface ItemContract {
         fun doShowChannel()
         fun doStar()
         fun doShare()
+        fun doView()
     }
 
     interface External {
@@ -37,6 +38,7 @@ interface ItemContract {
         fun onShowChannel(item: ItemModel)
         fun onStar(item: ItemModel)
         fun onShare(item: ItemModel)
+        fun onView(item: ItemModel)
     }
 
 }

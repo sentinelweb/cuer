@@ -9,6 +9,9 @@
         <item name="colorControlNormal">@color/control_normal</item>
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
+        <!--        <item name="android:windowBackground">@color/primary_dark</item>-->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:navigationBarColor">@color/primary_dark</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">

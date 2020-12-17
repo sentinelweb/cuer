@@ -6,6 +6,6 @@ class ChipModel constructor(
     val value: String? = null
 ) {
     enum class Type {
-        PLAYLIST, PLAYLIST_SELECT, TAG, TAG_SELECT
+        PLAYLIST, PLAYLIST_SELECT
     }
 }

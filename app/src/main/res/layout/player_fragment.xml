@@ -31,5 +31,6 @@
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_player"
+        tools:layout="@layout/playlist_fragment"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

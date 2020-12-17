@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">@color/red_600</color>
-    <color name="primary_dark">@color/red_900</color>
+    <color name="primary_dark">@color/deep_red</color>
     <color name="accent">@color/light_blue_700</color>
     <color name="control_normal">@color/grey_400</color>
 
@@ -14,4 +14,7 @@
     <color name="menu_button_icon_tint">@color/white</color>
 
     <color name="playing_item_background">@color/red_50</color>
+
+    <!--    custom colors-->
+    <color name="deep_red">#961717</color>
 </resources>

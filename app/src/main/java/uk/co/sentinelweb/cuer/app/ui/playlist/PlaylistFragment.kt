@@ -5,6 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -36,6 +37,8 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -86,6 +89,7 @@ class PlaylistFragment :
             PLAY_NOW.getBoolean(arguments) ?: false
         )
     }
+
     // endregion
 
     // region PlaylistContract.View
@@ -166,6 +170,15 @@ class PlaylistFragment :
             }
         }
         createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
+    }
+
+    override fun onView(item: ItemModel) {
+        presenter.onItemViewClick(item)
+    }
+
+    override fun showItemDescription(itemWitId: PlaylistItemDomain) {
+        PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise())
+            .apply { findNavController().navigate(this) }
     }
 
     override fun showAlertDialog(model: AlertDialogModel) {

@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
@@ -127,6 +128,11 @@ class PlaylistPresenter(
         }
     }
 
+    override fun onItemViewClick(item: ItemModel) {
+        state.playlist?.itemWitId(item.id)
+            ?.apply { view.showItemDescription(this) }
+    }
+
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
@@ -158,8 +164,6 @@ class PlaylistPresenter(
                 if (!ytJavaApi.launchVideo(itemDomain.media)) {
                     toastWrapper.show("can't launch video")
                 }
-            } else {
-                view.playLocal(itemDomain.media)
             }
         } ?: toastWrapper.show("can't find video")
     }
