@@ -8,8 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -48,11 +46,7 @@ class MainActivity :
         setContentView(R.layout.main_activity)
 
         navController = findNavController(R.id.nav_host_fragment)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(setOf(R.id.bottom_navigation))
-
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        // setup nav draw https://developer.android.com/guide/navigation/navigation-ui#add_a_navigation_drawer
         bottom_nav_view.setupWithNavController(navController)
         presenter.initialise()
     }
@@ -157,6 +151,8 @@ class MainActivity :
     }
 
     companion object {
+        val TOP_LEVEL_DESTINATIONS =
+            setOf(R.id.navigation_browse, R.id.navigation_playlists, R.id.navigation_playlist, R.id.navigation_player)
         private const val SERVICES_REQUEST_CODE = 1
 
         @JvmStatic

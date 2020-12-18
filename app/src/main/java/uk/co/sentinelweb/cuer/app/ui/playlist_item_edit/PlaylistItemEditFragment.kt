@@ -144,7 +144,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
             }
     }
 
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         /* init */ viewModel
@@ -176,20 +175,16 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     Glide.with(ple_author_image)
                         .load(model.channelThumbUrl)
                         .into(ple_author_image)
-                    ple_chips.removeAllViews() // todo reuse chip views
+                    ple_chips.removeAllViews()
                     model.chips.forEach { chipModel ->
                         chipCreator.create(chipModel, ple_chips)?.apply {
                             ple_chips.addView(this)
                             when (chipModel.type) {
                                 PLAYLIST_SELECT -> {
-                                    setOnClickListener {
-                                        viewModel.onSelectPlaylistChipClick(chipModel)
-                                    }
+                                    setOnClickListener { viewModel.onSelectPlaylistChipClick(chipModel) }
                                 }
                                 PLAYLIST -> {
-                                    setOnCloseIconClickListener {
-                                        viewModel.onRemovePlaylist(chipModel)
-                                    }
+                                    setOnCloseIconClickListener { viewModel.onRemovePlaylist(chipModel) }
                                 }
                                 else -> Unit
                             }
