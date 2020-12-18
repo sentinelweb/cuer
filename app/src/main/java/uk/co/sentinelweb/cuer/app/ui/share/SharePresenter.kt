@@ -35,7 +35,7 @@ class SharePresenter constructor(
 ) : ShareContract.Presenter {
 
     init {
-        log.tag = "SharePresenter"
+        log.tag(this)
     }
 
     override fun fromShareUrl(uriString: String) {
@@ -119,6 +119,7 @@ class SharePresenter constructor(
                 } else null
 
                 if (forward) {
+                    log.d("finish:play = $play, item = $playlistItem")
                     view.gotoMain(playlistItem, play)
                     view.exit()
                 } else { // return play is hidden for not connected

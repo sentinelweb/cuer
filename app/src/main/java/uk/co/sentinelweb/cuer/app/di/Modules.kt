@@ -79,7 +79,8 @@ object Modules {
                 contextProvider = get(),
                 mediaSessionManager = get(),
                 playlistMutator = get(),
-                prefsWrapper = get(named<GeneralPreferences>())
+                prefsWrapper = get(named<GeneralPreferences>()),
+                log = get()
             )
         }
         single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }

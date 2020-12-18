@@ -43,6 +43,10 @@ class PlaylistPresenter(
     private val timeProvider: TimeProvider
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
+    init {
+        log.tag(this)
+    }
+
     private val isQueuedPlaylist: Boolean
         get() = state.playlist?.let { queue.playlist?.id == state.playlist?.id } ?: false
 
@@ -136,8 +140,8 @@ class PlaylistPresenter(
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
-                toastWrapper.show("No chromecast -> playing locally")
-                view.playLocal(itemDomain.media)
+                //toastWrapper.show("No chromecast -> playing locally")
+                //view.playLocal(itemDomain.media)
             } else {
                 if (isQueuedPlaylist) {
                     queue.onItemSelected(itemDomain)
@@ -164,6 +168,8 @@ class PlaylistPresenter(
                 if (!ytJavaApi.launchVideo(itemDomain.media)) {
                     toastWrapper.show("can't launch video")
                 }
+            } else {
+                view.playLocal(itemDomain.media)
             }
         } ?: toastWrapper.show("can't find video")
     }
@@ -225,10 +231,11 @@ class PlaylistPresenter(
             plId?.apply {
                 state.playlistId = plId
                 executeRefresh()
-
+                //log.d("setPlaylistData(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
                 if (playNow) {
                     state.playlist?.apply {
-                        queue.playNow(this, plItemId)// todo current item isnt set properly in queue
+                        //log.d("setPlaylistData.play(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
+                        queue.playNow(this, plItemId) // todo current item isn't set properly in queue
                         state.playlist = queue.playlist?.copy()
                     }
                 } else {

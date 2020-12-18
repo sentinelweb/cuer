@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 
 object CoreModule {
     val objectModule = module {
-        factory { TimeStampMapper() }
+        factory { TimeStampMapper(log = get()) }
         factory { CoroutineContextProvider() }
         factory { TimeProvider() }
         factory { TimeFormatter() }

@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
 class MainActivity :
@@ -38,8 +39,13 @@ class MainActivity :
     private val presenter: MainContract.Presenter by currentScope.inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val snackBarWrapper: SnackbarWrapper by currentScope.inject()
+    private val log: LogWrapper by currentScope.inject()
 
     private lateinit var navController: NavController
+
+    init {
+        log.tag(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,11 +92,13 @@ class MainActivity :
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
+
     }
 
     override fun onStart() {
         super.onStart()
         presenter.onStart()
+        checkIntent(intent)
 
     }
 
@@ -104,18 +112,14 @@ class MainActivity :
         super.onDestroy()
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        checkIntent(intent)
-    }
-
-    private fun checkIntent(intent: Intent?) {
-        intent?.getStringExtra(Target.KEY)?.let {
+    private fun checkIntent(intent: Intent) {
+        intent.getStringExtra(Target.KEY)?.let {
             when (it) {
                 PLAYLIST_FRAGMENT.toString() ->
                     PLAYLIST_ITEM.getString(intent)
                         ?.let { deserialisePlaylistItem(it) }
                         ?.let { item ->
+                            //log.d("checkIntent navigate intent.plid=${item.playlistId} intent.pl_item_id=${item.id}")
                             navController.navigate(
                                 R.id.navigation_playlist, bundleOf(
                                     PLAYLIST_ID.name to item.playlistId,
@@ -123,11 +127,13 @@ class MainActivity :
                                     PLAY_NOW.name to PLAY_NOW.getBoolean(intent)
                                 )
                             )
+                            intent.removeExtra(PLAYLIST_ITEM.name)
                         }
                         ?: Unit
             }
         }
-        intent?.removeExtra(PLAY_NOW.toString())
+        intent.removeExtra(Target.KEY)
+        intent.removeExtra(PLAY_NOW.toString())
     }
 
     override fun isRecreating() = isChangingConfigurations
