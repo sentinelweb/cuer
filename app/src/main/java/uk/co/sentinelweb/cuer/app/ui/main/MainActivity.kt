@@ -8,8 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -22,6 +20,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
@@ -47,11 +46,7 @@ class MainActivity :
         setContentView(R.layout.main_activity)
 
         navController = findNavController(R.id.nav_host_fragment)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(setOf(R.id.bottom_navigation))
-
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        // setup nav draw https://developer.android.com/guide/navigation/navigation-ui#add_a_navigation_drawer
         bottom_nav_view.setupWithNavController(navController)
         presenter.initialise()
     }
@@ -115,18 +110,21 @@ class MainActivity :
     }
 
     private fun checkIntent(intent: Intent?) {
-        intent?.getStringExtra(NavigationModel.Target::class.java.simpleName)?.let {
+        intent?.getStringExtra(Target.KEY)?.let {
             when (it) {
-                PLAYLIST_FRAGMENT.toString() -> {
-                    val item = deserialisePlaylistItem(intent?.getStringExtra(PLAYLIST_ITEM.toString()))
-                    navController.navigate(
-                        R.id.navigation_playlist, bundleOf(
-                            PLAYLIST_ID.toString() to item.playlistId,
-                            PLAYLIST_ITEM_ID.toString() to item.id,
-                            PLAY_NOW.toString() to intent.getBooleanExtra(PLAY_NOW.toString(), false)
-                        )
-                    )
-                }
+                PLAYLIST_FRAGMENT.toString() ->
+                    PLAYLIST_ITEM.getString(intent)
+                        ?.let { deserialisePlaylistItem(it) }
+                        ?.let { item ->
+                            navController.navigate(
+                                R.id.navigation_playlist, bundleOf(
+                                    PLAYLIST_ID.name to item.playlistId,
+                                    PLAYLIST_ITEM_ID.name to item.id,
+                                    PLAY_NOW.name to PLAY_NOW.getBoolean(intent)
+                                )
+                            )
+                        }
+                        ?: Unit
             }
         }
         intent?.removeExtra(PLAY_NOW.toString())
@@ -153,6 +151,8 @@ class MainActivity :
     }
 
     companion object {
+        val TOP_LEVEL_DESTINATIONS =
+            setOf(R.id.navigation_browse, R.id.navigation_playlists, R.id.navigation_playlist, R.id.navigation_player)
         private const val SERVICES_REQUEST_CODE = 1
 
         @JvmStatic

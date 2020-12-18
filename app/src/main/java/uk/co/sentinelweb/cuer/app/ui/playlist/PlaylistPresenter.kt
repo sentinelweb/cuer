@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
@@ -81,15 +82,15 @@ class PlaylistPresenter(
                 view.showPlaylistSelector(
                     playlistDialogModelCreator.mapPlaylistSelectionForDialog(
                         allPlaylists, setOf(state.playlist!!), false,
-                        { which, _ ->
+                        itemClick = { which: Int, _ ->
                             if (which < allPlaylists.size) {
-                                allPlaylists[which].id?.let {
-                                    moveItemToPlaylist(it)
-                                }
+                                allPlaylists[which].id?.let { moveItemToPlaylist(it) }
                             } else {
                                 view.showPlaylistCreateDialog()
                             }
-                        })
+                        },
+                        dismiss = { view.resetItemsState() }
+                    )
                 )
             }
         }
@@ -105,7 +106,6 @@ class PlaylistPresenter(
                 moveItem.copy(playlistId = it, order = timeProvider.currentTimeMillis())
                     .apply { playlistRepository.savePlaylistItem(this) }
                 executeRefresh()
-
             }
         }
     }
@@ -122,10 +122,15 @@ class PlaylistPresenter(
                     //repository.delete(deleteItem.media)
                     view.showDeleteUndo("Deleted: ${deleteItem.media.title}")
                     state.focusIndex = indexOf(deleteItem)
-                    executeRefresh()
+                    executeRefresh(false)
                 }
             }
         }
+    }
+
+    override fun onItemViewClick(item: ItemModel) {
+        state.playlist?.itemWitId(item.id)
+            ?.apply { view.showItemDescription(this) }
     }
 
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
@@ -159,8 +164,6 @@ class PlaylistPresenter(
                 if (!ytJavaApi.launchVideo(itemDomain.media)) {
                     toastWrapper.show("can't launch video")
                 }
-            } else {
-                view.playLocal(itemDomain.media)
             }
         } ?: toastWrapper.show("can't find video")
     }
@@ -274,7 +277,7 @@ class PlaylistPresenter(
         state.viewModelScope.launch { executeRefresh() }
     }
 
-    private suspend fun executeRefresh() {
+    private suspend fun executeRefresh(animate: Boolean = true) {
         try {
             (state.playlistId
                 ?.let { playlistRepository.load(it, flat = false) }
@@ -294,7 +297,7 @@ class PlaylistPresenter(
                 }
                 .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
                 ?.let { modelMapper.map(it) }
-                ?.also { view.setList(it.items) }
+                ?.also { view.setList(it.items, animate) }
                 .also {
                     state.focusIndex?.apply {
                         view.scrollToItem(this)

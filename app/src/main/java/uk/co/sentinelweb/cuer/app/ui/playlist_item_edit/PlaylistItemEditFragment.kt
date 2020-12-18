@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
@@ -7,6 +8,7 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
@@ -28,11 +30,14 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.util.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
 
 class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) {
@@ -50,10 +55,17 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     private var createPlaylistDialog: DialogFragment? = null
 
     init {
-        log.tag = "PlaylistItemEditFragment"
+        log.tag(this)
+    }
+
+    private val saveCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            viewModel.checkToSave()
+        }
     }
 
     fun setData(media: MediaDomain?) = viewModel.setData(media)
+    fun setData(item: PlaylistItemDomain) = viewModel.setData(item)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,6 +129,21 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         observeDialog()
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(this, saveCallback)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        PLAYLIST_ITEM.getString(arguments)
+            ?.let { deserialisePlaylistItem(it) }
+            ?.let {
+                setData(it)
+                saveCallback.isEnabled = true
+            }
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         /* init */ viewModel
@@ -148,20 +175,16 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     Glide.with(ple_author_image)
                         .load(model.channelThumbUrl)
                         .into(ple_author_image)
-                    ple_chips.removeAllViews() // todo reuse chip views
+                    ple_chips.removeAllViews()
                     model.chips.forEach { chipModel ->
                         chipCreator.create(chipModel, ple_chips)?.apply {
                             ple_chips.addView(this)
                             when (chipModel.type) {
                                 PLAYLIST_SELECT -> {
-                                    setOnClickListener {
-                                        viewModel.onSelectPlaylistChipClick(chipModel)
-                                    }
+                                    setOnClickListener { viewModel.onSelectPlaylistChipClick(chipModel) }
                                 }
                                 PLAYLIST -> {
-                                    setOnCloseIconClickListener {
-                                        viewModel.onRemovePlaylist(chipModel)
-                                    }
+                                    setOnCloseIconClickListener { viewModel.onRemovePlaylist(chipModel) }
                                 }
                                 else -> Unit
                             }
@@ -188,9 +211,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         viewModel.getNavigationObservable().observe(this.viewLifecycleOwner,
             object : Observer<NavigationModel> {
                 override fun onChanged(nav: NavigationModel) {
-                    when (nav.target) {
-                        else -> navMapper.map(nav)
-                    }
+                    navMapper.map(nav)
                 }
             }
         )
@@ -207,19 +228,20 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         ft.commit()
                     }
                     when (model.type) {
-                        DialogModel.Type.PLAYLIST -> dialog =
-                            selectDialogCreator.createMulti(model as SelectDialogModel).apply {
-                                show()
-                            }
+                        DialogModel.Type.PLAYLIST ->
+                            dialog = selectDialogCreator
+                                .createMulti(model as SelectDialogModel)
+                                .apply { show() }
                         DialogModel.Type.PLAYLIST_ADD -> {
-                            createPlaylistDialog = PlaylistEditFragment.newInstance(null).apply {
-                                listener = object : PlaylistEditFragment.Listener {
-                                    override fun onPlaylistCommit(domain: PlaylistDomain?) {
-                                        domain?.apply { viewModel.onPlaylistSelected(this) }
-                                        createPlaylistDialog?.dismissAllowingStateLoss()
+                            createPlaylistDialog = PlaylistEditFragment.newInstance(null)
+                                .apply {
+                                    listener = object : PlaylistEditFragment.Listener {
+                                        override fun onPlaylistCommit(domain: PlaylistDomain?) {
+                                            domain?.apply { viewModel.onPlaylistSelected(this) }
+                                            createPlaylistDialog?.dismissAllowingStateLoss()
+                                        }
                                     }
                                 }
-                            }
                             createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
                         }
                         else -> Unit
@@ -259,7 +281,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 scoped {
                     NavigationMapper(
                         activity = (getSource() as Fragment).requireActivity(),
-                        toastWrapper = get()
+                        toastWrapper = get(),
+                        fragment = (getSource() as Fragment)
                     )
                 }
                 scoped {

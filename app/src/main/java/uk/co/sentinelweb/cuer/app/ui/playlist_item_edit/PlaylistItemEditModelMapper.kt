@@ -27,7 +27,7 @@ class PlaylistItemEditModelMapper(
 
     fun map(
         domain: MediaDomain,
-        selectedPlaylists: MutableSet<PlaylistDomain>
+        selectedPlaylists: Set<PlaylistDomain>
     ) = PlaylistItemEditModel(
         title = domain.title,
         description = domain.description,

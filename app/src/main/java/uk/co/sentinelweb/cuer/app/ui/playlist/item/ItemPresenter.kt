@@ -52,4 +52,8 @@ class ItemPresenter(
         interactions.onShare(state.item!!)
     }
 
+    override fun doView() {
+        interactions.onView(state.item!!)
+    }
+
 }
