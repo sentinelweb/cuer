@@ -9,7 +9,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.koin.android.scope.currentScope
@@ -17,6 +21,7 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import java.io.File
 
@@ -25,6 +30,16 @@ class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupC
     private val presenter: PrefBackupContract.Presenter by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private lateinit var progress: ProgressBar
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
+        (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
+            (onCreateView as ViewGroup).addView(it, 0)
+            //(activity as AppCompatActivity).setSupportActionBar(it)
+            it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
+        }
+        return onCreateView
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_backup, rootKey)
@@ -39,7 +54,7 @@ class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupC
         if (!::progress.isInitialized) {
             progress = LayoutInflater.from(activity)
                 .inflate(R.layout.preference_progress, (view as ViewGroup), false) as ProgressBar
-            (view as ViewGroup).addView(progress, 0)
+            (view as ViewGroup).addView(progress, 1)
         }
     }
 
