@@ -14,7 +14,6 @@ interface MainContract {
         fun checkPlayServices()
         fun isRecreating(): Boolean
         fun showMessage(msg: String)
-
     }
 
 }

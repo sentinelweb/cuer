@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -24,7 +25,8 @@ class QueueMediator constructor(
     private val contextProvider: CoroutineContextProvider,
     private val mediaSessionManager: MediaSessionManager,
     private val playlistMutator: PlaylistMutator,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
+    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
+    private val log: LogWrapper
 ) : QueueMediatorContract.Producer, QueueMediatorContract.Consumer {
 
     override val currentItem: PlaylistItemDomain?
@@ -40,6 +42,7 @@ class QueueMediator constructor(
     private val producerListeners: MutableList<ProducerListener> = mutableListOf()
 
     init {
+        log.tag(this)
         state.playlistId = prefsWrapper.getLong(CURRENT_PLAYLIST_ID)
         refreshQueueBackground()
     }
@@ -58,20 +61,24 @@ class QueueMediator constructor(
             .takeIf { it.isSuccessful }
             ?.data
             ?.let {
+                //log.d("playNow(loaded playlist= ${it.id}, requested=$playlistId, item = $playlistItemId)")
                 playNow(it, playlistItemId)
             }
     }
 
     override suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?) {
         playlist.indexOfItemId(playlistItemId)?.let { foundIndex ->
+            //log.d("playNow(load found Index= $foundIndex)")
             playlist.let {
                 it.copy(currentIndex = foundIndex).apply {
                     playlistRepository.save(it, false)
                 }
             }
         }?.also {
+            //log.d("playNow(updated Index to = ${it.currentIndex})")
             prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
-            refreshQueueFrom(playlist)
+            refreshQueueFrom(it)
+            //log.d("playNow(state current Index is = ${state.playlist?.currentIndex})")
             playNow()
         }
     }
@@ -85,7 +92,9 @@ class QueueMediator constructor(
             } else {
                 currentItem()
             }
+            //log.d("playNow() item = ${itemToPlay})")
             itemToPlay?.let {
+                //log.d("playNow(item= $it)")
                 state.playlist = playlistMutator.playItem(this, it)
                 updateCurrentItem()
             }
@@ -163,6 +172,7 @@ class QueueMediator constructor(
                 playlist.currentIndex.let { playlist.items[it] }
             }
             ?: throw NullPointerException("playlist should not be null")
+        //log.d("updateCurrentItem: currentItemId=${state.currentItem?.id} currentMediaId=${state.currentItem?.media?.id} currentIndex=${state.playlist?.currentIndex} items.size=${state.playlist?.items?.size} ")
         state.currentItem?.apply {
             mediaSessionManager.setMedia(media)
         }
@@ -194,8 +204,7 @@ class QueueMediator constructor(
                     playlistDomain.items[playlistDomain.currentIndex]
                 } else null
         } else {
-            state.currentItem = state.currentItem
-                ?.let { item -> playlistDomain.items.find { it.id == item.id } }
+            state.currentItem = playlistDomain.currentItem()
         }
         state.playlist = playlistDomain
         consumerListeners.forEach { it.onPlaylistUpdated() }

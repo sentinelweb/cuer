@@ -43,10 +43,14 @@ class PlaylistPresenter(
     private val timeProvider: TimeProvider
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
-    private val isQueuedPlaylist: Boolean
-        get() = state.playlist?.let { queue.playlist?.id == state.playlist?.id } ?: false
+    init {
+        log.tag(this)
+    }
 
-    private fun queueExecIf(
+    private val isQueuedPlaylist: Boolean
+        get() = state.playlist?.let { queue.playlistId == it.id } ?: false
+
+    private fun queueExecIfElse(
         block: QueueMediatorContract.Producer.() -> Unit,
         elseBlock: (QueueMediatorContract.Producer.() -> Unit)? = null
     ) {
@@ -61,6 +65,7 @@ class PlaylistPresenter(
     override fun initialise() {
         queue.addProducerListener(this)
         state.playlistId = prefsWrapper.getLong(CURRENT_PLAYLIST_ID)
+        //log.d("initialise state.playlistId=${state.playlistId}")
     }
 
     override fun refreshList() {
@@ -136,8 +141,9 @@ class PlaylistPresenter(
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
-                toastWrapper.show("No chromecast -> playing locally")
-                view.playLocal(itemDomain.media)
+                //toastWrapper.show("No chromecast -> playing locally")
+                //view.playLocal(itemDomain.media)
+                view.showItemDescription(itemDomain)
             } else {
                 if (isQueuedPlaylist) {
                     queue.onItemSelected(itemDomain)
@@ -164,6 +170,8 @@ class PlaylistPresenter(
                 if (!ytJavaApi.launchVideo(itemDomain.media)) {
                     toastWrapper.show("can't launch video")
                 }
+            } else {
+                view.playLocal(itemDomain.media)
             }
         } ?: toastWrapper.show("can't find video")
     }
@@ -221,30 +229,32 @@ class PlaylistPresenter(
     }
 
     override fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean) {
+        //log.d("setPlaylistData(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
         state.viewModelScope.launch {
-            plId?.apply {
-                state.playlistId = plId
-                executeRefresh()
-
-                if (playNow) {
-                    state.playlist?.apply {
-                        queue.playNow(this, plItemId)// todo current item isnt set properly in queue
-                        state.playlist = queue.playlist?.copy()
-                    }
-                } else {
-                    state.playlist?.apply {
-                        indexOfItemId(plItemId)?.also { foundIndex ->
-                            view.scrollToItem(foundIndex)
+            plId
+                ?.takeIf { it != -1L }
+                ?.apply {
+                    state.playlistId = plId
+                    executeRefresh()
+                    //log.d("setPlaylistData(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
+                    if (playNow) {
+                        state.playlist?.apply {
+                            //log.d("setPlaylistData.play(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
+                            queue.playNow(this, plItemId) // todo current item isn't set properly in queue
+                            state.playlist = queue.playlist?.copy()
+                        }
+                    } else {
+                        state.playlist?.apply {
+                            indexOfItemId(plItemId)?.also { foundIndex ->
+                                view.scrollToItem(foundIndex)
+                            }
                         }
                     }
-                }
-                queueExecIf {
-                    view.highlightPlayingItem(queue.currentItemIndex)
-                    currentItemIndex?.apply { view.scrollToItem(this) }
-                }
-            } ?: run {
-                executeRefresh()
-            }
+                    queueExecIf {
+                        view.highlightPlayingItem(queue.currentItemIndex)
+                        currentItemIndex?.apply { view.scrollToItem(this) }
+                    }
+                } ?: run { executeRefresh() }
         }
     }
 
@@ -278,6 +288,7 @@ class PlaylistPresenter(
     }
 
     private suspend fun executeRefresh(animate: Boolean = true) {
+        //log.d("executeRefresh state.playlistId=${state.playlistId}")
         try {
             (state.playlistId
                 ?.let { playlistRepository.load(it, flat = false) }
@@ -292,6 +303,7 @@ class PlaylistPresenter(
                 ?.also {
                     queueExecIf {
                         refreshQueueFrom(it)
+                        //log.d("executeRefresh:1: queue.playlistId = ${queue.playlistId} queue.playlist.Id = ${queue.playlist?.id}")
                         view.highlightPlayingItem(currentItemIndex)
                     }
                 }
@@ -303,6 +315,16 @@ class PlaylistPresenter(
                         view.scrollToItem(this)
                         state.lastFocusIndex = state.focusIndex
                         state.focusIndex = null
+                    } ?: run {
+                        queueExecIfElse(
+                            {
+                                queue.playlist?.currentIndex?.also {
+                                    view.scrollToItem(it)
+                                    view.highlightPlayingItem(it)
+                                }
+                            },
+                            { state.playlist?.currentIndex?.also { view.scrollToItem(it) } }
+                        )
                     }
                 }
         } catch (e: Throwable) {

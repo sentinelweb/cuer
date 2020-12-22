@@ -52,7 +52,7 @@ data class NavigationModel constructor(
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)
-        fun getLong(i: Intent?) = i?.getLongExtra(name, -1) ?: -1L
+        fun getLong(i: Intent?) = i?.let { if (it.hasExtra(name)) it.getLongExtra(name, -1) else null }
         fun getBoolean(b: Bundle?) = b?.getBoolean(name)
         fun getBoolean(i: Intent?) = i?.getBooleanExtra(name, false) ?: false
         fun getString(b: Bundle?) = b?.getString(name)

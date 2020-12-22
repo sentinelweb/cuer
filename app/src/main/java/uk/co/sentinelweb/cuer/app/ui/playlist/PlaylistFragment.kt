@@ -95,14 +95,13 @@ class PlaylistFragment :
 
     override fun onResume() {
         super.onResume()
-
+        log.d("onResume arg.plid=${PLAYLIST_ID.getLong(arguments)} arg.pl_item_id=${PLAYLIST_ITEM_ID.getLong(arguments)}")
         presenter.setPlaylistData(
             PLAYLIST_ID.getLong(arguments),
             PLAYLIST_ITEM_ID.getLong(arguments),
             PLAY_NOW.getBoolean(arguments) ?: false
         )
     }
-
     // endregion
 
     // region PlaylistContract.View
