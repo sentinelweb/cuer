@@ -211,10 +211,21 @@ class YouTubePlayerListener(
 
     private fun loadVideo(item: PlaylistItemDomain?) {
         item?.apply {
-            youTubePlayer?.loadVideo(media.platformId, 0f)
+            val startPos = media.run {
+                val position = positon ?: -1
+                val duration = duration ?: -1
+                log.d("loadVideo: check seek: pos =  $position")
+                if (position > 0 &&
+                    duration > 0 && position < duration - 10000
+                ) {
+                    position / 1000f
+                } else {
+                    0f
+                }
+            }
+            youTubePlayer?.loadVideo(media.platformId, startPos)
             state.currentMedia = media
             playerUi?.setMedia(media)
-            media.positon?.apply { if (this > 0) youTubePlayer?.seekTo(this / 1000f) }
         } ?: playerUi?.reset()
     }
 
