@@ -65,6 +65,7 @@ class PlaylistPresenter(
     override fun initialise() {
         queue.addProducerListener(this)
         state.playlistId = prefsWrapper.getLong(CURRENT_PLAYLIST_ID)
+        //log.d("initialise state.playlistId=${state.playlistId}")
     }
 
     override fun refreshList() {
@@ -227,31 +228,32 @@ class PlaylistPresenter(
     }
 
     override fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean) {
+        //log.d("setPlaylistData(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
         state.viewModelScope.launch {
-            plId?.apply {
-                state.playlistId = plId
-                executeRefresh()
-                //log.d("setPlaylistData(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
-                if (playNow) {
-                    state.playlist?.apply {
-                        //log.d("setPlaylistData.play(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
-                        queue.playNow(this, plItemId) // todo current item isn't set properly in queue
-                        state.playlist = queue.playlist?.copy()
-                    }
-                } else {
-                    state.playlist?.apply {
-                        indexOfItemId(plItemId)?.also { foundIndex ->
-                            view.scrollToItem(foundIndex)
+            plId
+                ?.takeIf { it != -1L }
+                ?.apply {
+                    state.playlistId = plId
+                    executeRefresh()
+                    //log.d("setPlaylistData(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
+                    if (playNow) {
+                        state.playlist?.apply {
+                            //log.d("setPlaylistData.play(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
+                            queue.playNow(this, plItemId) // todo current item isn't set properly in queue
+                            state.playlist = queue.playlist?.copy()
+                        }
+                    } else {
+                        state.playlist?.apply {
+                            indexOfItemId(plItemId)?.also { foundIndex ->
+                                view.scrollToItem(foundIndex)
+                            }
                         }
                     }
-                }
-                queueExecIf {
-                    view.highlightPlayingItem(queue.currentItemIndex)
-                    currentItemIndex?.apply { view.scrollToItem(this) }
-                }
-            } ?: run {
-                executeRefresh()
-            }
+                    queueExecIf {
+                        view.highlightPlayingItem(queue.currentItemIndex)
+                        currentItemIndex?.apply { view.scrollToItem(this) }
+                    }
+                } ?: run { executeRefresh() }
         }
     }
 
@@ -285,6 +287,7 @@ class PlaylistPresenter(
     }
 
     private suspend fun executeRefresh(animate: Boolean = true) {
+        //log.d("executeRefresh state.playlistId=${state.playlistId}")
         try {
             (state.playlistId
                 ?.let { playlistRepository.load(it, flat = false) }

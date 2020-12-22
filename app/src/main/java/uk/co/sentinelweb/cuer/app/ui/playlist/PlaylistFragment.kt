@@ -102,7 +102,6 @@ class PlaylistFragment :
             PLAY_NOW.getBoolean(arguments) ?: false
         )
     }
-
     // endregion
 
     // region PlaylistContract.View
