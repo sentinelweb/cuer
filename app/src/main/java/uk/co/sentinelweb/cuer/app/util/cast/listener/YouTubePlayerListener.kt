@@ -214,7 +214,6 @@ class YouTubePlayerListener(
             val startPos = media.run {
                 val position = positon ?: -1
                 val duration = duration ?: -1
-                log.d("loadVideo: check seek: pos =  $position")
                 if (position > 0 &&
                     duration > 0 && position < duration - 10000
                 ) {
@@ -223,6 +222,7 @@ class YouTubePlayerListener(
                     0f
                 }
             }
+            log.d("loadVideo: play position: pos =  $startPos sec")
             youTubePlayer?.loadVideo(media.platformId, startPos)
             state.currentMedia = media
             playerUi?.setMedia(media)
