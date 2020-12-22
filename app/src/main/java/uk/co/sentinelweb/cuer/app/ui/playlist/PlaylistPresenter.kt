@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.indexOfItemId
 import uk.co.sentinelweb.cuer.domain.ext.itemWitId
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
@@ -141,23 +142,35 @@ class PlaylistPresenter(
     override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
-                //toastWrapper.show("No chromecast -> playing locally")
-                //view.playLocal(itemDomain.media)
                 view.showItemDescription(itemDomain)
             } else {
-                if (isQueuedPlaylist) {
-                    queue.onItemSelected(itemDomain)
-                } else {
-                    view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
-                        state.playlist?.let {
-                            prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
-                            queue.refreshQueueFrom(it)
-                            queue.onItemSelected(itemDomain, true)
-                        }
-                    }))
-                }
+                playItem(itemDomain, false)
             }
         } // todo error
+    }
+
+    override fun onPlayStartClick(item: PlaylistModel.PlaylistItemModel) {
+        state.playlist?.itemWitId(item.id)?.let { itemDomain ->
+            if (!(ytContextHolder.isConnected())) {
+                //view.showItemDescription(itemDomain)
+            } else {
+                playItem(itemDomain, true)
+            }
+        } // todo error
+    }
+
+    private fun playItem(itemDomain: PlaylistItemDomain, resetPos: Boolean) {
+        if (isQueuedPlaylist) {
+            queue.onItemSelected(itemDomain, resetPosition = resetPos)
+        } else {
+            view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
+                state.playlist?.let {
+                    prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
+                    queue.refreshQueueFrom(it)
+                    queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)
+                }
+            }))
+        }
     }
 
     override fun scroll(direction: PlaylistContract.ScrollDirection) {
@@ -240,7 +253,7 @@ class PlaylistPresenter(
                     if (playNow) {
                         state.playlist?.apply {
                             //log.d("setPlaylistData.play(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
-                            queue.playNow(this, plItemId) // todo current item isn't set properly in queue
+                            queue.playNow(this, plItemId)
                             state.playlist = queue.playlist?.copy()
                         }
                     } else {

@@ -15,7 +15,7 @@ interface QueueMediatorContract {
     }
 
     interface Producer : Shared {
-        fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean = false)
+        fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean = false, resetPosition: Boolean = false)
         fun addProducerListener(l: ProducerListener)
         fun removeProducerListener(l: ProducerListener)
         fun destroy()

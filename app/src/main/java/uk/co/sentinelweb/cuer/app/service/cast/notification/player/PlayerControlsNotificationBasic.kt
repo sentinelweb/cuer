@@ -8,18 +8,20 @@ import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_PAUSE
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_PLAY
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPB
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPF
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_PAUSE
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_PLAY
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_SKIPB
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_SKIPF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 
 class PlayerControlsNotificationBasic constructor(
     private val service: YoutubeCastService,
-    private val appState: CuerAppState
+    private val appState: CuerAppState,
+    private val timeProvider: TimeProvider
 ) : PlayerControlsNotificationContract.View {
 
     override fun showNotification(
@@ -61,7 +63,7 @@ class PlayerControlsNotificationBasic constructor(
             .setContentText(media?.description ?: "No description")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setWhen(System.currentTimeMillis())
+            .setWhen(timeProvider.currentTimeMillis())
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
@@ -95,7 +97,6 @@ class PlayerControlsNotificationBasic constructor(
     }
 
     companion object {
-
         const val FOREGROUND_ID = 34563
     }
 }

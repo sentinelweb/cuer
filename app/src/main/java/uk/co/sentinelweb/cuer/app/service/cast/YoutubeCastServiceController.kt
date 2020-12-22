@@ -8,7 +8,7 @@ class YoutubeCastServiceController constructor(
     private val service: YoutubeCastService,
     private val state: YoutubeCastServiceState,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
-    private val notification: PlayerControlsNotificationContract.PresenterExternal,
+    private val notification: PlayerControlsNotificationContract.External,
     private val appState: CuerAppState
 ) {
     fun initialise() {

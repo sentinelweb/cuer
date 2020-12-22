@@ -220,6 +220,10 @@ class PlaylistFragment :
         presenter.onItemClicked(item as PlaylistModel.PlaylistItemModel)
     }
 
+    override fun onPlayStartClick(item: ItemModel) {
+        presenter.onPlayStartClick(item as PlaylistModel.PlaylistItemModel)
+    }
+
     override fun onRightSwipe(item: ItemModel) {
         presenter.onItemSwipeRight(item as PlaylistModel.PlaylistItemModel)
     }

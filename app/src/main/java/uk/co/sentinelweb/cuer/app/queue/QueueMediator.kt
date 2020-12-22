@@ -47,12 +47,12 @@ class QueueMediator constructor(
         refreshQueueBackground()
     }
 
-    override fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean) {
+    override fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean, resetPosition: Boolean) {
         state.playlist
             ?.takeIf { playlistItem != state.currentItem || forcePlay }
             ?.let {
                 state.playlist = playlistMutator.playItem(it, playlistItem)
-                updateCurrentItem()
+                updateCurrentItem(resetPosition)
             }
     }
 
@@ -96,7 +96,7 @@ class QueueMediator constructor(
             itemToPlay?.let {
                 //log.d("playNow(item= $it)")
                 state.playlist = playlistMutator.playItem(this, it)
-                updateCurrentItem()
+                updateCurrentItem(false)
             }
         }
     }
@@ -106,10 +106,16 @@ class QueueMediator constructor(
             val mediaUpdated = media.copy(
                 positon = updatedMedia.positon,
                 duration = updatedMedia.duration,
+                dateLastPlayed = updatedMedia.dateLastPlayed,
                 watched = true
             )
             exec { repository.save(mediaUpdated, true) }
             copy(media = mediaUpdated)
+        }
+        state.playlist = state.playlist?.let {
+            it.copy(items = it.items.toMutableList().apply {
+                set(currentItemIndex ?: throw IllegalStateException(), state.currentItem ?: throw IllegalStateException())
+            })
         }
     }
 
@@ -153,7 +159,7 @@ class QueueMediator constructor(
         state.playlist?.let { currentPlaylist ->
             state.playlist = playlistMutator.gotoNextItem(currentPlaylist)
             if (state.playlist?.currentIndex ?: 0 < currentPlaylist.items.size) {
-                updateCurrentItem()
+                updateCurrentItem(false)
             }
         }
     }
@@ -161,18 +167,21 @@ class QueueMediator constructor(
     override fun previousItem() {
         state.playlist?.let { currentPlaylist ->
             state.playlist = playlistMutator.gotoPreviousItem(currentPlaylist)
-            updateCurrentItem()
+            updateCurrentItem(false)
         }
     }
 
-    private fun updateCurrentItem() {
+    private fun updateCurrentItem(resetPosition: Boolean) {
         state.currentItem = state.playlist
             ?.let { playlist ->
                 exec { playlistRepository.save(playlist, true) }
                 playlist.currentIndex.let { playlist.items[it] }
             }
             ?: throw NullPointerException("playlist should not be null")
-        //log.d("updateCurrentItem: currentItemId=${state.currentItem?.id} currentMediaId=${state.currentItem?.media?.id} currentIndex=${state.playlist?.currentIndex} items.size=${state.playlist?.items?.size} ")
+        log.d("updateCurrentItem: currentItemId=${state.currentItem?.id} currentMediaId=${state.currentItem?.media?.id} currentIndex=${state.playlist?.currentIndex} items.size=${state.playlist?.items?.size} ")
+        if (resetPosition) {
+            state.currentItem?.apply { updateMediaItem(media.copy(positon = 0)) }
+        }
         state.currentItem?.apply {
             mediaSessionManager.setMedia(media)
         }
@@ -207,6 +216,10 @@ class QueueMediator constructor(
             state.currentItem = playlistDomain.currentItem()
         }
         state.playlist = playlistDomain
+        //log.d("refreshQueueFrom: currentItemId=${state.currentItem?.id}")
+        state.currentItem?.apply {
+            mediaSessionManager.setMedia(media)
+        }
         consumerListeners.forEach { it.onPlaylistUpdated() }
     }
 

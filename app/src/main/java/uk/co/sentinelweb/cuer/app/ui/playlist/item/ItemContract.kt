@@ -22,6 +22,7 @@ interface ItemContract {
         fun doStar()
         fun doShare()
         fun doView()
+        fun doPlayStartClick()
     }
 
     interface External {
@@ -39,6 +40,7 @@ interface ItemContract {
         fun onStar(item: ItemModel)
         fun onShare(item: ItemModel)
         fun onView(item: ItemModel)
+        fun onPlayStartClick(item: ItemModel)
     }
 
 }

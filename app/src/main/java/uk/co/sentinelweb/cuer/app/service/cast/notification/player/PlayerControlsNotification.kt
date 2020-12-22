@@ -6,8 +6,8 @@ import android.graphics.drawable.Drawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Presenter
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.PresenterExternal
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -18,14 +18,13 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 
 
-class PlayerControlsNotificationPresenter constructor(
+class PlayerControlsNotification constructor(
     private val view: PlayerControlsNotificationContract.View,
     private val state: PlayerControlsNotificationState,
     private val toastWrapper: ToastWrapper,
     private val log: LogWrapper,
     private val context: Context
-
-) : PresenterExternal, Presenter {
+) : External, Presenter {
 
     private val listeners: MutableList<Listener> = mutableListOf()
 
@@ -159,5 +158,9 @@ class PlayerControlsNotificationPresenter constructor(
         const val ACTION_SKIPB = "skipb"
         const val ACTION_TRACKF = "trackf"
         const val ACTION_TRACKB = "trackb"
+        const val ACTION_DISCONNECT = "disconnect"
+        const val ACTION_STAR = "star"
+        const val ACTION_UNSTAR = "unstar"
+
     }
 }
