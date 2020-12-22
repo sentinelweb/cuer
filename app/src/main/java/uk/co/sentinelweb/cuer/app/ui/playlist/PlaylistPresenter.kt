@@ -48,9 +48,9 @@ class PlaylistPresenter(
     }
 
     private val isQueuedPlaylist: Boolean
-        get() = state.playlist?.let { queue.playlist?.id == state.playlist?.id } ?: false
+        get() = state.playlist?.let { queue.playlistId == it.id } ?: false
 
-    private fun queueExecIf(
+    private fun queueExecIfElse(
         block: QueueMediatorContract.Producer.() -> Unit,
         elseBlock: (QueueMediatorContract.Producer.() -> Unit)? = null
     ) {
@@ -303,6 +303,7 @@ class PlaylistPresenter(
                 ?.also {
                     queueExecIf {
                         refreshQueueFrom(it)
+                        //log.d("executeRefresh:1: queue.playlistId = ${queue.playlistId} queue.playlist.Id = ${queue.playlist?.id}")
                         view.highlightPlayingItem(currentItemIndex)
                     }
                 }
@@ -314,6 +315,16 @@ class PlaylistPresenter(
                         view.scrollToItem(this)
                         state.lastFocusIndex = state.focusIndex
                         state.focusIndex = null
+                    } ?: run {
+                        queueExecIfElse(
+                            {
+                                queue.playlist?.currentIndex?.also {
+                                    view.scrollToItem(it)
+                                    view.highlightPlayingItem(it)
+                                }
+                            },
+                            { state.playlist?.currentIndex?.also { view.scrollToItem(it) } }
+                        )
                     }
                 }
         } catch (e: Throwable) {
