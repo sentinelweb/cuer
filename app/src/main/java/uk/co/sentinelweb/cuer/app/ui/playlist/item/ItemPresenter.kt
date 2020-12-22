@@ -56,4 +56,8 @@ class ItemPresenter(
         interactions.onView(state.item!!)
     }
 
+    override fun doPlayStartClick() {
+        interactions.onPlayStartClick(state.item!!)
+    }
+
 }

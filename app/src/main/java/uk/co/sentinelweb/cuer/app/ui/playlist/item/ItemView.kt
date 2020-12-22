@@ -50,6 +50,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
                 when (item.itemId) {
                     R.id.playlist_context_view -> presenter.doView()
                     R.id.playlist_context_play -> presenter.doPlay(false)
+                    R.id.playlist_context_play_start -> presenter.doPlayStartClick()
                     R.id.playlist_context_play_external -> presenter.doPlay(true)
                     R.id.playlist_context_channel_external -> presenter.doShowChannel()
                     R.id.playlist_context_star -> presenter.doStar()

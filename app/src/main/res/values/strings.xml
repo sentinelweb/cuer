@@ -47,6 +47,7 @@
     <string name="playlist_change_dialog_message">This will change the current playlist …</string>
     <string name="playlist_item_menu_view">View</string>
     <string name="playlist_item_menu_play">Play</string>
+    <string name="playlist_item_menu_play_start">Play from start</string>
     <string name="playlist_item_menu_play_yt">Launch</string>
     <string name="playlist_item_menu_channel_yt">Go to channel</string>
     <string name="playlist_item_menu_star">Star</string>
