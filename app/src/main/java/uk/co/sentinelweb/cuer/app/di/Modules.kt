@@ -86,7 +86,7 @@ object Modules {
         single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }
         single { ChromecastYouTubePlayerContextHolder(get(), get()) }
         factory { MediaSessionManager(get(), androidApplication(), get(), get(), get()) }
-        factory { MediaMetadataMapper() }
+        factory { MediaMetadataMapper(get()) }
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }

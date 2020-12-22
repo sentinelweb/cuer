@@ -3,9 +3,9 @@ package uk.co.sentinelweb.cuer.app.service.cast
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationMedia
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationState
 
 object YoutubeCastServiceModule {
@@ -15,17 +15,18 @@ object YoutubeCastServiceModule {
         scope(named<YoutubeCastService>()) {
             scoped { YoutubeCastServiceController(getSource(), get(), get(), get(), get()) }
             scoped { YoutubeCastServiceState() }
-            scoped { PlayerControlsNotificationPresenter(get(), get(), get(), get(), androidApplication()) }
-            scoped<PlayerControlsNotificationContract.PresenterExternal> {
-                get<PlayerControlsNotificationPresenter>()
+            scoped { PlayerControlsNotification(get(), get(), get(), get(), androidApplication()) }
+            scoped<PlayerControlsNotificationContract.External> {
+                get<PlayerControlsNotification>()
             }
             scoped<PlayerControlsNotificationContract.Presenter> {
-                get<PlayerControlsNotificationPresenter>()
+                get<PlayerControlsNotification>()
             }
             scoped<PlayerControlsNotificationContract.View> {
                 PlayerControlsNotificationMedia(
-                    getSource(),
-                    get()
+                    service = getSource(),
+                    appState = get(),
+                    timeProvider = get()
                 )
             }
             scoped { PlayerControlsNotificationState() }

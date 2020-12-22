@@ -8,13 +8,16 @@ import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_PAUSE
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_PLAY
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPB
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_SKIPF
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_TRACKB
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationPresenter.Companion.ACTION_TRACKF
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_DISCONNECT
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_PAUSE
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_PLAY
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_SKIPB
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_SKIPF
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_STAR
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_TRACKB
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -22,7 +25,8 @@ import androidx.media.app.NotificationCompat as MediaNotificationCompat
 
 class PlayerControlsNotificationMedia constructor(
     private val service: YoutubeCastService,
-    private val appState: CuerAppState
+    private val appState: CuerAppState,
+    private val timeProvider: TimeProvider
 ) : PlayerControlsNotificationContract.View {
 
     override fun showNotification(
@@ -44,7 +48,8 @@ class PlayerControlsNotificationMedia constructor(
         val skipbPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPB)
         val trackfPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKF)
         val trackbPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKB)
-        // val releasePendingIntent: PendingIntent = pendingIntent(ACTION_TRACKB)
+        val disconnectPendingIntent: PendingIntent = pendingIntent(ACTION_DISCONNECT)
+        val starPendingIntent: PendingIntent = pendingIntent(ACTION_STAR)
 
         val contentIntent = Intent(service, MainActivity::class.java)
         val contentPendingIntent: PendingIntent =
@@ -58,10 +63,10 @@ class PlayerControlsNotificationMedia constructor(
             .setSmallIcon(R.drawable.ic_notif_status_cast_conn_white)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setWhen(System.currentTimeMillis())
+            .setWhen(timeProvider.currentTimeMillis())
             .setStyle(
                 MediaNotificationCompat.MediaStyle()
-                    .setShowActionsInCompactView(2) // #2: pause or play button
+                    .setShowActionsInCompactView(2, 6, 5) // #2: pause or play button
                     .setMediaSession(appState.mediaSession!!.sessionToken)
                 // .setCancelButtonIntent(releasePendingIntent)
             )
@@ -88,9 +93,9 @@ class PlayerControlsNotificationMedia constructor(
         builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent) // #3
         builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
         // #5 todo disconnect
-        builder.addAction(R.drawable.ic_notif_close_white, "Close", contentPendingIntent)
+        builder.addAction(R.drawable.ic_notif_close_white, "Close", disconnectPendingIntent) // #5
         // #6 todo star function
-        builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", contentPendingIntent)
+        builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #6
         return builder.build()
     }
 
@@ -103,7 +108,6 @@ class PlayerControlsNotificationMedia constructor(
     }
 
     companion object {
-
         const val FOREGROUND_ID = 34563
     }
 }

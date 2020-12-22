@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.stringMedia
 
 class YouTubePlayerListener(
     private val state: YouTubePlayerListenerState,
@@ -55,25 +56,53 @@ class YouTubePlayerListener(
         this.youTubePlayer = youTubePlayer
     }
 
+    override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
+        this.youTubePlayer = youTubePlayer
+        state.durationSec = duration
+        playerUi?.setDuration(duration)
+        updateMedia(false, durSec = duration)
+        state.currentMedia?.apply { mediaSessionManager.setMedia(this) }
+    }
+
     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
         this.youTubePlayer = youTubePlayer
         state.positionSec = second
-        if (timeProvider.currentTimeMillis() - state.lastUpdateUI > UI_UPDATE_INTERVAL) {
+        if (shouldUpdateUi()) {
             playerUi?.setCurrentSecond(second)
-            state.lastUpdateUI = timeProvider.currentTimeMillis()
+            setTimeUpdateUi()
         }
-        state.currentMedia = state.currentMedia?.copy(positon = (second * 1000).toLong())?.also {
-            updateMedia(true)
-        }
+        updateMedia(true, posSec = second)
+
         mediaSessionManager.updatePlaybackState(state.currentMedia, state.playState)
     }
 
-    private fun updateMedia(throttle: Boolean) {
-        if (!throttle || timeProvider.currentTimeMillis() - state.lastUpdateMedia > DB_UPDATE_INTERVAL) {
+    private fun shouldUpdateUi() = timeProvider.currentTimeMillis() - state.lastUpdateUI > UI_UPDATE_INTERVAL
+
+    private fun setTimeUpdateUi() {
+        state.lastUpdateUI = timeProvider.currentTimeMillis()
+    }
+
+    private fun updateMedia(throttle: Boolean, posSec: Float? = null, durSec: Float? = null) {
+        state.currentMedia = state.currentMedia?.run {
+            copy(
+                positon = posSec?.let { (it * 1000).toLong() } ?: positon,
+                duration = durSec?.let { (it * 1000).toLong() } ?: duration,
+                dateLastPlayed = timeProvider.instant()
+            )
+        }
+        if (shouldUpdateMedia(throttle)) {
             state.currentMedia?.apply { queue.updateMediaItem(this) }
-            state.lastUpdateMedia = timeProvider.currentTimeMillis()
+            setTimeUpdateMedia()
         }
     }
+
+    private fun shouldUpdateMedia(throttle: Boolean) =
+        !throttle || timeProvider.currentTimeMillis() - state.lastUpdateMedia > DB_UPDATE_INTERVAL
+
+    private fun setTimeUpdateMedia() {
+        state.lastUpdateMedia = timeProvider.currentTimeMillis()
+    }
+
 
     override fun onError(youTubePlayer: YouTubePlayer, error: PlayerError) {
         this.youTubePlayer = youTubePlayer
@@ -112,18 +141,9 @@ class YouTubePlayerListener(
         }
     }
 
-    override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
-        this.youTubePlayer = youTubePlayer
-        state.durationSec = duration
-        playerUi?.setDuration(duration)
-        state.currentMedia = state.currentMedia?.copy(duration = (duration * 1000L).toLong())?.also {
-            updateMedia(false)
-        }
-    }
-
     override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
         this.youTubePlayer = youTubePlayer
-        log.d("Got id: $videoId")
+        log.d("Got id: $videoId media=${state.currentMedia?.stringMedia()}")
     }
 
     override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {

@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 interface PlayerControlsNotificationContract {
 
-    interface PresenterExternal : CastPlayerContract.PlayerControls {
+    interface External : CastPlayerContract.PlayerControls {
         fun handleAction(action: String?)
         fun destroy()
     }

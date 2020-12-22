@@ -106,10 +106,16 @@ class QueueMediator constructor(
             val mediaUpdated = media.copy(
                 positon = updatedMedia.positon,
                 duration = updatedMedia.duration,
+                dateLastPlayed = updatedMedia.dateLastPlayed,
                 watched = true
             )
             exec { repository.save(mediaUpdated, true) }
             copy(media = mediaUpdated)
+        }
+        state.playlist = state.playlist?.let {
+            it.copy(items = it.items.toMutableList().apply {
+                set(currentItemIndex ?: throw IllegalStateException(), state.currentItem ?: throw IllegalStateException())
+            })
         }
     }
 
@@ -172,7 +178,7 @@ class QueueMediator constructor(
                 playlist.currentIndex.let { playlist.items[it] }
             }
             ?: throw NullPointerException("playlist should not be null")
-        //log.d("updateCurrentItem: currentItemId=${state.currentItem?.id} currentMediaId=${state.currentItem?.media?.id} currentIndex=${state.playlist?.currentIndex} items.size=${state.playlist?.items?.size} ")
+        log.d("updateCurrentItem: currentItemId=${state.currentItem?.id} currentMediaId=${state.currentItem?.media?.id} currentIndex=${state.playlist?.currentIndex} items.size=${state.playlist?.items?.size} ")
         state.currentItem?.apply {
             mediaSessionManager.setMedia(media)
         }
@@ -207,6 +213,10 @@ class QueueMediator constructor(
             state.currentItem = playlistDomain.currentItem()
         }
         state.playlist = playlistDomain
+        //log.d("refreshQueueFrom: currentItemId=${state.currentItem?.id}")
+        state.currentItem?.apply {
+            mediaSessionManager.setMedia(media)
+        }
         consumerListeners.forEach { it.onPlaylistUpdated() }
     }
 
