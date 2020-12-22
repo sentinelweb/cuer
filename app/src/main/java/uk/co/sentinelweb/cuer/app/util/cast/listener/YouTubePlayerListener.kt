@@ -175,6 +175,7 @@ class YouTubePlayerListener(
 
     // region  QueueMediatorContract.ConsumerListener
     override fun onItemChanged() {
+        //log.d("onItemChanged: currentItemId = ${queue.currentItem?.id}")
         loadVideo(queue.currentItem)
     }
 
@@ -189,11 +190,11 @@ class YouTubePlayerListener(
     }
 
     private fun loadVideo(item: PlaylistItemDomain?) {
-        item?.let {
-            youTubePlayer?.loadVideo(item.media.platformId, 0f)
-            state.currentMedia = item.media
-            playerUi?.setMedia(item.media)
-            item.media.positon?.apply { if (this > 0) youTubePlayer?.seekTo(this / 1000f) }
+        item?.apply {
+            youTubePlayer?.loadVideo(media.platformId, 0f)
+            state.currentMedia = media
+            playerUi?.setMedia(media)
+            media.positon?.apply { if (this > 0) youTubePlayer?.seekTo(this / 1000f) }
         } ?: playerUi?.reset()
     }
 
@@ -205,6 +206,10 @@ class YouTubePlayerListener(
             setPlayerState(state.playState)
             setDuration(state.durationSec)
             setCurrentSecond(state.positionSec)
+            if (state.currentMedia == null) {
+                state.currentMedia = queue.currentItem?.media
+            }
+            //log.d("setupPlayer: state.currentMedia=${state.currentMedia?.stringMedia()}")
             state.currentMedia?.apply { setMedia(this) }
         }
     }

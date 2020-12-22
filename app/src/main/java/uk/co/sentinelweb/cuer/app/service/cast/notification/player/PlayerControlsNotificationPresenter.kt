@@ -29,6 +29,10 @@ class PlayerControlsNotificationPresenter constructor(
 
     private val listeners: MutableList<Listener> = mutableListOf()
 
+    init {
+        log.tag(this)
+    }
+
     override fun handleAction(action: String?) {
         when (action) {
             ACTION_PAUSE ->
@@ -66,11 +70,16 @@ class PlayerControlsNotificationPresenter constructor(
     }
 
     private fun updateNotification() {
-        state.bitmap?.let {
-            view.showNotification(state.playState, state.media!!, it)
-        } ?: state.media?.image?.let { image ->
-            Glide.with(context).asBitmap().load(image.url).into(BitmapLoadTarget())
-        } ?: view.showNotification(state.playState, state.media, null)
+        //log.d("updateNotification: state.media=${state.media?.stringMedia()}")
+        state.media?.apply {
+            state.bitmap?.let { view.showNotification(state.playState, state.media, it) }
+                ?: state.media?.image?.let { image ->
+                    Glide.with(context).asBitmap().load(image.url).into(BitmapLoadTarget())
+                } ?: view.showNotification(state.playState, state.media, null)
+        } ?: run {
+            state.bitmap = null
+            view.showNotification(state.playState, null, null)
+        }
     }
 
     inner class BitmapLoadTarget : CustomTarget<Bitmap?>() {
@@ -111,12 +120,12 @@ class PlayerControlsNotificationPresenter constructor(
     }
 
     override fun setMedia(media: MediaDomain) {
+        //log.d("setMedia: state.media=${state.media?.stringMedia()} \nmedia=${media.stringMedia()}")
         if (state.media?.id != media.id) {
             state.bitmap = null
         }
         state.media = media
         updateNotification()
-        log.d("got media: $media")
     }
 
     override fun setPlaylistName(name: String) {
@@ -132,10 +141,12 @@ class PlayerControlsNotificationPresenter constructor(
     }
 
     override fun reset() {
+        //log.e("reset: state.media=${state.media?.stringMedia()}", Exception())
         state.bitmap = null
         state.media = null
         updateNotification()
     }
+
 
     override fun restoreState() {
 

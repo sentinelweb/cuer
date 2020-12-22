@@ -172,6 +172,7 @@ class QueueMediator constructor(
                 playlist.currentIndex.let { playlist.items[it] }
             }
             ?: throw NullPointerException("playlist should not be null")
+        //log.d("updateCurrentItem: currentItemId=${state.currentItem?.id} currentMediaId=${state.currentItem?.media?.id} currentIndex=${state.playlist?.currentIndex} items.size=${state.playlist?.items?.size} ")
         state.currentItem?.apply {
             mediaSessionManager.setMedia(media)
         }
