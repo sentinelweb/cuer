@@ -143,6 +143,7 @@ class PlaylistPresenter(
             if (!(ytContextHolder.isConnected())) {
                 //toastWrapper.show("No chromecast -> playing locally")
                 //view.playLocal(itemDomain.media)
+                view.showItemDescription(itemDomain)
             } else {
                 if (isQueuedPlaylist) {
                     queue.onItemSelected(itemDomain)
