@@ -24,11 +24,16 @@
             android:id="@+id/action_goto_playlist"
             app:destination="@id/navigation_playlist"
             app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist"
+            app:popUpToInclusive="true"
             />
 
         <action
             android:id="@+id/action_edit_playlist"
             app:destination="@id/navigation_playlist_edit"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist_edit"
+            app:popUpToInclusive="true"
             />
     </fragment>
 
@@ -67,6 +72,8 @@
             android:id="@+id/action_goto_playlist_item"
             app:destination="@id/navigation_playlist_item_edit"
             app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist_item_edit"
+            app:popUpToInclusive="true"
             />
     </fragment>
 
