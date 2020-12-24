@@ -86,7 +86,6 @@
                 android:background="@color/black_text_secondary"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                 android:textColor="@color/white"
-                app:layout_constraintStart_toEndOf="@id/ple_author_image"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="1:00:00"
                 />
@@ -99,9 +98,8 @@
                 android:background="@android:color/transparent"
                 android:elevation="0dp"
                 app:layout_collapseMode="pin"
-                app:layout_scrollFlags="scroll|enterAlways|snap"
-                app:menu="@menu/share_actionbar"
-                />
+                app:menu="@menu/playlist_item_edit_actionbar"
+                /><!-- app:layout_scrollFlags="scroll|enterAlways|snap"-->
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -238,6 +236,7 @@
         app:layout_anchor="@id/ple_appbar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_button_unstarred_white"
+        android:contentDescription="@string/menu_star"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

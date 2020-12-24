@@ -1,6 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
@@ -10,6 +13,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.playlist_fragment.*
 import org.koin.android.ext.android.inject
@@ -61,6 +65,20 @@ class PlaylistFragment :
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
     private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
 
+    private val starMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_star) }
+    private val playMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_play) }
+    private val editMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_edit) }
+    private val newMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_new) }
+    private val filterMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_filter) }
+    private val modeMenuItems: List<MenuItem> by lazy {
+        listOf(
+            playlist_toolbar.menu.findItem(R.id.playlist_mode_single),
+            playlist_toolbar.menu.findItem(R.id.playlist_mode_shuffle),
+            playlist_toolbar.menu.findItem(R.id.playlist_mode_loop)
+        )
+    }
+
+
     private var snackbar: Snackbar? = null
 
     private var createPlaylistDialog: DialogFragment? = null
@@ -77,7 +95,6 @@ class PlaylistFragment :
             (activity as AppCompatActivity).setSupportActionBar(it)
             it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
-
         presenter.initialise()
         playlist_list.layoutManager = LinearLayoutManager(context)
         playlist_list.adapter = adapter
@@ -86,6 +103,38 @@ class PlaylistFragment :
         playlist_fab_up.setOnLongClickListener { presenter.scroll(Top);true }
         playlist_fab_down.setOnClickListener { presenter.scroll(Down) }
         playlist_fab_down.setOnLongClickListener { presenter.scroll(Bottom);true }
+        playlist_appbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+
+            var isShow = false
+            var scrollRange = -1
+
+            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange()
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    isShow = true
+                    // only show the menu items for the non-empty state
+                    modeMenuItems[1].isVisible = true
+                    playMenuItem.isVisible = true
+                } else if (isShow) {
+                    isShow = false
+                    modeMenuItems.forEach { it.isVisible = false }
+                    playMenuItem.isVisible = false
+                }
+            }
+        })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.playlist_actionbar, menu)
+        modeMenuItems.forEach { it.isVisible = false }
+        playMenuItem.isVisible = false
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView() {

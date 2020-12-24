@@ -17,7 +17,7 @@
     <string name="menu_channel_yt">Go to channel</string>
     <string name="menu_star">Star</string>
     <string name="menu_share">Share</string>
-    <string name="menu_paste">Paste</string>
+    <string name="menu_paste">Paste &amp; add</string>
     <string name="menu_restart">Restart</string>
 
     <!-- share activity -->
@@ -74,5 +74,10 @@
     <string name="pe_error_title_blank">Add a title</string>
     <string name="playlist_dialog_add_playlist">Add playlist …</string>
     <string name="playlist_item_edit_title">View Item</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_playlist_mode_shuffle">Shuffle</string>
+    <string name="menu_playlist_mode_loop">Loop</string>
+    <string name="menu_playlist_mode_single">Single</string>
+    <string name="menu_show_unlistened">Show unlistened</string>
 
 </resources>

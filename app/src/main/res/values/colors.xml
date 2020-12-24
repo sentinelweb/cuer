@@ -17,4 +17,5 @@
 
     <!--    custom colors-->
     <color name="deep_red">#961717</color>
+    <color name="header_transparent_background">#8a000000</color>
 </resources>
