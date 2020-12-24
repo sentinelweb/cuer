@@ -79,5 +79,7 @@
     <string name="menu_playlist_mode_loop">Loop</string>
     <string name="menu_playlist_mode_single">Single</string>
     <string name="menu_show_unlistened">Show unlistened</string>
+    <string name="default_playlist">Default</string>
+    <string name="dash">-</string>
 
 </resources>

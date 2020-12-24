@@ -9,17 +9,15 @@ class ItemPresenter(
 ) : ItemContract.Presenter, ItemContract.External {
 
     override fun update(
-        item: ItemModel,
+        item: ItemContract.PlaylistItemModel,
         highlightPlaying: Boolean
     ) {
-        view.setTopText(item.topText)
-        view.setBottomText(item.bottomText)
-        view.setCheckedVisible(item.checkIcon)
+        view.setTopText(item.title)
+        view.setBottomText(item.url)
+        view.setCheckedVisible(false)
         item.thumbNailUrl
             ?.apply { view.setIconUrl(this) }
-            ?: item.iconRes
-                ?.apply { view.setIconResource(this) }
-            ?: view.setIconResource(0)
+            ?: view.setIconResource(R.drawable.ic_platform_youtube_24_black)
         view.setBackground(if (highlightPlaying) R.color.playing_item_background else R.color.white)
         state.item = item
     }

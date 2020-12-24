@@ -6,6 +6,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -13,6 +14,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.playlist_fragment.*
@@ -33,9 +35,9 @@ import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTI
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -64,6 +66,7 @@ class PlaylistFragment :
     private val log: LogWrapper by inject()
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
     private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
+    private val imageProvider: FirebaseDefaultImageProvider by inject()
 
     private val starMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_star) }
     private val playMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_play) }
@@ -71,17 +74,17 @@ class PlaylistFragment :
     private val newMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_new) }
     private val filterMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_filter) }
     private val modeMenuItems: List<MenuItem> by lazy {
-        listOf(
+        listOf( // same order as the enum in PlaylistDomain
             playlist_toolbar.menu.findItem(R.id.playlist_mode_single),
-            playlist_toolbar.menu.findItem(R.id.playlist_mode_shuffle),
-            playlist_toolbar.menu.findItem(R.id.playlist_mode_loop)
+            playlist_toolbar.menu.findItem(R.id.playlist_mode_loop),
+            playlist_toolbar.menu.findItem(R.id.playlist_mode_shuffle)
         )
     }
 
-
     private var snackbar: Snackbar? = null
-
     private var createPlaylistDialog: DialogFragment? = null
+
+    private var lastPlayModeIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,7 +118,7 @@ class PlaylistFragment :
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    modeMenuItems[1].isVisible = true
+                    modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == lastPlayModeIndex }
                     playMenuItem.isVisible = true
                 } else if (isShow) {
                     isShow = false
@@ -154,9 +157,23 @@ class PlaylistFragment :
     // endregion
 
     // region PlaylistContract.View
-    override fun setList(list: List<ItemModel>, animate: Boolean) {
+    override fun setModel(model: PlaylistModel, animate: Boolean) {
+        Glide.with(playlist_header_image).load(imageProvider.makeRef(model.imageUrl)).into(playlist_header_image)
+        //(activity as AppCompatActivity).supportActionBar?.title = model.title
+        playlist_collapsing_toolbar.title = model.title
+        playlist_fab_play.setImageResource(model.playIcon)
+        starMenuItem.setIcon(model.starredIcon)
+        playlist_items.setText("${model.items.size}")
+        playlist_flags.isVisible = model.isDefault
+        playlist_fab_playmode.setImageResource(model.loopModeIcon)
+        lastPlayModeIndex = model.loopModeIndex
+        if (!playlist_fab_playmode.isVisible) {
+            modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == lastPlayModeIndex }
+        }
+
+        // update list
         playlist_swipe.isRefreshing = false
-        adapter.setData(list, animate)
+        adapter.setData(model.items, animate)
         playlist_swipe.setOnRefreshListener { presenter.refreshList() }
     }
 
@@ -233,7 +250,7 @@ class PlaylistFragment :
         createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
     }
 
-    override fun onView(item: ItemModel) {
+    override fun onView(item: ItemContract.PlaylistItemModel) {
         presenter.onItemViewClick(item)
     }
 
@@ -265,38 +282,38 @@ class PlaylistFragment :
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemModel) {
-        presenter.onItemClicked(item as PlaylistModel.PlaylistItemModel)
+    override fun onClick(item: ItemContract.PlaylistItemModel) {
+        presenter.onItemClicked(item)
     }
 
-    override fun onPlayStartClick(item: ItemModel) {
-        presenter.onPlayStartClick(item as PlaylistModel.PlaylistItemModel)
+    override fun onPlayStartClick(item: ItemContract.PlaylistItemModel) {
+        presenter.onPlayStartClick(item)
     }
 
-    override fun onRightSwipe(item: ItemModel) {
-        presenter.onItemSwipeRight(item as PlaylistModel.PlaylistItemModel)
+    override fun onRightSwipe(item: ItemContract.PlaylistItemModel) {
+        presenter.onItemSwipeRight(item)
     }
 
-    override fun onLeftSwipe(item: ItemModel) {
-        val playlistItemModel = item as PlaylistModel.PlaylistItemModel
+    override fun onLeftSwipe(item: ItemContract.PlaylistItemModel) {
+        val playlistItemModel = item
         adapter.notifyItemRemoved(playlistItemModel.index)
         presenter.onItemSwipeLeft(playlistItemModel) // delays for animation
     }
 
-    override fun onPlay(item: ItemModel, external: Boolean) {
-        presenter.onItemPlay(item as PlaylistModel.PlaylistItemModel, external)
+    override fun onPlay(item: ItemContract.PlaylistItemModel, external: Boolean) {
+        presenter.onItemPlay(item, external)
     }
 
-    override fun onShowChannel(item: ItemModel) {
-        presenter.onItemShowChannel(item as PlaylistModel.PlaylistItemModel)
+    override fun onShowChannel(item: ItemContract.PlaylistItemModel) {
+        presenter.onItemShowChannel(item)
     }
 
-    override fun onStar(item: ItemModel) {
-        presenter.onItemStar(item as PlaylistModel.PlaylistItemModel)
+    override fun onStar(item: ItemContract.PlaylistItemModel) {
+        presenter.onItemStar(item)
     }
 
-    override fun onShare(item: ItemModel) {
-        presenter.onItemShare(item as PlaylistModel.PlaylistItemModel)
+    override fun onShare(item: ItemContract.PlaylistItemModel) {
+        presenter.onItemShare(item)
     }
 
     //endregion

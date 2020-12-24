@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
@@ -81,7 +81,7 @@ class PlaylistPresenter(
         queue.removeProducerListener(this)
     }
 
-    override fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel) {// move
+    override fun onItemSwipeRight(item: ItemContract.PlaylistItemModel) {// move
         state.viewModelScope.launch {
             state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
             playlistDialogModelCreator.loadPlaylists { allPlaylists ->
@@ -116,7 +116,7 @@ class PlaylistPresenter(
         }
     }
 
-    override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemSwipeLeft(item: ItemContract.PlaylistItemModel) {
         state.viewModelScope.launch {
             delay(400)
             state.playlist?.items?.apply {
@@ -134,12 +134,12 @@ class PlaylistPresenter(
         }
     }
 
-    override fun onItemViewClick(item: ItemModel) {
+    override fun onItemViewClick(item: ItemContract.PlaylistItemModel) {
         state.playlist?.itemWitId(item.id)
             ?.apply { view.showItemDescription(this) }
     }
 
-    override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemClicked(item: ItemContract.PlaylistItemModel) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
                 view.showItemDescription(itemDomain)
@@ -149,7 +149,7 @@ class PlaylistPresenter(
         } // todo error
     }
 
-    override fun onPlayStartClick(item: PlaylistModel.PlaylistItemModel) {
+    override fun onPlayStartClick(item: ItemContract.PlaylistItemModel) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
                 //view.showItemDescription(itemDomain)
@@ -177,7 +177,7 @@ class PlaylistPresenter(
         view.scrollTo(direction)
     }
 
-    override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
+    override fun onItemPlay(item: ItemContract.PlaylistItemModel, external: Boolean) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (external) {
                 if (!ytJavaApi.launchVideo(itemDomain.media)) {
@@ -189,7 +189,7 @@ class PlaylistPresenter(
         } ?: toastWrapper.show("can't find video")
     }
 
-    override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemShowChannel(item: ItemContract.PlaylistItemModel) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!ytJavaApi.launchChannel(itemDomain.media)) {
                 toastWrapper.show("can't launch channel")
@@ -197,11 +197,11 @@ class PlaylistPresenter(
         } ?: toastWrapper.show("can't find video")
     }
 
-    override fun onItemStar(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemStar(item: ItemContract.PlaylistItemModel) {
         toastWrapper.show("todo: star ${item.id}")
     }
 
-    override fun onItemShare(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemShare(item: ItemContract.PlaylistItemModel) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             shareWrapper.share(itemDomain.media)
         }
@@ -219,8 +219,8 @@ class PlaylistPresenter(
             state.playlist = state.playlist?.let { playlist ->
                 playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!)
             }?.also { plist ->
-                plist.let { modelMapper.map(it) }
-                    .also { view.setList(it.items, false) }
+                plist.let { modelMapper.map(it, isQueuedPlaylist) }
+                    .also { view.setModel(it, false) }
             }?.also { plist ->
                 state.viewModelScope.launch {
                     playlistRepository.save(plist, false)
@@ -321,8 +321,8 @@ class PlaylistPresenter(
                     }
                 }
                 .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
-                ?.let { modelMapper.map(it) }
-                ?.also { view.setList(it.items, animate) }
+                ?.let { modelMapper.map(it, isQueuedPlaylist) }
+                ?.also { view.setModel(it, animate) }
                 .also {
                     state.focusIndex?.apply {
                         view.scrollToItem(this)

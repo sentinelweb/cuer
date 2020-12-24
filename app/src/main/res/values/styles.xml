@@ -68,15 +68,17 @@
     <style name="TextAppearance.App.CollapsingToolbar" />
 
     <style name="TextAppearance.App.CollapsingToolbar.Expanded">
-        <item name="android:background">@color/purple_300</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="TextAppearance.App.CollapsingToolbar.Collapsed">
-        <item name="android:background">@color/orange_500</item>
+    <style name="TextAppearance.App.CollapsingToolbar.Collapsed.Small">
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.App.CollapsingToolbar.Collapsed">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
     <style name="FabButton" parent="Widget.MaterialComponents.FloatingActionButton">
