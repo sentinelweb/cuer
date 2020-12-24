@@ -12,7 +12,7 @@ class PlaylistModelMapper constructor(
     private val res: ResourceWrapper
 ) {
 
-    fun map(domain: PlaylistDomain, isPlaying: Boolean): PlaylistModel = PlaylistModel(
+    fun map(domain: PlaylistDomain, isPlaying: Boolean, mapItems: Boolean = true): PlaylistModel = PlaylistModel(
         domain.title,
         domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         domain.mode.ordinal,
@@ -24,8 +24,12 @@ class PlaylistModelMapper constructor(
         if (isPlaying) R.drawable.ic_player_pause_black else R.drawable.ic_button_play_black,
         if (domain.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_unstarred_white,
         domain.default,
-        domain.items.mapIndexed { index, item ->
-            map(item, index)
+        if (mapItems) {
+            domain.items.mapIndexed { index, item ->
+                map(item, index)
+            }
+        } else {
+            listOf()
         }
     )
 

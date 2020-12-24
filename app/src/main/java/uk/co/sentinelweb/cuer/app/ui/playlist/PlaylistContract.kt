@@ -29,10 +29,18 @@ interface PlaylistContract {
         fun commitMove()
         fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean)
         fun onPlaylistSelected(playlist: PlaylistDomain)
+        fun onPlayModeChange(): Boolean
+        fun onPlayPlaylist(): Boolean
+        fun onStarPlaylist(): Boolean
+        fun onFilterNewItems(): Boolean
+        fun onEdit(): Boolean
+        fun onFilterPlaylistItems(): Boolean
     }
 
     interface View {
         fun setModel(model: PlaylistModel, animate: Boolean = true)
+        fun setHeaderModel(model: PlaylistModel)
+        fun setList(items: List<ItemContract.PlaylistItemModel>, animate: Boolean)
         fun scrollToItem(index: Int)
         fun scrollTo(direction: ScrollDirection)
         fun playLocal(media: MediaDomain)

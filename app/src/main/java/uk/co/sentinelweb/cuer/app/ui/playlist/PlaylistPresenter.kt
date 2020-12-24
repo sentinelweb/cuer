@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.indexOfItemId
 import uk.co.sentinelweb.cuer.domain.ext.itemWitId
@@ -104,6 +105,47 @@ class PlaylistPresenter(
 
     override fun onPlaylistSelected(playlist: PlaylistDomain) {
         playlist.id?.let { moveItemToPlaylist(it) }
+    }
+
+    override fun onPlayModeChange(): Boolean {
+        //log.d("onPlayModeChange")
+        state.playlist = state.playlist?.copy(
+            mode = when (state.playlist?.mode) {
+                SINGLE -> SHUFFLE
+                SHUFFLE -> LOOP
+                LOOP -> SINGLE
+                else -> SINGLE
+            }
+        )
+        state.playlist?.apply {
+            view.setHeaderModel(modelMapper.map(this, isQueuedPlaylist, false))
+        }
+        return true
+    }
+
+    override fun onPlayPlaylist(): Boolean {
+        log.d("onPlayModeChange")
+        return true
+    }
+
+    override fun onStarPlaylist(): Boolean {
+        log.d("onPlayPlaylist")
+        return true
+    }
+
+    override fun onFilterNewItems(): Boolean {
+        log.d("onFilterNewItems")
+        return true
+    }
+
+    override fun onEdit(): Boolean {
+        log.d("onEdit")
+        return true
+    }
+
+    override fun onFilterPlaylistItems(): Boolean {
+        log.d("onFilterPlaylistItems")
+        return true
     }
 
     private fun moveItemToPlaylist(it: Long) {

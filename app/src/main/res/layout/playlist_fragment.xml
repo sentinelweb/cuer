@@ -31,7 +31,7 @@
             app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:statusBarScrim="?attr/colorPrimaryDark"
-            ><!-- todo find a way to make header appear when scrolling down enterAlways hide toolbar on scroll up  -->
+            ><!-- todo find a way to make header appear when scrolling down adding |enterAlways seems to break it!  -->
 
             <ImageView
                 android:id="@+id/playlist_header_image"
@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"
-                android:layout_marginTop="120dp"
+                android:layout_marginTop="118dp"
                 android:background="@color/black_text_secondary"
                 android:padding="4dp"
                 android:text="@string/default_playlist"

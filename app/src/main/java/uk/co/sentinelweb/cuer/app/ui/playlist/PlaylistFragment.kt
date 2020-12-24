@@ -127,13 +127,22 @@ class PlaylistFragment :
                 }
             }
         })
+        playlist_fab_playmode.setOnClickListener { presenter.onPlayModeChange() }
+        playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
+        playlist_fab_play.setOnClickListener { presenter.onPlayPlaylist() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlist_actionbar, menu)
         modeMenuItems.forEach { it.isVisible = false }
+        modeMenuItems.forEach { it.setOnMenuItemClickListener { presenter.onPlayModeChange() } }
         playMenuItem.isVisible = false
+        playMenuItem.setOnMenuItemClickListener { presenter.onPlayPlaylist() }
+        starMenuItem.setOnMenuItemClickListener { presenter.onStarPlaylist() }
+        newMenuItem.setOnMenuItemClickListener { presenter.onFilterNewItems() }
+        editMenuItem.setOnMenuItemClickListener { presenter.onEdit() }
+        filterMenuItem.setOnMenuItemClickListener { presenter.onFilterPlaylistItems() }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -158,10 +167,23 @@ class PlaylistFragment :
 
     // region PlaylistContract.View
     override fun setModel(model: PlaylistModel, animate: Boolean) {
+        setHeaderModel(model)
+
+        // update list
+        setList(model.items, animate)
+    }
+
+    override fun setList(items: List<ItemContract.PlaylistItemModel>, animate: Boolean) {
+        playlist_swipe.isRefreshing = false
+        adapter.setData(items, animate)
+        playlist_swipe.setOnRefreshListener { presenter.refreshList() }
+    }
+
+    override fun setHeaderModel(model: PlaylistModel) {
         Glide.with(playlist_header_image).load(imageProvider.makeRef(model.imageUrl)).into(playlist_header_image)
-        //(activity as AppCompatActivity).supportActionBar?.title = model.title
         playlist_collapsing_toolbar.title = model.title
         playlist_fab_play.setImageResource(model.playIcon)
+        playMenuItem.setIcon(model.playIcon)
         starMenuItem.setIcon(model.starredIcon)
         playlist_items.setText("${model.items.size}")
         playlist_flags.isVisible = model.isDefault
@@ -170,11 +192,6 @@ class PlaylistFragment :
         if (!playlist_fab_playmode.isVisible) {
             modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == lastPlayModeIndex }
         }
-
-        // update list
-        playlist_swipe.isRefreshing = false
-        adapter.setData(model.items, animate)
-        playlist_swipe.setOnRefreshListener { presenter.refreshList() }
     }
 
     override fun showDeleteUndo(msg: String) {
