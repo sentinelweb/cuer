@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.di
 
+import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -102,6 +103,7 @@ object Modules {
         factory { ResourceWrapper(androidApplication()) }
         factory<LogWrapper> { AndroidLogWrapper() }
         factory { FileWrapper(androidApplication()) }
+        factory { SoftKeyboardWrapper() }
         single(named<GeneralPreferences>()) {
             SharedPrefsWrapper(GeneralPreferences::class.java, androidApplication(), get())
         }

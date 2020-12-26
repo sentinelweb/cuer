@@ -108,7 +108,6 @@ class PlaylistPresenter(
     }
 
     override fun onPlayModeChange(): Boolean {
-        //log.d("onPlayModeChange")
         state.playlist = state.playlist?.copy(
             mode = when (state.playlist?.mode) {
                 SINGLE -> SHUFFLE
@@ -117,10 +116,20 @@ class PlaylistPresenter(
                 else -> SINGLE
             }
         )
-        state.playlist?.apply {
-            view.setHeaderModel(modelMapper.map(this, isQueuedPlaylist, false))
-        }
+        commitHeaderChange()
         return true
+    }
+
+    private fun commitHeaderChange() {
+        state.viewModelScope.launch {
+            state.playlist?.let {
+                playlistRepository.save(it, flat = true)
+                queueExecIf { refreshQueueFrom(it) }
+            }
+            state.playlist?.apply {
+                view.setHeaderModel(modelMapper.map(this, isQueuedPlaylist, false))
+            }
+        }
     }
 
     override fun onPlayPlaylist(): Boolean {
@@ -129,7 +138,8 @@ class PlaylistPresenter(
     }
 
     override fun onStarPlaylist(): Boolean {
-        log.d("onPlayPlaylist")
+        state.playlist = state.playlist?.let { it.copy(starred = !it.starred) }
+        commitHeaderChange()
         return true
     }
 
@@ -139,7 +149,9 @@ class PlaylistPresenter(
     }
 
     override fun onEdit(): Boolean {
-        log.d("onEdit")
+        state.playlist
+            ?.run { id }
+            ?.apply { view.gotoEdit(this) }
         return true
     }
 

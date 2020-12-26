@@ -48,8 +48,10 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     private val chipCreator: ChipCreator by currentScope.inject()
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
 
-    private val starMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_star) }
-    private val playMenuItem: MenuItem by lazy { ple_toolbar.menu.findItem(R.id.share_play) }
+    private val starMenuItem: MenuItem
+        get() = ple_toolbar.menu.findItem(R.id.share_star)
+    private val playMenuItem: MenuItem
+        get() = ple_toolbar.menu.findItem(R.id.share_play)
 
     private var dialog: AppCompatDialog? = null
     private var createPlaylistDialog: DialogFragment? = null

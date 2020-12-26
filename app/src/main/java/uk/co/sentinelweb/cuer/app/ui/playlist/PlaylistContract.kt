@@ -52,6 +52,7 @@ interface PlaylistContract {
         fun showAlertDialog(model: AlertDialogModel)
         fun resetItemsState()
         fun showItemDescription(itemWitId: PlaylistItemDomain)
+        fun gotoEdit(id: Long)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }

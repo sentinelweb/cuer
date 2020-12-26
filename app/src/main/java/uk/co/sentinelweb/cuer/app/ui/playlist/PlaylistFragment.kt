@@ -68,18 +68,22 @@ class PlaylistFragment :
     private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
 
-    private val starMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_star) }
-    private val playMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_play) }
-    private val editMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_edit) }
-    private val newMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_new) }
-    private val filterMenuItem: MenuItem by lazy { playlist_toolbar.menu.findItem(R.id.playlist_filter) }
-    private val modeMenuItems: List<MenuItem> by lazy {
-        listOf( // same order as the enum in PlaylistDomain
+    private val starMenuItem: MenuItem
+        get() = playlist_toolbar.menu.findItem(R.id.playlist_star)
+    private val playMenuItem: MenuItem
+        get() = playlist_toolbar.menu.findItem(R.id.playlist_play)
+    private val editMenuItem: MenuItem
+        get() = playlist_toolbar.menu.findItem(R.id.playlist_edit)
+    private val newMenuItem: MenuItem
+        get() = playlist_toolbar.menu.findItem(R.id.playlist_new)
+    private val filterMenuItem: MenuItem
+        get() = playlist_toolbar.menu.findItem(R.id.playlist_filter)
+    private val modeMenuItems: List<MenuItem>
+        get() = listOf( // same order as the enum in PlaylistDomain
             playlist_toolbar.menu.findItem(R.id.playlist_mode_single),
             playlist_toolbar.menu.findItem(R.id.playlist_mode_loop),
             playlist_toolbar.menu.findItem(R.id.playlist_mode_shuffle)
         )
-    }
 
     private var snackbar: Snackbar? = null
     private var createPlaylistDialog: DialogFragment? = null
@@ -273,6 +277,11 @@ class PlaylistFragment :
 
     override fun showItemDescription(itemWitId: PlaylistItemDomain) {
         PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise())
+            .apply { findNavController().navigate(this) }
+    }
+
+    override fun gotoEdit(id: Long) {
+        PlaylistFragmentDirections.actionGotoEditPlaylist(id)
             .apply { findNavController().navigate(this) }
     }
 
