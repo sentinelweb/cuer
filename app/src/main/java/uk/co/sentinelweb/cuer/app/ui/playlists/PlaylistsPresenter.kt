@@ -125,7 +125,7 @@ class PlaylistsPresenter(
 
         state.playlists
             .let { modelMapper.map(it) }
-            .also { view.setList(it.items, animate) }
+            .also { view.setList(it, animate) }
             .takeIf { focusCurrent }
             ?.let {
                 state.playlists.apply {

@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -9,6 +11,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.playlists_fragment.*
 import org.koin.android.ext.android.inject
@@ -23,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTI
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModel
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -40,8 +44,10 @@ class PlaylistsFragment :
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private val toastWrapper: ToastWrapper by inject()
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
+    private val imageProvider: FirebaseDefaultImageProvider by inject()
 
     private var snackbar: Snackbar? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -70,6 +76,10 @@ class PlaylistsFragment :
         super.onDestroyView()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
     override fun onResume() {
         super.onResume()
         presenter.onResume()
@@ -77,9 +87,13 @@ class PlaylistsFragment :
     // endregion
 
     // region PlaylistContract.View
-    override fun setList(list: List<ItemModel>, animate: Boolean) {
+    override fun setList(model: PlaylistsModel, animate: Boolean) {
+        Glide.with(playlists_header_image)
+            .load(imageProvider.makeRef(model.imageUrl))
+            .into(playlists_header_image)
         playlists_swipe.isRefreshing = false
-        adapter.setData(list, animate)
+        playlists_items.text = "${model.items.size}"
+        adapter.setData(model.items, animate)
         playlists_swipe.setOnRefreshListener { presenter.refreshList() }
     }
 

@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 class PlaylistsModelMapper constructor() {
 
     fun map(domains: List<PlaylistDomain>): PlaylistsModel = PlaylistsModel(
+        DEFAULT_HEADER_IMAGE,
         domains.mapIndexed { index, pl ->
             ItemModel(
                 pl.id!!,
@@ -17,5 +18,9 @@ class PlaylistsModelMapper constructor() {
             )
         }
     )
+
+    companion object {
+        const val DEFAULT_HEADER_IMAGE = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg"
+    }
 
 }

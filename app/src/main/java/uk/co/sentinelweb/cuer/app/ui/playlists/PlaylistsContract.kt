@@ -17,19 +17,16 @@ interface PlaylistsContract {
         fun onItemStar(item: ItemModel)
         fun onItemShare(item: ItemModel)
         fun moveItem(fromPosition: Int, toPosition: Int)
-
-        //        fun scroll(direction: ScrollDirection)
+        //fun scroll(direction: ScrollDirection)
         fun undoDelete()
         fun commitMove()
         fun onResume()
     }
 
     interface View {
-        fun setList(list: List<ItemModel>, animate: Boolean = true)
+        fun setList(model: PlaylistsModel, animate: Boolean = true)
         fun scrollToItem(index: Int)
-
         //fun scrollTo(direction: ScrollDirection)
-        //fun playLocal(media: MediaDomain)
         fun showDeleteUndo(msg: String)
         fun gotoPlaylist(id: Long, play: Boolean)
         fun gotoEdit(id: Long)
