@@ -188,7 +188,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                                 PLAYLIST -> {
                                     setOnCloseIconClickListener { viewModel.onRemovePlaylist(chipModel) }
                                 }
-                                else -> Unit
                             }
                         }
                     }
@@ -288,7 +287,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     )
                 }
                 scoped {
-                    ChipCreator((getSource() as Fragment).requireActivity())
+                    ChipCreator((getSource() as Fragment).requireActivity(), get(), get())
                 }
                 scoped {
                     SelectDialogCreator((getSource() as Fragment).requireActivity())

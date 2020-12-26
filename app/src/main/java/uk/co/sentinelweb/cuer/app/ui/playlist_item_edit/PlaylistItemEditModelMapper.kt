@@ -38,7 +38,7 @@ class PlaylistItemEditModelMapper(
             selectedPlaylists.forEachIndexed { index, playlist ->
                 add(
                     index,
-                    ChipModel(ChipModel.Type.PLAYLIST, playlist.title, playlist.id.toString())
+                    ChipModel(ChipModel.Type.PLAYLIST, playlist.title, playlist.id.toString(), playlist.thumb ?: playlist.image)
                 )
             }
         },

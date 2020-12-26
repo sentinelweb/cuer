@@ -2,13 +2,14 @@
 <com.google.android.material.chip.Chip
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     style="@style/Widget.MaterialComponents.Chip.Entry"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="4dp"
     android:checkable="false"
-    android:text="Playlist 1"
+    app:chipIconSize="@dimen/chip_thumb_icon_size"
     app:chipIcon="@drawable/ic_chip_playlist_black"
-    app:chipIconSize="20dp"
+    tools:text="Playlist 1"
     app:chipIconVisible="true"
     />

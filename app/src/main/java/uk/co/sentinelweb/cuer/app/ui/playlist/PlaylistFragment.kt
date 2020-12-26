@@ -170,6 +170,7 @@ class PlaylistFragment :
             PLAY_NOW.getBoolean(arguments) ?: false
         )
         presenter.onResume()
+//        throw RuntimeException("test crashlytics")
     }
 
     override fun onPause() {
