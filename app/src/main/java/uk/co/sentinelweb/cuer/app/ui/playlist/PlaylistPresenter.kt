@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import androidx.lifecycle.viewModelScope
+import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
+import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
@@ -8,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
@@ -22,6 +25,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.currentItemOrStart
 import uk.co.sentinelweb.cuer.domain.ext.indexOfItemId
 import uk.co.sentinelweb.cuer.domain.ext.itemWitId
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
@@ -36,6 +40,7 @@ class PlaylistPresenter(
     private val queue: QueueMediatorContract.Producer,
     private val toastWrapper: ToastWrapper,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val chromeCastWrapper: ChromeCastWrapper,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val shareWrapper: ShareWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
@@ -52,6 +57,35 @@ class PlaylistPresenter(
     private val isQueuedPlaylist: Boolean
         get() = state.playlist?.let { queue.playlistId == it.id } ?: false
 
+    private val castConnectionListener = object : ChromecastConnectionListener {
+        override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
+            if (isQueuedPlaylist) {
+                view.setPlayState(PlaylistContract.PlayState.PLAYING)
+            }
+        }
+
+        override fun onChromecastConnecting() {
+            if (isQueuedPlaylist) {
+                view.setPlayState(PlaylistContract.PlayState.CONNECTING)
+            }
+        }
+
+        override fun onChromecastDisconnected() {
+            if (isQueuedPlaylist) {
+                view.setPlayState(PlaylistContract.PlayState.NOT_CONNECTED)
+            }
+        }
+
+    }
+
+    override fun onResume() {
+        ytContextHolder.addConnectionListener(castConnectionListener)
+    }
+
+    override fun onPause() {
+        ytContextHolder.removeConnectionListener(castConnectionListener)
+    }
+
     private fun queueExecIfElse(
         block: QueueMediatorContract.Producer.() -> Unit,
         elseBlock: (QueueMediatorContract.Producer.() -> Unit)? = null
@@ -63,6 +97,7 @@ class PlaylistPresenter(
     private fun queueExecIf(block: QueueMediatorContract.Producer.() -> Unit) {
         if (isQueuedPlaylist) block(queue)
     }
+
 
     override fun initialise() {
         queue.addProducerListener(this)
@@ -127,13 +162,26 @@ class PlaylistPresenter(
                 queueExecIf { refreshQueueFrom(it) }
             }
             state.playlist?.apply {
-                view.setHeaderModel(modelMapper.map(this, isQueuedPlaylist, false))
+                view.setHeaderModel(modelMapper.map(this, isPlaylistPlaying(), false))
             }
         }
     }
 
     override fun onPlayPlaylist(): Boolean {
-        log.d("onPlayModeChange")
+        if (isPlaylistPlaying()) {
+            chromeCastWrapper.killCurrentSession()
+        } else {
+            state.playlist?.let {
+                prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
+                queue.refreshQueueFrom(it)
+                it.currentItemOrStart()?.let { queue.onItemSelected(it, forcePlay = true, resetPosition = false) }
+                    ?: toastWrapper.show("No items to play")
+            }
+            if (!ytContextHolder.isConnected()) {
+                view.showCastRouteSelectorDialog()
+            }
+        }
+
         return true
     }
 
@@ -273,7 +321,7 @@ class PlaylistPresenter(
             state.playlist = state.playlist?.let { playlist ->
                 playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!)
             }?.also { plist ->
-                plist.let { modelMapper.map(it, isQueuedPlaylist) }
+                plist.let { modelMapper.map(it, isPlaylistPlaying()) }
                     .also { view.setModel(it, false) }
             }?.also { plist ->
                 state.viewModelScope.launch {
@@ -375,7 +423,7 @@ class PlaylistPresenter(
                     }
                 }
                 .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
-                ?.let { modelMapper.map(it, isQueuedPlaylist) }
+                ?.let { modelMapper.map(it, isPlaylistPlaying()) }
                 ?.also { view.setModel(it, animate) }
                 .also {
                     state.focusIndex?.apply {
@@ -390,7 +438,12 @@ class PlaylistPresenter(
                                     view.highlightPlayingItem(it)
                                 }
                             },
-                            { state.playlist?.currentIndex?.also { view.scrollToItem(it) } }
+                            {
+                                state.playlist?.currentIndex?.also {
+                                    view.scrollToItem(it)
+                                    view.highlightPlayingItem(it)
+                                }
+                            }
                         )
                     }
                 }
@@ -398,4 +451,6 @@ class PlaylistPresenter(
             log.e("Error loading playlist", e)
         }
     }
+
+    private fun isPlaylistPlaying() = isQueuedPlaylist && ytContextHolder.isConnected()
 }

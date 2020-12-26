@@ -11,5 +11,5 @@ data class PlaylistModel constructor(
     @DrawableRes val playIcon: Int,
     @DrawableRes val starredIcon: Int,
     val isDefault: Boolean,
-    val items: List<ItemContract.PlaylistItemModel>
+    val items: List<ItemContract.PlaylistItemModel>?
 )

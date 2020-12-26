@@ -29,7 +29,7 @@ class PlaylistModelMapper constructor(
                 map(item, index)
             }
         } else {
-            listOf()
+            null
         }
     )
 

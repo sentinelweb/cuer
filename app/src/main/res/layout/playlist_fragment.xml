@@ -22,7 +22,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            android:minHeight="?attr/actionBarSize"
             app:collapsedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Collapsed"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginBottom="28dp"
@@ -124,7 +123,6 @@
             app:layoutManager="LinearLayoutManager"
             tools:context=".ui.playlist.PlaylistFragment"
             tools:listitem="@layout/view_playlist_item"
-
             />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
@@ -170,27 +168,27 @@
         app:srcCompat="@drawable/ic_button_play_black"
         />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/playlist_fab_shownew"
-        style="@style/FabButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="80dp"
-        android:contentDescription="@string/menu_show_unlistened"
-        android:tint="@color/white"
-        app:fabSize="mini"
-        app:layout_anchor="@id/playlist_appbar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_button_new_24"
-        tools:ignore="RtlSymmetry"
-        />
+    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+    <!--        android:id="@+id/playlist_fab_shownew"-->
+    <!--        style="@style/FabButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginEnd="132dp"-->
+    <!--        android:contentDescription="@string/menu_show_unlistened"-->
+    <!--        android:tint="@color/white"-->
+    <!--        app:fabSize="mini"-->
+    <!--        app:layout_anchor="@id/playlist_appbar"-->
+    <!--        app:layout_anchorGravity="bottom|end"-->
+    <!--        app:srcCompat="@drawable/ic_button_new_24"-->
+    <!--        tools:ignore="RtlSymmetry"-->
+    <!--        />-->
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/playlist_fab_playmode"
         style="@style/FabButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="132dp"
+        android:layout_marginEnd="80dp"
         android:contentDescription="@null"
         android:tint="@color/white"
         app:fabSize="mini"

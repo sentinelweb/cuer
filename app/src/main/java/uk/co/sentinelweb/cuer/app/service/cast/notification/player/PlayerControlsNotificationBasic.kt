@@ -79,7 +79,7 @@ class PlayerControlsNotificationBasic constructor(
             BUFFERING ->
                 builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", playPendingIntent)
             ERROR ->
-                builder.addAction(R.drawable.ic_notif_buffer_black, "Error", contentPendingIntent)
+                builder.addAction(R.drawable.ic_baseline_error_24, "Error", contentPendingIntent)
             else -> Unit
         }
         builder.addAction(R.drawable.ic_player_pause_black, "-30s", skipbPendingIntent)

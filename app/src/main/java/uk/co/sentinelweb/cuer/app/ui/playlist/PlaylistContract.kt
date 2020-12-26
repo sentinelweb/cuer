@@ -35,6 +35,8 @@ interface PlaylistContract {
         fun onFilterNewItems(): Boolean
         fun onEdit(): Boolean
         fun onFilterPlaylistItems(): Boolean
+        fun onResume()
+        fun onPause()
     }
 
     interface View {
@@ -53,7 +55,10 @@ interface PlaylistContract {
         fun resetItemsState()
         fun showItemDescription(itemWitId: PlaylistItemDomain)
         fun gotoEdit(id: Long)
+        fun showCastRouteSelectorDialog()
+        fun setPlayState(state: PlayState)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
+    enum class PlayState { PLAYING, CONNECTING, NOT_CONNECTED }
 }

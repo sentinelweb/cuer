@@ -32,11 +32,13 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.PlayState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
+import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
@@ -67,6 +69,7 @@ class PlaylistFragment :
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
     private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
+    private val castDialogWrapper: CastDialogWrapper by inject()
 
     private val starMenuItem: MenuItem
         get() = playlist_toolbar.menu.findItem(R.id.playlist_star)
@@ -132,7 +135,7 @@ class PlaylistFragment :
             }
         })
         playlist_fab_playmode.setOnClickListener { presenter.onPlayModeChange() }
-        playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
+        //playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
         playlist_fab_play.setOnClickListener { presenter.onPlayPlaylist() }
     }
 
@@ -166,6 +169,12 @@ class PlaylistFragment :
             PLAYLIST_ITEM_ID.getLong(arguments),
             PLAY_NOW.getBoolean(arguments) ?: false
         )
+        presenter.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        presenter.onPause()
     }
     // endregion
 
@@ -174,7 +183,7 @@ class PlaylistFragment :
         setHeaderModel(model)
 
         // update list
-        setList(model.items, animate)
+        model.items?.apply { setList(this, animate) }
     }
 
     override fun setList(items: List<ItemContract.PlaylistItemModel>, animate: Boolean) {
@@ -189,7 +198,7 @@ class PlaylistFragment :
         playlist_fab_play.setImageResource(model.playIcon)
         playMenuItem.setIcon(model.playIcon)
         starMenuItem.setIcon(model.starredIcon)
-        playlist_items.setText("${model.items.size}")
+        //playlist_items.setText("${model.items.size}")
         playlist_flags.isVisible = model.isDefault
         playlist_fab_playmode.setImageResource(model.loopModeIcon)
         lastPlayModeIndex = model.loopModeIndex
@@ -247,6 +256,8 @@ class PlaylistFragment :
 
     override fun highlightPlayingItem(currentItemIndex: Int?) {
         adapter.highlightItem = currentItemIndex
+        // todo map it properly
+        playlist_items.setText("${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}")
     }
 
     override fun setSubTitle(subtitle: String) {
@@ -291,6 +302,27 @@ class PlaylistFragment :
 
     override fun resetItemsState() {
         adapter.notifyDataSetChanged()
+    }
+
+    override fun showCastRouteSelectorDialog() {
+        castDialogWrapper.showRouteSelector(childFragmentManager)
+    }
+
+    override fun setPlayState(state: PlaylistContract.PlayState) {
+        when (state) {
+            PLAYING -> {
+                playlist_fab_play.setImageResource(R.drawable.ic_player_pause_black)
+                playMenuItem.setIcon(R.drawable.ic_player_pause_black)
+            }
+            NOT_CONNECTED -> {
+                playlist_fab_play.setImageResource(R.drawable.ic_button_play_black)
+                playMenuItem.setIcon(R.drawable.ic_button_play_black)
+            }
+            CONNECTING -> {
+                playlist_fab_play.setImageResource(R.drawable.ic_notif_buffer_black)// todo copy progress anim dr
+                playMenuItem.setIcon(R.drawable.ic_notif_buffer_black)
+            }
+        }
     }
     //endregion
 
@@ -362,6 +394,7 @@ class PlaylistFragment :
                         queue = get(),
                         toastWrapper = get(),
                         ytContextHolder = get(),
+                        chromeCastWrapper = get(),
                         ytJavaApi = get(),
                         shareWrapper = get(),
                         prefsWrapper = get(named<GeneralPreferences>()),

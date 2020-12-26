@@ -1,8 +1,7 @@
 package uk.co.sentinelweb.cuer.domain.mutator
 
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.LOOP
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlaylistMutator {
@@ -50,33 +49,41 @@ class PlaylistMutator {
         return domain
     }
 
-    // todo shuffle
-    fun gotoPreviousItem(currentPlaylist: PlaylistDomain): PlaylistDomain {
-        if (currentPlaylist.currentIndex > -1) {
-            var newPosition = currentPlaylist.currentIndex
+    fun gotoPreviousItem(playlist: PlaylistDomain): PlaylistDomain {
+        var newPosition = playlist.currentIndex
+        if (playlist.currentIndex > -1) {
             newPosition--
-            if (currentPlaylist.mode == LOOP && newPosition < 0) {
-                newPosition = currentPlaylist.items.size - 1
+            if (playlist.mode == LOOP && newPosition < 0) {
+                newPosition = playlist.items.size - 1
             }
-            return currentPlaylist.copy(currentIndex = newPosition)
+
+        } else if (playlist.mode == SHUFFLE && playlist.items.size > 0) {
+            newPosition = selectRandom(newPosition, playlist)
         }
-        return currentPlaylist
+        return playlist.copy(currentIndex = newPosition)
     }
 
-    // todo shuffle
-    fun gotoNextItem(currentPlaylist: PlaylistDomain): PlaylistDomain {
-        var newPosition = currentPlaylist.currentIndex
-        if (currentPlaylist.mode == LOOP || currentPlaylist.mode == SINGLE) {
-            if (newPosition < currentPlaylist.items.size) {
+    fun gotoNextItem(playlist: PlaylistDomain): PlaylistDomain {
+        var newPosition = playlist.currentIndex
+        if (playlist.mode == LOOP || playlist.mode == SINGLE) {
+            if (newPosition < playlist.items.size) {
                 newPosition++
             }
-            if (currentPlaylist.mode == LOOP &&
-                newPosition >= currentPlaylist.items.size
-            ) {
+            if (playlist.mode == LOOP && newPosition >= playlist.items.size) {
                 newPosition = 0
             }
+        } else if (playlist.mode == SHUFFLE && playlist.items.size > 0) {
+            newPosition = selectRandom(newPosition, playlist)
         }
-        return currentPlaylist.copy(currentIndex = newPosition)
+        return playlist.copy(currentIndex = newPosition)
+    }
+
+    private fun selectRandom(oldIndex: Int, playlist: PlaylistDomain): Int {
+        var newIndex = oldIndex
+        while (newIndex == oldIndex && newIndex < playlist.items.size) {
+            newIndex = (Math.random() * (playlist.items.size)).toInt()
+        }
+        return newIndex
     }
 
     fun playItem(

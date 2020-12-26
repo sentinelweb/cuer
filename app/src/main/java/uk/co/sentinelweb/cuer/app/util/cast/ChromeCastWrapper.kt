@@ -11,6 +11,8 @@ import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.CastContext
+import com.google.android.gms.cast.framework.CastSession
+import com.google.android.gms.cast.framework.SessionManagerListener
 import com.google.android.gms.common.images.WebImage
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.utils.PlayServicesUtils
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -33,9 +35,15 @@ class ChromeCastWrapper(private val application: Application) {
             activity, requestCode, Runnable { okFunc() })
     }
 
-    fun getCastContext() : CastContext = CastContext.getSharedInstance(application)
+    fun getCastContext(): CastContext = CastContext.getSharedInstance(application)
 
     fun killCurrentSession() = getCastContext().sessionManager.endCurrentSession(true)
+
+    fun addSessionListener(listener: SessionManagerListener<CastSession>) =
+        getCastContext().sessionManager.addSessionManagerListener(listener, CastSession::class.java)
+
+    fun removeSessionListener(listener: SessionManagerListener<CastSession>) =
+        getCastContext().sessionManager.addSessionManagerListener(listener, CastSession::class.java)
 
     // from: https://code.tutsplus.com/tutorials/google-play-services-google-cast-v3-and-media--cms-26893
     fun getRemoteClient() =
