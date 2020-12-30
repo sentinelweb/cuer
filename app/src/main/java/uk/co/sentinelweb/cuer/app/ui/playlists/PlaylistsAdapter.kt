@@ -22,6 +22,8 @@ class PlaylistsAdapter constructor(
     val data: List<ItemModel>
         get() = _data
 
+    var currentPlaylistId: Long? = null
+
     fun setData(data: List<ItemModel>, animate: Boolean = true) {
         if (animate) {
             DiffUtil.calculateDiff(
@@ -53,7 +55,9 @@ class PlaylistsAdapter constructor(
 
     @Override
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.itemPresenter.update(_data.get(position))
+        _data.get(position).apply {
+            holder.itemPresenter.update(this, this.id == currentPlaylistId)
+        }
     }
 
     override fun getItemCount(): Int = _data.size

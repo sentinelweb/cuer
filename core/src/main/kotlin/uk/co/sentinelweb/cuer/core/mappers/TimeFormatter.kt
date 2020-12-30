@@ -39,7 +39,6 @@ class TimeFormatter {
     private fun formatter(format: Format = Format.SECS) = when (format) {
         Format.MILLIS -> timeStampFormatterMillis
         Format.SECS -> timeStampFormatterSecs
-        else -> timeStampFormatterSecs
     }
 
     private fun String.strip00() = this.let {

@@ -36,7 +36,7 @@
             android:name=".ui.share.ShareActivity"
             android:label="@string/app_name"
             android:launchMode="standard"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme">
 
             <nav-graph android:value="@navigation/deeplink" />
 

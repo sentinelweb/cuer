@@ -93,6 +93,7 @@ class PlaylistsFragment :
             .into(playlists_header_image)
         playlists_swipe.isRefreshing = false
         playlists_items.text = "${model.items.size}"
+        adapter.currentPlaylistId = model.currentPlaylistId
         adapter.setData(model.items, animate)
         playlists_swipe.setOnRefreshListener { presenter.refreshList() }
     }
@@ -179,10 +180,9 @@ class PlaylistsFragment :
                     PlaylistsPresenter(
                         view = get(),
                         state = get(),
-                        repository = get(),
                         playlistRepository = get(),
                         modelMapper = get(),
-                        contextProvider = get(),
+                        queue = get(),
                         log = get(),
                         toastWrapper = get(),
                         prefsWrapper = get(named<GeneralPreferences>())

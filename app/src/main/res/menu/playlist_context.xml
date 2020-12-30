@@ -3,52 +3,52 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
-
+<!-- todo try removing icon tint and inherit form ContextMenu style -->
     <item
         android:id="@+id/playlist_context_view"
         android:icon="@drawable/ic_menu_info_black"
         android:title="@string/playlist_item_menu_view"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="@color/popup_menu_item_enabled"
         />
 
     <item
         android:id="@+id/playlist_context_play"
         android:icon="@drawable/ic_menu_play_black"
         android:title="@string/playlist_item_menu_play"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="@color/popup_menu_item_enabled"
         />
     <item
         android:id="@+id/playlist_context_play_start"
         android:icon="@drawable/ic_menu_play_start_black"
         android:title="@string/playlist_item_menu_play_start"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="@color/popup_menu_item_enabled"
         />
 
     <item
         android:id="@+id/playlist_context_play_external"
         android:icon="@drawable/ic_menu_launch_black"
         android:title="@string/menu_play_yt"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="@color/popup_menu_item_enabled"
         />
 
     <item
         android:id="@+id/playlist_context_channel_external"
         android:icon="@drawable/ic_menu_subscriptions_black"
         android:title="@string/playlist_item_menu_channel_yt"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="@color/popup_menu_item_enabled"
         />
 
     <item
         android:id="@+id/playlist_context_star"
         android:icon="@drawable/ic_menu_unstarred_black"
         android:title="@string/playlist_item_menu_star"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="@color/popup_menu_item_enabled"
         />
 
     <item
         android:id="@+id/playlist_context_share"
         android:icon="@drawable/ic_menu_share_black"
         android:title="@string/playlist_item_menu_share"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="@color/popup_menu_item_enabled"
         />
 </menu>

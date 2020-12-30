@@ -8,8 +8,8 @@ class ItemPresenter(
     val state: ItemState
 ) : ItemContract.Presenter, ItemContract.External {
 
-    override fun update(item: ItemModel) {
-        view.setTopText(item.title)
+    override fun update(item: ItemModel, current: Boolean) {
+        view.setTopText((if (current) "> " else "") + item.title)
         view.setBottomText(item.data)
         view.setCheckedVisible(item.checkIcon)
         item.thumbNailUrl

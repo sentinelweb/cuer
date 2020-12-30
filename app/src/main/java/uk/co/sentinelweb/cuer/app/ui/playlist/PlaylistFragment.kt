@@ -391,7 +391,6 @@ class PlaylistFragment :
                         repository = get(),
                         playlistRepository = get(),
                         modelMapper = get(),
-                        contextProvider = get(),
                         queue = get(),
                         toastWrapper = get(),
                         ytContextHolder = get(),
@@ -405,7 +404,7 @@ class PlaylistFragment :
                         timeProvider = get()
                     )
                 }
-                scoped { PlaylistModelMapper(res = get()) }
+                scoped { PlaylistModelMapper(res = get(), timeFormatter = get(), timeSinceFormatter = get()) }
                 scoped { PlaylistAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }

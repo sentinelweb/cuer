@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
+import android.text.SpannableString
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
@@ -53,6 +54,8 @@ interface ItemContract {
         val title: String,
         val length: String,
         val positon: String,
-        val thumbNailUrl: String?
+        val thumbNailUrl: String?,
+        val bottomText: SpannableString,
+        val progress: Float
     ) : ItemBaseModel(id)
 }

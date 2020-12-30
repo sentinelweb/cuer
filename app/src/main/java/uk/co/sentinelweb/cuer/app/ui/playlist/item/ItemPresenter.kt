@@ -12,13 +12,13 @@ class ItemPresenter(
         item: ItemContract.PlaylistItemModel,
         highlightPlaying: Boolean
     ) {
-        view.setTopText(item.title)
+        view.setTopText((if (highlightPlaying) "> " else "") + item.title)
         view.setBottomText(item.url)
         view.setCheckedVisible(false)
         item.thumbNailUrl
             ?.apply { view.setIconUrl(this) }
             ?: view.setIconResource(R.drawable.ic_platform_youtube_24_black)
-        view.setBackground(if (highlightPlaying) R.color.playing_item_background else R.color.white)
+        //view.setBackground(if (highlightPlaying) R.color.playing_item_background else R.color.white)
         state.item = item
     }
 

@@ -5,8 +5,9 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistsModelMapper constructor() {
 
-    fun map(domains: List<PlaylistDomain>): PlaylistsModel = PlaylistsModel(
+    fun map(domains: List<PlaylistDomain>, current: Long?): PlaylistsModel = PlaylistsModel(
         DEFAULT_HEADER_IMAGE,
+        current,
         domains.mapIndexed { index, pl ->
             ItemModel(
                 pl.id!!,

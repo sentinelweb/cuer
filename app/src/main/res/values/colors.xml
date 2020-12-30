@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">@color/red_600</color>
-    <color name="primary_dark">@color/deep_red</color>
-    <color name="accent">@color/light_blue_700</color>
-    <color name="control_normal">@color/grey_400</color>
+    <color name="primary_on">@color/white</color>
+    <color name="primary_variant">@color/red_800</color>
+    <color name="primary_dark">@color/dark_red</color>
+    <color name="secondary">@color/indigo_600</color>
+    <color name="secondary_on">@color/white</color>
+    <color name="secondary_variant">@color/indigo_800</color>
+    <color name="secondary_dark">@color/dark_indigo</color>
+    <color name="text_primary">@color/grey_900</color>
+    <color name="text_secondary">@color/grey_600</color>
+    <color name="surface">@color/grey_50</color>
+    <color name="background">@color/white</color>
+    <color name="accent">@color/light_green_700</color><!-- links, etc -->
+    <color name="control_control_normal">@color/grey_400</color>
+    <color name="control_control_activated">@color/grey_600</color>
+    <color name="control_control_highlight">@color/grey_100</color>
 
-    <color name="text_light">@color/grey_400</color>
-    <color name="text_normal">@color/grey_800</color>
-    <color name="popup_menu_text">@color/grey_800</color>
-    <color name="popup_menu_icon_tint">@color/grey_400</color>
+    <color name="popup_menu_item_enabled">@color/text_secondary</color>
+
     <color name="fab_button_icon_tint">@color/white</color>
     <color name="button_fg_tint">@color/white</color>
     <color name="menu_button_icon_tint">@color/white</color>
@@ -16,6 +26,7 @@
     <color name="playing_item_background">@color/red_50</color>
 
     <!--    custom colors-->
-    <color name="deep_red">#961717</color>
+    <color name="dark_red">#961717</color>
+    <color name="dark_indigo">#1e245f</color>
     <color name="header_transparent_background">#8a000000</color>
 </resources>

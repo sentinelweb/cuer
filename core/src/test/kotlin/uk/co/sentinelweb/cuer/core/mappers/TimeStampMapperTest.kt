@@ -2,9 +2,10 @@ package uk.co.sentinelweb.cuer.core.mappers
 
 import org.junit.Before
 import org.junit.Test
+import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 
 class TimeStampMapperTest {
-    private val sut = TimeStampMapper()
+    private val sut = TimeStampMapper(SystemLogWrapper())
 
     @Before
     fun setUp() {

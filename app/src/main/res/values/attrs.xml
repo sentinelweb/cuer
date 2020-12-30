@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="colorCheckIcon" format="color" />
+    <attr name="colorDelete" format="color" />
+    <attr name="colorMove" format="color" />
+    <attr name="colorEdit" format="color" />
+</resources>

@@ -63,6 +63,10 @@
     <!-- local player -->
     <string name="title_activity_fullscreen">YoutubeFullscreenActivity</string>
 
+    <!-- generic contentdescription -->
+    <string name="cd_overflow">More actions</string>
+    <string name="cd_check">Select item</string>
+
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="menu_settings">Settings</string>
@@ -81,5 +85,8 @@
     <string name="menu_show_unlistened">Show unlistened</string>
     <string name="default_playlist">Default</string>
     <string name="dash">-</string>
+    <string name="pls_item_edit">Edit</string>
+    <string name="pls_item_delete">Delete</string>
+
 
 </resources>

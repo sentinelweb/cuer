@@ -45,7 +45,6 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     private fun showContextualMenu() {
 
         val wrapper = ContextThemeWrapper(context, R.style.ContextMenu)
-        //val wrapper = context
         val popup = PopupMenu(wrapper, listitem_overflow_click)
         popup.inflate(R.menu.playlists_context)
         popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. -->
+    <!-- https://medium.com/androiddevelopers/android-styling-common-theme-attributes-8f7c50c9eaba -->
+    <!--    https://material.io/design/color/the-color-system.html#color-usage-and-palettes-->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorOnPrimary">@color/primary_on</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary_variant</item>
+        <item name="colorOnSecondary">@color/secondary_on</item>
+
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorControlNormal">@color/control_control_normal</item>
+        <item name="colorControlActivated">@color/control_control_activated</item>
+        <item name="colorControlHighlight">@color/control_control_highlight</item>
+        <item name="android:colorControlNormal">@color/control_control_normal</item>
+        <item name="android:colorControlActivated">@color/control_control_activated</item>
+        <item name="android:colorControlHighlight">@color/control_control_highlight</item>
+
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+
+        <item name="colorSurface">@color/surface</item>
+        <item name="android:colorBackground">@color/background</item>
+
+        <item name="android:statusBarColor">?colorPrimaryDark</item>
+        <item name="android:navigationBarColor">?colorPrimaryDark</item>
+
+        <!-- custom attributes -->
+        <item name="colorCheckIcon">@color/green_700</item>
+        <item name="colorDelete">@color/red_600</item>
+        <item name="colorMove">@color/blue_600</item>
+        <item name="colorEdit">@color/green_600</item>
+
+        <item name="android:popupMenuStyle">@style/ContextMenu</item>
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
+        <!--        <item name="android:windowBackground">@color/primary_dark</item>-->
+    </style>
+
+</resources>

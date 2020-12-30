@@ -21,7 +21,7 @@ interface ItemContract {
     }
 
     interface External {
-        fun update(item: ItemModel)
+        fun update(item: ItemModel, current: Boolean)
         fun doLeft()
         fun doRight()
     }

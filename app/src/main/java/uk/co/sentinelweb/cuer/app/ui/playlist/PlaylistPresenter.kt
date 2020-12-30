@@ -18,7 +18,6 @@ import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -36,7 +35,6 @@ class PlaylistPresenter(
     private val repository: MediaDatabaseRepository,
     private val playlistRepository: PlaylistDatabaseRepository,
     private val modelMapper: PlaylistModelMapper,
-    private val contextProvider: CoroutineContextProvider,
     private val queue: QueueMediatorContract.Producer,
     private val toastWrapper: ToastWrapper,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,

@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.app.ui.playlists
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModel
@@ -11,7 +10,6 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -19,10 +17,9 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 class PlaylistsPresenter(
     private val view: PlaylistsContract.View,
     private val state: PlaylistsState,
-    private val repository: MediaDatabaseRepository,
     private val playlistRepository: PlaylistDatabaseRepository,
+    private val queue: QueueMediatorContract.Producer,
     private val modelMapper: PlaylistsModelMapper,
-    private val contextProvider: CoroutineContextProvider,
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
@@ -124,7 +121,7 @@ class PlaylistsPresenter(
             ?: listOf()
 
         state.playlists
-            .let { modelMapper.map(it) }
+            .let { modelMapper.map(it, queue.playlistId) }
             .also { view.setList(it, animate) }
             .takeIf { focusCurrent }
             ?.let {
