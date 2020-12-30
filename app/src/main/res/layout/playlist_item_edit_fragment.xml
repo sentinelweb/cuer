@@ -79,13 +79,8 @@
 
             <TextView
                 android:id="@+id/ple_duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
+                style="@style/Header.InfoText"
                 android:layout_marginTop="64dp"
-                android:background="@color/black_text_secondary"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-                android:textColor="@color/white"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="1:00:00"
                 />
@@ -123,7 +118,6 @@
                 android:id="@+id/ple_author_image"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:background="@color/purple_400"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:contentDescription="@null"

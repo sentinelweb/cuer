@@ -9,7 +9,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialog
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -33,6 +36,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.util.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -49,12 +53,24 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
 
     private val starMenuItem: MenuItem
-        get() = ple_toolbar.menu.findItem(R.id.share_star)
+        get() = ple_toolbar.menu.findItem(R.id.plie_star)
     private val playMenuItem: MenuItem
-        get() = ple_toolbar.menu.findItem(R.id.share_play)
+        get() = ple_toolbar.menu.findItem(R.id.plie_play)
 
     private var dialog: AppCompatDialog? = null
     private var createPlaylistDialog: DialogFragment? = null
+
+    // todo extract
+    private val errDrawable by lazy {
+        ContextCompat.getDrawable(requireContext(), R.drawable.ic_platform_youtube_24_black)?.apply {
+            DrawableCompat.setTint(this, ContextCompat.getColor(requireContext(), R.color.primary))
+        }
+    }
+
+    private object menuState {
+        var modelEmpty = false
+        var scrolledDown = false
+    }
 
     init {
         log.tag(this)
@@ -80,6 +96,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         ple_star_fab.setOnClickListener { viewModel.onStarClick() }
         starMenuItem.isVisible = false
         playMenuItem.isVisible = false
+        ple_author_image.setOnClickListener { viewModel.onChannelClick() }
         ple_desc.setMovementMethod(object : LinkMovementMethod() {
             override fun handleMovementKey(
                 widget: TextView?,
@@ -94,11 +111,11 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         })
         ple_toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.share_star -> {
+                R.id.plie_star -> {
                     viewModel.onStarClick()
                     true
                 }
-                R.id.share_play -> {
+                R.id.plie_play -> {
                     viewModel.onPlayVideoLocal()
                     true
                 }
@@ -117,13 +134,15 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    starMenuItem.isVisible = ple_star_fab.isVisible
-                    playMenuItem.isVisible = ple_star_fab.isVisible
+                    starMenuItem.isVisible = !menuState.modelEmpty
+                    playMenuItem.isVisible = !menuState.modelEmpty
+
                 } else if (isShow) {
                     isShow = false
                     starMenuItem.isVisible = false
                     playMenuItem.isVisible = false
                 }
+                menuState.scrolledDown = isShow
             }
         })
         observeModel()
@@ -161,22 +180,32 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     ple_title_pos.isVisible = !model.empty
                     ple_duration.isVisible = !model.empty
                     ple_star_fab.isVisible = !model.empty
-                    starMenuItem.setVisible(!model.empty)
-                    playMenuItem.setVisible(!model.empty)
+                    if (menuState.scrolledDown) {
+                        starMenuItem.isVisible = !model.empty
+                        playMenuItem.isVisible = !model.empty
+                    } else {
+                        starMenuItem.isVisible = false
+                        playMenuItem.isVisible = false
+                    }
                     Glide.with(ple_image)
                         .load(model.imageUrl)
                         .into(ple_image)
-                    ple_desc.setText(model.description)
-                    ple_title.setText(model.title)
+                    ple_desc.text = model.description
+                    ple_title.text = model.title
                     ple_toolbar.title = model.title
-
+                    menuState.modelEmpty = model.empty
                     if (model.empty) {
                         return
                     }
 
-                    Glide.with(ple_author_image)
-                        .load(model.channelThumbUrl)
-                        .into(ple_author_image)
+                    model.channelThumbUrl?.apply {
+                        Glide.with(ple_author_image)
+                            .load(this)
+                            .circleCrop()
+                            .into(ple_author_image)
+                            .onLoadFailed(errDrawable)
+                    } ?: run { ple_author_image.setImageDrawable(errDrawable) }
+
                     ple_chips.removeAllViews()
                     model.chips.forEach { chipModel ->
                         chipCreator.create(chipModel, ple_chips)?.apply {
@@ -283,9 +312,11 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     NavigationMapper(
                         activity = (getSource() as Fragment).requireActivity(),
                         toastWrapper = get(),
-                        fragment = (getSource() as Fragment)
+                        fragment = (getSource() as Fragment),
+                        ytJavaApi = get()
                     )
                 }
+                scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped {
                     ChipCreator((getSource() as Fragment).requireActivity(), get(), get())
                 }

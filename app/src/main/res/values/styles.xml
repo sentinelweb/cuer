@@ -5,6 +5,24 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <!-- Headers =========================== -->
+    <style name="Header" />
+
+    <style name="Header.InfoText">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">top|end</item>
+        <item name="android:layout_marginTop">84dp</item>
+        <item name="android:background">@color/black_text_secondary</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1
+        </item>
+    </style>
+
+
+    <!-- end Headers =========================== -->
+
     <!-- ItemView =========================== -->
     <style name="ItemView" />
 
@@ -47,18 +65,23 @@
 
     <style name="ItemView.TopText" parent="@style/TextAppearance.AppCompat.Small">
         <item name="android:textSize">16sp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:paddingEnd">4dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:padding">4dp</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">1</item>
     </style>
 
     <style name="ItemView.BottomText" parent="@style/TextAppearance.AppCompat.Small">
         <item name="android:textSize">14sp</item>
-        <item name="android:padding">4dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingEnd">4dp</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
-        <item name="android:layout_margin">0dp</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">1</item>
     </style>
@@ -87,10 +110,41 @@
     </style>
 
     <style name="ContextMenu" parent="Widget.AppCompat.PopupMenu">
-        <item name="android:textColor">@color/popup_menu_item_enabled</item>
-        <item name="android:iconTint">@color/popup_menu_item_enabled</item>
+        <item name="android:textColor">?contextMenuItemColor</item>
+        <item name="android:iconTint">?contextMenuItemColor</item>
     </style>
     <!-- end ItemView =========================== -->
+
+    <!-- CompactPlayer =========================== -->
+    <style name="CompactPlayer" />
+
+    <style name="CompactPlayer.Button">
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:layout_width">@dimen/player_button_size</item>
+        <item name="android:layout_height">@dimen/player_button_size</item>
+        <item name="android:padding">@dimen/player_button_padding</item>
+        <item name="android:tint">?playerButtonColor</item>
+    </style>
+    <!-- end CompactPlayer =========================== -->
+
+    <!-- Chips =========================== -->
+    <style name="Chip" />
+
+    <style name="Chip.SelectPlaylist" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="chipIcon">@drawable/ic_chip_playlist_black</item>
+        <item name="chipIconSize">20dp</item>
+        <item name="chipIconTint">@color/chip_icon_tint</item>
+    </style>
+
+    <style name="Chip.Playlist" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="chipIconSize">@dimen/chip_thumb_icon_size</item>
+        <item name="chipIconVisible">true</item>
+        <item name="android:checkable">false</item>
+    </style>
+    <!-- end Chips =========================== -->
+
 
     <style name="FullscreenTheme" parent="AppTheme">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>

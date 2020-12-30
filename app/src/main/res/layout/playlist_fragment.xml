@@ -46,31 +46,20 @@
 
             <TextView
                 android:id="@+id/playlist_items"
+                style="@style/Header.InfoText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="84dp"
-                android:background="@color/black_text_secondary"
-                android:padding="4dp"
                 android:text="@string/dash"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-                android:textColor="@color/white"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="800"
                 />
 
             <TextView
                 android:id="@+id/playlist_flags"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
+                style="@style/Header.InfoText"
                 android:layout_marginTop="118dp"
-                android:background="@color/black_text_secondary"
-                android:padding="4dp"
                 android:text="@string/default_playlist"
                 android:visibility="gone"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-                android:textColor="@color/white"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Default"
                 />

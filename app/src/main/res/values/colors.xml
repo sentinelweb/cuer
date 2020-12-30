@@ -17,13 +17,13 @@
     <color name="control_control_activated">@color/grey_600</color>
     <color name="control_control_highlight">@color/grey_100</color>
 
-    <color name="popup_menu_item_enabled">@color/text_secondary</color>
 
-    <color name="fab_button_icon_tint">@color/white</color>
-    <color name="button_fg_tint">@color/white</color>
-    <color name="menu_button_icon_tint">@color/white</color>
-
-    <color name="playing_item_background">@color/red_50</color>
+    <color name="default_tint">@color/white</color>
+    <color name="fab_button_icon_tint">@color/default_tint</color>
+    <color name="button_fg_tint">@color/default_tint</color>
+    <color name="menu_button_icon_tint">@color/default_tint</color>
+    <color name="chip_icon_tint">@color/black</color>
+    <color name="player_button_tint">@color/black</color>
 
     <!--    custom colors-->
     <color name="dark_red">#961717</color>

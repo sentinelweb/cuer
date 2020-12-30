@@ -6,17 +6,17 @@ import android.net.Uri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.LINK
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA_ID
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.WEB_LINK
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 
 class NavigationMapper constructor(
     private val activity: Activity,
     private val toastWrapper: ToastWrapper,
-    private val fragment: Fragment? = null
+    private val fragment: Fragment? = null,
+    private val ytJavaApi: YoutubeJavaApiWrapper
 ) {
 
     fun map(nav: NavigationModel) {
@@ -34,9 +34,11 @@ class NavigationMapper constructor(
                         )
                     )
                 } ?: throw IllegalArgumentException("$WEB_LINK: $LINK param required")
-            NavigationModel.Target.NAV_BACK -> fragment?.findNavController()?.popBackStack()
+            NAV_BACK -> fragment?.findNavController()?.popBackStack()
                 ?: throw IllegalStateException("Fragment unavailable")
-
+            YOUTUBE_CHANNEL -> if (!ytJavaApi.launchChannel(nav.params[CHANNEL_ID] as String)) {
+                toastWrapper.show("can't launch channel")
+            }
             else -> toastWrapper.show("Cannot launch ${nav.target}")
         }
     }

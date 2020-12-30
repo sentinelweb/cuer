@@ -77,19 +77,13 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/cast_player_play"
-            android:background="?selectableItemBackground"
-            android:layout_width="@dimen/player_button_size"
-            android:layout_height="@dimen/player_button_size"
-            android:padding="@dimen/player_button_padding"
+            style="@style/CompactPlayer.Button"
             android:src="@drawable/ic_player_play_black"
             />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/cast_player_pause"
-            android:background="?selectableItemBackground"
-            android:layout_width="@dimen/player_button_size"
-            android:layout_height="@dimen/player_button_size"
-            android:padding="@dimen/player_button_padding"
+            style="@style/CompactPlayer.Button"
             android:src="@drawable/ic_player_pause_black"
 
             />
@@ -106,44 +100,32 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_seek_back"
-        android:background="?selectableItemBackground"
-        android:layout_width="@dimen/player_button_size"
-        android:layout_height="@dimen/player_button_size"
+        style="@style/CompactPlayer.Button"
         android:src="@drawable/ic_player_fast_rewind_black"
-        android:padding="@dimen/player_button_padding"
         app:layout_constraintRight_toLeftOf="@id/cast_player_center"
         app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_seek_forward"
-        android:background="?selectableItemBackground"
-        android:layout_width="@dimen/player_button_size"
-        android:layout_height="@dimen/player_button_size"
+        style="@style/CompactPlayer.Button"
         android:src="@drawable/ic_player_fast_forward_black"
-        android:padding="@dimen/player_button_padding"
         app:layout_constraintLeft_toRightOf="@id/cast_player_center"
         app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_track_last"
-        android:background="?selectableItemBackground"
-        android:layout_width="@dimen/player_button_size"
-        android:layout_height="@dimen/player_button_size"
+        style="@style/CompactPlayer.Button"
         android:src="@drawable/ic_player_skip_b_black"
-        android:padding="@dimen/player_button_padding"
         app:layout_constraintRight_toLeftOf="@id/cast_player_seek_back"
         app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cast_player_track_next"
-        android:background="?selectableItemBackground"
-        android:layout_width="@dimen/player_button_size"
-        android:layout_height="@dimen/player_button_size"
+        style="@style/CompactPlayer.Button"
         android:src="@drawable/ic_player_skip_f_black"
-        android:padding="@dimen/player_button_padding"
         app:layout_constraintLeft_toRightOf="@id/cast_player_seek_forward"
         app:layout_constraintTop_toTopOf="parent"
         />

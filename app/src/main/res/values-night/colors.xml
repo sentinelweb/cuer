@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--    <color name="primary">@color/red_600</color>-->
+    <color name="primary_on">@color/white</color>
+    <!--    <color name="primary_variant">@color/red_800</color>-->
+    <!--    <color name="primary_dark">@color/dark_red</color>-->
+    <!--    <color name="secondary">@color/indigo_600</color>-->
+    <color name="secondary_on">@color/white</color>
+    <!--    <color name="secondary_variant">@color/indigo_800</color>-->
+    <!--    <color name="secondary_dark">@color/dark_indigo</color>-->
+    <color name="text_primary">@color/grey_50</color>
+    <color name="text_secondary">@color/grey_300</color>
+    <color name="surface">@color/grey_900</color>
+    <color name="background">@color/black</color>
+    <color name="accent">@color/light_green_300</color><!-- links, etc -->
+    <color name="control_control_normal">@color/grey_600</color>
+    <color name="control_control_activated">@color/grey_400</color>
+    <color name="control_control_highlight">@color/grey_900</color>
+
+    <!--    <color name="fab_button_icon_tint">@color/white</color>-->
+    <!--    <color name="button_fg_tint">@color/white</color>-->
+    <!--    <color name="menu_button_icon_tint">@color/white</color>-->
+    <color name="chip_icon_tint">@color/default_tint</color>
+    <color name="player_button_tint">@color/white</color>
+
+    <!--    custom colors-->
+    <!--    <color name="dark_red">#961717</color>-->
+    <!--    <color name="dark_indigo">#1e245f</color>-->
+    <!--    <color name="header_transparent_background">#8a000000</color>-->
+</resources>

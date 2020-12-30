@@ -32,7 +32,7 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
     private val softKeyboard: SoftKeyboardWrapper by inject()
 
     private val starMenuItem: MenuItem
-        get() = pe_toolbar.menu.findItem(R.id.share_star)
+        get() = pe_toolbar.menu.findItem(R.id.plie_star)
 
     internal var listener: Listener? = null
 
@@ -63,7 +63,7 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
         starMenuItem.isVisible = false
         pe_toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.share_star -> {
+                R.id.plie_star -> {
                     viewModel.onStarClick()
                     true
                 }

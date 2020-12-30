@@ -5,19 +5,21 @@
     >
 
     <item
-        android:id="@+id/share_play"
+        android:id="@+id/plie_play"
         android:icon="@drawable/ic_menu_play_black"
         android:title="@string/menu_play"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="ifRoom"
+        android:visible="false"
         />
 
     <item
-        android:id="@+id/share_star"
+        android:id="@+id/plie_star"
         android:icon="@drawable/ic_button_unstarred_white"
         android:title="@string/menu_star"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="ifRoom"
+        android:visible="false"
         />
 
 </menu>

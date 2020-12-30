@@ -4,4 +4,6 @@
     <attr name="colorDelete" format="color" />
     <attr name="colorMove" format="color" />
     <attr name="colorEdit" format="color" />
+    <attr name="playerButtonColor" format="color" />
+    <attr name="contextMenuItemColor" format="color" />
 </resources>

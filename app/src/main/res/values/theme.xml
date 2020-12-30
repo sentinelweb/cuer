@@ -3,7 +3,7 @@
     <!-- Base application theme. -->
     <!-- https://medium.com/androiddevelopers/android-styling-common-theme-attributes-8f7c50c9eaba -->
     <!--    https://material.io/design/color/the-color-system.html#color-usage-and-palettes-->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -35,6 +35,8 @@
         <item name="colorDelete">@color/red_600</item>
         <item name="colorMove">@color/blue_600</item>
         <item name="colorEdit">@color/green_600</item>
+        <item name="contextMenuItemColor">?android:textColorSecondary</item>
+        <item name="playerButtonColor">@color/player_button_tint</item>
 
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>

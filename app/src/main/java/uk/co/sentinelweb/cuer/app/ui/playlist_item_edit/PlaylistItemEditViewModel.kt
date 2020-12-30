@@ -12,8 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.LINK
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -150,6 +149,12 @@ class PlaylistItemEditViewModel constructor(
         update()
     }
 
+    fun onChannelClick() {
+        state.media?.channelData?.platformId?.let { channelId ->
+            _navigateLiveData.value = NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to channelId))
+        }
+    }
+
     private fun update() {
         state.model = modelMapper.map(state.media!!, selectedPlaylists)
         _modelLiveData.value = state.model
@@ -202,6 +207,4 @@ class PlaylistItemEditViewModel constructor(
     }
 
     fun getCommittedItems() = state.committedItems ?: listOf()
-
-
 }
