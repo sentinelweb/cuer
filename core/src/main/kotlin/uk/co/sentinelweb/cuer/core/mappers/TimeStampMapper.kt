@@ -22,13 +22,18 @@ class TimeStampMapper constructor(
     fun mapTimestamp(dateString: String): LocalDateTime? = try {
         LocalDateTime.parse(dateString, timeStampFormatter)
     } catch (e: Exception) {
-        log.e("mapTimestampcould not parse : $dateString", e)
+        log.e("mapTimestamp could not parse : $dateString", e)
         null
     }
 
     fun mapTimestamp(date: LocalDateTime) = timeStampFormatter.format(date)
 
-    fun mapDuration(duration: String) = Duration.parse(duration).toMillis()
+    fun mapDuration(duration: String) = try {
+        Duration.parse(duration).toMillis()
+    } catch (e: Exception) {
+        log.e("mapDuration.could not parse : $duration", e)
+        null
+    }
 
     fun mapDateTimeSimple(date: LocalDateTime): String = simpleTimeStampFormatter.format(date)
 
@@ -40,7 +45,7 @@ class TimeStampMapper constructor(
     }
 
     companion object {
-        private const val TIMESTAMP_PATTERN = "uuuu-MM-dd'T'HH:mm:ss[.S[S][S][S][S][S]]'Z'"
+        private const val TIMESTAMP_PATTERN = "uuuu-MM-dd'T'HH:mm:ss[.n]'Z'"
         private const val SIMPLE_DATETIME_PATTERN = "uuuu-MM-dd_HH:mm:ss"
     }
 }

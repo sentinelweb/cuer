@@ -52,7 +52,7 @@ class CuerApp : Application() {
     fun setDefaultExceptionHander() {
         Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
             firebaseWrapper.logMessage("Thread Name: ${paramThread.name} state:${paramThread.state} group:${paramThread.threadGroup?.name}")
-            log.e("Global Exception", paramThrowable)
+            log.e("FATAL Global Exception", paramThrowable)
             if (oldHandler != null) {
                 oldHandler.uncaughtException(paramThread, paramThrowable)
             } else {
