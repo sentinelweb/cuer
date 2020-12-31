@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
+import androidx.annotation.DrawableRes
+import androidx.lifecycle.ViewModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -14,15 +16,15 @@ interface PlaylistContract {
         fun destroy()
         fun refreshList()
         fun setFocusMedia(mediaDomain: MediaDomain)
-        fun onItemSwipeRight(item: ItemContract.PlaylistItemModel)
-        fun onItemSwipeLeft(item: ItemContract.PlaylistItemModel)
-        fun onItemClicked(item: ItemContract.PlaylistItemModel)
-        fun onItemPlay(item: ItemContract.PlaylistItemModel, external: Boolean)
-        fun onItemShowChannel(item: ItemContract.PlaylistItemModel)
-        fun onItemStar(item: ItemContract.PlaylistItemModel)
-        fun onItemShare(item: ItemContract.PlaylistItemModel)
-        fun onPlayStartClick(item: ItemContract.PlaylistItemModel)
-        fun onItemViewClick(item: ItemContract.PlaylistItemModel)
+        fun onItemSwipeRight(item: ItemContract.Model)
+        fun onItemSwipeLeft(item: ItemContract.Model)
+        fun onItemClicked(item: ItemContract.Model)
+        fun onItemPlay(item: ItemContract.Model, external: Boolean)
+        fun onItemShowChannel(item: ItemContract.Model)
+        fun onItemStar(item: ItemContract.Model)
+        fun onItemShare(item: ItemContract.Model)
+        fun onPlayStartClick(item: ItemContract.Model)
+        fun onItemViewClick(item: ItemContract.Model)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
@@ -40,9 +42,9 @@ interface PlaylistContract {
     }
 
     interface View {
-        fun setModel(model: PlaylistModel, animate: Boolean = true)
-        fun setHeaderModel(model: PlaylistModel)
-        fun setList(items: List<ItemContract.PlaylistItemModel>, animate: Boolean)
+        fun setModel(model: Model, animate: Boolean = true)
+        fun setHeaderModel(model: Model)
+        fun setList(items: List<ItemContract.Model>, animate: Boolean)
         fun scrollToItem(index: Int)
         fun scrollTo(direction: ScrollDirection)
         fun playLocal(media: MediaDomain)
@@ -61,4 +63,26 @@ interface PlaylistContract {
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
     enum class PlayState { PLAYING, CONNECTING, NOT_CONNECTED }
+
+    data class State constructor(
+        var playlistId: Long? = null,
+        var playlist: PlaylistDomain? = null,
+        var deletedPlaylistItem: PlaylistItemDomain? = null,
+        var focusIndex: Int? = null,
+        var lastFocusIndex: Int? = null, // used for undo
+        var dragFrom: Int? = null,
+        var dragTo: Int? = null,
+        var selectedPlaylistItem: PlaylistItemDomain? = null
+    ) : ViewModel()
+
+    data class Model constructor(
+        val title: String,
+        val imageUrl: String,
+        val loopModeIndex: Int,
+        @DrawableRes val loopModeIcon: Int,
+        @DrawableRes val playIcon: Int,
+        @DrawableRes val starredIcon: Int,
+        val isDefault: Boolean,
+        val items: List<ItemContract.Model>?
+    )
 }

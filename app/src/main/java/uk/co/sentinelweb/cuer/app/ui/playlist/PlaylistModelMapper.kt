@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import android.text.SpannableString
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -10,6 +9,7 @@ import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import java.time.OffsetDateTime
 
 
 class PlaylistModelMapper constructor(
@@ -18,7 +18,7 @@ class PlaylistModelMapper constructor(
     private val timeFormatter: TimeFormatter
 ) {
 
-    fun map(domain: PlaylistDomain, isPlaying: Boolean, mapItems: Boolean = true): PlaylistModel = PlaylistModel(
+    fun map(domain: PlaylistDomain, isPlaying: Boolean, mapItems: Boolean = true): PlaylistContract.Model = PlaylistContract.Model(
         domain.title,
         domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         domain.mode.ordinal,
@@ -37,22 +37,27 @@ class PlaylistModelMapper constructor(
         }
     )
 
-    private fun map(item: PlaylistItemDomain, index: Int): ItemContract.PlaylistItemModel {
+    private fun map(item: PlaylistItemDomain, index: Int): ItemContract.Model {
         val top = item.media.title ?: "No title"
         val pos = item.media.positon?.toFloat() ?: 0f
-        val bottom = SpannableString("[star] [pos] [pub]/[wat]")
-        //bottom.setSpan(ImageSpan(res.getDrawable(if (item.media.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_starred_white , R.color.col)), 7, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        return ItemContract.PlaylistItemModel(
+        val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f
+        return ItemContract.Model(
             item.id!!,
             index = index,
             url = item.media.url,
             type = item.media.mediaType,
             title = top,
-            length = item.media.duration?.let { "${it / 1000}s" } ?: "-",
-            positon = item.media.positon?.let { "${it / 1000}s" } ?: "-",
+            duration = item.media.duration?.let { timeFormatter.formatMillis(it) } ?: "-",
+            positon = "" + (progress * 100).toInt() + "%",
             thumbNailUrl = item.media.thumbNail?.url,
-            bottomText = bottom,
-            progress = item.media.duration?.let { pos * it.toFloat() } ?: 0f
+            progress = progress,
+            starred = item.media.starred,
+            watched = item.media.dateLastPlayed?.let { timeSinceFormatter.formatTimeSince(it.toEpochMilli()) } ?: "-",
+            published = item.media.published?.let {
+                timeSinceFormatter.formatTimeSince(
+                    it.toInstant(OffsetDateTime.now().getOffset()).toEpochMilli()
+                )
+            } ?: "-"
         )
     }
 

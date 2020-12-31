@@ -180,20 +180,20 @@ class PlaylistFragment :
     // endregion
 
     // region PlaylistContract.View
-    override fun setModel(model: PlaylistModel, animate: Boolean) {
+    override fun setModel(model: PlaylistContract.Model, animate: Boolean) {
         setHeaderModel(model)
 
         // update list
         model.items?.apply { setList(this, animate) }
     }
 
-    override fun setList(items: List<ItemContract.PlaylistItemModel>, animate: Boolean) {
+    override fun setList(items: List<ItemContract.Model>, animate: Boolean) {
         playlist_swipe.isRefreshing = false
         adapter.setData(items, animate)
         playlist_swipe.setOnRefreshListener { presenter.refreshList() }
     }
 
-    override fun setHeaderModel(model: PlaylistModel) {
+    override fun setHeaderModel(model: PlaylistContract.Model) {
         Glide.with(playlist_header_image).load(imageProvider.makeRef(model.imageUrl)).into(playlist_header_image)
         playlist_collapsing_toolbar.title = model.title
         playlist_fab_play.setImageResource(model.playIcon)
@@ -283,7 +283,7 @@ class PlaylistFragment :
         createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
     }
 
-    override fun onView(item: ItemContract.PlaylistItemModel) {
+    override fun onView(item: ItemContract.Model) {
         presenter.onItemViewClick(item)
     }
 
@@ -341,37 +341,37 @@ class PlaylistFragment :
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemContract.PlaylistItemModel) {
+    override fun onClick(item: ItemContract.Model) {
         presenter.onItemClicked(item)
     }
 
-    override fun onPlayStartClick(item: ItemContract.PlaylistItemModel) {
+    override fun onPlayStartClick(item: ItemContract.Model) {
         presenter.onPlayStartClick(item)
     }
 
-    override fun onRightSwipe(item: ItemContract.PlaylistItemModel) {
+    override fun onRightSwipe(item: ItemContract.Model) {
         presenter.onItemSwipeRight(item)
     }
 
-    override fun onLeftSwipe(item: ItemContract.PlaylistItemModel) {
+    override fun onLeftSwipe(item: ItemContract.Model) {
         val playlistItemModel = item
         adapter.notifyItemRemoved(playlistItemModel.index)
         presenter.onItemSwipeLeft(playlistItemModel) // delays for animation
     }
 
-    override fun onPlay(item: ItemContract.PlaylistItemModel, external: Boolean) {
+    override fun onPlay(item: ItemContract.Model, external: Boolean) {
         presenter.onItemPlay(item, external)
     }
 
-    override fun onShowChannel(item: ItemContract.PlaylistItemModel) {
+    override fun onShowChannel(item: ItemContract.Model) {
         presenter.onItemShowChannel(item)
     }
 
-    override fun onStar(item: ItemContract.PlaylistItemModel) {
+    override fun onStar(item: ItemContract.Model) {
         presenter.onItemStar(item)
     }
 
-    override fun onShare(item: ItemContract.PlaylistItemModel) {
+    override fun onShare(item: ItemContract.Model) {
         presenter.onItemShare(item)
     }
 
@@ -411,10 +411,10 @@ class PlaylistFragment :
                 scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ItemFactory() }
+                scoped { ItemFactory(get()) }
                 scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
-                viewModel { PlaylistState() }
+                viewModel { PlaylistContract.State() }
             }
         }
 

@@ -28,5 +28,5 @@
     <!--    custom colors-->
     <color name="dark_red">#961717</color>
     <color name="dark_indigo">#1e245f</color>
-    <color name="header_transparent_background">#8a000000</color>
+    <color name="black_transparent_background">#8a000000</color>
 </resources>

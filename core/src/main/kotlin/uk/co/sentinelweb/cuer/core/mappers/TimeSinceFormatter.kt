@@ -8,7 +8,7 @@ class TimeSinceFormatter(
 ) {
     fun formatTimeSince(millis: Long): String {
         val diff = (timeProvider.currentTimeMillis() - millis) / 1000L
-        return if (diff > 0) {
+        return if (diff >= 0) {
             when (diff) {
                 in 0L..5L -> "now"
                 in 5L..59L -> "${SECONDS.toSeconds(diff)}s"

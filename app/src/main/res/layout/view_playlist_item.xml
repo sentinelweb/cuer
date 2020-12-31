@@ -43,6 +43,28 @@
             tools:src="@drawable/ic_player_play_black"
             />
 
+        <TextView
+            android:id="@+id/listitem_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/black_transparent_background"
+            android:padding="2dp"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/listitem_icon"
+            app:layout_constraintRight_toRightOf="@+id/listitem_icon"
+            tools:text="0:00"
+            />
+
+        <View
+            android:id="@+id/listitem_progress"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:background="@color/primary"
+            app:layout_constraintBottom_toBottomOf="@+id/listitem_icon"
+            app:layout_constraintLeft_toLeftOf="@+id/listitem_icon"
+            />
+
         <ImageView
             android:id="@+id/listitem_icon_check"
             style="@style/ItemView.CheckIcon.Row"

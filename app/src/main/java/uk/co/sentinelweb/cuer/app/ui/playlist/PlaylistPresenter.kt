@@ -31,7 +31,7 @@ import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 class PlaylistPresenter(
     private val view: PlaylistContract.View,
-    private val state: PlaylistState,
+    private val state: PlaylistContract.State,
     private val repository: MediaDatabaseRepository,
     private val playlistRepository: PlaylistDatabaseRepository,
     private val modelMapper: PlaylistModelMapper,
@@ -115,7 +115,7 @@ class PlaylistPresenter(
         queue.removeProducerListener(this)
     }
 
-    override fun onItemSwipeRight(item: ItemContract.PlaylistItemModel) {// move
+    override fun onItemSwipeRight(item: ItemContract.Model) {// move
         state.viewModelScope.launch {
             state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
             playlistDialogModelCreator.loadPlaylists { allPlaylists ->
@@ -216,7 +216,7 @@ class PlaylistPresenter(
         }
     }
 
-    override fun onItemSwipeLeft(item: ItemContract.PlaylistItemModel) {
+    override fun onItemSwipeLeft(item: ItemContract.Model) {
         state.viewModelScope.launch {
             delay(400)
             state.playlist?.items?.apply {
@@ -234,12 +234,12 @@ class PlaylistPresenter(
         }
     }
 
-    override fun onItemViewClick(item: ItemContract.PlaylistItemModel) {
+    override fun onItemViewClick(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)
             ?.apply { view.showItemDescription(this) }
     }
 
-    override fun onItemClicked(item: ItemContract.PlaylistItemModel) {
+    override fun onItemClicked(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
                 view.showItemDescription(itemDomain)
@@ -249,7 +249,7 @@ class PlaylistPresenter(
         } // todo error
     }
 
-    override fun onPlayStartClick(item: ItemContract.PlaylistItemModel) {
+    override fun onPlayStartClick(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
                 //view.showItemDescription(itemDomain)
@@ -277,7 +277,7 @@ class PlaylistPresenter(
         view.scrollTo(direction)
     }
 
-    override fun onItemPlay(item: ItemContract.PlaylistItemModel, external: Boolean) {
+    override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (external) {
                 if (!ytJavaApi.launchVideo(itemDomain.media)) {
@@ -289,7 +289,7 @@ class PlaylistPresenter(
         } ?: toastWrapper.show("can't find video")
     }
 
-    override fun onItemShowChannel(item: ItemContract.PlaylistItemModel) {
+    override fun onItemShowChannel(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!ytJavaApi.launchChannel(itemDomain.media)) {
                 toastWrapper.show("can't launch channel")
@@ -297,11 +297,11 @@ class PlaylistPresenter(
         } ?: toastWrapper.show("can't find video")
     }
 
-    override fun onItemStar(item: ItemContract.PlaylistItemModel) {
+    override fun onItemStar(item: ItemContract.Model) {
         toastWrapper.show("todo: star ${item.id}")
     }
 
-    override fun onItemShare(item: ItemContract.PlaylistItemModel) {
+    override fun onItemShare(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             shareWrapper.share(itemDomain.media)
         }

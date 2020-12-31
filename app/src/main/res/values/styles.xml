@@ -76,7 +76,7 @@
     </style>
 
     <style name="ItemView.BottomText" parent="@style/TextAppearance.AppCompat.Small">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">@dimen/list_item_bottom_text_size</item>
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">8dp</item>

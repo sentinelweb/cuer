@@ -23,7 +23,11 @@ class ResourceWrapper constructor(
 
     fun getDrawable(@DrawableRes id: Int, @ColorRes tint: Int?) =
         ContextCompat.getDrawable(context, id)?.let { d ->
-            tint?.let { DrawableCompat.setTint(d, it) }
+            tint?.let { DrawableCompat.setTint(d, ContextCompat.getColor(context, it)) }
             d
-        } ?: throw Exception("Drawable doesn't exist")
+        } ?: throw Exception("Drawable doesn't exist $id")
+
+    fun getDrawable(@DrawableRes id: Int) =
+        ContextCompat.getDrawable(context, id)
+            ?: throw Exception("Drawable doesn't exist : $id")
 }

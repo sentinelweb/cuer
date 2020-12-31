@@ -16,9 +16,9 @@ class PlaylistAdapter constructor(
 
     private lateinit var recyclerView: RecyclerView
 
-    private var _data: List<ItemContract.PlaylistItemModel> = listOf()
+    private var _data: List<ItemContract.Model> = listOf()
 
-    val data: List<ItemContract.PlaylistItemModel>
+    val data: List<ItemContract.Model>
         get() = _data
 
     var highlightItem: Int? = null
@@ -27,7 +27,7 @@ class PlaylistAdapter constructor(
             notifyDataSetChanged()
         }
 
-    fun setData(data: List<ItemContract.PlaylistItemModel>, animate: Boolean = true) {
+    fun setData(data: List<ItemContract.Model>, animate: Boolean = true) {
         if (animate) {
             DiffUtil.calculateDiff(
                 ItemDiffCallback(
