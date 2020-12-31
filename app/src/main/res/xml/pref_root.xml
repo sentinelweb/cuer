@@ -2,12 +2,20 @@
 
 <PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <Preference
-        app:fragment="uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment"
-        app:summary="Data backup options"
-        app:title="@string/prefs_root_item_backup_title"
-        app:icon="@drawable/ic_pref_backup_restore_normal"
-        />
-
+    <PreferenceCategory app:title="@string/prefs_root_backup_cat_title">
+        <Preference
+            app:fragment="uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment"
+            app:icon="@drawable/ic_prefs_root_backup_restore_normal"
+            app:summary="@string/prefs_root_backup_summary"
+            app:title="@string/prefs_root_backup_item_title"
+            />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/prefs_root_debug_cat_title">
+        <Preference
+            app:icon="@drawable/ic_baseline_bug_report_24"
+            app:key="@string/prefs_root_debug_send_reports_key"
+            app:summary="@string/prefs_root_debug_send_reports_summary"
+            app:title="@string/prefs_root_debug_send_reports_title"
+            />
+    </PreferenceCategory>
 </PreferenceScreen>

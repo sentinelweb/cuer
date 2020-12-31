@@ -144,7 +144,7 @@ class MainActivity :
         pref: Preference
     ): Boolean {
         when (pref.title) {
-            getString(R.string.prefs_root_item_backup_title) -> navController.navigate(R.id.navigation_settings_backup)
+            getString(R.string.prefs_root_backup_item_title) -> navController.navigate(R.id.navigation_settings_backup)
         }
         return true
     }

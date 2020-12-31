@@ -67,13 +67,23 @@
     <string name="cd_overflow">More actions</string>
     <string name="cd_check">Select item</string>
 
+    <!-- prefs -->
+    <string name="prefs_root_debug_send_reports_key">sendReports</string>
+    <string name="prefs_root_backup_item_title">Backup</string>
+    <string name="prefs_root_backup_cat_title">Backup/Restore</string>
+    <string name="prefs_root_backup_summary">Data backup options</string>
+    <string name="prefs_root_debug_cat_title">Debug</string>
+    <string
+        name="prefs_root_debug_send_reports_summary">Trigger unsent crash report to crashlytics</string>
+    <string name="prefs_root_debug_send_reports_title">Send unsent reports</string>
+    <string name="prefs_backup_backup_key">backup</string>
+    <string name="prefs_backup_restore_key">restore</string>
+
+
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="menu_settings">Settings</string>
-    <string name="prefs_root_item_backup_title">Backup</string>
     <string name="nav_title_backup_settings">Backup settings</string>
-    <string name="pref_key_backup">backup</string>
-    <string name="pref_key_restore">restore</string>
     <string name="pe_default_display_title">Enter a title …</string>
     <string name="pe_error_title_blank">Add a title</string>
     <string name="playlist_dialog_add_playlist">Add playlist …</string>

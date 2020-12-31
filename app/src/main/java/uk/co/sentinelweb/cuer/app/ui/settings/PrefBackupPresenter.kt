@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class PrefBackupPresenter constructor(
     private val view: PrefBackupContract.View,
-    private val state: PrefBackupState,
+    private val state: PrefBackupContract.State,
     private val toastWrapper: ToastWrapper,
     private val backupManager: BackupFileManager,
     private val timeProvider: TimeProvider,
@@ -53,6 +53,10 @@ class PrefBackupPresenter constructor(
                 showResult(false, e.message ?: e::class.java.simpleName)
             }
         }
+    }
+
+    override fun openRestoreFile() {
+        view.openRestoreFile()
     }
 
     private fun CoroutineScope.showResult(success: Boolean?, message: String = "") {

@@ -10,16 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -60,8 +56,8 @@ class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupC
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         when (preference.key) {
-            getString(R.string.pref_key_backup) -> presenter.backupDatabaseToJson()
-            getString(R.string.pref_key_restore) -> openFile()
+            getString(R.string.prefs_backup_backup_key) -> presenter.backupDatabaseToJson()
+            getString(R.string.prefs_backup_restore_key) -> presenter.openRestoreFile()
         }
 
         return super.onPreferenceTreeClick(preference)
@@ -99,7 +95,7 @@ class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupC
         snackbarWrapper.make(msg).show()
     }
 
-    private fun openFile() {
+    override fun openRestoreFile() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = BACKUP_MIME_TYPE
@@ -116,27 +112,6 @@ class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupC
         private const val CREATE_FILE = 2
         private const val READ_FILE = 3
         private const val BACKUP_MIME_TYPE = "application/json"
-
-        @JvmStatic
-        val fragmentModule = module {
-            scope(named<PrefBackupFragment>()) {
-                scoped<PrefBackupContract.View> { getSource() }
-                scoped<PrefBackupContract.Presenter> {
-                    PrefBackupPresenter(
-                        view = get(),
-                        state = get(),
-                        toastWrapper = get(),
-                        backupManager = get(),
-                        timeProvider = get(),
-                        fileWrapper = get(),
-                        timeStampMapper = get(),
-                        log = get()
-                    )
-                }
-                scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
-                viewModel { PrefBackupState() }
-            }
-        }
 
     }
 }

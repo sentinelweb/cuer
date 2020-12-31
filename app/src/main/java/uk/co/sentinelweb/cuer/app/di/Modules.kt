@@ -22,7 +22,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsFragment
-import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment
+import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
+import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -36,6 +37,8 @@ import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
+import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.di.DomainModule
@@ -55,7 +58,8 @@ object Modules {
         PlaylistItemEditFragment.fragmentModule,
         PlaylistEditFragment.fragmentModule,
         YoutubeCastServiceModule.serviceModule,
-        PrefBackupFragment.fragmentModule
+        PrefBackupContract.fragmentModule,
+        PrefRootContract.fragmentModule
     )
 
     private val uiModule = module {
@@ -101,7 +105,8 @@ object Modules {
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }
         factory { ResourceWrapper(androidApplication()) }
-        factory<LogWrapper> { AndroidLogWrapper() }
+        factory<LogWrapper> { CompositeLogWrapper(get(), get()) }
+        factory { AndroidLogWrapper() }
         factory { FileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
         single(named<GeneralPreferences>()) {

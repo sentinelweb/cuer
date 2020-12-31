@@ -8,11 +8,17 @@ import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
-class PrefRootFragment constructor() : PreferenceFragmentCompat() {
+class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContract.View {
+
+    private val presenter: PrefRootContract.Presenter by currentScope.inject()
+    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
@@ -28,4 +34,15 @@ class PrefRootFragment constructor() : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.pref_root, rootKey)
     }
 
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
+        when (preference.key) {
+            getString(R.string.prefs_root_debug_send_reports_key) -> presenter.sendDebugReports()
+        }
+
+        return super.onPreferenceTreeClick(preference)
+    }
+
+    override fun showMessage(msg: String) {
+        snackbarWrapper.make(msg).show()
+    }
 }

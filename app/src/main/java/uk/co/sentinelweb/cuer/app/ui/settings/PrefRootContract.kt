@@ -8,42 +8,31 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import java.time.Instant
 
-interface PrefBackupContract {
-
+interface PrefRootContract {
     interface Presenter {
-        fun backupDatabaseToJson()
-        fun saveWriteData(uri: String)
-        fun restoreFile(uriString: String)
-        fun openRestoreFile()
+        fun sendDebugReports()
     }
 
     interface View {
-        fun promptForSaveLocation(fileName: String)
-        fun showProgress(b: Boolean)
         fun showMessage(msg: String)
-        fun openRestoreFile()
     }
 
     data class State constructor(
-        var lastBackedUp: Instant? = null,
-        var writeData: String? = null
+        var lastDebugSent: Instant? = null
     ) : ViewModel()
 
     companion object {
         @JvmStatic
         val fragmentModule = module {
-            scope(named<PrefBackupFragment>()) {
+            scope(named<PrefRootFragment>()) {
                 scoped<View> { getSource() }
                 scoped<Presenter> {
-                    PrefBackupPresenter(
+                    PrefRootPresenter(
                         view = get(),
                         state = get(),
-                        toastWrapper = get(),
-                        backupManager = get(),
-                        timeProvider = get(),
-                        fileWrapper = get(),
-                        timeStampMapper = get(),
-                        log = get()
+                        log = get(),
+                        firebaseWrapper = get(),
+                        timeProvider = get()
                     )
                 }
                 scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
