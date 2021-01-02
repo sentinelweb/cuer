@@ -95,6 +95,7 @@
             android:layout_height="@dimen/player_button_icon_size"
             android:padding="4dp"
             android:layout_margin="4dp"
+            android:indeterminateTint="?colorProgress"
             />
     </FrameLayout>
 
@@ -194,8 +195,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="1000"
-        android:progressTint="@color/primary"
-        android:thumbTint="@color/primary"
+        android:progressTint="?colorProgress"
+        android:thumbTint="?colorProgress"
         app:layout_constraintTop_toBottomOf="@id/cast_player_title"
         />
 

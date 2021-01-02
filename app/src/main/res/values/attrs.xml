@@ -6,4 +6,5 @@
     <attr name="colorEdit" format="color" />
     <attr name="playerButtonColor" format="color" />
     <attr name="contextMenuItemColor" format="color" />
+    <attr name="colorProgress" format="color" />
 </resources>

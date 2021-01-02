@@ -18,7 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialog
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsFragment
@@ -48,7 +48,7 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
 object Modules {
     private val scopedModules = listOf(
-        PlaylistFragment.fragmentModule,
+        PlaylistContract.fragmentModule,
         PlaylistsFragment.fragmentModule,
         PlayerFragment.fragmentModule,
         BrowseFragment.fragmentModule,

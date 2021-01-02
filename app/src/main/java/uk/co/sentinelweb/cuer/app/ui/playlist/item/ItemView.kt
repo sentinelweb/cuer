@@ -15,16 +15,28 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.view_playlist_item.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.extension.fade
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 
 class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLayout(c, a, def),
-    ItemContract.View {
+    ItemContract.View, KoinComponent {
 
     constructor(c: Context, a: AttributeSet?) : this(c, a, 0)
 
     private lateinit var presenter: ItemContract.Presenter
+    private val log: LogWrapper by inject()
+
+    init {
+        log.tag(this::class.java)
+    }
+
+    override fun setPresenter(itemPresenter: ItemContract.Presenter) {
+        presenter = itemPresenter
+    }
 
     val itemView: View
         get() = listitem
@@ -37,11 +49,6 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         super.onFinishInflate()
         listitem.setOnClickListener { presenter.doClick() }
         listitem_overflow_click.setOnClickListener { showContextualMenu() }
-    }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        presenter.updateProgress()
     }
 
     @SuppressLint("RestrictedApi")
@@ -94,12 +101,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         listitem_bottom.setText(text)
     }
 
-    override fun setPresenter(itemPresenter: ItemContract.Presenter) {
-        presenter = itemPresenter
-    }
-
     override fun setIconUrl(url: String) {
-        //Picasso.get().load(url).into(listitem_icon)
         Glide.with(listitem_icon)
             .load(url)
             .into(listitem_icon)
@@ -114,9 +116,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     }
 
     override fun setProgress(ratio: Float) {
-        listitem_progress.layoutParams = listitem_progress.layoutParams.apply {
-            width = (listitem_icon.width * ratio).toInt()
-        }
+        listitem_progress.progress = (100 * ratio).toInt()
     }
 
 }

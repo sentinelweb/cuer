@@ -37,6 +37,7 @@
         <item name="colorEdit">@color/green_600</item>
         <item name="contextMenuItemColor">?android:textColorSecondary</item>
         <item name="playerButtonColor">@color/player_button_tint</item>
+        <item name="colorProgress">@color/primary</item>
 
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>

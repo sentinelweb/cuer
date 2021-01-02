@@ -47,9 +47,11 @@ class PlaylistAdapter constructor(
         }
 
     }
+
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemViewHolder {
         return itemFactory.createItemViewHolder(parent, interactions)
     }

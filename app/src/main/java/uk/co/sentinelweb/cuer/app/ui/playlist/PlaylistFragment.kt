@@ -20,31 +20,23 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.playlist_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
-import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.PlayState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -379,44 +371,6 @@ class PlaylistFragment :
 
     companion object {
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
-
-        @JvmStatic
-        val fragmentModule = module {
-            scope(named<PlaylistFragment>()) {
-                scoped<PlaylistContract.View> { getSource() }
-                scoped<PlaylistContract.Presenter> {
-                    PlaylistPresenter(
-                        view = get(),
-                        state = get(),
-                        repository = get(),
-                        playlistRepository = get(),
-                        modelMapper = get(),
-                        queue = get(),
-                        toastWrapper = get(),
-                        ytContextHolder = get(),
-                        chromeCastWrapper = get(),
-                        ytJavaApi = get(),
-                        shareWrapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>()),
-                        playlistMutator = get(),
-                        log = get(),
-                        playlistDialogModelCreator = get(),
-                        timeProvider = get()
-                    )
-                }
-                scoped { PlaylistModelMapper(res = get(), timeFormatter = get(), timeSinceFormatter = get()) }
-                scoped { PlaylistAdapter(get(), getSource()) }
-                scoped { ItemTouchHelperCallback(getSource()) }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
-                scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ItemFactory(get()) }
-                scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
-                scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
-                viewModel { PlaylistContract.State() }
-            }
-        }
 
     }
 }

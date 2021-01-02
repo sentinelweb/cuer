@@ -15,11 +15,17 @@ class ResourceWrapper constructor(
 
     val resources: Resources = context.resources
 
+    val pixelDensity: Float by lazy {
+        resources.displayMetrics.density
+    }
+
     fun getString(@StringRes id: Int) = context.getString(id)
 
     fun getString(@StringRes id: Int, vararg params: Any) = context.resources.getString(id, *params)
 
     fun getDimensionPixelSize(@DimenRes id: Int): Int = context.resources.getDimensionPixelSize(id)
+
+    fun getDimensionPixelSize(pixels: Float): Int = (pixelDensity * pixels).toInt()
 
     fun getDrawable(@DrawableRes id: Int, @ColorRes tint: Int?) =
         ContextCompat.getDrawable(context, id)?.let { d ->
