@@ -4,7 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import uk.co.sentinelweb.cuer.app.R
 
-class ItemFactory {
+class ItemFactory constructor(
+    private val modelMapper: ItemModelMapper
+) {
 
     fun createItemViewHolder(
         parent: ViewGroup,
@@ -21,7 +23,7 @@ class ItemFactory {
         view: ItemContract.View,
         interactions: ItemContract.Interactions
     ): ItemContract.External {
-        val itemPresenter = ItemPresenter(view, interactions, ItemState())
+        val itemPresenter = ItemPresenter(view, interactions, ItemContract.State(), modelMapper)
         view.setPresenter(itemPresenter)
         return itemPresenter
     }

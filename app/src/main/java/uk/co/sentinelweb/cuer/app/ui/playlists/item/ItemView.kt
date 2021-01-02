@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item
 // todo view binding
 import android.annotation.SuppressLint
 import android.content.Context
+import android.text.SpannableString
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.view.View
@@ -80,11 +81,11 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         listitem_icon_check.visibility = if (checked) View.VISIBLE else View.GONE
     }
 
-    override fun setTopText(text: String) {
+    override fun setTopText(text: SpannableString) {
         listitem_top.setText(text)
     }
 
-    override fun setBottomText(text: String) {
+    override fun setBottomText(text: SpannableString) {
         listitem_bottom.setText(text)
     }
 

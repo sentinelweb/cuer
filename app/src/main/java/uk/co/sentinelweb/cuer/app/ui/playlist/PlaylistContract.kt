@@ -125,14 +125,14 @@ interface PlaylistContract {
                         timeProvider = get()
                     )
                 }
-                scoped { PlaylistModelMapper(res = get(), timeFormatter = get(), timeSinceFormatter = get()) }
+                scoped { PlaylistModelMapper(res = get(), timeFormatter = get(), timeSinceFormatter = get(), loopModeMapper = get()) }
                 scoped { PlaylistAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ItemFactory(get()) }
+                scoped { ItemFactory(get(), get()) }
                 scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
                 viewModel { State() }

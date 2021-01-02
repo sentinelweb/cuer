@@ -15,13 +15,15 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.PlatformMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
@@ -49,7 +51,7 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 object Modules {
     private val scopedModules = listOf(
         PlaylistContract.fragmentModule,
-        PlaylistsFragment.fragmentModule,
+        PlaylistsContract.fragmentModule,
         PlayerFragment.fragmentModule,
         BrowseFragment.fragmentModule,
         MainActivity.activityModule,
@@ -64,6 +66,8 @@ object Modules {
 
     private val uiModule = module {
         factory { PlaylistSelectDialogModelCreator(get(), get()) }
+        factory { PlatformMapper() }
+        factory { LoopModeMapper() }
     }
 
     private val utilModule = module {

@@ -1,21 +1,25 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class PlaylistsModelMapper constructor() {
 
-    fun map(domains: List<PlaylistDomain>, current: Long?): PlaylistsModel = PlaylistsModel(
+    fun map(domains: Map<PlaylistDomain, PlaylistStatDomain?>, current: Long?): PlaylistsContract.Model = PlaylistsContract.Model(
         DEFAULT_HEADER_IMAGE,
         current,
-        domains.mapIndexed { index, pl ->
-            ItemModel(
+        domains.keys.mapIndexed { index, pl ->
+            ItemContract.Model(
                 pl.id!!,
                 index,
                 pl.title,
-                (if (pl.starred) " * " else " ") + (if (pl.default) " D " else " ") + pl.mode,
                 false,
-                (pl.thumb ?: pl.image)?.url
+                (pl.thumb ?: pl.image)?.url,
+                count = domains[pl]?.itemCount ?: -1,
+                newItems = domains[pl]?.let { it.itemCount - it.watchedItemCount } ?: -1,
+                starred = pl.starred,
+                loopMode = pl.mode
             )
         }
     )

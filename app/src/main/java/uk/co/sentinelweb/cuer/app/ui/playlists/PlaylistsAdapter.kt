@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemViewHolder
 
 
@@ -17,14 +16,14 @@ class PlaylistsAdapter constructor(
 
     private lateinit var recyclerView: RecyclerView
 
-    private var _data: List<ItemModel> = listOf()
+    private var _data: List<ItemContract.Model> = listOf()
 
-    val data: List<ItemModel>
+    val data: List<ItemContract.Model>
         get() = _data
 
     var currentPlaylistId: Long? = null
 
-    fun setData(data: List<ItemModel>, animate: Boolean = true) {
+    fun setData(data: List<ItemContract.Model>, animate: Boolean = true) {
         if (animate) {
             DiffUtil.calculateDiff(
                 ItemDiffCallback(

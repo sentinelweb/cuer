@@ -32,4 +32,12 @@ interface PlaylistItemDao {
 
     @Query("SELECT * FROM playlist_item WHERE media_id IN (:mediaIds)")
     suspend fun loadItemsByMediaId(mediaIds: List<Long>): List<PlaylistItemEntity>
+
+    @Query("select count() from playlist_item,media where playlist_item.playlist_id=:playlistId and media.id=playlist_item.media_id and media.flags & :flags == :flags")
+    suspend fun countMediaFlags(playlistId: Long, flags: Long): Int
+
+    @Query("SELECT count() FROM playlist_item WHERE playlist_id ==:playlistId")
+    suspend fun countItems(playlistId: Long): Int
+
+
 }

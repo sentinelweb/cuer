@@ -5,6 +5,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
 interface ItemContract {
 
@@ -60,8 +61,10 @@ interface ItemContract {
         val thumbNailUrl: String?,
         val progress: Float, // 0..1
         val published: String,
-        val watched: String,
-        val starred: Boolean
+        val watchedSince: String,
+        val isWatched: Boolean,
+        val starred: Boolean,
+        val platform: PlatformDomain
     ) : ItemBaseModel(id)
 
     data class State constructor(var item: Model? = null)

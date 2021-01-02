@@ -2,6 +2,10 @@ package uk.co.sentinelweb.cuer.app.util.wrapper
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.drawable.Drawable
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ImageSpan
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
@@ -36,4 +40,29 @@ class ResourceWrapper constructor(
     fun getDrawable(@DrawableRes id: Int) =
         ContextCompat.getDrawable(context, id)
             ?: throw Exception("Drawable doesn't exist : $id")
+
+    fun getDrawable(
+        @DrawableRes icon: Int,
+        @ColorRes tint: Int,
+        @DimenRes textSize: Int,
+        scale: Float = 1f
+    ): Drawable {
+        val textPixelSize = (getDimensionPixelSize(textSize) * scale).toInt()
+        return getDrawable(icon, tint).apply { setBounds(0, 0, textPixelSize, textPixelSize); }
+    }
+
+    fun replaceSpannableIcon(
+        string: SpannableString,
+        d: Drawable,
+        start: Int,
+        end: Int
+    ) {
+        string.apply {
+            setSpan(
+                ImageSpan(d, ImageSpan.ALIGN_BOTTOM),
+                start, end,
+                Spannable.SPAN_INCLUSIVE_INCLUSIVE
+            )
+        }
+    }
 }

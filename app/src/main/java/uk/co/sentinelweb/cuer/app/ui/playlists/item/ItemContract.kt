@@ -1,12 +1,15 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
+import android.text.SpannableString
 import androidx.annotation.DrawableRes
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 interface ItemContract {
 
     interface View {
-        fun setTopText(text: String)
-        fun setBottomText(text: String)
+        fun setTopText(text: SpannableString)
+        fun setBottomText(text: SpannableString)
         fun setIconResource(@DrawableRes iconRes: Int)
         fun setCheckedVisible(checked: Boolean)
         fun setPresenter(itemPresenter: Presenter)
@@ -21,18 +24,32 @@ interface ItemContract {
     }
 
     interface External {
-        fun update(item: ItemModel, current: Boolean)
+        fun update(item: Model, current: Boolean)
         fun doLeft()
         fun doRight()
     }
 
     interface Interactions {
-        fun onClick(item: ItemModel)
-        fun onRightSwipe(item: ItemModel)
-        fun onLeftSwipe(item: ItemModel)
-        fun onPlay(item: ItemModel, external: Boolean)
-        fun onStar(item: ItemModel)
-        fun onShare(item: ItemModel)
+        fun onClick(item: Model)
+        fun onRightSwipe(item: Model)
+        fun onLeftSwipe(item: Model)
+        fun onPlay(item: Model, external: Boolean)
+        fun onStar(item: Model)
+        fun onShare(item: Model)
     }
+
+    data class State constructor(var item: Model? = null)
+
+    data class Model(
+        override val id: Long,
+        val index: Int,
+        val title: String,
+        val checkIcon: Boolean,
+        val thumbNailUrl: String?,
+        val starred: Boolean,
+        val count: Int,
+        val newItems: Int,
+        val loopMode: PlaylistDomain.PlaylistModeDomain
+    ) : ItemBaseModel(id)
 
 }

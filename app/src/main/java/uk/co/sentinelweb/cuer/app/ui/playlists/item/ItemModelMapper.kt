@@ -1,15 +1,15 @@
-package uk.co.sentinelweb.cuer.app.ui.playlist.item
+package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.PlatformMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class ItemModelMapper constructor(
     private val res: ResourceWrapper,
-    private val platformMapper: PlatformMapper
+    private val loopModeMapper: LoopModeMapper
 ) {
 
     private val playDrawable: Drawable by lazy {
@@ -26,10 +26,6 @@ class ItemModelMapper constructor(
 
     private val unwatchDrawable: Drawable by lazy {
         res.getDrawable(R.drawable.ic_baseline_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, 1.3f)
-    }
-
-    private val watchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_baseline_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, 1.3f)
     }
 
     private val _bottomDrawables: MutableMap<Int, Drawable> = mutableMapOf()
@@ -58,29 +54,24 @@ class ItemModelMapper constructor(
     }
 
     fun mapBottomText(model: ItemContract.Model): SpannableString {
-        return SpannableString(model.run { "  $positon   $WATCH $watchedSince   $PLAT $published" }).apply {
+        return SpannableString(model.run { "       $newItems / $count" }).apply {
             res.replaceSpannableIcon(
                 this,
                 if (model.starred) starDrawable else unstarDrawable,
                 0, 1
             )
-            val platPos = indexOf(PLAT)
+
             res.replaceSpannableIcon(
                 this,
-                bottomDrawable(platformMapper.mapIcon(model.platform)),
-                platPos, platPos + PLAT.length
+                bottomDrawable(loopModeMapper.mapIcon(model.loopMode)),
+                2, 3
             )
-            val watchPos = indexOf(WATCH)
+
             res.replaceSpannableIcon(
                 this,
-                if (model.isWatched) watchDrawable else unwatchDrawable,
-                watchPos, watchPos + WATCH.length
+                unwatchDrawable,
+                5, 6
             )
         }
-    }
-
-    companion object {
-        private val PLAT = "[plat]"
-        private val WATCH = "[watch]"
     }
 }

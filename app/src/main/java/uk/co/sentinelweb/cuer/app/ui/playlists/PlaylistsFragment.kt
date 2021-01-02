@@ -16,22 +16,13 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.playlists_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
-import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModel
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 
 class PlaylistsFragment :
     Fragment(R.layout.playlists_fragment),
@@ -87,7 +78,7 @@ class PlaylistsFragment :
     // endregion
 
     // region PlaylistContract.View
-    override fun setList(model: PlaylistsModel, animate: Boolean) {
+    override fun setList(model: PlaylistsContract.Model, animate: Boolean) {
         Glide.with(playlists_header_image)
             .load(imageProvider.makeRef(model.imageUrl))
             .into(playlists_header_image)
@@ -143,68 +134,32 @@ class PlaylistsFragment :
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemModel) {
+    override fun onClick(item: ItemContract.Model) {
         presenter.onItemClicked(item)
     }
 
-    override fun onRightSwipe(item: ItemModel) {
+    override fun onRightSwipe(item: ItemContract.Model) {
         presenter.onItemSwipeRight(item)
     }
 
-    override fun onLeftSwipe(item: ItemModel) {
+    override fun onLeftSwipe(item: ItemContract.Model) {
         val playlistItemModel = item
         adapter.notifyItemRemoved(playlistItemModel.index)
         presenter.onItemSwipeLeft(playlistItemModel) // delays for animation
     }
 
-    override fun onPlay(item: ItemModel, external: Boolean) {
+    override fun onPlay(item: ItemContract.Model, external: Boolean) {
         presenter.onItemPlay(item, external)
     }
 
-    override fun onStar(item: ItemModel) {
+    override fun onStar(item: ItemContract.Model) {
         presenter.onItemStar(item)
     }
 
-    override fun onShare(item: ItemModel) {
+    override fun onShare(item: ItemContract.Model) {
         presenter.onItemShare(item)
     }
     //endregion
-
-    companion object {
-
-        @JvmStatic
-        val fragmentModule = module {
-            scope(named<PlaylistsFragment>()) {
-                scoped<PlaylistsContract.View> { getSource() }
-                scoped<PlaylistsContract.Presenter> {
-                    PlaylistsPresenter(
-                        view = get(),
-                        state = get(),
-                        playlistRepository = get(),
-                        modelMapper = get(),
-                        queue = get(),
-                        log = get(),
-                        toastWrapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>())
-                    )
-                }
-                scoped { PlaylistsModelMapper() }
-                scoped { PlaylistsAdapter(get(), getSource()) }
-                scoped {
-                    ItemTouchHelperCallback(
-                        getSource()
-                    )
-                }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
-                scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ItemFactory() }
-                viewModel { PlaylistsState() }
-            }
-        }
-
-    }
 
 //    override fun scrollTo(direction: PlaylistsContract.ScrollDirection) {
 //        (playlist_list.layoutManager as LinearLayoutManager).run {
