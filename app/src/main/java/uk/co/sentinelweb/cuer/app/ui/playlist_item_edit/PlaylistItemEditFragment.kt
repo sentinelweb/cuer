@@ -99,12 +99,13 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         setHasOptionsMenu(true)
         if (itemArg != null) {
             sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+            sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ple_play_button.setOnClickListener { viewModel.onPlayVideoLocal() }
+        //ple_play_button.setOnClickListener { viewModel.onPlayVideoLocal() }
         ple_star_fab.setOnClickListener { viewModel.onStarClick() }
         starMenuItem.isVisible = false
         playMenuItem.isVisible = false
@@ -164,7 +165,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 .load(item.media.image?.url)
                 .into(ple_image)
 
-            ple_play_button.isVisible = false
+            //ple_play_button.isVisible = false
             ple_author_image.isVisible = false
             ple_title_pos.isVisible = false
             ple_star_fab.isVisible = false
@@ -195,7 +196,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
             object : Observer<PlaylistItemEditModel> {
                 override fun onChanged(model: PlaylistItemEditModel) {
                     ple_author_image.isVisible = !model.empty
-                    ple_play_button.isVisible = !model.empty
+                    //ple_play_button.isVisible = !model.empty
                     ple_title_pos.isVisible = !model.empty
                     ple_duration.isVisible = !model.empty
                     ple_star_fab.isVisible = !model.empty
@@ -248,7 +249,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     } ?: ple_title_pos.apply { isVisible = false }
                     ple_pub_date.setText(model.pubDate)
                     ple_author_title.setText(model.channelTitle)
-                    ple_play_button.isVisible = model.canPlay
+                    //ple_play_button.isVisible = model.canPlay
                     val starIconResource =
                         if (model.starred) R.drawable.ic_button_starred_white
                         else R.drawable.ic_button_unstarred_white

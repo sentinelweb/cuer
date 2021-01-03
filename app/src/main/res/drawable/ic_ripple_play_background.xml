@@ -15,7 +15,7 @@
         <!-- Use the shape you want here -->
         <shape android:shape="oval">
             <!-- Use the solid tag to define the background color you want -->
-            <solid android:color="@color/player_button_background_tint" />
+            <solid android:color="@android:color/transparent" />
         </shape>
     </item>
 </ripple>

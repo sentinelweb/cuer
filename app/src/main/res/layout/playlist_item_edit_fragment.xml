@@ -46,20 +46,20 @@
                 android:transitionName="image"
                 />
 
-            <ImageButton
-                android:id="@+id/ple_play_button"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:alpha="0.8"
-                android:contentDescription="@null"
-                android:fitsSystemWindows="true"
-                android:scaleType="center"
-                android:src="@drawable/ic_player_play_black"
-                android:tint="@color/white"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7"
-                />
+            <!--            <ImageButton-->
+            <!--                android:id="@+id/ple_play_button"-->
+            <!--                android:layout_width="80dp"-->
+            <!--                android:layout_height="80dp"-->
+            <!--                android:layout_gravity="center"-->
+            <!--                android:alpha="0.8"-->
+            <!--                android:contentDescription="@null"-->
+            <!--                android:fitsSystemWindows="true"-->
+            <!--                android:scaleType="center"-->
+            <!--                android:src="@drawable/ic_player_play_black"-->
+            <!--                android:tint="@color/white"-->
+            <!--                app:layout_collapseMode="parallax"-->
+            <!--                app:layout_collapseParallaxMultiplier="0.7"-->
+            <!--                />-->
 
             <View
                 android:id="@+id/ple_title_bg"
