@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
@@ -47,6 +48,13 @@ class PlaylistItemEditViewModel constructor(
         super.onCleared()
         // https://developer.android.com/topic/libraries/architecture/coroutines
         // coroutines cancel via viewModelScope
+    }
+
+    fun delayedLoad(item: PlaylistItemDomain) {
+        viewModelScope.launch {
+            delay(400)
+            setData(item) // loads data after delay
+        }
     }
 
     fun setData(media: MediaDomain?) {
@@ -207,4 +215,5 @@ class PlaylistItemEditViewModel constructor(
     }
 
     fun getCommittedItems() = state.committedItems ?: listOf()
+
 }

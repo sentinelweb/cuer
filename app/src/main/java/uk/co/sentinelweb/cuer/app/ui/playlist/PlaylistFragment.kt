@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -19,6 +20,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.playlist_fragment.*
+import kotlinx.android.synthetic.main.view_playlist_item.view.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
@@ -286,8 +288,16 @@ class PlaylistFragment :
     }
 
     override fun showItemDescription(itemWitId: PlaylistItemDomain) {
-        PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise())
-            .apply { findNavController().navigate(this) }
+        itemWitId.id?.also { id ->
+            adapter.getItemViewForId(id)?.itemView?.let { itemView ->
+                val extras = FragmentNavigatorExtras(
+                    itemView.listitem_top to "title",
+                    itemView.listitem_icon to "image" // todo extract constants somewhere
+                )
+                PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise())
+                    .apply { findNavController().navigate(this, extras) }
+            }
+        }
     }
 
     override fun gotoEdit(id: Long) {

@@ -49,6 +49,7 @@
         <item name="headlineFontLetterSpacing">0.02</item>
         <item name="headlineFontXScaling">1.05</item>
 
+        <!--        <item name="android:windowActivityTransitions">true</item>--><!-- only for activities -->
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
         <item name="android:toolbarStyle">@style/Toolbar</item>
         <item name="toolbarStyle">@style/Toolbar</item>

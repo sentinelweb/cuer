@@ -30,6 +30,7 @@ interface ItemContract {
         fun doView()
         fun doPlayStartClick()
         fun updateProgress()
+        fun isViewForId(id: Long): Boolean
     }
 
     interface External {

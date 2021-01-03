@@ -40,6 +40,8 @@ class ItemPresenter(
         view.setProgress(state.item?.progress ?: 0f)
     }
 
+    override fun isViewForId(id: Long): Boolean = state.item?.id == id
+
     override fun doPlay(external: Boolean) {
         interactions.onPlay(state.item!!, external)
     }

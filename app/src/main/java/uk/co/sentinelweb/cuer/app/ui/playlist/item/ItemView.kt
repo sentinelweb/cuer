@@ -46,6 +46,8 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     val leftSwipeView: View
         get() = swipe_label_left
 
+    fun isViewForId(id: Long): Boolean = presenter.isViewForId(id)
+
     override fun onFinishInflate() {
         super.onFinishInflate()
         listitem.setOnClickListener { presenter.doClick() }
@@ -96,6 +98,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
 
     override fun setTopText(text: SpannableString) {
         listitem_top.setText(text)
+        listitem_top.transitionName = text.toString()
     }
 
     override fun setBottomText(text: SpannableString) {
@@ -107,6 +110,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
             .load(url)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(listitem_icon)
+        listitem_icon.transitionName = url
     }
 
     override fun setBackground(@ColorRes backgroundColor: Int) {

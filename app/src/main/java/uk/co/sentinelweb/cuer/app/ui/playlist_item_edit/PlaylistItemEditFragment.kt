@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
+import android.transition.TransitionInflater
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
@@ -38,6 +39,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -52,6 +54,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     private val navMapper: NavigationMapper by currentScope.inject()
     private val chipCreator: ChipCreator by currentScope.inject()
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
+    private val contextProvider: CoroutineContextProvider by currentScope.inject()
 
     private val starMenuItem: MenuItem
         get() = ple_toolbar.menu.findItem(R.id.plie_star)
@@ -73,10 +76,15 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         var scrolledDown = false
     }
 
+    private val itemArg: PlaylistItemDomain? by lazy {
+        PLAYLIST_ITEM.getString(arguments)?.let { deserialisePlaylistItem(it) }
+    }
+
     init {
         log.tag(this)
     }
 
+    // saves the data on back press (enabled in onResume)
     private val saveCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             viewModel.checkToSave()
@@ -84,11 +92,14 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     }
 
     fun setData(media: MediaDomain?) = viewModel.setData(media)
-    fun setData(item: PlaylistItemDomain) = viewModel.setData(item)
+    //fun setData(item: PlaylistItemDomain) = viewModel.setData(item)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        if (itemArg != null) {
+            sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -146,6 +157,23 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 menuState.scrolledDown = isShow
             }
         })
+
+        // setup data for fragment transition
+        itemArg?.let { item ->
+            Glide.with(ple_image)
+                .load(item.media.image?.url)
+                .into(ple_image)
+
+            ple_play_button.isVisible = false
+            ple_author_image.isVisible = false
+            ple_title_pos.isVisible = false
+            ple_star_fab.isVisible = false
+            starMenuItem.isVisible = false
+            playMenuItem.isVisible = false
+            saveCallback.isEnabled = true
+
+            viewModel.delayedLoad(item)
+        }
         observeModel()
         observeNavigation()
         observeDialog()
@@ -154,16 +182,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback(this, saveCallback)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        PLAYLIST_ITEM.getString(arguments)
-            ?.let { deserialisePlaylistItem(it) }
-            ?.let {
-                setData(it)
-                saveCallback.isEnabled = true
-            }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -193,6 +211,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         .into(ple_image)
                     ple_desc.text = model.description
                     ple_title.text = model.title
+                    ple_collapsing_toolbar.title = model.title
                     ple_toolbar.title = model.title
                     menuState.modelEmpty = model.empty
                     if (model.empty) {

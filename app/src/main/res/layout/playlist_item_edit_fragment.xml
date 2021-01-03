@@ -18,6 +18,7 @@
         >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/ple_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
@@ -42,6 +43,7 @@
                 android:background="@color/background"
                 app:layout_collapseParallaxMultiplier="0.7"
                 tools:src="@drawable/im_test_nietzche"
+                android:transitionName="image"
                 />
 
             <ImageButton
@@ -50,7 +52,6 @@
                 android:layout_height="100dp"
                 android:layout_gravity="center"
                 android:alpha="0.8"
-                android:background="@drawable/ic_ripple_play_background"
                 android:contentDescription="@null"
                 android:fitsSystemWindows="true"
                 android:scaleType="center"
@@ -94,6 +95,7 @@
                 android:elevation="0dp"
                 app:layout_collapseMode="pin"
                 app:menu="@menu/playlist_item_edit_actionbar"
+                android:transitionName="title"
                 /><!-- app:layout_scrollFlags="scroll|enterAlways|snap"-->
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
