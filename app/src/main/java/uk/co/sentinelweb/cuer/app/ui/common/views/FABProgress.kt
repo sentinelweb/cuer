@@ -96,6 +96,7 @@ class FABProgress(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
             tickerChannel?.cancel()
             receiveJob?.cancel()
             tickerChannel = null
+            invalidate()
         }
     }
 

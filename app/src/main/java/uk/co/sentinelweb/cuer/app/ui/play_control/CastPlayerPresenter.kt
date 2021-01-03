@@ -94,6 +94,7 @@ class CastPlayerPresenter(
 
     override fun setPlayerState(playState: PlayerStateDomain) {
         state.playState = playState
+        log.d("playState = $playState")
         when (playState) {
             UNKNOWN -> view.showBuffering()
             UNSTARTED -> view.showBuffering()

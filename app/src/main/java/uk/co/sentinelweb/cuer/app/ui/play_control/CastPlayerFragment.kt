@@ -81,12 +81,12 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     }
 
     override fun setPlaying() {
-        binding.castPlayerFab.setImageResource(R.drawable.ic_player_pause_black)
+        binding.castPlayerFab.setImageState(intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked), false)
         binding.castPlayerFab.showProgress(false)
     }
 
     override fun setPaused() {
-        binding.castPlayerFab.setImageResource(R.drawable.ic_player_play_black)
+        binding.castPlayerFab.setImageState(intArrayOf(android.R.attr.state_enabled), false)
         binding.castPlayerFab.showProgress(false)
     }
 
