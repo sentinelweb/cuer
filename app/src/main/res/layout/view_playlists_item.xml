@@ -40,6 +40,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_nav_playlist_black"
+            android:background="@color/background"
             />
 
         <ImageView

@@ -15,6 +15,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.playlist_fragment.*
@@ -188,7 +189,10 @@ class PlaylistFragment :
     }
 
     override fun setHeaderModel(model: PlaylistContract.Model) {
-        Glide.with(playlist_header_image).load(imageProvider.makeRef(model.imageUrl)).into(playlist_header_image)
+        Glide.with(playlist_header_image)
+            .load(imageProvider.makeRef(model.imageUrl))
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(playlist_header_image)
         playlist_collapsing_toolbar.title = model.title
         playlist_fab_play.setImageResource(model.playIcon)
         playMenuItem.setIcon(model.playIcon)

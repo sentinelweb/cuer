@@ -13,6 +13,7 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.android.synthetic.main.view_playlists_item.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.context.KoinContextHandler.get
@@ -96,6 +97,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     override fun setIconUrl(url: String) {
         Glide.with(listitem_icon.context)
             .load(imageProvider.makeRef(url))
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(listitem_icon)
     }
 

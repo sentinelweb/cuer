@@ -39,6 +39,7 @@
                 android:contentDescription="@null"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
+                android:background="@color/background"
                 tools:src="@drawable/im_test_nietzche"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7"

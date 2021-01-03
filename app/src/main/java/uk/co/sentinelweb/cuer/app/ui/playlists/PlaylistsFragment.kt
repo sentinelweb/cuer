@@ -12,6 +12,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.playlists_fragment.*
 import org.koin.android.ext.android.inject
@@ -81,6 +82,7 @@ class PlaylistsFragment :
     override fun setList(model: PlaylistsContract.Model, animate: Boolean) {
         Glide.with(playlists_header_image)
             .load(imageProvider.makeRef(model.imageUrl))
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(playlists_header_image)
         playlists_swipe.isRefreshing = false
         playlists_items.text = "${model.items.size}"

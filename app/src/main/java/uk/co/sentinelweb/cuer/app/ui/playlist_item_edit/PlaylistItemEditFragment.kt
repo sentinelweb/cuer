@@ -18,6 +18,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.playlist_item_edit_fragment.*
 import org.koin.android.ext.android.inject
@@ -202,6 +203,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         Glide.with(ple_author_image)
                             .load(this)
                             .circleCrop()
+                            .transition(DrawableTransitionOptions.withCrossFade())
                             .into(ple_author_image)
                             .onLoadFailed(errDrawable)
                     } ?: run { ple_author_image.setImageDrawable(errDrawable) }
