@@ -308,15 +308,15 @@ class PlaylistFragment :
             PLAYING -> {
                 playlist_fab_play.setImageResource(R.drawable.ic_baseline_playlist_close_24)
                 playMenuItem.setIcon(R.drawable.ic_baseline_playlist_close_24)
-                playlist_fab_play.showProgress(false)
+                //playlist_fab_play.showProgress(false)
             }
             NOT_CONNECTED -> {
                 playlist_fab_play.setImageResource(R.drawable.ic_baseline_playlist_play_24)
                 playMenuItem.setIcon(R.drawable.ic_baseline_playlist_play_24)
-                playlist_fab_play.showProgress(false)
+                //playlist_fab_play.showProgress(false)
             }
             CONNECTING -> {
-                playlist_fab_play.showProgress(true)
+                //playlist_fab_play.showProgress(true)
                 playMenuItem.setIcon(R.drawable.ic_notif_buffer_black)
             }
         }
