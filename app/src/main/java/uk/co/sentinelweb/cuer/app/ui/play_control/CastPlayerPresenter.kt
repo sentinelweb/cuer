@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -10,12 +11,25 @@ import kotlin.math.min
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
-    private val state: CastPlayerState,
-    private val mapper: CastPlayerUiMapper
+    private val state: CastPlayerContract.State,
+    private val mapper: CastPlayerUiMapper,
+    private val log: LogWrapper
 ) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls {
+
+    init {
+        log.tag(this)
+    }
 
     override fun initialise() {
         state.isDestroyed = false
+    }
+
+    override fun onPlayPausePressed() {
+        when (state.playState) {
+            PLAYING -> state.listeners.forEach { it.pause() }
+            VIDEO_CUED, UNSTARTED, PAUSED, UNKNOWN -> state.listeners.forEach { it.play() }
+            else -> Unit
+        }
     }
 
     override fun onDestroyView() {
@@ -30,14 +44,6 @@ class CastPlayerPresenter(
 
     override fun removeListener(l: CastPlayerContract.PlayerControls.Listener) {
         state.listeners.remove(l)
-    }
-
-    override fun onPlayPressed() {
-        state.listeners.forEach { it.play() }
-    }
-
-    override fun onPausePressed() {
-        state.listeners.forEach { it.pause() }
     }
 
     override fun onSeekBackPressed() {
@@ -79,23 +85,22 @@ class CastPlayerPresenter(
     }
 
     override fun setConnectionState(connState: CastPlayerContract.ConnectionState) {
-        view.setConnectionText(
-            when (connState) {
-                CC_DISCONNECTED -> "X"
-                CC_CONNECTING -> "*"
-                CC_CONNECTED -> "="
-            }
-        )
+        when (connState) {
+            CC_DISCONNECTED -> view.hideBuffering()
+            CC_CONNECTING -> view.showBuffering()
+            CC_CONNECTED -> view.hideBuffering()
+        }
     }
 
     override fun setPlayerState(playState: PlayerStateDomain) {
+        state.playState = playState
         when (playState) {
-            UNKNOWN -> view.setPaused() // todo better state
-            UNSTARTED -> view.setPaused() // todo better state
+            UNKNOWN -> view.showBuffering()
+            UNSTARTED -> view.showBuffering()
             ENDED -> view.setPaused()
             PLAYING -> view.setPlaying()
             PAUSED -> view.setPaused()
-            BUFFERING -> view.setBuffering()
+            BUFFERING -> view.showBuffering()
             VIDEO_CUED -> Unit
             ERROR -> {
                 view.setPaused(); view.showMessage("An error occurred")

@@ -31,7 +31,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     private val log: LogWrapper by inject()
 
     init {
-        log.tag(this::class.java)
+        log.tag(this)
     }
 
     override fun setPresenter(itemPresenter: ItemContract.Presenter) {

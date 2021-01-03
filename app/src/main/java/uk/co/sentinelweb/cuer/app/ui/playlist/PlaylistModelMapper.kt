@@ -24,7 +24,7 @@ class PlaylistModelMapper constructor(
         domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         domain.mode.ordinal,
         loopModeMapper.mapIcon(domain.mode),
-        if (isPlaying) R.drawable.ic_player_pause_black else R.drawable.ic_button_play_black,
+        if (isPlaying) R.drawable.ic_baseline_playlist_close_24 else R.drawable.ic_baseline_playlist_play_24,
         if (domain.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_unstarred_white,
         domain.default,
         if (mapItems) {

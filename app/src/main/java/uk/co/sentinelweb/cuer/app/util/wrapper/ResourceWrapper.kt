@@ -6,10 +6,7 @@ import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
-import androidx.annotation.ColorRes
-import androidx.annotation.DimenRes
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 
@@ -23,9 +20,19 @@ class ResourceWrapper constructor(
         resources.displayMetrics.density
     }
 
+    val screenWidth: Int by lazy {
+        resources.displayMetrics.widthPixels
+    }
+    val screenHeight: Int by lazy {
+        resources.displayMetrics.heightPixels
+    }
+
     fun getString(@StringRes id: Int) = context.getString(id)
 
     fun getString(@StringRes id: Int, vararg params: Any) = context.resources.getString(id, *params)
+
+    @ColorInt
+    fun getColor(@ColorRes id: Int) = ContextCompat.getColor(context, id)
 
     fun getDimensionPixelSize(@DimenRes id: Int): Int = context.resources.getDimensionPixelSize(id)
 

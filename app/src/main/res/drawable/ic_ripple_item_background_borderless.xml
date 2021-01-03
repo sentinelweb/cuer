@@ -8,5 +8,5 @@
         android:drawable="@color/grey_400"
         android:state_focused="true"
         />
-    <item android:drawable="@color/surface" />
+    <item android:drawable="@android:color/transparent" />
 </ripple>

@@ -1,203 +1,194 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cordinatorBottom"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toBottomOf="parent"
     >
 
-    <View
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/primary_dark"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/primary_dark"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/cast_player_image"
-        android:layout_width="64dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
-
-    <LinearLayout
-        android:id="@+id/cast_player_playlist_button"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:translationX="10dp"
-        android:translationY="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/cast_player_image"
-        app:layout_constraintRight_toLeftOf="@id/cast_player_track_last"
+        android:layout_gravity="bottom"
+        android:layout_marginTop="30dp"
+        android:paddingBottom="0dp"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp"
+        app:fabAlignmentMode="center"
+        app:fabCradleMargin="10dp"
+        app:fabCradleRoundedCornerRadius="25dp"
+        app:fabCradleVerticalOffset="0dp"
         >
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/cast_player_playlist_image"
-            android:layout_width="32dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:background="@color/white"
-            android:padding="1dp"
-            android:src="@drawable/ic_nav_playlist_black"
-            android:visibility="gone"
-            />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
 
-        <TextView
-            android:id="@+id/cast_player_playlist_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="#ccffffff"
-            android:padding="2dp"
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            tools:text="playlist"
-            />
-    </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/primary_dark"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
 
-    <FrameLayout
-        android:id="@+id/cast_player_center"
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/cast_player_image"
+                android:layout_width="64dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <LinearLayout
+                android:id="@+id/cast_player_playlist_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:translationX="10dp"
+                android:translationY="4dp"
+                app:layout_constraintBottom_toBottomOf="@+id/cast_player_image"
+                app:layout_constraintRight_toLeftOf="@id/cast_player_track_last"
+                >
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/cast_player_playlist_image"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:background="@color/white"
+                    android:padding="1dp"
+                    android:src="@drawable/ic_nav_playlist_black"
+                    android:visibility="gone"
+                    />
+
+                <TextView
+                    android:id="@+id/cast_player_playlist_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="#ccffffff"
+                    android:padding="2dp"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    tools:text="playlist"
+                    />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/cast_player_center"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/cast_player_seek_back"
+                style="@style/CompactPlayer.Button"
+                android:src="@drawable/ic_player_fast_rewind_black"
+                app:layout_constraintRight_toLeftOf="@id/cast_player_center"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/cast_player_seek_forward"
+                style="@style/CompactPlayer.Button"
+                android:src="@drawable/ic_player_fast_forward_black"
+                app:layout_constraintLeft_toRightOf="@id/cast_player_center"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/cast_player_track_last"
+                style="@style/CompactPlayer.Button"
+                android:src="@drawable/ic_player_skip_b_black"
+                app:layout_constraintRight_toLeftOf="@id/cast_player_seek_back"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/cast_player_track_next"
+                style="@style/CompactPlayer.Button"
+                android:src="@drawable/ic_player_skip_f_black"
+                app:layout_constraintLeft_toRightOf="@id/cast_player_seek_forward"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <androidx.mediarouter.app.MediaRouteButton
+                android:id="@+id/media_route_button"
+                android:layout_width="@dimen/player_button_size"
+                android:layout_height="@dimen/player_button_size"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/cast_player_current_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cast_player_center"
+                tools:ignore="RtlHardcoded"
+                tools:text="11:22:33"
+                />
+
+            <TextView
+                android:id="@+id/cast_player_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:gravity="center"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:singleLine="true"
+                app:layout_constraintLeft_toRightOf="@+id/cast_player_current_time"
+                app:layout_constraintRight_toLeftOf="@+id/cast_player_duration"
+                app:layout_constraintTop_toBottomOf="@id/cast_player_center"
+                tools:text="title"
+                />
+
+            <TextView
+                android:id="@+id/cast_player_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cast_player_center"
+                tools:ignore="RtlHardcoded"
+                tools:text="44:44:44"
+                />
+
+            <SeekBar
+                android:id="@+id/cast_player_seek"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="1000"
+                android:progressTint="?colorProgress"
+                android:thumbTint="?colorProgress"
+                app:layout_constraintTop_toBottomOf="@id/cast_player_title"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+    <uk.co.sentinelweb.cuer.app.ui.common.views.FABProgress
+        android:id="@+id/cast_player_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/cast_player_play"
-            style="@style/CompactPlayer.Button"
-            android:src="@drawable/ic_player_play_black"
-            />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/cast_player_pause"
-            style="@style/CompactPlayer.Button"
-            android:src="@drawable/ic_player_pause_black"
-
-            />
-
-        <ProgressBar
-            android:id="@+id/cast_player_buffering"
-            android:background="?selectableItemBackground"
-            android:layout_width="@dimen/player_button_icon_size"
-            android:layout_height="@dimen/player_button_icon_size"
-            android:padding="4dp"
-            android:layout_margin="4dp"
-            android:indeterminateTint="?colorProgress"
-            />
-    </FrameLayout>
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/cast_player_seek_back"
-        style="@style/CompactPlayer.Button"
-        android:src="@drawable/ic_player_fast_rewind_black"
-        app:layout_constraintRight_toLeftOf="@id/cast_player_center"
-        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/ic_player_play_black"
+        android:tint="@color/white"
+        app:backgroundTint="?colorPrimary"
+        app:layout_anchor="@id/bottom_bar"
         />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/cast_player_seek_forward"
-        style="@style/CompactPlayer.Button"
-        android:src="@drawable/ic_player_fast_forward_black"
-        app:layout_constraintLeft_toRightOf="@id/cast_player_center"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/cast_player_track_last"
-        style="@style/CompactPlayer.Button"
-        android:src="@drawable/ic_player_skip_b_black"
-        app:layout_constraintRight_toLeftOf="@id/cast_player_seek_back"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/cast_player_track_next"
-        style="@style/CompactPlayer.Button"
-        android:src="@drawable/ic_player_skip_f_black"
-        app:layout_constraintLeft_toRightOf="@id/cast_player_seek_forward"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <TextView
-        android:id="@+id/cast_player_status_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintRight_toLeftOf="@id/media_route_button"
-        app:layout_constraintTop_toTopOf="parent"
-        android:padding="@dimen/player_button_padding"
-        tools:text="-"
-        android:visibility="gone"
-        />
-
-
-    <androidx.mediarouter.app.MediaRouteButton
-        android:id="@+id/media_route_button"
-        android:layout_width="@dimen/player_button_size"
-        android:layout_height="@dimen/player_button_size"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <TextView
-        android:id="@+id/cast_player_current_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/cast_player_center"
-        app:layout_constraintLeft_toLeftOf="parent"
-        tools:text="11:22:33"
-        android:layout_marginLeft="8dp"
-        tools:ignore="RtlHardcoded"
-        />
-
-    <TextView
-        android:id="@+id/cast_player_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:ellipsize="marquee"
-        android:gravity="center"
-        android:singleLine="true"
-        app:layout_constraintTop_toBottomOf="@id/cast_player_center"
-        app:layout_constraintLeft_toRightOf="@+id/cast_player_current_time"
-        app:layout_constraintRight_toLeftOf="@+id/cast_player_duration"
-        tools:text="title"
-        />
-
-    <TextView
-        android:id="@+id/cast_player_duration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/cast_player_center"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:text="44:44:44"
-        android:layout_marginRight="8dp"
-        tools:ignore="RtlHardcoded"
-        />
-
-    <SeekBar
-        android:id="@+id/cast_player_seek"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:max="1000"
-        android:progressTint="?colorProgress"
-        android:thumbTint="?colorProgress"
-        app:layout_constraintTop_toBottomOf="@id/cast_player_title"
-        />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

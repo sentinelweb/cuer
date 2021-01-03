@@ -1,11 +1,10 @@
-package uk.co.sentinelweb.cuer.app.util.navigation
+package uk.co.sentinelweb.cuer.app.ui.common.navigation
 
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity

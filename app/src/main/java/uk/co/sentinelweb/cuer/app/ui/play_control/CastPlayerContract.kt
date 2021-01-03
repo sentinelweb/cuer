@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
+import androidx.lifecycle.ViewModel
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -7,8 +8,6 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 interface CastPlayerContract {
 
     interface Presenter {
-        fun onPlayPressed()
-        fun onPausePressed()
         fun onSeekBackPressed()
         fun onSeekFwdPressed()
         fun onTrackBackPressed()
@@ -17,6 +16,7 @@ interface CastPlayerContract {
         fun onSeekFinished()
         fun onDestroyView()
         fun initialise()
+        fun onPlayPausePressed()
     }
 
     // todo think about this maybe sub with android MediaControl interface
@@ -48,12 +48,12 @@ interface CastPlayerContract {
     interface View {
         val playerControls: PlayerControls
         fun initMediaRouteButton()
-        fun setConnectionText(text: String)
         fun setCurrentSecond(second: String)
         fun setDuration(duration: String)
         fun setPlaying()
         fun setPaused()
-        fun setBuffering()
+        fun showBuffering()
+        fun hideBuffering()
         fun showMessage(msg: String)
         fun setTitle(title: String)
         fun updateSeekPosition(ratio: Float)
@@ -66,5 +66,16 @@ interface CastPlayerContract {
     enum class ConnectionState {
         CC_DISCONNECTED, CC_CONNECTING, CC_CONNECTED,
     }
+
+    data class State constructor(
+        val listeners: MutableList<PlayerControls.Listener> = mutableListOf(), // todo data only here move to presenter?
+        var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
+        var positionMs: Long = 0,
+        var seekPositionMs: Long = 0,
+        var durationMs: Long = 0,
+        var title: String = "",
+        var isDestroyed: Boolean = false
+    ) : ViewModel()
+
 
 }

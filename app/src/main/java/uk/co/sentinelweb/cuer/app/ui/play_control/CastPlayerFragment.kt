@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -44,8 +43,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.castPlayerPlay.setOnClickListener { presenter.onPlayPressed() }
-        binding.castPlayerPause.setOnClickListener { presenter.onPausePressed() }
+        binding.castPlayerFab.setOnClickListener { presenter.onPlayPausePressed() }
         binding.castPlayerSeekBack.setOnClickListener { presenter.onSeekBackPressed() }
         binding.castPlayerSeekForward.setOnClickListener { presenter.onSeekFwdPressed() }
         binding.castPlayerTrackLast.setOnClickListener { presenter.onTrackBackPressed() }
@@ -74,10 +72,6 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
     }
 
-    override fun setConnectionText(text: String) {
-        binding.castPlayerStatusText.text = text
-    }
-
     override fun setCurrentSecond(second: String) {
         binding.castPlayerCurrentTime.text = second
     }
@@ -87,21 +81,21 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     }
 
     override fun setPlaying() {
-        binding.castPlayerPlay.isVisible = false
-        binding.castPlayerPause.isVisible = true
-        binding.castPlayerBuffering.isVisible = false
+        binding.castPlayerFab.setImageResource(R.drawable.ic_player_pause_black)
+        binding.castPlayerFab.showProgress(false)
     }
 
     override fun setPaused() {
-        binding.castPlayerPlay.isVisible = true
-        binding.castPlayerPause.isVisible = false
-        binding.castPlayerBuffering.isVisible = false
+        binding.castPlayerFab.setImageResource(R.drawable.ic_player_play_black)
+        binding.castPlayerFab.showProgress(false)
     }
 
-    override fun setBuffering() {
-        binding.castPlayerPlay.isVisible = false
-        binding.castPlayerPause.isVisible = false
-        binding.castPlayerBuffering.isVisible = true
+    override fun showBuffering() {
+        binding.castPlayerFab.showProgress(true)
+    }
+
+    override fun hideBuffering() {
+        binding.castPlayerFab.showProgress(false)
     }
 
     override fun showMessage(msg: String) {
@@ -147,11 +141,12 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
                     CastPlayerPresenter(
                         get(),
                         get(),
+                        get(),
                         get()
                     )
                 }
                 scoped { CastPlayerUiMapper(get()) }
-                viewModel { CastPlayerState() }
+                viewModel { CastPlayerContract.State() }
             }
         }
     }

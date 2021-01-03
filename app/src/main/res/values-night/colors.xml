@@ -22,6 +22,9 @@
     <!--    <color name="menu_button_icon_tint">@color/white</color>-->
     <color name="chip_icon_tint">@color/default_tint</color>
     <color name="player_button_tint">@color/white</color>
+    <color name="player_button_progress">@color/white</color>
+    <color name="player_button_background_tint">@android:color/transparent</color>
+    <color name="player_button_ripple_tint">@color/grey_300</color>
 
     <!--    custom colors-->
     <!--    <color name="dark_red">#961717</color>-->

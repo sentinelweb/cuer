@@ -29,6 +29,10 @@
 
         <item name="android:statusBarColor">?colorPrimaryDark</item>
         <item name="android:navigationBarColor">?colorPrimaryDark</item>
+        <item name="android:selectableItemBackground">@drawable/ic_ripple_item_background</item>
+        <item name="android:selectableItemBackgroundBorderless">
+            @drawable/ic_ripple_item_background_borderless
+        </item>
 
         <!-- custom attributes -->
         <item name="colorCheckIcon">@color/green_700</item>
