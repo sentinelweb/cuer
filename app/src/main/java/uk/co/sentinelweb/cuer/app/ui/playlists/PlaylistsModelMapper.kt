@@ -1,21 +1,31 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class PlaylistsModelMapper constructor() {
 
-    fun map(domains: List<PlaylistDomain>): PlaylistsModel = PlaylistsModel(
-        domains.mapIndexed { index, pl ->
-            ItemModel(
+    fun map(domains: Map<PlaylistDomain, PlaylistStatDomain?>, current: Long?): PlaylistsContract.Model = PlaylistsContract.Model(
+        DEFAULT_HEADER_IMAGE,
+        current,
+        domains.keys.mapIndexed { index, pl ->
+            ItemContract.Model(
                 pl.id!!,
                 index,
                 pl.title,
-                (if (pl.starred) " * " else " ") + (if (pl.default) " D " else " ") + pl.mode,
                 false,
-                (pl.thumb ?: pl.image)?.url
+                (pl.thumb ?: pl.image)?.url,
+                count = domains[pl]?.itemCount ?: -1,
+                newItems = domains[pl]?.let { it.itemCount - it.watchedItemCount } ?: -1,
+                starred = pl.starred,
+                loopMode = pl.mode
             )
         }
     )
+
+    companion object {
+        const val DEFAULT_HEADER_IMAGE = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg"
+    }
 
 }

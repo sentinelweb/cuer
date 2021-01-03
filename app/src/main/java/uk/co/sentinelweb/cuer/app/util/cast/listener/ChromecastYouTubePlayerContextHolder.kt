@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.cast.listener
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
+import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 
@@ -38,6 +39,16 @@ class ChromecastYouTubePlayerContextHolder constructor(
         listener = null
         context?.release()
         context = null
+    }
+
+    fun addConnectionListener(listener: ChromecastConnectionListener) {
+        context?.addChromecastConnectionListener(listener)
+            ?: throw IllegalStateException("No context created")
+    }
+
+    fun removeConnectionListener(listener: ChromecastConnectionListener) {
+        context?.removeChromecastConnectionListener(listener)
+            ?: throw IllegalStateException("No context created")
     }
 
 }

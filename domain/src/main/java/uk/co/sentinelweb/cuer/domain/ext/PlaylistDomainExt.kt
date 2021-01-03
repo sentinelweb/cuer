@@ -7,6 +7,12 @@ fun PlaylistDomain.currentItem() = if (currentIndex > -1 && currentIndex < items
     items[currentIndex]
 } else null
 
+fun PlaylistDomain.currentItemOrStart() = if (currentIndex > -1 && currentIndex < items.size) {
+    items[currentIndex]
+} else if (items.size > 0) {
+    items[0]
+} else null
+
 fun PlaylistDomain.itemWitId(id: Long?) = items.find { it.id == id }
 
 fun PlaylistDomain.indexOfItem(item: PlaylistItemDomain): Int? {

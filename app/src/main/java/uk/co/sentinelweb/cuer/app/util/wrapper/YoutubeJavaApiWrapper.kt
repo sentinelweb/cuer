@@ -27,6 +27,13 @@ class YoutubeJavaApiWrapper(
                 activity.startActivity(createChannelIntent(activity, media.channelData.platformId))
             } ?: false
 
+    fun launchChannel(id: String) =
+        canLaunchChannel()
+            .takeIf { it }
+            .also {
+                activity.startActivity(createChannelIntent(activity, id))
+            } ?: false
+
 
     fun launchVideo(media: MediaDomain) =
         canLaunchVideo()

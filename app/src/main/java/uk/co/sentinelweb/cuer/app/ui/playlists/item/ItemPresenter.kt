@@ -5,12 +5,13 @@ import uk.co.sentinelweb.cuer.app.R
 class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
-    val state: ItemState
+    val state: ItemContract.State,
+    val modelMapper: ItemModelMapper
 ) : ItemContract.Presenter, ItemContract.External {
 
-    override fun update(item: ItemModel) {
-        view.setTopText(item.title)
-        view.setBottomText(item.data)
+    override fun update(item: ItemContract.Model, current: Boolean) {
+        view.setTopText(modelMapper.mapTopText(item, current))
+        view.setBottomText(modelMapper.mapBottomText(item))
         view.setCheckedVisible(item.checkIcon)
         item.thumbNailUrl
             ?.apply { view.setIconUrl(this) }

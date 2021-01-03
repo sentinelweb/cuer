@@ -1,55 +1,211 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="colorControlNormal">@color/control_normal</item>
-        <item name="android:popupMenuStyle">@style/ContextMenu</item>
-        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
-        <!--        <item name="android:windowBackground">@color/primary_dark</item>-->
-        <item name="android:statusBarColor">@color/primary_dark</item>
-        <item name="android:navigationBarColor">@color/primary_dark</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="android:popupMenuStyle">@style/ContextMenu</item>
-        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="TextAppearance.App.Button" parent="TextAppearance.MaterialComponents.Button">
+    <!-- TextAppearance -->
+    <style name="TextAppearance.App.Button"
+           parent="@style/TextAppearance.MaterialComponents.Button">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/white</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
     </style>
 
+    <style name="TextAppearance.App.Headline1"
+           parent="@style/TextAppearance.MaterialComponents.Headline1">
+        <item name="android:textSize">48sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline2"
+           parent="@style/TextAppearance.MaterialComponents.Headline2">
+        <item name="android:textSize">36sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline3"
+           parent="@style/TextAppearance.MaterialComponents.Headline3">
+        <item name="android:textSize">28sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline4"
+           parent="@style/TextAppearance.MaterialComponents.Headline4">
+        <item name="android:textSize">24sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline5"
+           parent="@style/TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textSize">20sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textSize">16sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="Toolbar" parent="@style/Widget.MaterialComponents.Toolbar">
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+    <!-- end TextAppearance -->
+    <!-- Headers =========================== -->
+    <style name="Header" />
+
+    <style name="Header.InfoText">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">top|end</item>
+        <item name="android:layout_marginTop">84dp</item>
+        <item name="android:background">@color/black_text_secondary</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1
+        </item>
+    </style>
+
+
+    <!-- end Headers =========================== -->
+
+    <!-- ItemView =========================== -->
     <style name="ItemView" />
 
-    <style name="ItemView.TopText" parent="@style/TextAppearance.AppCompat.Small">
+    <style name="ItemView.Container">
+        <item name="android:layout_margin">@dimen/list_item_margin</item>
+        <item name="android:background">@drawable/ic_ripple_item_background</item>
+        <item name="android:elevation">@dimen/list_item_elevation</item>
+    </style>
+
+    <style name="ItemView.Background">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:textColor">?colorOnPrimary</item>
         <item name="android:textSize">16sp</item>
+        <item name="tint">?colorOnPrimary</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:drawableTint">?colorOnPrimary</item>
+        <item name="android:alpha">0</item>
+        <item name="android:padding">@dimen/list_item_swipe_margin</item>
+    </style>
+
+    <style name="ItemView.Background.Right">
+        <item name="android:gravity">left|center_vertical</item>
+
+    </style>
+
+    <style name="ItemView.Background.Left">
+        <item name="android:gravity">right|center_vertical</item>
+    </style>
+
+    <style name="ItemView.Thumb">
+        <item name="android:padding">0dp</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <style name="ItemView.Thumb.Row">
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">56dp</item>
+    </style>
+
+    <style name="ItemView.TopText" parent="@style/TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:paddingEnd">4dp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/text_normal</item>
-        <item name="android:padding">4dp</item>
-        <item name="android:layout_margin">0dp</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
     </style>
 
     <style name="ItemView.BottomText" parent="@style/TextAppearance.AppCompat.Small">
-        <item name="android:padding">4dp</item>
-        <item name="android:textColor">@color/text_light</item>
-        <item name="android:layout_margin">0dp</item>
+        <item name="android:textSize">@dimen/list_item_bottom_text_size</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="ItemView.OverflowButtonClick">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+    </style>
+
+    <style name="ItemView.OverflowButton">
+        <item name="android:layout_width">16dp</item>
+        <item name="tint">@color/grey_300</item>
+        <item name="android:src">@drawable/ic_more_vert_black</item>
+        <item name="android:scaleType">center</item>
+    </style>
+
+    <style name="ItemView.CheckIcon">
+        <item name="tint">?colorCheckIcon</item>
+        <item name="android:src">@drawable/ic_item_tick_white</item>
+        <item name="android:visibility">visible</item><!-- todo gone -->
+    </style>
+
+    <style name="ItemView.CheckIcon.Row">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
     </style>
 
     <style name="ContextMenu" parent="Widget.AppCompat.PopupMenu">
-        <item name="android:textColor">@color/popup_menu_text</item>
-        <item name="android:iconTint">@color/popup_menu_icon_tint</item>
+        <item name="android:textColor">?contextMenuItemColor</item>
+        <item name="android:iconTint">?contextMenuItemColor</item>
     </style>
+    <!-- end ItemView =========================== -->
+
+    <!-- CompactPlayer =========================== -->
+    <style name="CompactPlayer" />
+
+    <style name="CompactPlayer.Button">
+        <item name="android:background">@drawable/ic_ripple_play_background</item>
+        <item name="android:layout_width">@dimen/player_button_size</item>
+        <item name="android:layout_height">@dimen/player_button_size</item>
+        <item name="android:padding">@dimen/player_button_padding</item>
+        <item name="android:tint">?playerButtonColor</item>
+    </style>
+    <!-- end CompactPlayer =========================== -->
+
+    <!-- Chips =========================== -->
+    <style name="Chip" />
+
+    <style name="Chip.SelectPlaylist" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="chipIcon">@drawable/ic_chip_playlist_black</item>
+        <item name="chipIconSize">20dp</item>
+        <item name="chipIconTint">@color/chip_icon_tint</item>
+    </style>
+
+    <style name="Chip.Playlist" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="chipIconSize">@dimen/chip_thumb_icon_size</item>
+        <item name="chipIconVisible">true</item>
+        <item name="android:checkable">false</item>
+    </style>
+    <!-- end Chips =========================== -->
+
 
     <style name="FullscreenTheme" parent="AppTheme">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
@@ -68,20 +224,27 @@
     <style name="TextAppearance.App.CollapsingToolbar" />
 
     <style name="TextAppearance.App.CollapsingToolbar.Expanded">
-        <item name="android:background">@color/purple_300</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="TextAppearance.App.CollapsingToolbar.Collapsed">
-        <item name="android:background">@color/orange_500</item>
+    <style name="TextAppearance.App.CollapsingToolbar.Collapsed.Small">
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="TextAppearance.App.CollapsingToolbar.Collapsed">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
     <style name="FabButton" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="backgroundTint">?colorPrimary</item>
-        <item name="tint">@color/fab_button_icon_tint</item>
+        <item name="tint">?colorOnPrimary</item>
+    </style>
+
+    <style name="FabButton.Secondary">
+        <item name="backgroundTint">?colorSecondary</item>
+        <item name="tint">?colorOnSecondary</item>
     </style>
 
 </resources>

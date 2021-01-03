@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.dao.MediaDao
 import uk.co.sentinelweb.cuer.app.db.dao.PlaylistDao
 import uk.co.sentinelweb.cuer.app.db.dao.PlaylistItemDao
+import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistAndItems
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistItemMapper
@@ -13,6 +14,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class PlaylistDatabaseRepository constructor(
     private val playlistDao: PlaylistDao,
@@ -176,6 +178,25 @@ class PlaylistDatabaseRepository constructor(
                 RepoResult.Error<Boolean>(e, msg)
             }
         }
+
+    // region PlaylistStatDomain
+    suspend fun loadPlaylistStatList(playlistIds: List<Long>): RepoResult<List<PlaylistStatDomain>> =
+        withContext(coProvider.IO) {
+            try {
+                RepoResult.Data(playlistIds.map {
+                    PlaylistStatDomain(
+                        playlistId = it,
+                        itemCount = playlistItemDao.countItems(it),
+                        watchedItemCount = playlistItemDao.countMediaFlags(it, MediaEntity.FLAG_WATCHED)
+                    )
+                })
+            } catch (e: Exception) {
+                val msg = "couldn't delete all media"
+                log.e(msg, e)
+                RepoResult.Error<List<PlaylistStatDomain>>(e, msg)
+            }
+        }
+    // endregion PlaylistStatDomain
 
     // region PlaylistItemDomain
     suspend fun savePlaylistItem(item: PlaylistItemDomain): RepoResult<PlaylistItemDomain> =

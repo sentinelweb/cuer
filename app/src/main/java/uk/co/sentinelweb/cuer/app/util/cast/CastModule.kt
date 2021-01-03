@@ -28,5 +28,6 @@ object CastModule {
                 log = get()
             )
         }
+        factory { CastDialogWrapper(get()) }
     }
 }

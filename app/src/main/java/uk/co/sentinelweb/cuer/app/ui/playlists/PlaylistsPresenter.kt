@@ -3,26 +3,23 @@ package uk.co.sentinelweb.cuer.app.ui.playlists
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistsPresenter(
     private val view: PlaylistsContract.View,
-    private val state: PlaylistsState,
-    private val repository: MediaDatabaseRepository,
+    private val state: PlaylistsContract.State,
     private val playlistRepository: PlaylistDatabaseRepository,
+    private val queue: QueueMediatorContract.Producer,
     private val modelMapper: PlaylistsModelMapper,
-    private val contextProvider: CoroutineContextProvider,
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
@@ -43,11 +40,11 @@ class PlaylistsPresenter(
     override fun destroy() {
     }
 
-    override fun onItemSwipeRight(item: ItemModel) {
+    override fun onItemSwipeRight(item: ItemContract.Model) {
         view.gotoEdit(item.id)
     }
 
-    override fun onItemSwipeLeft(item: ItemModel) {
+    override fun onItemSwipeLeft(item: ItemContract.Model) {
         state.viewModelScope.launch {
             delay(400)
             state.playlists.apply {
@@ -61,19 +58,19 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onItemClicked(item: ItemModel) {
+    override fun onItemClicked(item: ItemContract.Model) {
         view.gotoPlaylist(item.id, false)
     }
 
-    override fun onItemPlay(item: ItemModel, external: Boolean) {
+    override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
         view.gotoPlaylist(item.id, true)
     }
 
-    override fun onItemStar(item: ItemModel) {
+    override fun onItemStar(item: ItemContract.Model) {
         toastWrapper.show("todo: star ${item.id}")
     }
 
-    override fun onItemShare(item: ItemModel) {
+    override fun onItemShare(item: ItemContract.Model) {
         toastWrapper.show("share: ${item.title}")
     }
 
@@ -123,9 +120,14 @@ class PlaylistsPresenter(
             ?.data
             ?: listOf()
 
+        state.playlistStats = playlistRepository
+            .loadPlaylistStatList(state.playlists.mapNotNull { it.id }).data
+            ?: listOf()
+
         state.playlists
-            .let { modelMapper.map(it) }
-            .also { view.setList(it.items, animate) }
+            .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
+            .let { modelMapper.map(it, queue.playlistId) }
+            .also { view.setList(it, animate) }
             .takeIf { focusCurrent }
             ?.let {
                 state.playlists.apply {

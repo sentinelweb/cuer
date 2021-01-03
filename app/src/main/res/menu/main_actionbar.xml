@@ -10,14 +10,14 @@
     <!--        app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"-->
     <!--        app:showAsAction="always"/>-->
 
-    <item
-        android:id="@+id/restart_conn"
-        android:icon="@drawable/ic_menu_restart_conn_black"
-        android:title="@string/menu_restart"
-        android:visible="false"
-        app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="never"
-        />
+    <!--    <item-->
+    <!--        android:id="@+id/restart_conn"-->
+    <!--        android:icon="@drawable/ic_menu_restart_conn_black"-->
+    <!--        android:title="@string/menu_restart"-->
+    <!--        android:visible="false"-->
+    <!--        app:iconTint="@color/menu_button_icon_tint"-->
+    <!--        app:showAsAction="never"-->
+    <!--        />-->
 
     <item
         android:id="@+id/settings"
@@ -31,14 +31,6 @@
         android:id="@+id/paste_add"
         android:icon="@drawable/ic_menu_paste_add_black"
         android:title="@string/menu_paste"
-        app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="ifRoom"
-        />
-
-    <item
-        android:id="@+id/filter"
-        android:icon="@drawable/ic_menu_filter_list_white"
-        android:title="@string/menu_filter"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="ifRoom"
         />

@@ -1,13 +1,16 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import androidx.lifecycle.viewModelScope
+import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
+import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
@@ -15,26 +18,27 @@ import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.currentItemOrStart
 import uk.co.sentinelweb.cuer.domain.ext.indexOfItemId
 import uk.co.sentinelweb.cuer.domain.ext.itemWitId
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 class PlaylistPresenter(
     private val view: PlaylistContract.View,
-    private val state: PlaylistState,
+    private val state: PlaylistContract.State,
     private val repository: MediaDatabaseRepository,
     private val playlistRepository: PlaylistDatabaseRepository,
     private val modelMapper: PlaylistModelMapper,
-    private val contextProvider: CoroutineContextProvider,
     private val queue: QueueMediatorContract.Producer,
     private val toastWrapper: ToastWrapper,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val chromeCastWrapper: ChromeCastWrapper,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val shareWrapper: ShareWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
@@ -51,6 +55,35 @@ class PlaylistPresenter(
     private val isQueuedPlaylist: Boolean
         get() = state.playlist?.let { queue.playlistId == it.id } ?: false
 
+    private val castConnectionListener = object : ChromecastConnectionListener {
+        override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
+            if (isQueuedPlaylist) {
+                view.setPlayState(PlaylistContract.PlayState.PLAYING)
+            }
+        }
+
+        override fun onChromecastConnecting() {
+            if (isQueuedPlaylist) {
+                view.setPlayState(PlaylistContract.PlayState.CONNECTING)
+            }
+        }
+
+        override fun onChromecastDisconnected() {
+            if (isQueuedPlaylist) {
+                view.setPlayState(PlaylistContract.PlayState.NOT_CONNECTED)
+            }
+        }
+
+    }
+
+    override fun onResume() {
+        ytContextHolder.addConnectionListener(castConnectionListener)
+    }
+
+    override fun onPause() {
+        ytContextHolder.removeConnectionListener(castConnectionListener)
+    }
+
     private fun queueExecIfElse(
         block: QueueMediatorContract.Producer.() -> Unit,
         elseBlock: (QueueMediatorContract.Producer.() -> Unit)? = null
@@ -62,6 +95,7 @@ class PlaylistPresenter(
     private fun queueExecIf(block: QueueMediatorContract.Producer.() -> Unit) {
         if (isQueuedPlaylist) block(queue)
     }
+
 
     override fun initialise() {
         queue.addProducerListener(this)
@@ -81,7 +115,7 @@ class PlaylistPresenter(
         queue.removeProducerListener(this)
     }
 
-    override fun onItemSwipeRight(item: PlaylistModel.PlaylistItemModel) {// move
+    override fun onItemSwipeRight(item: ItemContract.Model) {// move
         state.viewModelScope.launch {
             state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
             playlistDialogModelCreator.loadPlaylists { allPlaylists ->
@@ -106,6 +140,72 @@ class PlaylistPresenter(
         playlist.id?.let { moveItemToPlaylist(it) }
     }
 
+    override fun onPlayModeChange(): Boolean {
+        state.playlist = state.playlist?.copy(
+            mode = when (state.playlist?.mode) {
+                SINGLE -> SHUFFLE
+                SHUFFLE -> LOOP
+                LOOP -> SINGLE
+                else -> SINGLE
+            }
+        )
+        commitHeaderChange()
+        return true
+    }
+
+    private fun commitHeaderChange() {
+        state.viewModelScope.launch {
+            state.playlist?.let {
+                playlistRepository.save(it, flat = true)
+                queueExecIf { refreshQueueFrom(it) }
+            }
+            state.playlist?.apply {
+                view.setHeaderModel(modelMapper.map(this, isPlaylistPlaying(), false))
+            }
+        }
+    }
+
+    override fun onPlayPlaylist(): Boolean {
+        if (isPlaylistPlaying()) {
+            chromeCastWrapper.killCurrentSession()
+        } else {
+            state.playlist?.let {
+                prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
+                queue.refreshQueueFrom(it)
+                it.currentItemOrStart()?.let { queue.onItemSelected(it, forcePlay = true, resetPosition = false) }
+                    ?: toastWrapper.show("No items to play")
+            }
+            if (!ytContextHolder.isConnected()) {
+                view.showCastRouteSelectorDialog()
+            }
+        }
+
+        return true
+    }
+
+    override fun onStarPlaylist(): Boolean {
+        state.playlist = state.playlist?.let { it.copy(starred = !it.starred) }
+        commitHeaderChange()
+        return true
+    }
+
+    override fun onFilterNewItems(): Boolean {
+        log.d("onFilterNewItems")
+        return true
+    }
+
+    override fun onEdit(): Boolean {
+        state.playlist
+            ?.run { id }
+            ?.apply { view.gotoEdit(this) }
+        return true
+    }
+
+    override fun onFilterPlaylistItems(): Boolean {
+        log.d("onFilterPlaylistItems")
+        return true
+    }
+
     private fun moveItemToPlaylist(it: Long) {
         state.selectedPlaylistItem?.let { moveItem ->
             state.viewModelScope.launch {
@@ -116,7 +216,7 @@ class PlaylistPresenter(
         }
     }
 
-    override fun onItemSwipeLeft(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemSwipeLeft(item: ItemContract.Model) {
         state.viewModelScope.launch {
             delay(400)
             state.playlist?.items?.apply {
@@ -134,12 +234,12 @@ class PlaylistPresenter(
         }
     }
 
-    override fun onItemViewClick(item: ItemModel) {
+    override fun onItemViewClick(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)
             ?.apply { view.showItemDescription(this) }
     }
 
-    override fun onItemClicked(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemClicked(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
                 view.showItemDescription(itemDomain)
@@ -149,7 +249,7 @@ class PlaylistPresenter(
         } // todo error
     }
 
-    override fun onPlayStartClick(item: PlaylistModel.PlaylistItemModel) {
+    override fun onPlayStartClick(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
                 //view.showItemDescription(itemDomain)
@@ -162,7 +262,7 @@ class PlaylistPresenter(
     private fun playItem(itemDomain: PlaylistItemDomain, resetPos: Boolean) {
         if (isQueuedPlaylist) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
-        } else {
+        } else { // todo only confirm if video is playing
             view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
                 state.playlist?.let {
                     prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
@@ -177,7 +277,7 @@ class PlaylistPresenter(
         view.scrollTo(direction)
     }
 
-    override fun onItemPlay(item: PlaylistModel.PlaylistItemModel, external: Boolean) {
+    override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (external) {
                 if (!ytJavaApi.launchVideo(itemDomain.media)) {
@@ -189,7 +289,7 @@ class PlaylistPresenter(
         } ?: toastWrapper.show("can't find video")
     }
 
-    override fun onItemShowChannel(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemShowChannel(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!ytJavaApi.launchChannel(itemDomain.media)) {
                 toastWrapper.show("can't launch channel")
@@ -197,11 +297,11 @@ class PlaylistPresenter(
         } ?: toastWrapper.show("can't find video")
     }
 
-    override fun onItemStar(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemStar(item: ItemContract.Model) {
         toastWrapper.show("todo: star ${item.id}")
     }
 
-    override fun onItemShare(item: PlaylistModel.PlaylistItemModel) {
+    override fun onItemShare(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             shareWrapper.share(itemDomain.media)
         }
@@ -219,8 +319,8 @@ class PlaylistPresenter(
             state.playlist = state.playlist?.let { playlist ->
                 playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!)
             }?.also { plist ->
-                plist.let { modelMapper.map(it) }
-                    .also { view.setList(it.items, false) }
+                plist.let { modelMapper.map(it, isPlaylistPlaying()) }
+                    .also { view.setModel(it, false) }
             }?.also { plist ->
                 state.viewModelScope.launch {
                     playlistRepository.save(plist, false)
@@ -321,8 +421,8 @@ class PlaylistPresenter(
                     }
                 }
                 .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
-                ?.let { modelMapper.map(it) }
-                ?.also { view.setList(it.items, animate) }
+                ?.let { modelMapper.map(it, isPlaylistPlaying()) }
+                ?.also { view.setModel(it, animate) }
                 .also {
                     state.focusIndex?.apply {
                         view.scrollToItem(this)
@@ -336,7 +436,12 @@ class PlaylistPresenter(
                                     view.highlightPlayingItem(it)
                                 }
                             },
-                            { state.playlist?.currentIndex?.also { view.scrollToItem(it) } }
+                            {
+                                state.playlist?.currentIndex?.also {
+                                    view.scrollToItem(it)
+                                    view.highlightPlayingItem(it)
+                                }
+                            }
                         )
                     }
                 }
@@ -344,4 +449,6 @@ class PlaylistPresenter(
             log.e("Error loading playlist", e)
         }
     }
+
+    private fun isPlaylistPlaying() = isQueuedPlaylist && ytContextHolder.isConnected()
 }

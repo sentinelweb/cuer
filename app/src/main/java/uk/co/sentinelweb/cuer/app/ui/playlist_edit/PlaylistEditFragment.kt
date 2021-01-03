@@ -9,7 +9,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
+import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
 import kotlinx.android.synthetic.main.playlist_edit_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
@@ -28,10 +30,10 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
     private val viewModel: PlaylistEditViewModel by currentScope.inject()
     private val log: LogWrapper by inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
+    private val softKeyboard: SoftKeyboardWrapper by inject()
 
-    private val starMenuItem: MenuItem by lazy { pe_toolbar.menu.findItem(R.id.share_star) }
-
-    //private var lastImageUrl: String? = null
+    private val starMenuItem: MenuItem
+        get() = pe_toolbar.menu.findItem(R.id.plie_star)
 
     internal var listener: Listener? = null
 
@@ -62,7 +64,7 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
         starMenuItem.isVisible = false
         pe_toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.share_star -> {
+                R.id.plie_star -> {
                     viewModel.onStarClick()
                     true
                 }
@@ -138,6 +140,7 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
                         //if (lastImageUrl != it) {
                         Glide.with(pe_image.context)
                             .load(imageProvider.makeRef(it))
+                            .transition(DrawableTransitionOptions.withCrossFade())
                             .into(pe_image)
                         //Picasso.get().load(model.imageUrl).into(ple_image)
                         //}
@@ -165,6 +168,7 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
             this.viewLifecycleOwner,
             object : Observer<PlaylistDomain> {
                 override fun onChanged(domain: PlaylistDomain) {
+                    softKeyboard.hideSoftKeyboard(pe_title_edit)
                     listener?.onPlaylistCommit(domain)
                         ?: findNavController().popBackStack()
                 }

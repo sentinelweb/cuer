@@ -5,22 +5,22 @@ import uk.co.sentinelweb.cuer.app.R
 class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
-    val state: ItemState
+    val state: ItemContract.State,
+    private val modelMapper: ItemModelMapper
 ) : ItemContract.Presenter, ItemContract.External {
 
     override fun update(
-        item: ItemModel,
+        item: ItemContract.Model,
         highlightPlaying: Boolean
     ) {
-        view.setTopText(item.topText)
-        view.setBottomText(item.bottomText)
-        view.setCheckedVisible(item.checkIcon)
+        view.setTopText(modelMapper.mapTopText(item, highlightPlaying))
+        view.setBottomText(modelMapper.mapBottomText(item))
+        view.setCheckedVisible(false)
         item.thumbNailUrl
             ?.apply { view.setIconUrl(this) }
-            ?: item.iconRes
-                ?.apply { view.setIconResource(this) }
-            ?: view.setIconResource(0)
-        view.setBackground(if (highlightPlaying) R.color.playing_item_background else R.color.white)
+            ?: view.setIconResource(R.drawable.ic_platform_youtube_24_black)
+        view.setDuration(item.duration)
+        view.setProgress(item.progress)
         state.item = item
     }
 
@@ -35,6 +35,12 @@ class ItemPresenter(
     override fun doRight() {
         interactions.onRightSwipe(state.item!!)
     }
+
+    override fun updateProgress() {
+        view.setProgress(state.item?.progress ?: 0f)
+    }
+
+    override fun isViewForId(id: Long): Boolean = state.item?.id == id
 
     override fun doPlay(external: Boolean) {
         interactions.onPlay(state.item!!, external)

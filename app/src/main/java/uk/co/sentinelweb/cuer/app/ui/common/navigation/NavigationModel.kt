@@ -31,7 +31,7 @@ data class NavigationModel constructor(
         PLAYLISTS_FRAGMENT(),
         BROWSE_FRAGMENT(),
         PLAYER_FRAGMENT(),
-        NAV_BACK() // use navigation to go back
+        NAV_BACK(), // use navigation to go back
         ;
 
         companion object {

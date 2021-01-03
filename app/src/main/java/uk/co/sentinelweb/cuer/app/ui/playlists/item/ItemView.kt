@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item
 // todo view binding
 import android.annotation.SuppressLint
 import android.content.Context
+import android.text.SpannableString
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.android.synthetic.main.view_playlists_item.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.context.KoinContextHandler.get
@@ -45,7 +47,6 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     private fun showContextualMenu() {
 
         val wrapper = ContextThemeWrapper(context, R.style.ContextMenu)
-        //val wrapper = context
         val popup = PopupMenu(wrapper, listitem_overflow_click)
         popup.inflate(R.menu.playlists_context)
         popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
@@ -81,11 +82,11 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         listitem_icon_check.visibility = if (checked) View.VISIBLE else View.GONE
     }
 
-    override fun setTopText(text: String) {
+    override fun setTopText(text: SpannableString) {
         listitem_top.setText(text)
     }
 
-    override fun setBottomText(text: String) {
+    override fun setBottomText(text: SpannableString) {
         listitem_bottom.setText(text)
     }
 
@@ -96,6 +97,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     override fun setIconUrl(url: String) {
         Glide.with(listitem_icon.context)
             .load(imageProvider.makeRef(url))
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(listitem_icon)
     }
 

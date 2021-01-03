@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.di
 
+import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -14,14 +15,17 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.PlatformMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsFragment
-import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
+import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
+import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -35,6 +39,8 @@ import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
+import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.di.DomainModule
@@ -44,8 +50,8 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
 object Modules {
     private val scopedModules = listOf(
-        PlaylistFragment.fragmentModule,
-        PlaylistsFragment.fragmentModule,
+        PlaylistContract.fragmentModule,
+        PlaylistsContract.fragmentModule,
         PlayerFragment.fragmentModule,
         BrowseFragment.fragmentModule,
         MainActivity.activityModule,
@@ -54,11 +60,14 @@ object Modules {
         PlaylistItemEditFragment.fragmentModule,
         PlaylistEditFragment.fragmentModule,
         YoutubeCastServiceModule.serviceModule,
-        PrefBackupFragment.fragmentModule
+        PrefBackupContract.fragmentModule,
+        PrefRootContract.fragmentModule
     )
 
     private val uiModule = module {
         factory { PlaylistSelectDialogModelCreator(get(), get()) }
+        factory { PlatformMapper() }
+        factory { LoopModeMapper() }
     }
 
     private val utilModule = module {
@@ -100,8 +109,10 @@ object Modules {
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }
         factory { ResourceWrapper(androidApplication()) }
-        factory<LogWrapper> { AndroidLogWrapper() }
+        factory<LogWrapper> { CompositeLogWrapper(get(), get()) }
+        factory { AndroidLogWrapper() }
         factory { FileWrapper(androidApplication()) }
+        factory { SoftKeyboardWrapper() }
         single(named<GeneralPreferences>()) {
             SharedPrefsWrapper(GeneralPreferences::class.java, androidApplication(), get())
         }

@@ -1,12 +1,13 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import android.view.ViewGroup
+import androidx.core.view.children
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemView
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemViewHolder
 
 
@@ -17,9 +18,9 @@ class PlaylistAdapter constructor(
 
     private lateinit var recyclerView: RecyclerView
 
-    private var _data: List<ItemModel> = listOf()
+    private var _data: List<ItemContract.Model> = listOf()
 
-    val data: List<ItemModel>
+    val data: List<ItemContract.Model>
         get() = _data
 
     var highlightItem: Int? = null
@@ -28,7 +29,7 @@ class PlaylistAdapter constructor(
             notifyDataSetChanged()
         }
 
-    fun setData(data: List<ItemModel>, animate: Boolean = true) {
+    fun setData(data: List<ItemContract.Model>, animate: Boolean = true) {
         if (animate) {
             DiffUtil.calculateDiff(
                 ItemDiffCallback(
@@ -48,9 +49,11 @@ class PlaylistAdapter constructor(
         }
 
     }
+
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemViewHolder {
         return itemFactory.createItemViewHolder(parent, interactions)
     }
@@ -61,4 +64,15 @@ class PlaylistAdapter constructor(
     }
 
     override fun getItemCount(): Int = _data.size
+
+    fun getItemViewForId(id: Long): ItemView? {
+        recyclerView.children.forEach { childView ->
+            if (childView is ItemView) {
+                if (childView.isViewForId(id)) {
+                    return@getItemViewForId childView
+                }
+            }
+        }
+        return null
+    }
 }

@@ -6,21 +6,27 @@
     <dimen name="player_button_icon_size">40dp</dimen>
     <dimen name="player_button_size">48dp</dimen>
     <dimen name="player_button_padding">8dp</dimen>
+    <dimen name="player_fab_button_icon_size">64dp</dimen>
 
     <dimen name="notif_button_icon_size">24dp</dimen>
     <dimen name="chip_icon_size">16dp</dimen>
 
     <dimen name="list_item_padding">4dp</dimen>
     <dimen name="list_item_margin">8dp</dimen>
-    <dimen name="list_item_swipe_margin">16dp</dimen>
+    <dimen name="list_item_swipe_margin">8dp</dimen>
     <dimen name="list_item_elevation">2dp</dimen>
     <dimen name="list_item_swipe_dismiss_dist">100dp</dimen>
     <dimen name="list_item_swipe_dismiss_toerance">4dp</dimen>
     <dimen name="list_item_height">76dp</dimen>
-    <dimen name="item_swipe_icon_size">36dp</dimen>
+    <dimen name="list_item_top_text_size">16sp</dimen>
+    <dimen name="list_item_bottom_text_size">14sp</dimen>
+    <dimen name="list_item_progress_height">4dp</dimen>
+    <dimen name="item_swipe_icon_size">28dp</dimen>
     <dimen name="button_icon_size">24dp</dimen>
     <dimen name="menu_icon_size">24dp</dimen>
     <dimen name="button_elevation">1dp</dimen>
     <dimen name="share_button_width">250dp</dimen>
     <dimen name="pref_icon_size">36dp</dimen>
+
+    <dimen name="chip_thumb_icon_size">48dp</dimen>
 </resources>

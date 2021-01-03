@@ -17,7 +17,7 @@
     <string name="menu_channel_yt">Go to channel</string>
     <string name="menu_star">Star</string>
     <string name="menu_share">Share</string>
-    <string name="menu_paste">Paste</string>
+    <string name="menu_paste">Paste &amp; add</string>
     <string name="menu_restart">Restart</string>
 
     <!-- share activity -->
@@ -63,16 +63,40 @@
     <!-- local player -->
     <string name="title_activity_fullscreen">YoutubeFullscreenActivity</string>
 
+    <!-- generic contentdescription -->
+    <string name="cd_overflow">More actions</string>
+    <string name="cd_check">Select item</string>
+
+    <!-- prefs -->
+    <string name="prefs_root_debug_send_reports_key">sendReports</string>
+    <string name="prefs_root_backup_item_title">Backup</string>
+    <string name="prefs_root_backup_cat_title">Backup/Restore</string>
+    <string name="prefs_root_backup_summary">Data backup options</string>
+    <string name="prefs_root_debug_cat_title">Debug</string>
+    <string
+        name="prefs_root_debug_send_reports_summary">Trigger unsent crash report to crashlytics</string>
+    <string name="prefs_root_debug_send_reports_title">Send unsent reports</string>
+    <string name="prefs_backup_backup_key">backup</string>
+    <string name="prefs_backup_restore_key">restore</string>
+
+
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="menu_settings">Settings</string>
-    <string name="prefs_root_item_backup_title">Backup</string>
     <string name="nav_title_backup_settings">Backup settings</string>
-    <string name="pref_key_backup">backup</string>
-    <string name="pref_key_restore">restore</string>
     <string name="pe_default_display_title">Enter a title …</string>
     <string name="pe_error_title_blank">Add a title</string>
     <string name="playlist_dialog_add_playlist">Add playlist …</string>
     <string name="playlist_item_edit_title">View Item</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_playlist_mode_shuffle">Shuffle</string>
+    <string name="menu_playlist_mode_loop">Loop</string>
+    <string name="menu_playlist_mode_single">Single</string>
+    <string name="menu_show_unlistened">Show unlistened</string>
+    <string name="default_playlist">Default</string>
+    <string name="dash">-</string>
+    <string name="pls_item_edit">Edit</string>
+    <string name="pls_item_delete">Delete</string>
+
 
 </resources>

@@ -1,13 +1,14 @@
 package uk.co.sentinelweb.cuer.app.util.firebase
 
+import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
-import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 
 class FirebaseDefaultImageProvider constructor(
-    private val log: LogWrapper
+    private val log: AndroidLogWrapper
 ) {
     private lateinit var rootStorageRef: StorageReference
     private lateinit var listStorageRef: List<StorageReference>
@@ -33,7 +34,10 @@ class FirebaseDefaultImageProvider constructor(
 
                 }
             }
-            addOnFailureListener { ex -> log.e("Couldn't init ", ex) }
+            addOnFailureListener { ex ->
+                log.e("Couldn't init ", ex)
+                Firebase.crashlytics.recordException(ex)
+            }
         }
     }
 

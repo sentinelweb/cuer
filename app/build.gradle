@@ -80,8 +80,8 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
 
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation "androidx.recyclerview:recyclerview:$ver_recyclerview"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$ver_recyclerview"
 
     implementation "com.jakewharton:process-phoenix:$ver_process_phoenix" // todo remove this with connectin monitor
     implementation "androidx.preference:preference-ktx:$ver_preference"
@@ -115,24 +115,23 @@ dependencies {
 
     // FIREBASE
     // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:26.1.1')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation platform("com.google.firebase:firebase-bom:$ver_firebase_bom")
     // Declare the dependency for the Cloud Storage library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-storage-ktx'
-    implementation 'com.firebaseui:firebase-ui-storage:7.1.1'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
 
+    implementation "com.firebaseui:firebase-ui-storage:$ver_firebase_ui"
 
-    implementation 'com.github.bumptech.glide:glide:4.11.0'// todo extract version
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
-    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation "com.github.bumptech.glide:glide:$ver_glide"// todo extract version
+    annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
+    kapt "com.github.bumptech.glide:compiler:$ver_glide"
 
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
-    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: ver_hamcrest
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
     testImplementation "androidx.room:room-testing:$ver_room"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test"
@@ -146,7 +145,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
     androidTestImplementation "org.koin:koin-test:$ver_koin"
     androidTestImplementation "io.mockk:mockk:$ver_mockk"
-    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: ver_hamcrest
     androidTestImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
     androidTestImplementation "androidx.test:core:$ver_androidx_test"
     androidTestImplementation "androidx.test:runner:$ver_androidx_test"

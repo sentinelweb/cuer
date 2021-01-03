@@ -43,7 +43,7 @@ class CuerApp : Application() {
         databaseInit.initDatabase()
 
         firebaseWrapper.init()
-
+        firebaseWrapper.sendUnsentReports()
         setDefaultExceptionHander()
     }
 
@@ -51,10 +51,11 @@ class CuerApp : Application() {
 
     fun setDefaultExceptionHander() {
         Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
-            if (oldHandler != null) oldHandler.uncaughtException(paramThread, paramThrowable)
-            else {
-                System.err.println(paramThread.state.toString())
-                paramThrowable.printStackTrace(System.err)
+            firebaseWrapper.logMessage("Thread Name: ${paramThread.name} state:${paramThread.state} group:${paramThread.threadGroup?.name}")
+            log.e("FATAL Global Exception", paramThrowable)
+            if (oldHandler != null) {
+                oldHandler.uncaughtException(paramThread, paramThrowable)
+            } else {
                 System.exit(0)
             }
         }

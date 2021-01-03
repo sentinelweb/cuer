@@ -10,6 +10,9 @@ interface PlaylistDao {
     @Query("SELECT count() FROM playlist")
     suspend fun count(): Int
 
+    @Query("SELECT count() FROM playlist")
+    suspend fun countItems(): Int
+
     @Transaction
     @Query("SELECT * FROM playlist")
     suspend fun getAllPlaylistsWithItems(): List<PlaylistAndItems>

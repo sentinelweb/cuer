@@ -1,42 +1,47 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import android.os.Bundle
+import android.transition.TransitionInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.playlist_fragment.*
+import kotlinx.android.synthetic.main.view_playlist_item.view.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
-import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.PlayState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModel
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -60,14 +65,36 @@ class PlaylistFragment :
     private val log: LogWrapper by inject()
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
     private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
+    private val imageProvider: FirebaseDefaultImageProvider by inject()
+    private val castDialogWrapper: CastDialogWrapper by inject()
+
+    private val starMenuItem: MenuItem
+        get() = playlist_toolbar.menu.findItem(R.id.playlist_star)
+    private val playMenuItem: MenuItem
+        get() = playlist_toolbar.menu.findItem(R.id.playlist_play)
+    private val editMenuItem: MenuItem
+        get() = playlist_toolbar.menu.findItem(R.id.playlist_edit)
+    private val newMenuItem: MenuItem
+        get() = playlist_toolbar.menu.findItem(R.id.playlist_new)
+    private val filterMenuItem: MenuItem
+        get() = playlist_toolbar.menu.findItem(R.id.playlist_filter)
+    private val modeMenuItems: List<MenuItem>
+        get() = listOf( // same order as the enum in PlaylistDomain
+            playlist_toolbar.menu.findItem(R.id.playlist_mode_single),
+            playlist_toolbar.menu.findItem(R.id.playlist_mode_loop),
+            playlist_toolbar.menu.findItem(R.id.playlist_mode_shuffle)
+        )
 
     private var snackbar: Snackbar? = null
-
     private var createPlaylistDialog: DialogFragment? = null
+
+    private var lastPlayModeIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
+        sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
     }
 
     // region Fragment
@@ -77,7 +104,6 @@ class PlaylistFragment :
             (activity as AppCompatActivity).setSupportActionBar(it)
             it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
-
         presenter.initialise()
         playlist_list.layoutManager = LinearLayoutManager(context)
         playlist_list.adapter = adapter
@@ -86,6 +112,51 @@ class PlaylistFragment :
         playlist_fab_up.setOnLongClickListener { presenter.scroll(Top);true }
         playlist_fab_down.setOnClickListener { presenter.scroll(Down) }
         playlist_fab_down.setOnLongClickListener { presenter.scroll(Bottom);true }
+        playlist_appbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+
+            var isShow = false
+            var scrollRange = -1
+
+            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange()
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    isShow = true
+                    // only show the menu items for the non-empty state
+                    modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == lastPlayModeIndex }
+                    playMenuItem.isVisible = true
+                } else if (isShow) {
+                    isShow = false
+                    modeMenuItems.forEach { it.isVisible = false }
+                    playMenuItem.isVisible = false
+                }
+            }
+        })
+        playlist_fab_playmode.setOnClickListener { presenter.onPlayModeChange() }
+        //playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
+        playlist_fab_play.setOnClickListener { presenter.onPlayPlaylist() }
+        postponeEnterTransition()
+        playlist_list.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.playlist_actionbar, menu)
+        modeMenuItems.forEach { it.isVisible = false }
+        modeMenuItems.forEach { it.setOnMenuItemClickListener { presenter.onPlayModeChange() } }
+        playMenuItem.isVisible = false
+        playMenuItem.setOnMenuItemClickListener { presenter.onPlayPlaylist() }
+        starMenuItem.setOnMenuItemClickListener { presenter.onStarPlaylist() }
+        newMenuItem.setOnMenuItemClickListener { presenter.onFilterNewItems() }
+        editMenuItem.setOnMenuItemClickListener { presenter.onEdit() }
+        filterMenuItem.setOnMenuItemClickListener { presenter.onFilterPlaylistItems() }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView() {
@@ -101,14 +172,48 @@ class PlaylistFragment :
             PLAYLIST_ITEM_ID.getLong(arguments),
             PLAY_NOW.getBoolean(arguments) ?: false
         )
+        presenter.onResume()
+//        throw RuntimeException("test crashlytics")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        presenter.onPause()
     }
     // endregion
 
     // region PlaylistContract.View
-    override fun setList(list: List<ItemModel>, animate: Boolean) {
+    override fun setModel(model: PlaylistContract.Model, animate: Boolean) {
+        setHeaderModel(model)
+
+        // update list
+        model.items?.apply { setList(this, animate) }
+    }
+
+    override fun setList(items: List<ItemContract.Model>, animate: Boolean) {
         playlist_swipe.isRefreshing = false
-        adapter.setData(list, animate)
+        adapter.setData(items, animate)
         playlist_swipe.setOnRefreshListener { presenter.refreshList() }
+        playlist_fab_up.isVisible = items.size > 30
+        playlist_fab_down.isVisible = items.size > 30
+    }
+
+    override fun setHeaderModel(model: PlaylistContract.Model) {
+        Glide.with(playlist_header_image)
+            .load(imageProvider.makeRef(model.imageUrl))
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(playlist_header_image)
+        playlist_collapsing_toolbar.title = model.title
+        playlist_fab_play.setImageResource(model.playIcon)
+        playMenuItem.setIcon(model.playIcon)
+        starMenuItem.setIcon(model.starredIcon)
+        //playlist_items.setText("${model.items.size}")
+        playlist_flags.isVisible = model.isDefault
+        playlist_fab_playmode.setImageResource(model.loopModeIcon)
+        lastPlayModeIndex = model.loopModeIndex
+        if (!playlist_fab_playmode.isVisible) {
+            modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == lastPlayModeIndex }
+        }
     }
 
     override fun showDeleteUndo(msg: String) {
@@ -160,6 +265,8 @@ class PlaylistFragment :
 
     override fun highlightPlayingItem(currentItemIndex: Int?) {
         adapter.highlightItem = currentItemIndex
+        // todo map it properly
+        playlist_items.setText("${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}")
     }
 
     override fun setSubTitle(subtitle: String) {
@@ -184,12 +291,25 @@ class PlaylistFragment :
         createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
     }
 
-    override fun onView(item: ItemModel) {
+    override fun onView(item: ItemContract.Model) {
         presenter.onItemViewClick(item)
     }
 
     override fun showItemDescription(itemWitId: PlaylistItemDomain) {
-        PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise())
+        itemWitId.id?.also { id ->
+            adapter.getItemViewForId(id)?.itemView?.let { itemView ->
+                val extras = FragmentNavigatorExtras(
+                    itemView.listitem_top to "title",
+                    itemView.listitem_icon to "image" // todo extract constants somewhere
+                )
+                PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise())
+                    .apply { findNavController().navigate(this, extras) }
+            }
+        }
+    }
+
+    override fun gotoEdit(id: Long) {
+        PlaylistFragmentDirections.actionGotoEditPlaylist(id)
             .apply { findNavController().navigate(this) }
     }
 
@@ -199,6 +319,29 @@ class PlaylistFragment :
 
     override fun resetItemsState() {
         adapter.notifyDataSetChanged()
+    }
+
+    override fun showCastRouteSelectorDialog() {
+        castDialogWrapper.showRouteSelector(childFragmentManager)
+    }
+
+    override fun setPlayState(state: PlaylistContract.PlayState) {
+        when (state) {
+            PLAYING -> {
+                playlist_fab_play.setImageResource(R.drawable.ic_baseline_playlist_close_24)
+                playMenuItem.setIcon(R.drawable.ic_baseline_playlist_close_24)
+                //playlist_fab_play.showProgress(false)
+            }
+            NOT_CONNECTED -> {
+                playlist_fab_play.setImageResource(R.drawable.ic_baseline_playlist_play_24)
+                playMenuItem.setIcon(R.drawable.ic_baseline_playlist_play_24)
+                //playlist_fab_play.showProgress(false)
+            }
+            CONNECTING -> {
+                //playlist_fab_play.showProgress(true)
+                playMenuItem.setIcon(R.drawable.ic_notif_buffer_black)
+            }
+        }
     }
     //endregion
 
@@ -216,82 +359,44 @@ class PlaylistFragment :
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemModel) {
-        presenter.onItemClicked(item as PlaylistModel.PlaylistItemModel)
+    override fun onClick(item: ItemContract.Model) {
+        presenter.onItemClicked(item)
     }
 
-    override fun onPlayStartClick(item: ItemModel) {
-        presenter.onPlayStartClick(item as PlaylistModel.PlaylistItemModel)
+    override fun onPlayStartClick(item: ItemContract.Model) {
+        presenter.onPlayStartClick(item)
     }
 
-    override fun onRightSwipe(item: ItemModel) {
-        presenter.onItemSwipeRight(item as PlaylistModel.PlaylistItemModel)
+    override fun onRightSwipe(item: ItemContract.Model) {
+        presenter.onItemSwipeRight(item)
     }
 
-    override fun onLeftSwipe(item: ItemModel) {
-        val playlistItemModel = item as PlaylistModel.PlaylistItemModel
+    override fun onLeftSwipe(item: ItemContract.Model) {
+        val playlistItemModel = item
         adapter.notifyItemRemoved(playlistItemModel.index)
         presenter.onItemSwipeLeft(playlistItemModel) // delays for animation
     }
 
-    override fun onPlay(item: ItemModel, external: Boolean) {
-        presenter.onItemPlay(item as PlaylistModel.PlaylistItemModel, external)
+    override fun onPlay(item: ItemContract.Model, external: Boolean) {
+        presenter.onItemPlay(item, external)
     }
 
-    override fun onShowChannel(item: ItemModel) {
-        presenter.onItemShowChannel(item as PlaylistModel.PlaylistItemModel)
+    override fun onShowChannel(item: ItemContract.Model) {
+        presenter.onItemShowChannel(item)
     }
 
-    override fun onStar(item: ItemModel) {
-        presenter.onItemStar(item as PlaylistModel.PlaylistItemModel)
+    override fun onStar(item: ItemContract.Model) {
+        presenter.onItemStar(item)
     }
 
-    override fun onShare(item: ItemModel) {
-        presenter.onItemShare(item as PlaylistModel.PlaylistItemModel)
+    override fun onShare(item: ItemContract.Model) {
+        presenter.onItemShare(item)
     }
 
     //endregion
 
     companion object {
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
-
-        @JvmStatic
-        val fragmentModule = module {
-            scope(named<PlaylistFragment>()) {
-                scoped<PlaylistContract.View> { getSource() }
-                scoped<PlaylistContract.Presenter> {
-                    PlaylistPresenter(
-                        view = get(),
-                        state = get(),
-                        repository = get(),
-                        playlistRepository = get(),
-                        modelMapper = get(),
-                        contextProvider = get(),
-                        queue = get(),
-                        toastWrapper = get(),
-                        ytContextHolder = get(),
-                        ytJavaApi = get(),
-                        shareWrapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>()),
-                        playlistMutator = get(),
-                        log = get(),
-                        playlistDialogModelCreator = get(),
-                        timeProvider = get()
-                    )
-                }
-                scoped { PlaylistModelMapper(res = get()) }
-                scoped { PlaylistAdapter(get(), getSource()) }
-                scoped { ItemTouchHelperCallback(getSource()) }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
-                scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ItemFactory() }
-                scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
-                scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
-                viewModel { PlaylistState() }
-            }
-        }
 
     }
 }

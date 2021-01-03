@@ -8,27 +8,27 @@
         android:id="@+id/playlists_context_play"
         android:icon="@drawable/ic_menu_play_black"
         android:title="@string/menu_play"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="?contextMenuItemColor"
         />
 
     <item
         android:id="@+id/playlists_context_play_external"
         android:icon="@drawable/ic_menu_launch_black"
         android:title="@string/menu_play_yt"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="?contextMenuItemColor"
         />
 
     <item
         android:id="@+id/playlists_context_star"
         android:icon="@drawable/ic_menu_unstarred_black"
         android:title="@string/menu_star"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="?contextMenuItemColor"
         />
 
     <item
         android:id="@+id/playlists_context_share"
         android:icon="@drawable/ic_menu_share_black"
         android:title="@string/menu_share"
-        app:iconTint="@color/popup_menu_icon_tint"
+        app:iconTint="?contextMenuItemColor"
         />
 </menu>

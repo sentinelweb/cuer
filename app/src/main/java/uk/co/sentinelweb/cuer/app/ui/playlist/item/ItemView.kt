@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist.item
 // todo view binding
 import android.annotation.SuppressLint
 import android.content.Context
+import android.text.SpannableString
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.view.View
@@ -13,17 +14,30 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.android.synthetic.main.view_playlist_item.view.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.extension.fade
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 
 class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLayout(c, a, def),
-    ItemContract.View {
+    ItemContract.View, KoinComponent {
 
     constructor(c: Context, a: AttributeSet?) : this(c, a, 0)
 
     private lateinit var presenter: ItemContract.Presenter
+    private val log: LogWrapper by inject()
+
+    init {
+        log.tag(this)
+    }
+
+    override fun setPresenter(itemPresenter: ItemContract.Presenter) {
+        presenter = itemPresenter
+    }
 
     val itemView: View
         get() = listitem
@@ -31,6 +45,8 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         get() = swipe_label_right
     val leftSwipeView: View
         get() = swipe_label_left
+
+    fun isViewForId(id: Long): Boolean = presenter.isViewForId(id)
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -80,27 +96,33 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         listitem_icon_check.visibility = if (checked) View.VISIBLE else View.GONE
     }
 
-    override fun setTopText(text: String) {
+    override fun setTopText(text: SpannableString) {
         listitem_top.setText(text)
+        listitem_top.transitionName = text.toString()
     }
 
-    override fun setBottomText(text: String) {
+    override fun setBottomText(text: SpannableString) {
         listitem_bottom.setText(text)
     }
 
-    override fun setPresenter(itemPresenter: ItemContract.Presenter) {
-        presenter = itemPresenter
-    }
-
     override fun setIconUrl(url: String) {
-        //Picasso.get().load(url).into(listitem_icon)
         Glide.with(listitem_icon)
             .load(url)
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(listitem_icon)
+        listitem_icon.transitionName = url
     }
 
     override fun setBackground(@ColorRes backgroundColor: Int) {
         listitem.setBackgroundResource(backgroundColor)
+    }
+
+    override fun setDuration(text: String) {
+        listitem_duration.text = text
+    }
+
+    override fun setProgress(ratio: Float) {
+        listitem_progress.progress = (100 * ratio).toInt()
     }
 
 }

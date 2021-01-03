@@ -66,8 +66,7 @@ class MainActivity :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.paste_add -> startActivity(ShareActivity.intent(this, true))
-            R.id.filter -> snackBarWrapper.make("Not implemented")
-            R.id.restart_conn -> presenter.restartYtCastContext()
+            //R.id.restart_conn -> presenter.restartYtCastContext()
             R.id.settings -> navController.navigate(R.id.navigation_settings_root)
         }
         return super.onOptionsItemSelected(item)
@@ -92,14 +91,12 @@ class MainActivity :
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
-
     }
 
     override fun onStart() {
         super.onStart()
         presenter.onStart()
         checkIntent(intent)
-
     }
 
     override fun onStop() {
@@ -147,7 +144,7 @@ class MainActivity :
         pref: Preference
     ): Boolean {
         when (pref.title) {
-            getString(R.string.prefs_root_item_backup_title) -> navController.navigate(R.id.navigation_settings_backup)
+            getString(R.string.prefs_root_backup_item_title) -> navController.navigate(R.id.navigation_settings_backup)
         }
         return true
     }
