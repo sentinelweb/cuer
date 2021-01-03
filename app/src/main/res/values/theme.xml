@@ -46,7 +46,7 @@
         <item name="colorProgress">@color/primary</item>
         <item name="bodyFont">@font/montserrat</item>
         <item name="headlineFont">@font/didact_gothic</item>
-        <item name="headlineFontLetterSpacing">0.05</item>
+        <item name="headlineFontLetterSpacing">0.02</item>
         <item name="headlineFontXScaling">1.05</item>
 
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
