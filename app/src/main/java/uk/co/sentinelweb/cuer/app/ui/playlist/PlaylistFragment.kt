@@ -1,11 +1,13 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -91,6 +93,8 @@ class PlaylistFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
+        sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
     }
 
     // region Fragment
@@ -132,6 +136,10 @@ class PlaylistFragment :
         playlist_fab_playmode.setOnClickListener { presenter.onPlayModeChange() }
         //playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
         playlist_fab_play.setOnClickListener { presenter.onPlayPlaylist() }
+        postponeEnterTransition()
+        playlist_list.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

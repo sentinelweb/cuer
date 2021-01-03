@@ -30,6 +30,7 @@
             app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:statusBarScrim="?attr/colorPrimaryDark"
+            android:background="@color/background"
             >
 
             <ImageView

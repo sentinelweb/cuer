@@ -99,7 +99,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         setHasOptionsMenu(true)
         if (itemArg != null) {
             sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
-            sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         }
     }
 
@@ -168,6 +167,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
             //ple_play_button.isVisible = false
             ple_author_image.isVisible = false
             ple_title_pos.isVisible = false
+            ple_title_bg.isVisible = false
             ple_star_fab.isVisible = false
             starMenuItem.isVisible = false
             playMenuItem.isVisible = false
@@ -195,6 +195,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
             this.viewLifecycleOwner,
             object : Observer<PlaylistItemEditModel> {
                 override fun onChanged(model: PlaylistItemEditModel) {
+                    ple_title_bg.isVisible = true
                     ple_author_image.isVisible = !model.empty
                     //ple_play_button.isVisible = !model.empty
                     ple_title_pos.isVisible = !model.empty
