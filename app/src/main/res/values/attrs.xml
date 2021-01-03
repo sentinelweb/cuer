@@ -7,6 +7,10 @@
     <attr name="playerButtonColor" format="color" />
     <attr name="contextMenuItemColor" format="color" />
     <attr name="colorProgress" format="color" />
+    <attr name="bodyFont" format="reference" />
+    <attr name="headlineFont" format="reference" />
+    <attr name="headlineFontLetterSpacing" format="float" />
+    <attr name="headlineFontXScaling" format="float" />
 
     <declare-styleable name="FABProgress">
         <attr name="progressColor" format="color" />

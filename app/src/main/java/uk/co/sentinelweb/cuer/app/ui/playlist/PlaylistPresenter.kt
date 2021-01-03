@@ -262,7 +262,7 @@ class PlaylistPresenter(
     private fun playItem(itemDomain: PlaylistItemDomain, resetPos: Boolean) {
         if (isQueuedPlaylist) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
-        } else {
+        } else { // todo only confirm if video is playing
             view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
                 state.playlist?.let {
                     prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
