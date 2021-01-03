@@ -185,7 +185,7 @@
         android:id="@+id/cast_player_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_player_play_paused_check"
+        android:src="@drawable/ic_player_anim_play_paused_check"
         android:tint="@color/white"
         app:backgroundTint="?colorPrimary"
         app:layout_anchor="@id/bottom_bar"

@@ -15,13 +15,13 @@
         />
 
     <transition
-        android:drawable="@drawable/ic_player_pause_to_play"
+        android:drawable="@drawable/ic_player_anim_pause_to_play"
         android:fromId="@id/paused"
         android:toId="@id/play"
         />
 
     <transition
-        android:drawable="@drawable/ic_player_play_to_pause"
+        android:drawable="@drawable/ic_player_anim_play_to_pause"
         android:fromId="@id/play"
         android:toId="@id/paused"
         />
