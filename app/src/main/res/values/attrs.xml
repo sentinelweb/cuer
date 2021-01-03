@@ -7,4 +7,9 @@
     <attr name="playerButtonColor" format="color" />
     <attr name="contextMenuItemColor" format="color" />
     <attr name="colorProgress" format="color" />
+
+    <declare-styleable name="FABProgress">
+        <attr name="progressColor" format="color" />
+        <attr name="progressMargin" format="dimension" />
+    </declare-styleable>
 </resources>

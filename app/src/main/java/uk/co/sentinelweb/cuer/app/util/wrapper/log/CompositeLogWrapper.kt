@@ -27,7 +27,6 @@ class CompositeLogWrapper constructor(
 
     override fun w(msg: String) {
         android.w(msg)
-        firebase.logMessage(msg)
     }
 
     override fun e(msg: String, t: Throwable?) {

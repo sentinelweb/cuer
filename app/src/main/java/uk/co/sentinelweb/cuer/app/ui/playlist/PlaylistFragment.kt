@@ -183,6 +183,8 @@ class PlaylistFragment :
         playlist_swipe.isRefreshing = false
         adapter.setData(items, animate)
         playlist_swipe.setOnRefreshListener { presenter.refreshList() }
+        playlist_fab_up.isVisible = items.size > 30
+        playlist_fab_down.isVisible = items.size > 30
     }
 
     override fun setHeaderModel(model: PlaylistContract.Model) {
@@ -304,15 +306,17 @@ class PlaylistFragment :
     override fun setPlayState(state: PlaylistContract.PlayState) {
         when (state) {
             PLAYING -> {
-                playlist_fab_play.setImageResource(R.drawable.ic_player_pause_black)
-                playMenuItem.setIcon(R.drawable.ic_player_pause_black)
+                playlist_fab_play.setImageResource(R.drawable.ic_baseline_playlist_close_24)
+                playMenuItem.setIcon(R.drawable.ic_baseline_playlist_close_24)
+                playlist_fab_play.showProgress(false)
             }
             NOT_CONNECTED -> {
-                playlist_fab_play.setImageResource(R.drawable.ic_button_play_black)
-                playMenuItem.setIcon(R.drawable.ic_button_play_black)
+                playlist_fab_play.setImageResource(R.drawable.ic_baseline_playlist_play_24)
+                playMenuItem.setIcon(R.drawable.ic_baseline_playlist_play_24)
+                playlist_fab_play.showProgress(false)
             }
             CONNECTING -> {
-                playlist_fab_play.setImageResource(R.drawable.ic_notif_buffer_black)// todo copy progress anim dr
+                playlist_fab_play.showProgress(true)
                 playMenuItem.setIcon(R.drawable.ic_notif_buffer_black)
             }
         }

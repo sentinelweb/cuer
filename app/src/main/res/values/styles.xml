@@ -119,7 +119,7 @@
     <style name="CompactPlayer" />
 
     <style name="CompactPlayer.Button">
-        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:background">@drawable/ic_ripple_play_background</item>
         <item name="android:layout_width">@dimen/player_button_size</item>
         <item name="android:layout_height">@dimen/player_button_size</item>
         <item name="android:padding">@dimen/player_button_padding</item>
