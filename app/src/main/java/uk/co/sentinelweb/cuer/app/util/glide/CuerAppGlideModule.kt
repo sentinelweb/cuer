@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.firebase
+package uk.co.sentinelweb.cuer.app.util.glide
 
 import android.content.Context
 import com.bumptech.glide.Glide
@@ -10,7 +10,7 @@ import com.google.firebase.storage.StorageReference
 import java.io.InputStream
 
 @GlideModule
-class CuerFirebaseGlideModule : AppGlideModule() {
+class CuerAppGlideModule : AppGlideModule() {
     override fun registerComponents(
         context: Context,
         glide: Glide,

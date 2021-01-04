@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
@@ -12,8 +13,6 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialog
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -38,8 +37,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
+import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -54,7 +54,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     private val navMapper: NavigationMapper by currentScope.inject()
     private val chipCreator: ChipCreator by currentScope.inject()
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
-    private val contextProvider: CoroutineContextProvider by currentScope.inject()
+    private val res: ResourceWrapper by currentScope.inject()
 
     private val starMenuItem: MenuItem
         get() = ple_toolbar.menu.findItem(R.id.plie_star)
@@ -65,10 +65,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     private var createPlaylistDialog: DialogFragment? = null
 
     // todo extract
-    private val errDrawable by lazy {
-        ContextCompat.getDrawable(requireContext(), R.drawable.ic_platform_youtube_24_black)?.apply {
-            DrawableCompat.setTint(this, ContextCompat.getColor(requireContext(), R.color.primary))
-        }
+    private val ytDrawable: Drawable by lazy {
+        res.getDrawable(R.drawable.ic_platform_youtube_24_black, R.color.primary)
     }
 
     private object menuState {
@@ -197,7 +195,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 override fun onChanged(model: PlaylistItemEditModel) {
                     ple_title_bg.isVisible = true
                     ple_author_image.isVisible = !model.empty
-                    //ple_play_button.isVisible = !model.empty
                     ple_title_pos.isVisible = !model.empty
                     ple_duration.isVisible = !model.empty
                     ple_star_fab.isVisible = !model.empty
@@ -210,6 +207,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     }
                     Glide.with(ple_image)
                         .load(model.imageUrl)
+                        .transition(DrawableTransitionOptions.withCrossFade())
                         .into(ple_image)
                     ple_desc.text = model.description
                     ple_title.text = model.title
@@ -220,14 +218,15 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         return
                     }
 
-                    model.channelThumbUrl?.apply {
+                    model.channelThumbUrl?.also { url ->
                         Glide.with(ple_author_image)
-                            .load(this)
+                            .load(url)
                             .circleCrop()
                             .transition(DrawableTransitionOptions.withCrossFade())
+                            .addListener(GlideFallbackLoadListener(ple_author_image, url, ytDrawable, log))
                             .into(ple_author_image)
-                            .onLoadFailed(errDrawable)
-                    } ?: run { ple_author_image.setImageDrawable(errDrawable) }
+                            .onLoadFailed(ytDrawable)
+                    } ?: run { ple_author_image.setImageDrawable(ytDrawable) }
 
                     ple_chips.removeAllViews()
                     model.chips.forEach { chipModel ->
@@ -243,13 +242,14 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                             }
                         }
                     }
-                    ple_pub_date.setText(model.pubDate)
-                    ple_duration.setText(model.durationText)
+                    ple_pub_date.text = model.pubDate
+                    ple_duration.text = model.durationText
                     model.position?.let { ratio ->
                         ple_title_pos.layoutParams.width = (ratio * ple_title_bg.width).toInt()
                     } ?: ple_title_pos.apply { isVisible = false }
-                    ple_pub_date.setText(model.pubDate)
-                    ple_author_title.setText(model.channelTitle)
+                    ple_pub_date.text = model.pubDate
+                    ple_author_title.text = model.channelTitle
+                    ple_author_desc.text = model.channelDescription
                     //ple_play_button.isVisible = model.canPlay
                     val starIconResource =
                         if (model.starred) R.drawable.ic_button_starred_white
@@ -326,7 +326,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         mediaRepo = get(),
                         itemCreator = get(),
                         playlistDialogModelCreator = get(),
-                        log = get()
+                        log = get(),
+                        ytInteractor = get()
                     )
                 }
                 scoped { PlaylistItemEditState() }

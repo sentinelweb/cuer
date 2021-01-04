@@ -46,19 +46,16 @@ android {
         jvmTarget = "1.8"
     }
 
-    viewBinding {
-        enabled = true
+    buildFeatures {
+        viewBinding {
+            enabled = true
+        }
     }
 
     sourceSets {
         // Adds exported schema location as test app assets.
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
-
-//    packagingOptions {
-//        exclude 'META-INF/AL2.0'
-//        exclude 'META-INF/LGPL2.1'
-//    }
 }
 
 dependencies {
@@ -83,7 +80,8 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:$ver_recyclerview"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$ver_recyclerview"
 
-    implementation "com.jakewharton:process-phoenix:$ver_process_phoenix" // todo remove this with connectin monitor
+    implementation "com.jakewharton:process-phoenix:$ver_process_phoenix"
+    // todo remove this with connection monitor
     implementation "androidx.preference:preference-ktx:$ver_preference"
 
     //navigation
@@ -124,7 +122,8 @@ dependencies {
 
     implementation "com.firebaseui:firebase-ui-storage:$ver_firebase_ui"
 
-    implementation "com.github.bumptech.glide:glide:$ver_glide"// todo extract version
+    // only use glide to load firebase images (its shit)
+    implementation "com.github.bumptech.glide:glide:$ver_glide"
     annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
     kapt "com.github.bumptech.glide:compiler:$ver_glide"
 

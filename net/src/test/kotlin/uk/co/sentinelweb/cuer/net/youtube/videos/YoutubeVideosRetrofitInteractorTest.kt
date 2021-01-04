@@ -14,6 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import org.koin.core.KoinComponent
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
+import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -63,6 +64,11 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
     private val fixtIds = listOf("8nhPVOM97Jg", "fY7M3pzXdUo")
     private val fixtParts = listOf(ID, SNIPPET, CONTENT_DETAILS, PLAYER)
 
+    private val connectivityWrapper = object : ConnectivityWrapper {
+        override fun isConnected() = true
+        override fun isMetered() = true
+    }
+
     private lateinit var sut: YoutubeInteractor
 
     @Before
@@ -95,7 +101,8 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
             videoMapper = mockVideoMapper,
             channelMapper = mockChannelMapper,
             coContext = CoroutineContextTestProvider(),
-            errorMapper = mockErrorMapper
+            errorMapper = mockErrorMapper,
+            connectivity = connectivityWrapper
         )
     }
 

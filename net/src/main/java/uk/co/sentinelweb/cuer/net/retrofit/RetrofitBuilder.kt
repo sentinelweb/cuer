@@ -10,11 +10,15 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
+import java.util.concurrent.TimeUnit
 
-internal class RetrofitBuilder constructor() {
+class RetrofitBuilder constructor(
+    private val config: NetModuleConfig
+) {
 
-    internal fun buildYoutubeClient(debug: Boolean = false) = Retrofit.Builder()
+    internal fun buildYoutubeClient() = Retrofit.Builder()
         .baseUrl(YOUTUBE_BASE)
         //.addConverterFactory(GsonConverterFactory.create())
         .addConverterFactory(
@@ -22,19 +26,23 @@ internal class RetrofitBuilder constructor() {
                 CONTENT_TYPE
             )
         )
-        .client(buildOkHttpClient(debug))
+        .client(buildOkHttpClient())
         .build()
 
-    private fun buildOkHttpClient(debug: Boolean = false): OkHttpClient {
+    fun buildOkHttpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
+        if (config.debug) {
+            builder.addInterceptor(HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
                 override fun log(message: String) {
                     println(message)
                 }
             }))
-        if (debug) {
-            builder.addInterceptor(PRINT_URL_INTERCEPTOR)
+                .addInterceptor(PRINT_URL_INTERCEPTOR)
         }
+        builder.readTimeout(config.timeoutMs, TimeUnit.MILLISECONDS)
+        builder.connectTimeout(config.timeoutMs, TimeUnit.MILLISECONDS)
+        builder.writeTimeout(config.timeoutMs, TimeUnit.MILLISECONDS)
+        builder.callTimeout(config.timeoutMs, TimeUnit.MILLISECONDS)
         return builder.build()
     }
 
@@ -42,9 +50,7 @@ internal class RetrofitBuilder constructor() {
         retrofit.create(YoutubeService::class.java)
 
     internal companion object {
-
         private const val YOUTUBE_BASE = "https://www.googleapis.com/youtube/v3/"
-
         private val CONTENT_TYPE = "application/json".toMediaType()
 
         val PRINT_URL_INTERCEPTOR = object : Interceptor {

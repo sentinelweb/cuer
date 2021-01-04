@@ -34,6 +34,7 @@ class PlaylistItemEditModelMapper(
         imageUrl = (domain.image ?: domain.thumbNail)?.url,
         channelTitle = domain.channelData.title,
         channelThumbUrl = (domain.channelData.thumbNail ?: domain.channelData.image)?.url,
+        channelDescription = domain.channelData.description,
         chips = mutableListOf(ChipModel(ChipModel.Type.PLAYLIST_SELECT)).apply {
             selectedPlaylists.forEachIndexed { index, playlist ->
                 add(
@@ -65,6 +66,7 @@ class PlaylistItemEditModelMapper(
         chips = listOf(),
         channelTitle = null,
         channelThumbUrl = null,
+        channelDescription = null,
         starred = false,
         canPlay = false,
         empty = true

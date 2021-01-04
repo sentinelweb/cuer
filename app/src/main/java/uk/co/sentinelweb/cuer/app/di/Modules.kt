@@ -4,6 +4,7 @@ import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
@@ -42,10 +43,12 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.core.di.CoreModule
+import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.di.DomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.NetModule
+import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
 object Modules {
@@ -110,6 +113,7 @@ object Modules {
         factory { NotificationWrapper(androidApplication()) }
         factory { ResourceWrapper(androidApplication()) }
         factory<LogWrapper> { CompositeLogWrapper(get(), get()) }
+        factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication()) }
         factory { AndroidLogWrapper() }
         factory { FileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
@@ -120,6 +124,7 @@ object Modules {
 
     private val appNetModule = module {
         factory<YoutubeApiKeyProvider> { CuerYoutubeApiKeyProvider() }
+        single { NetModuleConfig(debug = BuildConfig.DEBUG) }
     }
 
     val allModules = listOf(utilModule)

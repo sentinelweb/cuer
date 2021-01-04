@@ -23,4 +23,6 @@ internal class ErrorMapper(
             NetResult.Error<R>(t)
         }
     }
+
+    fun <R> notConnected() = NetResult.NotConnectedError<R>()
 }
