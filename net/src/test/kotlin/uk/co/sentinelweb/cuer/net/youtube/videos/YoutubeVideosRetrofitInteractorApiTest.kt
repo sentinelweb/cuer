@@ -9,7 +9,9 @@ import org.junit.Test
 import org.koin.core.KoinComponent
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
+import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
 import uk.co.sentinelweb.cuer.net.retrofit.RetrofitBuilder
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
@@ -33,19 +35,27 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
         override val key: String = System.getProperty("CUER_YOUTUBE_API_KEY")
     }
 
+    private val log = SystemLogWrapper()
+    private val config = NetModuleConfig(debug = true)
+    private val connectivityWrapper = object : ConnectivityWrapper {
+        override fun isConnected() = true
+        override fun isMetered() = true
+    }
+
     private lateinit var sut: YoutubeInteractor
 
     @Before
     fun setUp() {
-        service = RetrofitBuilder().let { it.buildYoutubeService(it.buildYoutubeClient(true)) }
+        service = RetrofitBuilder(config).let { it.buildYoutubeService(it.buildYoutubeClient()) }
 
         sut = YoutubeRetrofitInteractor(
             service = service,
             keyProvider = keyProvider,
-            videoMapper = YoutubeVideoMediaDomainMapper(TimeStampMapper()),
-            channelMapper = YoutubeChannelDomainMapper(TimeStampMapper()),
+            videoMapper = YoutubeVideoMediaDomainMapper(TimeStampMapper(log)),
+            channelMapper = YoutubeChannelDomainMapper(TimeStampMapper(log)),
             coContext = CoroutineContextProvider(),
-            errorMapper = ErrorMapper(SystemLogWrapper())
+            errorMapper = ErrorMapper(SystemLogWrapper()),
+            connectivity = connectivityWrapper
         )
     }
 
@@ -73,8 +83,8 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
             )
             assertNotNull(actual.data)
             // note the items come out of order
-            assertEquals("UCzuqE7-t13O4NIDYJfakrhw", actual.data!![1].id)
-            assertEquals("UC2UIXt4VQnhQ-VZM4P1bUMQ", actual.data!![0].id)
+            assertEquals("UCzuqE7-t13O4NIDYJfakrhw", actual.data!![1].platformId)
+            assertEquals("UC2UIXt4VQnhQ-VZM4P1bUMQ", actual.data!![0].platformId)
         }
     }
 }

@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
+import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
 
 class PlaylistItemEditViewModel constructor(
@@ -29,7 +30,8 @@ class PlaylistItemEditViewModel constructor(
     private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator,
     private val mediaRepo: MediaDatabaseRepository,
     private val itemCreator: PlaylistItemCreator,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val ytInteractor: YoutubeInteractor
 ) : ViewModel() {
 
     private val _modelLiveData: MutableLiveData<PlaylistItemEditModel> = MutableLiveData()
@@ -59,11 +61,23 @@ class PlaylistItemEditViewModel constructor(
 
     fun setData(media: MediaDomain?) {
         viewModelScope.launch {
-            media?.let {
-                state.media = media
+            media?.let { originalMedia ->
+                state.media = originalMedia
                 playlistDialogModelCreator.loadPlaylists { state.allPlaylists = it }
-                it.id?.let {
+                originalMedia.id?.let {
                     state.selectedPlaylistIds.addAll(getPlaylistsForMediaId(it).map { it.id!! })
+                }
+                if (originalMedia.channelData.thumbNail == null) {
+                    originalMedia.channelData.platformId?.apply {
+                        ytInteractor.channels(listOf(this))
+                            .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
+                            ?.let {
+                                it.data?.get(0)?.apply {
+                                    state.media = state.media?.copy(channelData = this.copy(id = originalMedia.channelData.id))
+                                    state.mediaChanged = true
+                                }
+                            }
+                    }
                 }
                 update()
             } ?: run {
@@ -171,7 +185,9 @@ class PlaylistItemEditViewModel constructor(
     fun checkToSave() =
         state.playlistItem?.also { item ->
             viewModelScope.launch {
-                state.media?.let { mediaRepo.save(it) }
+                if (state.mediaChanged) {
+                    state.media?.let { mediaRepo.save(it) }
+                }
                 if (state.playlistsChanged) {
                     if (!state.selectedPlaylistIds.contains(item.playlistId)) {
                         playlistRepo.delete(item)
@@ -179,7 +195,6 @@ class PlaylistItemEditViewModel constructor(
                         playlistRepo.savePlaylistItem(item)
                     }
                     commitPlaylistItems()
-
                 }
                 _navigateLiveData.value = NavigationModel(NAV_BACK)
             }

@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubeVideoMediaDomainMapper
 object NetModule {
 
     val netModule = module {
-        single { RetrofitBuilder() }
+        single { RetrofitBuilder(get()) }
         single(named(ServiceType.YOUTUBE)) { get<RetrofitBuilder>().buildYoutubeClient() }
         single { get<RetrofitBuilder>().buildYoutubeService(get(named(ServiceType.YOUTUBE))) }
         factory<YoutubeInteractor> {
@@ -23,7 +23,8 @@ object NetModule {
                 videoMapper = get(),
                 channelMapper = get(),
                 coContext = get(),
-                errorMapper = get()
+                errorMapper = get(),
+                connectivity = get()
             )
         }
         factory { YoutubeVideoMediaDomainMapper(get()) }

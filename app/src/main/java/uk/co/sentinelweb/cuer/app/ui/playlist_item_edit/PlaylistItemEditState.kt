@@ -11,5 +11,6 @@ data class PlaylistItemEditState(
     var allPlaylists: List<PlaylistDomain> = listOf(),
     var committedItems: List<PlaylistItemDomain>? = null,
     var playlistItem: PlaylistItemDomain? = null,
-    var playlistsChanged: Boolean = false
+    var playlistsChanged: Boolean = false,
+    var mediaChanged: Boolean = false
 )

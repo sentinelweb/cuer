@@ -23,7 +23,7 @@ sealed class NetResult<R> constructor(
     }
 
     open class Error<R>(
-        val t: Throwable,
+        val t: Throwable?,
         val msg: String? = null,
         val code: String? = null
     ) : NetResult<R>(false)
@@ -39,4 +39,9 @@ sealed class NetResult<R> constructor(
         msg: String = t.message().toString(),
         code: String = t.code().toString()
     ) : Error<R>(t, msg, code)
+
+    class NotConnectedError<R>(
+    ) : Error<R>(null, "Not connected", "NOT_CONNECTED")
+
+
 }
