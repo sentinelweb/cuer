@@ -225,7 +225,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .addListener(GlideFallbackLoadListener(ple_author_image, url, ytDrawable, log))
                             .into(ple_author_image)
-                            .onLoadFailed(ytDrawable)
+                            //.onLoadFailed(ytDrawable)
                     } ?: run { ple_author_image.setImageDrawable(ytDrawable) }
 
                     ple_chips.removeAllViews()
