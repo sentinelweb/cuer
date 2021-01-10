@@ -22,6 +22,8 @@ interface PlayerControlsNotificationContract {
             media: MediaDomain?,
             bitmap: Bitmap?
         )
+
+        fun stopSelf()
     }
 
 }

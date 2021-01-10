@@ -11,29 +11,33 @@ import org.koin.ext.getOrCreateScope
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class YoutubeCastService : Service(), KoinComponent {
+class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, KoinComponent {
 
     private lateinit var scope: Scope
-    private lateinit var controller: YoutubeCastServiceController
+    private lateinit var controller: YoutubeCastServiceContract.Controller
     private val toastWrapper: ToastWrapper by inject()
     private val notificationWrapper: NotificationWrapper by inject()
     private val appState: CuerAppState by inject()
+    private val log: LogWrapper by inject()
 
     override fun onCreate() {
         super.onCreate()
+        log.tag(this)
         _instance = this
         scope = this.getOrCreateScope().apply {
             controller = get()
         }
-        // toastWrapper.showToast("Service created")
+        log.d("Service created")
         appState.castNotificationChannelId = notificationWrapper.createChannelId()
         controller.initialise()
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // toastWrapper.showToast("Service destroyed")
+        log.d("Service destroyed")
         controller.destroy()
         _instance = null
     }
@@ -49,7 +53,6 @@ class YoutubeCastService : Service(), KoinComponent {
         }
         return START_NOT_STICKY
     }
-
 
     override fun onBind(p0: Intent?): IBinder? = null
 

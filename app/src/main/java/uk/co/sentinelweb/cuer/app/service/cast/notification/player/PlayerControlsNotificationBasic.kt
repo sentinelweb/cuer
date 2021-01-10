@@ -35,6 +35,10 @@ class PlayerControlsNotificationBasic constructor(
         )
     }
 
+    override fun stopSelf() {
+        service.stopSelf()
+    }
+
     // todo try this (media notif) https://developer.android.com/training/notify-user/expanded#media-style
     // or this (custom layout) https://stackoverflow.com/questions/41888161/how-to-create-a-custom-notification-layout-in-android
     private fun buildNotification(

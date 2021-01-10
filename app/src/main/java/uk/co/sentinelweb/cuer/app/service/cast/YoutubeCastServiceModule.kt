@@ -13,9 +13,12 @@ object YoutubeCastServiceModule {
     val serviceModule = module {
         factory { YoutubeCastServiceManager(androidApplication()) }
         scope(named<YoutubeCastService>()) {
-            scoped { YoutubeCastServiceController(getSource(), get(), get(), get(), get()) }
-            scoped { YoutubeCastServiceState() }
-            scoped { PlayerControlsNotification(get(), get(), get(), get(), androidApplication()) }
+            scoped<YoutubeCastServiceContract.Controller> {
+                YoutubeCastServiceController(getSource(), get(), get(), get(), get(), get())
+            }
+            scoped {
+                PlayerControlsNotification(get(), get(), get(), get(), androidApplication())
+            }
             scoped<PlayerControlsNotificationContract.External> {
                 get<PlayerControlsNotification>()
             }

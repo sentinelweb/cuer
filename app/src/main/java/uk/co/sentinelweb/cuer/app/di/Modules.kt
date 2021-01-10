@@ -120,6 +120,7 @@ object Modules {
         single(named<GeneralPreferences>()) {
             SharedPrefsWrapper(GeneralPreferences::class.java, androidApplication(), get())
         }
+        factory { ServiceWrapper(androidApplication(), get()) }
     }
 
     private val appNetModule = module {

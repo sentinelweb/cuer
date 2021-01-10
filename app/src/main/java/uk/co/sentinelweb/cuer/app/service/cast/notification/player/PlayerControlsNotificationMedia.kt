@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
@@ -37,6 +38,10 @@ class PlayerControlsNotificationMedia constructor(
         service.startForeground(FOREGROUND_ID, buildNotification(state, media, bitmap))
     }
 
+    override fun stopSelf() {
+        service.stopSelf()
+    }
+
     private fun buildNotification(
         state: PlayerStateDomain,
         media: MediaDomain?,
@@ -61,14 +66,22 @@ class PlayerControlsNotificationMedia constructor(
         )
             .setDefaults(Notification.DEFAULT_ALL)
             .setSmallIcon(R.drawable.ic_notif_status_cast_conn_white)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(timeProvider.currentTimeMillis())
             .setStyle(
                 MediaNotificationCompat.MediaStyle()
-                    .setShowActionsInCompactView(2, 6, 5) // #2: pause or play button
                     .setMediaSession(appState.mediaSession!!.sessionToken)
-                // .setCancelButtonIntent(releasePendingIntent)
+                    .setShowCancelButton(true)
+                    .setCancelButtonIntent(disconnectPendingIntent)
+                    .run {
+                        // geting index out of bounds 6 on pixel 3a (android 11)- seems to be max 5 actions
+                        if (Build.VERSION.SDK_INT >= 30) {
+                            setShowActionsInCompactView(2, 4) // #2: pause or play button
+                        } else {
+                            setShowActionsInCompactView(2, 6, 5)
+                        }
+                    }
             )
             .setContentTitle(media?.title ?: "No title")
             .setContentText(media?.description ?: "No description")
@@ -92,7 +105,6 @@ class PlayerControlsNotificationMedia constructor(
         }
         builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent) // #3
         builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
-        // #5 todo disconnect
         builder.addAction(R.drawable.ic_notif_close_white, "Close", disconnectPendingIntent) // #5
         // #6 todo star function
         builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #6
