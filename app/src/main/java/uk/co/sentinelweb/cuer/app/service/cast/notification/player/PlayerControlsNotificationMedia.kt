@@ -38,6 +38,10 @@ class PlayerControlsNotificationMedia constructor(
         service.startForeground(FOREGROUND_ID, buildNotification(state, media, bitmap))
     }
 
+    override fun stopSelf() {
+        service.stopSelf()
+    }
+
     private fun buildNotification(
         state: PlayerStateDomain,
         media: MediaDomain?,

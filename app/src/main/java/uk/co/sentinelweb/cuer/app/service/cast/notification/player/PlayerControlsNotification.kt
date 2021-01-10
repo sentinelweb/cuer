@@ -9,6 +9,7 @@ import com.bumptech.glide.request.transition.Transition
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Presenter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.CC_DISCONNECTED
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -114,7 +115,9 @@ class PlayerControlsNotification constructor(
     }
 
     override fun setConnectionState(connState: CastPlayerContract.ConnectionState) {
-
+        if (connState == CC_DISCONNECTED) {
+            view.stopSelf()
+        }
     }
 
     override fun setMedia(media: MediaDomain) {
