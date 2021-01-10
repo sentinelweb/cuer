@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Intent
 
 class YoutubeCastServiceManager constructor(
-    private val app:Application
+    private val app: Application
 ) {
 
     fun start() {
@@ -19,9 +19,9 @@ class YoutubeCastServiceManager constructor(
         }
     }
 
-    fun get():YoutubeCastService? = YoutubeCastService.instance()
+    fun get(): YoutubeCastService? = YoutubeCastService.instance()
 
-    fun isRunning():Boolean = YoutubeCastService.instance() != null
+    fun isRunning(): Boolean = YoutubeCastService.instance() != null
 
     private fun intent() = Intent(app, YoutubeCastService::class.java)
 

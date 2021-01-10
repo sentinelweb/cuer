@@ -17,7 +17,6 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 
-
 class PlayerControlsNotification constructor(
     private val view: PlayerControlsNotificationContract.View,
     private val state: PlayerControlsNotificationState,
