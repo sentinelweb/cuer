@@ -21,9 +21,12 @@ class ChromecastYouTubePlayerContextHolder constructor(
         }
 
     fun create() {
-        listener = creator.createConnectionListener().apply {
+        listener = creator.createConnectionListener().also { listener ->
             this.playerUi = playerUi
-            context = creator.createContext(chromeCastWrapper.getCastContext(), this)
+            creator.createContext(chromeCastWrapper.getCastContext(), listener).also { context ->
+                this@ChromecastYouTubePlayerContextHolder.context = context
+                listener.context = context
+            }
         }
     }
 

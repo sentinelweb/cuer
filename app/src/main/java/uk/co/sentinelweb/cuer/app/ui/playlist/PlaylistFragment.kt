@@ -1,17 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
+//import kotlinx.android.synthetic.main.view_playlist_item.view.*
 import android.os.Bundle
 import android.transition.TransitionInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -21,11 +18,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.playlist_fragment.*
-import kotlinx.android.synthetic.main.view_playlist_item.view.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.databinding.PlaylistFragmentBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
@@ -68,22 +64,26 @@ class PlaylistFragment :
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
 
+    private var _binding: PlaylistFragmentBinding? = null
+    private val binding get() = _binding!!
+
     private val starMenuItem: MenuItem
-        get() = playlist_toolbar.menu.findItem(R.id.playlist_star)
+        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_star)
     private val playMenuItem: MenuItem
-        get() = playlist_toolbar.menu.findItem(R.id.playlist_play)
+        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_play)
     private val editMenuItem: MenuItem
-        get() = playlist_toolbar.menu.findItem(R.id.playlist_edit)
+        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_edit)
     private val newMenuItem: MenuItem
-        get() = playlist_toolbar.menu.findItem(R.id.playlist_new)
+        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_new)
     private val filterMenuItem: MenuItem
-        get() = playlist_toolbar.menu.findItem(R.id.playlist_filter)
+        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_filter)
     private val modeMenuItems: List<MenuItem>
         get() = listOf( // same order as the enum in PlaylistDomain
-            playlist_toolbar.menu.findItem(R.id.playlist_mode_single),
-            playlist_toolbar.menu.findItem(R.id.playlist_mode_loop),
-            playlist_toolbar.menu.findItem(R.id.playlist_mode_shuffle)
+            binding.playlistToolbar.menu.findItem(R.id.playlist_mode_single),
+            binding.playlistToolbar.menu.findItem(R.id.playlist_mode_loop),
+            binding.playlistToolbar.menu.findItem(R.id.playlist_mode_shuffle)
         )
+
 
     private var snackbar: Snackbar? = null
     private var createPlaylistDialog: DialogFragment? = null
@@ -93,26 +93,31 @@ class PlaylistFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-
         sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = PlaylistFragmentBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        playlist_toolbar.let {
+        binding.playlistToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
             it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
         presenter.initialise()
-        playlist_list.layoutManager = LinearLayoutManager(context)
-        playlist_list.adapter = adapter
-        itemTouchHelper.attachToRecyclerView(playlist_list)
-        playlist_fab_up.setOnClickListener { presenter.scroll(Up) }
-        playlist_fab_up.setOnLongClickListener { presenter.scroll(Top);true }
-        playlist_fab_down.setOnClickListener { presenter.scroll(Down) }
-        playlist_fab_down.setOnLongClickListener { presenter.scroll(Bottom);true }
-        playlist_appbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+        binding.playlistList.layoutManager = LinearLayoutManager(context)
+        binding.playlistList.adapter = adapter
+        itemTouchHelper.attachToRecyclerView(binding.playlistList)
+        binding.playlistFabUp.setOnClickListener { presenter.scroll(Up) }
+        binding.playlistFabUp.setOnLongClickListener { presenter.scroll(Top);true }
+        binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }
+        binding.playlistFabDown.setOnLongClickListener { presenter.scroll(Bottom);true }
+        binding.playlistAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false
             var scrollRange = -1
@@ -133,11 +138,11 @@ class PlaylistFragment :
                 }
             }
         })
-        playlist_fab_playmode.setOnClickListener { presenter.onPlayModeChange() }
+        binding.playlistFabPlaymode.setOnClickListener { presenter.onPlayModeChange() }
         //playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
-        playlist_fab_play.setOnClickListener { presenter.onPlayPlaylist() }
+        binding.playlistFabPlay.setOnClickListener { presenter.onPlayPlaylist() }
         postponeEnterTransition()
-        playlist_list.doOnPreDraw {
+        binding.playlistList.doOnPreDraw {
             startPostponedEnterTransition()
         }
     }
@@ -191,27 +196,27 @@ class PlaylistFragment :
     }
 
     override fun setList(items: List<ItemContract.Model>, animate: Boolean) {
-        playlist_swipe.isRefreshing = false
+        binding.playlistSwipe.isRefreshing = false
         adapter.setData(items, animate)
-        playlist_swipe.setOnRefreshListener { presenter.refreshList() }
-        playlist_fab_up.isVisible = items.size > 30
-        playlist_fab_down.isVisible = items.size > 30
+        binding.playlistSwipe.setOnRefreshListener { presenter.refreshList() }
+        binding.playlistFabUp.isVisible = items.size > 30
+        binding.playlistFabDown.isVisible = items.size > 30
     }
 
     override fun setHeaderModel(model: PlaylistContract.Model) {
-        Glide.with(playlist_header_image)
+        Glide.with(binding.playlistHeaderImage)
             .load(imageProvider.makeRef(model.imageUrl))
             .transition(DrawableTransitionOptions.withCrossFade())
-            .into(playlist_header_image)
-        playlist_collapsing_toolbar.title = model.title
-        playlist_fab_play.setImageResource(model.playIcon)
+            .into(binding.playlistHeaderImage)
+        binding.playlistCollapsingToolbar.title = model.title
+        binding.playlistFabPlay.setImageResource(model.playIcon)
         playMenuItem.setIcon(model.playIcon)
         starMenuItem.setIcon(model.starredIcon)
         //playlist_items.setText("${model.items.size}")
-        playlist_flags.isVisible = model.isDefault
-        playlist_fab_playmode.setImageResource(model.loopModeIcon)
+        binding.playlistFlags.isVisible = model.isDefault
+        binding.playlistFabPlaymode.setImageResource(model.loopModeIcon)
         lastPlayModeIndex = model.loopModeIndex
-        if (!playlist_fab_playmode.isVisible) {
+        if (!binding.playlistFabPlaymode.isVisible) {
             modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == lastPlayModeIndex }
         }
     }
@@ -225,7 +230,7 @@ class PlaylistFragment :
     }
 
     override fun scrollTo(direction: PlaylistContract.ScrollDirection) {
-        (playlist_list.layoutManager as LinearLayoutManager).run {
+        (binding.playlistList.layoutManager as LinearLayoutManager).run {
             val itemsOnScreen =
                 this.findLastCompletelyVisibleItemPosition() - this.findFirstCompletelyVisibleItemPosition()
 
@@ -240,21 +245,21 @@ class PlaylistFragment :
                 Bottom -> adapter.data.size - 1
             }
             if (abs(this.findLastCompletelyVisibleItemPosition() - useIndex) > 20)
-                playlist_list.scrollToPosition(useIndex)
+                binding.playlistList.scrollToPosition(useIndex)
             else {
-                playlist_list.smoothScrollToPosition(useIndex)
+                binding.playlistList.smoothScrollToPosition(useIndex)
             }
         }
     }
 
     override fun scrollToItem(index: Int) {
-        (playlist_list.layoutManager as LinearLayoutManager).run {
+        (binding.playlistList.layoutManager as LinearLayoutManager).run {
             val useIndex = if (index > 0 && index < adapter.data.size) {
                 index
             } else 0
 
             if (index !in this.findFirstCompletelyVisibleItemPosition()..this.findLastCompletelyVisibleItemPosition()) {
-                playlist_list.scrollToPosition(useIndex)
+                binding.playlistList.scrollToPosition(useIndex)
             }
         }
     }
@@ -266,7 +271,7 @@ class PlaylistFragment :
     override fun highlightPlayingItem(currentItemIndex: Int?) {
         adapter.highlightItem = currentItemIndex
         // todo map it properly
-        playlist_items.setText("${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}")
+        _binding?.playlistItems?.setText("${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}")
     }
 
     override fun setSubTitle(subtitle: String) {
@@ -297,13 +302,9 @@ class PlaylistFragment :
 
     override fun showItemDescription(itemWitId: PlaylistItemDomain) {
         itemWitId.id?.also { id ->
-            adapter.getItemViewForId(id)?.itemView?.let { itemView ->
-                val extras = FragmentNavigatorExtras(
-                    itemView.listitem_top to "title",
-                    itemView.listitem_icon to "image" // todo extract constants somewhere
-                )
+            adapter.getItemViewForId(id)?.let { view ->
                 PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise())
-                    .apply { findNavController().navigate(this, extras) }
+                    .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
             }
         }
     }
@@ -328,17 +329,17 @@ class PlaylistFragment :
     override fun setPlayState(state: PlaylistContract.PlayState) {
         when (state) {
             PLAYING -> {
-                playlist_fab_play.setImageResource(R.drawable.ic_baseline_playlist_close_24)
+                binding.playlistFabPlay.setImageResource(R.drawable.ic_baseline_playlist_close_24)
                 playMenuItem.setIcon(R.drawable.ic_baseline_playlist_close_24)
-                //playlist_fab_play.showProgress(false)
+                //binding.playlistFabPlay.showProgress(false)
             }
             NOT_CONNECTED -> {
-                playlist_fab_play.setImageResource(R.drawable.ic_baseline_playlist_play_24)
+                binding.playlistFabPlay.setImageResource(R.drawable.ic_baseline_playlist_play_24)
                 playMenuItem.setIcon(R.drawable.ic_baseline_playlist_play_24)
-                //playlist_fab_play.showProgress(false)
+                //binding.playlistFabPlay.showProgress(false)
             }
             CONNECTING -> {
-                //playlist_fab_play.showProgress(true)
+                //binding.playlistFabPlay.showProgress(true)
                 playMenuItem.setIcon(R.drawable.ic_notif_buffer_black)
             }
         }

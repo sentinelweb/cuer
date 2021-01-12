@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -27,7 +28,8 @@ import androidx.media.app.NotificationCompat as MediaNotificationCompat
 class PlayerControlsNotificationMedia constructor(
     private val service: YoutubeCastService,
     private val appState: CuerAppState,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val log: LogWrapper
 ) : PlayerControlsNotificationContract.View {
 
     override fun showNotification(
@@ -71,7 +73,7 @@ class PlayerControlsNotificationMedia constructor(
             .setWhen(timeProvider.currentTimeMillis())
             .setStyle(
                 MediaNotificationCompat.MediaStyle()
-                    .setMediaSession(appState.mediaSession!!.sessionToken)
+                    .setMediaSession(appState.mediaSession?.sessionToken ?: throw IllegalArgumentException("No media session ID allocated"))
                     .setShowCancelButton(true)
                     .setCancelButtonIntent(disconnectPendingIntent)
                     .run {

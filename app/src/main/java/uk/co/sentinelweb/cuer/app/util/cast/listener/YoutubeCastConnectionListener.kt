@@ -17,6 +17,7 @@ class YoutubeCastConnectionListener constructor(
     private val queue: QueueMediatorContract.Consumer
 ) : ChromecastConnectionListener, QueueMediatorContract.ConsumerListener {
 
+    lateinit var context: ChromecastYouTubePlayerContext
     private var youTubePlayerListener: YouTubePlayerListener? = null
     private var connectionState: ConnectionState? = null
 
@@ -44,21 +45,21 @@ class YoutubeCastConnectionListener constructor(
 
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
         //if (connectionMonitor.checkAlreadyConnected(connectionState)) return
-
         connectionState = CC_CONNECTED.also {
             playerUi?.setConnectionState(it)
             //connectionMonitor.connectionState = it
         }
         youTubePlayerListener?.let {
             it.playerUi = playerUi
-        } ?: setupPlayerListener(chromecastYouTubePlayerContext)
+        } ?: setupPlayerListener()
 
-        youTubePlayerListener?.apply { mediaSessionManager.createMediaSession(this) }
+        mediaSessionManager.checkCreateMediaSession(youTubePlayerListener!!)
+        pushUpdateFromQueue()
     }
 
-    private fun setupPlayerListener(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
+    private fun setupPlayerListener() {
         youTubePlayerListener = creator.createPlayerListener().also {
-            chromecastYouTubePlayerContext.initialize(it)
+            context.initialize(it)
             it.playerUi = playerUi
         }
     }
@@ -90,13 +91,17 @@ class YoutubeCastConnectionListener constructor(
     }
 
     override fun onPlaylistUpdated() {
+        pushUpdateFromQueue()
+    }
+
+    private fun pushUpdateFromQueue() {
         playerUi?.apply {
-            queue.currentItem?.media?.apply {
-                if (youTubePlayerListener == null) {
+            if (youTubePlayerListener != null) {
+                queue.currentItem?.media?.apply {
                     setPlayerState(PlayerStateDomain.PAUSED)
                     setCurrentSecond((positon?.toFloat() ?: 0f) / 1000f)
+                    setMedia(this)
                 }
-                setMedia(this)
             }
             setPlaylistName(queue.playlist?.title ?: "none")
             setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
