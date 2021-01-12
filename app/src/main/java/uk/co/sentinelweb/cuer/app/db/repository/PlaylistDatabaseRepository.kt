@@ -179,6 +179,19 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
+    suspend fun updateCurrentIndex(playlist: PlaylistDomain): RepoResult<Boolean> =
+        withContext(coProvider.IO) {
+            try {
+                RepoResult.Data(playlist.id?.let {
+                    playlistDao.updateIndex(it, playlist.currentIndex) > 0
+                } ?: false)
+            } catch (e: Exception) {
+                val msg = "couldn't delete all media"
+                log.e(msg, e)
+                RepoResult.Error<Boolean>(e, msg)
+            }
+        }
+
     // region PlaylistStatDomain
     suspend fun loadPlaylistStatList(playlistIds: List<Long>): RepoResult<List<PlaylistStatDomain>> =
         withContext(coProvider.IO) {

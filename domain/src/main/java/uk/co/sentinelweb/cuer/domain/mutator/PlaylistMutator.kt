@@ -98,4 +98,25 @@ class PlaylistMutator {
             )
         }
     }
+
+    fun delete(playlist: PlaylistDomain, deleteItem: PlaylistItemDomain): PlaylistDomain {
+        return playlist.let { plist ->
+            val newItems = plist.items.toMutableList()
+            var newCurrentIndex = plist.currentIndex
+            val deleteIndex = newItems.indexOfFirst { it.id == deleteItem.id }
+            if (deleteIndex > -1) {
+                newItems.removeAt(deleteIndex)
+                newCurrentIndex = deleteIndex.let {
+                    if (it < plist.currentIndex && it > 0) plist.currentIndex - 1 else plist.currentIndex
+                }
+                if (newCurrentIndex >= newItems.size) {
+                    newCurrentIndex = newItems.size - 1
+                }
+            }
+            plist.copy(
+                items = newItems,
+                currentIndex = newCurrentIndex
+            )
+        }
+    }
 }

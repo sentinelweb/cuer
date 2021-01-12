@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.currentItem
+import uk.co.sentinelweb.cuer.domain.ext.currentItemOrStart
 import uk.co.sentinelweb.cuer.domain.ext.indexOfItemId
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
@@ -135,18 +136,46 @@ class QueueMediator constructor(
         producerListeners.remove(l)
     }
 
-    override fun itemRemoved(playlistItemDomain: PlaylistItemDomain) {
-        val currentItemDeleted = currentItem?.id == playlistItemDomain.id
-        state.playlist = state.playlist?.let { plist ->
-            plist.copy(items = plist.items.let {
-                plist.items.find { it.id == playlistItemDomain.id }?.apply {
-                    it.minus(this)
+    override fun deleteItem(index: Int) {
+        state.playlist?.let { plist ->
+            val deleteItem = plist.items.get(index)
+            val isCurrentItem = currentItem?.id == deleteItem.id
+            exec {
+                val mutated = playlistMutator.delete(plist, deleteItem)
+                playlistRepository.delete(deleteItem)
+                playlistRepository.updateCurrentIndex(mutated)
+                refreshQueueFrom(mutated)
+                if (isCurrentItem) {
+                    if (mutated.currentIndex > -1) {
+                        currentItem?.apply { onItemSelected(this, true, true) }
+                    } else {
+                        state.currentItem = null
+                        consumerListeners.forEach { it.onItemChanged() }
+                    }
                 }
-                it
-            })
+                producerListeners.forEach { it.onPlaylistUpdated(mutated) }
+            }
         }
-        if (currentItemDeleted) {
-            nextItem()
+    }
+
+    override fun refreshHeaderData() {
+        exec {
+            state.playlist?.let { plist ->
+                plist.id?.let { id ->
+                    playlistRepository.load(id, true)
+                        .takeIf { it.isSuccessful }
+                        ?.apply {
+                            data?.apply {
+                                refreshQueueFrom(
+                                    copy(
+                                        currentIndex = plist.currentIndex,
+                                        items = plist.items
+                                    )
+                                )
+                            }
+                        }
+                }
+            }
         }
     }
 
@@ -205,13 +234,7 @@ class QueueMediator constructor(
         // if the playlist is the same then don't change the current item
         if (state.playlist?.id != playlistDomain.id) {
             state.playlistId = playlistDomain.id
-            state.currentItem =
-                if (playlistDomain.currentIndex > -1
-                    && playlistDomain.items.size > 0
-                    && playlistDomain.currentIndex < playlistDomain.items.size
-                ) {
-                    playlistDomain.items[playlistDomain.currentIndex]
-                } else null
+            state.currentItem = playlistDomain.currentItemOrStart()
         } else {
             state.currentItem = playlistDomain.currentItem()
         }

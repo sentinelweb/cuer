@@ -40,7 +40,7 @@ class ChipCreator(
                 tag = model
                 text = model.text
                 model.thumb?.let {
-                    Glide.with(this)
+                    Glide.with(c)
                         .asBitmap()
                         .load(imageProvider.makeRef(it))
                         .transform(CropTransformation(it.url))

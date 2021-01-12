@@ -204,7 +204,7 @@ class PlaylistFragment :
     }
 
     override fun setHeaderModel(model: PlaylistContract.Model) {
-        Glide.with(binding.playlistHeaderImage)
+        Glide.with(requireContext())
             .load(imageProvider.makeRef(model.imageUrl))
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.playlistHeaderImage)

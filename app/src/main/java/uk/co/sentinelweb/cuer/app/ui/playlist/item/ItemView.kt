@@ -111,7 +111,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     }
 
     override fun setIconUrl(url: String) {
-        Glide.with(binding.listitemIcon)
+        Glide.with(context)
             .load(url)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.listitemIcon)

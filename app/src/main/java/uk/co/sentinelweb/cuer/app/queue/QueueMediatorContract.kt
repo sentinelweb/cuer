@@ -21,11 +21,14 @@ interface QueueMediatorContract {
         fun destroy()
         fun refreshQueueBackground()//after: (() -> Unit)? = null
         fun refreshQueueFrom(playlistDomain: PlaylistDomain)//after: (() -> Unit)? = null
-        fun itemRemoved(playlistItemDomain: PlaylistItemDomain)
+
+        //fun itemRemoved(playlistItemDomain: PlaylistItemDomain)
         suspend fun refreshQueue()//after: (() -> Unit)? = null
         fun playNow()
         suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?)
         suspend fun playNow(playlistId: Long, playlistItemId: Long?)
+        fun deleteItem(index: Int)
+        fun refreshHeaderData()
     }
 
     interface Consumer : Shared {
