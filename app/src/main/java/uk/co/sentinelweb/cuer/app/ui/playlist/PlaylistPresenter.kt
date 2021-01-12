@@ -157,7 +157,7 @@ class PlaylistPresenter(
         state.viewModelScope.launch {
             state.playlist?.let {
                 playlistRepository.save(it, flat = true)
-                queueExecIf { refreshQueueFrom(it) }
+                queueExecIf { refreshHeaderData() }
             }
             state.playlist?.apply {
                 view.setHeaderModel(modelMapper.map(this, isPlaylistPlaying(), false))
@@ -211,7 +211,9 @@ class PlaylistPresenter(
             state.viewModelScope.launch {
                 moveItem.copy(playlistId = it, order = timeProvider.currentTimeMillis())
                     .apply { playlistRepository.savePlaylistItem(this) }
+                // todo update playlist pointer
                 executeRefresh()
+                queueExecIf { refreshQueueFrom(state.playlist!!) }
             }
         }
     }
@@ -219,16 +221,26 @@ class PlaylistPresenter(
     override fun onItemSwipeLeft(item: ItemContract.Model) {
         state.viewModelScope.launch {
             delay(400)
-            state.playlist?.items?.apply {
-                find { it.id == item.id }?.let { deleteItem ->
-                    state.deletedPlaylistItem = deleteItem
-                    playlistRepository.delete(deleteItem)
-                    queueExecIf { itemRemoved(deleteItem) }
-                    // todo check if media is on other playlist and delete if not?
-                    //repository.delete(deleteItem.media)
-                    view.showDeleteUndo("Deleted: ${deleteItem.media.title}")
-                    state.focusIndex = indexOf(deleteItem)
-                    executeRefresh(false)
+
+            state.playlist?.let { plist ->
+                plist.items.let { items ->
+                    items.find { it.id == item.id }?.let { deleteItem ->
+                        val indexOf = items.indexOf(deleteItem)
+                        queueExecIfElse({
+                            state.deletedPlaylistItem = deleteItem
+                            deleteItem(indexOf)
+                            view.showDeleteUndo("Deleted: ${deleteItem.media.title}")
+                        }, {
+                            state.viewModelScope.launch {
+                                state.deletedPlaylistItem = deleteItem
+                                val mutated = playlistMutator.delete(plist, deleteItem)
+                                playlistRepository.delete(deleteItem)
+                                playlistRepository.save(mutated, true)// save currentIndex
+                                view.showDeleteUndo("Deleted: ${deleteItem.media.title}")
+                                executeRefresh(false)
+                            }
+                        })
+                    }
                 }
             }
         }
@@ -376,21 +388,35 @@ class PlaylistPresenter(
             state.viewModelScope.launch {
                 playlistRepository.savePlaylistItem(itemDomain)
                 state.focusIndex = state.lastFocusIndex
-                state.deletedPlaylistItem = null
                 executeRefresh()
+                (state.playlist?.items?.indexOfFirst { it.id == itemDomain.id } ?: -2).let { restoredIndex ->
+                    if (restoredIndex >= 0) {
+                        state.playlist?.currentIndex?.also { currentIndex ->
+                            if (restoredIndex <= currentIndex) {
+                                state.playlist = state.playlist?.copy(currentIndex = currentIndex + 1)
+                                state.playlist?.let { playlistRepository.updateCurrentIndex(it) }
+                                view.scrollToItem(restoredIndex)
+                                view.highlightPlayingItem(currentIndex + 1)
+                            }
+                        }
+                    }
+                }
+                state.deletedPlaylistItem = null
+                queueExecIf { refreshQueueFrom(state.playlist ?: throw java.lang.IllegalStateException("playlist is null")) }
             }
         }
     }
 
     override fun onPlaylistUpdated(list: PlaylistDomain) {
-        refreshPlaylist()
+        state.playlist = list
+        doUiUpdate()
     }
 
     override fun onItemChanged() {
         queueExecIf {
             currentItemIndex?.apply {
                 state.playlist = state.playlist?.copy(currentIndex = this)
-            } ?: throw IllegalStateException()
+            } ?: throw IllegalStateException("Current item is null")
             view.highlightPlayingItem(currentItemIndex)
             currentItemIndex?.apply { view.scrollToItem(this) }
         }
@@ -413,41 +439,29 @@ class PlaylistPresenter(
                         ?.data?.get(0)
                 })
                 .also { state.playlist = it }
-                ?.also {
-                    queueExecIf {
-                        refreshQueueFrom(it)
-                        //log.d("executeRefresh:1: queue.playlistId = ${queue.playlistId} queue.playlist.Id = ${queue.playlist?.id}")
-                        view.highlightPlayingItem(currentItemIndex)
-                    }
-                }
-                .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
-                ?.let { modelMapper.map(it, isPlaylistPlaying()) }
-                ?.also { view.setModel(it, animate) }
-                .also {
-                    state.focusIndex?.apply {
-                        view.scrollToItem(this)
-                        state.lastFocusIndex = state.focusIndex
-                        state.focusIndex = null
-                    } ?: run {
-                        queueExecIfElse(
-                            {
-                                queue.playlist?.currentIndex?.also {
-                                    view.scrollToItem(it)
-                                    view.highlightPlayingItem(it)
-                                }
-                            },
-                            {
-                                state.playlist?.currentIndex?.also {
-                                    view.scrollToItem(it)
-                                    view.highlightPlayingItem(it)
-                                }
-                            }
-                        )
-                    }
-                }
+                .also { doUiUpdate(animate) }
         } catch (e: Throwable) {
             log.e("Error loading playlist", e)
         }
+    }
+
+    fun doUiUpdate(animate: Boolean = true) {
+        state.playlist
+            .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
+            ?.let { modelMapper.map(it, isPlaylistPlaying()) }
+            ?.also { view.setModel(it, animate) }
+            .also {
+                state.focusIndex?.apply {
+                    view.scrollToItem(this)
+                    state.lastFocusIndex = state.focusIndex
+                    state.focusIndex = null
+                } ?: run {
+                    state.playlist?.currentIndex?.also {
+                        view.scrollToItem(it)
+                        view.highlightPlayingItem(it)
+                    }
+                }
+            }
     }
 
     private fun isPlaylistPlaying() = isQueuedPlaylist && ytContextHolder.isConnected()

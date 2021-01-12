@@ -80,7 +80,7 @@ class PlaylistsFragment :
 
     // region PlaylistContract.View
     override fun setList(model: PlaylistsContract.Model, animate: Boolean) {
-        Glide.with(playlists_header_image)
+        Glide.with(requireContext())
             .load(imageProvider.makeRef(model.imageUrl))
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(playlists_header_image)

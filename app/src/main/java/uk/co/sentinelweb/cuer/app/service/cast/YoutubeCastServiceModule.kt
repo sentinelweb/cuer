@@ -29,7 +29,8 @@ object YoutubeCastServiceModule {
                 PlayerControlsNotificationMedia(
                     service = getSource(),
                     appState = get(),
-                    timeProvider = get()
+                    timeProvider = get(),
+                    log = get()
                 )
             }
             scoped { PlayerControlsNotificationState() }

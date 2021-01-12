@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.domain.ext
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-fun PlaylistDomain.currentItem() = if (currentIndex > -1 && currentIndex < items.size) {
+fun PlaylistDomain.currentItem() = if (currentIndex > -1 && items.size > 0 && currentIndex < items.size) {
     items[currentIndex]
 } else null
 

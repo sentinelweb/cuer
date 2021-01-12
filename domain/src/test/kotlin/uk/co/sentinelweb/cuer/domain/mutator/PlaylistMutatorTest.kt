@@ -235,4 +235,41 @@ class PlaylistMutatorTest {
 
         assertEquals(2, actual.currentIndex)
     }
+
+    @Test
+    fun `delete current`() {
+        val fixtCurrentIndex = 1
+        val fixWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        val deleteItem = fixWithIndex.items[fixtCurrentIndex]
+
+        val actual = sut.delete(fixWithIndex, deleteItem)
+
+        assertEquals(10, actual.items.size)
+        assertEquals(fixtCurrentIndex, actual.currentIndex)
+    }
+
+    @Test
+    fun `delete item before current`() {
+        val fixtCurrentIndex = 2
+        val fixWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        val deleteItem = fixWithIndex.items[1]
+
+        val actual = sut.delete(fixWithIndex, deleteItem)
+
+        assertEquals(10, actual.items.size)
+        assertEquals(fixtCurrentIndex - 1, actual.currentIndex)
+    }
+
+    @Test
+    fun `delete last current`() {
+        val fixtCurrentIndex = fixtPlaylist.items.size - 1
+        val fixWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        val deleteItem = fixWithIndex.items[fixtCurrentIndex]
+
+        val actual = sut.delete(fixWithIndex, deleteItem)
+
+        assertEquals(10, actual.items.size)
+        assertEquals(fixtCurrentIndex - 1, actual.currentIndex)
+    }
+
 }

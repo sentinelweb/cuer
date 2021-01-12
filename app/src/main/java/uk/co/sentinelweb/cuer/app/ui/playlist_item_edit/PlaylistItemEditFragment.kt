@@ -158,7 +158,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
 
         // setup data for fragment transition
         itemArg?.let { item ->
-            Glide.with(ple_image)
+            Glide.with(requireContext())
                 .load(item.media.image?.url)
                 .into(ple_image)
 
@@ -205,7 +205,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         starMenuItem.isVisible = false
                         playMenuItem.isVisible = false
                     }
-                    Glide.with(ple_image)
+                    Glide.with(requireContext())
                         .load(model.imageUrl)
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(ple_image)
@@ -219,7 +219,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     }
 
                     model.channelThumbUrl?.also { url ->
-                        Glide.with(ple_author_image)
+                        Glide.with(requireContext())
                             .load(url)
                             .circleCrop()
                             .transition(DrawableTransitionOptions.withCrossFade())

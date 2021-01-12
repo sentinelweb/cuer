@@ -107,7 +107,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     }
 
     override fun setImage(url: String) {
-        Glide.with(binding.castPlayerImage)
+        Glide.with(requireContext())
             .load(url)
             .into(binding.castPlayerImage)
     }
@@ -122,7 +122,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 
     override fun setPlaylistImage(url: String?) {
         url?.apply {
-            Glide.with(binding.castPlayerPlaylistImage)
+            Glide.with(requireContext())
                 .load(imageProvider.makeRef(this))
                 .into(binding.castPlayerPlaylistImage)
         } ?: binding.castPlayerPlaylistImage.setImageResource(R.drawable.ic_nav_playlist_black)

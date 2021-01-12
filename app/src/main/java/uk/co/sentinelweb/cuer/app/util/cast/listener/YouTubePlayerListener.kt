@@ -226,7 +226,11 @@ class YouTubePlayerListener(
             youTubePlayer?.loadVideo(media.platformId, startPos)
             state.currentMedia = media
             playerUi?.setMedia(media)
-        } ?: playerUi?.reset()
+        } ?: run {
+            state.currentMedia = null
+            youTubePlayer?.pause()
+            playerUi?.reset()
+        }
     }
 
     // todo fix this - not clean

@@ -16,10 +16,10 @@ class MediaSessionManager constructor(
     private val playbackStateMapper: PlaybackStateMapper
 ) {
     init {
-        log.tag = this::class.java.simpleName
+        log.tag(this)
     }
 
-    fun createMediaSession(controls: CastPlayerContract.PlayerControls.Listener) {
+    fun checkCreateMediaSession(controls: CastPlayerContract.PlayerControls.Listener) {
         if (appState.mediaSession == null) {
             appState.mediaSession = MediaSessionCompat(context, "CuerService")
                 .apply {
