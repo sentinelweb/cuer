@@ -147,7 +147,7 @@ class PlaylistFragment :
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
+        // fixme activity menu items are dissappearing
         inflater.inflate(R.menu.playlist_actionbar, menu)
         modeMenuItems.forEach { it.isVisible = false }
         modeMenuItems.forEach { it.setOnMenuItemClickListener { presenter.onPlayModeChange() } }
@@ -157,6 +157,9 @@ class PlaylistFragment :
         newMenuItem.setOnMenuItemClickListener { presenter.onFilterNewItems() }
         editMenuItem.setOnMenuItemClickListener { presenter.onEdit() }
         filterMenuItem.setOnMenuItemClickListener { presenter.onFilterPlaylistItems() }
+//        menu.findItem(R.id.settings).isVisible = true
+//        menu.findItem(R.id.paste_add).isVisible = true
+        //super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

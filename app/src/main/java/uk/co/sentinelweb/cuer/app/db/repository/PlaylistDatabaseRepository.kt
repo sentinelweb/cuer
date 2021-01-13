@@ -20,7 +20,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
-// todo update satts automatically on save/delete
+
 @Suppress("DEPRECATION")
 class PlaylistDatabaseRepository constructor(
     private val playlistDao: PlaylistDao,
