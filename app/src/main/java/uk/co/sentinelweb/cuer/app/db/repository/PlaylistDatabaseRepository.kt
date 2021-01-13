@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.repository
 
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
@@ -29,6 +30,8 @@ class PlaylistDatabaseRepository constructor(
     private val log: LogWrapper,
     private val database: AppDatabase
 ) : DatabaseRepository<PlaylistDomain> {
+
+    val playlistHeaderUpdates = MutableSharedFlow<PlaylistDomain>()
 
     override suspend fun save(domain: PlaylistDomain, flat: Boolean): RepoResult<PlaylistDomain> =
         withContext(coProvider.IO) {

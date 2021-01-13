@@ -27,7 +27,7 @@ class BackupFileManager constructor(
             medias = listOf(),
             playlists = playlistRepository.loadList(PlaylistDatabaseRepository.AllFilter(flat = false)).data!!
         ).let {
-            jsonBackupSerialzer.stringify(BackupFileModel.serializer(), it)
+            jsonBackupSerialzer.encodeToString(BackupFileModel.serializer(), it)
         }
     }
 

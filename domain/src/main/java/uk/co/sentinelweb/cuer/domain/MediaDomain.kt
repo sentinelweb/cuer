@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.domain
 
-import kotlinx.serialization.ContextualSerialization
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.time.LocalDateTime
@@ -15,9 +15,9 @@ data class MediaDomain(
     val title: String? = null,
     val duration: Long? = null,
     val positon: Long? = null,
-    @ContextualSerialization val dateLastPlayed: Instant? = null,
+    @Contextual val dateLastPlayed: Instant? = null,
     val description: String? = null,
-    @ContextualSerialization val published: LocalDateTime? = null,
+    @Contextual val published: LocalDateTime? = null,
     val channelData: ChannelDomain,
     val thumbNail: ImageDomain? = null,
     val image: ImageDomain? = null,

@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.domain
 
-import kotlinx.serialization.ContextualSerialization
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import java.time.Instant
@@ -36,7 +36,7 @@ data class PlaylistDomain constructor(
         val type: PlaylistTypeDomain = PlaylistTypeDomain.USER,
         val platform: PlatformDomain = PlatformDomain.YOUTUBE,
         val updateUrl: String? = null,
-        @ContextualSerialization val lastUpdate: Instant? = null,
+        @Contextual val lastUpdate: Instant? = null,
         val updateInterval: Long? = null,
         val channelData: ChannelDomain? = null
     )
