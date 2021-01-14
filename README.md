@@ -23,5 +23,16 @@ Using
 - Chromecast (using https://github.com/PierfrancescoSoffritti/Android-YouTube-Player)
 - Koin
 - Glide
-
+- Test
+  - JUnit 4
+  - Mockk
+  - Hamcrest
+  - JFixture
+  - Android X tTest
+  - Robolectric
+  - Espresso
+  - Room test
+  - Koin test
+  - Coroutines test
+  - 
 ## screenshots
