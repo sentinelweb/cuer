@@ -45,7 +45,7 @@ Using
 ### Video info
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/info-2021-01-14-101125.png" width="400">
 
-### Share info
+### Add via Share
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/share-2021-01-14-101320.png" width="400">
 
 
