@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
@@ -83,6 +84,23 @@ class PlaylistPresenter(
 
     override fun onResume() {
         ytContextHolder.addConnectionListener(castConnectionListener)
+        state.viewModelScope.launch {
+            playlistRepository.playlistUpdates.collect { (plist, flat) ->
+                if (plist.id == state.playlistId) {
+                    if (flat) {
+                        state.playlist = plist.copy(items = (state.playlist ?: plist).items)
+                            .apply {
+                                view.setHeaderModel(
+                                    modelMapper.map(this, isPlaylistPlaying(), false)
+                                )
+                            }
+                    } else {
+                        state.playlist = plist
+                        doUiUpdate()
+                    }
+                }
+            }
+        }
     }
 
     override fun onPause() {
@@ -147,27 +165,23 @@ class PlaylistPresenter(
     }
 
     override fun onPlayModeChange(): Boolean {
-        state.playlist = state.playlist?.copy(
+        state.playlist?.copy(
             mode = when (state.playlist?.mode) {
                 SINGLE -> SHUFFLE
                 SHUFFLE -> LOOP
                 LOOP -> SINGLE
                 else -> SINGLE
             }
-        )
-        commitHeaderChange()
+        )?.apply {
+            commitHeaderChange(this)
+        }
         return true
     }
 
-    private fun commitHeaderChange() {
+    private fun commitHeaderChange(plist: PlaylistDomain) {
         state.viewModelScope.launch {
-            state.playlist?.let {
-                playlistRepository.save(it, flat = true)
-                queueExecIf { refreshHeaderData() }
-            }
-            state.playlist?.apply {
-                view.setHeaderModel(modelMapper.map(this, isPlaylistPlaying(), false))
-            }
+            playlistRepository.save(plist, flat = true)
+            queueExecIf { refreshHeaderData() } // todo remove this and add flow collector
         }
     }
 
@@ -190,8 +204,8 @@ class PlaylistPresenter(
     }
 
     override fun onStarPlaylist(): Boolean {
-        state.playlist = state.playlist?.let { it.copy(starred = !it.starred) }
-        commitHeaderChange()
+        state.playlist?.let { commitHeaderChange(it.copy(starred = !it.starred)) }
+
         return true
     }
 
@@ -421,13 +435,13 @@ class PlaylistPresenter(
     }
 
     override fun onItemChanged() {
-        queueExecIf {
-            currentItemIndex?.apply {
-                state.playlist = state.playlist?.copy(currentIndex = this)
-            } ?: throw IllegalStateException("Current item is null")
-            view.highlightPlayingItem(currentItemIndex)
-            currentItemIndex?.apply { view.scrollToItem(this) }
-        }
+//        queueExecIf {
+//            currentItemIndex?.apply {
+//                state.playlist = state.playlist?.copy(currentIndex = this)
+//            } ?: throw IllegalStateException("Current item is null")
+//            view.highlightPlayingItem(currentItemIndex)
+//            currentItemIndex?.apply { view.scrollToItem(this) }
+//        }
     }
 
     private fun refreshPlaylist() {
@@ -440,7 +454,7 @@ class PlaylistPresenter(
             playlistRepository.getPlaylistOrDefault(state.playlistId)
                 .also { state.playlist = it }
                 ?.also { state.playlistId = it.id }
-                .also { updateView(animate) }
+                .also { doUiUpdate(animate) }
         } catch (e: Throwable) {
             log.e("Error loading playlist", e)
         }
