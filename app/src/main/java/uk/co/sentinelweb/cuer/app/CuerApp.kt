@@ -9,6 +9,8 @@ import org.koin.core.logger.Level
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.di.Modules
 import uk.co.sentinelweb.cuer.app.exception.TerminatedWhilePlayingError
+import uk.co.sentinelweb.cuer.app.queue.QueueMediator
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
@@ -26,6 +28,7 @@ class CuerApp : Application() {
     private val log: LogWrapper by inject()
     private val castServiceManager: YoutubeCastServiceManager by inject()
     private val serviceWrapper: ServiceWrapper by inject()
+    private val queue: QueueMediatorContract.Producer by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -63,6 +66,7 @@ class CuerApp : Application() {
                 )
             )
         }
+        queue.destroy()
     }
 
     private lateinit var oldHandler: java.lang.Thread.UncaughtExceptionHandler

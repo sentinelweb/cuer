@@ -3,9 +3,12 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants.*
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -17,10 +20,11 @@ class YouTubePlayerListener(
     private val queue: QueueMediatorContract.Consumer,
     private val mediaSessionManager: MediaSessionManager,
     private val log: LogWrapper,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val coroutines: CoroutineContextProvider
 ) : AbstractYouTubePlayerListener(),
-    CastPlayerContract.PlayerControls.Listener,
-    QueueMediatorContract.ConsumerListener {
+    CastPlayerContract.PlayerControls.Listener//,
+/*QueueMediatorContract.ConsumerListener*/ {
 
     private var youTubePlayer: YouTubePlayer? = null
 
@@ -35,7 +39,10 @@ class YouTubePlayerListener(
 
     init {
         log.tag(this)
-        queue.addConsumerListener(this)
+        //queue.addConsumerListener(this)
+        coroutines.mainScope.launch {
+            queue.currentItemFlow.collect { loadVideo(queue.currentItem) }
+        }
     }
 
     fun onDisconnected() {
@@ -43,7 +50,8 @@ class YouTubePlayerListener(
         youTubePlayer = null
         playerUi?.reset()
         playerUi = null
-        queue.removeConsumerListener(this)
+        coroutines.cancel()
+        // queue.removeConsumerListener(this)
     }
 
     // region AbstractYouTubePlayerListener
@@ -194,14 +202,14 @@ class YouTubePlayerListener(
     // endregion
 
     // region  QueueMediatorContract.ConsumerListener
-    override fun onItemChanged() {
-        //log.d("onItemChanged: currentItemId = ${queue.currentItem?.id}")
-        loadVideo(queue.currentItem)
-    }
-
-    override fun onPlaylistUpdated() {
-
-    }
+//    override fun onItemChanged() {
+//        //log.d("onItemChanged: currentItemId = ${queue.currentItem?.id}")
+//        loadVideo(queue.currentItem)
+//    }
+//
+//    override fun onPlaylistUpdated() {
+//
+//    }
     // endregion
 
     private fun handleError(e: Exception) {

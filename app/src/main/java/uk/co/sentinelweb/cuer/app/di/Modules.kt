@@ -88,7 +88,7 @@ object Modules {
                 state = QueueMediatorState(),
                 repository = get(),
                 playlistRepository = get(),
-                contextProvider = get(),
+                coroutines = get(),
                 mediaSessionManager = get(),
                 playlistMutator = get(),
                 prefsWrapper = get(named<GeneralPreferences>()),

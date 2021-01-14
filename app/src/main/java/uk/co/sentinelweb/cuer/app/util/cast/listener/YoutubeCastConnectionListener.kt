@@ -2,27 +2,35 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 class YoutubeCastConnectionListener constructor(
     private val creator: YoutubePlayerContextCreator,
     private val mediaSessionManager: MediaSessionManager,
     private val castWrapper: ChromeCastWrapper,
-    private val queue: QueueMediatorContract.Consumer
-) : ChromecastConnectionListener, QueueMediatorContract.ConsumerListener {
+    private val queue: QueueMediatorContract.Consumer,
+    private val coroutines: CoroutineContextProvider
+
+) : ChromecastConnectionListener/*, QueueMediatorContract.ConsumerListener*/ {
 
     lateinit var context: ChromecastYouTubePlayerContext
     private var youTubePlayerListener: YouTubePlayerListener? = null
     private var connectionState: ConnectionState? = null
 
     init {
-        queue.addConsumerListener(this)
+        //queue.addConsumerListener(this)
+        coroutines.mainScope.launch {
+            queue.currentPlaylistFlow.collect { pushUpdateFromQueue() }
+        }
     }
 
     var playerUi: CastPlayerContract.PlayerControls? = null
@@ -85,14 +93,15 @@ class YoutubeCastConnectionListener constructor(
     fun destroy() {
         //connectionMonitor.cancelTimer()
         castWrapper.killCurrentSession()
+        coroutines.cancel()
     }
 
-    override fun onItemChanged() {
-    }
-
-    override fun onPlaylistUpdated() {
-        pushUpdateFromQueue()
-    }
+//    override fun onItemChanged() {
+//    }
+//
+//    override fun onPlaylistUpdated() {
+//        pushUpdateFromQueue()
+//    }
 
     private fun pushUpdateFromQueue() {
         playerUi?.apply {
