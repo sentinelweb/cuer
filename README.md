@@ -38,10 +38,13 @@ Using
 ## screenshots
 ### Playlist
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/playlist-2021-01-14-101002.png" width="400">
+
 ### Playlists
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/playlists-2021-01-14-101020.png" width="400">
+
 ### Video info
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/info-2021-01-14-101125.png" width="400">
+
 ### Share info
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/share-2021-01-14-101320.png" width="400">
 
