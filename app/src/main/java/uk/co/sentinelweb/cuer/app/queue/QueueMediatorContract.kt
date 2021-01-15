@@ -7,7 +7,6 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface QueueMediatorContract {
 
-
     interface Shared {
         val currentItem: PlaylistItemDomain?
         val currentItemIndex: Int?
@@ -18,21 +17,14 @@ interface QueueMediatorContract {
 
     interface Producer : Shared {
         fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean = false, resetPosition: Boolean = false)
-
-        //        fun addProducerListener(l: ProducerListener)
-//        fun removeProducerListener(l: ProducerListener)
         fun destroy()
-        fun refreshQueueBackground()//after: (() -> Unit)? = null
-        //fun refreshQueueFrom(playlistDomain: PlaylistDomain)//after: (() -> Unit)? = null
-
-        //fun itemRemoved(playlistItemDomain: PlaylistItemDomain)
-        suspend fun refreshQueue()//after: (() -> Unit)? = null
+        fun refreshQueueBackground()
+        suspend fun refreshQueue()
         fun playNow()
         suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?)
         suspend fun playNow(playlistId: Long, playlistItemId: Long?)
         fun deleteItem(index: Int)
-        fun switchToPlaylist(id: Long)
-        //fun refreshHeaderData()
+        suspend fun switchToPlaylist(id: Long)
     }
 
     interface Consumer : Shared {
@@ -40,19 +32,7 @@ interface QueueMediatorContract {
         fun onTrackEnded(media: MediaDomain?)
         fun nextItem()
         fun previousItem()
-
-        //        fun addConsumerListener(l: ConsumerListener)
-//        fun removeConsumerListener(l: ConsumerListener)
         fun updateMediaItem(updatedMedia: MediaDomain)
     }
-//
-//    interface ConsumerListener {
-//        fun onItemChanged()
-//        fun onPlaylistUpdated()
-//    }
 
-//    interface ProducerListener {
-//        fun onPlaylistUpdated(list: PlaylistDomain)
-//        fun onItemChanged()
-//    }
 }

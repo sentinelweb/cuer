@@ -69,43 +69,54 @@ class QueueMediator constructor(
     private fun listenToDb() {
         coroutines.computationScope.launch {
             playlistRepository.playlistFlow.collect { (op, plist) ->
-                if (plist.id == state.playlistId) {
-                    when (op) {
-                        FLAT -> state.playlist?.apply { refreshQueueFrom(replaceHeaderKeepIndex(plist)) }
-                        FULL -> {
-                            refreshQueueFrom(plist)
-                        }
-                        DELETE -> {
-                            refreshQueue()
-                            log.e("Current playlist deleted!!")
+                try {
+                    if (plist.id == state.playlistId) {
+                        when (op) {
+                            FLAT -> state.playlist?.apply { refreshQueueFrom(replaceHeaderKeepIndex(plist)) }
+                            FULL -> {
+                                refreshQueueFrom(plist)
+                            }
+                            DELETE -> {
+                                refreshQueue()
+                                log.e("Current playlist deleted!!")
+                            }
                         }
                     }
-                }
-            }
-            playlistRepository.playlistItemFlow.collect { (op, plistItem) ->
-                when (op) {
-                    FLAT,
-                    FULL -> if (plistItem.playlistId == state.playlistId) {
-                        // todo might be issues here as if the current index is changes and isn't saved might get overwritten -  should be minimal
-                        state.playlist?.apply {
-                            val plist = playlistMutator.addOrReplaceItem(this, plistItem)
-                            refreshQueueFrom(plist)
-                        }
-                    } else {// moved out?
-                        state.playlist?.items
-                            ?.find { it.id == plistItem.id }
-                            ?.apply { refreshQueue() }
-                    }
-                    DELETE -> // leave for now as item is only deleted in here for queue
-                        log.d("TODO : Playlist Item deleted!!!!")
+                } catch (e: Exception) {
+                    log.e("Playlist exception: $op (${plist.id}) ${plist.title}", e)
                 }
             }
         }
+        coroutines.computationScope.launch {
+            playlistRepository.playlistItemFlow.collect { (op, plistItem) ->
+                try {
+                    when (op) {
+                        FLAT,
+                        FULL -> if (plistItem.playlistId == state.playlistId) {
+                            // todo might be issues here as if the current index is changes and isn't saved might get overwritten -  should be minimal
+                            state.playlist?.apply {
+                                val plist = playlistMutator.addOrReplaceItem(this, plistItem)
+                                refreshQueueFrom(plist)
+                            }
+                        } else {// moved out?
+                            state.playlist?.items
+                                ?.find { it.id == plistItem.id }
+                                ?.apply { refreshQueue() }
+                        }
+                        DELETE -> // leave for now as item is only deleted in here for queue
+                            log.d("TODO : Playlist Item deleted!!!!")
+                    }
+                } catch (e: Exception) {
+                    log.e("Playlist item exception: $op (${plistItem.id}) ${plistItem.media.title}", e)
+                }
+            }
+
+        }
     }
 
-    override fun switchToPlaylist(id: Long) {
+    override suspend fun switchToPlaylist(id: Long) {
         state.playlistId = id
-        refreshQueueBackground()
+        refreshQueue()
     }
 
     override fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean, resetPosition: Boolean) {
@@ -208,8 +219,8 @@ class QueueMediator constructor(
             val isCurrentItem = currentItem?.id == deleteItem.id
             coroutines.computationScope.launch {
                 val mutated = playlistMutator.delete(plist, deleteItem)
-                playlistRepository.delete(deleteItem)
                 playlistRepository.updateCurrentIndex(mutated)
+                playlistRepository.delete(deleteItem)
                 refreshQueueFrom(mutated)
                 if (isCurrentItem) {
                     if (mutated.currentIndex > -1) {
@@ -225,30 +236,7 @@ class QueueMediator constructor(
         }
     }
 
-//    override fun refreshHeaderData() {
-//        exec {
-//            state.playlist?.let { plist ->
-//                plist.id?.let { id ->
-//                    playlistRepository.load(id, true)
-//                        .takeIf { it.isSuccessful }
-//                        ?.apply {
-//                            data?.apply {
-//                                refreshQueueFrom(
-//                                    copy(
-//                                        currentIndex = plist.currentIndex,
-//                                        items = plist.items
-//                                    )
-//                                )
-//                            }
-//                        }
-//                }
-//            }
-//        }
-//    }
-
     override fun destroy() {
-        // might not be needed if singleton
-        // save queue position
         coroutines.cancel()
     }
 

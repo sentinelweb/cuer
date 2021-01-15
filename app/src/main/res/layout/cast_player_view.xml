@@ -59,7 +59,7 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/cast_player_playlist_image"
-                    android:layout_width="32dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:background="@color/white"
