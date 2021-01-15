@@ -14,10 +14,13 @@ class MainPresenter(
     private val log: LogWrapper
 ) : MainContract.Presenter {
 
+    init {
+        log.tag(this)
+    }
+
     override fun initialise() {
-        log.tag = "MainPresenter"
-        playerControls.initMediaRouteButton()
-        playerControls.reset()
+
+
         if (!state.playServiceCheckDone) {
             view.checkPlayServices()
             state.playServiceCheckDone = true
@@ -42,6 +45,11 @@ class MainPresenter(
         ytServiceManager.stop()
         if (!ytContextHolder.isCreated() && state.playServicesAvailable) {
             initialiseCastContext()
+        }
+        if (!state.playControlsInit) {
+            playerControls.initMediaRouteButton()
+            playerControls.reset()
+            state.playControlsInit = true
         }
         ytContextHolder.playerUi = playerControls
     }

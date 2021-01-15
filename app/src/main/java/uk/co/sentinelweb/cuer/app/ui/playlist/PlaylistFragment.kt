@@ -10,8 +10,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -28,7 +26,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.PlayState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -48,7 +45,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class PlaylistFragment :
-    Fragment(R.layout.playlist_fragment),
+    Fragment(),
     PlaylistContract.View,
     ItemContract.Interactions,
     ItemBaseContract.ItemMoveInteractions {
@@ -84,11 +81,14 @@ class PlaylistFragment :
             binding.playlistToolbar.menu.findItem(R.id.playlist_mode_shuffle)
         )
 
-
     private var snackbar: Snackbar? = null
     private var createPlaylistDialog: DialogFragment? = null
 
     private var lastPlayModeIndex = 0
+
+    init {
+        log.tag(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +107,7 @@ class PlaylistFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.playlistToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
-            it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
+            //it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
         presenter.initialise()
         binding.playlistList.layoutManager = LinearLayoutManager(context)

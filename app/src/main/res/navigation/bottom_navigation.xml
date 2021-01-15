@@ -4,8 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_navigation"
-    app:startDestination="@id/navigation_playlist"
+    app:startDestination="@id/navigation_browse"
     >
+    <!--    Theres is a bug with app:startDestination that caused the specified fragment to use two instances when navigating -->
 
     <fragment
         android:id="@+id/navigation_browse"

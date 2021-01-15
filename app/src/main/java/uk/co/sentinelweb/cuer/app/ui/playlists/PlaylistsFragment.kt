@@ -7,8 +7,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -19,11 +17,11 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
-import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class PlaylistsFragment :
     Fragment(R.layout.playlists_fragment),
@@ -37,20 +35,28 @@ class PlaylistsFragment :
     private val toastWrapper: ToastWrapper by inject()
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
+    private val log: LogWrapper by inject()
 
     private var snackbar: Snackbar? = null
+
+    init {
+        log.tag(this)
+        log.d("${hashCode()} - init")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        log.d("${hashCode()} - onCreate")
     }
 
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        log.d("${hashCode()} - onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         playlists_toolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
-            it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
+            //it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
 
         //presenter.initialise()
@@ -64,17 +70,24 @@ class PlaylistsFragment :
     }
 
     override fun onDestroyView() {
+        log.d("${hashCode()} - onDestroyView")
         presenter.destroy()
         super.onDestroyView()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        log.d("${hashCode()} - onCreateOptionsMenu")
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onResume() {
+        log.d("${hashCode()} - onResume")
         super.onResume()
         presenter.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
     }
     // endregion
 
