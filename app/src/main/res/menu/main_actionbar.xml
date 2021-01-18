@@ -25,6 +25,8 @@
         android:title="@string/menu_settings"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="never"
+        android:orderInCategory="1000"
+
         />
 
     <item
@@ -33,6 +35,8 @@
         android:title="@string/menu_paste"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="ifRoom"
+        android:orderInCategory="1100"
+
         />
 
 </menu>

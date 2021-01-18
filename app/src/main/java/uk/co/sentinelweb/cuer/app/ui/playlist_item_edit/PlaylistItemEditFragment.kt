@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
 import android.transition.TransitionInflater
-import android.view.KeyEvent
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +35,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
+import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -55,6 +54,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
     private val chipCreator: ChipCreator by currentScope.inject()
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
     private val res: ResourceWrapper by currentScope.inject()
+    private val castDialogWrapper: CastDialogWrapper by inject()
 
     private val starMenuItem: MenuItem
         get() = ple_toolbar.menu.findItem(R.id.plie_star)
@@ -102,8 +102,12 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        ple_toolbar.let {
+            (activity as AppCompatActivity).setSupportActionBar(it)
+        }
         //ple_play_button.setOnClickListener { viewModel.onPlayVideoLocal() }
         ple_star_fab.setOnClickListener { viewModel.onStarClick() }
+        ple_play_fab.setOnClickListener { viewModel.onPlayVideo() }
         starMenuItem.isVisible = false
         playMenuItem.isVisible = false
         ple_author_image.setOnClickListener { viewModel.onChannelClick() }
@@ -126,7 +130,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     true
                 }
                 R.id.plie_play -> {
-                    viewModel.onPlayVideoLocal()
+                    viewModel.onPlayVideo()
                     true
                 }
                 else -> false
@@ -146,7 +150,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     // only show the menu items for the non-empty state
                     starMenuItem.isVisible = !menuState.modelEmpty
                     playMenuItem.isVisible = !menuState.modelEmpty
-
                 } else if (isShow) {
                     isShow = false
                     starMenuItem.isVisible = false
@@ -176,6 +179,11 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         observeModel()
         observeNavigation()
         observeDialog()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
     }
 
     override fun onAttach(context: Context) {
@@ -225,7 +233,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .addListener(GlideFallbackLoadListener(ple_author_image, url, ytDrawable, log))
                             .into(ple_author_image)
-                            //.onLoadFailed(ytDrawable)
+                        //.onLoadFailed(ytDrawable)
                     } ?: run { ple_author_image.setImageDrawable(ytDrawable) }
 
                     ple_chips.removeAllViews()
@@ -250,11 +258,11 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     ple_pub_date.text = model.pubDate
                     ple_author_title.text = model.channelTitle
                     ple_author_desc.text = model.channelDescription
-                    //ple_play_button.isVisible = model.canPlay
                     val starIconResource =
                         if (model.starred) R.drawable.ic_button_starred_white
                         else R.drawable.ic_button_unstarred_white
                     starMenuItem.setIcon(starIconResource)
+                    ple_star_fab.setImageResource(starIconResource)
                     ple_star_fab.setImageResource(starIconResource)
                 }
             })
@@ -297,6 +305,9 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                                 }
                             createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
                         }
+                        DialogModel.Type.SELECT_ROUTE -> {
+                            castDialogWrapper.showRouteSelector(childFragmentManager)
+                        }
                         else -> Unit
                     }
                 }
@@ -327,7 +338,10 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         itemCreator = get(),
                         playlistDialogModelCreator = get(),
                         log = get(),
-                        ytInteractor = get()
+                        ytInteractor = get(),
+                        queue = get(),
+                        ytContextHolder = get(),
+                        toast = get()
                     )
                 }
                 scoped { PlaylistItemEditState() }

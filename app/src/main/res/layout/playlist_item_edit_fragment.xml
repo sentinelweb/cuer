@@ -222,15 +222,28 @@
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/ple_star_fab"
+        android:id="@+id/ple_play_fab"
         style="@style/FabButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:contentDescription="@string/menu_play"
+        app:layout_anchor="@id/ple_appbar"
+        app:layout_anchorGravity="bottom|end"
+        app:srcCompat="@drawable/ic_player_play_black"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/ple_star_fab"
+        style="@style/FabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_anchor="@id/ple_appbar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_button_unstarred_white"
         android:contentDescription="@string/menu_star"
+        android:layout_marginEnd="80dp"
+        app:fabSize="mini"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

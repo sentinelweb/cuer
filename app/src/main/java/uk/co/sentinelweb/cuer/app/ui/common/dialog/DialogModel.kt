@@ -5,6 +5,6 @@ open class DialogModel constructor(
     open val title: String
 ) {
     enum class Type {
-        PLAYLIST, PLAYLIST_ADD, CONFIRM
+        PLAYLIST, PLAYLIST_ADD, CONFIRM, SELECT_ROUTE
     }
 }
