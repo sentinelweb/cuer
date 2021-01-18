@@ -462,12 +462,12 @@ class PlaylistPresenter(
         }
     }
 
-    override fun onPlaylistUpdated(list: PlaylistDomain) {
-        state.playlist = list
-        state.viewModelScope.launch {
-            updateView()
-        }
-    }
+//    override fun onPlaylistUpdated(list: PlaylistDomain) {
+//        state.playlist = list
+//        state.viewModelScope.launch {
+//            updateView()
+//        }
+//    }
 
 //    override fun onItemChanged() {
 //        queueExecIf {
