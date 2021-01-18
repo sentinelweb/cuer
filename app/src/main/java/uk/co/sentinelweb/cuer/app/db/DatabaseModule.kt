@@ -9,11 +9,10 @@ import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 
 object DatabaseModule {
     val dbModule = module {
-        single { println("createdb");get<RoomWrapper>().createDb() }
-        single { println("RoomWrapper");RoomWrapper(androidApplication()) }
+        single { get<RoomWrapper>().createDb() }
+        single { RoomWrapper(androidApplication()) }
 
         factory {
-            println("MediaDatabaseRepository")
             MediaDatabaseRepository(
                 mediaDao = get<AppDatabase>().mediaDao(),
                 mediaMapper = get(),
@@ -24,8 +23,7 @@ object DatabaseModule {
                 database = get()
             )
         }
-        factory {
-            println("PlaylistDatabaseRepository")
+        single {
             PlaylistDatabaseRepository(
                 playlistDao = get<AppDatabase>().playlistDao(),
                 playlistMapper = get(),
@@ -33,11 +31,11 @@ object DatabaseModule {
                 playlistItemMapper = get(),
                 mediaDao = get<AppDatabase>().mediaDao(),
                 coProvider = get(),
-                log = get()
+                log = get(),
+                database = get()
             )
         }
-        factory {
-            println("DatabaseInitializer")
+        single {
             DatabaseInitializer(
                 ytInteractor = get(),
                 mediaRepository = get(),
@@ -47,10 +45,10 @@ object DatabaseModule {
                 log = get()
             )
         }
-        factory { println("PlaylistMapper"); PlaylistMapper(get(), get()) }
-        factory { println("PlaylistItemMapper"); PlaylistItemMapper(get()) }
-        factory { println("MediaMapper"); MediaMapper(get(), get()) }
-        factory { println("ImageMapper"); ImageMapper() }
-        factory { println("ChannelMapper"); ChannelMapper(get()) }
+        factory { PlaylistMapper(get(), get()) }
+        factory { PlaylistItemMapper(get()) }
+        factory { MediaMapper(get(), get()) }
+        factory { ImageMapper() }
+        factory { ChannelMapper(get()) }
     }
 }

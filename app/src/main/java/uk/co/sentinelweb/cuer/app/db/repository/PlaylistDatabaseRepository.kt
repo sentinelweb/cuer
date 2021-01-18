@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.repository
 
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.dao.MediaDao
 import uk.co.sentinelweb.cuer.app.db.dao.PlaylistDao
@@ -16,6 +17,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
+// todo update satts automatically on save/delete
+@Suppress("DEPRECATION")
 class PlaylistDatabaseRepository constructor(
     private val playlistDao: PlaylistDao,
     private val playlistMapper: PlaylistMapper,
@@ -23,7 +26,8 @@ class PlaylistDatabaseRepository constructor(
     private val playlistItemMapper: PlaylistItemMapper,
     private val mediaDao: MediaDao,
     private val coProvider: CoroutineContextProvider,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val database: AppDatabase
 ) : DatabaseRepository<PlaylistDomain> {
 
     override suspend fun save(domain: PlaylistDomain, flat: Boolean): RepoResult<PlaylistDomain> =
@@ -31,6 +35,7 @@ class PlaylistDatabaseRepository constructor(
             try {
                 var insertId = -1L
                 domain
+                    .also { database.beginTransaction() }
                     .let { playlistMapper.map(it) }
                     .let { playlistDao.insert(it) }
                     .also { insertId = it }
@@ -38,11 +43,15 @@ class PlaylistDatabaseRepository constructor(
                     ?.let { playlistId -> domain.items.map { it.copy(playlistId = playlistId) } }
                     ?.map { item -> playlistItemMapper.map(item) }
                     ?.let { playlistItemEntities -> playlistItemDao.insertAll(playlistItemEntities) }
-
-                RepoResult.Data(load(insertId, flat).data)
-            } catch (e: Exception) {
+                    .also { database.setTransactionSuccessful() }
+                    .also { database.endTransaction() }
+                load(insertId, flat)
+                    .takeIf { it.isSuccessful }
+                    ?: throw IllegalStateException("Couldn't load saved data")
+            } catch (e: Throwable) {
                 val msg = "couldn't save playlist ${domain.title}"
                 log.e(msg, e)
+                database.endTransaction()
                 RepoResult.Error<PlaylistDomain>(e, msg)
             }
         }
@@ -55,6 +64,7 @@ class PlaylistDatabaseRepository constructor(
             try {
                 var insertIds = listOf<Long>()
                 domains
+                    .also { database.beginTransaction() }
                     .map { playlistMapper.map(it) }
                     .let { playlistDao.insertAll(it) }
                     .also { insertIds = it }
@@ -66,11 +76,15 @@ class PlaylistDatabaseRepository constructor(
                             .map { playlistItemMapper.map(it) }
                             .let { playlistItems -> playlistItemDao.insertAll(playlistItems) }
                     }
+                    .also { database.setTransactionSuccessful() }
+                    .also { database.endTransaction() }
 
-                RepoResult.Data(loadList(IdListFilter(insertIds, flat)).data)
-            } catch (e: Exception) {
+                RepoResult.Data(loadList(PlaylistDatabaseRepository.IdListFilter(insertIds, flat)).data)
+                // todo emit
+            } catch (e: Throwable) {
                 val msg = "couldn't save playlists ${domains.joinToString { it.title }}"
                 log.e(msg, e)
+                database.endTransaction()
                 RepoResult.Error<List<PlaylistDomain>>(e, msg)
             }
         }
@@ -78,6 +92,7 @@ class PlaylistDatabaseRepository constructor(
     override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistDomain> =
         withContext(coProvider.IO) {
             try {
+                database.beginTransaction()
                 if (flat) {
                     playlistDao.load(id)!!
                         .let { playlistMapper.map(it, null, null) }
@@ -85,11 +100,12 @@ class PlaylistDatabaseRepository constructor(
                     mapDeep(playlistDao.loadWithItems(id)!!)
                 }
                     .let { domain -> RepoResult.Data(domain) }
+                    .also { database.setTransactionSuccessful() }
             } catch (e: Exception) {
                 val msg = "couldn't load $id"
                 log.e(msg, e)
                 RepoResult.Error<PlaylistDomain>(e, msg)
-            }
+            }.also { database.endTransaction() }
         }
 
     private suspend fun mapDeep(loadWithItems: PlaylistAndItems) =
@@ -105,39 +121,43 @@ class PlaylistDatabaseRepository constructor(
     override suspend fun loadList(filter: DatabaseRepository.Filter?): RepoResult<List<PlaylistDomain>> =
         withContext(coProvider.IO) {
             try {
-                when (filter) {
-                    is IdListFilter ->
-                        if (filter.flat) playlistDao
-                            .loadAllByIds(filter.ids.toLongArray())
-                            .map { playlistMapper.map(it, null, null) }
-                        else playlistDao
-                            .loadAllByIdsWithItems(filter.ids.toLongArray())
-                            .map { mapDeep(it) }
-                    is DefaultFilter ->
-                        if (filter.flat) playlistDao
-                            .loadAllByFlags(PlaylistEntity.FLAG_DEFAULT)
-                            .map { playlistMapper.map(it, null, null) }
-                        else playlistDao
-                            .loadAllByFlagsWithItems(PlaylistEntity.FLAG_DEFAULT)
-                            .map { mapDeep(it) }
-                    is AllFilter ->
-                        if (filter.flat) playlistDao
-                            .getAllPlaylists()
-                            .map { playlistMapper.map(it, null, null) }
-                        else playlistDao
-                            .getAllPlaylistsWithItems()
-                            .map { mapDeep(it) }
-                    else ->
-                        playlistDao
-                            .getAllPlaylists()
-                            .map { playlistMapper.map(it, null, null) }
-
-                }.let { RepoResult.Data(it) }
+                playlistDao
+                    .also { database.beginTransaction() }
+                    .let { playlistDao ->
+                        when (filter) {
+                            is PlaylistDatabaseRepository.IdListFilter ->
+                                if (filter.flat)
+                                    playlistDao.loadAllByIds(filter.ids.toLongArray())
+                                        .map { playlistMapper.map(it, null, null) }
+                                else playlistDao
+                                    .loadAllByIdsWithItems(filter.ids.toLongArray())
+                                    .map { mapDeep(it) }
+                            is DefaultFilter ->
+                                if (filter.flat) playlistDao
+                                    .loadAllByFlags(PlaylistEntity.FLAG_DEFAULT)
+                                    .map { playlistMapper.map(it, null, null) }
+                                else playlistDao
+                                    .loadAllByFlagsWithItems(PlaylistEntity.FLAG_DEFAULT)
+                                    .map { mapDeep(it) }
+                            is AllFilter ->
+                                if (filter.flat) playlistDao
+                                    .getAllPlaylists()
+                                    .map { playlistMapper.map(it, null, null) }
+                                else playlistDao
+                                    .getAllPlaylistsWithItems()
+                                    .map { mapDeep(it) }
+                            else ->
+                                playlistDao
+                                    .getAllPlaylists()
+                                    .map { playlistMapper.map(it, null, null) }
+                        }
+                    }.let { RepoResult.Data(it) }
+                    .also { database.setTransactionSuccessful() }
             } catch (e: Throwable) {
                 val msg = "couldn't load $filter"
                 log.e(msg, e)
                 RepoResult.Error<List<PlaylistDomain>>(e, msg)
-            }
+            }.also { database.endTransaction() }
         }
 
     override suspend fun count(filter: DatabaseRepository.Filter?): RepoResult<Int> =
@@ -155,15 +175,18 @@ class PlaylistDatabaseRepository constructor(
         withContext(coProvider.IO) {
             try {
                 domain
+                    .also { database.beginTransaction() }
                     .let { playlistMapper.map(it) }
                     .also { playlistDao.delete(it) }
                     .also { playlistItemDao.deletePlaylistItems(it.id) }
+                    .also { database.setTransactionSuccessful() }
+
                 RepoResult.Data.Empty(true)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 val msg = "couldn't delete ${domain.id}"
                 log.e(msg, e)
                 RepoResult.Error<Boolean>(e, msg)
-            }
+            }.also { database.endTransaction() }
         }
 
     override suspend fun deleteAll(): RepoResult<Boolean> =
@@ -196,14 +219,16 @@ class PlaylistDatabaseRepository constructor(
     suspend fun loadPlaylistStatList(playlistIds: List<Long>): RepoResult<List<PlaylistStatDomain>> =
         withContext(coProvider.IO) {
             try {
-                RepoResult.Data(playlistIds.map {
-                    PlaylistStatDomain(
-                        playlistId = it,
-                        itemCount = playlistItemDao.countItems(it),
-                        watchedItemCount = playlistItemDao.countMediaFlags(it, MediaEntity.FLAG_WATCHED)
-                    )
-                })
-            } catch (e: Exception) {
+                database.beginTransaction()
+                RepoResult.Data(
+                    playlistIds.map {
+                        PlaylistStatDomain(
+                            playlistId = it,
+                            itemCount = playlistItemDao.countItems(it),
+                            watchedItemCount = playlistItemDao.countMediaFlags(it, MediaEntity.FLAG_WATCHED)
+                        )
+                    }).also { database.setTransactionSuccessful() }
+            } catch (e: Throwable) {
                 val msg = "couldn't delete all media"
                 log.e(msg, e)
                 RepoResult.Error<List<PlaylistStatDomain>>(e, msg)
@@ -229,7 +254,7 @@ class PlaylistDatabaseRepository constructor(
                     }
                     .let { playlistItemMapper.map(it, item.media) }
                     .let { RepoResult.Data(it) }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 val msg = "couldn't save playlist item"
                 log.e(msg, e)
                 RepoResult.Error<PlaylistItemDomain>(e, msg)
@@ -265,7 +290,7 @@ class PlaylistDatabaseRepository constructor(
                         )
                     }
                     .let { RepoResult.Data(it) }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 val msg = "couldn't save playlist items"
                 log.e(msg, e)
                 RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
@@ -278,7 +303,7 @@ class PlaylistDatabaseRepository constructor(
                 playlistItemDao.load(id)!!
                     .let { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                     .let { RepoResult.Data(it) }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 val msg = "couldn't save playlist item"
                 log.e(msg, e)
                 RepoResult.Error<PlaylistItemDomain>(e, msg)
@@ -294,7 +319,7 @@ class PlaylistDatabaseRepository constructor(
                     else -> playlistItemDao.loadItems()
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                 }.let { RepoResult.Data(it) }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 val msg = "couldn't save playlist item"
                 log.e(msg, e)
                 RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
@@ -308,7 +333,7 @@ class PlaylistDatabaseRepository constructor(
                     .let { playlistItemMapper.map(it) }
                     .also { playlistItemDao.delete(it) }
                 RepoResult.Data.Empty(true)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 val msg = "couldn't delete ${domain.id}"
                 log.e(msg, e)
                 RepoResult.Error<Boolean>(e, msg)
