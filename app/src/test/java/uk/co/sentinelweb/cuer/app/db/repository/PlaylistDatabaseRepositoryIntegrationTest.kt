@@ -78,7 +78,8 @@ class PlaylistDatabaseRepositoryIntegrationTest {
             playlistItemMapper = playlistItemMapper,
             mediaDao = database.mediaDao(),
             log = systemLogWrapper,
-            coProvider = coCxtProvider
+            coProvider = coCxtProvider,
+            database = database
         )
         runBlocking {
             mediaRepo.save(playlist.items.map { it.media.copy(channelData = it.media.channelData.copy(id = null)) })
