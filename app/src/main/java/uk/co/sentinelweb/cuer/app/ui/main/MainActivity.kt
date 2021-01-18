@@ -18,6 +18,7 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
@@ -27,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
@@ -40,6 +42,7 @@ class MainActivity :
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val snackBarWrapper: SnackbarWrapper by currentScope.inject()
     private val log: LogWrapper by currentScope.inject()
+    private val navMapper: NavigationMapper by currentScope.inject()
 
     private lateinit var navController: NavController
 
@@ -119,7 +122,6 @@ class MainActivity :
                     PLAYLIST_ITEM.getString(intent)
                         ?.let { deserialisePlaylistItem(it) }
                         ?.let { item ->
-                            //log.d("checkIntent navigate intent.plid=${item.playlistId} intent.pl_item_id=${item.id}")
                             navController.navigate(
                                 R.id.navigation_playlist, bundleOf(
                                     PLAYLIST_ID.name to item.playlistId,
@@ -153,7 +155,7 @@ class MainActivity :
     }
 
     override fun navigate(destination: NavigationModel) {
-
+        navMapper.map(destination)
     }
 
     companion object {
@@ -180,6 +182,18 @@ class MainActivity :
                         .supportFragmentManager
                         .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).playerControls
                 }
+                scoped {
+                    NavigationMapper(
+                        activity = getSource(),
+                        toastWrapper = get(),
+                        ytJavaApi = get(),
+                        navController = (getSource<AppCompatActivity>()
+                            .supportFragmentManager
+                            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+                            .navController
+                    )
+                }
+                scoped { YoutubeJavaApiWrapper(getSource()) }
                 viewModel { MainState() }
                 scoped { SnackbarWrapper(getSource()) }
             }

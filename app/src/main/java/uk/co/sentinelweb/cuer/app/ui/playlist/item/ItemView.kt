@@ -21,6 +21,8 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistItemBinding
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_IMAGE
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_TITLE
 import uk.co.sentinelweb.cuer.app.util.extension.fade
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -132,7 +134,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
 
     override fun makeTransitionExtras() =
         FragmentNavigatorExtras(
-            binding.listitemTop to "title",
-            binding.listitemIcon to "image"
+            binding.listitemTop to TRANS_TITLE,
+            binding.listitemIcon to TRANS_IMAGE
         )
 }

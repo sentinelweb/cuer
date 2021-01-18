@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cast_player_trans_image">castPlayerImage</string>
+    <string name="cast_player_trans_title">castPlayerTitle</string>
+    <string name="playlist_item_trans_image">playlistItemHeaderImage</string>
+    <string name="playlist_item_trans_title">playlistItemHeaderTitle</string>
+</resources>

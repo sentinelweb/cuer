@@ -1,11 +1,15 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import kotlin.math.max
 import kotlin.math.min
 
@@ -146,19 +150,41 @@ class CastPlayerPresenter(
         // todo restore state
     }
 
-    override fun setMedia(media: MediaDomain) {
-        media.thumbNail?.url?.apply { view.setImage(this) }
-        media.title?.apply { state.title = this }
-        media.title?.let { view.setTitle(it) }
-        state.durationMs = media.duration ?: 0L
-        view.setDuration(mapper.formatTime(state.durationMs))
-    }
-
     override fun setPlaylistName(name: String) {
         view.setPlaylistName(name)
     }
 
+    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) {
+        state.playlistItem = playlistItem?.apply {
+            media.thumbNail?.url?.apply { view.setImage(this) }
+            media.title?.apply { state.title = this }
+            media.title?.let { view.setTitle(it) }
+            state.durationMs = media.duration ?: 0L
+            view.setDuration(mapper.formatTime(state.durationMs))
+        }
+    }
+
     override fun setPlaylistImage(image: ImageDomain?) {
         view.setPlaylistImage(image?.url)
+    }
+
+    override fun onPlaylistClick() {
+        state.playlistItem?.playlistId?.let {
+            view.navigate(NavigationModel(PLAYLIST_FRAGMENT, mapOf(PLAYLIST_ID to it, PLAY_NOW to false)))
+        }
+    }
+
+    override fun onPlaylistItemClick() {
+        state.playlistItem?.let {
+            view.navigate(
+                NavigationModel(
+                    PLAYLIST_ITEM_FRAGMENT,
+                    mapOf(
+                        PLAYLIST_ITEM to it,
+                        FRAGMENT_NAV_EXTRAS to view.makeItemTransitionExtras()
+                    )
+                )
+            )
+        }
     }
 }

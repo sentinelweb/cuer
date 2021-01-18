@@ -15,6 +15,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
@@ -22,6 +23,7 @@ import kotlinx.android.synthetic.main.playlist_item_edit_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.core.context.KoinContextHandler
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
@@ -321,10 +323,11 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
 
     fun getPlaylistItems() = viewModel.getCommittedItems()
 
-
     companion object {
 
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
+        val TRANS_IMAGE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
+        val TRANS_TITLE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
 
         @JvmStatic
         val fragmentModule = module {
@@ -351,7 +354,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         activity = (getSource() as Fragment).requireActivity(),
                         toastWrapper = get(),
                         fragment = (getSource() as Fragment),
-                        ytJavaApi = get()
+                        ytJavaApi = get(),
+                        navController = (getSource() as Fragment).findNavController()
                     )
                 }
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }

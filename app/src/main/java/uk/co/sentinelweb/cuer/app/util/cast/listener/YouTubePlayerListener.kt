@@ -225,11 +225,12 @@ class YouTubePlayerListener(
             log.d("loadVideo: play position: pos =  $startPos sec")
             youTubePlayer?.loadVideo(media.platformId, startPos)
             state.currentMedia = media
-            playerUi?.setMedia(media)
+            playerUi?.setPlaylistItem(queue.currentItem)
         } ?: run {
             state.currentMedia = null
             youTubePlayer?.pause()
             playerUi?.reset()
+            playerUi?.setPlaylistItem(null)
         }
     }
 
@@ -245,7 +246,7 @@ class YouTubePlayerListener(
                 state.currentMedia = queue.currentItem?.media
             }
             //log.d("setupPlayer: state.currentMedia=${state.currentMedia?.stringMedia()}")
-            state.currentMedia?.apply { setMedia(this) }
+            setPlaylistItem(queue.currentItem)
         }
     }
 

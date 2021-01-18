@@ -28,6 +28,7 @@ data class NavigationModel constructor(
         PLAYLIST_EDIT(listOf(PLAYLIST_ID)),
         PLAYLIST_CREATE(),
         PLAYLIST_FRAGMENT(listOf(PLAYLIST_ID, PLAY_NOW)),
+        PLAYLIST_ITEM_FRAGMENT(listOf(PLAYLIST_ITEM, FRAGMENT_NAV_EXTRAS)),
         PLAYLISTS_FRAGMENT(),
         BROWSE_FRAGMENT(),
         PLAYER_FRAGMENT(),
@@ -49,6 +50,7 @@ data class NavigationModel constructor(
         PLAYLIST_ID, /* Long */
         PLAYLIST_ITEM_ID, /* Long */
         PLAYLIST_ITEM, /* PlaylistItemDomain */
+        FRAGMENT_NAV_EXTRAS /**/
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)

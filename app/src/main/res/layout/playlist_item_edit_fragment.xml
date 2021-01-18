@@ -44,7 +44,7 @@
                 android:background="@color/background"
                 app:layout_collapseParallaxMultiplier="0.7"
                 tools:src="@drawable/im_test_nietzche"
-                android:transitionName="image"
+                android:transitionName="@string/playlist_item_trans_image"
                 />
 
             <!--            <ImageButton-->
@@ -96,7 +96,7 @@
                 android:elevation="0dp"
                 app:layout_collapseMode="pin"
                 app:menu="@menu/playlist_item_edit_actionbar"
-                android:transitionName="title"
+                android:transitionName="@string/playlist_item_trans_title"
                 /><!-- app:layout_scrollFlags="scroll|enterAlways|snap"-->
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
