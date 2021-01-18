@@ -1,8 +1,7 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos
 
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -67,6 +66,8 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
                 listOf("8nhPVOM97Jg", "fY7M3pzXdUo"),
                 listOf(ID, SNIPPET, CONTENT_DETAILS, PLAYER)
             )
+
+            assertTrue(actual.isSuccessful)
             assertNotNull(actual.data)
             assertEquals("8nhPVOM97Jg", actual.data!![0].platformId)
             assertEquals("fY7M3pzXdUo", actual.data!![1].platformId)
@@ -81,10 +82,12 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
                 listOf("UCzuqE7-t13O4NIDYJfakrhw", "UC2UIXt4VQnhQ-VZM4P1bUMQ"),
                 listOf(ID, SNIPPET)
             )
+
+            assertTrue(actual.isSuccessful)
             assertNotNull(actual.data)
             // note the items come out of order
-            assertEquals("UCzuqE7-t13O4NIDYJfakrhw", actual.data!![1].platformId)
-            assertEquals("UC2UIXt4VQnhQ-VZM4P1bUMQ", actual.data!![0].platformId)
+            assertEquals("UCzuqE7-t13O4NIDYJfakrhw", actual.data!![0].platformId)
+            assertEquals("UC2UIXt4VQnhQ-VZM4P1bUMQ", actual.data!![1].platformId)
         }
     }
 }

@@ -65,9 +65,10 @@ class CuerApp : Application() {
         }
     }
 
-    val oldHandler = Thread.getDefaultUncaughtExceptionHandler()
+    private lateinit var oldHandler: java.lang.Thread.UncaughtExceptionHandler
 
     fun setDefaultExceptionHander() {
+        oldHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
             firebaseWrapper.logMessage("Thread Name: ${paramThread.name} state:${paramThread.state} group:${paramThread.threadGroup?.name}")
             log.e("FATAL Global Exception", paramThrowable)

@@ -13,7 +13,7 @@ interface PlaylistDao {
     @Query("SELECT count() FROM playlist")
     suspend fun countItems(): Int
 
-    @Transaction
+    //@Transaction
     @Query("SELECT * FROM playlist")
     suspend fun getAllPlaylistsWithItems(): List<PlaylistAndItems>
 
@@ -35,15 +35,15 @@ interface PlaylistDao {
     @Query("SELECT * FROM playlist WHERE flags & :flags == :flags")
     suspend fun loadAllByFlags(flags: Long): List<PlaylistEntity>
 
-    @Transaction
+    //@Transaction
     @Query("SELECT * FROM playlist WHERE id == :id")
     suspend fun loadWithItems(id: Long): PlaylistAndItems?
 
-    @Transaction
+    //@Transaction
     @Query("SELECT * FROM playlist WHERE id IN (:playlistIds)")
     suspend fun loadAllByIdsWithItems(playlistIds: LongArray): List<PlaylistAndItems>
 
-    @Transaction
+    //@Transaction
     @Query("SELECT * FROM playlist WHERE flags & :flags == :flags")
     suspend fun loadAllByFlagsWithItems(flags: Long): List<PlaylistAndItems>
 

@@ -13,9 +13,9 @@ dependencies {
 
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:$ver_retrofit"
-    //implementation "com.squareup.retrofit2:converter-gson:$ver_retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$ver_retrofit"
     implementation "com.squareup.okhttp3:logging-interceptor:$ver_okhttp3_logging" // 4.5.0 break for some reason
-    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:$ver_retrofit2_kotlinx_serialization_converter"
+//    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:$ver_retrofit2_kotlinx_serialization_converter"
 
     // koin
     implementation  "org.koin:koin-core:$ver_koin"

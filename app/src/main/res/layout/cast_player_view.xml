@@ -77,6 +77,9 @@
                     android:padding="2dp"
                     android:textColor="@color/black"
                     android:textSize="12sp"
+                    android:ellipsize="end"
+                    android:maxWidth="88dp"
+                    android:maxLines="1"
                     tools:text="playlist"
                     />
             </LinearLayout>

@@ -84,7 +84,7 @@ class FABProgress(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
         showProgress = show
         if (show && tickerChannel == null) {
             tickerChannel = ticker(delayMillis = 1000 / 60, initialDelayMillis = 0)
-            receiveJob = contextProvider.MainScope.launch {
+            receiveJob = contextProvider.mainScope.launch {
                 tickerChannel?.apply {
                     for (event in this) {
                         animVars.inc()

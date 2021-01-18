@@ -49,6 +49,22 @@ class PlaylistMutator {
         return domain
     }
 
+    fun addOrReplaceItem(playlist: PlaylistDomain, item: PlaylistItemDomain) =
+        if (item.playlistId == playlist.id) {
+            val items = playlist.items.toMutableList()
+            val isReplace = items.removeIf { it.id == item.id }
+            var index = items.indexOfFirst { it.order < item.order }
+            if (index == -1) index = items.size;
+            val newIndex = if (!isReplace && index < playlist.currentIndex) {
+                playlist.currentIndex + 1
+            } else playlist.currentIndex
+            items.add(index, item)
+            playlist.copy(
+                items = items,
+                currentIndex = newIndex
+            )
+        } else throw IllegalStateException("Item is not on this playlist")
+
     fun gotoPreviousItem(playlist: PlaylistDomain): PlaylistDomain {
         var newPosition = playlist.currentIndex
         if (playlist.currentIndex > -1) {

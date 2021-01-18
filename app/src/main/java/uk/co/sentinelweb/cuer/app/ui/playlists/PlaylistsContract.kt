@@ -38,6 +38,7 @@ interface PlaylistsContract {
         fun undoDelete()
         fun commitMove()
         fun onResume()
+        fun onPause()
     }
 
     interface View {
@@ -81,7 +82,8 @@ interface PlaylistsContract {
                         queue = get(),
                         log = get(),
                         toastWrapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>())
+                        prefsWrapper = get(named<GeneralPreferences>()),
+                        coroutines = get()
                     )
                 }
                 scoped { PlaylistsModelMapper() }

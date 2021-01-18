@@ -87,7 +87,9 @@ class PlaylistsFragment :
     }
 
     override fun onPause() {
+        log.d("${hashCode()} - onPause")
         super.onPause()
+        presenter.onPause()
     }
     // endregion
 

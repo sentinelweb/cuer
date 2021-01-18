@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.queue
 
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract.ConsumerListener
@@ -153,7 +154,9 @@ class QueueMediator constructor(
                         consumerListeners.forEach { it.onItemChanged() }
                     }
                 }
-                producerListeners.forEach { it.onPlaylistUpdated(mutated) }
+                withContext(contextProvider.Main) {
+                    producerListeners.forEach { it.onPlaylistUpdated(mutated) }
+                }
             }
         }
     }
@@ -214,8 +217,10 @@ class QueueMediator constructor(
         state.currentItem?.apply {
             mediaSessionManager.setMedia(media)
         }
+
         consumerListeners.forEach { it.onItemChanged() }
         producerListeners.forEach { it.onItemChanged() }
+
     }
 
     override fun onTrackEnded(media: MediaDomain?) {
@@ -227,7 +232,7 @@ class QueueMediator constructor(
     }
 
     fun exec(block: suspend () -> Unit) {
-        state.jobs.add(contextProvider.MainScope.launch { block() })
+        contextProvider.computationScope.launch { block() }
     }
 
     override fun refreshQueueFrom(playlistDomain: PlaylistDomain) {
@@ -243,7 +248,9 @@ class QueueMediator constructor(
         state.currentItem?.apply {
             mediaSessionManager.setMedia(media)
         }
-        consumerListeners.forEach { it.onPlaylistUpdated() }
+        contextProvider.mainScope.launch {
+            consumerListeners.forEach { it.onPlaylistUpdated() }
+        }
     }
 
     override suspend fun refreshQueue() {

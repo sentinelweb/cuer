@@ -1,15 +1,14 @@
 package uk.co.sentinelweb.cuer.net.retrofit
 
 //import retrofit2.converter.gson.GsonConverterFactory
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
+//import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import java.util.concurrent.TimeUnit
@@ -20,12 +19,12 @@ class RetrofitBuilder constructor(
 
     internal fun buildYoutubeClient() = Retrofit.Builder()
         .baseUrl(YOUTUBE_BASE)
-        //.addConverterFactory(GsonConverterFactory.create())
-        .addConverterFactory(
-            Json(JsonConfiguration(ignoreUnknownKeys = true, isLenient = true)).asConverterFactory(
-                CONTENT_TYPE
-            )
-        )
+        .addConverterFactory(GsonConverterFactory.create())
+//        .addConverterFactory(
+//            Json{ignoreUnknownKeys = true; isLenient = true}.asConverterFactory(
+//                CONTENT_TYPE
+//            )
+//        )
         .client(buildOkHttpClient())
         .build()
 

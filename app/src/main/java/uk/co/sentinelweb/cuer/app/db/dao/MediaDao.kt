@@ -13,15 +13,15 @@ interface MediaDao {
     @Query("SELECT count() FROM media")
     suspend fun count(): Int
 
-    @Transaction
+    //Transaction
     @Query("SELECT * FROM media WHERE id IN (:mediaIds)")
     suspend fun loadAllByIds(mediaIds: LongArray): List<MediaAndChannel>
 
-    @Transaction
+    //@Transaction
     @Query("SELECT * FROM media WHERE id == :id")
     suspend fun load(id: Long): MediaAndChannel?
 
-    @Transaction
+    //@Transaction
     @Query("SELECT * FROM media WHERE media_id LIKE :mediaId LIMIT 1")
     suspend fun findByMediaId(mediaId: String): MediaAndChannel?
 

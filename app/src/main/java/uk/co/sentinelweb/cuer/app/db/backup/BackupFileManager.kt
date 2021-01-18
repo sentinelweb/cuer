@@ -7,8 +7,10 @@ import uk.co.sentinelweb.cuer.app.db.backup.version.jsonBackupSerialzer
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 
 class BackupFileManager constructor(
@@ -27,7 +29,7 @@ class BackupFileManager constructor(
             medias = listOf(),
             playlists = playlistRepository.loadList(PlaylistDatabaseRepository.AllFilter(flat = false)).data!!
         ).let {
-            jsonBackupSerialzer.stringify(BackupFileModel.serializer(), it)
+            jsonBackupSerialzer.encodeToString(BackupFileModel.serializer(), it)
         }
     }
 
@@ -41,7 +43,16 @@ class BackupFileManager constructor(
                 ?.takeIf { it.isSuccessful }
                 ?.let { playlistRepository.deleteAll() }
                 ?.takeIf { it.isSuccessful }
-                ?.let { mediaRepository.save(backupFileModel.medias) }
+                ?.let {
+                    backupFileModel.medias.chunked(CHUNK_SIZE)
+                        .map { mediaRepository.save(it) }
+                        .reduce { acc: RepoResult<List<MediaDomain>>, result: RepoResult<List<MediaDomain>> ->
+                            RepoResult.Composite<List<MediaDomain>>(
+                                acc.isSuccessful && result.isSuccessful,
+                                result.data?.let { acc.data?.plus(it) }
+                            )
+                        }
+                }
                 ?.takeIf { it.isSuccessful }
                 ?.data
                 ?.let { savedMedias ->
@@ -52,7 +63,7 @@ class BackupFileManager constructor(
                                 items = it.items.map {
                                     it.copy(
                                         media = idLookup.get(it.media.platformId)
-                                            ?: throw IllegalArgumentException("ID lookup failed")
+                                            ?: throw IllegalArgumentException("media ID lookup failed: ${it.media.platformId}")
                                     )
                                 }
                             )
@@ -103,5 +114,6 @@ class BackupFileManager constructor(
 
     companion object {
         const val VERSION = 3
+        const val CHUNK_SIZE = 400
     }
 }

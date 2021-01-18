@@ -94,7 +94,6 @@ class PlaylistFragment :
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -166,6 +165,7 @@ class PlaylistFragment :
 
     override fun onDestroyView() {
         presenter.destroy()
+        _binding = null
         super.onDestroyView()
     }
 
@@ -276,7 +276,7 @@ class PlaylistFragment :
 
     override fun setSubTitle(subtitle: String) {
         // todo make better in ui upgrade
-        (activity as AppCompatActivity).supportActionBar?.setTitle(subtitle)
+        (activity as AppCompatActivity?)?.supportActionBar?.setTitle(subtitle)
     }
 
     override fun showPlaylistSelector(model: SelectDialogModel) {

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -10,9 +11,9 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistsPresenter(
     private val view: PlaylistsContract.View,
@@ -22,15 +23,16 @@ class PlaylistsPresenter(
     private val modelMapper: PlaylistsModelMapper,
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
-) : PlaylistsContract.Presenter, QueueMediatorContract.ProducerListener {
+    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
+    private val coroutines: CoroutineContextProvider
+) : PlaylistsContract.Presenter/*, QueueMediatorContract.ProducerListener*/ {
 
     override fun initialise() {
 
     }
 
     override fun refreshList() {
-        refreshPlaylist()
+        refreshPlaylists()
     }
 
     override fun setFocusMedia(mediaDomain: MediaDomain) {
@@ -86,7 +88,7 @@ class PlaylistsPresenter(
             toastWrapper.show("todo save move ..")
         } else {
             toastWrapper.show("Move failed ..")
-            refreshPlaylist()
+            refreshPlaylists()
         }
         state.dragFrom = null
         state.dragTo = null
@@ -102,15 +104,15 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onPlaylistUpdated(list: PlaylistDomain) {
-        refreshPlaylist()
-    }
+//    override fun onPlaylistUpdated(list: PlaylistDomain) {
+//        refreshPlaylist()
+//    }
+//
+//    override fun onItemChanged() {
+//
+//    }
 
-    override fun onItemChanged() {
-
-    }
-
-    private fun refreshPlaylist() {
+    private fun refreshPlaylists() {
         state.viewModelScope.launch { executeRefresh(false) }
     }
 
@@ -139,5 +141,16 @@ class PlaylistsPresenter(
 
     override fun onResume() {
         state.viewModelScope.launch { executeRefresh(true) }
+        coroutines.mainScope.launch {
+            // todo a better job - might refresh too much
+            // todo listen for stat changes
+            playlistRepository.playlistFlow.collect { (op, plist) ->
+                refreshPlaylists()
+            }
+        }
+    }
+
+    override fun onPause() {
+        coroutines.cancel()
     }
 }

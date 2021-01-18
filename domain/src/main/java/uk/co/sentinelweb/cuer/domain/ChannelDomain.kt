@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.domain
 
-import kotlinx.serialization.ContextualSerialization
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
@@ -13,7 +13,7 @@ data class ChannelDomain constructor(
     val title: String? = null,
     val customUrl: String? = null,
     val description: String? = null,
-    @ContextualSerialization val published: LocalDateTime? = null,
+    @Contextual val published: LocalDateTime? = null,
     val thumbNail: ImageDomain? = null,
     val image: ImageDomain? = null,
     val starred: Boolean = false
