@@ -122,7 +122,8 @@ interface PlaylistContract {
                         playlistMutator = get(),
                         log = get(),
                         playlistDialogModelCreator = get(),
-                        timeProvider = get()
+                        timeProvider = get(),
+                        coroutines = get()
                     )
                 }
                 scoped { PlaylistModelMapper(res = get(), timeFormatter = get(), timeSinceFormatter = get(), loopModeMapper = get()) }

@@ -28,6 +28,22 @@ fun PlaylistDomain.indexOfItemId(id1: Long?): Int? {
     }
 }
 
+fun PlaylistDomain.replaceHeader(header: PlaylistDomain) = header.copy(items = items)
+
+fun PlaylistDomain.replaceHeaderKeepIndex(header: PlaylistDomain) = header.copy(items = items, currentIndex = currentIndex)
+
+fun PlaylistDomain.removeItem(item: PlaylistItemDomain) =
+    this.items.find { it.id == item.id }
+        ?.let { this.copy(items = this.items.minus(it)) }
+
+fun PlaylistDomain.replaceItem(item: PlaylistItemDomain) =
+    this.items.indexOfFirst { it.id == item.id }
+        .let { index ->
+            if (index > -1) {
+                this.copy(items = this.items.toMutableList().apply { set(index, item) }.toList())
+            } else this
+        }
+
 fun PlaylistDomain.scanOrder(): StringBuilder {
     var lastorder = -1L
     val orderString = StringBuilder("cur: $currentIndex [")

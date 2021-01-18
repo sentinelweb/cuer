@@ -24,4 +24,7 @@ sealed class RepoResult<R> constructor(
         val msg: String? = null,
         val code: String? = null
     ) : RepoResult<R>(false)
+
+
+    class Composite<R>(isSuccessful: Boolean, data: R?) : RepoResult<R>(isSuccessful, data = data)
 }

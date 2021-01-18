@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.repository
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
@@ -12,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.db.entity.PlaylistAndItems
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistMapper
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository.Operation.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -31,9 +33,35 @@ class PlaylistDatabaseRepository constructor(
     private val database: AppDatabase
 ) : DatabaseRepository<PlaylistDomain> {
 
-    val playlistHeaderUpdates = MutableSharedFlow<PlaylistDomain>()
+    enum class Operation { FLAT, FULL, DELETE }
 
-    override suspend fun save(domain: PlaylistDomain, flat: Boolean): RepoResult<PlaylistDomain> =
+    private val _playlistFlow = MutableSharedFlow<Pair<Operation, PlaylistDomain>>()
+    val playlistFlow: Flow<Pair<Operation, PlaylistDomain>>
+        get() = _playlistFlow
+
+    private val _playlistItemFlow = MutableSharedFlow<Pair<Operation, PlaylistItemDomain>>()
+    val playlistItemFlow: Flow<Pair<Operation, PlaylistItemDomain>>
+        get() = _playlistItemFlow
+
+    private val _playlistStats: MutableList<PlaylistStatDomain> = mutableListOf()
+    val playlistStats: List<PlaylistStatDomain> = _playlistStats
+    private val _playlistStatFlow = MutableSharedFlow<PlaylistStatDomain>()
+    val playlistStatFlow: Flow<PlaylistStatDomain>
+        get() = _playlistStatFlow
+
+    init {
+//        coProvider.computationScope.launch {
+//            // todo error check
+//            loadList(null).data?.map { it.id!! }
+//                ?.apply {
+//                    _playlistStats.addAll(loadPlaylistStatList(this).data!!)
+//                }
+//        }
+    }
+
+    override suspend fun save(domain: PlaylistDomain, flat: Boolean): RepoResult<PlaylistDomain> = save(domain, flat, true)
+
+    private suspend fun save(domain: PlaylistDomain, flat: Boolean, emit: Boolean = false): RepoResult<PlaylistDomain> =
         withContext(coProvider.IO) {
             try {
                 var insertId = -1L
@@ -50,6 +78,7 @@ class PlaylistDatabaseRepository constructor(
                     .also { database.endTransaction() }
                 load(insertId, flat)
                     .takeIf { it.isSuccessful }
+                    ?.also { if (emit) it.data?.apply { _playlistFlow.emit((if (flat) FLAT else FULL) to this) } }
                     ?: throw IllegalStateException("Couldn't load saved data")
             } catch (e: Throwable) {
                 val msg = "couldn't save playlist ${domain.title}"
@@ -59,10 +88,9 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
-    override suspend fun save(
-        domains: List<PlaylistDomain>,
-        flat: Boolean
-    ): RepoResult<List<PlaylistDomain>> =
+    override suspend fun save(domains: List<PlaylistDomain>, flat: Boolean): RepoResult<List<PlaylistDomain>> = save(domains, flat, true)
+
+    private suspend fun save(domains: List<PlaylistDomain>, flat: Boolean, emit: Boolean = false): RepoResult<List<PlaylistDomain>> =
         withContext(coProvider.IO) {
             try {
                 var insertIds = listOf<Long>()
@@ -174,7 +202,9 @@ class PlaylistDatabaseRepository constructor(
             RepoResult.Error<Int>(e, msg)
         }
 
-    override suspend fun delete(domain: PlaylistDomain): RepoResult<Boolean> =
+    override suspend fun delete(domain: PlaylistDomain) = delete(domain, true)
+
+    private suspend fun delete(domain: PlaylistDomain, emit: Boolean = false): RepoResult<Boolean> =
         withContext(coProvider.IO) {
             try {
                 domain
@@ -183,7 +213,11 @@ class PlaylistDatabaseRepository constructor(
                     .also { playlistDao.delete(it) }
                     .also { playlistItemDao.deletePlaylistItems(it.id) }
                     .also { database.setTransactionSuccessful() }
-
+                    .also {
+                        if (emit) {
+                            _playlistFlow.emit(DELETE to domain)
+                        }
+                    }
                 RepoResult.Data.Empty(true)
             } catch (e: Throwable) {
                 val msg = "couldn't delete ${domain.id}"
@@ -205,12 +239,17 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
-    suspend fun updateCurrentIndex(playlist: PlaylistDomain): RepoResult<Boolean> =
+    suspend fun updateCurrentIndex(playlist: PlaylistDomain, emit: Boolean = true): RepoResult<Boolean> =
         withContext(coProvider.IO) {
             try {
                 RepoResult.Data(playlist.id?.let {
                     playlistDao.updateIndex(it, playlist.currentIndex) > 0
-                } ?: false)
+                } ?: false).also {
+                    if (emit) {
+                        _playlistFlow.emit(FLAT to playlist)
+                    }
+                }
+
             } catch (e: Exception) {
                 val msg = "couldn't delete all media"
                 log.e(msg, e)
@@ -219,7 +258,7 @@ class PlaylistDatabaseRepository constructor(
         }
 
     // region PlaylistStatDomain
-    suspend fun loadPlaylistStatList(playlistIds: List<Long>): RepoResult<List<PlaylistStatDomain>> =
+    suspend fun loadPlaylistStatList(playlistIds: List<Long>, emit: Boolean = false): RepoResult<List<PlaylistStatDomain>> =
         withContext(coProvider.IO) {
             try {
                 database.beginTransaction()
@@ -231,16 +270,17 @@ class PlaylistDatabaseRepository constructor(
                             watchedItemCount = playlistItemDao.countMediaFlags(it, MediaEntity.FLAG_WATCHED)
                         )
                     }).also { database.setTransactionSuccessful() }
+                    .also { if (emit) it.data?.forEach { _playlistStatFlow.emit(it) } }
             } catch (e: Throwable) {
                 val msg = "couldn't delete all media"
                 log.e(msg, e)
                 RepoResult.Error<List<PlaylistStatDomain>>(e, msg)
-            }
+            }.also { database.endTransaction() }
         }
     // endregion PlaylistStatDomain
 
     // region PlaylistItemDomain
-    suspend fun savePlaylistItem(item: PlaylistItemDomain): RepoResult<PlaylistItemDomain> =
+    suspend fun savePlaylistItem(item: PlaylistItemDomain, emit: Boolean = true): RepoResult<PlaylistItemDomain> =
         withContext(coProvider.IO) {
             try {
                 item
@@ -257,6 +297,7 @@ class PlaylistDatabaseRepository constructor(
                     }
                     .let { playlistItemMapper.map(it, item.media) }
                     .let { RepoResult.Data(it) }
+                    .also { if (emit) it.data?.also { _playlistItemFlow.emit(FLAT to it) } }
             } catch (e: Throwable) {
                 val msg = "couldn't save playlist item"
                 log.e(msg, e)
@@ -264,7 +305,7 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
-    suspend fun savePlaylistItems(items: List<PlaylistItemDomain>): RepoResult<List<PlaylistItemDomain>> =
+    suspend fun savePlaylistItems(items: List<PlaylistItemDomain>, emit: Boolean = true): RepoResult<List<PlaylistItemDomain>> =
         withContext(coProvider.IO) {
             try {
                 val checkOrderAndPlaylist: MutableSet<String> = mutableSetOf()
@@ -272,7 +313,7 @@ class PlaylistDatabaseRepository constructor(
                     .apply {
                         forEach {
                             val key = "${it.order}:${it.playlistId}"
-                            if (checkOrderAndPlaylist.contains(key)) throw IllegalStateException("order / playlist is not unique")
+                            if (checkOrderAndPlaylist.contains(key)) throw IllegalStateException("Order / playlist is not unique")
                             else checkOrderAndPlaylist.add(key)
                         }
                     }
@@ -293,8 +334,9 @@ class PlaylistDatabaseRepository constructor(
                         )
                     }
                     .let { RepoResult.Data(it) }
+                    .also { if (emit) it.data?.forEach { _playlistItemFlow.emit(FLAT to it) } }
             } catch (e: Throwable) {
-                val msg = "couldn't save playlist items"
+                val msg = "Couldn't save playlist items"
                 log.e(msg, e)
                 RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
             }
@@ -329,12 +371,17 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
-    suspend fun delete(domain: PlaylistItemDomain): RepoResult<Boolean> =
+    suspend fun delete(domain: PlaylistItemDomain, emit: Boolean = true): RepoResult<Boolean> =
         withContext(coProvider.IO) {
             try {
                 domain
                     .let { playlistItemMapper.map(it) }
                     .also { playlistItemDao.delete(it) }
+                    .also {
+                        if (emit) {
+                            _playlistItemFlow.emit(DELETE to domain)
+                        }
+                    }
                 RepoResult.Data.Empty(true)
             } catch (e: Throwable) {
                 val msg = "couldn't delete ${domain.id}"
@@ -343,6 +390,17 @@ class PlaylistDatabaseRepository constructor(
             }
         }
     // endregion
+
+    suspend fun getPlaylistOrDefault(playlistId: Long?) =
+        (playlistId
+            ?.let { load(it, flat = false) }
+            ?.takeIf { it.isSuccessful }
+            ?.data
+            ?: run {
+                loadList(PlaylistDatabaseRepository.DefaultFilter(flat = false))
+                    .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
+                    ?.data?.get(0)
+            })
 
     class IdListFilter(val ids: List<Long>, val flat: Boolean = true) : DatabaseRepository.Filter
     class MediaIdListFilter(val ids: List<Long>, val flat: Boolean = true) : DatabaseRepository.Filter

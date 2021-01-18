@@ -19,7 +19,7 @@ class DatabaseInitializer constructor(
 ) {
 
     fun initDatabase() {
-        contextProvider.IOScope.launch {
+        contextProvider.ioScope.launch {
             (mediaRepository.count()
                 .takeIf { it.isSuccessful && it.data == 0 }
                 ?: let { return@launch })

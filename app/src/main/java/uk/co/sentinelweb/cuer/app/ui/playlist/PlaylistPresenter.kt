@@ -5,6 +5,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsend
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -18,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -45,12 +47,15 @@ class PlaylistPresenter(
     private val playlistMutator: PlaylistMutator,
     private val log: LogWrapper,
     private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val coroutines: CoroutineContextProvider
 ) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
 
     init {
         log.tag(this)
     }
+
+    private fun isPlaylistPlaying() = isQueuedPlaylist && ytContextHolder.isConnected()
 
     private val isQueuedPlaylist: Boolean
         get() = state.playlist?.let { queue.playlistId == it.id } ?: false
@@ -82,6 +87,7 @@ class PlaylistPresenter(
 
     override fun onPause() {
         ytContextHolder.removeConnectionListener(castConnectionListener)
+        coroutines.cancel()
     }
 
     private fun queueExecIfElse(
@@ -409,7 +415,9 @@ class PlaylistPresenter(
 
     override fun onPlaylistUpdated(list: PlaylistDomain) {
         state.playlist = list
-        doUiUpdate()
+        state.viewModelScope.launch {
+            updateView()
+        }
     }
 
     override fun onItemChanged() {
@@ -426,26 +434,19 @@ class PlaylistPresenter(
         state.viewModelScope.launch { executeRefresh() }
     }
 
-    private suspend fun executeRefresh(animate: Boolean = true) {
+    private suspend fun executeRefresh(animate: Boolean = true, scrollToItem: Boolean = false) {
         //log.d("executeRefresh state.playlistId=${state.playlistId}")
         try {
-            (state.playlistId
-                ?.let { playlistRepository.load(it, flat = false) }
-                ?.takeIf { it.isSuccessful }
-                ?.data
-                ?: run {
-                    playlistRepository.loadList(PlaylistDatabaseRepository.DefaultFilter(flat = false))
-                        .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
-                        ?.data?.get(0)
-                })
+            playlistRepository.getPlaylistOrDefault(state.playlistId)
                 .also { state.playlist = it }
-                .also { doUiUpdate(animate) }
+                ?.also { state.playlistId = it.id }
+                .also { updateView(animate) }
         } catch (e: Throwable) {
             log.e("Error loading playlist", e)
         }
     }
 
-    fun doUiUpdate(animate: Boolean = true) {
+    private suspend fun updateView(animate: Boolean = true, scrollToItem: Boolean = false) = withContext(coroutines.Main) {
         state.playlist
             .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
             ?.let { modelMapper.map(it, isPlaylistPlaying()) }
@@ -457,12 +458,17 @@ class PlaylistPresenter(
                     state.focusIndex = null
                 } ?: run {
                     state.playlist?.currentIndex?.also {
-                        view.scrollToItem(it)
+                        if (scrollToItem) {
+                            view.scrollToItem(it)
+                        }
                         view.highlightPlayingItem(it)
                     }
                 }
             }
     }
 
-    private fun isPlaylistPlaying() = isQueuedPlaylist && ytContextHolder.isConnected()
+    private suspend fun updateHeader() = withContext(coroutines.Main) {
+        state.playlist?.apply { view.setHeaderModel(modelMapper.map(this, isPlaylistPlaying(), false)) }
+    }
+
 }

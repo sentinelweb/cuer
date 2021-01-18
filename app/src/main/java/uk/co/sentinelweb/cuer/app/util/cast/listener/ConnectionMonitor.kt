@@ -36,7 +36,7 @@ class ConnectionMonitor constructor(
 
     fun setTimer(stateProvider: () -> CastPlayerContract.ConnectionState?) {
         timerJob?.cancel()
-        timerJob = coCxtProvider.DefaultScope.launch {
+        timerJob = coCxtProvider.mainScope.launch {
             delay(10000)
             withContext(coCxtProvider.Main) { checkConnected(stateProvider()) }
         }
