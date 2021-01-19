@@ -17,7 +17,6 @@ class ItemPresenter(
             ?.apply { view.setIconUrl(this) }
             ?: R.drawable.ic_chip_playlist_black
                 .apply { view.setIconResource(this) }
-            ?: view.setIconResource(0)
         state.item = item
     }
 

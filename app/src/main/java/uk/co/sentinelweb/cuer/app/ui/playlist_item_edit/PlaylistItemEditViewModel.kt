@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
@@ -118,7 +119,7 @@ class PlaylistItemEditViewModel constructor(
                 }
             }
             if (!ytContextHolder.isConnected()) {
-                _selectModelLiveData.value = DialogModel(DialogModel.Type.SELECT_ROUTE, "Select Route")
+                _selectModelLiveData.value = DialogModel(DialogModel.Type.SELECT_ROUTE, R.string.select_route_dialog_title)
             }
         } ?: run { toast.show("Please save the item first ...") }
 
@@ -168,7 +169,7 @@ class PlaylistItemEditViewModel constructor(
             }.also { update() }
         } else {
             _selectModelLiveData.value =
-                DialogModel(DialogModel.Type.PLAYLIST_ADD, "Create playlist")
+                DialogModel(DialogModel.Type.PLAYLIST_ADD, R.string.create_playlist_dialog_title)
         }
     }
 

@@ -60,6 +60,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         _binding = ViewPlaylistItemBinding.bind(this)
         binding.listitem.setOnClickListener { presenter.doClick() }
         binding.listitemOverflowClick.setOnClickListener { showContextualMenu() }
+        binding.listitemIcon.setOnClickListener { presenter.doView() }
     }
 
     @SuppressLint("RestrictedApi")

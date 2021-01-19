@@ -61,6 +61,7 @@ class PlaylistFragment :
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
 
+    // todo consider making binding nulll - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
     private val binding get() = _binding!!
 

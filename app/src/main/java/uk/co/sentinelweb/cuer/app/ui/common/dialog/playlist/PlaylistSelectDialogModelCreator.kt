@@ -31,7 +31,7 @@ class PlaylistSelectDialogModelCreator constructor(
     ) = SelectDialogModel(
         type = DialogModel.Type.PLAYLIST,
         multi = multi,
-        title = res.getString(R.string.playlist_dialog_title),
+        title = R.string.playlist_dialog_title,
         items = all.map { playlist ->
             SelectDialogModel.Item(
                 playlist.title,

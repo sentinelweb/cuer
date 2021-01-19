@@ -287,6 +287,8 @@ class PlaylistPresenter(
                     queue.refreshQueueFrom(it)
                     queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)
                 }
+            }, {// info
+                view.showItemDescription(itemDomain)
             }))
         }
     }

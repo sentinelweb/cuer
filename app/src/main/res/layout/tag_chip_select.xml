@@ -6,7 +6,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="4dp"
-    android:text="@string/select"
+    android:text="@string/chip_select"
     app:chipIcon="@drawable/ic_chip_tag_black"
     app:chipIconSize="18dp"
     />
