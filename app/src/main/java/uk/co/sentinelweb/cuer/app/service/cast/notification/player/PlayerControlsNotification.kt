@@ -14,9 +14,9 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.PlayerContr
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlayerControlsNotification constructor(
     private val view: PlayerControlsNotificationContract.View,
@@ -120,15 +120,6 @@ class PlayerControlsNotification constructor(
         }
     }
 
-    override fun setMedia(media: MediaDomain) {
-        //log.d("setMedia: state.media=${state.media?.stringMedia()} \nmedia=${media.stringMedia()}")
-        if (state.media?.id != media.id) {
-            state.bitmap = null
-        }
-        state.media = media
-        updateNotification()
-    }
-
     override fun setPlaylistName(name: String) {
         state.playlistName = name
     }
@@ -137,8 +128,16 @@ class PlayerControlsNotification constructor(
         // not needed here
     }
 
-    override fun initMediaRouteButton() {
+    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) {
+        if (state.media?.id != playlistItem?.media?.id) {
+            state.bitmap = null
+        }
+        state.media = playlistItem?.media
+        updateNotification()
+    }
 
+    override fun initMediaRouteButton() {
+        // not needed here
     }
 
     override fun reset() {
@@ -147,7 +146,6 @@ class PlayerControlsNotification constructor(
         state.media = null
         updateNotification()
     }
-
 
     override fun restoreState() {
 

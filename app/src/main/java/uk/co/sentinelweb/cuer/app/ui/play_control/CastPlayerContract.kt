@@ -1,9 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import androidx.lifecycle.ViewModel
+import androidx.navigation.fragment.FragmentNavigator
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.domain.ImageDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface CastPlayerContract {
 
@@ -17,6 +19,8 @@ interface CastPlayerContract {
         fun onDestroyView()
         fun initialise()
         fun onPlayPausePressed()
+        fun onPlaylistClick()
+        fun onPlaylistItemClick()
     }
 
     // todo think about this maybe sub with android MediaControl interface
@@ -32,9 +36,11 @@ interface CastPlayerContract {
         fun setTitle(title: String)
         fun reset()
         fun restoreState()
-        fun setMedia(media: MediaDomain)
+
+        //fun setMedia(media: MediaDomain)// todo remove - use playlistitem
         fun setPlaylistName(name: String)
         fun setPlaylistImage(image: ImageDomain?)
+        fun setPlaylistItem(playlistItem: PlaylistItemDomain?)
 
         interface Listener {
             fun play()
@@ -43,6 +49,7 @@ interface CastPlayerContract {
             fun trackFwd()
             fun seekTo(positionMs: Long)
         }
+
     }
 
     interface View {
@@ -61,20 +68,23 @@ interface CastPlayerContract {
         fun clearImage()
         fun setPlaylistName(name: String)
         fun setPlaylistImage(url: String?)
+        fun navigate(navModel: NavigationModel)
+        fun makeItemTransitionExtras(): FragmentNavigator.Extras
     }
 
     enum class ConnectionState {
         CC_DISCONNECTED, CC_CONNECTING, CC_CONNECTED,
     }
 
-    data class State constructor(
+    data class State(
         val listeners: MutableList<PlayerControls.Listener> = mutableListOf(), // todo data only here move to presenter?
         var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
         var positionMs: Long = 0,
         var seekPositionMs: Long = 0,
         var durationMs: Long = 0,
         var title: String = "",
-        var isDestroyed: Boolean = false
+        var isDestroyed: Boolean = false,
+        var playlistItem: PlaylistItemDomain? = null
     ) : ViewModel()
 
 

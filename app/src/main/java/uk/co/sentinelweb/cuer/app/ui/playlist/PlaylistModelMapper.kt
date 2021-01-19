@@ -60,10 +60,11 @@ class PlaylistModelMapper constructor(
         )
     }
 
-    fun mapChangePlaylistAlert(confirm: () -> Unit): AlertDialogModel = AlertDialogModel(
-        res.getString(R.string.playlist_change_dialog_title),
-        res.getString(R.string.playlist_change_dialog_message),
-        confirm
+    fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel = AlertDialogModel(
+        R.string.playlist_change_dialog_title,
+        R.string.playlist_change_dialog_message,
+        AlertDialogModel.Button(R.string.ok, confirm),
+        AlertDialogModel.Button(R.string.dialog_button_view_info, info)
     )
 
 }

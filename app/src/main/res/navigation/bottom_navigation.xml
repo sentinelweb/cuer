@@ -89,7 +89,7 @@
     <fragment
         android:id="@+id/navigation_playlist_item_edit"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment"
-        android:label="@string/playlist_item_edit_title"
+        android:label="@string/nav_playlist_item_edit_title"
         tools:layout="@layout/playlist_item_edit_fragment"
         >
         <argument

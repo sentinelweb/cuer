@@ -44,6 +44,7 @@
                 android:layout_marginStart="8dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                android:transitionName="@string/cast_player_trans_image"
                 />
 
             <LinearLayout
@@ -57,16 +58,16 @@
                 app:layout_constraintRight_toLeftOf="@id/cast_player_track_last"
                 >
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/cast_player_playlist_image"
-                    android:layout_width="32dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:background="@color/white"
-                    android:padding="1dp"
-                    android:src="@drawable/ic_nav_playlist_black"
-                    android:visibility="gone"
-                    />
+                <!--                <androidx.appcompat.widget.AppCompatImageView-->
+                <!--                    android:id="@+id/cast_player_playlist_image"-->
+                <!--                    android:layout_width="32dp"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_gravity="end"-->
+                <!--                    android:background="@color/white"-->
+                <!--                    android:padding="1dp"-->
+                <!--                    android:src="@drawable/ic_nav_playlist_black"-->
+                <!--                    android:visibility="gone"-->
+                <!--                    />-->
 
                 <TextView
                     android:id="@+id/cast_player_playlist_text"
@@ -159,6 +160,7 @@
                 app:layout_constraintRight_toLeftOf="@+id/cast_player_duration"
                 app:layout_constraintTop_toBottomOf="@id/cast_player_center"
                 tools:text="title"
+                android:transitionName="@string/cast_player_trans_title"
                 />
 
             <TextView

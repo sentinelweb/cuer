@@ -144,7 +144,7 @@ class PlaylistsPresenter(
         coroutines.mainScope.launch {
             // todo a better job - might refresh too much
             // todo listen for stat changes
-            playlistRepository.playlistFlow.collect { (op, plist) ->
+            playlistRepository.playlistFlow.collect { (_, _) ->
                 refreshPlaylists()
             }
         }

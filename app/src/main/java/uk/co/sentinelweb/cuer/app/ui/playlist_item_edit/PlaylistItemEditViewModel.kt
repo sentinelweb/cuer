@@ -6,15 +6,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -31,7 +35,10 @@ class PlaylistItemEditViewModel constructor(
     private val mediaRepo: MediaDatabaseRepository,
     private val itemCreator: PlaylistItemCreator,
     private val log: LogWrapper,
-    private val ytInteractor: YoutubeInteractor
+    private val ytInteractor: YoutubeInteractor,
+    private val queue: QueueMediatorContract.Producer,
+    private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val toast: ToastWrapper
 ) : ViewModel() {
 
     private val _modelLiveData: MutableLiveData<PlaylistItemEditModel> = MutableLiveData()
@@ -104,12 +111,24 @@ class PlaylistItemEditViewModel constructor(
             ?: listOf()
 
 
-    fun onPlayVideoLocal() {
-        _navigateLiveData.value =
-            NavigationModel(
-                LOCAL_PLAYER,
-                mapOf(MEDIA_ID to state.media!!.platformId)
-            )
+    fun onPlayVideo() {
+        state.playlistItem?.let { item ->
+            viewModelScope.launch {
+                item.playlistId?.let {
+                    queue.playNow(it, item.id)
+                }
+            }
+            if (!ytContextHolder.isConnected()) {
+                _selectModelLiveData.value = DialogModel(DialogModel.Type.SELECT_ROUTE, R.string.select_route_dialog_title)
+            }
+        } ?: run { toast.show("Please save the item first ...") }
+
+// need different UX for local
+//        _navigateLiveData.value =
+//            NavigationModel(
+//                LOCAL_PLAYER,
+//                mapOf(MEDIA_ID to state.media!!.platformId)
+//            )
     }
 
     fun onStarClick() {
@@ -150,7 +169,7 @@ class PlaylistItemEditViewModel constructor(
             }.also { update() }
         } else {
             _selectModelLiveData.value =
-                DialogModel(DialogModel.Type.PLAYLIST_ADD, "Create playlist")
+                DialogModel(DialogModel.Type.PLAYLIST_ADD, R.string.create_playlist_dialog_title)
         }
     }
 

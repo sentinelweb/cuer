@@ -25,7 +25,10 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.PlayState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -61,6 +64,7 @@ class PlaylistFragment :
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
 
+    // todo consider making binding nulll - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
     private val binding get() = _binding!!
 
@@ -171,14 +175,37 @@ class PlaylistFragment :
 
     override fun onResume() {
         super.onResume()
-        log.d("onResume arg.plid=${PLAYLIST_ID.getLong(arguments)} arg.pl_item_id=${PLAYLIST_ITEM_ID.getLong(arguments)}")
-        presenter.setPlaylistData(
-            PLAYLIST_ID.getLong(arguments),
-            PLAYLIST_ITEM_ID.getLong(arguments),
-            PLAY_NOW.getBoolean(arguments) ?: false
-        )
+        // todo clean up after i m sure it works for all cases
+        // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
+        ((activity as NavigationProvider?)?.checkForPendingNavigation(PLAYLIST_FRAGMENT)?.apply {
+            //onResumeGotArguments = true
+            log.d("onResume: got nav on callup model = $this")
+        } ?: let {
+            val plId = PLAYLIST_ID.getLong(arguments)
+            val onResumeGotArguments = plId?.let { it > 0L } ?: false
+            if (onResumeGotArguments) {
+                log.d(
+                    "onResume: got nav on args model = plid = $plId plitemId = ${PLAYLIST_ITEM_ID.getLong(arguments)} playNow = ${
+                        PLAY_NOW.getBoolean(
+                            arguments
+                        )
+                    }"
+                )
+                makeNav(plId, PLAYLIST_ITEM_ID.getLong(arguments), PLAY_NOW.getBoolean(arguments) ?: false)
+            } else null
+        })?.apply {
+            log.d("onResume: apply nav args model = $this")
+            presenter.setPlaylistData(
+                params[PLAYLIST_ID] as Long?,
+                params[PLAYLIST_ITEM_ID] as Long?,
+                params[PLAY_NOW] as Boolean? ?: false
+            )
+            (activity as NavigationProvider?)?.clearPendingNavigation(PLAYLIST_FRAGMENT)
+        } ?: run {
+            log.d("onResume: got no nav args")
+            presenter.setPlaylistData()
+        }
         presenter.onResume()
-//        throw RuntimeException("test crashlytics")
     }
 
     override fun onPause() {
@@ -397,7 +424,44 @@ class PlaylistFragment :
     //endregion
 
     companion object {
+        fun makeNav(item: PlaylistItemDomain, play: Boolean): NavigationModel = NavigationModel(
+            PLAYLIST_FRAGMENT, mapOf(
+                PLAYLIST_ID to (item.playlistId ?: throw IllegalArgumentException("No Playlist Id")),
+                PLAYLIST_ITEM_ID to (item.id ?: throw IllegalArgumentException("No Playlist tem Id")),
+                PLAY_NOW to play
+            )
+        )
+
+        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean): NavigationModel = NavigationModel(
+            PLAYLIST_FRAGMENT, mapOf(
+                PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
+                PLAYLIST_ITEM_ID to (plItemId ?: throw IllegalArgumentException("No Playlist tem Id")),
+                PLAY_NOW to play
+            )
+        )
+
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
 
     }
+
+    // old code
+//    private var onResumeGotArguments = false
+
+
+//    override fun onAttach(context: Context) {
+//        super.onAttach(context)
+//        // crappy hack - sometime onResume is called before activity onStart so the fragment doesn't get the arguments
+//        val plId = PLAYLIST_ID.getLong(arguments)
+//        val hasArguments = plId?.let{ it>0L } ?:false
+//        log.d("onAttach")
+//        if (isResumed && hasArguments && !onResumeGotArguments) {
+//            log.d("onAttach: got nav on args model = plid = $plId plitemId = ${PLAYLIST_ITEM_ID.getLong(arguments)} playNow = ${PLAY_NOW.getBoolean(arguments)}")
+//            presenter.setPlaylistData(
+//                plId,
+//                PLAYLIST_ITEM_ID.getLong(arguments),
+//                PLAY_NOW.getBoolean(arguments) ?: false
+//            )
+//        }
+//    }
+
 }

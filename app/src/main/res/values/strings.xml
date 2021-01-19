@@ -1,15 +1,14 @@
 <resources>
     <string name="app_name">Cuer</string>
+
+    <!-- nav -->
     <string name="bottomnav_title_browse">Browse</string>
     <string name="bottomnav_title_playlists">Playlists</string>
     <string name="bottomnav_title_playlist">Playlist</string>
     <string name="bottomnav_title_player">Player</string>
-    <string name="media_route_menu_title">Cast on</string>
-    <string name="menu_filter">Play</string>
-    <string name="right">Right</string>
-    <string name="left">Left</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
+    <string name="nav_title_backup_settings">Backup settings</string>
+    <string name="nav_playlist_item_edit_title">View Item</string>
+
 
     <!-- menu -->
     <string name="menu_play">Play</string>
@@ -19,13 +18,19 @@
     <string name="menu_share">Share</string>
     <string name="menu_paste">Paste &amp; add</string>
     <string name="menu_restart">Restart</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_playlist_mode_shuffle">Shuffle</string>
+    <string name="menu_playlist_mode_loop">Loop</string>
+    <string name="menu_playlist_mode_single">Single</string>
+    <string name="menu_show_unlistened">Show unlistened</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_filter">Play</string>
 
     <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>
     <string name="share_button_reject">Reject</string>
     <string name="share_button_play_now">Play Now</string>
     <string name="share_button_add_to_queue">Add to queue</string>
-    <string name="select">Select &#8230;</string>
     <string name="share_button_play_locally">Play locally</string>
     <string name="share_button_play_return">Play / Return</string>
     <string name="share_button_goto_item">Go to item</string>
@@ -61,7 +66,7 @@
     <string name="pe_save">Save</string>
 
     <!-- local player -->
-    <string name="title_activity_fullscreen">YoutubeFullscreenActivity</string>
+    <string name="title_activity_fullscreen">Video Player</string>
 
     <!-- generic contentdescription -->
     <string name="cd_overflow">More actions</string>
@@ -79,24 +84,29 @@
     <string name="prefs_backup_backup_key">backup</string>
     <string name="prefs_backup_restore_key">restore</string>
 
-
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="menu_settings">Settings</string>
-    <string name="nav_title_backup_settings">Backup settings</string>
+    <!-- playlist edit -->
     <string name="pe_default_display_title">Enter a title …</string>
     <string name="pe_error_title_blank">Add a title</string>
-    <string name="playlist_dialog_add_playlist">Add playlist …</string>
-    <string name="playlist_item_edit_title">View Item</string>
-    <string name="menu_edit">Edit</string>
-    <string name="menu_playlist_mode_shuffle">Shuffle</string>
-    <string name="menu_playlist_mode_loop">Loop</string>
-    <string name="menu_playlist_mode_single">Single</string>
-    <string name="menu_show_unlistened">Show unlistened</string>
-    <string name="default_playlist">Default</string>
-    <string name="dash">-</string>
+
+    <!-- playlists & item -->
     <string name="pls_item_edit">Edit</string>
     <string name="pls_item_delete">Delete</string>
+
+    <!-- dialogs -->
+    <string name="playlist_dialog_add_playlist">Add playlist …</string>
+    <string name="select_route_dialog_title">Select Route</string>
+    <string name="create_playlist_dialog_title">Create playlist</string>
+
+    <!-- misc -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="media_route_menu_title">Cast on</string>
+    <string name="default_playlist">Default</string>
+    <string name="dash">-</string>
+    <string name="chip_select">Select &#8230;</string>
+    <string name="dialog_button_view_info">View info</string>
+
+    <!-- new -->
 
 
 </resources>

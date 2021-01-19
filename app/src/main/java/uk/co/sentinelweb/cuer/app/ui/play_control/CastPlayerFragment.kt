@@ -6,18 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.cast_player_view.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.core.context.KoinContextHandler.get
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 
@@ -48,6 +52,8 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         binding.castPlayerSeekForward.setOnClickListener { presenter.onSeekFwdPressed() }
         binding.castPlayerTrackLast.setOnClickListener { presenter.onTrackBackPressed() }
         binding.castPlayerTrackNext.setOnClickListener { presenter.onTrackFwdPressed() }
+        binding.castPlayerPlaylistText.setOnClickListener { presenter.onPlaylistClick() }
+        binding.castPlayerImage.setOnClickListener { presenter.onPlaylistItemClick() }
         binding.castPlayerSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -117,22 +123,35 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     }
 
     override fun setPlaylistName(name: String) {
-        cast_player_playlist_text.text = name
+        binding.castPlayerPlaylistText.text = name
     }
 
     override fun setPlaylistImage(url: String?) {
-        url?.apply {
-            Glide.with(requireContext())
-                .load(imageProvider.makeRef(this))
-                .into(binding.castPlayerPlaylistImage)
-        } ?: binding.castPlayerPlaylistImage.setImageResource(R.drawable.ic_nav_playlist_black)
+//        url?.apply {
+//            Glide.with(requireContext())
+//                .load(imageProvider.makeRef(this))
+//                .into(binding.castPlayerPlaylistImage)
+//        } ?: binding.castPlayerPlaylistImage.setImageResource(R.drawable.ic_nav_playlist_black)
     }
 
     override fun updateSeekPosition(ratio: Float) {
         binding.castPlayerSeek.progress = (ratio * binding.castPlayerSeek.max).toInt()
     }
 
+    override fun navigate(navModel: NavigationModel) {
+        (activity as NavigationProvider).navigate(navModel)
+    }
+
+    override fun makeItemTransitionExtras() =
+        FragmentNavigatorExtras(
+            binding.castPlayerTitle to TRANS_TITLE,
+            binding.castPlayerImage to TRANS_IMAGE
+        )
+
     companion object {
+        val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_image) }
+        val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title) }
+
         @JvmStatic
         val viewModule = module {
             scope(named<CastPlayerFragment>()) {

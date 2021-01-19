@@ -16,18 +16,20 @@ data class NavigationModel constructor(
     }
 
     enum class Target constructor(
-        val requiredParams: List<Param> = listOf()
+        val requiredParams: List<Param> = listOf(),
+        val optionalParams: List<Param> = listOf()
     ) {
         LOCAL_PLAYER(listOf(MEDIA_ID)),
         WEB_LINK(listOf(LINK)),
         YOUTUBE_VIDEO(listOf(MEDIA_ID)),
         YOUTUBE_CHANNEL(listOf(CHANNEL_ID)),
         MAIN_MEDIA(listOf(MEDIA)),
-        MAIN_MEDIA_PLAY(listOf(MEDIA, PLAY_NOW)),
+        MAIN_MEDIA_PLAY(listOf(MEDIA), listOf(PLAY_NOW)),
         SHARE(listOf(MEDIA)),
         PLAYLIST_EDIT(listOf(PLAYLIST_ID)),
         PLAYLIST_CREATE(),
-        PLAYLIST_FRAGMENT(listOf(PLAYLIST_ID, PLAY_NOW)),
+        PLAYLIST_FRAGMENT(listOf(PLAYLIST_ID), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
+        PLAYLIST_ITEM_FRAGMENT(listOf(PLAYLIST_ITEM), listOf(FRAGMENT_NAV_EXTRAS)),
         PLAYLISTS_FRAGMENT(),
         BROWSE_FRAGMENT(),
         PLAYER_FRAGMENT(),
@@ -49,6 +51,7 @@ data class NavigationModel constructor(
         PLAYLIST_ID, /* Long */
         PLAYLIST_ITEM_ID, /* Long */
         PLAYLIST_ITEM, /* PlaylistItemDomain */
+        FRAGMENT_NAV_EXTRAS /**/
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)

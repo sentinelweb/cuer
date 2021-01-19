@@ -97,12 +97,14 @@ class YoutubeCastConnectionListener constructor(
     private fun pushUpdateFromQueue() {
         playerUi?.apply {
             if (youTubePlayerListener != null) {
-                queue.currentItem?.media?.apply {
+                queue.currentItem?.apply {
                     setPlayerState(PlayerStateDomain.PAUSED)
-                    setCurrentSecond((positon?.toFloat() ?: 0f) / 1000f)
-                    setMedia(this)
+                    setCurrentSecond((media.positon?.toFloat() ?: 0f) / 1000f)
+
+
                 }
             }
+            queue.currentItem?.let { setPlaylistItem(it) }
             setPlaylistName(queue.playlist?.title ?: "none")
             setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
         }
