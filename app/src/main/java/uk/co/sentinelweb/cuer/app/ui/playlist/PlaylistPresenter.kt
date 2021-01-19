@@ -362,8 +362,8 @@ class PlaylistPresenter(
     }
 
     override fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean) {
-        //log.d("setPlaylistData(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
-        state.viewModelScope.launch {
+        state.initialLoadJob?.apply { cancel() } // if called from resume and attach
+        state.initialLoadJob = state.viewModelScope.launch {
             plId
                 ?.takeIf { it != -1L }
                 ?.apply {

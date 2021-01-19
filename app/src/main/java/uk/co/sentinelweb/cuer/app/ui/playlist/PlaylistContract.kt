@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
+import kotlinx.coroutines.Job
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -43,7 +44,7 @@ interface PlaylistContract {
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
         fun commitMove()
-        fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean)
+        fun setPlaylistData(plId: Long? = null, plItemId: Long? = null, playNow: Boolean = false)
         fun onPlaylistSelected(playlist: PlaylistDomain)
         fun onPlayModeChange(): Boolean
         fun onPlayPlaylist(): Boolean
@@ -86,7 +87,8 @@ interface PlaylistContract {
         var lastFocusIndex: Int? = null, // used for undo
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
-        var selectedPlaylistItem: PlaylistItemDomain? = null
+        var selectedPlaylistItem: PlaylistItemDomain? = null,
+        var initialLoadJob: Job? = null
     ) : ViewModel()
 
     data class Model constructor(

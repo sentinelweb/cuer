@@ -355,7 +355,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                         toastWrapper = get(),
                         fragment = (getSource() as Fragment),
                         ytJavaApi = get(),
-                        navController = (getSource() as Fragment).findNavController()
+                        navController = (getSource() as Fragment).findNavController(),
+                        log = get()
                     )
                 }
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }

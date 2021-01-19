@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
@@ -23,8 +24,8 @@ class NavigationMapper constructor(
     private val toastWrapper: ToastWrapper,
     private val fragment: Fragment? = null,
     private val ytJavaApi: YoutubeJavaApiWrapper,
-    private val navController: NavController
-
+    private val navController: NavController,
+    private val log: LogWrapper
 ) {
 
     fun map(nav: NavigationModel) {
@@ -71,5 +72,21 @@ class NavigationMapper constructor(
             )
             else -> toastWrapper.show("Cannot launch ${nav.target}")
         }
+    }
+
+    fun clearArgs(intent: Intent, target: NavigationModel.Target) {
+        log.d("clearPendingNavigation:$target > ${intent.getStringExtra(NavigationModel.Target.KEY)}")
+        intent.getStringExtra(NavigationModel.Target.KEY)
+            ?.takeIf { it == target.name }
+            ?.also {
+                when (target) {
+                    PLAYLIST_FRAGMENT -> {
+                        intent.removeExtra(NavigationModel.Target.KEY)
+                        intent.removeExtra(PLAY_NOW.toString())
+                        intent.removeExtra(PLAYLIST_ITEM.name)
+                    }
+                    else -> Unit
+                }
+            }
     }
 }
