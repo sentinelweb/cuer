@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -40,7 +41,6 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        presenter.initialise()
         _binding = CastPlayerViewBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -66,6 +66,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
                 presenter.onSeekFinished()
             }
         })
+        presenter.initialise()
     }
 
     override fun onDestroyView() {
@@ -134,8 +135,21 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 //        } ?: binding.castPlayerPlaylistImage.setImageResource(R.drawable.ic_nav_playlist_black)
     }
 
+    override fun setSkipFwdText(text: String) {
+        binding.castPlayerSkipfwdText.text = text
+    }
+
+    override fun setSkipBackText(text: String) {
+        binding.castPlayerSkipbackText.text = text
+    }
+
     override fun updateSeekPosition(ratio: Float) {
-        binding.castPlayerSeek.progress = (ratio * binding.castPlayerSeek.max).toInt()
+        if (ratio != -1F) {
+            binding.castPlayerSeek.progress = (ratio * binding.castPlayerSeek.max).toInt()
+            binding.castPlayerSeek.isEnabled = true
+        } else {
+            binding.castPlayerSeek.isEnabled = false
+        }
     }
 
     override fun navigate(navModel: NavigationModel) {
@@ -158,12 +172,15 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
                 scoped<CastPlayerContract.View> { getSource() }
                 scoped<CastPlayerContract.Presenter> {
                     CastPlayerPresenter(
-                        get(),
-                        get(),
-                        get(),
-                        get()
+                        view = get(),
+                        mapper = get(),
+                        state = get(),
+                        log = get(),
+                        skipPresenter = get(),
+                        res = get()
                     )
                 }
+                scoped { SkipPresenter(get(), get(), get()) }
                 scoped { CastPlayerUiMapper(get()) }
                 viewModel { CastPlayerContract.State() }
             }

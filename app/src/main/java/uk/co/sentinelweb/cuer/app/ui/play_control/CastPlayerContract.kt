@@ -68,6 +68,8 @@ interface CastPlayerContract {
         fun clearImage()
         fun setPlaylistName(name: String)
         fun setPlaylistImage(url: String?)
+        fun setSkipFwdText(text: String)
+        fun setSkipBackText(text: String)
         fun navigate(navModel: NavigationModel)
         fun makeItemTransitionExtras(): FragmentNavigator.Extras
     }
@@ -84,7 +86,8 @@ interface CastPlayerContract {
         var durationMs: Long = 0,
         var title: String = "",
         var isDestroyed: Boolean = false,
-        var playlistItem: PlaylistItemDomain? = null
+        var playlistItem: PlaylistItemDomain? = null,
+        var isLiveStream: Boolean = false
     ) : ViewModel()
 
 
