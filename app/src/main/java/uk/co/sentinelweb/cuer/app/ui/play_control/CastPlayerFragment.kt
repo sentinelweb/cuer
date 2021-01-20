@@ -188,11 +188,11 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
                         mapper = get(),
                         state = get(),
                         log = get(),
-                        skipPresenter = get(),
+                        skipControl = get(),
                         res = get()
                     )
                 }
-                scoped {
+                scoped<SkipContract.External> {
                     SkipPresenter(
                         view = get(),
                         state = SkipContract.State(),

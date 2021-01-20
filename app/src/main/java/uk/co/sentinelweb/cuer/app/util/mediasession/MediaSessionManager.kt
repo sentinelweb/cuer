@@ -38,7 +38,7 @@ class MediaSessionManager constructor(
         appState.mediaSession?.setMetadata(metadataMapper.map(media))
     }
 
-    fun updatePlaybackState(media: MediaDomain?, state: PlayerStateDomain) {
+    fun updatePlaybackState(media: MediaDomain, state: PlayerStateDomain) {
         appState.mediaSession?.setPlaybackState(playbackStateMapper.map(media, state))
     }
 

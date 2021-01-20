@@ -8,11 +8,17 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 class PlaybackStateMapper {
 
     @Suppress("RemoveRedundantQualifierName")
-    fun map(domain: MediaDomain?, state: PlayerStateDomain): PlaybackStateCompat =
+    fun map(domain: MediaDomain, state: PlayerStateDomain): PlaybackStateCompat = if (domain.isLiveBroadcast) {
         PlaybackStateCompat.Builder()
-            .setState(mapState(state), domain?.positon ?: 0, 1f)
+            .setState(mapState(state), 0, 1f)
+            .setActions(PlaybackStateCompat.ACTION_REWIND or PlaybackStateCompat.ACTION_FAST_FORWARD)
+            .build()
+    } else {
+        PlaybackStateCompat.Builder()
+            .setState(mapState(state), domain.positon ?: 0, 1f)
             .setActions(PlaybackStateCompat.ACTION_SEEK_TO)
             .build()
+    }
 
     private fun mapState(state: PlayerStateDomain) = when (state) {
         PlayerStateDomain.UNKNOWN -> STATE_NONE

@@ -14,25 +14,25 @@ class SkipPresenter constructor(
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
 ) : SkipContract.Presenter, SkipContract.External {
 
-    val forwardJumpInterval: Int
-        get() = state.forwardJumpInterval
+    override val skipBackText: String get() = mapper.mapBackTime(state.backJumpInterval.toLong())
+    override val skipForwardText: String get() = mapper.mapForwardTime(state.forwardJumpInterval.toLong())
 
-    val backJumpInterval: Int
-        get() = state.backJumpInterval
-
-    val skipBackText: String get() = mapper.mapBackTime(state.backJumpInterval.toLong())
-    val skipForwardText: String get() = mapper.mapForwardTime(state.forwardJumpInterval.toLong())
-
-    var duration: Long
+    override var duration: Long
         get() = state.duration
         set(value) {
             state.duration = value
         }
 
-    lateinit var listener: SkipContract.Listener
+    override lateinit var listener: SkipContract.Listener
 
     private val isSeeking: Boolean
         get() = state.targetPosition != null
+    private val forwardJumpInterval: Int
+        get() = state.forwardJumpInterval
+
+    private val backJumpInterval: Int
+        get() = state.backJumpInterval
+
 
     init {
         log.tag(this)

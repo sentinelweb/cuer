@@ -6,7 +6,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -20,28 +19,28 @@ class CastPlayerPresenter(
     private val state: CastPlayerContract.State,
     private val mapper: CastPlayerUiMapper,
     private val log: LogWrapper,
-    private val skipPresenter: SkipPresenter,
+    private val skipControl: SkipContract.External,
     private val res: ResourceWrapper
 ) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls, SkipContract.Listener {
 
     init {
         log.tag(this)
-        skipPresenter.listener = this
+        skipControl.listener = this
     }
 
     override fun initialise() {
         state.isDestroyed = false
-        view.setSkipBackText(skipPresenter.skipBackText)
-        view.setSkipFwdText(skipPresenter.skipForwardText)
+        view.setSkipBackText(skipControl.skipBackText)
+        view.setSkipFwdText(skipControl.skipForwardText)
     }
 
     override fun onSeekBackSelectTimePressed(): Boolean {
-        skipPresenter.onSelectSkipTime(false)
+        skipControl.onSelectSkipTime(false)
         return true
     }
 
     override fun onSeekSelectTimeFwdPressed(): Boolean {
-        skipPresenter.onSelectSkipTime(true)
+        skipControl.onSelectSkipTime(true)
         return true
     }
 
@@ -68,11 +67,11 @@ class CastPlayerPresenter(
     }
 
     override fun onSeekBackPressed() {
-        skipPresenter.skipBack()
+        skipControl.skipBack()
     }
 
     override fun onSeekFwdPressed() {
-        skipPresenter.skipFwd()
+        skipControl.skipFwd()
     }
 
     override fun onTrackBackPressed() {
@@ -110,7 +109,7 @@ class CastPlayerPresenter(
     override fun setPlayerState(playState: PlayerStateDomain) {
         state.playState = playState
         log.d("playState = $playState")
-        skipPresenter.stateChange(playState)
+        skipControl.stateChange(playState)
         when (playState) {
             PLAYING -> view.setPlaying()
             ENDED -> view.setPaused()
@@ -127,7 +126,7 @@ class CastPlayerPresenter(
 
     override fun setCurrentSecond(second: Float) {
         state.positionMs = (second * 1000).toLong()
-        skipPresenter.updatePosition(state.positionMs)
+        skipControl.updatePosition(state.positionMs)
         if (state.durationMs > 0) {
             if (!state.isLiveStream) {
                 view.setCurrentSecond(mapper.formatTime(state.positionMs))
@@ -138,7 +137,7 @@ class CastPlayerPresenter(
 
     override fun setDuration(duration: Float) {
         state.durationMs = (duration * 1000).toLong()
-        skipPresenter.duration = state.durationMs
+        skipControl.duration = state.durationMs
         if (!state.isLiveStream) {
             view.setDuration(mapper.formatTime(state.durationMs))
         }

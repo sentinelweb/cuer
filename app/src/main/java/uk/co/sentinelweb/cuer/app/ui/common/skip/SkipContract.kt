@@ -14,6 +14,10 @@ interface SkipContract {
     }
 
     interface External {
+        val skipBackText: String
+        val skipForwardText: String
+        var duration: Long
+        var listener: Listener
         fun skipFwd()
         fun skipBack()
         fun updatePosition(ms: Long)
