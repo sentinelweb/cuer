@@ -115,9 +115,8 @@ class PlaylistItemEditViewModel constructor(
                             starred = originalMedia.starred,
                             watched = originalMedia.watched,
                         )
-                            ?.run { mediaRepo.save(this) }
-                            ?.takeIf { it.isSuccessful }
-                            ?.also { state.media = it.data }
+                            ?.also { state.media = it }
+                            ?.also { state.mediaChanged = true }
                             ?.also { update() }
                             ?: also { updateError() }
                     }
@@ -158,8 +157,10 @@ class PlaylistItemEditViewModel constructor(
     }
 
     fun onStarClick() {
-        state.media = state.media
+        state.media
             ?.let { it.copy(starred = !it.starred) }
+            ?.also { state.media = it }
+            ?.also { state.mediaChanged = true }
             ?.also { update() }
     }
 
