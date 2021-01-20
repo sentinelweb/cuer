@@ -56,4 +56,7 @@ class SharedPrefsWrapper<T : Field> constructor(
     fun remove(field: T) {
         prefs.edit().remove(field.fname).apply()
     }
+
+    fun has(field: T): Boolean = prefs.contains(field.fname)
+
 }

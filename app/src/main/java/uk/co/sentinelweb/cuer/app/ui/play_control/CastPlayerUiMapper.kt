@@ -8,4 +8,5 @@ class CastPlayerUiMapper constructor(
     fun formatTime(ms: Long): String = if (ms >= 0) {
         dateTimeMapper.formatTime(ms / 1000f)
     } else "-"
+
 }

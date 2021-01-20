@@ -41,8 +41,15 @@ class YouTubePlayerListener(
     fun onDisconnected() {
         youTubePlayer?.removeListener(this)
         youTubePlayer = null
-        playerUi?.reset()
-        playerUi = null
+        queue.currentItem?.apply {
+            playerUi?.setPlaylistItem(this)
+            playerUi?.setConnectionState(CastPlayerContract.ConnectionState.CC_DISCONNECTED)
+            playerUi?.setPlayerState(PlayerStateDomain.PAUSED)
+            playerUi?.setCurrentSecond(0f)
+        } ?: run {
+            playerUi?.reset()
+            playerUi = null
+        }
         queue.removeConsumerListener(this)
     }
 

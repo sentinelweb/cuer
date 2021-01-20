@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import androidx.annotation.ColorRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.bumptech.glide.Glide
@@ -33,6 +34,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     private val presenter: CastPlayerContract.Presenter by currentScope.inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
+    private val res: ResourceWrapper by inject()
 
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding!!
@@ -87,6 +89,11 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 
     override fun setCurrentSecond(second: String) {
         binding.castPlayerCurrentTime.text = second
+    }
+
+    override fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int) {
+        binding.castPlayerDuration.setTextColor(res.getColor(text))
+        binding.castPlayerDuration.setBackgroundColor(res.getColor(upcomingBackground))
     }
 
     override fun setDuration(duration: String) {
@@ -149,13 +156,12 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         binding.castPlayerSkipbackText.text = text
     }
 
+    override fun setSeekEnabled(enabled: Boolean) {
+        binding.castPlayerSeek.isEnabled = enabled
+    }
+
     override fun updateSeekPosition(ratio: Float) {
-        if (ratio != -1F) {
-            binding.castPlayerSeek.progress = (ratio * binding.castPlayerSeek.max).toInt()
-            binding.castPlayerSeek.isEnabled = true
-        } else {
-            binding.castPlayerSeek.isEnabled = false
-        }
+        binding.castPlayerSeek.progress = (ratio * binding.castPlayerSeek.max).toInt()
     }
 
     override fun navigate(navModel: NavigationModel) {

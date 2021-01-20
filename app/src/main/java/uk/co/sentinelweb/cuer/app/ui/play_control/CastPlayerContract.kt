@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
+import androidx.annotation.ColorRes
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.FragmentNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -74,6 +75,8 @@ interface CastPlayerContract {
         fun setSkipBackText(text: String)
         fun navigate(navModel: NavigationModel)
         fun makeItemTransitionExtras(): FragmentNavigator.Extras
+        fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int)
+        fun setSeekEnabled(enabled: Boolean)
     }
 
     enum class ConnectionState {
@@ -89,8 +92,11 @@ interface CastPlayerContract {
         var title: String = "",
         var isDestroyed: Boolean = false,
         var playlistItem: PlaylistItemDomain? = null,
-        var isLiveStream: Boolean = false
-    ) : ViewModel()
+        var isLiveStream: Boolean = false,
+        var isUpcoming: Boolean = false
+    ) : ViewModel() {
+
+    }
 
 
 }

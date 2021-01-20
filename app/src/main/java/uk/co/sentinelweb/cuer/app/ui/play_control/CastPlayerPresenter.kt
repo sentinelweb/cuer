@@ -139,13 +139,8 @@ class CastPlayerPresenter(
     override fun setDuration(duration: Float) {
         state.durationMs = (duration * 1000).toLong()
         skipPresenter.duration = state.durationMs
-        state.isLiveStream = state.durationMs > 1000 * 60 * 60 * 12
         if (!state.isLiveStream) {
             view.setDuration(mapper.formatTime(state.durationMs))
-        } else {
-            view.setCurrentSecond("-")
-            view.setDuration(res.getString(R.string.live))
-            view.updateSeekPosition(-1f)
         }
     }
 
@@ -165,6 +160,9 @@ class CastPlayerPresenter(
             state.durationMs = 0L.apply { view.setDuration("") }
             view.clearImage()
             view.setPaused()
+            view.setDurationColors(R.color.text_primary, R.color.transparent)
+            view.setSeekEnabled(false)
+            view.updateSeekPosition(0f)
         }
     }
 
@@ -184,7 +182,23 @@ class CastPlayerPresenter(
             media.title?.let { view.setTitle(it) }
             state.durationMs = media.duration ?: 0L
             state.isLiveStream = media.isLiveBroadcast
-            view.setDuration(mapper.formatTime(state.durationMs))
+            state.isUpcoming = media.isLiveBroadcastUpcoming
+            if (state.isLiveStream) {
+                view.setCurrentSecond("-")
+                if (state.isUpcoming) {
+                    view.setDuration(res.getString(R.string.upcoming))
+                    view.setDurationColors(R.color.white, R.color.upcoming_background)
+                } else {
+                    view.setDuration(res.getString(R.string.live))
+                    view.setDurationColors(R.color.white, R.color.live_background)
+                }
+                view.updateSeekPosition(1f)
+
+            } else {
+                view.setDuration(mapper.formatTime(state.durationMs))
+                view.setDurationColors(R.color.text_primary, R.color.transparent)
+            }
+            view.setSeekEnabled(!state.isLiveStream)
         }
     }
 
