@@ -37,6 +37,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -179,9 +180,23 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
 
             viewModel.delayedLoad(item)
         }
+        observeUi()
         observeModel()
         observeNavigation()
         observeDialog()
+    }
+
+    private fun observeUi() {
+        viewModel.getUiObservable().observe(
+            this.viewLifecycleOwner,
+            object : Observer<PlaylistItemEditViewModel.UiEvent> {
+                override fun onChanged(model: PlaylistItemEditViewModel.UiEvent) {
+                    when (model.type) {
+                        REFRESHING -> ple_swipe.isRefreshing = model.data as Boolean
+                    }
+                }
+            })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

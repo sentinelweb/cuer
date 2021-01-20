@@ -41,11 +41,19 @@ class PlaylistItemEditViewModel constructor(
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val toast: ToastWrapper
 ) : ViewModel() {
+    data class UiEvent(
+        val type: Type,
+        val data: Any?
+    ) {
+        enum class Type { REFRESHING }
+    }
 
+    private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
     private val _modelLiveData: MutableLiveData<PlaylistItemEditModel> = MutableLiveData()
     private val _selectModelLiveData: MutableLiveData<DialogModel> = MutableLiveData()
     private val _navigateLiveData: MutableLiveData<NavigationModel> = MutableLiveData()
 
+    fun getUiObservable(): LiveData<UiEvent> = _uiLiveData
     fun getModelObservable(): LiveData<PlaylistItemEditModel> = _modelLiveData
     fun getNavigationObservable(): LiveData<NavigationModel> = _navigateLiveData
     fun getDialogObservable(): LiveData<DialogModel> = _selectModelLiveData
@@ -75,19 +83,21 @@ class PlaylistItemEditViewModel constructor(
                 originalMedia.id?.let {
                     state.selectedPlaylistIds.addAll(getPlaylistsForMediaId(it).map { it.id!! })
                 }
-                if (originalMedia.channelData.thumbNail == null) {
-                    originalMedia.channelData.platformId?.apply {
-                        ytInteractor.channels(listOf(this))
-                            .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
-                            ?.let {
-                                it.data?.get(0)?.apply {
-                                    state.media = state.media?.copy(channelData = this.copy(id = originalMedia.channelData.id))
-                                    state.mediaChanged = true
-                                }
-                            }
-                    }
+                if (originalMedia.channelData.thumbNail == null || (originalMedia.duration?.let { it > 1000 * 60 * 60 * 24 } ?: false)) {
+                    refreshMedia()
+//                    originalMedia.channelData.platformId?.apply {
+//                        ytInteractor.channels(listOf(this))
+//                            .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
+//                            ?.let {
+//                                it.data?.get(0)?.apply {
+//                                    state.media = state.media?.copy(channelData = this.copy(id = originalMedia.channelData.id))
+//                                    state.mediaChanged = true
+//                                }
+//                            }
+//                    }
+                } else {
+                    update()
                 }
-                update()
             } ?: run {
                 _modelLiveData.value = modelMapper.mapEmpty()
             }
@@ -104,6 +114,7 @@ class PlaylistItemEditViewModel constructor(
     fun refreshMedia() {
         viewModelScope.launch {
             state.media?.let { originalMedia ->
+                _uiLiveData.value = UiEvent(UiEvent.Type.REFRESHING, true)
                 ytInteractor.videos(
                     listOf(originalMedia.platformId), listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS)
                 )

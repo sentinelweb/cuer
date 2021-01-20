@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
@@ -42,7 +42,7 @@ class SharePresenter constructor(
         linkScanner
             .scan(uriString)
             ?.let { scannedMedia ->
-                state.jobs.add(CoroutineScope(contextProvider.Main).launch {
+                state.viewModelScope.launch {
                     loadOrInfo(scannedMedia)
                         ?.also {
                             state.media = it
@@ -58,7 +58,7 @@ class SharePresenter constructor(
                             }
                         }
                         ?: errorLoading(scannedMedia.url)
-                })
+                }
             } ?: linkError(uriString)
     }
 
@@ -95,7 +95,7 @@ class SharePresenter constructor(
     }
 
     private fun finish(add: Boolean, play: Boolean, forward: Boolean) {
-        state.jobs.add(CoroutineScope(contextProvider.Main).launch {
+        state.viewModelScope.launch {
             try {
                 if (add) {
                     view.commitPlaylistItems()
@@ -140,7 +140,7 @@ class SharePresenter constructor(
                     else -> view.error(t.message ?: (t::class.java.simpleName + " error ... sorry"))
                 }
             }
-        })
+        }
     }
 
     override fun onStop() {
