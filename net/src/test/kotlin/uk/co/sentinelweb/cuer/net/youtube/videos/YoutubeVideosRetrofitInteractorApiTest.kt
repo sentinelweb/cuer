@@ -63,7 +63,7 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
     fun videos() {
         runBlocking {
             val actual = sut.videos(
-                listOf("8nhPVOM97Jg", "fY7M3pzXdUo"),
+                listOf("8nhPVOM97Jg", "fY7M3pzXdUo", "GXfsI-zZO7s"/* live broadcast test (might change)*/),
                 listOf(ID, SNIPPET, CONTENT_DETAILS, PLAYER)
             )
 
@@ -71,6 +71,9 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
             assertNotNull(actual.data)
             assertEquals("8nhPVOM97Jg", actual.data!![0].platformId)
             assertEquals("fY7M3pzXdUo", actual.data!![1].platformId)
+            assertFalse(actual.data!![1].liveBroadcast)
+            assertEquals("GXfsI-zZO7s", actual.data!![2].platformId)
+            assertTrue(actual.data!![2].liveBroadcast)
         }
     }
 

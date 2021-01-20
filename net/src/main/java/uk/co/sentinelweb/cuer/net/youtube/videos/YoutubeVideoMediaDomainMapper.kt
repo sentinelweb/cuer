@@ -34,7 +34,9 @@ internal class YoutubeVideoMediaDomainMapper(
                     title = it.snippet?.channelTitle,
                     platform = PlatformDomain.YOUTUBE
                 ),
-                published = it.snippet?.publishedAt?.let { ts -> timeStampMapper.mapTimestamp(ts) }
+                published = it.snippet?.publishedAt?.let { ts -> timeStampMapper.mapTimestamp(ts) },
+                liveBroadcast = it.snippet?.liveBroadcastContent?.let { it == "live" || it == "upcoming" } ?: false,
+                liveBroadcastUpcoming = it.snippet?.liveBroadcastContent?.let { it == "upcoming" } ?: false
             )
         }
 

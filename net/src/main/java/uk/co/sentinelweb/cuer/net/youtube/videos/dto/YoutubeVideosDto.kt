@@ -19,6 +19,7 @@ data class YoutubeVideosDto constructor(
             val channelId: String,
             val channelTitle: String,
             val publishedAt: String,
+            val liveBroadcastContent: String,
             val thumbnails: ThumbnailsDto
 
         ) {
