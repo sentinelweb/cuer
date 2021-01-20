@@ -97,6 +97,8 @@
     <string name="select_route_dialog_title">Select Route</string>
     <string name="create_playlist_dialog_title">Create playlist</string>
     <string name="dialog_button_view_info">View info</string>
+    <string name="dialog_title_select_fwd_skip_time">Forward skip time</string>
+    <string name="dialog_title_select_back_skip_time">Back skip time</string>
 
     <!-- misc -->
     <string name="ok">OK</string>
@@ -106,7 +108,7 @@
     <string name="dash">-</string>
     <string name="chip_select">Select &#8230;</string>
     <string name="live">live</string>
-    <!-- new -->
+    <string name="new_items_below">New Items v</string> <!-- new -->
 
 
 </resources>

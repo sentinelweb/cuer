@@ -21,6 +21,8 @@ interface CastPlayerContract {
         fun onPlayPausePressed()
         fun onPlaylistClick()
         fun onPlaylistItemClick()
+        fun onSeekBackSelectTimePressed(): Boolean
+        fun onSeekSelectTimeFwdPressed(): Boolean
     }
 
     // todo think about this maybe sub with android MediaControl interface

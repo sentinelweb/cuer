@@ -29,25 +29,25 @@ class SharedPrefsWrapper<T : Field> constructor(
         prefs.edit().putLong(field.fname, value).commit()
     }
 
-    fun getInt(field: T, def: Int) {
+    fun getInt(field: T, def: Int): Int =
         prefs.getInt(field.fname, def)
-    }
+
 
     fun putInt(field: T, value: Int) {
         prefs.edit().putInt(field.fname, value).apply()
     }
 
-    fun getString(field: T, def: String) {
+    fun getString(field: T, def: String): String? =
         prefs.getString(field.fname, def)
-    }
+
 
     fun putString(field: T, value: String) {
         prefs.edit().putString(field.fname, value).apply()
     }
 
-    fun getBoolean(field: T, def: Boolean) {
+    fun getBoolean(field: T, def: Boolean): Boolean =
         prefs.getBoolean(field.fname, def)
-    }
+
 
     fun putBoolean(field: T, value: Boolean) {
         prefs.edit().putBoolean(field.fname, value).apply()

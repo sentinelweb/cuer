@@ -1,42 +1,47 @@
 package uk.co.sentinelweb.cuer.app.ui.common.skip
 
-import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
-import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import kotlin.math.abs
 
 class SkipPresenter constructor(
-    private val timeSinceFormatter: TimeSinceFormatter,
-    private val timeProvider: TimeProvider,
-    private val log: LogWrapper
+    private val view: SkipContract.View,
+    private val state: SkipContract.State,
+    private val mapper: SkipContract.Mapper,
+    private val log: LogWrapper,
+    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
+) : SkipContract.Presenter, SkipContract.External {
 
-) {
-    var forwardJumpInterval: Long = 30000
-    var backJumpInterval: Long = 30000
-    var duration: Long = 0
+    val forwardJumpInterval: Int
+        get() = state.forwardJumpInterval
 
-    lateinit var listener: Listener
+    val backJumpInterval: Int
+        get() = state.backJumpInterval
 
-    private var accumulator: Long = 0
+    val skipBackText: String get() = mapper.mapBackTime(state.backJumpInterval.toLong())
+    val skipForwardText: String get() = mapper.mapForwardTime(state.forwardJumpInterval.toLong())
+
+    var duration: Long
+        get() = state.duration
+        set(value) {
+            state.duration = value
+        }
+
+    lateinit var listener: SkipContract.Listener
+
     private val isSeeking: Boolean
-        get() = targetPosition != null
-
-    private var targetPosition: Long? = null
-    private var position: Long = 0
-    private var currentStateState: PlayerStateDomain? = null
+        get() = state.targetPosition != null
 
     init {
         log.tag(this)
+        state.forwardJumpInterval = prefsWrapper.getInt(GeneralPreferences.SKIP_FWD_TIME, 30000)
+        state.backJumpInterval = prefsWrapper.getInt(GeneralPreferences.SKIP_BACK_TIME, 30000)
     }
 
-    val skipFwdDefaultText
-        get() = timeSinceFormatter.formatTimeShort(forwardJumpInterval)
-    val skipBackDefaultText
-        get() = "-" + timeSinceFormatter.formatTimeShort(backJumpInterval)
-
-    fun skipFwd() {
-        accumulator += forwardJumpInterval
+    override fun skipFwd() {
+        state.accumulator += forwardJumpInterval
         //log.d("skipFwd: accum=$accumulator isSeeking=$isSeeking")
         if (!isSeeking) {
             sendAccumulation()
@@ -45,8 +50,8 @@ class SkipPresenter constructor(
         }
     }
 
-    fun skipBack() {
-        accumulator -= backJumpInterval
+    override fun skipBack() {
+        state.accumulator -= backJumpInterval
         //log.d("skipBack: accum=$accumulator isSeeking=$isSeeking")
         if (!isSeeking) {
             sendAccumulation()
@@ -56,41 +61,51 @@ class SkipPresenter constructor(
     }
 
     private fun sendAccumChange() {
-        val value = timeSinceFormatter.formatTimeShort(accumulator)
+        val value = mapper.mapAccumulationTime(state.accumulator)
         //log.d("sendAccumChange: accum=$accumulator time=$value")
         onSkipAccumulationChange(
             value,
-            if (accumulator == 0L) null else accumulator > 0
+            if (state.accumulator == 0L) null else state.accumulator > 0
         )
     }
 
-    fun updatePosition(ms: Long) {
-        position = ms
-        targetPosition = targetPosition?.let {
+    override fun updatePosition(ms: Long) {
+        state.position = ms
+        state.targetPosition = state.targetPosition?.let {
             val targetFound = abs(ms - it) < 10000
             if (targetFound) null else it
         }
-        if (targetPosition == null) {
-            if (accumulator != 0L) {
+        if (state.targetPosition == null) {
+            if (state.accumulator != 0L) {
                 sendAccumulation()
             }
         }
     }
 
-    fun stateChange(playState: PlayerStateDomain) {
-        if (currentStateState == PlayerStateDomain.BUFFERING && playState == PlayerStateDomain.PLAYING) {
-            targetPosition = null
+    override fun stateChange(playState: PlayerStateDomain) {
+        if (state.currentStateState == PlayerStateDomain.BUFFERING && playState == PlayerStateDomain.PLAYING) {
+            state.targetPosition = null
         }
-        currentStateState = playState
+        state.currentStateState = playState
+    }
+
+    override fun onSelectSkipTime(fwd: Boolean) {
+        view.showDialog(
+            mapper.mapTimeSelectionDialogModel(
+                if (fwd) state.forwardJumpInterval else state.backJumpInterval,
+                fwd,
+                { timeSelected -> onSkipTimeSelected(timeSelected, fwd) }
+            )
+        )
     }
 
     private fun sendAccumulation() {
         //log.d("sendAccumulation: accum=$accumulator targetPosition=$targetPosition")
-        if (accumulator != 0L && targetPosition == null) {
-            targetPosition = (position + accumulator).apply {
+        if (state.accumulator != 0L && state.targetPosition == null) {
+            state.targetPosition = (state.position + state.accumulator).apply {
                 onSkipAvailable(this)
             }
-            accumulator = 0
+            state.accumulator = 0
             onSkipAccumulationChange("", null)
         }
     }
@@ -102,26 +117,32 @@ class SkipPresenter constructor(
                 val mn: Long = java.lang.Long.min(duration, mx)
                 listener.skipSeekTo(mn)
             }
-
         }
     }
 
     private fun onSkipAccumulationChange(value: String, fwd: Boolean?) {
         if (fwd == null) {
-            listener.skipSetBackText(skipBackDefaultText)
-            listener.skipSetFwdText(skipFwdDefaultText)
+            listener.skipSetBackText(skipBackText)
+            listener.skipSetFwdText(skipForwardText)
         } else if (fwd) {
-            listener.skipSetBackText(skipBackDefaultText)
+            listener.skipSetBackText(skipBackText)
             listener.skipSetFwdText(value)
         } else {
             listener.skipSetBackText(value)
-            listener.skipSetFwdText(skipFwdDefaultText)
+            listener.skipSetFwdText(skipForwardText)
         }
     }
 
-    interface Listener {
-        fun skipSeekTo(target: Long)
-        fun skipSetBackText(text: String)
-        fun skipSetFwdText(text: String)
+    private fun onSkipTimeSelected(time: Int, fwd: Boolean) {
+        if (fwd) {
+            state.forwardJumpInterval = time
+            prefsWrapper.putInt(GeneralPreferences.SKIP_FWD_TIME, time)
+            listener.skipSetFwdText(skipForwardText)
+        } else {
+            state.backJumpInterval = time
+            prefsWrapper.putInt(GeneralPreferences.SKIP_BACK_TIME, time)
+            listener.skipSetBackText(skipBackText)
+        }
     }
+
 }

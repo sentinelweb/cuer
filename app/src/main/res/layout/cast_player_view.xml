@@ -104,7 +104,7 @@
 
             <TextView
                 android:id="@+id/cast_player_skipback_text"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:textSize="12sp"
@@ -123,7 +123,7 @@
 
             <TextView
                 android:id="@+id/cast_player_skipfwd_text"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:textSize="12sp"

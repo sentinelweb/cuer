@@ -72,4 +72,6 @@ class ResourceWrapper constructor(
             )
         }
     }
+
+    fun getIntArray(@ArrayRes id: Int): List<Int> = resources.getIntArray(id).toList()
 }

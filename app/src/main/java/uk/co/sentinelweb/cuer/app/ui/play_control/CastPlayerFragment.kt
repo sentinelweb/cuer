@@ -17,11 +17,15 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
@@ -50,6 +54,8 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         binding.castPlayerFab.setOnClickListener { presenter.onPlayPausePressed() }
         binding.castPlayerSeekBack.setOnClickListener { presenter.onSeekBackPressed() }
         binding.castPlayerSeekForward.setOnClickListener { presenter.onSeekFwdPressed() }
+        binding.castPlayerSeekBack.setOnLongClickListener { presenter.onSeekBackSelectTimePressed() }
+        binding.castPlayerSeekForward.setOnLongClickListener { presenter.onSeekSelectTimeFwdPressed() }
         binding.castPlayerTrackLast.setOnClickListener { presenter.onTrackBackPressed() }
         binding.castPlayerTrackNext.setOnClickListener { presenter.onTrackFwdPressed() }
         binding.castPlayerPlaylistText.setOnClickListener { presenter.onPlaylistClick() }
@@ -180,7 +186,22 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
                         res = get()
                     )
                 }
-                scoped { SkipPresenter(get(), get(), get()) }
+                scoped {
+                    SkipPresenter(
+                        view = get(),
+                        state = SkipContract.State(),
+                        log = get(),
+                        mapper = SkipContract.Mapper(timeSinceFormatter = get(), res = get()),
+                        prefsWrapper = get(named<GeneralPreferences>())
+                    )
+                }
+                scoped<SkipContract.View> {
+                    SkipView(
+                        selectDialogCreator = SelectDialogCreator(
+                            context = getSource<CastPlayerFragment>().requireContext()
+                        )
+                    )
+                }
                 scoped { CastPlayerUiMapper(get()) }
                 viewModel { CastPlayerContract.State() }
             }

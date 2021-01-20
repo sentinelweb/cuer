@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -21,7 +22,7 @@ class CastPlayerPresenter(
     private val log: LogWrapper,
     private val skipPresenter: SkipPresenter,
     private val res: ResourceWrapper
-) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls, SkipPresenter.Listener {
+) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls, SkipContract.Listener {
 
     init {
         log.tag(this)
@@ -30,8 +31,18 @@ class CastPlayerPresenter(
 
     override fun initialise() {
         state.isDestroyed = false
-        view.setSkipBackText(skipPresenter.skipBackDefaultText)
-        view.setSkipFwdText(skipPresenter.skipFwdDefaultText)
+        view.setSkipBackText(skipPresenter.skipBackText)
+        view.setSkipFwdText(skipPresenter.skipForwardText)
+    }
+
+    override fun onSeekBackSelectTimePressed(): Boolean {
+        skipPresenter.onSelectSkipTime(false)
+        return true
+    }
+
+    override fun onSeekSelectTimeFwdPressed(): Boolean {
+        skipPresenter.onSelectSkipTime(true)
+        return true
     }
 
     override fun onPlayPausePressed() {
