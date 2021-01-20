@@ -107,8 +107,8 @@
     <string name="default_playlist">Default</string>
     <string name="dash">-</string>
     <string name="chip_select">Select &#8230;</string>
-    <string name="live">live</string>
+    <string name="live">LIVE</string>
+    <string name="upcoming">Upcoming</string>
     <string name="new_items_below">New Items v</string> <!-- new -->
-
 
 </resources>

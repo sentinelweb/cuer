@@ -29,10 +29,10 @@ class MediaMapper(
         image = imageMapper.mapImage(domain.image),
         channelId = domain.channelData.id!!.toLong(),
         published = domain.published,
-        flags = if (domain.watched) FLAG_WATCHED else 0 +
-                if (domain.starred) FLAG_STARRED else 0 +
-                        if (domain.liveBroadcast) FLAG_LIVE else 0 +
-                                if (domain.liveBroadcastUpcoming) FLAG_LIVE_UPCOMING else 0
+        flags = (if (domain.watched) FLAG_WATCHED else 0) +
+                (if (domain.starred) FLAG_STARRED else 0) +
+                (if (domain.isLiveBroadcast) FLAG_LIVE else 0) +
+                (if (domain.isLiveBroadcastUpcoming) FLAG_LIVE_UPCOMING else 0)
     )
 
     fun map(entity: MediaEntity, channelEntity: ChannelEntity): MediaDomain = MediaDomain(
@@ -52,8 +52,8 @@ class MediaMapper(
         published = entity.published,
         watched = entity.flags and FLAG_WATCHED == FLAG_WATCHED,
         starred = entity.flags and FLAG_STARRED == FLAG_STARRED,
-        liveBroadcast = entity.flags and FLAG_LIVE == FLAG_LIVE,
-        liveBroadcastUpcoming = entity.flags and FLAG_LIVE_UPCOMING == FLAG_LIVE_UPCOMING
+        isLiveBroadcast = entity.flags and FLAG_LIVE == FLAG_LIVE,
+        isLiveBroadcastUpcoming = entity.flags and FLAG_LIVE_UPCOMING == FLAG_LIVE_UPCOMING
     )
 
     fun map(entity: MediaAndChannel): MediaDomain = map(entity.media, entity.channel)

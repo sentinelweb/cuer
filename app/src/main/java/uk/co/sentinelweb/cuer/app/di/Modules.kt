@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.PlatformMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
@@ -71,6 +72,7 @@ object Modules {
         factory { PlaylistSelectDialogModelCreator(get(), get()) }
         factory { PlatformMapper() }
         factory { LoopModeMapper() }
+        factory { BackgroundMapper(get()) }
     }
 
     private val utilModule = module {

@@ -183,6 +183,7 @@ class CastPlayerPresenter(
             media.title?.apply { state.title = this }
             media.title?.let { view.setTitle(it) }
             state.durationMs = media.duration ?: 0L
+            state.isLiveStream = media.isLiveBroadcast
             view.setDuration(mapper.formatTime(state.durationMs))
         }
     }

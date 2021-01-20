@@ -138,6 +138,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 else -> false
             }
         }
+        ple_swipe.setOnRefreshListener { viewModel.refreshMedia() }
         ple_appbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false
@@ -224,6 +225,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     ple_collapsing_toolbar.title = model.title
                     ple_toolbar.title = model.title
                     menuState.modelEmpty = model.empty
+                    ple_swipe.isRefreshing = false
                     if (model.empty) {
                         return
                     }
@@ -254,6 +256,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     }
                     ple_pub_date.text = model.pubDate
                     ple_duration.text = model.durationText
+                    ple_duration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
+
                     model.position?.let { ratio ->
                         ple_title_pos.layoutParams.width = (ratio * ple_title_bg.width).toInt()
                     } ?: ple_title_pos.apply { isVisible = false }
@@ -348,7 +352,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     )
                 }
                 scoped { PlaylistItemEditState() }
-                scoped { PlaylistItemEditModelMapper(get(), get()) }
+                scoped { PlaylistItemEditModelMapper(get(), get(), get(), get()) }
                 scoped {
                     NavigationMapper(
                         activity = (getSource() as Fragment).requireActivity(),

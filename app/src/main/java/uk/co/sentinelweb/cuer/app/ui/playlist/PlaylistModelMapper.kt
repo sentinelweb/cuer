@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -16,7 +17,8 @@ class PlaylistModelMapper constructor(
     private val res: ResourceWrapper,
     private val timeSinceFormatter: TimeSinceFormatter,
     private val timeFormatter: TimeFormatter,
-    private val loopModeMapper: LoopModeMapper
+    private val loopModeMapper: LoopModeMapper,
+    private val backgroundMapper: BackgroundMapper
 ) {
 
     fun map(domain: PlaylistDomain, isPlaying: Boolean, mapItems: Boolean = true): PlaylistContract.Model = PlaylistContract.Model(
@@ -44,8 +46,13 @@ class PlaylistModelMapper constructor(
             url = item.media.url,
             type = item.media.mediaType,
             title = top,
-            duration = item.media.duration?.let { timeFormatter.formatMillis(it) } ?: "-",
-            positon = "" + (progress * 100).toInt() + "%",
+            duration = (
+                    if (item.media.isLiveBroadcast) {
+                        if (item.media.isLiveBroadcastUpcoming) res.getString(R.string.upcoming)
+                        else res.getString(R.string.live)
+                    } else (item.media.duration?.let { item.media.duration?.let { timeFormatter.formatMillis(it) } } ?: "-")
+                    ),
+            positon = if (item.media.isLiveBroadcast) res.getString(R.string.live) else (progress * 100).toInt().toString() + "%",
             thumbNailUrl = item.media.thumbNail?.url,
             progress = progress,
             starred = item.media.starred,
@@ -56,7 +63,10 @@ class PlaylistModelMapper constructor(
                     it.toInstant(OffsetDateTime.now().getOffset()).toEpochMilli()
                 )
             } ?: "-",
-            platform = item.media.platform
+            platform = item.media.platform,
+            isLive = item.media.isLiveBroadcast,
+            isUpcoming = item.media.isLiveBroadcastUpcoming,
+            infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media)
         )
     }
 

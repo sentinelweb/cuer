@@ -144,6 +144,7 @@ class PlaylistFragment :
         binding.playlistFabPlaymode.setOnClickListener { presenter.onPlayModeChange() }
         //playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
         binding.playlistFabPlay.setOnClickListener { presenter.onPlayPlaylist() }
+        binding.playlistSwipe.setOnRefreshListener { presenter.refreshList() }
         postponeEnterTransition()
         binding.playlistList.doOnPreDraw {
             startPostponedEnterTransition()
@@ -225,7 +226,6 @@ class PlaylistFragment :
     override fun setList(items: List<ItemContract.Model>, animate: Boolean) {
         binding.playlistSwipe.isRefreshing = false
         adapter.setData(items, animate)
-        binding.playlistSwipe.setOnRefreshListener { presenter.refreshList() }
         binding.playlistFabUp.isVisible = items.size > 30
         binding.playlistFabDown.isVisible = items.size > 30
     }

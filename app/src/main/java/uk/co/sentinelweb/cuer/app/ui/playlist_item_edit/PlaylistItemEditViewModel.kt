@@ -25,6 +25,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
+import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 
 class PlaylistItemEditViewModel constructor(
@@ -97,6 +98,31 @@ class PlaylistItemEditViewModel constructor(
         item.let {
             state.playlistItem = it
             it.media.let { setData(it) }
+        }
+    }
+
+    fun refreshMedia() {
+        viewModelScope.launch {
+            state.media?.let { originalMedia ->
+                ytInteractor.videos(
+                    listOf(originalMedia.platformId), listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS)
+                )
+                    .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
+                    ?.let {
+                        it.data?.get(0)?.copy(
+                            id = originalMedia.id,
+                            dateLastPlayed = originalMedia.dateLastPlayed,
+                            starred = originalMedia.starred,
+                            watched = originalMedia.watched,
+                        )
+                            ?.run { mediaRepo.save(this) }
+                            ?.takeIf { it.isSuccessful }
+                            ?.also { state.media = it.data }
+                            ?.also { update() }
+                            ?: also { updateError() }
+                    }
+                    ?: also { updateError() }
+            }
         }
     }
 
@@ -198,6 +224,11 @@ class PlaylistItemEditViewModel constructor(
 
     private fun update() {
         state.model = modelMapper.map(state.media!!, selectedPlaylists)
+        _modelLiveData.value = state.model
+    }
+
+    private fun updateError() {
+        state.model = modelMapper.mapEmpty()
         _modelLiveData.value = state.model
     }
 

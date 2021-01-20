@@ -128,7 +128,15 @@ interface PlaylistContract {
                         coroutines = get()
                     )
                 }
-                scoped { PlaylistModelMapper(res = get(), timeFormatter = get(), timeSinceFormatter = get(), loopModeMapper = get()) }
+                scoped {
+                    PlaylistModelMapper(
+                        res = get(),
+                        timeFormatter = get(),
+                        timeSinceFormatter = get(),
+                        loopModeMapper = get(),
+                        backgroundMapper = get()
+                    )
+                }
                 scoped { PlaylistAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }

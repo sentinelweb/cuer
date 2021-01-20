@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_VIEWED_ID
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -367,6 +368,7 @@ class PlaylistPresenter(
             plId
                 ?.takeIf { it != -1L }
                 ?.apply {
+                    prefsWrapper.putLong(LAST_PLAYLIST_VIEWED_ID, plId)
                     state.playlistId = plId
                     executeRefresh()
                     //log.d("setPlaylistData(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
@@ -387,7 +389,10 @@ class PlaylistPresenter(
                         view.highlightPlayingItem(queue.currentItemIndex)
                         currentItemIndex?.apply { view.scrollToItem(this) }
                     }
-                } ?: run { executeRefresh() }
+                } ?: run {
+                state.playlistId = prefsWrapper.getLong(LAST_PLAYLIST_VIEWED_ID)
+                executeRefresh()
+            }
         }
     }
 

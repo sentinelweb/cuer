@@ -71,9 +71,9 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
             assertNotNull(actual.data)
             assertEquals("8nhPVOM97Jg", actual.data!![0].platformId)
             assertEquals("fY7M3pzXdUo", actual.data!![1].platformId)
-            assertFalse(actual.data!![1].liveBroadcast)
+            assertFalse(actual.data!![1].isLiveBroadcast)
             assertEquals("GXfsI-zZO7s", actual.data!![2].platformId)
-            assertTrue(actual.data!![2].liveBroadcast)
+            assertTrue(actual.data!![2].isLiveBroadcast)
         }
     }
 
