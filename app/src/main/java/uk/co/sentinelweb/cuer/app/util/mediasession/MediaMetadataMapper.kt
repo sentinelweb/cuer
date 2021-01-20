@@ -17,8 +17,10 @@ class MediaMetadataMapper constructor(
             .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, domain.channelData.title)
             .putText(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, domain.id.toString())
         //log.d("map media meta data:${domain.duration}")
-        domain.duration?.apply {
-            builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, this)
+        if (!domain.isLiveBroadcast) {
+            domain.duration?.apply {
+                builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, this)
+            }
         }
         return builder.build()
     }

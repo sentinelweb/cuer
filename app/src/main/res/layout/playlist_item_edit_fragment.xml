@@ -21,6 +21,7 @@
             android:id="@+id/ple_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/background"
             android:fitsSystemWindows="true"
             app:collapsedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Collapsed.Small"
             app:contentScrim="?attr/colorPrimary"
@@ -30,21 +31,20 @@
             app:expandedTitleTextAppearance="@style/TextAppearance.App.CollapsingToolbar.Expanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:statusBarScrim="?attr/colorPrimaryDark"
-            android:background="@color/background"
             >
 
             <ImageView
                 android:id="@+id/ple_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/background"
                 android:contentDescription="@null"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
+                android:transitionName="@string/playlist_item_trans_image"
                 app:layout_collapseMode="parallax"
-                android:background="@color/background"
                 app:layout_collapseParallaxMultiplier="0.7"
                 tools:src="@drawable/im_test_nietzche"
-                android:transitionName="@string/playlist_item_trans_image"
                 />
 
             <!--            <ImageButton-->
@@ -94,132 +94,140 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
                 android:elevation="0dp"
+                android:transitionName="@string/playlist_item_trans_title"
                 app:layout_collapseMode="pin"
                 app:menu="@menu/playlist_item_edit_actionbar"
-                android:transitionName="@string/playlist_item_trans_title"
                 /><!-- app:layout_scrollFlags="scroll|enterAlways|snap"-->
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/ple_scroll"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/ple_swipe"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/ple_scroll"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            tools:context=".ui.playlist_item_edit.PlaylistItemEditFragment"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             >
 
-            <ImageView
-                android:id="@+id/ple_author_image"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:contentDescription="@null"
-                />
-
-            <TextView
-                android:id="@+id/ple_author_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:ellipsize="end"
-                android:maxWidth="200dp"
-                android:maxLines="1"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
-                app:layout_constraintStart_toEndOf="@id/ple_author_image"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Channel title"
-                />
-
-            <TextView
-                android:id="@+id/ple_pub_date"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                app:layout_constraintStart_toEndOf="@id/ple_author_image"
-                app:layout_constraintTop_toBottomOf="@id/ple_author_title"
-                tools:text="23 Aug 2012"
-                />
-
-            <TextView
-                android:id="@+id/ple_author_desc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:autoLink="web|email"
-                android:ellipsize="end"
-                android:linksClickable="true"
-                android:maxLines="3"
-                android:textColor="?android:textColorSecondary"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                app:layout_constraintStart_toEndOf="@id/ple_author_image"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ple_pub_date"
-                tools:text="Channel description http://www.yahoo.com descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel description"
-                />
-
-            <HorizontalScrollView
-                android:id="@+id/ple_chips_scroll"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ple_author_desc"
+                android:layout_margin="16dp"
+                tools:context=".ui.playlist_item_edit.PlaylistItemEditFragment"
                 >
 
-                <LinearLayout
-                    android:id="@+id/ple_chips"
-                    android:layout_width="wrap_content"
+                <ImageView
+                    android:id="@+id/ple_author_image"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:contentDescription="@null"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+
+                <TextView
+                    android:id="@+id/ple_author_title"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_marginStart="16dp"
+                    android:ellipsize="end"
+                    android:maxWidth="200dp"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                    app:layout_constraintStart_toEndOf="@id/ple_author_image"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Channel title"
+                    />
+
+                <TextView
+                    android:id="@+id/ple_pub_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    app:layout_constraintStart_toEndOf="@id/ple_author_image"
+                    app:layout_constraintTop_toBottomOf="@id/ple_author_title"
+                    tools:text="23 Aug 2012"
+                    />
+
+                <TextView
+                    android:id="@+id/ple_author_desc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:autoLink="web|email"
+                    android:ellipsize="end"
+                    android:linksClickable="true"
+                    android:maxLines="3"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    android:textColor="?android:textColorSecondary"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/ple_author_image"
+                    app:layout_constraintTop_toBottomOf="@id/ple_pub_date"
+                    tools:text="Channel description http://www.yahoo.com descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel description"
+                    />
+
+                <HorizontalScrollView
+                    android:id="@+id/ple_chips_scroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ple_author_desc"
                     >
 
-                </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/ple_chips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        >
 
-            </HorizontalScrollView>
+                    </LinearLayout>
 
-            <TextView
-                android:id="@+id/ple_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                style="?textAppearanceHeadline5"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ple_chips_scroll"
-                tools:text="Playlist Item Edit Title"
-                />
+                </HorizontalScrollView>
 
-            <TextView
-                android:id="@+id/ple_desc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:autoLink="web|email"
-                android:layout_marginTop="4dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ple_title"
-                android:linksClickable="true"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                tools:text="Playlist Item http://www.google.com Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description"
-                />
+                <TextView
+                    android:id="@+id/ple_title"
+                    style="?textAppearanceHeadline5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ple_chips_scroll"
+                    tools:text="Playlist Item Edit Title"
+                    />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+                <TextView
+                    android:id="@+id/ple_desc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:autoLink="web|email"
+                    android:linksClickable="true"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ple_title"
+                    tools:text="Playlist Item http://www.google.com Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description"
+                    />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/ple_play_fab"
@@ -238,12 +246,12 @@
         style="@style/FabButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="80dp"
+        android:contentDescription="@string/menu_star"
+        app:fabSize="mini"
         app:layout_anchor="@id/ple_appbar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_button_unstarred_white"
-        android:contentDescription="@string/menu_star"
-        android:layout_marginEnd="80dp"
-        app:fabSize="mini"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

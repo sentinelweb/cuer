@@ -7,6 +7,10 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationMedia
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationState
+import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 
 object YoutubeCastServiceModule {
 
@@ -17,7 +21,23 @@ object YoutubeCastServiceModule {
                 YoutubeCastServiceController(getSource(), get(), get(), get(), get(), get())
             }
             scoped {
-                PlayerControlsNotification(get(), get(), get(), get(), androidApplication())
+                PlayerControlsNotification(
+                    view = get(),
+                    context = androidApplication(),
+                    log = get(),
+                    state = get(),
+                    toastWrapper = get(),
+                    skipControl = get()
+                )
+            }
+            scoped<SkipContract.External> {
+                SkipPresenter(
+                    view = EmptySkipView(),
+                    state = SkipContract.State(),
+                    log = get(),
+                    mapper = SkipContract.Mapper(timeSinceFormatter = get(), res = get()),
+                    prefsWrapper = get(named<GeneralPreferences>())
+                )
             }
             scoped<PlayerControlsNotificationContract.External> {
                 get<PlayerControlsNotification>()

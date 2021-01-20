@@ -37,6 +37,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -138,6 +139,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 else -> false
             }
         }
+        ple_swipe.setOnRefreshListener { viewModel.refreshMedia() }
         ple_appbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false
@@ -178,9 +180,23 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
 
             viewModel.delayedLoad(item)
         }
+        observeUi()
         observeModel()
         observeNavigation()
         observeDialog()
+    }
+
+    private fun observeUi() {
+        viewModel.getUiObservable().observe(
+            this.viewLifecycleOwner,
+            object : Observer<PlaylistItemEditViewModel.UiEvent> {
+                override fun onChanged(model: PlaylistItemEditViewModel.UiEvent) {
+                    when (model.type) {
+                        REFRESHING -> ple_swipe.isRefreshing = model.data as Boolean
+                    }
+                }
+            })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -224,6 +240,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     ple_collapsing_toolbar.title = model.title
                     ple_toolbar.title = model.title
                     menuState.modelEmpty = model.empty
+                    ple_swipe.isRefreshing = false
                     if (model.empty) {
                         return
                     }
@@ -254,6 +271,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     }
                     ple_pub_date.text = model.pubDate
                     ple_duration.text = model.durationText
+                    ple_duration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
+
                     model.position?.let { ratio ->
                         ple_title_pos.layoutParams.width = (ratio * ple_title_bg.width).toInt()
                     } ?: ple_title_pos.apply { isVisible = false }
@@ -348,7 +367,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     )
                 }
                 scoped { PlaylistItemEditState() }
-                scoped { PlaylistItemEditModelMapper(get(), get()) }
+                scoped { PlaylistItemEditModelMapper(get(), get(), get(), get()) }
                 scoped {
                     NavigationMapper(
                         activity = (getSource() as Fragment).requireActivity(),

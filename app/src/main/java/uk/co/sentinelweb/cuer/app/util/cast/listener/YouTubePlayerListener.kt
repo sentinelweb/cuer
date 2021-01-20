@@ -41,8 +41,15 @@ class YouTubePlayerListener(
     fun onDisconnected() {
         youTubePlayer?.removeListener(this)
         youTubePlayer = null
-        playerUi?.reset()
-        playerUi = null
+        queue.currentItem?.apply {
+            playerUi?.setPlaylistItem(this)
+            playerUi?.setConnectionState(CastPlayerContract.ConnectionState.CC_DISCONNECTED)
+            playerUi?.setPlayerState(PlayerStateDomain.PAUSED)
+            playerUi?.setCurrentSecond(0f)
+        } ?: run {
+            playerUi?.reset()
+            playerUi = null
+        }
         queue.removeConsumerListener(this)
     }
 
@@ -67,13 +74,12 @@ class YouTubePlayerListener(
     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
         this.youTubePlayer = youTubePlayer
         state.positionSec = second
+        updateMedia(true, posSec = second)
         if (shouldUpdateUi()) {
             playerUi?.setCurrentSecond(second)
             setTimeUpdateUi()
+            state.currentMedia?.apply { mediaSessionManager.updatePlaybackState(this, state.playState) }
         }
-        updateMedia(true, posSec = second)
-
-        mediaSessionManager.updatePlaybackState(state.currentMedia, state.playState)
     }
 
     private fun shouldUpdateUi() = timeProvider.currentTimeMillis() - state.lastUpdateUI > UI_UPDATE_INTERVAL
@@ -135,7 +141,7 @@ class YouTubePlayerListener(
             PlayerState.VIDEO_CUED -> PlayerStateDomain.VIDEO_CUED
         }
         playerUi?.setPlayerState(state.playState)
-        mediaSessionManager.updatePlaybackState(state.currentMedia, state.playState)
+        state.currentMedia?.apply { mediaSessionManager.updatePlaybackState(this, state.playState) }
         if (state.playState == PlayerStateDomain.ENDED) {
             queue.onTrackEnded(state.currentMedia)
         }

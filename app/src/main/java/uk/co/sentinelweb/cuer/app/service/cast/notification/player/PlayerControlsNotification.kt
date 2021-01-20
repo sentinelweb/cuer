@@ -8,6 +8,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Presenter
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.CC_DISCONNECTED
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.PlayerControls.Listener
@@ -23,13 +24,15 @@ class PlayerControlsNotification constructor(
     private val state: PlayerControlsNotificationState,
     private val toastWrapper: ToastWrapper,
     private val log: LogWrapper,
-    private val context: Context
-) : External, Presenter {
+    private val context: Context,
+    private val skipControl: SkipContract.External
+) : External, Presenter, SkipContract.Listener {
 
     private val listeners: MutableList<Listener> = mutableListOf()
 
     init {
         log.tag(this)
+        skipControl.listener = this
     }
 
     override fun handleAction(action: String?) {
@@ -39,9 +42,9 @@ class PlayerControlsNotification constructor(
             ACTION_PLAY ->
                 listeners.forEach { it.play() }
             ACTION_SKIPF ->
-                listeners.forEach { it.seekTo(state.positionMs + 30000) }
+                skipControl.skipFwd()
             ACTION_SKIPB ->
-                listeners.forEach { it.seekTo(state.positionMs - 30000) }
+                skipControl.skipBack()
             ACTION_TRACKB ->
                 listeners.forEach { it.trackBack() }
             ACTION_TRACKF ->
@@ -56,6 +59,7 @@ class PlayerControlsNotification constructor(
 
     override fun setPlayerState(playState: PlayerStateDomain) {
         state.playState = playState
+        skipControl.stateChange(playState)
         when (playState) {
             UNKNOWN -> Unit
             UNSTARTED -> Unit
@@ -100,10 +104,12 @@ class PlayerControlsNotification constructor(
 
     override fun setCurrentSecond(second: Float) {
         state.positionMs = second.toLong() * 1000
+        skipControl.updatePosition(state.positionMs)
     }
 
     override fun setDuration(duration: Float) {
         state.durationMs = duration.toLong() * 1000
+        skipControl.duration = state.durationMs
     }
 
     override fun error(msg: String) {
@@ -161,6 +167,18 @@ class PlayerControlsNotification constructor(
         const val ACTION_DISCONNECT = "disconnect"
         const val ACTION_STAR = "star"
         const val ACTION_UNSTAR = "unstar"
+
+    }
+
+    override fun skipSeekTo(target: Long) {
+        listeners.forEach { it.seekTo(target) }
+    }
+
+    override fun skipSetBackText(text: String) {
+
+    }
+
+    override fun skipSetFwdText(text: String) {
 
     }
 }

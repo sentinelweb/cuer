@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import androidx.annotation.ColorRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.bumptech.glide.Glide
@@ -17,10 +18,15 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
@@ -28,6 +34,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     private val presenter: CastPlayerContract.Presenter by currentScope.inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
+    private val res: ResourceWrapper by inject()
 
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding!!
@@ -40,7 +47,6 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        presenter.initialise()
         _binding = CastPlayerViewBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -50,6 +56,8 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         binding.castPlayerFab.setOnClickListener { presenter.onPlayPausePressed() }
         binding.castPlayerSeekBack.setOnClickListener { presenter.onSeekBackPressed() }
         binding.castPlayerSeekForward.setOnClickListener { presenter.onSeekFwdPressed() }
+        binding.castPlayerSeekBack.setOnLongClickListener { presenter.onSeekBackSelectTimePressed() }
+        binding.castPlayerSeekForward.setOnLongClickListener { presenter.onSeekSelectTimeFwdPressed() }
         binding.castPlayerTrackLast.setOnClickListener { presenter.onTrackBackPressed() }
         binding.castPlayerTrackNext.setOnClickListener { presenter.onTrackFwdPressed() }
         binding.castPlayerPlaylistText.setOnClickListener { presenter.onPlaylistClick() }
@@ -66,6 +74,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
                 presenter.onSeekFinished()
             }
         })
+        presenter.initialise()
     }
 
     override fun onDestroyView() {
@@ -80,6 +89,11 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 
     override fun setCurrentSecond(second: String) {
         binding.castPlayerCurrentTime.text = second
+    }
+
+    override fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int) {
+        binding.castPlayerDuration.setTextColor(res.getColor(text))
+        binding.castPlayerDuration.setBackgroundColor(res.getColor(upcomingBackground))
     }
 
     override fun setDuration(duration: String) {
@@ -134,6 +148,18 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 //        } ?: binding.castPlayerPlaylistImage.setImageResource(R.drawable.ic_nav_playlist_black)
     }
 
+    override fun setSkipFwdText(text: String) {
+        binding.castPlayerSkipfwdText.text = text
+    }
+
+    override fun setSkipBackText(text: String) {
+        binding.castPlayerSkipbackText.text = text
+    }
+
+    override fun setSeekEnabled(enabled: Boolean) {
+        binding.castPlayerSeek.isEnabled = enabled
+    }
+
     override fun updateSeekPosition(ratio: Float) {
         binding.castPlayerSeek.progress = (ratio * binding.castPlayerSeek.max).toInt()
     }
@@ -158,10 +184,28 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
                 scoped<CastPlayerContract.View> { getSource() }
                 scoped<CastPlayerContract.Presenter> {
                     CastPlayerPresenter(
-                        get(),
-                        get(),
-                        get(),
-                        get()
+                        view = get(),
+                        mapper = get(),
+                        state = get(),
+                        log = get(),
+                        skipControl = get(),
+                        res = get()
+                    )
+                }
+                scoped<SkipContract.External> {
+                    SkipPresenter(
+                        view = get(),
+                        state = SkipContract.State(),
+                        log = get(),
+                        mapper = SkipContract.Mapper(timeSinceFormatter = get(), res = get()),
+                        prefsWrapper = get(named<GeneralPreferences>())
+                    )
+                }
+                scoped<SkipContract.View> {
+                    SkipView(
+                        selectDialogCreator = SelectDialogCreator(
+                            context = getSource<CastPlayerFragment>().requireContext()
+                        )
                     )
                 }
                 scoped { CastPlayerUiMapper(get()) }

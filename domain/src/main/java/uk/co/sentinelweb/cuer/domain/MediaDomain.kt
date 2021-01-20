@@ -22,7 +22,9 @@ data class MediaDomain(
     val thumbNail: ImageDomain? = null,
     val image: ImageDomain? = null,
     val watched: Boolean = false,
-    val starred: Boolean = false
+    val starred: Boolean = false,
+    val isLiveBroadcast: Boolean = false,
+    val isLiveBroadcastUpcoming: Boolean = false
 ) {
     enum class MediaTypeDomain {
         VIDEO, AUDIO, WEB

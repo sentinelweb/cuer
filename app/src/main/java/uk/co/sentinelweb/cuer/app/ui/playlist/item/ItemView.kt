@@ -14,6 +14,7 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -24,6 +25,7 @@ import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistItemBinding
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_IMAGE
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_TITLE
 import uk.co.sentinelweb.cuer.app.util.extension.fade
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 
@@ -34,6 +36,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
 
     private lateinit var presenter: ItemContract.Presenter
     private val log: LogWrapper by inject()
+    private val res: ResourceWrapper by inject()
 
     private var _binding: ViewPlaylistItemBinding? = null
     private val binding get() = _binding!!
@@ -125,12 +128,20 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         binding.listitem.setBackgroundResource(backgroundColor)
     }
 
+    override fun setDurationBackground(@ColorRes infoTextBackgroundColor: Int) {
+        binding.listitemDuration.setBackgroundColor(res.getColor(infoTextBackgroundColor))
+    }
+
     override fun setDuration(text: String) {
         binding.listitemDuration.text = text
     }
 
     override fun setProgress(ratio: Float) {
         binding.listitemProgress.progress = (100 * ratio).toInt()
+    }
+
+    override fun showProgress(live: Boolean) {
+        binding.listitemProgress.isVisible = live
     }
 
     override fun makeTransitionExtras() =

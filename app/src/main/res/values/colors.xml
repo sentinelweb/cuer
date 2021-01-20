@@ -16,6 +16,9 @@
     <color name="control_control_normal">@color/grey_400</color>
     <color name="control_control_activated">@color/grey_600</color>
     <color name="control_control_highlight">@color/grey_100</color>
+    <color name="upcoming_background">@color/orange_700</color>
+    <color name="live_background">@color/red_700</color>
+    <color name="info_text_overlay_background">@color/black_transparent_background</color>
 
 
     <color name="default_tint">@color/white</color>
@@ -32,4 +35,5 @@
     <color name="dark_red">#961717</color>
     <color name="dark_indigo">#1e245f</color>
     <color name="black_transparent_background">#8a000000</color>
+    <color name="transparent">#00000000</color>
 </resources>

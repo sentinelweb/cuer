@@ -20,7 +20,9 @@ interface ItemContract {
         fun setBackground(@ColorRes backgroundColor: Int)
         fun setDuration(text: String)
         fun setProgress(ratio: Float)
+        fun showProgress(live: Boolean)
         fun makeTransitionExtras(): FragmentNavigator.Extras
+        fun setDurationBackground(@ColorRes infoTextBackgroundColor: Int)
     }
 
     interface Presenter {
@@ -67,7 +69,10 @@ interface ItemContract {
         val watchedSince: String,
         val isWatched: Boolean,
         val starred: Boolean,
-        val platform: PlatformDomain
+        val platform: PlatformDomain,
+        val isLive: Boolean,
+        val isUpcoming: Boolean,
+        @ColorRes val infoTextBackgroundColor: Int
     ) : ItemBaseModel(id)
 
     data class State constructor(var item: Model? = null)

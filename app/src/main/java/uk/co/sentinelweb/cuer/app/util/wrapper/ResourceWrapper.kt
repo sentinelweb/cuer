@@ -66,10 +66,12 @@ class ResourceWrapper constructor(
     ) {
         string.apply {
             setSpan(
-                ImageSpan(d, ImageSpan.ALIGN_BOTTOM),
+                ImageSpan(d, ImageSpan.ALIGN_BASELINE),
                 start, end,
                 Spannable.SPAN_INCLUSIVE_INCLUSIVE
             )
         }
     }
+
+    fun getIntArray(@ArrayRes id: Int): List<Int> = resources.getIntArray(id).toList()
 }

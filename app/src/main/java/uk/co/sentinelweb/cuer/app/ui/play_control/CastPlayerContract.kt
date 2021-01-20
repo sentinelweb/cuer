@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
+import androidx.annotation.ColorRes
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.FragmentNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -21,6 +22,8 @@ interface CastPlayerContract {
         fun onPlayPausePressed()
         fun onPlaylistClick()
         fun onPlaylistItemClick()
+        fun onSeekBackSelectTimePressed(): Boolean
+        fun onSeekSelectTimeFwdPressed(): Boolean
     }
 
     // todo think about this maybe sub with android MediaControl interface
@@ -68,8 +71,12 @@ interface CastPlayerContract {
         fun clearImage()
         fun setPlaylistName(name: String)
         fun setPlaylistImage(url: String?)
+        fun setSkipFwdText(text: String)
+        fun setSkipBackText(text: String)
         fun navigate(navModel: NavigationModel)
         fun makeItemTransitionExtras(): FragmentNavigator.Extras
+        fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int)
+        fun setSeekEnabled(enabled: Boolean)
     }
 
     enum class ConnectionState {
@@ -84,8 +91,12 @@ interface CastPlayerContract {
         var durationMs: Long = 0,
         var title: String = "",
         var isDestroyed: Boolean = false,
-        var playlistItem: PlaylistItemDomain? = null
-    ) : ViewModel()
+        var playlistItem: PlaylistItemDomain? = null,
+        var isLiveStream: Boolean = false,
+        var isUpcoming: Boolean = false
+    ) : ViewModel() {
+
+    }
 
 
 }

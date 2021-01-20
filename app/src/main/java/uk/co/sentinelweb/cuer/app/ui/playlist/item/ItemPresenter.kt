@@ -20,7 +20,11 @@ class ItemPresenter(
             ?.apply { view.setIconUrl(this) }
             ?: view.setIconResource(R.drawable.ic_platform_youtube_24_black)
         view.setDuration(item.duration)
-        view.setProgress(item.progress)
+        view.setDurationBackground(item.infoTextBackgroundColor)
+        view.showProgress(!item.isLive)
+        if (!item.isLive) {
+            view.setProgress(item.progress)
+        }
         state.item = item
     }
 

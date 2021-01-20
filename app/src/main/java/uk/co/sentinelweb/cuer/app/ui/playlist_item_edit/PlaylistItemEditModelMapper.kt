@@ -2,28 +2,19 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.core.mappers.DateFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
-import java.util.*
 
 class PlaylistItemEditModelMapper(
     private val timeFormater: TimeFormatter,
-    private val res: ResourceWrapper
+    private val dateFormater: DateFormatter,
+    private val res: ResourceWrapper,
+    private val backgroundMapper: BackgroundMapper
 ) {
-    var pattern: String = DateTimeFormatterBuilder
-        .getLocalizedDateTimePattern(
-            FormatStyle.SHORT
-            , FormatStyle.SHORT
-            , IsoChronology.INSTANCE
-            , Locale.getDefault()
-        )
-    private val pubDateFormatter = DateTimeFormatter.ofPattern(pattern)
 
     fun map(
         domain: MediaDomain,
@@ -45,14 +36,21 @@ class PlaylistItemEditModelMapper(
         },
         starred = domain.starred,
         canPlay = domain.platformId.isNotEmpty(),
-        durationText = domain.duration?.let { timeFormater.formatMillis(it, TimeFormatter.Format.SECS) },
+        durationText = (
+                if (domain.isLiveBroadcast) {
+                    if (domain.isLiveBroadcastUpcoming) res.getString(R.string.upcoming)
+                    else res.getString(R.string.live)
+                } else domain.duration?.let { timeFormater.formatMillis(it, TimeFormatter.Format.SECS) }
+                ),
         positionText = domain.positon?.let { timeFormater.formatMillis(it, TimeFormatter.Format.SECS) },
         position = domain.positon
             ?.takeIf { domain.duration != null && domain.duration!! > 0L }
-            ?.let { (it / domain.duration!!).toFloat() }
-        ,
-        pubDate = pubDateFormatter.format(domain.published),
-        empty = false
+            ?.let { (it / domain.duration!!).toFloat() },
+        pubDate = dateFormater.formatDateNullable(domain.published),
+        empty = false,
+        isLive = domain.isLiveBroadcast,
+        isUpcoming = domain.isLiveBroadcastUpcoming,
+        infoTextBackgroundColor = backgroundMapper.mapInfoBackground(domain)
     )
 
     fun mapEmpty(): PlaylistItemEditModel = PlaylistItemEditModel(
@@ -69,7 +67,10 @@ class PlaylistItemEditModelMapper(
         channelDescription = null,
         starred = false,
         canPlay = false,
-        empty = true
+        empty = true,
+        isLive = false,
+        isUpcoming = false,
+        infoTextBackgroundColor = R.color.info_text_overlay_background
     )
 
     companion object {

@@ -96,6 +96,9 @@
     <string name="playlist_dialog_add_playlist">Add playlist …</string>
     <string name="select_route_dialog_title">Select Route</string>
     <string name="create_playlist_dialog_title">Create playlist</string>
+    <string name="dialog_button_view_info">View info</string>
+    <string name="dialog_title_select_fwd_skip_time">Forward skip time</string>
+    <string name="dialog_title_select_back_skip_time">Back skip time</string>
 
     <!-- misc -->
     <string name="ok">OK</string>
@@ -104,9 +107,8 @@
     <string name="default_playlist">Default</string>
     <string name="dash">-</string>
     <string name="chip_select">Select &#8230;</string>
-    <string name="dialog_button_view_info">View info</string>
-
-    <!-- new -->
-
+    <string name="live">LIVE</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="new_items_below">New Items v</string> <!-- new -->
 
 </resources>

@@ -25,6 +25,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
+import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 
 class PlaylistItemEditViewModel constructor(
@@ -40,11 +41,19 @@ class PlaylistItemEditViewModel constructor(
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val toast: ToastWrapper
 ) : ViewModel() {
+    data class UiEvent(
+        val type: Type,
+        val data: Any?
+    ) {
+        enum class Type { REFRESHING }
+    }
 
+    private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
     private val _modelLiveData: MutableLiveData<PlaylistItemEditModel> = MutableLiveData()
     private val _selectModelLiveData: MutableLiveData<DialogModel> = MutableLiveData()
     private val _navigateLiveData: MutableLiveData<NavigationModel> = MutableLiveData()
 
+    fun getUiObservable(): LiveData<UiEvent> = _uiLiveData
     fun getModelObservable(): LiveData<PlaylistItemEditModel> = _modelLiveData
     fun getNavigationObservable(): LiveData<NavigationModel> = _navigateLiveData
     fun getDialogObservable(): LiveData<DialogModel> = _selectModelLiveData
@@ -74,19 +83,25 @@ class PlaylistItemEditViewModel constructor(
                 originalMedia.id?.let {
                     state.selectedPlaylistIds.addAll(getPlaylistsForMediaId(it).map { it.id!! })
                 }
-                if (originalMedia.channelData.thumbNail == null) {
-                    originalMedia.channelData.platformId?.apply {
-                        ytInteractor.channels(listOf(this))
-                            .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
-                            ?.let {
-                                it.data?.get(0)?.apply {
-                                    state.media = state.media?.copy(channelData = this.copy(id = originalMedia.channelData.id))
-                                    state.mediaChanged = true
-                                }
-                            }
-                    }
+                if (originalMedia.channelData.thumbNail == null
+                    || (originalMedia.duration?.let { it > 1000 * 60 * 60 * 24 } ?: false)
+                    || originalMedia.isLiveBroadcast
+                    || originalMedia.isLiveBroadcastUpcoming
+                ) {
+                    refreshMedia()
+//                    originalMedia.channelData.platformId?.apply {
+//                        ytInteractor.channels(listOf(this))
+//                            .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
+//                            ?.let {
+//                                it.data?.get(0)?.apply {
+//                                    state.media = state.media?.copy(channelData = this.copy(id = originalMedia.channelData.id))
+//                                    state.mediaChanged = true
+//                                }
+//                            }
+//                    }
+                } else {
+                    update()
                 }
-                update()
             } ?: run {
                 _modelLiveData.value = modelMapper.mapEmpty()
             }
@@ -97,6 +112,31 @@ class PlaylistItemEditViewModel constructor(
         item.let {
             state.playlistItem = it
             it.media.let { setData(it) }
+        }
+    }
+
+    fun refreshMedia() {
+        viewModelScope.launch {
+            state.media?.let { originalMedia ->
+                _uiLiveData.value = UiEvent(UiEvent.Type.REFRESHING, true)
+                ytInteractor.videos(
+                    listOf(originalMedia.platformId), listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS)
+                )
+                    .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
+                    ?.let {
+                        it.data?.get(0)?.copy(
+                            id = originalMedia.id,
+                            dateLastPlayed = originalMedia.dateLastPlayed,
+                            starred = originalMedia.starred,
+                            watched = originalMedia.watched,
+                        )
+                            ?.also { state.media = it }
+                            ?.also { state.mediaChanged = true }
+                            ?.also { update() }
+                            ?: also { updateError() }
+                    }
+                    ?: also { updateError() }
+            }
         }
     }
 
@@ -132,8 +172,10 @@ class PlaylistItemEditViewModel constructor(
     }
 
     fun onStarClick() {
-        state.media = state.media
+        state.media
             ?.let { it.copy(starred = !it.starred) }
+            ?.also { state.media = it }
+            ?.also { state.mediaChanged = true }
             ?.also { update() }
     }
 
@@ -198,6 +240,11 @@ class PlaylistItemEditViewModel constructor(
 
     private fun update() {
         state.model = modelMapper.map(state.media!!, selectedPlaylists)
+        _modelLiveData.value = state.model
+    }
+
+    private fun updateError() {
+        state.model = modelMapper.mapEmpty()
         _modelLiveData.value = state.model
     }
 

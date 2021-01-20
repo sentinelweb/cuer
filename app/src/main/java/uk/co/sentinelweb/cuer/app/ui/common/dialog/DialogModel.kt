@@ -7,6 +7,6 @@ open class DialogModel constructor(
     @StringRes open val title: Int
 ) {
     enum class Type {
-        PLAYLIST, PLAYLIST_ADD, CONFIRM, SELECT_ROUTE
+        PLAYLIST, PLAYLIST_ADD, CONFIRM, SELECT_ROUTE, SKIP_TIME
     }
 }

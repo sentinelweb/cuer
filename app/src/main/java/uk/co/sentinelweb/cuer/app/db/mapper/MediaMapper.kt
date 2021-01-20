@@ -4,6 +4,8 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
 import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
+import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity.Companion.FLAG_LIVE
+import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity.Companion.FLAG_LIVE_UPCOMING
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity.Companion.FLAG_WATCHED
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -27,8 +29,10 @@ class MediaMapper(
         image = imageMapper.mapImage(domain.image),
         channelId = domain.channelData.id!!.toLong(),
         published = domain.published,
-        flags = if (domain.watched) FLAG_WATCHED else 0 +
-                if (domain.starred) FLAG_STARRED else 0
+        flags = (if (domain.watched) FLAG_WATCHED else 0) +
+                (if (domain.starred) FLAG_STARRED else 0) +
+                (if (domain.isLiveBroadcast) FLAG_LIVE else 0) +
+                (if (domain.isLiveBroadcastUpcoming) FLAG_LIVE_UPCOMING else 0)
     )
 
     fun map(entity: MediaEntity, channelEntity: ChannelEntity): MediaDomain = MediaDomain(
@@ -47,7 +51,9 @@ class MediaMapper(
         channelData = channelMapper.map(channelEntity),
         published = entity.published,
         watched = entity.flags and FLAG_WATCHED == FLAG_WATCHED,
-        starred = entity.flags and FLAG_STARRED == FLAG_STARRED
+        starred = entity.flags and FLAG_STARRED == FLAG_STARRED,
+        isLiveBroadcast = entity.flags and FLAG_LIVE == FLAG_LIVE,
+        isLiveBroadcastUpcoming = entity.flags and FLAG_LIVE_UPCOMING == FLAG_LIVE_UPCOMING
     )
 
     fun map(entity: MediaAndChannel): MediaDomain = map(entity.media, entity.channel)

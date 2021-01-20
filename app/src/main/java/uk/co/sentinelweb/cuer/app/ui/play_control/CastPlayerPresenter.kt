@@ -1,31 +1,47 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import kotlin.math.max
-import kotlin.math.min
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
     private val state: CastPlayerContract.State,
     private val mapper: CastPlayerUiMapper,
-    private val log: LogWrapper
-) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls {
+    private val log: LogWrapper,
+    private val skipControl: SkipContract.External,
+    private val res: ResourceWrapper
+) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls, SkipContract.Listener {
 
     init {
         log.tag(this)
+        skipControl.listener = this
     }
 
     override fun initialise() {
         state.isDestroyed = false
+        view.setSkipBackText(skipControl.skipBackText)
+        view.setSkipFwdText(skipControl.skipForwardText)
+    }
+
+    override fun onSeekBackSelectTimePressed(): Boolean {
+        skipControl.onSelectSkipTime(false)
+        return true
+    }
+
+    override fun onSeekSelectTimeFwdPressed(): Boolean {
+        skipControl.onSelectSkipTime(true)
+        return true
     }
 
     override fun onPlayPausePressed() {
@@ -51,17 +67,11 @@ class CastPlayerPresenter(
     }
 
     override fun onSeekBackPressed() {
-        if (state.durationMs > 0) {
-            state.listeners.forEach { it.seekTo(max(0, state.positionMs - 30000)) }
-        }
+        skipControl.skipBack()
     }
 
     override fun onSeekFwdPressed() {
-        if (state.durationMs > 0) {
-            state.listeners.forEach {
-                it.seekTo(min(state.durationMs, state.positionMs + 30000))
-            }
-        }
+        skipControl.skipFwd()
     }
 
     override fun onTrackBackPressed() {
@@ -99,12 +109,13 @@ class CastPlayerPresenter(
     override fun setPlayerState(playState: PlayerStateDomain) {
         state.playState = playState
         log.d("playState = $playState")
+        skipControl.stateChange(playState)
         when (playState) {
-            UNKNOWN -> view.showBuffering()
-            UNSTARTED -> view.showBuffering()
-            ENDED -> view.setPaused()
             PLAYING -> view.setPlaying()
+            ENDED -> view.setPaused()
             PAUSED -> view.setPaused()
+            UNKNOWN,
+            UNSTARTED,
             BUFFERING -> view.showBuffering()
             VIDEO_CUED -> Unit
             ERROR -> {
@@ -115,15 +126,21 @@ class CastPlayerPresenter(
 
     override fun setCurrentSecond(second: Float) {
         state.positionMs = (second * 1000).toLong()
-        view.setCurrentSecond(mapper.formatTime(state.positionMs))
+        skipControl.updatePosition(state.positionMs)
         if (state.durationMs > 0) {
-            view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
+            if (!state.isLiveStream) {
+                view.setCurrentSecond(mapper.formatTime(state.positionMs))
+                view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
+            }
         }
     }
 
     override fun setDuration(duration: Float) {
         state.durationMs = (duration * 1000).toLong()
-        view.setDuration(mapper.formatTime(state.durationMs))
+        skipControl.duration = state.durationMs
+        if (!state.isLiveStream) {
+            view.setDuration(mapper.formatTime(state.durationMs))
+        }
     }
 
     override fun error(msg: String) {
@@ -142,6 +159,9 @@ class CastPlayerPresenter(
             state.durationMs = 0L.apply { view.setDuration("") }
             view.clearImage()
             view.setPaused()
+            view.setDurationColors(R.color.text_primary, R.color.transparent)
+            view.setSeekEnabled(false)
+            view.updateSeekPosition(0f)
         }
     }
 
@@ -160,7 +180,24 @@ class CastPlayerPresenter(
             media.title?.apply { state.title = this }
             media.title?.let { view.setTitle(it) }
             state.durationMs = media.duration ?: 0L
-            view.setDuration(mapper.formatTime(state.durationMs))
+            state.isLiveStream = media.isLiveBroadcast
+            state.isUpcoming = media.isLiveBroadcastUpcoming
+            if (state.isLiveStream) {
+                view.setCurrentSecond("-")
+                if (state.isUpcoming) {
+                    view.setDuration(res.getString(R.string.upcoming))
+                    view.setDurationColors(R.color.white, R.color.upcoming_background)
+                } else {
+                    view.setDuration(res.getString(R.string.live))
+                    view.setDurationColors(R.color.white, R.color.live_background)
+                }
+                view.updateSeekPosition(1f)
+
+            } else {
+                view.setDuration(mapper.formatTime(state.durationMs))
+                view.setDurationColors(R.color.text_primary, R.color.transparent)
+            }
+            view.setSeekEnabled(!state.isLiveStream)
         }
     }
 
@@ -187,4 +224,19 @@ class CastPlayerPresenter(
             )
         }
     }
+
+    override fun skipSeekTo(target: Long) {
+        state.listeners.forEach {
+            it.seekTo(target)
+        }
+    }
+
+    override fun skipSetBackText(text: String) {
+        view.setSkipBackText(text)
+    }
+
+    override fun skipSetFwdText(text: String) {
+        view.setSkipFwdText(text)
+    }
+
 }
