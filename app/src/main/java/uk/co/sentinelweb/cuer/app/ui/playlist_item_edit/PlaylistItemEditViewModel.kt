@@ -83,7 +83,11 @@ class PlaylistItemEditViewModel constructor(
                 originalMedia.id?.let {
                     state.selectedPlaylistIds.addAll(getPlaylistsForMediaId(it).map { it.id!! })
                 }
-                if (originalMedia.channelData.thumbNail == null || (originalMedia.duration?.let { it > 1000 * 60 * 60 * 24 } ?: false)) {
+                if (originalMedia.channelData.thumbNail == null
+                    || (originalMedia.duration?.let { it > 1000 * 60 * 60 * 24 } ?: false)
+                    || originalMedia.isLiveBroadcast
+                    || originalMedia.isLiveBroadcastUpcoming
+                ) {
                     refreshMedia()
 //                    originalMedia.channelData.platformId?.apply {
 //                        ytInteractor.channels(listOf(this))
