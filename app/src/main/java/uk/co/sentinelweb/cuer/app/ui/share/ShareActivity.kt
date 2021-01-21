@@ -12,9 +12,6 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_share.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
@@ -23,7 +20,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PL
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -105,7 +101,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
             })
     }
 
-    override fun setData(model: ShareModel) {
+    override fun setData(model: ShareContract.Model) {
         model.media.apply { editFragment.setData(this) }
 
         top_left_button.apply {
@@ -156,38 +152,6 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
                 }
             }
 
-        @JvmStatic
-        val activityModule = module {
-            scope(named<ShareActivity>()) {
-                scoped<ShareContract.View> { getSource() }
-                scoped<ShareContract.Presenter> {
-                    SharePresenter(
-                        view = get(),
-                        repository = get(),
-                        playlistRepository = get(),
-                        linkScanner = get(),
-                        contextProvider = get(),
-                        ytInteractor = get(),
-                        toast = get(),
-                        queue = get(),
-                        state = get(),
-                        log = get(),
-                        ytContextHolder = get(),
-                        mapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>())
-                    )
-                }
-                scoped { ShareWrapper(getSource()) }
-                scoped { SnackbarWrapper(getSource()) }
-                viewModel { ShareState() }
-                scoped {
-                    ShareModelMapper(
-                        ytContextHolder = get(),
-                        res = get()
-                    )
-                }
-            }
-        }
     }
 
 }

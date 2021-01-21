@@ -3,7 +3,15 @@ package uk.co.sentinelweb.cuer.app.ui.play_control
 import androidx.annotation.ColorRes
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.FragmentNavigator
+import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -98,5 +106,41 @@ interface CastPlayerContract {
 
     }
 
+    companion object {
+        @JvmStatic
+        val viewModule = module {
+            scope(named<CastPlayerFragment>()) {
+                scoped<View> { getSource() }
+                scoped<Presenter> {
+                    CastPlayerPresenter(
+                        view = get(),
+                        mapper = get(),
+                        state = get(),
+                        log = get(),
+                        skipControl = get(),
+                        res = get()
+                    )
+                }
+                scoped<SkipContract.External> {
+                    SkipPresenter(
+                        view = get(),
+                        state = SkipContract.State(),
+                        log = get(),
+                        mapper = SkipContract.Mapper(timeSinceFormatter = get(), res = get()),
+                        prefsWrapper = get(named<GeneralPreferences>())
+                    )
+                }
+                scoped<SkipContract.View> {
+                    SkipView(
+                        selectDialogCreator = SelectDialogCreator(
+                            context = getSource<CastPlayerFragment>().requireContext()
+                        )
+                    )
+                }
+                scoped { CastPlayerUiMapper(get()) }
+                viewModel { State() }
+            }
+        }
+    }
 
 }

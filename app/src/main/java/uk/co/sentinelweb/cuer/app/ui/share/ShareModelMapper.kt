@@ -14,11 +14,11 @@ class ShareModelMapper constructor(
         media: MediaDomain?,
         playlistItems: List<PlaylistItemDomain>?,
         finish: (Boolean, Boolean, Boolean) -> Unit
-    ): ShareModel {
+    ): ShareContract.Model {
         val isConnected = ytContextHolder.isConnected()
         val isNew = media?.id == null || playlistItems?.size ?: 0 == 0
         return if (isNew) {
-            ShareModel(
+            ShareContract.Model(
                 topRightButtonAction = {
                     finish(/*add = */true, /*play = */ true, /*forward = */ true)
                 },
@@ -53,7 +53,7 @@ class ShareModelMapper constructor(
                 isNewVideo = isNew
             )
         } else {
-            ShareModel(
+            ShareContract.Model(
                 topRightButtonAction = {
                     finish(/*add = */false, /*play = */ true, /*forward = */ true)
                 },
@@ -89,7 +89,7 @@ class ShareModelMapper constructor(
     }
 
     fun mapEmptyState(finish: (Boolean, Boolean, Boolean) -> Unit) =
-        ShareModel(
+        ShareContract.Model(
             topRightButtonAction = {},
             topRightButtonText = null,
             topRightButtonIcon = 0,

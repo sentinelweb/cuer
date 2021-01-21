@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class MainPresenter(
     private val view: MainContract.View,
-    private val state: MainState,
+    private val state: MainContract.State,
     private val playerControls: CastPlayerContract.PlayerControls,
     private val ytServiceManager: YoutubeCastServiceManager,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
@@ -19,8 +19,6 @@ class MainPresenter(
     }
 
     override fun initialise() {
-
-
         if (!state.playServiceCheckDone) {
             view.checkPlayServices()
             state.playServiceCheckDone = true

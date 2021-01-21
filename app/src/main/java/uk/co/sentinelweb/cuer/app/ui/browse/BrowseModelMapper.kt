@@ -4,9 +4,9 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class BrowseModelMapper constructor() {
 
-    fun map(domain: List<MediaDomain>): BrowseModel = BrowseModel(
+    fun map(domain: List<MediaDomain>): BrowseContract.Model = BrowseContract.Model(
         domain.map {
-            BrowseModel.BrowseItemModel(
+            BrowseContract.Model.BrowseItemModel(
                 it.url,
                 it.mediaType,
                 it.title ?: "-",

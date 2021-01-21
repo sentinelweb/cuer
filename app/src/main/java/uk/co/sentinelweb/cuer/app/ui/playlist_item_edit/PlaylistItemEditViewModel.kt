@@ -254,6 +254,7 @@ class PlaylistItemEditViewModel constructor(
                 if (state.mediaChanged) {
                     state.media?.let { mediaRepo.save(it) }
                 }
+                // todo merge below into commitPlaylistItems() - needs to work for existing from share
                 if (state.playlistsChanged) {
                     if (!state.selectedPlaylistIds.contains(item.playlistId)) {
                         playlistRepo.delete(item)

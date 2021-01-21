@@ -27,7 +27,7 @@ class SharePresenter constructor(
     private val ytInteractor: YoutubeInteractor,
     private val toast: ToastWrapper,
     private val queue: QueueMediatorContract.Producer,
-    private val state: ShareState,
+    private val state: ShareContract.State,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val log: LogWrapper,
     private val mapper: ShareModelMapper,
