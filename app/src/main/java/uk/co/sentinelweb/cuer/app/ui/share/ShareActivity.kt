@@ -5,10 +5,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_share.*
+import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -20,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
+import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -31,6 +34,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
     private val presenter: ShareContract.Presenter by currentScope.inject()
     private val shareWrapper: ShareWrapper by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
+    private val volumeControl: CuerSimpleVolumeController by inject()
 
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
     private var snackbar: Snackbar? = null
@@ -43,6 +47,9 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_share)
     }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean =
+        if (volumeControl.handleVolumeKey(event)) true else super.dispatchKeyEvent(event)
 
     override fun error(msg: String) {
         snackbar?.dismiss()

@@ -45,10 +45,6 @@ class ChromeCastWrapper(private val application: Application) {
     fun removeSessionListener(listener: SessionManagerListener<CastSession>) =
         getCastContext().sessionManager.addSessionManagerListener(listener, CastSession::class.java)
 
-    // from: https://code.tutsplus.com/tutorials/google-play-services-google-cast-v3-and-media--cms-26893
-    fun getRemoteClient() =
-        CastContext.getSharedInstance(application).sessionManager.currentCastSession?.remoteMediaClient
-
     fun buildCastMediaInfo(media: MediaDomain): MediaInfo {
         val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE)
 

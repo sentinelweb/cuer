@@ -109,6 +109,6 @@
     <string name="chip_select">Select &#8230;</string>
     <string name="live">LIVE</string>
     <string name="upcoming">Upcoming</string>
-    <string name="new_items_below">New Items v</string> <!-- new -->
 
+    <string name="new_items_below">New Items v</string>
 </resources>

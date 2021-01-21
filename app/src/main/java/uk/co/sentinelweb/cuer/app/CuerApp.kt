@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.di.Modules
 import uk.co.sentinelweb.cuer.app.exception.TerminatedWhilePlayingError
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
+import uk.co.sentinelweb.cuer.app.util.cast.CuerCastSessionListener
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper
@@ -26,6 +27,7 @@ class CuerApp : Application() {
     private val log: LogWrapper by inject()
     private val castServiceManager: YoutubeCastServiceManager by inject()
     private val serviceWrapper: ServiceWrapper by inject()
+    private val castSessionListener: CuerCastSessionListener by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -39,7 +41,7 @@ class CuerApp : Application() {
 
             modules(Modules.allModules)
         }
-
+        castSessionListener.listen()
         stethoWrapper.init()
         sharingShortcutsManager.apply {
             removeAllDirectShareTargets(this@CuerApp)
@@ -55,6 +57,7 @@ class CuerApp : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
+        castSessionListener.destroy()
         if (castServiceManager.isRunning()) {
             log.e(
                 "App terminated while playing", TerminatedWhilePlayingError(
