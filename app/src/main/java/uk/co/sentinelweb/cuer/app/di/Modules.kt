@@ -30,7 +30,6 @@ import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
-import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
@@ -98,7 +97,6 @@ object Modules {
             )
         }
         single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }
-        single { ChromecastYouTubePlayerContextHolder(get(), get()) }
         factory { MediaSessionManager(get(), androidApplication(), get(), get(), get()) }
         factory { MediaMetadataMapper(get()) }
         factory { PlaybackStateMapper() }

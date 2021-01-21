@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
+import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -44,6 +46,7 @@ class MainActivity :
     private val snackBarWrapper: SnackbarWrapper by currentScope.inject()
     private val log: LogWrapper by currentScope.inject()
     private val navMapper: NavigationMapper by currentScope.inject()
+    private val volumeControl: CuerSimpleVolumeController by inject()
 
     private lateinit var navController: NavController
 
@@ -63,6 +66,9 @@ class MainActivity :
         intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
         presenter.initialise()
     }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean =
+        if (volumeControl.handleVolumeKey(event)) true else super.dispatchKeyEvent(event)
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         super.onCreateOptionsMenu(menu)
