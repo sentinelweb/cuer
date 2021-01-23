@@ -1,22 +1,20 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class ShareModelMapper constructor(
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val res: ResourceWrapper
 ) {
     fun mapShareModel(
-        media: MediaDomain?,
-        playlistItems: List<PlaylistItemDomain>?,
+        scanResult: ScanContract.Result,
         finish: (Boolean, Boolean, Boolean) -> Unit
     ): ShareContract.Model {
         val isConnected = ytContextHolder.isConnected()
-        val isNew = media?.id == null || playlistItems?.size ?: 0 == 0
+        val isNew = scanResult.isNew || !scanResult.isOnPlaylist
         return if (isNew) {
             ShareContract.Model(
                 topRightButtonAction = {
@@ -49,8 +47,7 @@ class ShareModelMapper constructor(
                 },
                 bottomLeftButtonText = res.getString(R.string.share_button_add_return),
                 bottomLeftButtonIcon = R.drawable.ic_button_add_black,
-                media = media,
-                isNewVideo = isNew
+                isNew = isNew
             )
         } else {
             ShareContract.Model(
@@ -82,8 +79,7 @@ class ShareModelMapper constructor(
                 },
                 bottomLeftButtonText = res.getString(R.string.share_button_return),
                 bottomLeftButtonIcon = R.drawable.ic_button_back_black,
-                media = media,
-                isNewVideo = isNew
+                isNew = isNew
             )
         }
     }
@@ -106,7 +102,6 @@ class ShareModelMapper constructor(
             },
             bottomLeftButtonText = res.getString(R.string.share_button_return),
             bottomLeftButtonIcon = R.drawable.ic_button_back_black,
-            media = null,
-            isNewVideo = false
+            isNew = false
         )
 }

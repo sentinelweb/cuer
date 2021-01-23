@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -27,7 +28,7 @@ class BackupFileManager constructor(
         BackupFileModel(
             version = 3,
             medias = listOf(),
-            playlists = playlistRepository.loadList(PlaylistDatabaseRepository.AllFilter(flat = false)).data!!
+            playlists = playlistRepository.loadList(OrchestratorContract.AllFilter()).data!!
         ).let {
             jsonBackupSerialzer.encodeToString(BackupFileModel.serializer(), it)
         }
@@ -92,7 +93,7 @@ class BackupFileManager constructor(
                 ?.takeIf { it.isSuccessful }
                 ?.let {
                     playlistRepository
-                        .loadList(PlaylistDatabaseRepository.DefaultFilter())
+                        .loadList(OrchestratorContract.DefaultFilter())
                         .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
                         ?.let { defPlaylistResult ->
                             val orderBase = timeProvider.currentTimeMillis()

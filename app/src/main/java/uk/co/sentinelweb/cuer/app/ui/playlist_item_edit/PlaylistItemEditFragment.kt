@@ -43,7 +43,6 @@ import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
@@ -92,13 +91,13 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         }
     }
 
-    fun setData(media: MediaDomain?) = viewModel.setData(media)
+    //fun setData(media: MediaDomain?) = viewModel.setData(media)
     //fun setData(item: PlaylistItemDomain) = viewModel.setData(item)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        if (itemArg != null) {
+        itemArg?.id?.apply {
             sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         }
     }
@@ -164,21 +163,26 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         })
 
         // setup data for fragment transition
-        itemArg?.let { item ->
-            Glide.with(requireContext())
-                .load(item.media.image?.url)
-                .into(ple_image)
+        itemArg?.apply {
+            if (id != null) { // fixme needs new flag assumes transition
+                media.image?.apply {
+                    Glide.with(requireContext())
+                        .load(this.url)
+                        .into(ple_image)
+                }
+                //ple_play_button.isVisible = false
+                ple_author_image.isVisible = false
+                ple_title_pos.isVisible = false
+                ple_title_bg.isVisible = false
+                ple_star_fab.isVisible = false
+                starMenuItem.isVisible = false
+                playMenuItem.isVisible = false
+                saveCallback.isEnabled = true
 
-            //ple_play_button.isVisible = false
-            ple_author_image.isVisible = false
-            ple_title_pos.isVisible = false
-            ple_title_bg.isVisible = false
-            ple_star_fab.isVisible = false
-            starMenuItem.isVisible = false
-            playMenuItem.isVisible = false
-            saveCallback.isEnabled = true
-
-            viewModel.delayedLoad(item)
+                viewModel.delayedSetData(this)
+            } else {
+                viewModel.setData(this)
+            }
         }
         observeUi()
         observeModel()
@@ -196,7 +200,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     }
                 }
             })
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -355,15 +358,15 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                     PlaylistItemEditViewModel(
                         state = get(),
                         modelMapper = get(),
-                        playlistRepo = get(),
-                        mediaRepo = get(),
                         itemCreator = get(),
                         playlistDialogModelCreator = get(),
                         log = get(),
-                        ytInteractor = get(),
                         queue = get(),
                         ytContextHolder = get(),
-                        toast = get()
+                        toast = get(),
+                        mediaOrchestrator = get(),
+                        playlistItemOrchestrator = get(),
+                        playlistOrchestrator = get()
                     )
                 }
                 scoped { PlaylistItemEditState() }

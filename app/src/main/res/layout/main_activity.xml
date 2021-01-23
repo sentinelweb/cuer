@@ -27,7 +27,7 @@
         android:layout_marginBottom="96dp"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/bottom_navigation"
+        app:navGraph="@navigation/main_navigation"
         />
 
     <androidx.fragment.app.FragmentContainerView

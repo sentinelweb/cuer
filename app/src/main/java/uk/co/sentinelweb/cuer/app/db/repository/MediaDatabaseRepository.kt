@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data.Empty
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
@@ -57,7 +58,7 @@ class MediaDatabaseRepository constructor(
                     .let { mediaDao.insertAll(it) }
                     .also { database.setTransactionSuccessful() }
                     .also { database.endTransaction() }
-                    .let { idlist -> Data(loadList(MediaDatabaseRepository.IdListFilter(idlist)).data) }
+                    .let { idlist -> Data(loadList(OrchestratorContract.IdListFilter(idlist)).data) }
             } catch (e: Throwable) {
                 val msg = "Couldn't save ${domains.map { it.url }}"
                 log.e(msg, e)
@@ -80,25 +81,23 @@ class MediaDatabaseRepository constructor(
             }
         }
 
-    override suspend fun loadList(filter: DatabaseRepository.Filter?)
+    override suspend fun loadList(filter: OrchestratorContract.Filter?, flat: Boolean)
             : RepoResult<List<MediaDomain>> = withContext(coProvider.IO) {
         try {// todo better transactions
             database.beginTransaction()
-//            database.transaction( object:Callable<RepoResult<List<MediaDomain>>> {
-//                override fun call(): RepoResult<List<MediaDomain>> {
             when (filter) {
-                is MediaDatabaseRepository.IdListFilter ->
+                is OrchestratorContract.IdListFilter ->
                     mediaDao
                         .loadAllByIds(filter.ids.toLongArray())
                         .map { mediaMapper.map(it) }
                         .let { Data(it) }
-                is MediaIdFilter ->
+                is OrchestratorContract.PlatformIdListFilter ->
                     mediaDao
-                        .findByMediaId(filter.mediaId)
+                        .findByMediaId(filter.ids[0])
                         ?.let { listOf(mediaMapper.map(it)) }
                         ?.let { Data.dataOrEmpty(it) }
                         ?: Empty(listOf())
-                else ->
+                else ->// todo return empty for else
                     mediaDao
                         .getAll()
                         .map { mediaMapper.map(it) }
@@ -142,7 +141,7 @@ class MediaDatabaseRepository constructor(
             }
         }.also { database.endTransaction() }
 
-    override suspend fun count(filter: DatabaseRepository.Filter?): RepoResult<Int> =
+    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> =
         try {
             withContext(coProvider.IO) {
                 mediaDao.count()
@@ -201,9 +200,6 @@ class MediaDatabaseRepository constructor(
                 RepoResult.Error<Boolean>(e, msg)
             }
         }.also { database.endTransaction() }
-
-    class IdListFilter(val ids: List<Long>) : DatabaseRepository.Filter
-    class MediaIdFilter(val mediaId: String) : DatabaseRepository.Filter
 
 
 }

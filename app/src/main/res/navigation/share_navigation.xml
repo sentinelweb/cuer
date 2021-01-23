@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_navigation"
+    app:startDestination="@id/navigation_scan"
+    >
+    <!--    Theres is a bug with app:startDestination that caused the specified fragment to use two instances when navigating -->
+
+    <fragment
+        android:id="@+id/navigation_scan"
+        android:name="uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragment"
+        android:label="@string/sharenav_title_scan"
+        tools:layout="@layout/browse_fragment"
+        >
+        <action
+            android:id="@+id/action_goto_playlist"
+            app:destination="@id/navigation_playlist"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist"
+            app:popUpToInclusive="true"
+            />
+
+        <action
+            android:id="@+id/action_goto_playlist_item"
+            app:destination="@id/navigation_playlist_item_edit"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist_item_edit"
+            app:popUpToInclusive="true"
+            />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_playlist"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment"
+        android:label="@string/sharenav_title_playlist"
+        tools:layout="@layout/playlist_fragment"
+        >
+        <argument
+            android:name="PLAYLIST_ID"
+            android:defaultValue="-1L"
+            app:argType="long"
+            app:nullable="false"
+            />
+
+        <action
+            android:id="@+id/action_goto_playlist_item"
+            app:destination="@id/navigation_playlist_item_edit"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist_item_edit"
+            app:popUpToInclusive="true"
+            />
+
+        <action
+            android:id="@+id/action_goto_edit_playlist"
+            app:destination="@id/navigation_playlist_edit"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist_edit"
+            app:popUpToInclusive="true"
+            />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_playlist_item_edit"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment"
+        android:label="@string/sharenav_playlist_iten"
+        tools:layout="@layout/playlist_item_edit_fragment"
+        >
+        <argument
+            android:name="PLAYLIST_ITEM"
+            app:argType="string"
+            app:nullable="true"
+            />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_playlist_edit"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment"
+        android:label="@string/sharenav_title_playlist_edit"
+        tools:layout="@layout/playlist_edit_fragment"
+        >
+        <argument
+            android:name="PLAYLIST_ID"
+            android:defaultValue="-1L"
+            app:argType="long"
+            app:nullable="false"
+            />
+    </fragment>
+
+    <activity
+        android:id="@+id/navigation_main"
+        android:name="uk.co.sentinelweb.cuer.app.ui.main.MainActivity"
+        android:label="@string/sharenav_title_main"
+        tools:layout="@layout/main_activity"
+        />
+</navigation>

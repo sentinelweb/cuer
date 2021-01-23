@@ -3,24 +3,23 @@ package uk.co.sentinelweb.cuer.app.ui.share
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.Job
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 
 interface ShareContract {
 
     interface Presenter {
-        fun fromShareUrl(uriString: String)
         fun onStop()
         fun linkError(clipText: String?)
+        fun scanResult(result: ScanContract.Result)
     }
 
     interface View {
@@ -31,10 +30,11 @@ interface ShareContract {
         fun warning(msg: String)
         suspend fun commitPlaylistItems()
         fun getPlaylistItems(): List<PlaylistItemDomain>
+        fun showMedia(mediaDomain: PlaylistItemDomain)
     }
 
     data class Model constructor(
-        val isNewVideo: Boolean,
+        val isNew: Boolean,
         val topRightButtonText: String?,
         @DrawableRes val topRightButtonIcon: Int,
         val topRightButtonAction: () -> Unit,
@@ -43,20 +43,17 @@ interface ShareContract {
         val bottomRightButtonAction: () -> Unit,
         val bottomLeftButtonText: String?,
         @DrawableRes val bottomLeftButtonIcon: Int,
+        val bottomLeftButtonAction: () -> Unit,
         val topLeftButtonAction: () -> Unit,
         val topLeftButtonText: String?,
-        @DrawableRes val topLeftButtonIcon: Int,
-        val bottomLeftButtonAction: () -> Unit,
-        val media: MediaDomain?
+        @DrawableRes val topLeftButtonIcon: Int
     )
 
-
-    @Serializable
-    data class State constructor(
-        var media: MediaDomain? = null,
-        var playlistItems: List<PlaylistItemDomain>? = null,
+    //    @Serializable
+    data class State(
         @Transient var model: Model? = null,
-        @Transient val jobs: MutableList<Job> = mutableListOf()
+        @Transient val jobs: MutableList<Job> = mutableListOf(),
+        var scanResult: ScanContract.Result? = null
     ) : ViewModel()
 
     companion object {
@@ -67,18 +64,15 @@ interface ShareContract {
                 scoped<Presenter> {
                     SharePresenter(
                         view = get(),
-                        repository = get(),
-                        playlistRepository = get(),
-                        linkScanner = get(),
                         contextProvider = get(),
-                        ytInteractor = get(),
                         toast = get(),
                         queue = get(),
                         state = get(),
                         log = get(),
                         ytContextHolder = get(),
                         mapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>())
+                        prefsWrapper = get(named<GeneralPreferences>()),
+                        timeProvider = get()
                     )
                 }
                 scoped { ShareWrapper(getSource()) }

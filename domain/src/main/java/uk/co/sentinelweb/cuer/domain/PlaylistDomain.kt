@@ -33,12 +33,13 @@ data class PlaylistDomain constructor(
 
     @Serializable
     data class PlaylistConfigDomain constructor(
-        val type: PlaylistTypeDomain = PlaylistTypeDomain.USER,
-        val platform: PlatformDomain = PlatformDomain.YOUTUBE,
+        val type: PlaylistTypeDomain = PlaylistTypeDomain.USER,//todo move to table
+        val platform: PlatformDomain = PlatformDomain.YOUTUBE,//todo move to table
         val updateUrl: String? = null,
         @Contextual val lastUpdate: Instant? = null,
         val updateInterval: Long? = null,
-        val channelData: ChannelDomain? = null
+        val channelData: ChannelDomain? = null,//todo move to table
+        val platformId: String? = null//todo move to table
     )
 }
 

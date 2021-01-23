@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_share.*
 import org.koin.android.ext.android.inject
@@ -18,30 +20,38 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
+import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
+import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-class ShareActivity : AppCompatActivity(), ShareContract.View {
-    // todo add navigation here
+class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.Listener {
     private val presenter: ShareContract.Presenter by currentScope.inject()
     private val shareWrapper: ShareWrapper by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
+    //private val navMapper: NavigationMapper by currentScope.inject()
 
+    private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
     private var snackbar: Snackbar? = null
 
-    private val editFragment by lazy {
-        supportFragmentManager.findFragmentById(R.id.playlist_edit_fragment) as PlaylistItemEditFragment
+    private val scanFragment: ScanContract.View? by lazy {
+        supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.run { (getChildFragmentManager().getFragments().get(0) as ScanContract.View?)!! }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_share)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+        //bottom_nav_view.setupWithNavController(navController)
+        //navController.navigate(R.id.navigation_playlist)
+        scanFragment!!.listener = this
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
@@ -68,7 +78,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
             clipboard.getPrimaryClip()
                 ?.getItemAt(0)
                 ?.text
-                ?.apply { presenter.fromShareUrl(this.toString()) }
+                ?.apply { scanFragment!!.fromShareUrl(this.toString()) }
                 ?: presenter.linkError(
                     clipboard.getPrimaryClip()
                         ?.getItemAt(0)?.text?.toString()
@@ -80,7 +90,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
         super.onResume()
         if (!intent.getBooleanExtra(EXTRA_PASTE, false)) {
             shareWrapper.getLinkFromIntent(intent) {
-                presenter.fromShareUrl(it)
+                scanFragment!!.fromShareUrl(it)
             }
         }
     }
@@ -102,7 +112,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
     }
 
     override fun setData(model: ShareContract.Model) {
-        model.media.apply { editFragment.setData(this) }
+        //model.media.apply { editFragment.setData(this) }
 
         top_left_button.apply {
             isVisible = model.topLeftButtonText?.isNotBlank() ?: false
@@ -134,10 +144,19 @@ class ShareActivity : AppCompatActivity(), ShareContract.View {
     }
 
     override suspend fun commitPlaylistItems() {
-        editFragment.commitPlaylistItems()
+        //editFragment.commitPlaylistItems()
     }
 
-    override fun getPlaylistItems(): List<PlaylistItemDomain> = editFragment.getPlaylistItems()
+    override fun showMedia(itemDomain: PlaylistItemDomain) {
+        ScanFragmentDirections.actionGotoPlaylistItem(itemDomain.serialise())
+            .apply { navController.navigate(this, null) }
+    }
+
+    override fun scanResult(result: ScanContract.Result) {
+        presenter.scanResult(result)
+    }
+
+    override fun getPlaylistItems(): List<PlaylistItemDomain> = listOf()//editFragment.getPlaylistItems()
 
     companion object {
 

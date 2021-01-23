@@ -2,64 +2,45 @@ package uk.co.sentinelweb.cuer.app.ui.share
 
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
-import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
-import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 class SharePresenter constructor(
     private val view: ShareContract.View,
-    private val repository: MediaDatabaseRepository,
-    private val playlistRepository: PlaylistDatabaseRepository,
-    private val linkScanner: LinkScanner,
     private val contextProvider: CoroutineContextProvider,
-    private val ytInteractor: YoutubeInteractor,
     private val toast: ToastWrapper,
     private val queue: QueueMediatorContract.Producer,
     private val state: ShareContract.State,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val log: LogWrapper,
     private val mapper: ShareModelMapper,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
+    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
+    private val timeProvider: TimeProvider
 ) : ShareContract.Presenter {
 
     init {
         log.tag(this)
     }
 
-    override fun fromShareUrl(uriString: String) {
-        linkScanner
-            .scan(uriString)
-            ?.let { scannedMedia ->
-                state.viewModelScope.launch {
-                    loadOrInfo(scannedMedia)
-                        ?.also {
-                            state.media = it
-                            if (it.id != null) {
-                                state.playlistItems =
-                                    playlistRepository.loadPlaylistItems(PlaylistDatabaseRepository.MediaIdListFilter(listOf(it.id!!)))
-                                        .takeIf { it.isSuccessful }
-                                        ?.data
-                            }
-                            mapDisplayModel()
-                            if (!(state.model?.isNewVideo ?: true)) {
-                                view.warning("Video already in queue ...")
-                            }
-                        }
-                        ?: errorLoading(scannedMedia.url)
-                }
-            } ?: linkError(uriString)
+    //
+    private fun mapDisplayModel() {
+        state.model = state.scanResult?.let {
+            mapper.mapShareModel(it, ::finish)
+        } ?: mapper.mapEmptyState(::finish)// todo fail result
+            .apply {
+                view.setData(this)
+            }
     }
 
     override fun linkError(clipText: String?) {
@@ -73,31 +54,19 @@ class SharePresenter constructor(
         }
     }
 
-    private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? =
-        scannedMedia.let {
-            repository.loadList(MediaDatabaseRepository.MediaIdFilter(scannedMedia.platformId))
-        }.takeIf { it.isSuccessful }
-            ?.let { it.data?.firstOrNull() }
-            ?: run {
-                ytInteractor.videos(
-                    ids = listOf(scannedMedia.platformId),
-                    parts = listOf(ID, SNIPPET, CONTENT_DETAILS)
-                ).takeIf { it.isSuccessful }
-                    ?.let {
-                        it.data?.firstOrNull()
-                    }
+    override fun scanResult(result: ScanContract.Result) {
+        state.scanResult = result
+        when (result.type) {
+            MEDIA -> (result.result as MediaDomain).let {
+                view.showMedia(PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null))
             }
-
-    private fun mapDisplayModel() {
-        state.model = mapper.mapShareModel(state.media, state.playlistItems, ::finish).apply {
-            view.setData(this)
         }
     }
 
     private fun finish(add: Boolean, play: Boolean, forward: Boolean) {
         state.viewModelScope.launch {
             try {
-                if (add) {
+                if (add) {// fixme if playlist items are changed then they arent saved here
                     view.commitPlaylistItems()
                     queue.refreshQueue()
                 }
@@ -105,7 +74,7 @@ class SharePresenter constructor(
                 val playlistItemList: List<PlaylistItemDomain>? = if (add)
                     view.getPlaylistItems()
                 else {
-                    state.playlistItems
+                    listOf()// todo existing state.playlistItems
                 }
                 val size = playlistItemList?.size ?: 0
                 val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYLIST_ID)

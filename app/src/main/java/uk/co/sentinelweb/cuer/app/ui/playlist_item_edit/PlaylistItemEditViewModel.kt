@@ -7,9 +7,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
+import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -24,23 +28,26 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 
 class PlaylistItemEditViewModel constructor(
     private val state: PlaylistItemEditState,
     private val modelMapper: PlaylistItemEditModelMapper,
-    private val playlistRepo: PlaylistDatabaseRepository,
+//    private val playlistRepo: PlaylistDatabaseRepository,
     private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator,
-    private val mediaRepo: MediaDatabaseRepository,
+//    private val mediaRepo: MediaDatabaseRepository,
     private val itemCreator: PlaylistItemCreator,
     private val log: LogWrapper,
-    private val ytInteractor: YoutubeInteractor,
+//    private val ytInteractor: YoutubeInteractor,
     private val queue: QueueMediatorContract.Producer,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
-    private val toast: ToastWrapper
+    private val toast: ToastWrapper,
+    private val playlistOrchestrator: PlaylistOrchestrator,
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val mediaOrchestrator: MediaOrchestrator
 ) : ViewModel() {
+
     data class UiEvent(
         val type: Type,
         val data: Any?
@@ -68,7 +75,7 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun delayedLoad(item: PlaylistItemDomain) {
+    fun delayedSetData(item: PlaylistItemDomain) {
         viewModelScope.launch {
             delay(400)
             setData(item) // loads data after delay
@@ -119,21 +126,17 @@ class PlaylistItemEditViewModel constructor(
         viewModelScope.launch {
             state.media?.let { originalMedia ->
                 _uiLiveData.value = UiEvent(UiEvent.Type.REFRESHING, true)
-                ytInteractor.videos(
-                    listOf(originalMedia.platformId), listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS)
-                )
-                    .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
+                mediaOrchestrator.load(originalMedia.platformId, Options(PLATFORM))
                     ?.let {
-                        it.data?.get(0)?.copy(
+                        it.copy(
                             id = originalMedia.id,
                             dateLastPlayed = originalMedia.dateLastPlayed,
                             starred = originalMedia.starred,
                             watched = originalMedia.watched,
                         )
-                            ?.also { state.media = it }
-                            ?.also { state.mediaChanged = true }
-                            ?.also { update() }
-                            ?: also { updateError() }
+                            .also { state.media = it }
+                            .also { state.mediaChanged = true }
+                            .also { update() }
                     }
                     ?: also { updateError() }
             }
@@ -141,15 +144,9 @@ class PlaylistItemEditViewModel constructor(
     }
 
     private suspend fun getPlaylistsForMediaId(mediaId: Long): List<PlaylistDomain> =
-        playlistRepo.loadPlaylistItems(PlaylistDatabaseRepository.MediaIdListFilter(listOf(mediaId)))
-            .takeIf { it.isSuccessful }
-            ?.data
-            ?.also { log.d("Playlist Items = ${it.map { it.playlistId }}") }
-            ?.let { playlistRepo.loadList(PlaylistDatabaseRepository.IdListFilter(it.map { it.playlistId!! }, flat = false)) }
-            ?.takeIf { it.isSuccessful }
-            ?.data
+        playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(mediaId)), Options(LOCAL))
+            ?.let { playlistOrchestrator.loadList(IdListFilter(it.map { it.playlistId!! }), Options(LOCAL)) }
             ?: listOf()
-
 
     fun onPlayVideo() {
         state.playlistItem?.let { item ->
@@ -252,14 +249,14 @@ class PlaylistItemEditViewModel constructor(
         state.playlistItem?.also { item ->
             viewModelScope.launch {
                 if (state.mediaChanged) {
-                    state.media?.let { mediaRepo.save(it) }
+                    state.media?.let { mediaOrchestrator.save(it, Options(LOCAL)) }
                 }
                 // todo merge below into commitPlaylistItems() - needs to work for existing from share
                 if (state.playlistsChanged) {
                     if (!state.selectedPlaylistIds.contains(item.playlistId)) {
-                        playlistRepo.delete(item)
+                        playlistItemOrchestrator.delete(item, DeleteOptions(LOCAL))
                     } else {
-                        playlistRepo.savePlaylistItem(item)
+                        playlistItemOrchestrator.save(item, Options(LOCAL))
                     }
                     commitPlaylistItems()
                 }
@@ -272,21 +269,18 @@ class PlaylistItemEditViewModel constructor(
             val selectedPlaylists = if (state.selectedPlaylistIds.size > 0) {
                 selectedPlaylists
             } else {
-                playlistRepo.loadList(PlaylistDatabaseRepository.DefaultFilter())
-                    .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
-                    ?.data
+                playlistOrchestrator.loadList(DefaultFilter(), Options(LOCAL))
                     ?: throw NoDefaultPlaylistException()
             }
             state.committedItems = state.media
-                ?.let { mediaRepo.save(it) }
-                ?.takeIf { it.isSuccessful }
-                ?.data?.let { savedMedia ->
+                ?.let { mediaOrchestrator.save(it, Options(LOCAL)) }
+                ?.let { savedMedia ->
                     state.media = savedMedia
                     selectedPlaylists.mapNotNull { playlist ->
-                        playlistRepo
+                        playlistItemOrchestrator
                             .takeIf { state.playlistItem?.playlistId != playlist.id } // skip edited item (saved in checkToSave)
                             ?.run {
-                                savePlaylistItem(itemCreator.buildPlayListItem(savedMedia, playlist)).data
+                                save(itemCreator.buildPlayListItem(savedMedia, playlist), Options(LOCAL))
                             }
 
                     }

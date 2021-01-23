@@ -13,14 +13,16 @@ import uk.co.sentinelweb.cuer.app.db.entity.PlaylistAndItems
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistMapper
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
-// todo update satts automatically on save/delete
+// todo update stats automatically on save/delete
 @Suppress("DEPRECATION")
 class PlaylistDatabaseRepository constructor(
     private val playlistDao: PlaylistDao,
@@ -31,9 +33,7 @@ class PlaylistDatabaseRepository constructor(
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
     private val database: AppDatabase
-) : DatabaseRepository<PlaylistDomain> {
-
-    enum class Operation { FLAT, FULL, DELETE }
+) : DatabaseRepository<PlaylistDomain> {// todo , DatabaseRepository<PlaylistItemDomain>
 
     private val _playlistFlow = MutableSharedFlow<Pair<Operation, PlaylistDomain>>()
     val playlistFlow: Flow<Pair<Operation, PlaylistDomain>>
@@ -43,11 +43,13 @@ class PlaylistDatabaseRepository constructor(
     val playlistItemFlow: Flow<Pair<Operation, PlaylistItemDomain>>
         get() = _playlistItemFlow
 
-    private val _playlistStats: MutableList<PlaylistStatDomain> = mutableListOf()
-    val playlistStats: List<PlaylistStatDomain> = _playlistStats
-    private val _playlistStatFlow = MutableSharedFlow<PlaylistStatDomain>()
-    val playlistStatFlow: Flow<PlaylistStatDomain>
+    private val _playlistStatFlow = MutableSharedFlow<Pair<Operation, PlaylistStatDomain>>()
+
+    val playlistStatFlow: Flow<Pair<Operation, PlaylistStatDomain>>
         get() = _playlistStatFlow
+
+    private val _playlistStats: MutableList<PlaylistStatDomain> = mutableListOf()
+    private val playlistStats: List<PlaylistStatDomain> = _playlistStats
 
     init {
 //        coProvider.computationScope.launch {
@@ -110,7 +112,7 @@ class PlaylistDatabaseRepository constructor(
                     .also { database.setTransactionSuccessful() }
                     .also { database.endTransaction() }
 
-                RepoResult.Data(loadList(PlaylistDatabaseRepository.IdListFilter(insertIds, flat)).data)
+                RepoResult.Data(loadList(OrchestratorContract.IdListFilter(insertIds), flat).data)
                 // todo emit
             } catch (e: Throwable) {
                 val msg = "couldn't save playlists ${domains.joinToString { it.title }}"
@@ -149,35 +151,35 @@ class PlaylistDatabaseRepository constructor(
                 )
             }
 
-    override suspend fun loadList(filter: DatabaseRepository.Filter?): RepoResult<List<PlaylistDomain>> =
+    override suspend fun loadList(filter: OrchestratorContract.Filter?, flat: Boolean): RepoResult<List<PlaylistDomain>> =
         withContext(coProvider.IO) {
             try {
                 playlistDao
                     .also { database.beginTransaction() }
                     .let { playlistDao ->
                         when (filter) {
-                            is PlaylistDatabaseRepository.IdListFilter ->
-                                if (filter.flat)
+                            is OrchestratorContract.IdListFilter ->
+                                if (flat)
                                     playlistDao.loadAllByIds(filter.ids.toLongArray())
                                         .map { playlistMapper.map(it, null, null) }
                                 else playlistDao
                                     .loadAllByIdsWithItems(filter.ids.toLongArray())
                                     .map { mapDeep(it) }
-                            is DefaultFilter ->
-                                if (filter.flat) playlistDao
+                            is OrchestratorContract.DefaultFilter ->
+                                if (flat) playlistDao
                                     .loadAllByFlags(PlaylistEntity.FLAG_DEFAULT)
                                     .map { playlistMapper.map(it, null, null) }
                                 else playlistDao
                                     .loadAllByFlagsWithItems(PlaylistEntity.FLAG_DEFAULT)
                                     .map { mapDeep(it) }
-                            is AllFilter ->
-                                if (filter.flat) playlistDao
+                            is OrchestratorContract.AllFilter ->
+                                if (flat) playlistDao
                                     .getAllPlaylists()
                                     .map { playlistMapper.map(it, null, null) }
                                 else playlistDao
                                     .getAllPlaylistsWithItems()
                                     .map { mapDeep(it) }
-                            else ->
+                            else ->// todo return empty for else
                                 playlistDao
                                     .getAllPlaylists()
                                     .map { playlistMapper.map(it, null, null) }
@@ -191,7 +193,7 @@ class PlaylistDatabaseRepository constructor(
             }.also { database.endTransaction() }
         }
 
-    override suspend fun count(filter: DatabaseRepository.Filter?): RepoResult<Int> =
+    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> =
         try {
             withContext(coProvider.IO) {
                 playlistDao.count()
@@ -270,7 +272,7 @@ class PlaylistDatabaseRepository constructor(
                             watchedItemCount = playlistItemDao.countMediaFlags(it, MediaEntity.FLAG_WATCHED)
                         )
                     }).also { database.setTransactionSuccessful() }
-                    .also { if (emit) it.data?.forEach { _playlistStatFlow.emit(it) } }
+                    .also { if (emit) it.data?.forEach { _playlistStatFlow.emit(FLAT to it) } }
             } catch (e: Throwable) {
                 val msg = "couldn't delete all media"
                 log.e(msg, e)
@@ -355,11 +357,11 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
-    suspend fun loadPlaylistItems(filter: DatabaseRepository.Filter? = null): RepoResult<List<PlaylistItemDomain>> =
+    suspend fun loadPlaylistItems(filter: OrchestratorContract.Filter? = null): RepoResult<List<PlaylistItemDomain>> =
         withContext(coProvider.IO) {
             try {
                 when (filter) {
-                    is MediaIdListFilter -> playlistItemDao.loadItemsByMediaId(filter.ids)
+                    is OrchestratorContract.IdListFilter -> playlistItemDao.loadItemsByMediaId(filter.ids)
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                     else -> playlistItemDao.loadItems()
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
@@ -391,19 +393,16 @@ class PlaylistDatabaseRepository constructor(
         }
     // endregion
 
-    suspend fun getPlaylistOrDefault(playlistId: Long?) =
+    suspend fun getPlaylistOrDefault(playlistId: Long?, flat: Boolean = false) =
         (playlistId
             ?.let { load(it, flat = false) }
             ?.takeIf { it.isSuccessful }
             ?.data
             ?: run {
-                loadList(PlaylistDatabaseRepository.DefaultFilter(flat = false))
+                loadList(OrchestratorContract.DefaultFilter(), flat)
                     .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
                     ?.data?.get(0)
             })
 
-    class IdListFilter(val ids: List<Long>, val flat: Boolean = true) : DatabaseRepository.Filter
-    class MediaIdListFilter(val ids: List<Long>, val flat: Boolean = true) : DatabaseRepository.Filter
-    class DefaultFilter(val flat: Boolean = true) : DatabaseRepository.Filter
-    class AllFilter(val flat: Boolean = true) : DatabaseRepository.Filter
+
 }
