@@ -29,8 +29,14 @@ interface ShareContract {
         fun error(msg: String)
         fun warning(msg: String)
         suspend fun commitPlaylistItems()
-        fun getPlaylistItems(): List<PlaylistItemDomain>
+        fun getCommittedItems(): List<Any>
         fun showMedia(mediaDomain: PlaylistItemDomain)
+    }
+
+    interface Committer<T> {
+        // todo out Any
+        suspend fun commit(): List<T>
+        fun getEditedDomains(): List<T>
     }
 
     data class Model constructor(

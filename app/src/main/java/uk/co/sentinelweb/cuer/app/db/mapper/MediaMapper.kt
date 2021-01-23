@@ -27,7 +27,7 @@ class MediaMapper(
         platform = domain.platform,
         thumbNail = imageMapper.mapImage(domain.thumbNail),
         image = imageMapper.mapImage(domain.image),
-        channelId = domain.channelData.id!!.toLong(),
+        channelId = domain.channelData.id ?: throw IllegalStateException("Channel is not saved"),
         published = domain.published,
         flags = (if (domain.watched) FLAG_WATCHED else 0) +
                 (if (domain.starred) FLAG_STARRED else 0) +

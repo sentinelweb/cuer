@@ -33,7 +33,6 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
     private val shareWrapper: ShareWrapper by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
-    //private val navMapper: NavigationMapper by currentScope.inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
@@ -42,6 +41,11 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
     private val scanFragment: ScanContract.View? by lazy {
         supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.run { (getChildFragmentManager().getFragments().get(0) as ScanContract.View?)!! }
+    }
+
+    private val commitFragment: ShareContract.Committer<*>? by lazy {
+        supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.run { (getChildFragmentManager().getFragments().get(0) as ShareContract.Committer<*>?)!! }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -143,10 +147,6 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         }
     }
 
-    override suspend fun commitPlaylistItems() {
-        //editFragment.commitPlaylistItems()
-    }
-
     override fun showMedia(itemDomain: PlaylistItemDomain) {
         ScanFragmentDirections.actionGotoPlaylistItem(itemDomain.serialise())
             .apply { navController.navigate(this, null) }
@@ -156,7 +156,14 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         presenter.scanResult(result)
     }
 
-    override fun getPlaylistItems(): List<PlaylistItemDomain> = listOf()//editFragment.getPlaylistItems()
+    override suspend fun commitPlaylistItems() {
+        commitFragment?.commit() ?: throw IllegalStateException("Not a commit fragment")
+    }
+
+    override fun getCommittedItems() =
+        commitFragment?.getEditedDomains()
+            ?.filterNotNull()
+            ?: throw IllegalStateException("Not a commit fragment")
 
     companion object {
 

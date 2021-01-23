@@ -10,7 +10,7 @@ data class PlaylistItemEditState(
     val selectedPlaylistIds: MutableSet<Long> = mutableSetOf(),
     var allPlaylists: List<PlaylistDomain> = listOf(),
     var committedItems: List<PlaylistItemDomain>? = null,
-    var playlistItem: PlaylistItemDomain? = null,
+    var editingPlaylistItem: PlaylistItemDomain? = null,
     var playlistsChanged: Boolean = false,
     var mediaChanged: Boolean = false
 )

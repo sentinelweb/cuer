@@ -38,6 +38,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
+import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -48,7 +49,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
 
-class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) {
+class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment), ShareContract.Committer<PlaylistItemDomain> {
 
     private val viewModel: PlaylistItemEditViewModel by currentScope.inject()
     private val log: LogWrapper by inject()
@@ -138,7 +139,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 else -> false
             }
         }
-        ple_swipe.setOnRefreshListener { viewModel.refreshMedia() }
+        ple_swipe.setOnRefreshListener { viewModel.refreshMediaBackground() }
         ple_appbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false
@@ -164,6 +165,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
 
         // setup data for fragment transition
         itemArg?.apply {
+            saveCallback.isEnabled = true
             if (id != null) { // fixme needs new flag assumes transition
                 media.image?.apply {
                     Glide.with(requireContext())
@@ -177,7 +179,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
                 ple_star_fab.isVisible = false
                 starMenuItem.isVisible = false
                 playMenuItem.isVisible = false
-                saveCallback.isEnabled = true
 
                 viewModel.delayedSetData(this)
             } else {
@@ -339,11 +340,11 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment) 
         )
     }
 
-    suspend fun commitPlaylistItems() {
+    override suspend fun commit() =
         viewModel.commitPlaylistItems()
-    }
 
-    fun getPlaylistItems() = viewModel.getCommittedItems()
+
+    override fun getEditedDomains(): List<PlaylistItemDomain> = viewModel.getCommittedItems()
 
     companion object {
 

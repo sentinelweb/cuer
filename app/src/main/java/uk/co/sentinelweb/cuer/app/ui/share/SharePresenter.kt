@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.PLAYLIST
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class SharePresenter constructor(
@@ -33,12 +34,15 @@ class SharePresenter constructor(
         log.tag(this)
     }
 
-    //
+
     private fun mapDisplayModel() {
-        state.model = state.scanResult?.let {
-            mapper.mapShareModel(it, ::finish)
-        } ?: mapper.mapEmptyState(::finish)// todo fail result
+        (state.scanResult
+            ?.let {
+                mapper.mapShareModel(it, ::finish)
+            }
+            ?: mapper.mapEmptyState(::finish))// todo fail result
             .apply {
+                state.model = this
                 view.setData(this)
             }
     }
@@ -59,7 +63,9 @@ class SharePresenter constructor(
         when (result.type) {
             MEDIA -> (result.result as MediaDomain).let {
                 view.showMedia(PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null))
+                mapDisplayModel()
             }
+            PLAYLIST -> TODO()
         }
     }
 
@@ -71,11 +77,13 @@ class SharePresenter constructor(
                     queue.refreshQueue()
                 }
                 val isConnected = ytContextHolder.isConnected()
-                val playlistItemList: List<PlaylistItemDomain>? = if (add)
-                    view.getPlaylistItems()
-                else {
-                    listOf()// todo existing state.playlistItems
-                }
+                val playlistItemList = view.getCommittedItems() as List<PlaylistItemDomain>?// todo change for playlist - will crash
+//                val playlistItemList: List<PlaylistItemDomain>? = if (add)
+//                    view.getPlaylistItems()
+//                else {
+//                    // todo fragment need to load playlist items for media here
+//                    listOf()// todo existing state.playlistItems
+//                }
                 val size = playlistItemList?.size ?: 0
                 val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYLIST_ID)
                 val playlistItem: PlaylistItemDomain? = if (size == 1) {
