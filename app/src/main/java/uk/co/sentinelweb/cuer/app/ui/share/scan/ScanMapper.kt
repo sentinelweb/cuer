@@ -25,7 +25,7 @@ class ScanMapper constructor() {
             ObjectTypeDomain.PLAYLIST,
             domain.title ?: "-",
             PlatformDomain.YOUTUBE,
-            domain.config.platformId!!,
+            domain.platformId!!,
             R.drawable.ic_item_tick_white,
             true
         )

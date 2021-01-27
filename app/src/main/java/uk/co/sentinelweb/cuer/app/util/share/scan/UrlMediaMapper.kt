@@ -76,9 +76,9 @@ private class YoutubeUrlPlaylistMapper : UrlMediaMapper {
         PLAYLIST to PlaylistDomain(
             id = null,
             config = PlaylistDomain.PlaylistConfigDomain(
-                updateUrl = uri.toString(),
-                platformId = uri.getQueryParameters("list")[0]
+                updateUrl = uri.toString()// todo might need to generate the api url or have fields for both
             ),
+            platformId = uri.getQueryParameters("list")[0],
             starred = false,
             items = listOf(),
             currentIndex = -1,

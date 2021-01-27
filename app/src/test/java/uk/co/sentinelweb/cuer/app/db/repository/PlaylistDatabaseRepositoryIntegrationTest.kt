@@ -17,7 +17,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.mapper.*
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository.IdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -73,7 +73,7 @@ class PlaylistDatabaseRepositoryIntegrationTest {
         )
         sut = PlaylistDatabaseRepository(
             playlistDao = database.playlistDao(),
-            playlistMapper = PlaylistMapper(imageMapper, playlistItemMapper),
+            playlistMapper = PlaylistMapper(imageMapper, playlistItemMapper, channelMapper),
             playlistItemDao = database.playlistItemDao(),
             playlistItemMapper = playlistItemMapper,
             mediaDao = database.mediaDao(),
@@ -116,7 +116,7 @@ class PlaylistDatabaseRepositoryIntegrationTest {
             assertTrue(saved.isSuccessful)
             assertEquals(
                 saved.data,
-                sut.loadList(IdListFilter(saved.data!!.map { it.id!!.toLong() }, flat = false)).data
+                sut.loadList(OrchestratorContract.IdListFilter(saved.data!!.map { it.id!!.toLong() })).data
             )
         }
     }

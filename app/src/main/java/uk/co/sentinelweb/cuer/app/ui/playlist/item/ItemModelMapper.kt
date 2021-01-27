@@ -13,23 +13,23 @@ class ItemModelMapper constructor(
 ) {
 
     private val playDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_player_play_black, R.color.text_primary, R.dimen.list_item_top_text_size, 1.3f)
+        res.getDrawable(R.drawable.ic_player_play_black, R.color.text_primary, R.dimen.list_item_top_text_size, SCALING)
     }
 
     private val starDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_button_starred_white, R.color.text_secondary, R.dimen.list_item_bottom_text_size, 1.3f)
+        res.getDrawable(R.drawable.ic_button_starred_white, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
     private val unstarDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_button_unstarred_white, R.color.text_secondary, R.dimen.list_item_bottom_text_size, 1.3f)
+        res.getDrawable(R.drawable.ic_button_unstarred_white, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
     private val unwatchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_baseline_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, 1.3f)
+        res.getDrawable(R.drawable.ic_baseline_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
     private val watchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_baseline_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, 1.3f)
+        res.getDrawable(R.drawable.ic_baseline_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
     private val _bottomDrawables: MutableMap<Int, Drawable> = mutableMapOf()
@@ -37,7 +37,7 @@ class ItemModelMapper constructor(
         return if (_bottomDrawables.containsKey(id)) {
             _bottomDrawables[id] ?: throw IllegalArgumentException("no drawable for $id")
         } else {
-            res.getDrawable(id, R.color.text_secondary, R.dimen.list_item_bottom_text_size, 1.3f).apply {
+            res.getDrawable(id, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING).apply {
                 _bottomDrawables.set(id, this)
             }
         }
@@ -82,5 +82,6 @@ class ItemModelMapper constructor(
     companion object {
         private val PLAT = "[plat]"
         private val WATCH = "[watch]"
+        private val SCALING = 1.1f
     }
 }

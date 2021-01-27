@@ -13,7 +13,6 @@ import uk.co.sentinelweb.cuer.app.db.entity.PlaylistAndItems
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistMapper
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -70,7 +69,7 @@ class PlaylistDatabaseRepository constructor(
                 domain
                     .also { database.beginTransaction() }
                     .let { playlistMapper.map(it) }
-                    .let { playlistDao.insert(it) }
+                    .let { playlistDao.insert(it) }/* todo channels */
                     .also { insertId = it }
                     .takeIf { !flat }
                     ?.let { playlistId -> domain.items.map { it.copy(playlistId = playlistId) } }
@@ -99,7 +98,7 @@ class PlaylistDatabaseRepository constructor(
                 domains
                     .also { database.beginTransaction() }
                     .map { playlistMapper.map(it) }
-                    .let { playlistDao.insertAll(it) }
+                    .let { playlistDao.insertAll(it) }/* todo channels */
                     .also { insertIds = it }
                     .takeIf { !flat }
                     ?.mapIndexed { index, playlistId -> domains[index] to playlistId }
@@ -128,7 +127,7 @@ class PlaylistDatabaseRepository constructor(
                 database.beginTransaction()
                 if (flat) {
                     playlistDao.load(id)!!
-                        .let { playlistMapper.map(it, null, null) }
+                        .let { playlistMapper.map(it, null, null, null) }/* todo channels */
                 } else {
                     mapDeep(playlistDao.loadWithItems(id)!!)
                 }
@@ -141,13 +140,14 @@ class PlaylistDatabaseRepository constructor(
             }.also { database.endTransaction() }
         }
 
-    private suspend fun mapDeep(loadWithItems: PlaylistAndItems) =
+    private suspend fun mapDeep(loadWithItems: PlaylistAndItems): PlaylistDomain =
         loadWithItems
             .let {
                 playlistMapper.map(
                     it.playlist,
                     it.items,
-                    mediaDao.loadAllByIds(it.items.map { it.mediaId }.toLongArray())
+                    mediaDao.loadAllByIds(it.items.map { it.mediaId }.toLongArray()),
+                    null/* todo channels */
                 )
             }
 
@@ -161,28 +161,28 @@ class PlaylistDatabaseRepository constructor(
                             is IdListFilter ->
                                 if (flat)
                                     playlistDao.loadAllByIds(filter.ids.toLongArray())
-                                        .map { playlistMapper.map(it, null, null) }
+                                        .map { playlistMapper.map(it, null, null, null) }/* todo channels */
                                 else playlistDao
                                     .loadAllByIdsWithItems(filter.ids.toLongArray())
                                     .map { mapDeep(it) }
                             is DefaultFilter ->
                                 if (flat) playlistDao
                                     .loadAllByFlags(PlaylistEntity.FLAG_DEFAULT)
-                                    .map { playlistMapper.map(it, null, null) }
+                                    .map { playlistMapper.map(it, null, null, null) }/* todo channels */
                                 else playlistDao
                                     .loadAllByFlagsWithItems(PlaylistEntity.FLAG_DEFAULT)
                                     .map { mapDeep(it) }
                             is AllFilter ->
                                 if (flat) playlistDao
                                     .getAllPlaylists()
-                                    .map { playlistMapper.map(it, null, null) }
+                                    .map { playlistMapper.map(it, null, null, null) }/* todo channels */
                                 else playlistDao
                                     .getAllPlaylistsWithItems()
                                     .map { mapDeep(it) }
                             else ->// todo return empty for else
                                 playlistDao
                                     .getAllPlaylists()
-                                    .map { playlistMapper.map(it, null, null) }
+                                    .map { playlistMapper.map(it, null, null, null) }/* todo channels */
                         }
                     }.let { RepoResult.Data(it) }
                     .also { database.setTransactionSuccessful() }
@@ -193,7 +193,7 @@ class PlaylistDatabaseRepository constructor(
             }.also { database.endTransaction() }
         }
 
-    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> =
+    override suspend fun count(filter: Filter?): RepoResult<Int> =
         try {
             withContext(coProvider.IO) {
                 playlistDao.count()

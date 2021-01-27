@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository.IdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper

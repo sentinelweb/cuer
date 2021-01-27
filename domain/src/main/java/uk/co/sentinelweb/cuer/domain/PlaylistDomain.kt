@@ -13,6 +13,10 @@ data class PlaylistDomain constructor(
     val currentIndex: Int = 0, // todo make nullable
     val parentId: Long? = null,
     val mode: PlaylistModeDomain = SINGLE,
+    val type: PlaylistTypeDomain = PlaylistTypeDomain.USER,
+    val platform: PlatformDomain? = null,
+    val channelData: ChannelDomain? = null,
+    val platformId: String? = null,
     val starred: Boolean = false,
     val archived: Boolean = false,
     val default: Boolean = false,
@@ -28,18 +32,14 @@ data class PlaylistDomain constructor(
     enum class PlaylistTypeDomain {
         USER,
         CHANNEL, /* link to a channel */
-        EXTERNAL /* External playlist do allow adding - just fix to source - maybe allow archiving of items */
+        PLATFORM /* External playlist do allow adding - just fix to source - maybe allow archiving of items */
     }
 
     @Serializable
     data class PlaylistConfigDomain constructor(
-        val type: PlaylistTypeDomain = PlaylistTypeDomain.USER,//todo move to table
-        val platform: PlatformDomain = PlatformDomain.YOUTUBE,//todo move to table
         val updateUrl: String? = null,
         @Contextual val lastUpdate: Instant? = null,
         val updateInterval: Long? = null,
-        val channelData: ChannelDomain? = null,//todo move to table
-        val platformId: String? = null//todo move to table
     )
 }
 

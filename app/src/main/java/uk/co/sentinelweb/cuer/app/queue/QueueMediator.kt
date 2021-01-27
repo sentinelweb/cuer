@@ -4,7 +4,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DefaultFilter
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract.ConsumerListener
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract.ProducerListener
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
@@ -255,15 +254,10 @@ class QueueMediator constructor(
     }
 
     override suspend fun refreshQueue() {
-        (state.playlistId
-            ?.let { playlistRepository.load(it) }
-            ?.takeIf { it.isSuccessful }
-            ?.data
-            ?: playlistRepository.loadList(DefaultFilter())
-                .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
-                ?.data?.get(0))
+        state.playlistId
+            ?.let { playlistRepository.getPlaylistOrDefault(it) }
             ?.also { refreshQueueFrom(it) }
-            ?: throw IllegalStateException("Could not load a playlist")
+        //?: throw IllegalStateException("Could not load a playlist")
     }
 
 }
