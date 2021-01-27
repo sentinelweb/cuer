@@ -8,8 +8,10 @@ import org.junit.Test
 import org.koin.core.KoinComponent
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
+import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
 import uk.co.sentinelweb.cuer.net.retrofit.RetrofitBuilder
@@ -54,7 +56,8 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
             channelMapper = YoutubeChannelDomainMapper(TimeStampMapper(log)),
             coContext = CoroutineContextProvider(),
             errorMapper = ErrorMapper(SystemLogWrapper()),
-            connectivity = connectivityWrapper
+            connectivity = connectivityWrapper,
+            playlistMapper = YoutubePlaylistDomainMapper(TimeStampMapper(log), PlaylistItemCreator(TimeProvider()))
         )
     }
 
@@ -91,6 +94,21 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
             // note the items come out of order
             assertEquals("UCzuqE7-t13O4NIDYJfakrhw", actual.data!![0].platformId)
             assertEquals("UC2UIXt4VQnhQ-VZM4P1bUMQ", actual.data!![1].platformId)
+        }
+    }
+
+    @Ignore("Real api test .. run manually only")
+    @Test
+    fun playlist() {
+        runBlocking {
+            val actual = sut.playlist(
+                "PLf-zrdqNE8p-7tt7JHtlpLH3w9QA1EU0L"
+            )
+
+            assertTrue(actual.isSuccessful)
+            assertNotNull(actual.data)
+            // note the items come out of order
+            assertEquals(170, actual.data!![0].items.size)
         }
     }
 }

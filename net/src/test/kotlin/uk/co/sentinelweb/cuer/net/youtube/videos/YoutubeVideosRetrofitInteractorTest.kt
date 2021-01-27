@@ -43,6 +43,9 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
     private lateinit var mockChannelMapper: YoutubeChannelDomainMapper
 
     @MockK
+    private lateinit var mockPlaylistDomainMapper: YoutubePlaylistDomainMapper
+
+    @MockK
     private lateinit var mockErrorMapper: ErrorMapper
 
     @MockK
@@ -102,7 +105,8 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
             channelMapper = mockChannelMapper,
             coContext = CoroutineContextTestProvider(),
             errorMapper = mockErrorMapper,
-            connectivity = connectivityWrapper
+            connectivity = connectivityWrapper,
+            playlistMapper = mockPlaylistDomainMapper
         )
     }
 

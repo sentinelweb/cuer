@@ -4,6 +4,7 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import java.time.Instant
+import java.time.LocalDateTime
 
 @Serializable
 data class PlaylistDomain constructor(
@@ -39,7 +40,9 @@ data class PlaylistDomain constructor(
     data class PlaylistConfigDomain constructor(
         val updateUrl: String? = null,
         @Contextual val lastUpdate: Instant? = null,
+        @Contextual val published: LocalDateTime? = null,
         val updateInterval: Long? = null,
+        val description: String? = null
     )
 }
 

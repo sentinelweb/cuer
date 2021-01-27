@@ -3,16 +3,13 @@ package uk.co.sentinelweb.cuer.net.youtube.videos.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class YoutubeVideosDto constructor(
-    val items: List<VideoDto>,
-    val nextPageToken: String?,
-    val prevPageToken: String?,
-    val pageInfo: PageInfoDto
+data class YoutubePlaylistDto constructor(
+    val items: List<PlaylistDto>
 ) {
     @Serializable
-    data class VideoDto constructor(
+    data class PlaylistDto constructor(
         val id: String,
-        val snippet: SnippetDto?, // optional field (declared as part)
+        val snippet: SnippetDto, // optional field (declared as part)
         val contentDetails: ContentDto? = null// optional field (declared as part)
     ) {
         @Serializable
@@ -22,7 +19,6 @@ data class YoutubeVideosDto constructor(
             val channelId: String,
             val channelTitle: String,
             val publishedAt: String,
-            val liveBroadcastContent: String,
             val thumbnails: ThumbnailsDto
 
         ) {
@@ -45,14 +41,7 @@ data class YoutubeVideosDto constructor(
 
         @Serializable
         data class ContentDto constructor(
-            val duration: String,
-            val definition: String
+            val itemCount: Int
         )
     }
-
-    @Serializable
-    data class PageInfoDto constructor(
-        val totalResults: Int,
-        val resultsPerPage: Int
-    )
 }

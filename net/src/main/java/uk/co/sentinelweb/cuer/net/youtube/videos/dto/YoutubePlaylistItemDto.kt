@@ -2,18 +2,18 @@ package uk.co.sentinelweb.cuer.net.youtube.videos.dto
 
 import kotlinx.serialization.Serializable
 
+// don't need contentDetails,status - just snippet
 @Serializable
-data class YoutubeVideosDto constructor(
-    val items: List<VideoDto>,
+data class YoutubePlaylistItemDto constructor(
+    val items: List<PlaylistItemDto>,
     val nextPageToken: String?,
     val prevPageToken: String?,
     val pageInfo: PageInfoDto
 ) {
     @Serializable
-    data class VideoDto constructor(
+    data class PlaylistItemDto constructor(
         val id: String,
         val snippet: SnippetDto?, // optional field (declared as part)
-        val contentDetails: ContentDto? = null// optional field (declared as part)
     ) {
         @Serializable
         data class SnippetDto constructor(
@@ -22,9 +22,9 @@ data class YoutubeVideosDto constructor(
             val channelId: String,
             val channelTitle: String,
             val publishedAt: String,
-            val liveBroadcastContent: String,
-            val thumbnails: ThumbnailsDto
-
+            val position: Int,
+            val thumbnails: ThumbnailsDto,
+            val resourceId: ResourceDto
         ) {
             @Serializable
             data class ThumbnailsDto constructor(
@@ -41,13 +41,14 @@ data class YoutubeVideosDto constructor(
                     val height: Int
                 )
             }
+
+            @Serializable
+            data class ResourceDto constructor(
+                val kind: String,
+                val videoId: String
+            )
         }
 
-        @Serializable
-        data class ContentDto constructor(
-            val duration: String,
-            val definition: String
-        )
     }
 
     @Serializable
