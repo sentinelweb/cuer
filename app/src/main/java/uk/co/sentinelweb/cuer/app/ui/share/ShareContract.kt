@@ -7,6 +7,7 @@ import kotlinx.serialization.Transient
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
@@ -24,19 +25,18 @@ interface ShareContract {
 
     interface View {
         fun exit()
-        fun gotoMain(media: PlaylistItemDomain?, play: Boolean = false)
+        fun gotoMain(playlistItemDomain: PlaylistItemDomain?, play: Boolean = false)
         fun setData(model: Model)
         fun error(msg: String)
         fun warning(msg: String)
         suspend fun commitPlaylistItems()
-        fun getCommittedItems(): List<Any>
-        fun showMedia(mediaDomain: PlaylistItemDomain)
+        fun getCommittedItems(): List<Any>?
+        fun showMedia(itemDomain: PlaylistItemDomain)
     }
 
     interface Committer<T> {
-        // todo out Any
-        suspend fun commit(): List<T>
-        fun getEditedDomains(): List<T>
+        suspend fun commit()
+        fun getEditedDomains(): List<T>?
     }
 
     data class Model constructor(
@@ -61,6 +61,12 @@ interface ShareContract {
         @Transient val jobs: MutableList<Job> = mutableListOf(),
         var scanResult: ScanContract.Result? = null
     ) : ViewModel()
+
+    class ShareDoneNavigation(private val activity: ShareActivity) : PlaylistItemEditContract.DoneNavigation {
+        override fun navigateDone() {
+            activity.finish()
+        }
+    }
 
     companion object {
         @JvmStatic
@@ -89,6 +95,9 @@ interface ShareContract {
                         ytContextHolder = get(),
                         res = get()
                     )
+                }
+                scoped<PlaylistItemEditContract.DoneNavigation> {
+                    ShareDoneNavigation(getSource())
                 }
             }
         }

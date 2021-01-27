@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistMapper
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -112,7 +112,7 @@ class PlaylistDatabaseRepository constructor(
                     .also { database.setTransactionSuccessful() }
                     .also { database.endTransaction() }
 
-                RepoResult.Data(loadList(OrchestratorContract.IdListFilter(insertIds), flat).data)
+                RepoResult.Data(loadList(IdListFilter(insertIds), flat).data)
                 // todo emit
             } catch (e: Throwable) {
                 val msg = "couldn't save playlists ${domains.joinToString { it.title }}"
@@ -151,28 +151,28 @@ class PlaylistDatabaseRepository constructor(
                 )
             }
 
-    override suspend fun loadList(filter: OrchestratorContract.Filter?, flat: Boolean): RepoResult<List<PlaylistDomain>> =
+    override suspend fun loadList(filter: Filter?, flat: Boolean): RepoResult<List<PlaylistDomain>> =
         withContext(coProvider.IO) {
             try {
                 playlistDao
                     .also { database.beginTransaction() }
                     .let { playlistDao ->
                         when (filter) {
-                            is OrchestratorContract.IdListFilter ->
+                            is IdListFilter ->
                                 if (flat)
                                     playlistDao.loadAllByIds(filter.ids.toLongArray())
                                         .map { playlistMapper.map(it, null, null) }
                                 else playlistDao
                                     .loadAllByIdsWithItems(filter.ids.toLongArray())
                                     .map { mapDeep(it) }
-                            is OrchestratorContract.DefaultFilter ->
+                            is DefaultFilter ->
                                 if (flat) playlistDao
                                     .loadAllByFlags(PlaylistEntity.FLAG_DEFAULT)
                                     .map { playlistMapper.map(it, null, null) }
                                 else playlistDao
                                     .loadAllByFlagsWithItems(PlaylistEntity.FLAG_DEFAULT)
                                     .map { mapDeep(it) }
-                            is OrchestratorContract.AllFilter ->
+                            is AllFilter ->
                                 if (flat) playlistDao
                                     .getAllPlaylists()
                                     .map { playlistMapper.map(it, null, null) }
@@ -357,13 +357,15 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
-    suspend fun loadPlaylistItems(filter: OrchestratorContract.Filter? = null): RepoResult<List<PlaylistItemDomain>> =
+    suspend fun loadPlaylistItems(filter: Filter? = null): RepoResult<List<PlaylistItemDomain>> =
         withContext(coProvider.IO) {
             try {
                 when (filter) {
-                    is OrchestratorContract.IdListFilter -> playlistItemDao.loadItemsByMediaId(filter.ids)
+                    is IdListFilter -> playlistItemDao.loadAllByIds(filter.ids)
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
-                    else -> playlistItemDao.loadItems()
+                    is MediaIdListFilter -> playlistItemDao.loadItemsByMediaId(filter.ids)
+                        .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
+                    else -> playlistItemDao.loadAllItems()
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                 }.let { RepoResult.Data(it) }
             } catch (e: Throwable) {
@@ -399,7 +401,7 @@ class PlaylistDatabaseRepository constructor(
             ?.takeIf { it.isSuccessful }
             ?.data
             ?: run {
-                loadList(OrchestratorContract.DefaultFilter(), flat)
+                loadList(DefaultFilter(), flat)
                     .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
                     ?.data?.get(0)
             })

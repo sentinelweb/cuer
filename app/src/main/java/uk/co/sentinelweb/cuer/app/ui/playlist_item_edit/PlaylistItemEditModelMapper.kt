@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.DateFormatter
@@ -19,7 +20,7 @@ class PlaylistItemEditModelMapper(
     fun map(
         domain: MediaDomain,
         selectedPlaylists: Set<PlaylistDomain>
-    ) = PlaylistItemEditModel(
+    ) = PlaylistItemEditContract.Model(
         title = domain.title,
         description = domain.description,
         imageUrl = (domain.image ?: domain.thumbNail)?.url,
@@ -53,7 +54,7 @@ class PlaylistItemEditModelMapper(
         infoTextBackgroundColor = backgroundMapper.mapInfoBackground(domain)
     )
 
-    fun mapEmpty(): PlaylistItemEditModel = PlaylistItemEditModel(
+    fun mapEmpty(): PlaylistItemEditContract.Model = PlaylistItemEditContract.Model(
         title = res.getString(R.string.pie_empty_title),
         imageUrl = EMPTY_IMAGE,
         description = res.getString(R.string.pie_empty_desc),
@@ -71,6 +72,13 @@ class PlaylistItemEditModelMapper(
         isLive = false,
         isUpcoming = false,
         infoTextBackgroundColor = R.color.info_text_overlay_background
+    )
+
+    fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel = AlertDialogModel(
+        R.string.dialog_title_save_check,
+        R.string.dialog_message_save_check,
+        AlertDialogModel.Button(R.string.dialog_button_save, confirm),
+        cancel = AlertDialogModel.Button(R.string.dialog_button_dont_save, cancel),
     )
 
     companion object {

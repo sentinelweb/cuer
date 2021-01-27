@@ -15,41 +15,36 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.playlist_item_edit_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.KoinContextHandler
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
-
-class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment), ShareContract.Committer<PlaylistItemDomain> {
+class PlaylistItemEditFragment
+    : Fragment(R.layout.playlist_item_edit_fragment),
+    ShareContract.Committer<PlaylistItemDomain> {
 
     private val viewModel: PlaylistItemEditViewModel by currentScope.inject()
     private val log: LogWrapper by inject()
@@ -58,6 +53,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment),
     private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
     private val res: ResourceWrapper by currentScope.inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
+    private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
+    private val doneNavigation: PlaylistItemEditContract.DoneNavigation by currentScope.inject()// from activity (see onAttach)
 
     private val starMenuItem: MenuItem
         get() = ple_toolbar.menu.findItem(R.id.plie_star)
@@ -91,9 +88,6 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment),
             viewModel.checkToSave()
         }
     }
-
-    //fun setData(media: MediaDomain?) = viewModel.setData(media)
-    //fun setData(item: PlaylistItemDomain) = viewModel.setData(item)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -211,6 +205,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment),
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback(this, saveCallback)
+        currentScope.linkTo(requireActivity().currentScope)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -221,8 +216,8 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment),
     private fun observeModel() {
         viewModel.getModelObservable().observe(
             this.viewLifecycleOwner,
-            object : Observer<PlaylistItemEditModel> {
-                override fun onChanged(model: PlaylistItemEditModel) {
+            object : Observer<PlaylistItemEditContract.Model> {
+                override fun onChanged(model: PlaylistItemEditContract.Model) {
                     ple_title_bg.isVisible = true
                     ple_author_image.isVisible = !model.empty
                     ple_title_pos.isVisible = !model.empty
@@ -297,7 +292,10 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment),
         viewModel.getNavigationObservable().observe(this.viewLifecycleOwner,
             object : Observer<NavigationModel> {
                 override fun onChanged(nav: NavigationModel) {
-                    navMapper.map(nav)
+                    when (nav.target) {
+                        NAV_DONE -> doneNavigation.navigateDone()//navigateDone()
+                        else -> navMapper.map(nav)
+                    }
                 }
             }
         )
@@ -333,6 +331,9 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment),
                         DialogModel.Type.SELECT_ROUTE -> {
                             castDialogWrapper.showRouteSelector(childFragmentManager)
                         }
+                        DialogModel.Type.CONFIRM -> {
+                            alertDialogCreator.create(model as AlertDialogModel).show()
+                        }
                         else -> Unit
                     }
                 }
@@ -344,7 +345,7 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment),
         viewModel.commitPlaylistItems()
 
 
-    override fun getEditedDomains(): List<PlaylistItemDomain> = viewModel.getCommittedItems()
+    override fun getEditedDomains(): List<PlaylistItemDomain>? = viewModel.getCommittedItems()
 
     companion object {
 
@@ -352,44 +353,5 @@ class PlaylistItemEditFragment : Fragment(R.layout.playlist_item_edit_fragment),
         val TRANS_IMAGE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
         val TRANS_TITLE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
 
-        @JvmStatic
-        val fragmentModule = module {
-            scope(named<PlaylistItemEditFragment>()) {
-                viewModel {
-                    PlaylistItemEditViewModel(
-                        state = get(),
-                        modelMapper = get(),
-                        itemCreator = get(),
-                        playlistDialogModelCreator = get(),
-                        log = get(),
-                        queue = get(),
-                        ytContextHolder = get(),
-                        toast = get(),
-                        mediaOrchestrator = get(),
-                        playlistItemOrchestrator = get(),
-                        playlistOrchestrator = get()
-                    )
-                }
-                scoped { PlaylistItemEditState() }
-                scoped { PlaylistItemEditModelMapper(get(), get(), get(), get()) }
-                scoped {
-                    NavigationMapper(
-                        activity = (getSource() as Fragment).requireActivity(),
-                        toastWrapper = get(),
-                        fragment = (getSource() as Fragment),
-                        ytJavaApi = get(),
-                        navController = (getSource() as Fragment).findNavController(),
-                        log = get()
-                    )
-                }
-                scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped {
-                    ChipCreator((getSource() as Fragment).requireActivity(), get(), get())
-                }
-                scoped {
-                    SelectDialogCreator((getSource() as Fragment).requireActivity())
-                }
-            }
-        }
     }
 }

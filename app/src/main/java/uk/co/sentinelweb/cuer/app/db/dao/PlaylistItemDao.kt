@@ -28,7 +28,10 @@ interface PlaylistItemDao {
     suspend fun deleteAll()
 
     @Query("SELECT * FROM playlist_item")
-    suspend fun loadItems(): List<PlaylistItemEntity>
+    suspend fun loadAllItems(): List<PlaylistItemEntity>
+
+    @Query("SELECT * FROM playlist_item  WHERE id IN (:playlistItemIds)")
+    suspend fun loadAllByIds(playlistItemIds: List<Long>): List<PlaylistItemEntity>
 
     @Query("SELECT * FROM playlist_item WHERE media_id IN (:mediaIds)")
     suspend fun loadItemsByMediaId(mediaIds: List<Long>): List<PlaylistItemEntity>

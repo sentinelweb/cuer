@@ -7,7 +7,8 @@ data class AlertDialogModel constructor(
     @StringRes val message: Int,
     val confirm: Button,
     val neutral: Button? = null,
-    val cancel: Button? = null
+    val cancel: Button? = null,
+    val dismiss: (() -> Unit)? = null
 ) : DialogModel(Type.CONFIRM, title) {
 
     data class Button(

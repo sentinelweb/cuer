@@ -34,7 +34,6 @@ class SharePresenter constructor(
         log.tag(this)
     }
 
-
     private fun mapDisplayModel() {
         (state.scanResult
             ?.let {
@@ -77,7 +76,7 @@ class SharePresenter constructor(
                     queue.refreshQueue()
                 }
                 val isConnected = ytContextHolder.isConnected()
-                val playlistItemList = view.getCommittedItems() as List<PlaylistItemDomain>?// todo change for playlist - will crash
+                val playlistItemList = view.getCommittedItems() as List<PlaylistItemDomain>? // todo change for playlist - will crash
 //                val playlistItemList: List<PlaylistItemDomain>? = if (add)
 //                    view.getPlaylistItems()
 //                else {

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.main
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -9,6 +10,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 
@@ -33,6 +35,12 @@ interface MainContract {
         var playServiceCheckDone: Boolean = false,
         var playControlsInit: Boolean = false
     ) : ViewModel()
+
+    class MainDoneNavigation(private val navController: NavController) : PlaylistItemEditContract.DoneNavigation {
+        override fun navigateDone() {
+            navController.popBackStack()
+        }
+    }
 
     companion object {
         @JvmStatic
@@ -59,16 +67,22 @@ interface MainContract {
                         activity = getSource(),
                         toastWrapper = get(),
                         ytJavaApi = get(),
-                        navController = (getSource<AppCompatActivity>()
-                            .supportFragmentManager
-                            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
-                            .navController,
+                        navController = get(),
                         log = get()
                     )
+                }
+                scoped<NavController> {
+                    (getSource<AppCompatActivity>()
+                        .supportFragmentManager
+                        .findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+                        .navController
                 }
                 scoped { YoutubeJavaApiWrapper(getSource()) }
                 viewModel { State() }
                 scoped { SnackbarWrapper(getSource()) }
+                scoped<PlaylistItemEditContract.DoneNavigation> {
+                    MainDoneNavigation(get())
+                }
             }
         }
     }

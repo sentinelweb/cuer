@@ -25,7 +25,7 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
@@ -64,7 +64,7 @@ object Modules {
         CastPlayerContract.viewModule,
         ShareContract.activityModule,
         ScanContract.fragmentModule,
-        PlaylistItemEditFragment.fragmentModule,
+        PlaylistItemEditContract.fragmentModule,
         PlaylistEditFragment.fragmentModule,
         YoutubeCastServiceModule.serviceModule,
         PrefBackupContract.fragmentModule,
@@ -80,7 +80,7 @@ object Modules {
 
     private val orchestratorModule = module {
         single { PlaylistOrchestrator(get(), get()) }
-        single { PlaylistItemOrchestrator(get()) }
+        single { PlaylistItemOrchestrator(get(), get()) }
         single { MediaOrchestrator(get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
         single { PlaylistStatsOrchestrator(get()) }

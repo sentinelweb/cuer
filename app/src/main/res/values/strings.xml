@@ -104,6 +104,9 @@
     <string name="dialog_button_view_info">View info</string>
     <string name="dialog_title_select_fwd_skip_time">Forward skip time</string>
     <string name="dialog_title_select_back_skip_time">Back skip time</string>
+    <string name="dialog_title_save_check">Save check</string>
+    <string name="dialog_message_save_check">Do you want to save the item?</string>
+    <string name="dialog_button_save">Save</string>
 
     <!-- misc -->
     <string name="ok">OK</string>
@@ -116,5 +119,7 @@
     <string name="upcoming">Upcoming</string>
 
     <string name="new_items_below">New Items v</string>
+    <string name="dialog_button_dont_save">Don\'t save</string>
+
 
 </resources>

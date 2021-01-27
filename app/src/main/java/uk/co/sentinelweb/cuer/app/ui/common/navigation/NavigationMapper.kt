@@ -45,6 +45,7 @@ class NavigationMapper constructor(
                 } ?: throw IllegalArgumentException("$WEB_LINK: $LINK param required")
             NAV_BACK -> fragment?.findNavController()?.popBackStack()
                 ?: throw IllegalStateException("Fragment unavailable")
+            NAV_FINISH -> activity.finish()
             YOUTUBE_CHANNEL -> if (!ytJavaApi.launchChannel(nav.params[CHANNEL_ID] as String)) {
                 toastWrapper.show("can't launch channel")
             }

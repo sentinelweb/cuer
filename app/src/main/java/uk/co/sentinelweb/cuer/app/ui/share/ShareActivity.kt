@@ -46,6 +46,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
     private val commitFragment: ShareContract.Committer<*>? by lazy {
         supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.run { (getChildFragmentManager().getFragments().get(0) as ShareContract.Committer<*>?)!! }
+            ?: throw IllegalStateException("Not a commit fragment")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +54,6 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         setContentView(R.layout.activity_share)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        //bottom_nav_view.setupWithNavController(navController)
-        //navController.navigate(R.id.navigation_playlist)
         scanFragment!!.listener = this
     }
 
@@ -82,7 +81,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
             clipboard.getPrimaryClip()
                 ?.getItemAt(0)
                 ?.text
-                ?.apply { scanFragment!!.fromShareUrl(this.toString()) }
+                ?.apply { scanFragment?.fromShareUrl(this.toString()) ?: throw IllegalStateException("Scan fragment not visible") }
                 ?: presenter.linkError(
                     clipboard.getPrimaryClip()
                         ?.getItemAt(0)?.text?.toString()
@@ -94,7 +93,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         super.onResume()
         if (!intent.getBooleanExtra(EXTRA_PASTE, false)) {
             shareWrapper.getLinkFromIntent(intent) {
-                scanFragment!!.fromShareUrl(it)
+                scanFragment?.fromShareUrl(it) ?: throw IllegalStateException("Scan fragment not visible")
             }
         }
     }
@@ -104,10 +103,10 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         presenter.onStop()
     }
 
-    override fun gotoMain(media: PlaylistItemDomain?, play: Boolean) {
+    override fun gotoMain(playlistItemDomain: PlaylistItemDomain?, play: Boolean) {
         startActivity( // todo map in NavigationMapper
             Intent(this, MainActivity::class.java).apply {
-                media?.let {
+                playlistItemDomain?.let {
                     putExtra(Target.KEY, PLAYLIST_FRAGMENT.name)
                     putExtra(PLAYLIST_ITEM.name, it.serialise())
                     if (play) putExtra(PLAY_NOW.name, true)
@@ -149,7 +148,8 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
 
     override fun showMedia(itemDomain: PlaylistItemDomain) {
         ScanFragmentDirections.actionGotoPlaylistItem(itemDomain.serialise())
-            .apply { navController.navigate(this, null) }
+            .apply { navController.navigate(this) }
+        //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
     }
 
     override fun scanResult(result: ScanContract.Result) {
@@ -157,13 +157,13 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
     }
 
     override suspend fun commitPlaylistItems() {
-        commitFragment?.commit() ?: throw IllegalStateException("Not a commit fragment")
+        commitFragment?.commit()
     }
 
     override fun getCommittedItems() =
         commitFragment?.getEditedDomains()
             ?.filterNotNull()
-            ?: throw IllegalStateException("Not a commit fragment")
+
 
     companion object {
 
@@ -179,5 +179,6 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
             }
 
     }
+
 
 }

@@ -2,10 +2,12 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlaylistItemOrchestrator constructor(
-    private val playlistDatabaseRepository: PlaylistDatabaseRepository
+    private val playlistDatabaseRepository: PlaylistDatabaseRepository,
+    private val log: LogWrapper
 ) : OrchestratorContract<PlaylistItemDomain> {
 
     override val updates: Flow<Pair<OrchestratorContract.Operation, PlaylistItemDomain>>

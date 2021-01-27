@@ -70,7 +70,7 @@
         <argument
             android:name="PLAYLIST_ITEM"
             app:argType="string"
-            app:nullable="true"
+            app:nullable="false"
             />
 
     </fragment>
