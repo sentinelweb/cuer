@@ -14,7 +14,9 @@ internal interface YoutubeService {
     suspend fun getVideoInfos(
         @Query("id") ids: String,
         @Query("part") parts: String,
-        @Query("key") key: String
+        @Query("key") key: String,
+        @Query("maxResults") maxResults: Int = MAX_RESULTS,
+        @Query("pageToken") pageToken: String? = null
     ): YoutubeVideosDto
 
     @GET("channels")
@@ -36,7 +38,11 @@ internal interface YoutubeService {
         @Query("playlistId") playlistId: String,
         @Query("part") parts: String,
         @Query("key") key: String,
-        @Query("maxResults") maxResults: Int,
-        @Query("pageToken") pageToken: String?
+        @Query("maxResults") maxResults: Int = MAX_RESULTS,
+        @Query("pageToken") pageToken: String? = null
     ): YoutubePlaylistItemDto
+
+    companion object {
+        val MAX_RESULTS = 50
+    }
 }

@@ -19,6 +19,10 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeChannelDomainMapper
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeImageMapper
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubePlaylistDomainMapper
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainMapper
 
 
 /**
@@ -42,22 +46,28 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
         override fun isConnected() = true
         override fun isMetered() = true
     }
-
+    private val imageMapper = YoutubeImageMapper()
     private lateinit var sut: YoutubeInteractor
 
     @Before
     fun setUp() {
         service = RetrofitBuilder(config).let { it.buildYoutubeService(it.buildYoutubeClient()) }
 
+        val channelMapper = YoutubeChannelDomainMapper(TimeStampMapper(log), imageMapper)
         sut = YoutubeRetrofitInteractor(
             service = service,
             keyProvider = keyProvider,
-            videoMapper = YoutubeVideoMediaDomainMapper(TimeStampMapper(log)),
-            channelMapper = YoutubeChannelDomainMapper(TimeStampMapper(log)),
+            videoMapper = YoutubeVideoMediaDomainMapper(TimeStampMapper(log), imageMapper),
+            channelMapper = channelMapper,
             coContext = CoroutineContextProvider(),
             errorMapper = ErrorMapper(SystemLogWrapper()),
             connectivity = connectivityWrapper,
-            playlistMapper = YoutubePlaylistDomainMapper(TimeStampMapper(log), PlaylistItemCreator(TimeProvider()))
+            playlistMapper = YoutubePlaylistDomainMapper(
+                TimeStampMapper(log),
+                PlaylistItemCreator(TimeProvider()),
+                imageMapper,
+                channelMapper
+            )
         )
     }
 
@@ -101,7 +111,7 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
     @Test
     fun playlist() {
         runBlocking {
-            val actual = sut.playlist(
+            val actual = sut.playlist(// long 170 items
                 "PLf-zrdqNE8p-7tt7JHtlpLH3w9QA1EU0L"
             )
 
@@ -109,6 +119,17 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
             assertNotNull(actual.data)
             // note the items come out of order
             assertEquals(170, actual.data!![0].items.size)
+
+            val actualLive = sut.playlist(// live - news
+                "PLf-zrdqNE8p9qjU-kzB8ROMpgbXYahCQR"
+            )
+
+            assertTrue(actualLive.isSuccessful)
+            assertNotNull(actualLive.data)
+            // note the items come out of order
+            assertEquals(10, actualLive.data!![0].items.size)
+            assertTrue(actualLive.data!![0].items[0].media.isLiveBroadcast)
+
         }
     }
 }

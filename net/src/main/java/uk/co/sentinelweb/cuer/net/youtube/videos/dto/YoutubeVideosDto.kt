@@ -12,7 +12,7 @@ data class YoutubeVideosDto constructor(
     @Serializable
     data class VideoDto constructor(
         val id: String,
-        val snippet: SnippetDto?, // optional field (declared as part)
+        val snippet: SnippetDto, // optional field (declared as part)
         val contentDetails: ContentDto? = null// optional field (declared as part)
     ) {
         @Serializable
@@ -25,23 +25,7 @@ data class YoutubeVideosDto constructor(
             val liveBroadcastContent: String,
             val thumbnails: ThumbnailsDto
 
-        ) {
-            @Serializable
-            data class ThumbnailsDto constructor(
-                val default: ThumbnailDto? = null,
-                val medium: ThumbnailDto? = null,
-                val high: ThumbnailDto? = null,
-                val standard: ThumbnailDto? = null,
-                val maxres: ThumbnailDto? = null
-            ) {
-                @Serializable
-                data class ThumbnailDto constructor(
-                    val url: String,
-                    val width: Int,
-                    val height: Int
-                )
-            }
-        }
+        )
 
         @Serializable
         data class ContentDto constructor(
@@ -55,4 +39,9 @@ data class YoutubeVideosDto constructor(
         val totalResults: Int,
         val resultsPerPage: Int
     )
+
+    companion object {
+        val LIVE = "live"
+        val UPCOMING = "upcoming"
+    }
 }

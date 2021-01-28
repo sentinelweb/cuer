@@ -20,24 +20,7 @@ data class YoutubePlaylistDto constructor(
             val channelTitle: String,
             val publishedAt: String,
             val thumbnails: ThumbnailsDto
-
-        ) {
-            @Serializable
-            data class ThumbnailsDto constructor(
-                val default: ThumbnailDto? = null,
-                val medium: ThumbnailDto? = null,
-                val high: ThumbnailDto? = null,
-                val standard: ThumbnailDto? = null,
-                val maxres: ThumbnailDto? = null
-            ) {
-                @Serializable
-                data class ThumbnailDto constructor(
-                    val url: String,
-                    val width: Int,
-                    val height: Int
-                )
-            }
-        }
+        )
 
         @Serializable
         data class ContentDto constructor(
