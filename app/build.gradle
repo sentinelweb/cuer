@@ -136,8 +136,6 @@ dependencies {
     annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
     kapt "com.github.bumptech.glide:compiler:$ver_glide"
 
-
-
     debugImplementation ('androidx.fragment:fragment-testing:1.2.5'){// hack
         exclude group:"androidx.test"
     }
@@ -150,33 +148,30 @@ dependencies {
     testImplementation "androidx.room:room-testing:$ver_room"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test"
     testImplementation "org.robolectric:robolectric:$ver_robolectric"
+    testImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     testImplementation "androidx.test:core:$ver_androidx_test"
     testImplementation "androidx.test:runner:$ver_androidx_test"
     testImplementation "androidx.test:rules:$ver_androidx_test"
     testImplementation "android.arch.core:core-testing:$ver_android_arch_test"
-
-    testImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    testImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
-    testImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
-    testImplementation 'androidx.test.ext:junit:1.1.2'
+    testImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
+    testImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
+    testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
 
 
-    androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
     androidTestImplementation "org.koin:koin-test:$ver_koin"
     androidTestImplementation "io.mockk:mockk:$ver_mockk"
     androidTestImplementation group: 'org.hamcrest', name: 'hamcrest', version: ver_hamcrest
     androidTestImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
+    androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     androidTestImplementation "androidx.test:core:$ver_androidx_test"
     androidTestImplementation "androidx.test:runner:$ver_androidx_test"
     androidTestImplementation "androidx.test:rules:$ver_androidx_test"
-
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-web:3.3.0'
-    androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.3.0'
+    androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso:espresso-accessibility:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso:espresso-web:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso.idling:idling-concurrent:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso:espresso-idling-resource:$ver_espresso_core"
 
 }
