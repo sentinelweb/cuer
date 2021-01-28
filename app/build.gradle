@@ -138,7 +138,9 @@ dependencies {
 
 
 
-    debugImplementation 'androidx.fragment:fragment-testing:1.2.5'// hack
+    debugImplementation ('androidx.fragment:fragment-testing:1.2.5'){// hack
+        exclude group:"androidx.test"
+    }
 
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"
