@@ -1,6 +1,7 @@
-# cuer
+# Cuer
 [![Actions Status](https://github.com/sentinelweb/cuer/workflows/Android%20CI/badge.svg)](https://github.com/sentinelweb/cuer/actions)
-MVP Youtube Media que manager for Android
+
+## MVP Youtube Media que manager for Android
 
 This project is a playlist manager for Youtube content. (In development)
 
