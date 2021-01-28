@@ -1,4 +1,4 @@
-include ':prototype'
+//include ':prototype'
 rootProject.name='Cuer'
 include ':app'
 include ':net'
