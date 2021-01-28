@@ -10,6 +10,8 @@ import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.ArgumentMatchers.anyString
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.CC_CONNECTED
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.CC_CONNECTING
@@ -89,7 +91,7 @@ class ConnectionMonitorTest {
 
             sut.emergencyCleanup()
             mockPhoenixWrapper.triggerRestart()
-            mockToast.show(any())
+            mockToast.show(anyString(), anyInt())
             mockCastWrapper.killCurrentSession()
             mockMediaSessionManager.destroyMediaSession()
         }
@@ -113,7 +115,7 @@ class ConnectionMonitorTest {
 
             sut.emergencyCleanup()
             mockPhoenixWrapper.triggerRestart()
-            mockToast.show(any())
+            mockToast.show(anyString(), anyInt())
             mockCastWrapper.killCurrentSession()
             mockMediaSessionManager.destroyMediaSession()
         }
@@ -130,7 +132,7 @@ class ConnectionMonitorTest {
             sut.cancelTimer()
             sut.emergencyCleanup()
             mockPhoenixWrapper.triggerRestart()
-            mockToast.show(any())
+            mockToast.show(anyString(), anyInt())
             mockCastWrapper.killCurrentSession()
             mockMediaSessionManager.destroyMediaSession()
         }
@@ -143,7 +145,7 @@ class ConnectionMonitorTest {
             sut.emergencyCleanup()
 
             mockPhoenixWrapper.triggerRestart()
-            mockToast.show(any())
+            mockToast.show(anyString(), anyInt())
             mockCastWrapper.killCurrentSession()
             mockMediaSessionManager.destroyMediaSession()
         }
