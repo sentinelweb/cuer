@@ -120,7 +120,6 @@ object Modules {
 
     private val wrapperModule = module {
         factory { ToastWrapper(androidApplication()) }
-        factory { PhoenixWrapper(androidApplication()) }
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }
         factory { ResourceWrapper(androidApplication()) }

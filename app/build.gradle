@@ -80,8 +80,6 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:$ver_recyclerview"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$ver_recyclerview"
 
-    implementation "com.jakewharton:process-phoenix:$ver_process_phoenix"
-    // todo remove this with connection monitor
     implementation "androidx.preference:preference-ktx:$ver_preference"
 
     //navigation
