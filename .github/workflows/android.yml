@@ -24,4 +24,6 @@ jobs:
         env:
           GS: "${{ secrets.GOOGLESERVICES_JSON }}"
       - name: Build with Gradle
-        run: ./gradlew -PCUER_YOUTUBE_API_KEY=${{ secrets.CUER_YOUTUBE_API_KEY }} build test
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY build test
+        env:
+          YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
