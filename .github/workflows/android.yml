@@ -23,11 +23,11 @@ jobs:
         run: echo $GS > ./app/google-services.json
         env:
           GS: "${{ secrets.GOOGLESERVICES_JSON }}"
-      - name: Build with Gradle
+      - name: Build
         run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY build
         env:
           YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
-      - name: Test with Gradle
-        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY test
+      - name: Test
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY core:test domain:test net:test app:testDebugUnitTest
         env:
           YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"

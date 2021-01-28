@@ -55,6 +55,17 @@ android {
     sourceSets {
         // Adds exported schema location as test app assets.
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+        test {
+            java.srcDir 'src/sharedTest/java'
+        }
+        androidTest {
+            java.srcDir 'src/sharedTest/java'
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
     }
 }
 
@@ -125,6 +136,10 @@ dependencies {
     annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
     kapt "com.github.bumptech.glide:compiler:$ver_glide"
 
+
+
+    debugImplementation 'androidx.fragment:fragment-testing:1.2.5'// hack
+
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
@@ -138,14 +153,28 @@ dependencies {
     testImplementation "androidx.test:rules:$ver_androidx_test"
     testImplementation "android.arch.core:core-testing:$ver_android_arch_test"
 
+    testImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    testImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
+    testImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
+    testImplementation 'androidx.test.ext:junit:1.1.2'
+
+
     androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
     androidTestImplementation "org.koin:koin-test:$ver_koin"
     androidTestImplementation "io.mockk:mockk:$ver_mockk"
-    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: ver_hamcrest
+    androidTestImplementation group: 'org.hamcrest', name: 'hamcrest', version: ver_hamcrest
     androidTestImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
     androidTestImplementation "androidx.test:core:$ver_androidx_test"
     androidTestImplementation "androidx.test:runner:$ver_androidx_test"
     androidTestImplementation "androidx.test:rules:$ver_androidx_test"
+
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-web:3.3.0'
+    androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.3.0'
 
 }

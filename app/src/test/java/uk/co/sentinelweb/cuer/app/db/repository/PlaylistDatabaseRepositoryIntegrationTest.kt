@@ -15,6 +15,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import uk.co.sentinelweb.cuer.app.CuerTestApplication
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.mapper.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
@@ -28,6 +30,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
  * Integration test for PlaylistDatabaseRepository
  */
 @RunWith(RobolectricTestRunner::class)
+@Config(application = CuerTestApplication::class)
 @ExperimentalCoroutinesApi
 class PlaylistDatabaseRepositoryIntegrationTest {
     private lateinit var database: AppDatabase
