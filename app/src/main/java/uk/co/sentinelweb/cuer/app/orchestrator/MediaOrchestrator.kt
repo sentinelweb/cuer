@@ -21,7 +21,9 @@ class MediaOrchestrator constructor(
     suspend override fun loadList(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): List<MediaDomain>? =
         when (options.source) {
             OrchestratorContract.Source.MEMORY -> TODO()
-            OrchestratorContract.Source.LOCAL -> TODO()
+            OrchestratorContract.Source.LOCAL -> mediaDatabaseRepository.loadList(filter, options.flat)
+                .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
+                ?.data
             OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
             OrchestratorContract.Source.REMOTE -> TODO()
             OrchestratorContract.Source.PLATFORM -> when (filter) {
