@@ -118,7 +118,7 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
             assertTrue(actual.isSuccessful)
             assertNotNull(actual.data)
             // note the items come out of order
-            assertEquals(170, actual.data!![0].items.size)
+            assertEquals(170, actual.data!!.items.size)
 
             val actualLive = sut.playlist(// live - news
                 "PLf-zrdqNE8p9qjU-kzB8ROMpgbXYahCQR"
@@ -127,8 +127,8 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
             assertTrue(actualLive.isSuccessful)
             assertNotNull(actualLive.data)
             // note the items come out of order
-            assertEquals(10, actualLive.data!![0].items.size)
-            assertTrue(actualLive.data!![0].items[0].media.isLiveBroadcast)
+            assertEquals(10, actualLive.data!!.items.size)
+            assertTrue(actualLive.data!!.items[0].media.isLiveBroadcast)
 
         }
     }

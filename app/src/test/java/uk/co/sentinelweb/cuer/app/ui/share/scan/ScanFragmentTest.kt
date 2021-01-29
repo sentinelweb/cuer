@@ -23,13 +23,13 @@ import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
-import uk.co.sentinelweb.cuer.app.CuerApp
+import uk.co.sentinelweb.cuer.app.CuerTestApp
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.tools.test.matchers.drawableMatches
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = CuerApp::class)
+@Config(application = CuerTestApp::class)
 class ScanFragmentTest {
 
     @Mock
