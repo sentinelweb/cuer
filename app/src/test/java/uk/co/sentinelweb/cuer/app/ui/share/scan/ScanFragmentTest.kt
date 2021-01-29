@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.flextrade.jfixture.JFixture
 import com.google.android.material.snackbar.Snackbar
+import com.nhaarman.mockitokotlin2.whenever
 import org.hamcrest.CoreMatchers
 import org.junit.After
 import org.junit.Before
@@ -20,7 +21,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
 import uk.co.sentinelweb.cuer.app.CuerTestApp
@@ -76,7 +78,7 @@ class ScanFragmentTest {
         val fixtMsg = fixture.create(String::class.java)
         val scenario = FragmentScenario.launchInContainer(ScanFragment::class.java)
         val mockSnackbar = mock(Snackbar::class.java)
-        `when`(mockSnackbarWrapper.make(fixtMsg)).thenReturn(mockSnackbar)
+        whenever(mockSnackbarWrapper.make(fixtMsg)).thenReturn(mockSnackbar)
         scenario.onFragment { it.showMessage(fixtMsg) }
         verify(mockSnackbarWrapper).make(fixtMsg)
         verify(mockSnackbar).show()

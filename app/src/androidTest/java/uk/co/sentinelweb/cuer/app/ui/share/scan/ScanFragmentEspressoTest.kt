@@ -58,7 +58,6 @@ class ScanFragmentEspressoTest {
     @Test
     fun fromShareUrl() {
         val fixtUrl = fixture.create(String::class.java)
-
         scenario().onFragment { it.fromShareUrl(fixtUrl) }
         onView(withId(R.id.scan_progress)).check(matches(isDisplayed()))
         onView(withId(R.id.scan_result)).check(matches(not(isDisplayed())))
