@@ -15,11 +15,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import uk.co.sentinelweb.cuer.app.CuerTestApp
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository.IdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -30,7 +32,9 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
  * Integration test for MediaDatabaseRepository
  */
 @RunWith(RobolectricTestRunner::class)
+@Config(application = CuerTestApp::class)
 @ExperimentalCoroutinesApi
+
 class MediaDatabaseRepositoryIntegrationTest {
     private lateinit var database: AppDatabase
     private val testCoroutineDispatcher = TestCoroutineDispatcher()

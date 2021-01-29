@@ -10,25 +10,27 @@ import uk.co.sentinelweb.cuer.app.db.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
-import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.PlatformMapper
-import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment
+import uk.co.sentinelweb.cuer.app.ui.main.MainContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
-import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
+import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
@@ -52,15 +54,17 @@ import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 
 object Modules {
+
     private val scopedModules = listOf(
         PlaylistContract.fragmentModule,
         PlaylistsContract.fragmentModule,
-        PlayerFragment.fragmentModule,
-        BrowseFragment.fragmentModule,
-        MainActivity.activityModule,
-        CastPlayerFragment.viewModule,
-        ShareActivity.activityModule,
-        PlaylistItemEditFragment.fragmentModule,
+        PlayerContract.fragmentModule,
+        BrowseContract.fragmentModule,
+        MainContract.activityModule,
+        CastPlayerContract.viewModule,
+        ShareContract.activityModule,
+        ScanContract.fragmentModule,
+        PlaylistItemEditContract.fragmentModule,
         PlaylistEditFragment.fragmentModule,
         YoutubeCastServiceModule.serviceModule,
         PrefBackupContract.fragmentModule,
@@ -72,6 +76,14 @@ object Modules {
         factory { PlatformMapper() }
         factory { LoopModeMapper() }
         factory { BackgroundMapper(get()) }
+    }
+
+    private val orchestratorModule = module {
+        single { PlaylistOrchestrator(get(), get()) }
+        single { PlaylistItemOrchestrator(get(), get()) }
+        single { MediaOrchestrator(get(), get()) }
+        single { ChannelOrchestrator(get(), get()) }
+        single { PlaylistStatsOrchestrator(get()) }
     }
 
     private val utilModule = module {
@@ -108,7 +120,6 @@ object Modules {
 
     private val wrapperModule = module {
         factory { ToastWrapper(androidApplication()) }
-        factory { PhoenixWrapper(androidApplication()) }
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }
         factory { ResourceWrapper(androidApplication()) }
@@ -133,6 +144,7 @@ object Modules {
         .plus(wrapperModule)
         .plus(scopedModules)
         .plus(appNetModule)
+        .plus(orchestratorModule)
         .plus(DatabaseModule.dbModule)
         .plus(NetModule.netModule)
         .plus(CoreModule.objectModule)

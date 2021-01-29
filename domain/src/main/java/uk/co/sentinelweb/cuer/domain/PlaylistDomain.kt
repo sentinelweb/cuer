@@ -3,7 +3,9 @@ package uk.co.sentinelweb.cuer.domain
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 import java.time.Instant
+import java.time.LocalDateTime
 
 @Serializable
 data class PlaylistDomain constructor(
@@ -13,6 +15,10 @@ data class PlaylistDomain constructor(
     val currentIndex: Int = 0, // todo make nullable
     val parentId: Long? = null,
     val mode: PlaylistModeDomain = SINGLE,
+    val type: PlaylistTypeDomain = USER,
+    val platform: PlatformDomain? = null,
+    val channelData: ChannelDomain? = null,
+    val platformId: String? = null,
     val starred: Boolean = false,
     val archived: Boolean = false,
     val default: Boolean = false,
@@ -28,17 +34,17 @@ data class PlaylistDomain constructor(
     enum class PlaylistTypeDomain {
         USER,
         CHANNEL, /* link to a channel */
-        EXTERNAL /* External playlist do allow adding - just fix to source - maybe allow archiving of items */
+        PLATFORM /* External playlist do allow adding - just fix to source - maybe allow archiving of items */
     }
 
     @Serializable
     data class PlaylistConfigDomain constructor(
-        val type: PlaylistTypeDomain = PlaylistTypeDomain.USER,
-        val platform: PlatformDomain = PlatformDomain.YOUTUBE,
         val updateUrl: String? = null,
+        val platformUrl: String? = null,
         @Contextual val lastUpdate: Instant? = null,
+        @Contextual val published: LocalDateTime? = null,
         val updateInterval: Long? = null,
-        val channelData: ChannelDomain? = null
+        val description: String? = null
     )
 }
 

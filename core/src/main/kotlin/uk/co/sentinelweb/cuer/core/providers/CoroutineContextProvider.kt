@@ -4,11 +4,11 @@ import kotlinx.coroutines.*
 import java.util.concurrent.Executors
 
 // this should be factory scopes should be shared between objects
-open class CoroutineContextProvider {
-    open val Main: CoroutineDispatcher = Dispatchers.Main
-    open val IO: CoroutineDispatcher = Dispatchers.IO
-    open val Default: CoroutineDispatcher = Dispatchers.Default
-
+open class CoroutineContextProvider constructor(
+    val Main: CoroutineDispatcher = Dispatchers.Main,
+    val IO: CoroutineDispatcher = Dispatchers.IO,
+    val Default: CoroutineDispatcher = Dispatchers.Default
+) {
     inner class ScopeHolder(private val dispatcher: CoroutineDispatcher) {
         private var _scope: CoroutineScope? = null
         fun get(): CoroutineScope {

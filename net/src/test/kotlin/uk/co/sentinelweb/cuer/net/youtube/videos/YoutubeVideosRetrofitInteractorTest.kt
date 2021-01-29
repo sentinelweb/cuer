@@ -26,6 +26,9 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeChannelDomainMapper
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubePlaylistDomainMapper
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainMapper
 
 // todo test update and channels
 class YoutubeVideosRetrofitInteractorTest : KoinComponent {
@@ -41,6 +44,9 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
 
     @MockK
     private lateinit var mockChannelMapper: YoutubeChannelDomainMapper
+
+    @MockK
+    private lateinit var mockPlaylistDomainMapper: YoutubePlaylistDomainMapper
 
     @MockK
     private lateinit var mockErrorMapper: ErrorMapper
@@ -102,7 +108,8 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
             channelMapper = mockChannelMapper,
             coContext = CoroutineContextTestProvider(),
             errorMapper = mockErrorMapper,
-            connectivity = connectivityWrapper
+            connectivity = connectivityWrapper,
+            playlistMapper = mockPlaylistDomainMapper
         )
     }
 

@@ -2,9 +2,11 @@ package uk.co.sentinelweb.cuer.app.db.entity
 
 import androidx.room.*
 import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
+import uk.co.sentinelweb.cuer.app.db.typeconverter.PlatformTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.PlaylistConfigJsonTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.PlaylistModeTypeConverter
 import uk.co.sentinelweb.cuer.app.db.typeconverter.PlaylistTypeTypeConverter
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
@@ -19,6 +21,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 @TypeConverters(
     PlaylistModeTypeConverter::class,
     PlaylistTypeTypeConverter::class,
+    PlatformTypeConverter::class,
     PlaylistConfigJsonTypeConverter::class
 )
 data class PlaylistEntity(
@@ -39,6 +42,15 @@ data class PlaylistEntity(
 
     @ColumnInfo(name = "type")
     val type: PlaylistDomain.PlaylistTypeDomain = USER,
+
+    @ColumnInfo(name = "platform")
+    val platform: PlatformDomain? = null,
+
+    @ColumnInfo(name = "platform_id")
+    val platformId: String? = null,
+
+    @ColumnInfo(name = "channel_id")
+    val channelId: Long? = null,
 
     @ColumnInfo(name = "parentId")
     val parentId: Long = -1,

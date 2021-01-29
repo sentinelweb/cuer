@@ -254,15 +254,10 @@ class QueueMediator constructor(
     }
 
     override suspend fun refreshQueue() {
-        (state.playlistId
-            ?.let { playlistRepository.load(it) }
-            ?.takeIf { it.isSuccessful }
-            ?.data
-            ?: playlistRepository.loadList(PlaylistDatabaseRepository.DefaultFilter(flat = false))
-                .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
-                ?.data?.get(0))
+        state.playlistId
+            ?.let { playlistRepository.getPlaylistOrDefault(it) }
             ?.also { refreshQueueFrom(it) }
-            ?: throw IllegalStateException("Could not load a playlist")
+        //?: throw IllegalStateException("Could not load a playlist")
     }
 
 }

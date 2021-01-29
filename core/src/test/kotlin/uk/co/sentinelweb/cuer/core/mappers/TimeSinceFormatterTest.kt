@@ -13,50 +13,52 @@ class TimeSinceFormatterTest {
 
     private val sut = TimeSinceFormatter(timeProvider)
 
+    private val baseTime = System.currentTimeMillis()
+
     @Before
     fun setUp() {
         // MockKAnnotations.init(relaxUnitFun = true)
-        every { timeProvider.currentTimeMillis() } returns System.currentTimeMillis()
+        every { timeProvider.currentTimeMillis() } returns baseTime
     }
 
     @Test
     fun `formatTimeSince now`() {
-        assertEquals("now", sut.formatTimeSince(System.currentTimeMillis() - 3000))
+        assertEquals("now", sut.formatTimeSince(baseTime - 3000))
     }
 
     @Test
     fun `formatTimeSince future`() {
-        assertEquals("!", sut.formatTimeSince(System.currentTimeMillis() + 3000))
+        assertEquals("!", sut.formatTimeSince(baseTime + 3000))
     }
 
     @Test
     fun `formatTimeSince sec`() {
-        assertEquals("30s", sut.formatTimeSince(System.currentTimeMillis() - 30 * 1000L))
+        assertEquals("30s", sut.formatTimeSince(baseTime - 30 * 1000L))
     }
 
     @Test
     fun `formatTimeSince min`() {
-        assertEquals("20m", sut.formatTimeSince(System.currentTimeMillis() - 1000L * 60 * 20))
+        assertEquals("20m", sut.formatTimeSince(baseTime - 1000L * 60 * 20))
     }
 
     @Test
     fun `formatTimeSince hrs`() {
-        assertEquals("20h", sut.formatTimeSince(System.currentTimeMillis() - 1000L * 60 * 60 * 20))
+        assertEquals("20h", sut.formatTimeSince(baseTime - 1000L * 60 * 60 * 20))
     }
 
     @Test
     fun `formatTimeSince days`() {
-        assertEquals("200d", sut.formatTimeSince(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 200))
+        assertEquals("200d", sut.formatTimeSince(baseTime - 1000L * 60 * 60 * 24 * 200))
     }
 
     @Test
     fun `formatTimeSince yrs`() {
-        assertEquals("2y", sut.formatTimeSince(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 365 * 2))
+        assertEquals("2y", sut.formatTimeSince(baseTime - 1000L * 60 * 60 * 24 * 365 * 2))
     }
 
     @Test
     fun `formatTimeSince too log`() {
-        assertEquals("-", sut.formatTimeSince(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 365 * 21))
+        assertEquals("-", sut.formatTimeSince(baseTime - 1000L * 60 * 60 * 24 * 365 * 21))
     }
 
 }

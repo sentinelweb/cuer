@@ -91,9 +91,9 @@
 
         <service
             android:name=".service.cast.YoutubeCastService"
-            android:exported="false"
-            android:foregroundServiceType="mediaPlayback">
+            android:exported="false">
 
+            <!--            android:foregroundServiceType="mediaPlayback"-->
             <!--
             might need to make another broadcast receiver to receive events this will
             start the service while the activity is running

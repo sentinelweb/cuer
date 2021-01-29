@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import java.time.Instant
 
@@ -46,7 +47,7 @@ interface PrefBackupContract {
                         log = get()
                     )
                 }
-                scoped { SnackbarWrapper((getSource() as Fragment).requireActivity()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity()) }
                 viewModel { State() }
             }
         }

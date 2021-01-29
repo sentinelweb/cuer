@@ -178,39 +178,6 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
         val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_image) }
         val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title) }
 
-        @JvmStatic
-        val viewModule = module {
-            scope(named<CastPlayerFragment>()) {
-                scoped<CastPlayerContract.View> { getSource() }
-                scoped<CastPlayerContract.Presenter> {
-                    CastPlayerPresenter(
-                        view = get(),
-                        mapper = get(),
-                        state = get(),
-                        log = get(),
-                        skipControl = get(),
-                        res = get()
-                    )
-                }
-                scoped<SkipContract.External> {
-                    SkipPresenter(
-                        view = get(),
-                        state = SkipContract.State(),
-                        log = get(),
-                        mapper = SkipContract.Mapper(timeSinceFormatter = get(), res = get()),
-                        prefsWrapper = get(named<GeneralPreferences>())
-                    )
-                }
-                scoped<SkipContract.View> {
-                    SkipView(
-                        selectDialogCreator = SelectDialogCreator(
-                            context = getSource<CastPlayerFragment>().requireContext()
-                        )
-                    )
-                }
-                scoped { CastPlayerUiMapper(get()) }
-                viewModel { CastPlayerContract.State() }
-            }
-        }
+
     }
 }

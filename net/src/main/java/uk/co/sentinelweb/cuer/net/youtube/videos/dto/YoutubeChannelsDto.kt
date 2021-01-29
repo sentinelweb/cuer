@@ -9,7 +9,7 @@ data class YoutubeChannelsDto constructor(
     @Serializable
     data class ItemDto constructor(
         val id: String,
-        val snippet: SnippetDto? = null // optional field (declared as part)
+        val snippet: SnippetDto
     ) {
         @Serializable
         data class SnippetDto constructor(
@@ -19,22 +19,6 @@ data class YoutubeChannelsDto constructor(
             val country: String? = null,
             val publishedAt: String,
             val thumbnails: ThumbnailsDto
-        ) {
-            @Serializable
-            data class ThumbnailsDto constructor(
-                val default: ThumbnailDto? = null,
-                val medium: ThumbnailDto? = null,
-                val high: ThumbnailDto? = null,
-                val standard: ThumbnailDto? = null,
-                val maxres: ThumbnailDto? = null
-            ) {
-                @Serializable
-                data class ThumbnailDto constructor(
-                    val url: String,
-                    val width: Int,
-                    val height: Int
-                )
-            }
-        }
+        )
     }
 }

@@ -8,18 +8,28 @@
     tools:context=".ui.share.ShareActivity"
     >
 
-    <fragment
-        android:id="@+id/playlist_edit_fragment"
-        android:name="uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment"
+    <!--    <fragment-->
+    <!--        android:id="@+id/playlist_edit_fragment"-->
+    <!--        android:name="uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:layout_marginBottom="4dp"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/share_warning"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        tools:layout="@layout/playlist_item_edit_fragment"-->
+    <!--        tools:ignore="FragmentTagUsage"-->
+    <!--        />-->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/share_warning"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@id/top_left_button"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/playlist_item_edit_fragment"
-        tools:ignore="FragmentTagUsage"
+        app:navGraph="@navigation/share_navigation"
         />
 
     <TextView

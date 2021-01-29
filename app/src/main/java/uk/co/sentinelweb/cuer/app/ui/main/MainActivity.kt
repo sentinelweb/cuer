@@ -14,9 +14,6 @@ import androidx.preference.PreferenceFragmentCompat
 import kotlinx.android.synthetic.main.main_activity.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -25,13 +22,11 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
@@ -177,42 +172,5 @@ class MainActivity :
         val TOP_LEVEL_DESTINATIONS =
             setOf(R.id.navigation_browse, R.id.navigation_playlists, R.id.navigation_playlist, R.id.navigation_player)
         private const val SERVICES_REQUEST_CODE = 1
-
-        @JvmStatic
-        val activityModule = module {
-            scope(named<MainActivity>()) {
-                scoped<MainContract.View> { getSource() }
-                scoped<MainContract.Presenter> {
-                    MainPresenter(
-                        view = get(),
-                        state = get(),
-                        playerControls = get(),
-                        ytServiceManager = get(),
-                        ytContextHolder = get(),
-                        log = get()
-                    )
-                }
-                scoped {
-                    (getSource<MainActivity>()
-                        .supportFragmentManager
-                        .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).playerControls
-                }
-                scoped {
-                    NavigationMapper(
-                        activity = getSource(),
-                        toastWrapper = get(),
-                        ytJavaApi = get(),
-                        navController = (getSource<AppCompatActivity>()
-                            .supportFragmentManager
-                            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
-                            .navController,
-                        log = get()
-                    )
-                }
-                scoped { YoutubeJavaApiWrapper(getSource()) }
-                viewModel { MainState() }
-                scoped { SnackbarWrapper(getSource()) }
-            }
-        }
     }
 }

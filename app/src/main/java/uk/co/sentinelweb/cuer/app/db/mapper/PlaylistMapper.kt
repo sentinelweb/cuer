@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.mapper
 
 import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
+import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
 import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_ARCHIVED
@@ -11,7 +12,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistMapper(
     private val imageMapper: ImageMapper,
-    private val playlistItemMapper: PlaylistItemMapper
+    private val playlistItemMapper: PlaylistItemMapper,
+    private val channelMapper: ChannelMapper
 ) {
     fun map(domain: PlaylistDomain): PlaylistEntity = PlaylistEntity(
         id = domain.id ?: INITIAL_ID,
@@ -24,13 +26,18 @@ class PlaylistMapper(
         thumb = imageMapper.mapImage(domain.thumb),
         mode = domain.mode,
         title = domain.title,
-        parentId = domain.parentId ?: -1
+        parentId = domain.parentId ?: -1,
+        type = domain.type,
+        platform = domain.platform,
+        platformId = domain.platformId,
+        channelId = domain.channelData?.id
     )
 
     fun map(
         entity: PlaylistEntity,
         items: List<PlaylistItemEntity>?,
-        medias: List<MediaAndChannel>?
+        medias: List<MediaAndChannel>?,
+        channelEntity: ChannelEntity?
     ): PlaylistDomain = PlaylistDomain(
         id = entity.id,
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
@@ -50,7 +57,11 @@ class PlaylistMapper(
         config = entity.config,
         currentIndex = entity.currentIndex,
         title = entity.title,
-        parentId = entity.parentId.takeIf { it > -1L }
+        parentId = entity.parentId.takeIf { it > -1L },
+        platformId = entity.platformId,
+        channelData = channelEntity?.let { channelMapper.map(it) },
+        platform = entity.platform,
+        type = entity.type
     )
 
 }

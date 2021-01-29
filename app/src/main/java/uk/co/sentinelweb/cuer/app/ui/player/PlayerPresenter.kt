@@ -1,10 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.player
 
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
-
 class PlayerPresenter(
     private val view: PlayerContract.View,
-    private val state: PlayerState,
+    private val state: PlayerContract.State,
     private val modelMapper: PlayerModelMapper
 ) : PlayerContract.Presenter {
 

@@ -16,6 +16,7 @@ class TimeProviderTest {
     }
 
     @Test
+    @Ignore
     fun instant() {
         assertEquals(sut.instant(), Instant.now())
     }
@@ -27,6 +28,7 @@ class TimeProviderTest {
     }
 
     @Test
+    @Ignore
     fun currentTimeMills() {
         assertEquals(sut.currentTimeMillis(), System.currentTimeMillis())
     }

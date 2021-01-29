@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.DialogInterface
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import uk.co.sentinelweb.cuer.app.R
 
 class AlertDialogCreator(
     private val context: Context
@@ -30,13 +29,18 @@ class AlertDialogCreator(
                     }
                 })
         }
-        builder
-            .setNegativeButton(model.cancel?.label ?: R.string.cancel, object : DialogInterface.OnClickListener {
-                override fun onClick(dialog: DialogInterface?, p1: Int) {
-                    model.cancel?.let { it.action() }
-                    dialog?.dismiss()
-                }
-            })
+        model.cancel?.apply {
+            builder
+                .setNegativeButton(model.cancel.label, object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, p1: Int) {
+                        model.cancel.let { it.action() }
+                        dialog?.dismiss()
+                    }
+                })
+        }
+        model.dismiss?.also {
+            builder.setOnDismissListener { it() }
+        }
         return builder.create()
     }
 }

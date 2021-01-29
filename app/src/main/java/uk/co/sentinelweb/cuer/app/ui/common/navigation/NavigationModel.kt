@@ -34,6 +34,8 @@ data class NavigationModel constructor(
         BROWSE_FRAGMENT(),
         PLAYER_FRAGMENT(),
         NAV_BACK(), // use navigation to go back
+        NAV_FINISH(), // use navigation to finish activity
+        NAV_DONE() // nav after operation is finished
         ;
 
         companion object {

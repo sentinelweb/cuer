@@ -15,21 +15,33 @@ import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.net.youtube.videos.dto.ThumbnailDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeImageMapper
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainMapper
 import java.time.LocalDateTime
 
 class YoutubeVideoMediaDomainMapperTest {
     @MockK
     private lateinit var mockStampMapper: TimeStampMapper
 
+    @MockK
+    private lateinit var mockImageMapper: YoutubeImageMapper
+
     @Fixture
     private lateinit var dto: YoutubeVideosDto
 
     @Fixture
-    private lateinit var fixtMedium: YoutubeVideosDto.VideoDto.SnippetDto.ThumbnailsDto.ThumbnailDto
+    private lateinit var fixtMedium: ThumbnailDto
 
     @Fixture
-    private lateinit var fixMaxRes: YoutubeVideosDto.VideoDto.SnippetDto.ThumbnailsDto.ThumbnailDto
+    private lateinit var fixMaxRes: ThumbnailDto
+
+    @Fixture
+    private lateinit var fixtMediumDomain: ImageDomain
+
+    @Fixture
+    private lateinit var fixMaxResDomain: ImageDomain
 
     @Fixture
     private lateinit var fixtDate: LocalDateTime
@@ -46,8 +58,8 @@ class YoutubeVideoMediaDomainMapperTest {
 
         dto = dto.copy(items = dto.items.map {
             it.copy(
-                snippet = it.snippet!!.copy(
-                    thumbnails = it.snippet!!.thumbnails.copy(
+                snippet = it.snippet.copy(
+                    thumbnails = it.snippet.thumbnails.copy(
                         medium = fixtMedium,
                         maxres = fixMaxRes
                     )
@@ -56,21 +68,24 @@ class YoutubeVideoMediaDomainMapperTest {
         })
         every { mockStampMapper.mapTimestamp(any<String>()) } returns fixtDate
         every { mockStampMapper.mapDuration(any()) } returns fixtDuration
-        sut = YoutubeVideoMediaDomainMapper(mockStampMapper)
+        dto.items.forEach {
+            every { mockImageMapper.mapThumb(it.snippet.thumbnails) } returns fixtMediumDomain
+            every { mockImageMapper.mapImage(it.snippet.thumbnails) } returns fixMaxResDomain
+        }
+        sut = YoutubeVideoMediaDomainMapper(mockStampMapper, mockImageMapper)
     }
 
     @Test
-    // fixme test fails!
     fun map() {
         val actual = sut.map(dto)
 
         actual.forEachIndexed { index, domain ->
-            assertEquals(domain.title, dto.items[index].snippet?.title)
-            assertEquals(domain.description, dto.items[index].snippet?.description)
+            assertEquals(domain.title, dto.items[index].snippet.title)
+            assertEquals(domain.description, dto.items[index].snippet.description)
             assertEquals(
                 domain.channelData, ChannelDomain(
-                    platformId = dto.items[index].snippet?.channelId ?: "",
-                    title = dto.items[index].snippet?.channelTitle ?: "",
+                    platformId = dto.items[index].snippet.channelId,
+                    title = dto.items[index].snippet.channelTitle,
                     platform = PlatformDomain.YOUTUBE
                 )
             )
@@ -79,16 +94,16 @@ class YoutubeVideoMediaDomainMapperTest {
             assertEquals(domain.platformId, dto.items[index].id)
             assertEquals(domain.mediaType, MediaDomain.MediaTypeDomain.VIDEO)
             assertEquals(domain.platform, PlatformDomain.YOUTUBE)
-            dto.items[index].snippet!!.thumbnails.medium!!.apply {
+            dto.items[index].snippet.thumbnails.medium!!.apply {
                 assertEquals(
                     domain.thumbNail,
-                    ImageDomain(fixtMedium.url, fixtMedium.width, fixtMedium.height)
+                    fixtMediumDomain
                 )
             }
-            dto.items[index].snippet!!.thumbnails.maxres!!.apply {
+            dto.items[index].snippet.thumbnails.maxres!!.apply {
                 assertEquals(
                     domain.image,
-                    ImageDomain(fixMaxRes.url, fixMaxRes.width, fixMaxRes.height)
+                    fixMaxResDomain
                 )
             }
             assertNull(domain.dateLastPlayed)

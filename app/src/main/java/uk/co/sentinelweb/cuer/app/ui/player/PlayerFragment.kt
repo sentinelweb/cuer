@@ -7,9 +7,7 @@ import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.player_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
@@ -36,16 +34,5 @@ class PlayerFragment : Fragment(R.layout.player_fragment), PlayerContract.View {
 //        }
 
     }
-    companion object {
 
-        @JvmStatic
-        val fragmentModule = module {
-            scope(named<PlayerFragment>()) {
-                scoped<PlayerContract.View> { getSource() }
-                scoped<PlayerContract.Presenter> { PlayerPresenter(get(), get(), get()) }
-                scoped { PlayerModelMapper() }
-                viewModel { PlayerState() }
-            }
-        }
-    }
 }
