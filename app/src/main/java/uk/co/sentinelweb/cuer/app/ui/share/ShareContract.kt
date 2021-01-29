@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -88,7 +89,7 @@ interface ShareContract {
                     )
                 }
                 scoped { ShareWrapper(getSource()) }
-                scoped { SnackbarWrapper(getSource()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource()) }
                 viewModel { State() }
                 scoped {
                     ShareModelMapper(

@@ -133,7 +133,7 @@ internal class YoutubeRetrofitInteractor constructor(
             }
         }
 
-    override suspend fun playlist(id: String): NetResult<List<PlaylistDomain>> =
+    override suspend fun playlist(id: String): NetResult<PlaylistDomain> =
         withContext(coContext.IO) {
             try {
                 if (connectivity.isConnected()) {
@@ -199,10 +199,10 @@ internal class YoutubeRetrofitInteractor constructor(
                         .let { playlistMapper.map(it.first, it.second, it.third, it.fourth) }
                         .let { NetResult.Data(it) }
                 } else {
-                    errorMapper.notConnected<List<PlaylistDomain>>()
+                    errorMapper.notConnected<PlaylistDomain>()
                 }
             } catch (ex: Throwable) {
-                errorMapper.map<List<PlaylistDomain>>(ex, "playlist: error: $id")
+                errorMapper.map<PlaylistDomain>(ex, "playlist: error: $id")
             }
         }
 

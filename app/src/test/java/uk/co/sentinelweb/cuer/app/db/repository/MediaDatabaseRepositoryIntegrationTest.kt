@@ -16,7 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import uk.co.sentinelweb.cuer.app.CuerTestApplication
+import uk.co.sentinelweb.cuer.app.CuerTestApp
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
@@ -32,7 +32,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
  * Integration test for MediaDatabaseRepository
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(application = CuerTestApplication::class)
+@Config(application = CuerTestApp::class)
 @ExperimentalCoroutinesApi
 
 class MediaDatabaseRepositoryIntegrationTest {

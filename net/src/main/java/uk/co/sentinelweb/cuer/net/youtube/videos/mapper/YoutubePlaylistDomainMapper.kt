@@ -20,12 +20,10 @@ internal class YoutubePlaylistDomainMapper(
         items: List<YoutubePlaylistItemDto.PlaylistItemDto>,
         videoDtos: List<YoutubeVideosDto.VideoDto>,
         channelDtos: List<YoutubeChannelsDto.ItemDto>
-    )
-            : List<PlaylistDomain> {
-
+    ): PlaylistDomain {
         val videoLookup = videoDtos.associateBy({ it.id }, { it })
         val channelLookup = channelDtos.associateBy({ it.id }, { channelMapper.map(it) })
-        return dto.items.map {
+        return dto.items[0].let {
             PlaylistDomain(
                 id = null,
                 title = it.snippet.title,

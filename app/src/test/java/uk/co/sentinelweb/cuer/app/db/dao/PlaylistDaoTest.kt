@@ -15,7 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import uk.co.sentinelweb.cuer.app.CuerTestApplication
+import uk.co.sentinelweb.cuer.app.CuerTestApp
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
@@ -23,7 +23,7 @@ import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = CuerTestApplication::class)
+@Config(application = CuerTestApp::class)
 class PlaylistDaoTest {
     private lateinit var database: AppDatabase
     private lateinit var playlistDao: PlaylistDao

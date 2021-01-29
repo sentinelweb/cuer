@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
+import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 
@@ -79,7 +80,7 @@ interface MainContract {
                 }
                 scoped { YoutubeJavaApiWrapper(getSource()) }
                 viewModel { State() }
-                scoped { SnackbarWrapper(getSource()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource()) }
                 scoped<PlaylistItemEditContract.DoneNavigation> {
                     MainDoneNavigation(get())
                 }

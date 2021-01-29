@@ -9,6 +9,8 @@ import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.PLAYLIST
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 
 val urlMediaMappers = listOf(
     YoutubeShortUrlMediaMapper(),
@@ -76,14 +78,16 @@ private class YoutubeUrlPlaylistMapper : UrlMediaMapper {
         PLAYLIST to PlaylistDomain(
             id = null,
             config = PlaylistDomain.PlaylistConfigDomain(
-                updateUrl = uri.toString()// todo might need to generate the api url or have fields for both
+                platformUrl = uri.toString()
             ),
+            type = PLATFORM,
+            platform = YOUTUBE,
             platformId = uri.getQueryParameters("list")[0],
             starred = false,
             items = listOf(),
             currentIndex = -1,
             title = "",
-            mode = PlaylistDomain.PlaylistModeDomain.SINGLE,
+            mode = SINGLE,
             parentId = null,
             default = false,
             archived = false,

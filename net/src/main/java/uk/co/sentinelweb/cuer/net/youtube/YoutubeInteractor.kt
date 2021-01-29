@@ -25,5 +25,5 @@ interface YoutubeInteractor {
     @Throws(Exception::class)
     suspend fun playlist(
         id: String
-    ): NetResult<List<PlaylistDomain>>
+    ): NetResult<PlaylistDomain>
 }

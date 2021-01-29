@@ -11,6 +11,10 @@ android {
     compileSdkVersion project.properties.app_compileSdkVersion as int
     buildToolsVersion project.properties.app_buildToolsVersion
 
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
+
     defaultConfig {
         applicationId project.properties.app_applicationId
         minSdkVersion project.properties.app_minSdkVersion as int
@@ -143,7 +147,9 @@ dependencies {
     testImplementation "junit:junit:$ver_junit"
     testImplementation "org.koin:koin-test:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
-    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: ver_hamcrest
+    testImplementation "com.google.truth:truth:$ver_truth"
+    testImplementation "org.mockito:mockito-inline:$ver_mockito_inline"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$ver_mockito"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
     testImplementation "androidx.room:room-testing:$ver_room"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test"
@@ -157,10 +163,10 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
 
-
     androidTestImplementation "org.koin:koin-test:$ver_koin"
-    androidTestImplementation "io.mockk:mockk:$ver_mockk"
-    androidTestImplementation group: 'org.hamcrest', name: 'hamcrest', version: ver_hamcrest
+    androidTestImplementation "com.google.truth:truth:$ver_truth"
+    androidTestImplementation "org.mockito:mockito-core:3.7.7"
+    androidTestImplementation "org.mockito:mockito-android:3.7.7"
     androidTestImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
     androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     androidTestImplementation "androidx.test:core:$ver_androidx_test"
@@ -173,5 +179,6 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-web:$ver_espresso_core"
     androidTestImplementation "androidx.test.espresso.idling:idling-concurrent:$ver_espresso_core"
     androidTestImplementation "androidx.test.espresso:espresso-idling-resource:$ver_espresso_core"
+    androidTestImplementation "org.robolectric:annotations:$ver_robolectric"
 
 }

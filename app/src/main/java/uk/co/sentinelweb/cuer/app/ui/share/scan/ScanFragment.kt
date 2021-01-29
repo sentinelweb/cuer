@@ -28,7 +28,6 @@ class ScanFragment : Fragment(R.layout.scan_fragment), ScanContract.View {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
     }
 
     override fun fromShareUrl(uriString: String) {
@@ -44,7 +43,7 @@ class ScanFragment : Fragment(R.layout.scan_fragment), ScanContract.View {
     override fun setModel(model: ScanContract.Model) {
         binding.scanResult.setImageResource(model.resultIcon)
         binding.scanText.isVisible = true
-        binding.scanText.text = "${model.title} ${model.type} ${model.platformId}"
+        binding.scanText.text = model.text
         binding.scanProgress.isVisible = model.isLoading
         binding.scanResult.isVisible = !model.isLoading
     }

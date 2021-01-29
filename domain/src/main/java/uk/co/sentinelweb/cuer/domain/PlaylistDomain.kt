@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.domain
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 import java.time.Instant
 import java.time.LocalDateTime
 
@@ -14,7 +15,7 @@ data class PlaylistDomain constructor(
     val currentIndex: Int = 0, // todo make nullable
     val parentId: Long? = null,
     val mode: PlaylistModeDomain = SINGLE,
-    val type: PlaylistTypeDomain = PlaylistTypeDomain.USER,
+    val type: PlaylistTypeDomain = USER,
     val platform: PlatformDomain? = null,
     val channelData: ChannelDomain? = null,
     val platformId: String? = null,
@@ -39,6 +40,7 @@ data class PlaylistDomain constructor(
     @Serializable
     data class PlaylistConfigDomain constructor(
         val updateUrl: String? = null,
+        val platformUrl: String? = null,
         @Contextual val lastUpdate: Instant? = null,
         @Contextual val published: LocalDateTime? = null,
         val updateInterval: Long? = null,
