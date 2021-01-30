@@ -112,7 +112,7 @@ class PlaylistDatabaseRepository constructor(
                     .also { database.endTransaction() }
 
                 RepoResult.Data(loadList(IdListFilter(insertIds), flat).data)
-                // todo emit
+                    .also { if (emit) it.data?.forEach { _playlistFlow.emit((if (flat) FLAT else FULL) to it) } }
             } catch (e: Throwable) {
                 val msg = "couldn't save playlists ${domains.joinToString { it.title }}"
                 log.e(msg, e)
@@ -206,7 +206,7 @@ class PlaylistDatabaseRepository constructor(
 
     override suspend fun delete(domain: PlaylistDomain) = delete(domain, true)
 
-    private suspend fun delete(domain: PlaylistDomain, emit: Boolean = false): RepoResult<Boolean> =
+    suspend fun delete(domain: PlaylistDomain, emit: Boolean = false): RepoResult<Boolean> =
         withContext(coProvider.IO) {
             try {
                 domain

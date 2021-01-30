@@ -16,7 +16,7 @@ class ChannelOrchestrator constructor(
         TODO("Not yet implemented")
     }
 
-    suspend override fun loadList(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): List<ChannelDomain>? {
+    suspend override fun loadList(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): List<ChannelDomain> {
         TODO("Not yet implemented")
     }
 
@@ -28,11 +28,11 @@ class ChannelOrchestrator constructor(
         TODO("Not yet implemented")
     }
 
-    suspend override fun save(domain: ChannelDomain, options: OrchestratorContract.Options): ChannelDomain? {
+    suspend override fun save(domain: ChannelDomain, options: OrchestratorContract.Options): ChannelDomain {
         TODO("Not yet implemented")
     }
 
-    suspend override fun save(domains: List<ChannelDomain>, options: OrchestratorContract.Options): ChannelDomain? {
+    suspend override fun save(domains: List<ChannelDomain>, options: OrchestratorContract.Options): List<ChannelDomain> {
         TODO("Not yet implemented")
     }
 

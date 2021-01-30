@@ -22,15 +22,15 @@ class PlaylistStatsOrchestrator constructor(
         TODO("Not yet implemented")
     }
 
-    suspend override fun loadList(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): List<PlaylistStatDomain>? {
+    suspend override fun loadList(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): List<PlaylistStatDomain> {
         TODO("Not yet implemented")
     }
 
-    suspend override fun save(domain: PlaylistStatDomain, options: OrchestratorContract.Options): PlaylistStatDomain? {
+    suspend override fun save(domain: PlaylistStatDomain, options: OrchestratorContract.Options): PlaylistStatDomain {
         TODO("Not yet implemented")
     }
 
-    suspend override fun save(domains: List<PlaylistStatDomain>, options: OrchestratorContract.Options): PlaylistStatDomain? {
+    suspend override fun save(domains: List<PlaylistStatDomain>, options: OrchestratorContract.Options): List<PlaylistStatDomain> {
         TODO("Not yet implemented")
     }
 

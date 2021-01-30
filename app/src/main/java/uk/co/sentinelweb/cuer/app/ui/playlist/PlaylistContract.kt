@@ -112,8 +112,9 @@ interface PlaylistContract {
                     PlaylistPresenter(
                         view = get(),
                         state = get(),
-                        repository = get(),
-                        playlistRepository = get(),
+                        mediaOrchestrator = get(),
+                        playlistOrchestrator = get(),
+                        playlistItemOrchestrator = get(),
                         modelMapper = get(),
                         queue = get(),
                         toastWrapper = get(),

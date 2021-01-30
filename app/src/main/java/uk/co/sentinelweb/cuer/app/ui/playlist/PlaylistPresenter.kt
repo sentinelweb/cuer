@@ -6,8 +6,11 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsend
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options.Companion.LOCAL_DEEP
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options.Companion.LOCAL_FLAT
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -35,8 +38,9 @@ import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 class PlaylistPresenter(
     private val view: PlaylistContract.View,
     private val state: PlaylistContract.State,
-    private val repository: MediaDatabaseRepository,
-    private val playlistRepository: PlaylistDatabaseRepository,
+    private val mediaOrchestrator: MediaOrchestrator,
+    private val playlistOrchestrator: PlaylistOrchestrator,
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val modelMapper: PlaylistModelMapper,
     private val queue: QueueMediatorContract.Producer,
     private val toastWrapper: ToastWrapper,
@@ -163,7 +167,7 @@ class PlaylistPresenter(
     private fun commitHeaderChange() {
         state.viewModelScope.launch {
             state.playlist?.let {
-                playlistRepository.save(it, flat = true)
+                playlistOrchestrator.save(it, LOCAL_FLAT)
                 queueExecIf { refreshHeaderData() }
             }
             state.playlist?.apply {
@@ -217,7 +221,7 @@ class PlaylistPresenter(
         state.selectedPlaylistItem?.let { moveItem ->
             state.viewModelScope.launch {
                 moveItem.copy(playlistId = it, order = timeProvider.currentTimeMillis())
-                    .apply { playlistRepository.savePlaylistItem(this) }
+                    .apply { playlistItemOrchestrator.save(this, LOCAL_FLAT) }
                 // todo update playlist pointer
                 executeRefresh()
                 queueExecIf { refreshQueueFrom(state.playlist!!) }
@@ -241,8 +245,9 @@ class PlaylistPresenter(
                             state.viewModelScope.launch {
                                 state.deletedPlaylistItem = deleteItem
                                 val mutated = playlistMutator.delete(plist, deleteItem)
-                                playlistRepository.delete(deleteItem)
-                                playlistRepository.save(mutated, true)// save currentIndex
+                                // todo handle errors
+                                playlistItemOrchestrator.delete(deleteItem, LOCAL_FLAT)
+                                playlistOrchestrator.updateCurrentIndex(mutated, LOCAL_FLAT)
                                 view.showDeleteUndo("Deleted: ${deleteItem.media.title}")
                                 executeRefresh(false)
                             }
@@ -344,8 +349,7 @@ class PlaylistPresenter(
                     .also { view.setModel(it, false) }
             }?.also { plist ->
                 state.viewModelScope.launch {
-                    playlistRepository.save(plist, false)
-                        .takeIf { it.isSuccessful }
+                    playlistOrchestrator.save(plist, LOCAL_DEEP)
                         ?: toastWrapper.show("Couldn't save playlist")
                     queueExecIf {
                         refreshQueueFrom(plist)
@@ -399,7 +403,7 @@ class PlaylistPresenter(
     override fun undoDelete() {
         state.deletedPlaylistItem?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistRepository.savePlaylistItem(itemDomain)
+                playlistItemOrchestrator.save(itemDomain, LOCAL_FLAT)
                 state.focusIndex = state.lastFocusIndex
                 executeRefresh()
                 (state.playlist?.items?.indexOfFirst { it.id == itemDomain.id } ?: -2).let { restoredIndex ->
@@ -407,7 +411,7 @@ class PlaylistPresenter(
                         state.playlist?.currentIndex?.also { currentIndex ->
                             if (restoredIndex <= currentIndex) {
                                 state.playlist = state.playlist?.copy(currentIndex = currentIndex + 1)
-                                state.playlist?.let { playlistRepository.updateCurrentIndex(it) }
+                                state.playlist?.let { playlistOrchestrator.updateCurrentIndex(it, LOCAL_FLAT) }
                                 view.scrollToItem(restoredIndex)
                                 view.highlightPlayingItem(currentIndex + 1)
                             }
@@ -444,7 +448,7 @@ class PlaylistPresenter(
     private suspend fun executeRefresh(animate: Boolean = true, scrollToItem: Boolean = false) {
         //log.d("executeRefresh state.playlistId=${state.playlistId}")
         try {
-            playlistRepository.getPlaylistOrDefault(state.playlistId)
+            playlistOrchestrator.getPlaylistOrDefault(state.playlistId, LOCAL_DEEP)
                 .also { state.playlist = it }
                 ?.also { state.playlistId = it.id }
                 .also { updateView(animate) }

@@ -26,12 +26,11 @@ class PlaylistItemOrchestrator constructor(
             OrchestratorContract.Source.PLATFORM -> throw OrchestratorContract.InvalidOperationException(this::class, null, options)
         }
 
-    suspend override fun loadList(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): List<PlaylistItemDomain>? =
+    suspend override fun loadList(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): List<PlaylistItemDomain> =
         when (options.source) {
             OrchestratorContract.Source.MEMORY -> TODO()
             OrchestratorContract.Source.LOCAL -> playlistDatabaseRepository.loadPlaylistItems(filter)
-                .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
-                ?.data
+                .forceDatabaseListResultNotEmpty("Playlist item $filter does not exist")
             OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
             OrchestratorContract.Source.REMOTE -> TODO()
             OrchestratorContract.Source.PLATFORM -> throw OrchestratorContract.InvalidOperationException(this::class, filter, options)
@@ -46,28 +45,25 @@ class PlaylistItemOrchestrator constructor(
             OrchestratorContract.Source.MEMORY -> TODO()
             OrchestratorContract.Source.LOCAL -> domain.id?.let {
                 playlistDatabaseRepository.loadPlaylistItem(it)
-                    .takeIf { it.isSuccessful }
-                    ?.data
+                    .allowDatabaseFail()
             }
-                ?: throw OrchestratorContract.DoesNotExistException("PlaylistItemDomain($domain?.id)")
 
             OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
             OrchestratorContract.Source.REMOTE -> TODO()
             OrchestratorContract.Source.PLATFORM -> throw OrchestratorContract.InvalidOperationException(this::class, null, options)
         }
 
-    suspend override fun save(domain: PlaylistItemDomain, options: OrchestratorContract.Options): PlaylistItemDomain? =
+    suspend override fun save(domain: PlaylistItemDomain, options: OrchestratorContract.Options): PlaylistItemDomain =
         when (options.source) {
             OrchestratorContract.Source.MEMORY -> TODO()
             OrchestratorContract.Source.LOCAL -> playlistDatabaseRepository.savePlaylistItem(domain, options.flat)
-                .takeIf { it.isSuccessful }
-                ?.data
+                .forceDatabaseSuccess("Svae failed $domain")
             OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
             OrchestratorContract.Source.REMOTE -> TODO()
             OrchestratorContract.Source.PLATFORM -> throw OrchestratorContract.InvalidOperationException(this::class, null, options)
         }
 
-    suspend override fun save(domains: List<PlaylistItemDomain>, options: OrchestratorContract.Options): PlaylistItemDomain? {
+    suspend override fun save(domains: List<PlaylistItemDomain>, options: OrchestratorContract.Options): List<PlaylistItemDomain> {
         TODO("Not yet implemented")
     }
 

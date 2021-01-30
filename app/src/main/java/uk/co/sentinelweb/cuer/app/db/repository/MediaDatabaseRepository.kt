@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import java.io.InvalidObjectException
-
+// todo emit
 @Suppress("DEPRECATION")
 class MediaDatabaseRepository constructor(
     private val mediaDao: MediaDao,
@@ -59,6 +59,7 @@ class MediaDatabaseRepository constructor(
                     .also { database.setTransactionSuccessful() }
                     .also { database.endTransaction() }
                     .let { idlist -> Data(loadList(OrchestratorContract.IdListFilter(idlist)).data) }
+                //.also { if (emit) it.data?.forEach { .emit((if (flat) OrchestratorContract.Operation.FLAT else OrchestratorContract.Operation.FULL) to it) } }
             } catch (e: Throwable) {
                 val msg = "Couldn't save ${domains.map { it.url }}"
                 log.e(msg, e)

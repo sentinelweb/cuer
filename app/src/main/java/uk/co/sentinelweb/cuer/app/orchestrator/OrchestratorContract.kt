@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
+import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.net.NetResult
 import kotlin.reflect.KClass
 
 interface OrchestratorContract<Domain> {
@@ -15,11 +17,11 @@ interface OrchestratorContract<Domain> {
 
     suspend fun load(id: Long, options: Options): Domain?
 
-    suspend fun loadList(filter: Filter, options: Options): List<Domain>?
+    suspend fun loadList(filter: Filter, options: Options): List<Domain>
 
-    suspend fun save(domain: Domain, options: Options): Domain?
+    suspend fun save(domain: Domain, options: Options): Domain
 
-    suspend fun save(domains: List<Domain>, options: Options): Domain?
+    suspend fun save(domains: List<Domain>, options: Options): List<Domain>
 
     suspend fun count(filter: Filter, options: Options): Int
 
@@ -31,7 +33,12 @@ interface OrchestratorContract<Domain> {
         val source: Source,
         val flat: Boolean = true,
         val emit: Boolean = true
-    )
+    ) {
+        companion object {
+            val LOCAL_FLAT = Options(Source.LOCAL)
+            val LOCAL_DEEP = Options(Source.LOCAL, flat = false)
+        }
+    }
 
     class DeleteOptions(source: Source) : Options(source, false)
 
@@ -48,4 +55,6 @@ interface OrchestratorContract<Domain> {
 
     class NotImplementedException(msg: String? = null) : Exception(msg)
     class DoesNotExistException(msg: String? = null) : Exception(msg)
+    class DatabaseException(result: RepoResult<*>) : Exception((result as RepoResult.Error<*>).msg, result.t)
+    class NetException(result: NetResult<*>) : Exception((result as NetResult.Error<*>).msg, result.t)
 }
