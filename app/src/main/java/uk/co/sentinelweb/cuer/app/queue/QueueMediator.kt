@@ -2,8 +2,11 @@ package uk.co.sentinelweb.cuer.app.queue
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options.Companion.LOCAL_DEEP
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options.Companion.LOCAL_FLAT
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract.ConsumerListener
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract.ProducerListener
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
@@ -22,8 +25,9 @@ import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 class QueueMediator constructor(
     private val state: QueueMediatorState,
-    private val repository: MediaDatabaseRepository,
-    private val playlistRepository: PlaylistDatabaseRepository,
+    private val mediaOrchestrator: MediaOrchestrator,
+    private val playlistOrchestrator: PlaylistOrchestrator,
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val contextProvider: CoroutineContextProvider,
     private val mediaSessionManager: MediaSessionManager,
     private val playlistMutator: PlaylistMutator,
@@ -59,9 +63,7 @@ class QueueMediator constructor(
     }
 
     override suspend fun playNow(playlistId: Long, playlistItemId: Long?) {
-        playlistRepository.load(playlistId, false)
-            .takeIf { it.isSuccessful }
-            ?.data
+        playlistOrchestrator.load(playlistId, LOCAL_DEEP)
             ?.let {
                 //log.d("playNow(loaded playlist= ${it.id}, requested=$playlistId, item = $playlistItemId)")
                 playNow(it, playlistItemId)
@@ -73,7 +75,7 @@ class QueueMediator constructor(
             //log.d("playNow(load found Index= $foundIndex)")
             playlist.let {
                 it.copy(currentIndex = foundIndex).apply {
-                    playlistRepository.save(it, false)
+                    playlistOrchestrator.save(it, LOCAL_FLAT)
                 }
             }
         }?.also {
@@ -111,7 +113,7 @@ class QueueMediator constructor(
                 dateLastPlayed = updatedMedia.dateLastPlayed,
                 watched = true
             )
-            exec { repository.save(mediaUpdated, true) }
+            exec { mediaOrchestrator.save(mediaUpdated, LOCAL_FLAT) }
             copy(media = mediaUpdated)
         }
         state.playlist = state.playlist?.let {
@@ -143,8 +145,8 @@ class QueueMediator constructor(
             val isCurrentItem = currentItem?.id == deleteItem.id
             exec {
                 val mutated = playlistMutator.delete(plist, deleteItem)
-                playlistRepository.delete(deleteItem)
-                playlistRepository.updateCurrentIndex(mutated)
+                playlistItemOrchestrator.delete(deleteItem, LOCAL_FLAT)
+                playlistOrchestrator.updateCurrentIndex(mutated, LOCAL_FLAT)
                 refreshQueueFrom(mutated)
                 if (isCurrentItem) {
                     if (mutated.currentIndex > -1) {
@@ -165,17 +167,9 @@ class QueueMediator constructor(
         exec {
             state.playlist?.let { plist ->
                 plist.id?.let { id ->
-                    playlistRepository.load(id, true)
-                        .takeIf { it.isSuccessful }
+                    playlistOrchestrator.load(id, LOCAL_FLAT)
                         ?.apply {
-                            data?.apply {
-                                refreshQueueFrom(
-                                    copy(
-                                        currentIndex = plist.currentIndex,
-                                        items = plist.items
-                                    )
-                                )
-                            }
+                            refreshQueueFrom(copy(currentIndex = plist.currentIndex, items = plist.items))
                         }
                 }
             }
@@ -206,20 +200,21 @@ class QueueMediator constructor(
     private fun updateCurrentItem(resetPosition: Boolean) {
         state.currentItem = state.playlist
             ?.let { playlist ->
-                exec { playlistRepository.save(playlist, true) }
+                exec { playlistOrchestrator.updateCurrentIndex(playlist, LOCAL_FLAT) }
                 playlist.currentIndex.let { playlist.items[it] }
             }
             ?: throw NullPointerException("playlist should not be null")
-        log.d("updateCurrentItem: currentItemId=${state.currentItem?.id} currentMediaId=${state.currentItem?.media?.id} currentIndex=${state.playlist?.currentIndex} items.size=${state.playlist?.items?.size} ")
+        //log.d("updateCurrentItem: currentItemId=${state.currentItem?.id} currentMediaId=${state.currentItem?.media?.id} currentIndex=${state.playlist?.currentIndex} items.size=${state.playlist?.items?.size} ")
         if (resetPosition) {
-            state.currentItem?.apply { updateMediaItem(media.copy(positon = 0)) }
+            state.currentItem?.apply { exec { updateMediaItem(media.copy(positon = 0)) } }
         }
         state.currentItem?.apply {
             mediaSessionManager.setMedia(media)
         }
-
-        consumerListeners.forEach { it.onItemChanged() }
-        producerListeners.forEach { it.onItemChanged() }
+        execMain {
+            consumerListeners.forEach { it.onItemChanged() }
+            producerListeners.forEach { it.onItemChanged() }
+        }
 
     }
 
@@ -233,6 +228,10 @@ class QueueMediator constructor(
 
     fun exec(block: suspend () -> Unit) {
         contextProvider.computationScope.launch { block() }
+    }
+
+    fun execMain(block: suspend () -> Unit) {
+        contextProvider.mainScope.launch { block() }
     }
 
     override fun refreshQueueFrom(playlistDomain: PlaylistDomain) {
@@ -255,9 +254,8 @@ class QueueMediator constructor(
 
     override suspend fun refreshQueue() {
         state.playlistId
-            ?.let { playlistRepository.getPlaylistOrDefault(it) }
+            ?.let { playlistOrchestrator.getPlaylistOrDefault(it, LOCAL_DEEP) }
             ?.also { refreshQueueFrom(it) }
-        //?: throw IllegalStateException("Could not load a playlist")
     }
 
 }

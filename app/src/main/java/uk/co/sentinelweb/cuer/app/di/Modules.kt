@@ -99,8 +99,9 @@ object Modules {
         single<QueueMediatorContract.Producer> {
             QueueMediator(
                 state = QueueMediatorState(),
-                repository = get(),
-                playlistRepository = get(),
+                mediaOrchestrator = get(),
+                playlistOrchestrator = get(),
+                playlistItemOrchestrator = get(),
                 contextProvider = get(),
                 mediaSessionManager = get(),
                 playlistMutator = get(),
