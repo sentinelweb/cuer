@@ -17,11 +17,12 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
+import uk.co.sentinelweb.cuer.app.CuerTestApp
 import uk.co.sentinelweb.cuer.tools.ext.build
 import uk.co.sentinelweb.cuer.tools.ext.buildCollection
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = intArrayOf(28))
+@Config(sdk = intArrayOf(28), application = CuerTestApp::class)
 class ResourceWrapperTest {
 
     @Mock
