@@ -32,5 +32,5 @@ jobs:
         env:
           YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
       - name: Android Test Report
-          uses: asadmansr/android-test-report-action@v1.2.0
-          if: ${{ always() }} # IMPORTANT: run Android Test Report regardless
+        uses: asadmansr/android-test-report-action@v1.2.0
+        if: ${{ always() }} # IMPORTANT: run Android Test Report regardless
