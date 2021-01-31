@@ -4,9 +4,11 @@ import androidx.lifecycle.viewModelScope
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options.Companion.LOCAL_DEEP
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options.Companion.LOCAL_FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
@@ -30,9 +32,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.ext.currentItemOrStart
-import uk.co.sentinelweb.cuer.domain.ext.indexOfItemId
-import uk.co.sentinelweb.cuer.domain.ext.itemWitId
+import uk.co.sentinelweb.cuer.domain.ext.*
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 class PlaylistPresenter(
@@ -54,7 +54,7 @@ class PlaylistPresenter(
     private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator,
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider
-) : PlaylistContract.Presenter, QueueMediatorContract.ProducerListener {
+) : PlaylistContract.Presenter/*, QueueMediatorContract.ProducerListener*/ {
 
     init {
         log.tag(this)
@@ -88,6 +88,41 @@ class PlaylistPresenter(
 
     override fun onResume() {
         ytContextHolder.addConnectionListener(castConnectionListener)
+        listenToRepository()
+    }
+
+    private fun listenToRepository() {
+        coroutines.mainScope.launch {// this may mis an update if it occur dureing a rotation
+            playlistOrchestrator.updates.collect { (op, plist) ->
+                when (op) {
+                    FLAT -> state.playlist = state.playlist?.replaceHeader(plist)
+                        ?.apply { updateHeader() }
+                    FULL -> {
+                        state.playlist = plist
+                        updateView()
+                    }
+                    DELETE -> toastWrapper.show("TODO : Playlist deleted!!!!")// todo exit screen?
+                }
+            }
+        }
+        coroutines.computationScope.launch {
+            playlistItemOrchestrator.updates.collect { (op, plistItem) ->
+                state.playlist?.items?.find { it.id == plistItem.id }
+                    ?.let { foundItem ->
+                        when (op) {
+                            FLAT,
+                            FULL -> if (plistItem.playlistId == state.playlistId) {
+                                state.playlist = state.playlist?.replaceItem(plistItem)
+                            } else {
+                                state.playlist = state.playlist?.removeItem(plistItem)
+                            }
+                            DELETE ->
+                                state.playlist = state.playlist?.removeItem(plistItem)
+                        }
+                    }?.apply { this@PlaylistPresenter.updateView(true) }
+                    .let { Unit }
+            }
+        }
     }
 
     override fun onPause() {
@@ -109,7 +144,7 @@ class PlaylistPresenter(
 
 
     override fun initialise() {
-        queue.addProducerListener(this)
+        //queue.addProducerListener(this)
         state.playlistId = prefsWrapper.getLong(CURRENT_PLAYLIST_ID)
         //log.d("initialise state.playlistId=${state.playlistId}")
     }
@@ -123,7 +158,7 @@ class PlaylistPresenter(
     }
 
     override fun destroy() {
-        queue.removeProducerListener(this)
+        //queue.removeProducerListener(this)
     }
 
     override fun onItemSwipeRight(item: ItemContract.Model) {// move
@@ -152,27 +187,23 @@ class PlaylistPresenter(
     }
 
     override fun onPlayModeChange(): Boolean {
-        state.playlist = state.playlist?.copy(
+        state.playlist?.copy(
             mode = when (state.playlist?.mode) {
                 SINGLE -> SHUFFLE
                 SHUFFLE -> LOOP
                 LOOP -> SINGLE
                 else -> SINGLE
             }
-        )
-        commitHeaderChange()
+        )?.apply {
+            commitHeaderChange(this)
+        }
         return true
     }
 
-    private fun commitHeaderChange() {
+    private fun commitHeaderChange(plist: PlaylistDomain) {
         state.viewModelScope.launch {
-            state.playlist?.let {
-                playlistOrchestrator.save(it, LOCAL_FLAT)
-                queueExecIf { refreshHeaderData() }
-            }
-            state.playlist?.apply {
-                view.setHeaderModel(modelMapper.map(this, isPlaylistPlaying(), false))
-            }
+            playlistOrchestrator.save(plist, LOCAL_FLAT)
+            //queueExecIf { refreshHeaderData() } // todo remove this and add flow collector
         }
     }
 
@@ -182,9 +213,12 @@ class PlaylistPresenter(
         } else {
             state.playlist?.let {
                 prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
-                queue.refreshQueueFrom(it)
-                it.currentItemOrStart()?.let { queue.onItemSelected(it, forcePlay = true, resetPosition = false) }
-                    ?: toastWrapper.show("No items to play")
+                //queue.refreshQueueFrom(it)
+                coroutines.computationScope.launch {
+                    it.id?.apply { queue.switchToPlaylist(this) }
+                    it.currentItemOrStart()?.let { queue.onItemSelected(it, forcePlay = true, resetPosition = false) }
+                        ?: toastWrapper.show("No items to play")
+                }
             }
             if (!ytContextHolder.isConnected()) {
                 view.showCastRouteSelectorDialog()
@@ -195,8 +229,8 @@ class PlaylistPresenter(
     }
 
     override fun onStarPlaylist(): Boolean {
-        state.playlist = state.playlist?.let { it.copy(starred = !it.starred) }
-        commitHeaderChange()
+        state.playlist?.let { commitHeaderChange(it.copy(starred = !it.starred)) }
+
         return true
     }
 
@@ -224,7 +258,7 @@ class PlaylistPresenter(
                     .apply { playlistItemOrchestrator.save(this, LOCAL_FLAT) }
                 // todo update playlist pointer
                 executeRefresh()
-                queueExecIf { refreshQueueFrom(state.playlist!!) }
+                // queueExecIf { refreshQueueFrom(state.playlist!!) }
             }
         }
     }
@@ -290,8 +324,11 @@ class PlaylistPresenter(
             view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
                 state.playlist?.let {
                     prefsWrapper.putLong(CURRENT_PLAYLIST_ID, it.id!!)
-                    queue.refreshQueueFrom(it)
-                    queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)
+                    //queue.refreshQueueFrom(it)
+                    coroutines.computationScope.launch {
+                        it.id?.apply { queue.switchToPlaylist(this) }
+                        queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)
+                    }
                 }
             }, {// info
                 view.showItemDescription(itemDomain)
@@ -352,7 +389,7 @@ class PlaylistPresenter(
                     playlistOrchestrator.save(plist, LOCAL_DEEP)
                         ?: toastWrapper.show("Couldn't save playlist")
                     queueExecIf {
-                        refreshQueueFrom(plist)
+                        //refreshQueueFrom(plist) // refresh from flow
                         view.highlightPlayingItem(currentItemIndex)
                     }
                 }
@@ -374,7 +411,7 @@ class PlaylistPresenter(
                 ?.apply {
                     prefsWrapper.putLong(LAST_PLAYLIST_VIEWED_ID, plId)
                     state.playlistId = plId
-                    executeRefresh()
+                    executeRefresh(scrollToItem = true)
                     //log.d("setPlaylistData(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
                     if (playNow) {
                         state.playlist?.apply {
@@ -397,13 +434,18 @@ class PlaylistPresenter(
                 state.playlistId = prefsWrapper.getLong(LAST_PLAYLIST_VIEWED_ID)
                 executeRefresh()
             }
+            queueExecIf {
+                coroutines.mainScope.launch {
+                    queue.currentItemFlow.collect { view.highlightPlayingItem(queue.currentItemIndex) }
+                }
+            }
         }
     }
 
     override fun undoDelete() {
         state.deletedPlaylistItem?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistItemOrchestrator.save(itemDomain, LOCAL_FLAT)
+                playlistItemOrchestrator.save(itemDomain, LOCAL_FLAT.copy(emit = false))
                 state.focusIndex = state.lastFocusIndex
                 executeRefresh()
                 (state.playlist?.items?.indexOfFirst { it.id == itemDomain.id } ?: -2).let { restoredIndex ->
@@ -411,35 +453,38 @@ class PlaylistPresenter(
                         state.playlist?.currentIndex?.also { currentIndex ->
                             if (restoredIndex <= currentIndex) {
                                 state.playlist = state.playlist?.copy(currentIndex = currentIndex + 1)
-                                state.playlist?.let { playlistOrchestrator.updateCurrentIndex(it, LOCAL_FLAT) }
+                                state.playlist?.let { playlistOrchestrator.updateCurrentIndex(it, LOCAL_FLAT.copy(emit = false)) }
                                 view.scrollToItem(restoredIndex)
-                                view.highlightPlayingItem(currentIndex + 1)
+                                queueExecIf {
+                                    refreshQueueBackground()
+                                }
+                                //view.highlightPlayingItem(currentIndex + 1)
                             }
                         }
                     }
                 }
                 state.deletedPlaylistItem = null
-                queueExecIf { refreshQueueFrom(state.playlist ?: throw java.lang.IllegalStateException("playlist is null")) }
+                //queueExecIf { refreshQueueFrom(state.playlist ?: throw java.lang.IllegalStateException("playlist is null")) }
             }
         }
     }
 
-    override fun onPlaylistUpdated(list: PlaylistDomain) {
-        state.playlist = list
-        state.viewModelScope.launch {
-            updateView()
-        }
-    }
+//    override fun onPlaylistUpdated(list: PlaylistDomain) {
+//        state.playlist = list
+//        state.viewModelScope.launch {
+//            updateView()
+//        }
+//    }
 
-    override fun onItemChanged() {
-        queueExecIf {
-            currentItemIndex?.apply {
-                state.playlist = state.playlist?.copy(currentIndex = this)
-            } ?: throw IllegalStateException("Current item is null")
-            view.highlightPlayingItem(currentItemIndex)
-            currentItemIndex?.apply { view.scrollToItem(this) }
-        }
-    }
+//    override fun onItemChanged() {
+//        queueExecIf {
+//            currentItemIndex?.apply {
+//                state.playlist = state.playlist?.copy(currentIndex = this)
+//            } ?: throw IllegalStateException("Current item is null")
+//            view.highlightPlayingItem(currentItemIndex)
+//            currentItemIndex?.apply { view.scrollToItem(this) }
+//        }
+//    }
 
     private fun refreshPlaylist() {
         state.viewModelScope.launch { executeRefresh() }

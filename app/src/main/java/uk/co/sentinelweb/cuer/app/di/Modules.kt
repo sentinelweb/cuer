@@ -102,7 +102,7 @@ object Modules {
                 mediaOrchestrator = get(),
                 playlistOrchestrator = get(),
                 playlistItemOrchestrator = get(),
-                contextProvider = get(),
+                coroutines = get(),
                 mediaSessionManager = get(),
                 playlistMutator = get(),
                 prefsWrapper = get(named<GeneralPreferences>()),

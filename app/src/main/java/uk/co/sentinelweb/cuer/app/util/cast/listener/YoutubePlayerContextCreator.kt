@@ -5,6 +5,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsend
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -14,6 +15,7 @@ class YoutubePlayerContextCreator constructor(
     private val mediaSessionManager: MediaSessionManager,
     private val castWrapper: ChromeCastWrapper,
     private val timeProvider: TimeProvider
+
 ) {
 
     fun createContext(
@@ -26,10 +28,18 @@ class YoutubePlayerContextCreator constructor(
         this,
         mediaSessionManager,
         castWrapper,
-        queue
+        queue,
+        CoroutineContextProvider()
     )
 
     fun createPlayerListener() =
-        YouTubePlayerListener(YouTubePlayerListenerState(), queue, mediaSessionManager, log, timeProvider)
+        YouTubePlayerListener(
+            YouTubePlayerListenerState(),
+            queue,
+            mediaSessionManager,
+            log,
+            timeProvider,
+            CoroutineContextProvider()
+        )
 
 }

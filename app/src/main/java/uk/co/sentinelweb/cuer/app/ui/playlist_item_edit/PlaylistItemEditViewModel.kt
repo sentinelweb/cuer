@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options.Companion.LOCAL_DEEP
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
@@ -296,7 +297,7 @@ class PlaylistItemEditViewModel constructor(
             if (state.isPlaylistsChanged && state.editingPlaylistItem?.playlistId != null) {
                 state.editingPlaylistItem?.also { item ->
                     if (!state.selectedPlaylistIds.contains(item.playlistId)) {
-                        playlistItemOrchestrator.delete(item, DeleteOptions(LOCAL))
+                        playlistItemOrchestrator.delete(item, LOCAL_DEEP)
                     }
                 }
             }

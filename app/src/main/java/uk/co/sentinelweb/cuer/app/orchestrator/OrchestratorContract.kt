@@ -29,7 +29,7 @@ interface OrchestratorContract<Domain> {
 
     interface Filter
 
-    open class Options constructor(
+    data class Options constructor(
         val source: Source,
         val flat: Boolean = true,
         val emit: Boolean = true
@@ -39,8 +39,6 @@ interface OrchestratorContract<Domain> {
             val LOCAL_DEEP = Options(Source.LOCAL, flat = false)
         }
     }
-
-    class DeleteOptions(source: Source) : Options(source, false)
 
     enum class Operation { FLAT, FULL, DELETE }
 
