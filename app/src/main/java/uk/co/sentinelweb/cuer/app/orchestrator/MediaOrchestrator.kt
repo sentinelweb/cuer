@@ -13,7 +13,7 @@ class MediaOrchestrator constructor(
     private val ytInteractor: YoutubeInteractor
 ) : OrchestratorContract<MediaDomain> {
 
-    override val updates: Flow<Pair<Operation, MediaDomain>>
+    override val updates: Flow<Triple<Operation, Source, MediaDomain>>
         get() = TODO("Not yet implemented")
 
     suspend override fun load(id: Long, options: Options): MediaDomain? {

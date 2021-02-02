@@ -3,6 +3,8 @@ package uk.co.sentinelweb.cuer.app.ui.share
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -84,7 +86,7 @@ class SharePresenter constructor(
 //                    listOf()// todo existing state.playlistItems
 //                }
                 val size = playlistItemList?.size ?: 0
-                val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYLIST_ID)
+                val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYLIST)
                 val playlistItem: PlaylistItemDomain? = if (size == 1) {
                     playlistItemList?.get(0)
                 } else if (size > 1) {
@@ -104,7 +106,7 @@ class SharePresenter constructor(
                         ?.takeIf { isConnected }
                         ?.let { pli ->
                             pli.playlistId?.let { itemPlaylistId ->
-                                queue.playNow(itemPlaylistId, pli.id)
+                                queue.playNow(itemPlaylistId.toIdentifier(LOCAL), pli.id)
                             } ?: throw IllegalArgumentException("Item had no playlist")
                         }
                     view.exit()

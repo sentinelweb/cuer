@@ -11,11 +11,11 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options.Companion.LOCAL_DEEP
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -168,7 +168,7 @@ class PlaylistItemEditViewModel constructor(
         state.editingPlaylistItem?.let { item ->
             viewModelScope.launch {
                 item.playlistId?.let {
-                    queue.playNow(it, item.id)
+                    queue.playNow(it.toIdentifier(LOCAL), item.id) // todo store source
                 }
             }
             if (!ytContextHolder.isConnected()) {
@@ -297,7 +297,7 @@ class PlaylistItemEditViewModel constructor(
             if (state.isPlaylistsChanged && state.editingPlaylistItem?.playlistId != null) {
                 state.editingPlaylistItem?.also { item ->
                     if (!state.selectedPlaylistIds.contains(item.playlistId)) {
-                        playlistItemOrchestrator.delete(item, LOCAL_DEEP)
+                        playlistItemOrchestrator.delete(item, Options(LOCAL))// todo use identifier
                     }
                 }
             }

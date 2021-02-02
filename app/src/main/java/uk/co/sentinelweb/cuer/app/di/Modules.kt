@@ -130,7 +130,7 @@ object Modules {
         factory { FileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
         single(named<GeneralPreferences>()) {
-            SharedPrefsWrapper(GeneralPreferences::class.java, androidApplication(), get())
+            SharedPrefsWrapper(GeneralPreferences::class, androidApplication(), get())
         }
         factory { ServiceWrapper(androidApplication(), get()) }
     }

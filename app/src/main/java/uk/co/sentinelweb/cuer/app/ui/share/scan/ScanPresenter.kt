@@ -67,7 +67,7 @@ class ScanPresenter(
     private suspend fun checkPlaylist(scannedPlaylist: PlaylistDomain): ScanContract.Result? =
         (scannedPlaylist.platformId
             ?.let {
-                playlistOrchestrator.loadList(PlatformIdListFilter(listOf(it)), Options.LOCAL_FLAT)
+                playlistOrchestrator.loadList(PlatformIdListFilter(listOf(it)), Options(LOCAL))
                     .takeIf { it.size > 0 }
                     ?.get(0)
                     ?.let { it to false }

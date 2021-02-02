@@ -5,10 +5,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
+import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -133,8 +136,9 @@ class PlaylistsPresenter(
             .takeIf { focusCurrent }
             ?.let {
                 state.playlists.apply {
-                    prefsWrapper.getLong(CURRENT_PLAYLIST_ID)
-                        ?.let { focusId -> view.scrollToItem(indexOf(find { it.id == focusId })) }
+                    prefsWrapper.getPairNonNull(CURRENT_PLAYLIST, NO_PLAYLIST.toPair())
+                        ?.toIdentifier()
+                        ?.let { focusId -> view.scrollToItem(indexOf(find { it.id == focusId.id })) }
                 }
             }
     }

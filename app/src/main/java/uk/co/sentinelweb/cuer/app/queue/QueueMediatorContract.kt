@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.queue
 
 import kotlinx.coroutines.flow.Flow
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -11,7 +12,7 @@ interface QueueMediatorContract {
         val currentItem: PlaylistItemDomain?
         val currentItemIndex: Int?
         val playlist: PlaylistDomain?
-        val playlistId: Long?
+        val playlistId: OrchestratorContract.Identifier<*>?
         val currentItemFlow: Flow<PlaylistItemDomain?>
     }
 
@@ -21,10 +22,9 @@ interface QueueMediatorContract {
         fun refreshQueueBackground()
         suspend fun refreshQueue()
         fun playNow()
-        suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?)
-        suspend fun playNow(playlistId: Long, playlistItemId: Long?)
+        suspend fun playNow(identifier: OrchestratorContract.Identifier<*>, playlistItemId: Long?)
         fun deleteItem(index: Int)
-        suspend fun switchToPlaylist(id: Long)
+        suspend fun switchToPlaylist(identifier: OrchestratorContract.Identifier<*>)
     }
 
     interface Consumer : Shared {

@@ -9,6 +9,10 @@ import kotlinx.coroutines.Job
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
@@ -45,7 +49,7 @@ interface PlaylistContract {
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
         fun commitMove()
-        fun setPlaylistData(plId: Long? = null, plItemId: Long? = null, playNow: Boolean = false)
+        fun setPlaylistData(plId: Long? = null, plItemId: Long? = null, playNow: Boolean = false, source: Source = LOCAL)
         fun onPlaylistSelected(playlist: PlaylistDomain)
         fun onPlayModeChange(): Boolean
         fun onPlayPlaylist(): Boolean
@@ -81,7 +85,7 @@ interface PlaylistContract {
     enum class PlayState { PLAYING, CONNECTING, NOT_CONNECTED }
 
     data class State constructor(
-        var playlistId: Long? = null,
+        var playlistIdentifier: Identifier<*> = NO_PLAYLIST,
         var playlist: PlaylistDomain? = null,
         var deletedPlaylistItem: PlaylistItemDomain? = null,
         var focusIndex: Int? = null,

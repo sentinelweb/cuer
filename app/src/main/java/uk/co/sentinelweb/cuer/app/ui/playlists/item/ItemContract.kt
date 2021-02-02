@@ -41,7 +41,7 @@ interface ItemContract {
     data class State constructor(var item: Model? = null)
 
     data class Model(
-        override val id: Long,
+        override val id: Long,// todo OrchestratorContract.Identifier
         val index: Int,
         val title: String,
         val checkIcon: Boolean,

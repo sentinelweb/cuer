@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
@@ -62,9 +63,9 @@ interface PlaylistsContract {
         var playlistStats: List<PlaylistStatDomain> = listOf()
     ) : ViewModel()
 
-    data class Model constructor(
+    data class Model(
         val imageUrl: String = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
-        val currentPlaylistId: Long?,
+        val currentPlaylistId: Identifier<*>?, // todo non null?
         val items: List<ItemContract.Model>
     )
 

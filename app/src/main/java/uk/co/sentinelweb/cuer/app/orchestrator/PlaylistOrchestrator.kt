@@ -1,9 +1,11 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
+import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
@@ -12,8 +14,9 @@ class PlaylistOrchestrator constructor(
     private val ytInteractor: YoutubeInteractor
 ) : OrchestratorContract<PlaylistDomain> {
 
-    override val updates: Flow<Pair<Operation, PlaylistDomain>>
+    override val updates: Flow<Triple<Operation, Source, PlaylistDomain>>
         get() = playlistDatabaseRepository.playlistFlow
+            .map { it.first to LOCAL then it.second }
 
     suspend override fun load(id: Long, options: Options): PlaylistDomain? = when (options.source) {
         MEMORY -> TODO()
@@ -93,10 +96,11 @@ class PlaylistOrchestrator constructor(
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
-    suspend fun getPlaylistOrDefault(playlistId: Long?, options: Options): PlaylistDomain? =
+    suspend fun getPlaylistOrDefault(playlistId: Long?, options: Options): Pair<PlaylistDomain, Source>? =
         when (options.source) {
             LOCAL ->
                 playlistDatabaseRepository.getPlaylistOrDefault(playlistId, options.flat)
+                    ?.let { it to LOCAL }
             else -> throw InvalidOperationException(this::class, null, options)
         }
 

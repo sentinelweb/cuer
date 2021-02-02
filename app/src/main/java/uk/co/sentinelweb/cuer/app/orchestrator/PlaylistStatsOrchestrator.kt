@@ -1,14 +1,19 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class PlaylistStatsOrchestrator constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
 ) : OrchestratorContract<PlaylistStatDomain> {
-    override val updates: Flow<Pair<OrchestratorContract.Operation, PlaylistStatDomain>>
+    override val updates: Flow<Triple<Operation, Source, PlaylistStatDomain>>
         get() = playlistDatabaseRepository.playlistStatFlow
+            .map { it.first to Source.LOCAL then it.second }
 
     suspend override fun load(platformId: String, options: OrchestratorContract.Options): PlaylistStatDomain? {
         TODO("Not yet implemented")
