@@ -116,7 +116,6 @@ interface PlaylistContract {
                     PlaylistPresenter(
                         view = get(),
                         state = get(),
-                        mediaOrchestrator = get(),
                         playlistOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         modelMapper = get(),

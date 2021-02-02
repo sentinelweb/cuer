@@ -56,6 +56,7 @@ interface OrchestratorContract<Domain> {
     class DoesNotExistException(msg: String? = null) : Exception(msg)
     class DatabaseException(result: RepoResult<*>) : Exception((result as RepoResult.Error<*>).msg, result.t)
     class NetException(result: NetResult<*>) : Exception((result as NetResult.Error<*>).msg, result.t)
+    class MemoryException(msg: String, cause: Throwable? = null) : Exception(msg, cause)
 
     open class Identifier<IdType>(
         open val id: IdType,

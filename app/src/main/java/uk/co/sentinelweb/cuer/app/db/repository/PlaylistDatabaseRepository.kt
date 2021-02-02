@@ -179,6 +179,13 @@ class PlaylistDatabaseRepository constructor(
                                 else playlistDao
                                     .getAllPlaylistsWithItems()
                                     .map { mapDeep(it) }
+                            is PlatformIdListFilter ->
+                                if (flat) playlistDao
+                                    .loadAllByPlatformIds(filter.ids)
+                                    .map { playlistMapper.map(it, null, null, null) }/* todo channels */
+                                else playlistDao
+                                    .loadAllByPlatformIdsWithItems(filter.ids)
+                                    .map { mapDeep(it) }
                             else ->// todo return empty for else
                                 playlistDao
                                     .getAllPlaylists()

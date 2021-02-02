@@ -39,7 +39,6 @@ import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 class PlaylistPresenter(
     private val view: PlaylistContract.View,
     private val state: PlaylistContract.State,
-    private val mediaOrchestrator: MediaOrchestrator,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val modelMapper: PlaylistModelMapper,
@@ -89,21 +88,23 @@ class PlaylistPresenter(
 
     override fun onResume() {
         ytContextHolder.addConnectionListener(castConnectionListener)
-        listenToRepository()
+        listen()
     }
 
-    private fun listenToRepository() {
+    private fun listen() {
         playlistOrchestrator.updates
             .onEach { (op, source, plist) ->
-                when (op) {
-                    FLAT -> state.playlist = state.playlist
-                        ?.replaceHeader(plist)
-                        ?.apply { updateHeader() }
-                    FULL -> {
-                        state.playlist = plist
-                        updateView()
+                if (plist.id?.toIdentifier(source) == state.playlistIdentifier) {
+                    when (op) {
+                        FLAT -> state.playlist = state.playlist
+                            ?.replaceHeader(plist)
+                            ?.apply { updateHeader() }
+                        FULL -> {
+                            state.playlist = plist
+                            updateView()
+                        }
+                        DELETE -> toastWrapper.show("TODO : Playlist deleted!!!!")// todo exit screen?
                     }
-                    DELETE -> toastWrapper.show("TODO : Playlist deleted!!!!")// todo exit screen?
                 }
             }.launchIn(coroutines.mainScope)
 
@@ -412,7 +413,9 @@ class PlaylistPresenter(
                 ?.toIdentifier(source)
                 ?.apply {
                     state.playlistIdentifier = this
-                    prefsWrapper.putPair(LAST_PLAYLIST_VIEWED, this.toPair())
+                    if (source == Source.LOCAL) {
+                        prefsWrapper.putPair(LAST_PLAYLIST_VIEWED, this.toPair())
+                    }
                     executeRefresh(scrollToItem = true)
                     //log.d("setPlaylistData(pl=$plId , state.pl=${state.playlist?.id} , pli=$plItemId, play=$playNow)")
                     if (playNow) {

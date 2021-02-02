@@ -20,6 +20,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistFragmentBinding
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
@@ -176,32 +177,28 @@ class PlaylistFragment :
 
     override fun onResume() {
         super.onResume()
-        // todo clean up after i m sure it works for all cases
+        // todo clean up after im sure it works for all cases
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
-        ((activity as NavigationProvider?)?.checkForPendingNavigation(PLAYLIST_FRAGMENT)?.apply {
+        ((activity as? NavigationProvider)?.checkForPendingNavigation(PLAYLIST_FRAGMENT)?.apply {
             //onResumeGotArguments = true
             log.d("onResume: got nav on callup model = $this")
         } ?: let {
             val plId = PLAYLIST_ID.getLong(arguments)
-            val onResumeGotArguments = plId?.let { it > 0L } ?: false
+            val source: Source? = SOURCE.getEnum<Source>(arguments)// todo enforce source?
+            val onResumeGotArguments = plId?.let { it != -1L } ?: false
             if (onResumeGotArguments) {
-                log.d(
-                    "onResume: got nav on args model = plid = $plId plitemId = ${PLAYLIST_ITEM_ID.getLong(arguments)} playNow = ${
-                        PLAY_NOW.getBoolean(
-                            arguments
-                        )
-                    }"
-                )
-                makeNav(plId, PLAYLIST_ITEM_ID.getLong(arguments), PLAY_NOW.getBoolean(arguments) ?: false)
+                //log.d("onResume: got nav on args model = plid = $plId plitemId = ${PLAYLIST_ITEM_ID.getLong(arguments)} playNow = ${PLAY_NOW.getBoolean(arguments) }" )
+                makeNav(plId, PLAYLIST_ITEM_ID.getLong(arguments), PLAY_NOW.getBoolean(arguments) ?: false, source)
             } else null
         })?.apply {
             log.d("onResume: apply nav args model = $this")
             presenter.setPlaylistData(
                 params[PLAYLIST_ID] as Long?,
                 params[PLAYLIST_ITEM_ID] as Long?,
-                params[PLAY_NOW] as Boolean? ?: false
+                params[PLAY_NOW] as Boolean? ?: false,
+                params[SOURCE] as Source
             )
-            (activity as NavigationProvider?)?.clearPendingNavigation(PLAYLIST_FRAGMENT)
+            (activity as? NavigationProvider)?.clearPendingNavigation(PLAYLIST_FRAGMENT)
         } ?: run {
             log.d("onResume: got no nav args")
             presenter.setPlaylistData()
@@ -231,8 +228,12 @@ class PlaylistFragment :
     }
 
     override fun setHeaderModel(model: PlaylistContract.Model) {
+
         Glide.with(requireContext())
-            .load(imageProvider.makeRef(model.imageUrl))
+            .run {
+                if (model.imageUrl.startsWith("gs://")) load(imageProvider.makeRef(model.imageUrl))
+                else load(model.imageUrl)
+            }
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.playlistHeaderImage)
         binding.playlistCollapsingToolbar.title = model.title
@@ -424,19 +425,21 @@ class PlaylistFragment :
     //endregion
 
     companion object {
-        fun makeNav(item: PlaylistItemDomain, play: Boolean): NavigationModel = NavigationModel(
+        fun makeNav(item: PlaylistItemDomain, play: Boolean, source: Source?): NavigationModel = NavigationModel(
             PLAYLIST_FRAGMENT, mapOf(
                 PLAYLIST_ID to (item.playlistId ?: throw IllegalArgumentException("No Playlist Id")),
                 PLAYLIST_ITEM_ID to (item.id ?: throw IllegalArgumentException("No Playlist tem Id")),
-                PLAY_NOW to play
+                PLAY_NOW to play,
+                SOURCE to (source ?: Source.LOCAL)// todo enforce source
             )
         )
 
-        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean): NavigationModel = NavigationModel(
+        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean, source: Source?): NavigationModel = NavigationModel(
             PLAYLIST_FRAGMENT, mapOf(
                 PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
                 PLAYLIST_ITEM_ID to (plItemId ?: throw IllegalArgumentException("No Playlist tem Id")),
-                PLAY_NOW to play
+                PLAY_NOW to play,
+                SOURCE to (source ?: Source.LOCAL)// todo enforce source
             )
         )
 

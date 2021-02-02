@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
@@ -17,6 +18,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.PLAYLIST
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class SharePresenter constructor(
@@ -66,7 +68,12 @@ class SharePresenter constructor(
                 view.showMedia(PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null))
                 mapDisplayModel()
             }
-            PLAYLIST -> TODO()
+            PLAYLIST -> (result.result as PlaylistDomain).let {
+                it.id?.let {
+                    view.showPlaylist(it.toIdentifier(if (result.isNew) MEMORY else LOCAL))
+                    mapDisplayModel()
+                } ?: throw IllegalStateException("Playlist needs an id (isNew = MEMORY)")
+            }
         }
     }
 

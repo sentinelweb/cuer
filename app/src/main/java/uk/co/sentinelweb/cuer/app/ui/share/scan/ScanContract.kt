@@ -63,7 +63,8 @@ interface ScanContract {
                         playlistOrchestrator = get(),
                         mediaOrchestrator = get(),
                         linkScanner = get(),
-                        modelMapper = get()
+                        modelMapper = get(),
+                        log = get()
                     )
                 }
                 scoped { ScanMapper() }

@@ -11,6 +11,8 @@ import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
@@ -47,6 +49,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.di.DomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.NetModule
@@ -79,11 +82,13 @@ object Modules {
     }
 
     private val orchestratorModule = module {
-        single { PlaylistOrchestrator(get(), get()) }
-        single { PlaylistItemOrchestrator(get(), get()) }
+        single { PlaylistOrchestrator(get(), get(), get()) }
+        single { PlaylistItemOrchestrator(get(), get(), get()) }
         single { MediaOrchestrator(get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
         single { PlaylistStatsOrchestrator(get()) }
+        single { PlaylistMemoryRepository() }
+        single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
     }
 
     private val utilModule = module {

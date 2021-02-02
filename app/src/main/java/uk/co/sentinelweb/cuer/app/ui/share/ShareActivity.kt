@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.activity_share.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
@@ -150,6 +151,11 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         ScanFragmentDirections.actionGotoPlaylistItem(itemDomain.serialise())
             .apply { navController.navigate(this) }
         //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
+    }
+
+    override fun showPlaylist(id: OrchestratorContract.Identifier<Long>) {
+        ScanFragmentDirections.actionGotoPlaylist(id.id, id.source.toString())
+            .apply { navController.navigate(this) }
     }
 
     override fun scanResult(result: ScanContract.Result) {

@@ -15,10 +15,10 @@ import kotlinx.android.synthetic.main.main_activity.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -154,7 +154,9 @@ class MainActivity :
                         PLAYLIST_ITEM.getString(intent)
                             ?.let { deserialisePlaylistItem(it) }
                             ?.let { item ->
-                                PlaylistFragment.makeNav(item, PLAY_NOW.getBoolean(intent)).apply {
+                                val play = PLAY_NOW.getBoolean(intent)
+                                val source = SOURCE.getEnum<Source>(intent)
+                                PlaylistFragment.makeNav(item, play, source).apply {
                                     log.d("got nav:$this")
                                 }
                             }

@@ -12,38 +12,38 @@ class ChannelOrchestrator constructor(
     private val ytInteractor: YoutubeInteractor
 ) : OrchestratorContract<ChannelDomain> {
     override val updates: Flow<Triple<Operation, Source, ChannelDomain>>
-        get() = TODO("Not yet implemented")
+        get() = throw OrchestratorContract.NotImplementedException()
 
     suspend override fun load(id: Long, options: OrchestratorContract.Options): ChannelDomain? {
-        TODO("Not yet implemented")
+        throw OrchestratorContract.NotImplementedException()
     }
 
     suspend override fun loadList(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): List<ChannelDomain> {
-        TODO("Not yet implemented")
+        throw OrchestratorContract.NotImplementedException()
     }
 
     suspend override fun load(platformId: String, options: OrchestratorContract.Options): ChannelDomain? {
-        TODO("Not yet implemented")
+        throw OrchestratorContract.NotImplementedException()
     }
 
     suspend override fun load(domain: ChannelDomain, options: OrchestratorContract.Options): ChannelDomain? {
-        TODO("Not yet implemented")
+        throw OrchestratorContract.NotImplementedException()
     }
 
     suspend override fun save(domain: ChannelDomain, options: OrchestratorContract.Options): ChannelDomain {
-        TODO("Not yet implemented")
+        throw OrchestratorContract.NotImplementedException()
     }
 
     suspend override fun save(domains: List<ChannelDomain>, options: OrchestratorContract.Options): List<ChannelDomain> {
-        TODO("Not yet implemented")
+        throw OrchestratorContract.NotImplementedException()
     }
 
     override suspend fun count(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): Int {
-        TODO("Not yet implemented")
+        throw OrchestratorContract.NotImplementedException()
     }
 
     override suspend fun delete(domain: ChannelDomain, options: OrchestratorContract.Options): Boolean {
-        TODO("Not yet implemented")
+        throw OrchestratorContract.NotImplementedException()
     }
 
 

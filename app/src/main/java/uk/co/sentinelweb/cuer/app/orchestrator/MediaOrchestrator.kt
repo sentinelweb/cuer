@@ -14,10 +14,10 @@ class MediaOrchestrator constructor(
 ) : OrchestratorContract<MediaDomain> {
 
     override val updates: Flow<Triple<Operation, Source, MediaDomain>>
-        get() = TODO("Not yet implemented")
+        get() = throw OrchestratorContract.NotImplementedException()
 
     suspend override fun load(id: Long, options: Options): MediaDomain? {
-        TODO("Not yet implemented")
+        throw OrchestratorContract.NotImplementedException()
     }
 
     suspend override fun loadList(filter: Filter, options: Options): List<MediaDomain> =
@@ -50,7 +50,7 @@ class MediaOrchestrator constructor(
 
 
     suspend override fun load(domain: MediaDomain, options: Options): MediaDomain? {
-        TODO("Not yet implemented")
+        throw NotImplementedException()
     }
 
     suspend override fun save(domain: MediaDomain, options: Options): MediaDomain =
@@ -65,15 +65,15 @@ class MediaOrchestrator constructor(
 
 
     suspend override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> {
-        TODO("Not yet implemented")
+        throw NotImplementedException()
     }
 
     override suspend fun count(filter: Filter, options: Options): Int {
-        TODO("Not yet implemented")
+        throw NotImplementedException()
     }
 
     override suspend fun delete(domain: MediaDomain, options: Options): Boolean {
-        TODO("Not yet implemented")
+        throw NotImplementedException()
     }
 
 

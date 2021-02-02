@@ -1,16 +1,19 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
 class PlaylistOrchestrator constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
+    private val playlistMemoryRepository: PlaylistMemoryRepository,
     private val ytInteractor: YoutubeInteractor
 ) : OrchestratorContract<PlaylistDomain> {
 
@@ -19,7 +22,7 @@ class PlaylistOrchestrator constructor(
             .map { it.first to LOCAL then it.second }
 
     suspend override fun load(id: Long, options: Options): PlaylistDomain? = when (options.source) {
-        MEMORY -> TODO()
+        MEMORY -> playlistMemoryRepository.load(id, options)
         LOCAL -> TODO()
         LOCAL_NETWORK -> TODO()
         REMOTE -> TODO()
@@ -30,13 +33,13 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> TODO()
             LOCAL -> playlistDatabaseRepository.loadList(filter)
-                .forceDatabaseListResultNotEmpty("Playlist $filter does not exist")
+                .allowDatabaseListResulEmpty("Playlist $filter does not exist")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, filter, options)
         }
 
-    suspend override fun load(platformId: String, options: Options): PlaylistDomain? =
+    suspend override fun load(platformId: String, options: Options): PlaylistDomain? =//todo maybe i should delete this
         when (options.source) {
             MEMORY -> TODO()
             LOCAL -> playlistDatabaseRepository.loadList(PlatformIdListFilter(listOf(platformId)))
@@ -49,12 +52,12 @@ class PlaylistOrchestrator constructor(
         }
 
     suspend override fun load(domain: PlaylistDomain, options: Options): PlaylistDomain? {
-        TODO("Not yet implemented")
+        throw NotImplementedException()
     }
 
     suspend override fun save(domain: PlaylistDomain, options: Options): PlaylistDomain =
         when (options.source) {
-            MEMORY -> TODO()
+            MEMORY -> playlistMemoryRepository.save(domain, options)
             LOCAL ->
                 playlistDatabaseRepository.save(domain, options.emit)
                     .forceDatabaseSuccess("Save failed ${domain.id}")
@@ -73,6 +76,7 @@ class PlaylistOrchestrator constructor(
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
+
 
     override suspend fun count(filter: Filter, options: Options): Int =
         when (options.source) {
@@ -98,6 +102,12 @@ class PlaylistOrchestrator constructor(
 
     suspend fun getPlaylistOrDefault(playlistId: Long?, options: Options): Pair<PlaylistDomain, Source>? =
         when (options.source) {
+            MEMORY ->
+                playlistMemoryRepository.load(playlistId!!, options)// TODO FALLBACK OR ERROR?
+                    ?.apply { delay(20) }// fixme: fucking menu items don't load in time sine memory is sequential
+                    ?.let { it to MEMORY }
+                    ?: playlistDatabaseRepository.getPlaylistOrDefault(null, options.flat)
+                        ?.let { it to LOCAL }
             LOCAL ->
                 playlistDatabaseRepository.getPlaylistOrDefault(playlistId, options.flat)
                     ?.let { it to LOCAL }

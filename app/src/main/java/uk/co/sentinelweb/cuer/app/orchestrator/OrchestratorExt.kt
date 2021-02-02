@@ -13,6 +13,12 @@ inline fun <reified T> RepoResult<List<T>>.forceDatabaseListResultNotEmpty(msg: 
         ?: throw OrchestratorContract.DoesNotExistException(msg)
 }
 
+inline fun <reified T> RepoResult<List<T>>.allowDatabaseListResulEmpty(msg: String) = this.let {
+    (it.takeIf { it.isSuccessful }
+        ?.data
+        ?: throw OrchestratorContract.DatabaseException(it))
+}
+
 inline fun <reified T> NetResult<List<T>>.forceNetListResultNotEmpty(msg: String) = this.let {
     (it.takeIf { it.isSuccessful }
         ?: throw OrchestratorContract.NetException(it))

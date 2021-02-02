@@ -3,14 +3,15 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlaylistItemOrchestrator constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
+    private val playlistItemMemoryRepository: MemoryRepository<PlaylistItemDomain>,
     private val log: LogWrapper
 ) : OrchestratorContract<PlaylistItemDomain> {
 
@@ -69,11 +70,11 @@ class PlaylistItemOrchestrator constructor(
         }
 
     suspend override fun save(domains: List<PlaylistItemDomain>, options: OrchestratorContract.Options): List<PlaylistItemDomain> {
-        TODO("Not yet implemented")
+        throw NotImplementedException()
     }
 
     override suspend fun count(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): Int {
-        TODO("Not yet implemented")
+        throw NotImplementedException()
     }
 
     override suspend fun delete(domain: PlaylistItemDomain, options: OrchestratorContract.Options): Boolean =
