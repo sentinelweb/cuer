@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
@@ -18,36 +19,41 @@ class PlaylistOrchestrator constructor(
 ) : OrchestratorContract<PlaylistDomain> {
 
     override val updates: Flow<Triple<Operation, Source, PlaylistDomain>>
-        get() = playlistDatabaseRepository.playlistFlow
-            .map { it.first to LOCAL then it.second }
+        get() = merge(
+            playlistDatabaseRepository.playlistFlow
+                .map { it.first to LOCAL then it.second },
+            (playlistMemoryRepository.updates
+                .map { it.first to MEMORY then it.second })
+        )
 
     suspend override fun load(id: Long, options: Options): PlaylistDomain? = when (options.source) {
         MEMORY -> playlistMemoryRepository.load(id, options)
         LOCAL -> playlistDatabaseRepository.load(id)
             .forceDatabaseSuccess()
-        LOCAL_NETWORK -> TODO()
-        REMOTE -> TODO()
+        LOCAL_NETWORK -> throw NotImplementedException()
+        REMOTE -> throw NotImplementedException()
         PLATFORM -> throw InvalidOperationException(this::class, null, options)
     }
 
     suspend override fun loadList(filter: Filter, options: Options): List<PlaylistDomain> =
         when (options.source) {
-            MEMORY -> TODO()
+            MEMORY -> playlistMemoryRepository.loadList(filter, options)
             LOCAL -> playlistDatabaseRepository.loadList(filter)
                 .allowDatabaseListResultEmpty()
-            LOCAL_NETWORK -> TODO()
-            REMOTE -> TODO()
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, filter, options)
         }
 
-    suspend override fun load(platformId: String, options: Options): PlaylistDomain? =//todo maybe i should delete this
+    suspend override fun load(platformId: String, options: Options): PlaylistDomain? =
         when (options.source) {
-            MEMORY -> TODO()
+            MEMORY -> playlistMemoryRepository.loadList(PlatformIdListFilter(listOf(platformId)), options)
+                .firstOrNull()
             LOCAL -> playlistDatabaseRepository.loadList(PlatformIdListFilter(listOf(platformId)))
-                .forceDatabaseListResultNotEmpty("Playlist platformId = $platformId does not exist")
-                .get(0)
-            LOCAL_NETWORK -> TODO()
-            REMOTE -> TODO()
+                .allowDatabaseListResultEmpty()
+                .firstOrNull()
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
             PLATFORM -> ytInteractor.playlist(platformId)
                 .forceNetSuccessNotNull("Youtube ${platformId} does not exist")
         }
@@ -69,35 +75,35 @@ class PlaylistOrchestrator constructor(
 
     suspend override fun save(domains: List<PlaylistDomain>, options: Options): List<PlaylistDomain> =
         when (options.source) {
-            MEMORY -> TODO()
+            MEMORY -> throw NotImplementedException()
             LOCAL ->
                 playlistDatabaseRepository.save(domains, options.emit)
                     .forceDatabaseListResultNotEmpty("Save failed ${domains.map { it.id }}")
-            LOCAL_NETWORK -> TODO()
-            REMOTE -> TODO()
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
 
     override suspend fun count(filter: Filter, options: Options): Int =
         when (options.source) {
-            MEMORY -> TODO()
+            MEMORY -> playlistMemoryRepository.count(filter, options)
             LOCAL ->
                 playlistDatabaseRepository.count(filter)
                     .forceDatabaseSuccessNotNull("Count failed $filter")
-            LOCAL_NETWORK -> TODO()
-            REMOTE -> TODO()
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
     override suspend fun delete(domain: PlaylistDomain, options: Options): Boolean =
         when (options.source) {
-            MEMORY -> TODO()
+            MEMORY -> playlistMemoryRepository.delete(domain, options)
             LOCAL ->
                 playlistDatabaseRepository.delete(domain, options.emit)
                     .forceDatabaseSuccessNotNull("Delete failed ${domain.id}")
-            LOCAL_NETWORK -> TODO()
-            REMOTE -> TODO()
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
@@ -115,8 +121,10 @@ class PlaylistOrchestrator constructor(
             else -> throw InvalidOperationException(this::class, null, options)
         }
 
+    // todo make update db better
     suspend fun updateCurrentIndex(it: PlaylistDomain, options: Options): Boolean =
         when (options.source) {
+            MEMORY -> true // since the value just stay in memory its ok
             LOCAL ->
                 playlistDatabaseRepository.updateCurrentIndex(it, options.emit)
                     .forceDatabaseSuccessNotNull("Update did not succeed")

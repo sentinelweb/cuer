@@ -17,24 +17,30 @@ import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.WindowWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.Listener {
+class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.Listener, PlaylistItemEditContract.DoneNavigation {
     private val presenter: ShareContract.Presenter by currentScope.inject()
     private val shareWrapper: ShareWrapper by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
+    private val windowWrapper: WindowWrapper by inject()
+    private val navMapper: NavigationMapper by currentScope.inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
@@ -53,6 +59,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //windowWrapper.setDecorFitsSystemWindows(this, true)
         setContentView(R.layout.activity_share)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
@@ -171,6 +178,14 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         commitFragment?.getEditedDomains()
             ?.filterNotNull()
 
+    // PlaylistItemEditContract.DoneNavigation
+    override fun navigateDone() {
+        presenter.afterItemEditNavigation()
+    }
+
+    override fun navigate(nav: NavigationModel) {
+        navMapper.map(nav)
+    }
 
     companion object {
 

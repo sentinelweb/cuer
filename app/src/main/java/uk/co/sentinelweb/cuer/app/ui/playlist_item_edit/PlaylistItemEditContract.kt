@@ -7,6 +7,7 @@ import androidx.navigation.fragment.findNavController
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
@@ -55,7 +56,9 @@ interface PlaylistItemEditContract {
         var isPlaylistsChanged: Boolean = false,
         var isMediaChanged: Boolean = false,
         var isSaved: Boolean = false
-    )
+    ) {
+        lateinit var source: OrchestratorContract.Source
+    }
 
     companion object {
         @JvmStatic

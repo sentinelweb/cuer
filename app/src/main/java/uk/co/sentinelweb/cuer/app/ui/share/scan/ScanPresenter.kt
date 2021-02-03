@@ -74,15 +74,13 @@ class ScanPresenter(
     private suspend fun checkPlaylist(scannedPlaylist: PlaylistDomain): ScanContract.Result? {
         return (scannedPlaylist.platformId
             ?.let {
-                playlistOrchestrator.loadList(PlatformIdListFilter(listOf(it)), Options(LOCAL))
-                    .takeIf { it.size > 0 }
-                    ?.get(0)
+                playlistOrchestrator.load(it, Options(LOCAL))
                     ?.also { log.d("found playlist = $it") }
                     ?.let { it to false }
                     ?: playlistOrchestrator.load(it, Options(PLATFORM))
                         ?.copy(id = SHARED_PLAYLIST)
                         ?.also { log.d("loaded playlist = ${it.title} id = ${it.id} platformId = ${it.id}") }
-                        ?.let { playlistOrchestrator.save(it, Options(MEMORY, emit = false)) to true }
+                        ?.let { playlistOrchestrator.save(it, Options(MEMORY, flat = false, emit = false)) to true }
                     ?: throw DoesNotExistException()
             })?.let { (playlist, isNew) ->
                 modelMapper.mapPlaylistResult(isNew, playlist)

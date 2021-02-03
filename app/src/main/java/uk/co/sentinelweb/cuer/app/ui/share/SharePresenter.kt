@@ -7,6 +7,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_BACK
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_FINISH
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -75,6 +78,14 @@ class SharePresenter constructor(
                     mapDisplayModel()
                 } ?: throw IllegalStateException("Playlist needs an id (isNew = MEMORY)")
             }
+        }
+    }
+
+    override fun afterItemEditNavigation() {
+        if (state.scanResult?.type == PLAYLIST) {
+            view.navigate(NavigationModel(NAV_BACK))
+        } else {
+            view.navigate(NavigationModel(NAV_FINISH))
         }
     }
 

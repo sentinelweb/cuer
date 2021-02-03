@@ -1,22 +1,29 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory
 
 import kotlinx.coroutines.flow.Flow
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.NotImplementedException
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.removeItemByPlatformId
+import uk.co.sentinelweb.cuer.domain.ext.replaceItemByPlatformId
 
-class PlaylistMemoryRepository : MemoryRepository<PlaylistDomain> {
+class PlaylistMemoryRepository constructor(
+    private val coroutines: CoroutineContextProvider
+) : MemoryRepository<PlaylistDomain> {
 
     private val data: MutableMap<Long, PlaylistDomain> = mutableMapOf()
 
     val playlistItemMemoryRepository = PlayListItemMemoryRepository()
 
-    override val updates: Flow<Pair<OrchestratorContract.Operation, PlaylistDomain>>
-        get() = throw NotImplementedException()
+    private val _playlistFlow = MutableSharedFlow<Pair<Operation, PlaylistDomain>>()
+    override val updates: Flow<Pair<Operation, PlaylistDomain>>
+        get() = _playlistFlow
 
-    override fun load(platformId: String, options: OrchestratorContract.Options): PlaylistDomain? {
+    override fun load(platformId: String, options: Options): PlaylistDomain? {
         throw NotImplementedException()
     }
 
@@ -26,34 +33,64 @@ class PlaylistMemoryRepository : MemoryRepository<PlaylistDomain> {
 
     override fun load(id: Long, options: Options): PlaylistDomain? = data[id]
 
-    override fun loadList(filter: OrchestratorContract.Filter, options: Options): List<PlaylistDomain> {
-        throw NotImplementedException()
+    override fun loadList(filter: Filter, options: Options): List<PlaylistDomain> = when (filter) {
+        is IdListFilter -> data.keys
+            .filter { filter.ids.contains(it) }
+            .map { data[it] }
+            .filterNotNull()
+        else -> throw NotImplementedException()
     }
 
     override fun save(domain: PlaylistDomain, options: Options): PlaylistDomain =
         domain.id?.let { playlistId ->
-            domain.copy(
-                items = domain.items.mapIndexed { index, item -> item.copy(id = index.toLong(), playlistId = playlistId) }
-            ).also { data[playlistId] = it }
-        } ?: throw OrchestratorContract.MemoryException("Please set the ID")
+            if (!options.flat || !data.containsKey(playlistId)) {
+                domain.copy(
+                    items = domain.items.mapIndexed { index, item ->
+                        item.copy(
+                            id = playlistItemMemoryRepository.idCounter,
+                            playlistId = playlistId,
+                            media = item.media.copy(id = playlistItemMemoryRepository.idCounter)
+                        )
+                    }
+                )
+            } else {
+                domain.copy(
+                    items = data[playlistId]?.items ?: throw IllegalStateException("Data got emptied")
+                )
+            }
+        }?.also { data[it.id!!] = it }
+            ?.also {
+                if (options.emit) {
+                    coroutines.computationScope.launch {
+                        _playlistFlow.emit((if (options.flat) FLAT else FULL) to domain)
+                    }
+                }
+            } ?: throw MemoryException("Please set the ID")
 
     override fun save(domains: List<PlaylistDomain>, options: Options): List<PlaylistDomain> {
         throw NotImplementedException()
     }
 
-    override fun count(filter: OrchestratorContract.Filter, options: Options): Int {
-        throw NotImplementedException()
+    override fun count(filter: Filter, options: Options): Int = when (filter) {
+        is PlatformIdListFilter -> data.values.filter { filter.ids.contains(it.platformId) }.size
+        else -> throw NotImplementedException()
     }
 
-    override fun delete(domain: PlaylistDomain, options: Options): Boolean {
-        throw NotImplementedException()
-    }
+    override fun delete(domain: PlaylistDomain, options: Options): Boolean =
+        domain.id
+            ?.let { data.remove(it) }
+            .let { it != null }
 
     inner class PlayListItemMemoryRepository : MemoryRepository<PlaylistItemDomain> {
-        override val updates: Flow<Pair<OrchestratorContract.Operation, PlaylistItemDomain>>
-            get() = throw NotImplementedException()
+        private val _playlistItemFlow = MutableSharedFlow<Pair<Operation, PlaylistItemDomain>>()
+        override val updates: Flow<Pair<Operation, PlaylistItemDomain>>
+            get() = _playlistItemFlow
 
-        override fun load(platformId: String, options: OrchestratorContract.Options): PlaylistItemDomain? {
+        private val _idCounter = 0L
+        val idCounter: Long
+            get() = _idCounter.dec()
+
+        override fun load(platformId: String, options: Options): PlaylistItemDomain? {
             throw NotImplementedException()
         }
 
@@ -65,26 +102,53 @@ class PlaylistMemoryRepository : MemoryRepository<PlaylistDomain> {
             throw NotImplementedException()
         }
 
-        override fun loadList(filter: OrchestratorContract.Filter, options: Options): List<PlaylistItemDomain> {
-            throw NotImplementedException()
+        override fun loadList(filter: Filter, options: Options): List<PlaylistItemDomain> = when (filter) {
+            is MediaIdListFilter -> data.values
+                .map { it.items }
+                .flatten()
+                .filter { filter.ids.contains(it.media.id) }
+            else -> throw NotImplementedException()
         }
 
-        override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain {
-            throw NotImplementedException()
-        }
+        override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
+            domain.playlistId
+                ?.takeIf { data.contains(it) }
+                ?.let { playlistId ->
+                    data[playlistId]?.let {
+                        data.set(playlistId, it.replaceItemByPlatformId(domain))
+                        if (options.emit) {
+                            coroutines.computationScope.launch {
+                                _playlistItemFlow.emit((if (options.flat) FLAT else FULL) to domain)
+                            }
+                        }
+                        domain
+                    }
+                    throw DoesNotExistException()
+                } ?: throw DoesNotExistException()
 
         override fun save(domains: List<PlaylistItemDomain>, options: Options): List<PlaylistItemDomain> {
             throw NotImplementedException()
         }
 
-        override fun count(filter: OrchestratorContract.Filter, options: Options): Int {
+        override fun count(filter: Filter, options: Options): Int {
             throw NotImplementedException()
         }
 
-        override fun delete(domain: PlaylistItemDomain, options: Options): Boolean {
-            throw NotImplementedException()
-        }
-
+        override fun delete(domain: PlaylistItemDomain, options: Options): Boolean =
+            domain.playlistId
+                ?.takeIf { data.contains(it) }
+                ?.let { playlistId ->
+                    data[playlistId]?.let {
+                        data.set(playlistId, it.removeItemByPlatformId(domain) ?: it)
+                        if (options.emit) {
+                            coroutines.computationScope.launch {
+                                _playlistItemFlow.emit(DELETE to domain)
+                            }
+                        }
+                        true
+                    }
+                    false
+                } ?: false
     }
 
     companion object {

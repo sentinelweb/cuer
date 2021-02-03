@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.WindowWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
@@ -42,6 +43,7 @@ class MainActivity :
     private val log: LogWrapper by currentScope.inject()
     private val navMapper: NavigationMapper by currentScope.inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
+    private val windowWrapper: WindowWrapper by inject()
 
     private lateinit var navController: NavController
 
@@ -52,7 +54,7 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-
+        //windowWrapper.setDecorFitsSystemWindows(this, true)
 //        navController = findNavController(R.id.nav_host_fragment)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController

@@ -21,6 +21,7 @@ inline fun <reified T> NetResult<List<T>>.forceNetListResultNotEmpty(msg: String
         ?: throw OrchestratorContract.DoesNotExistException(msg)
 }
 
+
 inline fun <reified T> RepoResult<List<T>>.allowDatabaseListResultEmpty(): List<T> = this.let {
     (it.takeIf { it.isSuccessful }
         ?: throw OrchestratorContract.DatabaseException(it))

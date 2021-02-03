@@ -23,6 +23,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import org.koin.core.context.KoinContextHandler
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
@@ -30,6 +31,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
@@ -76,6 +78,10 @@ class PlaylistItemEditFragment
 
     private val itemArg: PlaylistItemDomain? by lazy {
         PLAYLIST_ITEM.getString(arguments)?.let { deserialisePlaylistItem(it) }
+    }
+
+    private val sourceArg: Source by lazy {
+        SOURCE.getEnum<Source>(arguments) ?: Source.LOCAL
     }
 
     init {
@@ -174,9 +180,10 @@ class PlaylistItemEditFragment
                 starMenuItem.isVisible = false
                 playMenuItem.isVisible = false
 
-                viewModel.delayedSetData(this)
+
+                viewModel.delayedSetData(this, sourceArg)
             } else {
-                viewModel.setData(this)
+                viewModel.setData(this, sourceArg)
             }
         }
         observeUi()

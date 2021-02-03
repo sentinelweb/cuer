@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -164,21 +165,26 @@ class PlaylistPresenter(
 
     override fun onItemSwipeRight(item: ItemContract.Model) {// move
         state.viewModelScope.launch {
-            state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
-            playlistDialogModelCreator.loadPlaylists { allPlaylists ->
-                view.showPlaylistSelector(
-                    playlistDialogModelCreator.mapPlaylistSelectionForDialog(
-                        allPlaylists, setOf(state.playlist!!), false,
-                        itemClick = { which: Int, _ ->
-                            if (which < allPlaylists.size) {
-                                allPlaylists[which].id?.let { moveItemToPlaylist(it) }
-                            } else {
-                                view.showPlaylistCreateDialog()
-                            }
-                        },
-                        dismiss = { view.resetItemsState() }
+            if (state.playlistIdentifier.source == MEMORY) {
+                toastWrapper.show("Cant move the item before saving")
+                updateView()
+            } else {
+                state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
+                playlistDialogModelCreator.loadPlaylists { allPlaylists ->
+                    view.showPlaylistSelector(
+                        playlistDialogModelCreator.mapPlaylistSelectionForDialog(
+                            allPlaylists, setOf(state.playlist!!), false,
+                            itemClick = { which: Int, _ ->
+                                if (which < allPlaylists.size) {
+                                    allPlaylists[which].id?.let { moveItemToPlaylist(it) }
+                                } else {
+                                    view.showPlaylistCreateDialog()
+                                }
+                            },
+                            dismiss = { view.resetItemsState() }
+                        )
                     )
-                )
+                }
             }
         }
     }

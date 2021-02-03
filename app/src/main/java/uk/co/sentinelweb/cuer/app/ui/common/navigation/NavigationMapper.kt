@@ -7,7 +7,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.FragmentNavigator
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -43,8 +42,7 @@ class NavigationMapper constructor(
                         )
                     )
                 } ?: throw IllegalArgumentException("$WEB_LINK: $LINK param required")
-            NAV_BACK -> fragment?.findNavController()?.popBackStack()
-                ?: throw IllegalStateException("Fragment unavailable")
+            NAV_BACK -> navController.popBackStack()
             NAV_FINISH -> activity.finish()
             YOUTUBE_CHANNEL -> if (!ytJavaApi.launchChannel(nav.params[CHANNEL_ID] as String)) {
                 toastWrapper.show("can't launch channel")

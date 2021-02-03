@@ -87,7 +87,7 @@ object Modules {
         single { MediaOrchestrator(get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
         single { PlaylistStatsOrchestrator(get()) }
-        single { PlaylistMemoryRepository() }
+        single { PlaylistMemoryRepository(get()) }
         single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
     }
 
@@ -138,6 +138,7 @@ object Modules {
             SharedPrefsWrapper(GeneralPreferences::class, androidApplication(), get())
         }
         factory { ServiceWrapper(androidApplication(), get()) }
+        factory { WindowWrapper() }
     }
 
     private val appNetModule = module {

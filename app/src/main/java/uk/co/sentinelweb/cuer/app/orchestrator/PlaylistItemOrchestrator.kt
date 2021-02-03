@@ -35,7 +35,7 @@ class PlaylistItemOrchestrator constructor(
 
     suspend override fun loadList(filter: Filter, options: Options): List<PlaylistItemDomain> =
         when (options.source) {
-            MEMORY -> TODO()
+            MEMORY -> playlistItemMemoryRepository.loadList(filter, options)
             LOCAL -> playlistDatabaseRepository.loadPlaylistItems(filter)
                 .forceDatabaseListResultNotEmpty("Playlist item $filter does not exist")
             LOCAL_NETWORK -> TODO()
@@ -62,7 +62,7 @@ class PlaylistItemOrchestrator constructor(
 
     suspend override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
         when (options.source) {
-            MEMORY -> TODO()
+            MEMORY -> playlistItemMemoryRepository.save(domain, options)
             LOCAL -> playlistDatabaseRepository.savePlaylistItem(domain, options.flat)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
             LOCAL_NETWORK -> TODO()
@@ -74,13 +74,19 @@ class PlaylistItemOrchestrator constructor(
         throw NotImplementedException()
     }
 
-    override suspend fun count(filter: Filter, options: Options): Int {
-        throw NotImplementedException()
-    }
+    override suspend fun count(filter: Filter, options: Options): Int =
+        when (options.source) {
+            MEMORY -> playlistItemMemoryRepository.count(filter, options)
+            LOCAL -> playlistDatabaseRepository.count(filter)
+                .forceDatabaseSuccessNotNull("Count failed $filter")
+            LOCAL_NETWORK -> TODO()
+            REMOTE -> TODO()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)
+        }
 
     override suspend fun delete(domain: PlaylistItemDomain, options: Options): Boolean =
         when (options.source) {
-            MEMORY -> TODO()
+            MEMORY -> playlistItemMemoryRepository.delete(domain, options)
             LOCAL -> playlistDatabaseRepository.delete(domain, options.emit)
                 .forceDatabaseSuccessNotNull("Delete failed $domain")
             LOCAL_NETWORK -> TODO()
