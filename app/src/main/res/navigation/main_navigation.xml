@@ -50,6 +50,12 @@
             app:argType="long"
             app:nullable="false"
             />
+
+        <argument
+            android:name="SOURCE"
+            app:argType="string"
+            app:nullable="false"
+            />
     </fragment>
 
     <fragment
@@ -96,6 +102,12 @@
         >
         <argument
             android:name="PLAYLIST_ITEM"
+            app:argType="string"
+            app:nullable="false"
+            />
+
+        <argument
+            android:name="SOURCE"
             app:argType="string"
             app:nullable="false"
             />
