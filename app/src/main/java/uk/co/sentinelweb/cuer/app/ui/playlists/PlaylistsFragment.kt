@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -96,7 +97,7 @@ class PlaylistsFragment :
     // region PlaylistContract.View
     override fun setList(model: PlaylistsContract.Model, animate: Boolean) {
         Glide.with(requireContext())
-            .load(imageProvider.makeRef(model.imageUrl))
+            .loadFirebaseOrOtherUrl(model.imageUrl, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(playlists_header_image)
         playlists_swipe.isRefreshing = false

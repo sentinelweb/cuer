@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -15,7 +17,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 class PlaylistEditViewModel constructor(
     private val state: PlaylistEditState,
     private val mapper: PlaylistEditModelMapper,
-    private val playlistRepo: PlaylistDatabaseRepository,
+    private val playlistRepo: PlaylistOrchestrator,
     private val log: LogWrapper,
     private val imageProvider: FirebaseDefaultImageProvider
 ) : ViewModel() {
@@ -33,15 +35,13 @@ class PlaylistEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun setData(playlistId: Long?) {
+    fun setData(playlistId: Long?, source: Source) {
         viewModelScope.launch {
+            state.source = source
             playlistId?.let {
-                playlistRepo.load(it, true)
-                    .takeIf { it.isSuccessful }
+                playlistRepo.load(it, Options(source))
                     ?.let {
-                        it.data?.let {
-                            state.playlist = it
-                        } ?: makeCreateModel()
+                        state.playlist = it
                     } ?: makeCreateModel()
             } ?: makeCreateModel()
             update()
@@ -86,11 +86,10 @@ class PlaylistEditViewModel constructor(
     fun onCommitClick() {
         if (state.model?.validation?.valid ?: false) {
             viewModelScope.launch {
-                playlistRepo.save(state.playlist, true)
-                    .takeIf { it.isSuccessful }
-                    ?.let {
-                        it.data?.apply { state.playlist = this }
-                        _domainLiveData.value = it.data
+                playlistRepo.save(state.playlist, Options(state.source))
+                    .let {
+                        it.apply { state.playlist = this }
+                        _domainLiveData.value = it
                     }
             }
         }

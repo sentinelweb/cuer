@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.util.firebase
 
+import com.bumptech.glide.RequestManager
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
@@ -93,4 +94,9 @@ class FirebaseDefaultImageProvider constructor(
     companion object {
         private val ROOT = "gs://cuer-275020.appspot.com/playlist_header/"
     }
+}
+
+inline fun RequestManager.loadFirebaseOrOtherUrl(url: String, imageProvider: FirebaseDefaultImageProvider) = this.run {
+    if (url.startsWith("gs://")) load(imageProvider.makeRef(url))
+    else load(url)
 }

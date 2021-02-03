@@ -58,6 +58,12 @@ interface OrchestratorContract<Domain> {
     class NetException(result: NetResult<*>) : Exception((result as NetResult.Error<*>).msg, result.t)
     class MemoryException(msg: String, cause: Throwable? = null) : Exception(msg, cause)
 
+    // todo make this Identifier serialzable and make a sealed class for ID add ObjectType
+//    sealed class Id {
+//        class IdLong(id:Long)
+//        class IdString(id:String)
+//    }
+    // @Serializable
     open class Identifier<IdType>(
         open val id: IdType,
         val source: Source
@@ -76,7 +82,6 @@ interface OrchestratorContract<Domain> {
             result = 31 * result + source.hashCode()
             return result
         }
-        //fun matches(id:Identifier<*>) = this.id == id.id && this.source == id.source
     }
 
     data class LocalIdentifier(override val id: Long) : Identifier<Long>(id, LOCAL) {

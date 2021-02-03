@@ -48,7 +48,6 @@ class MediaOrchestrator constructor(
                     .get(0)
         }
 
-
     suspend override fun load(domain: MediaDomain, options: Options): MediaDomain? {
         throw NotImplementedException()
     }
@@ -57,7 +56,7 @@ class MediaOrchestrator constructor(
         when (options.source) {
             MEMORY -> TODO()
             LOCAL -> mediaDatabaseRepository.save(domain, options.flat)
-                .forceDatabaseSuccess("Save failed $domain")
+                .forceDatabaseSuccessNotNull("Save failed $domain")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> TODO()

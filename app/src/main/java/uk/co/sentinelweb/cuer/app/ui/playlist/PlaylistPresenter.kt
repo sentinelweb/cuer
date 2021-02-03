@@ -241,9 +241,8 @@ class PlaylistPresenter(
     }
 
     override fun onEdit(): Boolean {
-        state.playlist
-            ?.run { id }
-            ?.apply { view.gotoEdit(this) }
+        state.playlistIdentifier
+            .apply { view.gotoEdit(this.id as Long, this.source) }
         return true
     }
 
@@ -295,13 +294,13 @@ class PlaylistPresenter(
 
     override fun onItemViewClick(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)
-            ?.apply { view.showItemDescription(this) }
+            ?.apply { view.showItemDescription(this, state.playlistIdentifier.source) }// todo pass identifier?
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)?.let { itemDomain ->
             if (!(ytContextHolder.isConnected())) {
-                view.showItemDescription(itemDomain)
+                view.showItemDescription(itemDomain, state.playlistIdentifier.source)
             } else {
                 playItem(itemDomain, false)
             }
@@ -333,7 +332,7 @@ class PlaylistPresenter(
                     }
                 }
             }, {// info
-                view.showItemDescription(itemDomain)
+                view.showItemDescription(itemDomain, state.playlistIdentifier.source)
             }))
         }
     }
@@ -384,12 +383,11 @@ class PlaylistPresenter(
             state.playlist = state.playlist?.let { playlist ->
                 playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!)
             }?.also { plist ->
-                plist.let { modelMapper.map(it, isPlaylistPlaying()) }
+                plist.let { modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier) }
                     .also { view.setModel(it, false) }
             }?.also { plist ->
                 state.viewModelScope.launch {
                     playlistOrchestrator.save(plist, state.playlistIdentifier.toDeep<Long>())
-                        ?: toastWrapper.show("Couldn't save playlist")
                     queueExecIf {
                         //refreshQueueFrom(plist) // refresh from flow
                         view.highlightPlayingItem(currentItemIndex)
@@ -522,7 +520,7 @@ class PlaylistPresenter(
     private suspend fun updateView(animate: Boolean = true, scrollToItem: Boolean = false) = withContext(coroutines.Main) {
         state.playlist
             .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
-            ?.let { modelMapper.map(it, isPlaylistPlaying()) }
+            ?.let { modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier) }
             ?.also { view.setModel(it, animate) }
             .also {
                 state.focusIndex?.apply {
@@ -541,7 +539,7 @@ class PlaylistPresenter(
     }
 
     private suspend fun updateHeader() = withContext(coroutines.Main) {
-        state.playlist?.apply { view.setHeaderModel(modelMapper.map(this, isPlaylistPlaying(), false)) }
+        state.playlist?.apply { view.setHeaderModel(modelMapper.map(this, isPlaylistPlaying(), false, id = state.playlistIdentifier)) }
     }
 
 }

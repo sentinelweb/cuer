@@ -57,6 +57,8 @@ interface PlaylistDao {
     @Query("UPDATE playlist SET currentIndex=:index WHERE id=:id")
     suspend fun updateIndex(id: Long, index: Int): Int
 
+    // todo can make partial updates entities for fields
+    // https://stackoverflow.com/questions/45789325/update-some-specific-field-of-an-entity-in-android-room/59834309#59834309
     @Update
     suspend fun update(playlist: PlaylistEntity): Int
 

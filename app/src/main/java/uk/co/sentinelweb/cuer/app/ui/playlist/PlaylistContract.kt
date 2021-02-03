@@ -75,8 +75,8 @@ interface PlaylistContract {
         fun showPlaylistCreateDialog()
         fun showAlertDialog(model: AlertDialogModel)
         fun resetItemsState()
-        fun showItemDescription(itemWitId: PlaylistItemDomain)
-        fun gotoEdit(id: Long)
+        fun showItemDescription(itemWitId: PlaylistItemDomain, source: Source)
+        fun gotoEdit(id: Long, source: Source)
         fun showCastRouteSelectorDialog()
         fun setPlayState(state: PlayState)
     }
@@ -104,6 +104,8 @@ interface PlaylistContract {
         @DrawableRes val playIcon: Int,
         @DrawableRes val starredIcon: Int,
         val isDefault: Boolean,
+        val isSaved: Boolean,
+        val canPlay: Boolean,
         val items: List<ItemContract.Model>?
     )
 

@@ -23,7 +23,8 @@ class PlaylistOrchestrator constructor(
 
     suspend override fun load(id: Long, options: Options): PlaylistDomain? = when (options.source) {
         MEMORY -> playlistMemoryRepository.load(id, options)
-        LOCAL -> TODO()
+        LOCAL -> playlistDatabaseRepository.load(id)
+            .forceDatabaseSuccess()
         LOCAL_NETWORK -> TODO()
         REMOTE -> TODO()
         PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -33,7 +34,7 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> TODO()
             LOCAL -> playlistDatabaseRepository.loadList(filter)
-                .allowDatabaseListResulEmpty("Playlist $filter does not exist")
+                .allowDatabaseListResultEmpty()
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, filter, options)
@@ -48,7 +49,7 @@ class PlaylistOrchestrator constructor(
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> ytInteractor.playlist(platformId)
-                .forceNetResultNotNull("Youtube ${platformId} does not exist")
+                .forceNetSuccessNotNull("Youtube ${platformId} does not exist")
         }
 
     suspend override fun load(domain: PlaylistDomain, options: Options): PlaylistDomain? {
@@ -60,7 +61,7 @@ class PlaylistOrchestrator constructor(
             MEMORY -> playlistMemoryRepository.save(domain, options)
             LOCAL ->
                 playlistDatabaseRepository.save(domain, options.emit)
-                    .forceDatabaseSuccess("Save failed ${domain.id}")
+                    .forceDatabaseSuccessNotNull("Save failed ${domain.id}")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -71,7 +72,7 @@ class PlaylistOrchestrator constructor(
             MEMORY -> TODO()
             LOCAL ->
                 playlistDatabaseRepository.save(domains, options.emit)
-                    .forceDatabaseSuccess("Save failed ${domains.map { it.id }}")
+                    .forceDatabaseListResultNotEmpty("Save failed ${domains.map { it.id }}")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -83,7 +84,7 @@ class PlaylistOrchestrator constructor(
             MEMORY -> TODO()
             LOCAL ->
                 playlistDatabaseRepository.count(filter)
-                    .forceDatabaseSuccess("Count failed $filter")
+                    .forceDatabaseSuccessNotNull("Count failed $filter")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -94,7 +95,7 @@ class PlaylistOrchestrator constructor(
             MEMORY -> TODO()
             LOCAL ->
                 playlistDatabaseRepository.delete(domain, options.emit)
-                    .forceDatabaseSuccess("Delete failed ${domain.id}")
+                    .forceDatabaseSuccessNotNull("Delete failed ${domain.id}")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -118,7 +119,8 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             LOCAL ->
                 playlistDatabaseRepository.updateCurrentIndex(it, options.emit)
-                    .isSuccessful
+                    .forceDatabaseSuccessNotNull("Update did not succeed")
+
             else -> throw InvalidOperationException(this::class, null, options)
         }
 

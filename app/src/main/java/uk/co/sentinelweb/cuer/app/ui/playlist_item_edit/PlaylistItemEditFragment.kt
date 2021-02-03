@@ -317,7 +317,7 @@ class PlaylistItemEditFragment
                                 .createMulti(model as SelectDialogModel)
                                 .apply { show() }
                         DialogModel.Type.PLAYLIST_ADD -> {
-                            createPlaylistDialog = PlaylistEditFragment.newInstance(null)
+                            createPlaylistDialog = PlaylistEditFragment.newInstance()
                                 .apply {
                                     listener = object : PlaylistEditFragment.Listener {
                                         override fun onPlaylistCommit(domain: PlaylistDomain?) {

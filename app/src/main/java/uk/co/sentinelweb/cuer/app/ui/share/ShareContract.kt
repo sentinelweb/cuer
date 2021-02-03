@@ -8,6 +8,7 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -33,7 +34,7 @@ interface ShareContract {
         fun warning(msg: String)
         suspend fun commitPlaylistItems()
         fun getCommittedItems(): List<Any>?
-        fun showMedia(itemDomain: PlaylistItemDomain)
+        fun showMedia(itemDomain: PlaylistItemDomain, source: Source)
         fun showPlaylist(id: OrchestratorContract.Identifier<Long>)
     }
 

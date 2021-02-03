@@ -20,6 +20,7 @@ import org.koin.core.context.KoinContextHandler.get
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.extension.fade
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 
 
 class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLayout(c, a, def),
@@ -96,7 +97,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
 
     override fun setIconUrl(url: String) {
         Glide.with(listitem_icon.context)
-            .load(imageProvider.makeRef(url))
+            .loadFirebaseOrOtherUrl(url, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(listitem_icon)
     }

@@ -37,6 +37,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -230,15 +231,14 @@ class PlaylistFragment :
     override fun setHeaderModel(model: PlaylistContract.Model) {
 
         Glide.with(requireContext())
-            .run {
-                if (model.imageUrl.startsWith("gs://")) load(imageProvider.makeRef(model.imageUrl))
-                else load(model.imageUrl)
-            }
+            .loadFirebaseOrOtherUrl(model.imageUrl, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.playlistHeaderImage)
         binding.playlistCollapsingToolbar.title = model.title
         binding.playlistFabPlay.setImageResource(model.playIcon)
+        binding.playlistFabPlay.isEnabled = model.canPlay
         playMenuItem.setIcon(model.playIcon)
+        playMenuItem.setEnabled(model.canPlay)
         starMenuItem.setIcon(model.starredIcon)
         //playlist_items.setText("${model.items.size}")
         binding.playlistFlags.isVisible = model.isDefault
@@ -311,9 +311,9 @@ class PlaylistFragment :
         selectDialogCreator.createSingle(model).apply { show() }
     }
 
-    override fun showPlaylistCreateDialog() {
+    override fun showPlaylistCreateDialog() {// add playlist
         createPlaylistDialog?.dismissAllowingStateLoss()
-        createPlaylistDialog = PlaylistEditFragment.newInstance(null).apply {
+        createPlaylistDialog = PlaylistEditFragment.newInstance().apply {
             listener = object : PlaylistEditFragment.Listener {
                 override fun onPlaylistCommit(domain: PlaylistDomain?) {
                     domain?.apply { presenter.onPlaylistSelected(this) }
@@ -328,17 +328,17 @@ class PlaylistFragment :
         presenter.onItemViewClick(item)
     }
 
-    override fun showItemDescription(itemWitId: PlaylistItemDomain) {
+    override fun showItemDescription(itemWitId: PlaylistItemDomain, source: Source) {
         itemWitId.id?.also { id ->
             adapter.getItemViewForId(id)?.let { view ->
-                PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise())
+                PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise(), source.toString())
                     .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
             }
         }
     }
 
-    override fun gotoEdit(id: Long) {
-        PlaylistFragmentDirections.actionGotoEditPlaylist(id)
+    override fun gotoEdit(id: Long, source: Source) {
+        PlaylistFragmentDirections.actionGotoEditPlaylist(id, source.toString())
             .apply { findNavController().navigate(this) }
     }
 

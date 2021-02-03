@@ -65,7 +65,8 @@ class SharePresenter constructor(
         state.scanResult = result
         when (result.type) {
             MEDIA -> (result.result as MediaDomain).let {
-                view.showMedia(PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null))
+                // todo handle existing?
+                view.showMedia(PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null), MEMORY)
                 mapDisplayModel()
             }
             PLAYLIST -> (result.result as PlaylistDomain).let {
