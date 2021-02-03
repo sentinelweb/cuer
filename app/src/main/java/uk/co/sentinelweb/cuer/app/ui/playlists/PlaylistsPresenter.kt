@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -46,7 +47,7 @@ class PlaylistsPresenter(
     }
 
     override fun onItemSwipeRight(item: ItemContract.Model) {
-        view.gotoEdit(item.id)
+        view.gotoEdit(item.id, LOCAL)
     }
 
     override fun onItemSwipeLeft(item: ItemContract.Model) {
@@ -64,11 +65,11 @@ class PlaylistsPresenter(
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        view.gotoPlaylist(item.id, false)
+        view.gotoPlaylist(item.id, false, LOCAL)
     }
 
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
-        view.gotoPlaylist(item.id, true)
+        view.gotoPlaylist(item.id, true, LOCAL)
     }
 
     override fun onItemStar(item: ItemContract.Model) {

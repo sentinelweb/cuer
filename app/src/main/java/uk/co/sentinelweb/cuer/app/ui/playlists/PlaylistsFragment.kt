@@ -16,6 +16,8 @@ import kotlinx.android.synthetic.main.playlists_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
@@ -115,13 +117,13 @@ class PlaylistsFragment :
         snackbar?.show()
     }
 
-    override fun gotoPlaylist(id: Long, play: Boolean) {
-        PlaylistsFragmentDirections.actionGotoPlaylist(id, play)
+    override fun gotoPlaylist(id: Long, play: Boolean, source: Source) {
+        PlaylistsFragmentDirections.actionGotoPlaylist(id, play, source.toString())
             .apply { findNavController().navigate(this) }
     }
 
-    override fun gotoEdit(id: Long) {
-        PlaylistsFragmentDirections.actionEditPlaylist(id)
+    override fun gotoEdit(id: Long, source: Source) {
+        PlaylistsFragmentDirections.actionEditPlaylist(id, source.toString())
             .apply { findNavController().navigate(this) }
     }
 

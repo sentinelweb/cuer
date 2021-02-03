@@ -8,6 +8,7 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
@@ -49,8 +50,8 @@ interface PlaylistsContract {
 
         //fun scrollTo(direction: ScrollDirection)
         fun showDeleteUndo(msg: String)
-        fun gotoPlaylist(id: Long, play: Boolean)
-        fun gotoEdit(id: Long)
+        fun gotoPlaylist(id: Long, play: Boolean, source: Source)
+        fun gotoEdit(id: Long, source: Source)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
