@@ -7,7 +7,8 @@ import java.util.concurrent.Executors
 open class CoroutineContextProvider constructor(
     val Main: CoroutineDispatcher = Dispatchers.Main,
     val IO: CoroutineDispatcher = Dispatchers.IO,
-    val Default: CoroutineDispatcher = Dispatchers.Default
+    val Default: CoroutineDispatcher = Dispatchers.Default,
+    val Computation: CoroutineDispatcher = ComputationDispatcher
 ) {
     inner class ScopeHolder(private val dispatcher: CoroutineDispatcher) {
         private var _scope: CoroutineScope? = null
@@ -40,6 +41,6 @@ open class CoroutineContextProvider constructor(
     }
 
     companion object {
-        val Computation: CoroutineDispatcher = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
+        val ComputationDispatcher: CoroutineDispatcher = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
     }
 }

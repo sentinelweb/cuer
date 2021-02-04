@@ -86,9 +86,12 @@ class PlaylistMemoryRepository constructor(
         override val updates: Flow<Pair<Operation, PlaylistItemDomain>>
             get() = _playlistItemFlow
 
-        private val _idCounter = 0L
+        private var _idCounter = 0L
         val idCounter: Long
-            get() = _idCounter.dec()
+            get() {
+                _idCounter--
+                return _idCounter
+            }
 
         override fun load(platformId: String, options: Options): PlaylistItemDomain? {
             throw NotImplementedException()

@@ -66,6 +66,18 @@ class PlaylistPresenter(
     private val isQueuedPlaylist: Boolean
         get() = state.playlistIdentifier == queue.playlistId
 
+    private fun queueExecIfElse(
+        block: QueueMediatorContract.Producer.() -> Unit,
+        elseBlock: (QueueMediatorContract.Producer.() -> Unit)? = null
+    ) {
+        if (isQueuedPlaylist) block(queue)
+        else elseBlock?.let { it(queue) }
+    }
+
+    private fun queueExecIf(block: QueueMediatorContract.Producer.() -> Unit) {
+        if (isQueuedPlaylist) block(queue)
+    }
+
     private val castConnectionListener = object : ChromecastConnectionListener {
         override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
             if (isQueuedPlaylist) {
@@ -132,18 +144,6 @@ class PlaylistPresenter(
         coroutines.cancel()
     }
 
-    private fun queueExecIfElse(
-        block: QueueMediatorContract.Producer.() -> Unit,
-        elseBlock: (QueueMediatorContract.Producer.() -> Unit)? = null
-    ) {
-        if (isQueuedPlaylist) block(queue)
-        else elseBlock?.let { it(queue) }
-    }
-
-    private fun queueExecIf(block: QueueMediatorContract.Producer.() -> Unit) {
-        if (isQueuedPlaylist) block(queue)
-    }
-
 
     override fun initialise() {
         //queue.addProducerListener(this)
@@ -163,10 +163,10 @@ class PlaylistPresenter(
         //queue.removeProducerListener(this)
     }
 
-    override fun onItemSwipeRight(item: ItemContract.Model) {// move
+    override fun onItemSwipeRight(item: ItemContract.Model) { // move
         state.viewModelScope.launch {
             if (state.playlistIdentifier.source == MEMORY) {
-                toastWrapper.show("Cant move the item before saving")
+                toastWrapper.show("Cant move the items before saving")
                 updateView()
             } else {
                 state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
@@ -277,21 +277,21 @@ class PlaylistPresenter(
                 plist.items.let { items ->
                     items.find { it.id == item.id }?.let { deleteItem ->
                         val indexOf = items.indexOf(deleteItem)
-                        queueExecIfElse({
+//                        queueExecIfElse({
+//                            state.deletedPlaylistItem = deleteItem
+//                            deleteItem(indexOf)
+//                            view.showDeleteUndo("Deleted: ${deleteItem.media.title}")
+//                        }, {
+                        state.viewModelScope.launch {
                             state.deletedPlaylistItem = deleteItem
-                            deleteItem(indexOf)
+                            val mutated = playlistMutator.delete(plist, deleteItem)
+                            // todo handle errors
+                            playlistItemOrchestrator.delete(deleteItem, state.playlistIdentifier.toFlat<Long>())
+                            playlistOrchestrator.updateCurrentIndex(mutated, state.playlistIdentifier.toFlat<Long>())
                             view.showDeleteUndo("Deleted: ${deleteItem.media.title}")
-                        }, {
-                            state.viewModelScope.launch {
-                                state.deletedPlaylistItem = deleteItem
-                                val mutated = playlistMutator.delete(plist, deleteItem)
-                                // todo handle errors
-                                playlistItemOrchestrator.delete(deleteItem, state.playlistIdentifier.toFlat<Long>())
-                                playlistOrchestrator.updateCurrentIndex(mutated, state.playlistIdentifier.toFlat<Long>())
-                                view.showDeleteUndo("Deleted: ${deleteItem.media.title}")
-                                executeRefresh(false)
-                            }
-                        })
+                            executeRefresh(false)
+                        }
+//                        })
                     }
                 }
             }

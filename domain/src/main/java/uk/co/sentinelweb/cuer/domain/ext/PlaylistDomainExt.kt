@@ -28,6 +28,9 @@ fun PlaylistDomain.indexOfItemId(id1: Long?): Int? {
     }
 }
 
+fun PlaylistDomain.matchesHeader(playlist: PlaylistDomain?): Boolean =
+    this.copy(items = listOf()) == playlist?.copy(items = listOf())
+
 fun PlaylistDomain.replaceHeader(header: PlaylistDomain) = header.copy(items = items)
 
 fun PlaylistDomain.replaceHeaderKeepIndex(header: PlaylistDomain) = header.copy(items = items, currentIndex = currentIndex)

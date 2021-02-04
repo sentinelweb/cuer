@@ -48,7 +48,7 @@ class PlaylistMutator {
         }
         return domain
     }
-
+// todo  this needs not only to replace by id but also to synchronise the order
     fun addOrReplaceItem(playlist: PlaylistDomain, item: PlaylistItemDomain) =
         if (item.playlistId == playlist.id) {
             val items = playlist.items.toMutableList()

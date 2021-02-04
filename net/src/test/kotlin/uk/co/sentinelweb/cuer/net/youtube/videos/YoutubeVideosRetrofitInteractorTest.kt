@@ -117,7 +117,7 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
     fun videos() {
         every {
             mockErrorMapper.map<List<MediaDomain>>(any(), any())
-        } returns NetResult.Error<List<MediaDomain>>(Exception("error"))
+        } returns NetResult.Error(Exception("error"))
         runBlocking {
             val actual = sut.videos(fixtIds, fixtParts)
 
@@ -131,7 +131,7 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
     fun channels() {
         every {
             mockErrorMapper.map<List<ChannelDomain>>(any(), any())
-        } returns NetResult.Error<List<ChannelDomain>>(Exception("error"))
+        } returns NetResult.Error(Exception("error"))
         runBlocking {
             val actual = sut.channels(fixtIds, fixtParts)
 

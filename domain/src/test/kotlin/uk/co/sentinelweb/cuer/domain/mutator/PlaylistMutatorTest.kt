@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.domain.mutator
 import com.flextrade.jfixture.FixtureAnnotations
 import com.flextrade.jfixture.JFixture
 import com.flextrade.jfixture.annotations.Fixture
+import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -13,6 +14,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.LOOP
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.scanOrder
+import uk.co.sentinelweb.cuer.tools.ext.build
 import java.lang.Integer.max
 
 class PlaylistMutatorTest {
@@ -272,4 +274,23 @@ class PlaylistMutatorTest {
         assertEquals(fixtCurrentIndex - 1, actual.currentIndex)
     }
 
+    @Test
+    fun `addOrReplaceItem existing same order`() {
+        val replaceItemIndex = 2
+        val fixtChangedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylist.items.get(replaceItemIndex).id,
+            playlistId = fixtPlaylist.id,
+            order = fixtPlaylist.items.get(replaceItemIndex).order
+        )
+        val actual = sut.addOrReplaceItem(fixtPlaylist, fixtChangedItem)
+        assertThat(actual.items.get(replaceItemIndex)).isEqualTo(fixtChangedItem)
+    }
+
+    @Test
+    fun `addOrReplaceItem existing changed order`() {
+    }
+
+    @Test
+    fun `addOrReplaceItem added`() {
+    }
 }

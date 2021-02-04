@@ -23,7 +23,7 @@ interface QueueMediatorContract {
         suspend fun refreshQueue()
         fun playNow()
         suspend fun playNow(identifier: OrchestratorContract.Identifier<*>, playlistItemId: Long?)
-        fun deleteItem(index: Int)
+        //fun deleteItem(index: Int)
         suspend fun switchToPlaylist(identifier: OrchestratorContract.Identifier<*>)
     }
 
