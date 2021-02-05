@@ -116,7 +116,10 @@ class PlaylistPresenter(
                             state.playlist = plist
                             updateView()
                         }
-                        DELETE -> toastWrapper.show("TODO : Playlist deleted!!!!")// todo exit screen?
+                        DELETE -> {
+                            toastWrapper.show("This playlist was deleted")
+                            // view.exit()// todo exit or bac
+                        }
                     }
                 }
             }.launchIn(coroutines.mainScope)
@@ -163,6 +166,7 @@ class PlaylistPresenter(
         //queue.removeProducerListener(this)
     }
 
+    // move item to playlist
     override fun onItemSwipeRight(item: ItemContract.Model) { // move
         state.viewModelScope.launch {
             if (state.playlistIdentifier.source == MEMORY) {
@@ -209,7 +213,7 @@ class PlaylistPresenter(
 
     private fun commitHeaderChange(plist: PlaylistDomain) {
         state.viewModelScope.launch {
-            playlistOrchestrator.save(plist, state.playlistIdentifier.toFlat<Long>())
+            playlistOrchestrator.save(plist, state.playlistIdentifier.toFlatOptions<Long>())
             //queueExecIf { refreshHeaderData() } // todo remove this and add flow collector
         }
     }
@@ -261,7 +265,7 @@ class PlaylistPresenter(
         state.selectedPlaylistItem?.let { moveItem ->
             state.viewModelScope.launch {
                 moveItem.copy(playlistId = it, order = timeProvider.currentTimeMillis())
-                    .apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.toFlat<Long>()) }
+                    .apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.toFlatOptions<Long>()) }
                 // todo update playlist pointer
                 executeRefresh()
                 // queueExecIf { refreshQueueFrom(state.playlist!!) }
@@ -269,6 +273,7 @@ class PlaylistPresenter(
         }
     }
 
+    // delete item
     override fun onItemSwipeLeft(item: ItemContract.Model) {
         state.viewModelScope.launch {
             delay(400)
@@ -286,8 +291,8 @@ class PlaylistPresenter(
                             state.deletedPlaylistItem = deleteItem
                             val mutated = playlistMutator.delete(plist, deleteItem)
                             // todo handle errors
-                            playlistItemOrchestrator.delete(deleteItem, state.playlistIdentifier.toFlat<Long>())
-                            playlistOrchestrator.updateCurrentIndex(mutated, state.playlistIdentifier.toFlat<Long>())
+                            playlistItemOrchestrator.delete(deleteItem, state.playlistIdentifier.toFlatOptions<Long>())
+//                            playlistOrchestrator.updateCurrentIndex(mutated, state.playlistIdentifier.toFlat<Long>())
                             view.showDeleteUndo("Deleted: ${deleteItem.media.title}")
                             executeRefresh(false)
                         }
@@ -386,6 +391,7 @@ class PlaylistPresenter(
 
     override fun commitMove() {
         if (state.dragFrom != null && state.dragTo != null) {
+            val moveditem = state.playlist!!.items.get(state.dragFrom!!)
             state.playlist = state.playlist?.let { playlist ->
                 playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!)
             }?.also { plist ->
@@ -393,7 +399,10 @@ class PlaylistPresenter(
                     .also { view.setModel(it, false) }
             }?.also { plist ->
                 state.viewModelScope.launch {
-                    playlistOrchestrator.save(plist, state.playlistIdentifier.toDeep<Long>())
+                    //playlistOrchestrator.save(plist, state.playlistIdentifier.toDeep<Long>())
+                    moveditem.id?.toIdentifier(state.playlistIdentifier.source)?.toFlatOptions<Long>()?.let {
+                        playlistItemOrchestrator.save(moveditem, it)
+                    }
                     queueExecIf {
                         //refreshQueueFrom(plist) // refresh from flow
                         view.highlightPlayingItem(currentItemIndex)
@@ -454,7 +463,7 @@ class PlaylistPresenter(
     override fun undoDelete() {
         state.deletedPlaylistItem?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistItemOrchestrator.save(itemDomain, state.playlistIdentifier.toFlat<Long>(false))
+                playlistItemOrchestrator.save(itemDomain, state.playlistIdentifier.toFlatOptions<Long>(false))
                 state.focusIndex = state.lastFocusIndex
                 executeRefresh()
                 (state.playlist?.items?.indexOfFirst { it.id == itemDomain.id } ?: -2).let { restoredIndex ->
@@ -462,12 +471,12 @@ class PlaylistPresenter(
                         state.playlist?.currentIndex?.also { currentIndex ->
                             if (restoredIndex <= currentIndex) {
                                 state.playlist = state.playlist?.copy(currentIndex = currentIndex + 1)
-                                state.playlist?.let {
-                                    playlistOrchestrator.updateCurrentIndex(
-                                        it,
-                                        state.playlistIdentifier.toFlat<Long>(false)
-                                    )
-                                }
+//                                state.playlist?.let {
+//                                    playlistOrchestrator.updateCurrentIndex(
+//                                        it,
+//                                        state.playlistIdentifier.toFlat<Long>(false)
+//                                    )
+//                                }
                                 view.scrollToItem(restoredIndex)
                                 queueExecIf {
                                     refreshQueueBackground()

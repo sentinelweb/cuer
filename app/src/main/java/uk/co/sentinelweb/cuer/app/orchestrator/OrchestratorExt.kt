@@ -68,6 +68,6 @@ fun Long.toIdentifier(source: Source) = Identifier(this, source)
 
 inline fun <reified Id> Identifier<Id>.toPair() = Pair(id, source)
 inline fun <reified Id> Identifier<*>.toPairType() = Pair(id, source)
-inline fun <reified Id> Identifier<*>.toFlat(emit: Boolean = true) = OrchestratorContract.Options(source, flat = true, emit = emit)
+inline fun <reified Id> Identifier<*>.toFlatOptions(emit: Boolean = true) = OrchestratorContract.Options(source, flat = true, emit = emit)
 inline fun <reified Id> Identifier<*>.toDeep(emit: Boolean = false) = OrchestratorContract.Options(source, flat = false, emit = emit)
 

@@ -67,6 +67,8 @@ class QueueMediator constructor(
                         when (op) {
                             FLAT -> {
                                 if (!plist.matchesHeader(state.playlist)) {
+                                    val indexBefore = currentItemIndex
+                                    // todo check currentindex changes
                                     state.playlist?.apply { refreshQueueFrom(replaceHeader(plist), source) }
                                         ?: refreshQueueFrom(plist, source)
                                 }
@@ -74,6 +76,7 @@ class QueueMediator constructor(
                             FULL -> {
                                 if (plist != state.playlist) {
                                     val indexBefore = currentItemIndex
+                                    // todo check currentindex changes
                                     refreshQueueFrom(plist, source)
                                 }
                             }
@@ -98,13 +101,16 @@ class QueueMediator constructor(
                             state.playlist?.apply {
                                 val plist = playlistMutator.addOrReplaceItem(this, plistItem)
                                 refreshQueueFrom(plist, source)
+                                // todo check for currentIndex changes
                             }
                         } else { // moved out?
-                            state.playlist?.items
-                                ?.find { it.id == plistItem.id && source == state.playlistIdentifier.source }
-                                ?.apply { refreshQueue() }
+                            // todo check for id in this list and is remove remove from list and update current index if necessary
+                            state.playlist
+                                ?.apply { playlistMutator.remove(this, plistItem) }
+                                ?.takeIf { it != state.playlist }
+                                ?.apply { refreshQueueFrom(this, source) }
                         }
-                        DELETE -> // leave for now as item is only deleted in here for queue
+                        DELETE -> // todo check from removal - same as moved out
                             log.d("TODO : Playlist Item deleted!!!!")
                     }
                 } catch (e: Exception) {
@@ -185,7 +191,7 @@ class QueueMediator constructor(
                     dateLastPlayed = updatedMedia.dateLastPlayed,
                     watched = true
                 )
-                mediaOrchestrator.save(mediaUpdated, state.playlistIdentifier.toFlat<Long>(true))
+                mediaOrchestrator.save(mediaUpdated, state.playlistIdentifier.toFlatOptions<Long>(true))
                 copy(media = mediaUpdated)
             }
             state.playlist = state.playlist?.let {
@@ -225,7 +231,7 @@ class QueueMediator constructor(
     private suspend fun updateCurrentItem(resetPosition: Boolean) {
         state.currentItem = state.playlist
             ?.let { playlist ->
-                playlistOrchestrator.updateCurrentIndex(playlist, state.playlistIdentifier.toFlat<Long>(true))
+                playlistOrchestrator.updateCurrentIndex(playlist, state.playlistIdentifier.toFlatOptions<Long>(true))
                 playlist.currentIndex.let { playlist.items[it] }
             }
             ?: throw NullPointerException("playlist should not be null")

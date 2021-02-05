@@ -35,14 +35,10 @@ class PlaylistMutatorTest {
                 )
             }
         )
-        println("------- start test ------------")
-        fixtPlaylist.scanOrder()
-            .apply { println(this.toString()) }
     }
 
     @After
     fun tearDown() {
-        println("------- end test ------------")
     }
 
     private fun assertScanOrder(actual: PlaylistDomain) {
@@ -275,22 +271,234 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem existing same order`() {
-        val replaceItemIndex = 2
+    fun `addOrReplaceItem - same order - no index change`() {
+        val fixtReplaceItemIndex = 2
+        val fixtCurrentIndex = 3
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
         val fixtChangedItem = fixture.build<PlaylistItemDomain>().copy(
-            id = fixtPlaylist.items.get(replaceItemIndex).id,
+            id = fixtPlaylist.items.get(fixtReplaceItemIndex).id,
             playlistId = fixtPlaylist.id,
-            order = fixtPlaylist.items.get(replaceItemIndex).order
+            order = fixtPlaylist.items.get(fixtReplaceItemIndex).order
         )
-        val actual = sut.addOrReplaceItem(fixtPlaylist, fixtChangedItem)
-        assertThat(actual.items.get(replaceItemIndex)).isEqualTo(fixtChangedItem)
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
+
+        assertThat(actual.items.get(fixtReplaceItemIndex)).isEqualTo(fixtChangedItem)
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
     }
 
     @Test
-    fun `addOrReplaceItem existing changed order`() {
+    fun `addOrReplaceItem - behind current item - moved forward - past current Index - decrement index`() {
+        val changeItemIndex = 2
+        val fixtCurrentIndex = 3
+        val targetIndexPreMove = 4
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtChangedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylist.items.get(changeItemIndex).id,
+            playlistId = fixtPlaylist.id,
+            order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
+        )
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+
+        assertThat(actual.items.get(targetIndexPreMove - 1)).isEqualTo(fixtChangedItem)
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex - 1)
     }
 
     @Test
-    fun `addOrReplaceItem added`() {
+    fun `addOrReplaceItem - is current item - moved forward - moves index with it`() {
+        val changeItemIndex = 3
+        val fixtCurrentIndex = 3
+        val targetIndexPreMove = 6
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtChangedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylist.items.get(changeItemIndex).id,
+            playlistId = fixtPlaylist.id,
+            order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
+        )
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+
+        assertThat(actual.items.get(targetIndexPreMove - 1)).isEqualTo(fixtChangedItem)
+        assertThat(actual.currentIndex).isEqualTo(targetIndexPreMove - 1)
+    }
+
+    @Test
+    fun `addOrReplaceItem - is current item - moved backward - moves index with it`() {
+        val changeItemIndex = 3
+        val fixtCurrentIndex = 3
+        val targetIndexPreMove = 1
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtChangedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylist.items.get(changeItemIndex).id,
+            playlistId = fixtPlaylist.id,
+            order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
+        )
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+
+        assertThat(actual.items.get(targetIndexPreMove)).isEqualTo(fixtChangedItem)
+        assertThat(actual.currentIndex).isEqualTo(targetIndexPreMove)
+    }
+
+    @Test
+    fun `addOrReplaceItem - behind current item - moved forward - to before current Index - same index`() {
+        val changeItemIndex = 1
+        val fixtCurrentIndex = 3
+        val targetIndexPreMove = 3
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtChangedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylist.items.get(changeItemIndex).id,
+            playlistId = fixtPlaylist.id,
+            order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
+        )
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+
+        assertThat(actual.items.get(targetIndexPreMove - 1)).isEqualTo(fixtChangedItem)
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
+    }
+
+    @Test
+    fun `addOrReplaceItem - ahead of current item - moved backward - to before current Index - inc index`() {
+        val changeItemIndex = 6
+        val fixtCurrentIndex = 3
+        val targetIndexPreMove = 3
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtChangedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylist.items.get(changeItemIndex).id,
+            playlistId = fixtPlaylist.id,
+            order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
+        )
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+        assertThat(actual.items.get(targetIndexPreMove)).isEqualTo(fixtChangedItem)
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex + 1)
+    }
+
+    @Test
+    fun `addOrReplaceItem - ahead of current item - moved backward - to ahead current Index - same index`() {
+        val changeItemIndex = 6
+        val fixtCurrentIndex = 3
+        val targetIndexPreMove = 4
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtChangedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylist.items.get(changeItemIndex).id,
+            playlistId = fixtPlaylist.id,
+            order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
+        )
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+        assertThat(actual.items.get(targetIndexPreMove)).isEqualTo(fixtChangedItem)
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
+    }
+
+    @Test
+    fun `addOrReplaceItem - add new item before index - inc index`() {
+        val fixtCurrentIndex = 3
+        val targetIndexPreMove = 3
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtChangedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixture.build<Long>(),
+            playlistId = fixtPlaylist.id,
+            order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
+        )
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+        assertThat(actual.items.get(targetIndexPreMove)).isEqualTo(fixtChangedItem)
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex + 1)
+    }
+
+    @Test
+    fun `addOrReplaceItem - add new item after index - inc index`() {
+        val fixtCurrentIndex = 3
+        val targetIndexPreMove = 4
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtChangedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixture.build<Long>(),
+            playlistId = fixtPlaylist.id,
+            order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
+        )
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+        assertThat(actual.items.get(targetIndexPreMove)).isEqualTo(fixtChangedItem)
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
+    }
+
+    @Test
+    fun `remove - is before currentIndex`() {
+        val fixtCurrentIndex = 3
+        val removedIndex = 2
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtRemovedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylistWithIndex.items.get(removedIndex).id,
+            playlistId = fixtPlaylist.id
+        )
+        val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+        assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size - 1)
+        assertThat(actual.items.find { fixtRemovedItem.id == it.id }).isNull()
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex - 1)
+    }
+
+    @Test
+    fun `remove - is after afterIndex`() {
+        val fixtCurrentIndex = 3
+        val removedIndex = 4
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtRemovedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylistWithIndex.items.get(removedIndex).id,
+            playlistId = fixtPlaylist.id
+        )
+        val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+        assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size - 1)
+        assertThat(actual.items.find { fixtRemovedItem.id == it.id }).isNull()
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
+    }
+
+    @Test
+    fun `remove - is not in list`() {
+        @Test
+        fun `remove - is after afterIndex`() {
+            val fixtCurrentIndex = 3
+            val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+            fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+            val fixtRemovedItem = fixture.build<PlaylistItemDomain>().copy(
+                id = fixture.build(),
+                playlistId = fixtPlaylist.id
+            )
+            val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
+            actual.scanOrder().apply { println(this.toString()) }
+            assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size)
+            assertThat(actual.items.find { fixtRemovedItem.id == it.id }).isNull()
+            assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
+        }
+    }
+
+    @Test
+    fun `remove - is not same playlist id`() {
+        val fixtCurrentIndex = 3
+        val removedIndex = 4
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtRemovedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylistWithIndex.items.get(removedIndex).id,
+            playlistId = fixtPlaylistWithIndex.id!! + 1
+        )
+        val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+        assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size)
+        assertThat(actual).isEqualTo(fixtPlaylistWithIndex)
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
     }
 }
