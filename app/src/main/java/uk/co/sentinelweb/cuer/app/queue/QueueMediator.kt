@@ -133,23 +133,19 @@ class QueueMediator constructor(
     override suspend fun playNow(identifier: Identifier<*>, playlistItemId: Long?) {
         playlistOrchestrator.load(identifier.id as Long, Options(identifier.source, false))
             ?.let {
-                //log.d("playNow(loaded playlist= ${it.id}, requested=$playlistId, item = $playlistItemId)")
                 playNow(it, playlistItemId, identifier.source)
             }
     }
 
     private suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?, source: Source) {
         playlist.indexOfItemId(playlistItemId)?.let { foundIndex ->
-            //log.d("playNow(load found Index= $foundIndex)")
             playlist.let {
                 it.copy(currentIndex = foundIndex).apply {
                     playlistOrchestrator.save(it, Options(source, true))
                 }
             }
         }?.also {
-            //log.d("playNow(updated Index to = ${it.currentIndex})")
             refreshQueueFrom(it, source)
-            //log.d("playNow(state current Index is = ${state.playlist?.currentIndex})")
             playNow()
         }
     }
@@ -164,9 +160,7 @@ class QueueMediator constructor(
                 } else {
                     currentItem()
                 }
-                //log.d("playNow() item = ${itemToPlay})")
                 itemToPlay?.let {
-                    //log.d("playNow(item= $it)")
                     state.playlist = playlistMutator.playItem(this, it)
                     updateCurrentItem(false)
                 }
@@ -256,11 +250,9 @@ class QueueMediator constructor(
             state.currentItem = playlistDomain.currentItem()
         }
         state.playlist = playlistDomain
-        //log.d("refreshQueueFrom: currentItemId=${state.currentItem?.id}")
         state.currentItem?.apply {
             mediaSessionManager.setMedia(media)
         }
-        //consumerListeners.forEach { it.onPlaylistUpdated() }
         if (itemBefore != currentItem && this::_currentItemFlow.isInitialized) {
             _currentItemFlow.emit(currentItem)
         }
@@ -274,44 +266,5 @@ class QueueMediator constructor(
             .let { playlistOrchestrator.getPlaylistOrDefault(it.id as Long, Options(it.source, flat = false)) }
             ?.also { refreshQueueFrom(it.first, it.second) }
     }
-
-//    override fun addConsumerListener(l: ConsumerListener) {
-//        consumerListeners.add(l)
-//    }
-//
-//    override fun removeConsumerListener(l: ConsumerListener) {
-//        consumerListeners.remove(l)
-//    }
-
-//    override fun addProducerListener(l: ProducerListener) {
-//        producerListeners.add(l)
-//    }
-//
-//    override fun removeProducerListener(l: ProducerListener) {
-//        producerListeners.remove(l)
-//    }
-
-//    override fun deleteItem(index: Int) {
-//        state.playlist?.let { plist ->
-//            val deleteItem = plist.items.get(index)
-//            val isCurrentItem = currentItem?.id == deleteItem.id
-//            coroutines.computationScope.launch {
-//                val mutated = playlistMutator.delete(plist, deleteItem)
-//                playlistOrchestrator.updateCurrentIndex(mutated, Options(state.playlistIdentifier.source))
-//                playlistItemOrchestrator.delete(deleteItem, Options(state.playlistIdentifier.source))
-//                refreshQueueFrom(mutated to state.playlistIdentifier.source)
-//                if (isCurrentItem) {
-//                    if (mutated.currentIndex > -1) {
-//                        currentItem?.apply { onItemSelected(this, true, true) }
-//                    } else {
-//                        state.currentItem = null
-//                        //consumerListeners.forEach { it.onItemChanged() }
-//                        _currentItemFlow.emit(state.currentItem)
-//                    }
-//                }
-//
-//            }
-//        }
-//    }
 
 }
