@@ -31,7 +31,9 @@ class PlaylistMutatorTest {
         fixtPlaylist = fixtPlaylist.copy(
             items = (0..10).map { idx ->
                 fixture.create(PlaylistItemDomain::class.java).copy(
-                    order = 10000L + (idx * 1000L)
+                    order = 10000L + (idx * 1000L),
+                    playlistId = fixtPlaylist.id
+
                 )
             }
         )
@@ -280,6 +282,7 @@ class PlaylistMutatorTest {
             playlistId = fixtPlaylist.id,
             order = fixtPlaylist.items.get(fixtReplaceItemIndex).order
         )
+
         val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
 
         assertThat(actual.items.get(fixtReplaceItemIndex)).isEqualTo(fixtChangedItem)
@@ -298,6 +301,7 @@ class PlaylistMutatorTest {
             playlistId = fixtPlaylist.id,
             order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
         )
+
         val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
         actual.scanOrder().apply { println(this.toString()) }
 
@@ -317,6 +321,7 @@ class PlaylistMutatorTest {
             playlistId = fixtPlaylist.id,
             order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
         )
+
         val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
         actual.scanOrder().apply { println(this.toString()) }
 
@@ -336,6 +341,7 @@ class PlaylistMutatorTest {
             playlistId = fixtPlaylist.id,
             order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
         )
+
         val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
         actual.scanOrder().apply { println(this.toString()) }
 
@@ -355,6 +361,7 @@ class PlaylistMutatorTest {
             playlistId = fixtPlaylist.id,
             order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
         )
+
         val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
         actual.scanOrder().apply { println(this.toString()) }
 
@@ -374,8 +381,10 @@ class PlaylistMutatorTest {
             playlistId = fixtPlaylist.id,
             order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
         )
+
         val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
         actual.scanOrder().apply { println(this.toString()) }
+
         assertThat(actual.items.get(targetIndexPreMove)).isEqualTo(fixtChangedItem)
         assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex + 1)
     }
@@ -392,8 +401,10 @@ class PlaylistMutatorTest {
             playlistId = fixtPlaylist.id,
             order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
         )
+
         val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
         actual.scanOrder().apply { println(this.toString()) }
+
         assertThat(actual.items.get(targetIndexPreMove)).isEqualTo(fixtChangedItem)
         assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
     }
@@ -409,8 +420,10 @@ class PlaylistMutatorTest {
             playlistId = fixtPlaylist.id,
             order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
         )
+
         val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
         actual.scanOrder().apply { println(this.toString()) }
+
         assertThat(actual.items.get(targetIndexPreMove)).isEqualTo(fixtChangedItem)
         assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex + 1)
     }
@@ -426,10 +439,43 @@ class PlaylistMutatorTest {
             playlistId = fixtPlaylist.id,
             order = fixtPlaylist.items.get(targetIndexPreMove).order - 100
         )
+
         val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtChangedItem)
         actual.scanOrder().apply { println(this.toString()) }
+
         assertThat(actual.items.get(targetIndexPreMove)).isEqualTo(fixtChangedItem)
         assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
+    }
+
+    @Test
+    fun `addOrReplaceItem - same item replaced - should not change`() {
+        val fixtCurrentIndex = 3
+        val targetIndexReplace = 4
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtSameItem = fixtPlaylist.items.get(targetIndexReplace)
+
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtSameItem)
+        actual.scanOrder().apply { println(this.toString()) }
+
+        assertThat(actual.items).isEqualTo(fixtPlaylist.items)
+        assertThat(actual.items.get(targetIndexReplace)).isEqualTo(fixtSameItem)
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `addOrReplaceItem - not on playlist throws exception`() {
+        val fixtCurrentIndex = 3
+        val targetIndexReplace = 4
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtNotOnPlaylistItem = fixtPlaylist.items.get(targetIndexReplace).copy(
+            id = fixture.build(),
+            playlistId = fixtPlaylist.id?.let { it + 100 }
+        )
+
+        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtNotOnPlaylistItem)
+        // throws exception
     }
 
     @Test
@@ -442,8 +488,10 @@ class PlaylistMutatorTest {
             id = fixtPlaylistWithIndex.items.get(removedIndex).id,
             playlistId = fixtPlaylist.id
         )
+
         val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
         actual.scanOrder().apply { println(this.toString()) }
+
         assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size - 1)
         assertThat(actual.items.find { fixtRemovedItem.id == it.id }).isNull()
         assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex - 1)
@@ -459,34 +507,35 @@ class PlaylistMutatorTest {
             id = fixtPlaylistWithIndex.items.get(removedIndex).id,
             playlistId = fixtPlaylist.id
         )
+
         val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
         actual.scanOrder().apply { println(this.toString()) }
+
         assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size - 1)
         assertThat(actual.items.find { fixtRemovedItem.id == it.id }).isNull()
         assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
     }
 
     @Test
-    fun `remove - is not in list`() {
-        @Test
-        fun `remove - is after afterIndex`() {
-            val fixtCurrentIndex = 3
-            val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
-            fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
-            val fixtRemovedItem = fixture.build<PlaylistItemDomain>().copy(
-                id = fixture.build(),
-                playlistId = fixtPlaylist.id
-            )
-            val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
-            actual.scanOrder().apply { println(this.toString()) }
-            assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size)
-            assertThat(actual.items.find { fixtRemovedItem.id == it.id }).isNull()
-            assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
-        }
+    fun `remove - is not in list - returns same list`() {
+        val fixtCurrentIndex = 3
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtRemovedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixture.build(),
+            playlistId = fixtPlaylist.id
+        )
+
+        val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+
+        assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size)
+        assertThat(actual.items.find { fixtRemovedItem.id == it.id }).isNull()
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
     }
 
     @Test
-    fun `remove - is not same playlist id`() {
+    fun `remove - is not same playlist id after current`() {
         val fixtCurrentIndex = 3
         val removedIndex = 4
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
@@ -495,10 +544,33 @@ class PlaylistMutatorTest {
             id = fixtPlaylistWithIndex.items.get(removedIndex).id,
             playlistId = fixtPlaylistWithIndex.id!! + 1
         )
+
         val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
         actual.scanOrder().apply { println(this.toString()) }
-        assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size)
-        assertThat(actual).isEqualTo(fixtPlaylistWithIndex)
+
+        assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size - 1)
+        assertThat(actual).isNotEqualTo(fixtPlaylistWithIndex)
         assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex)
+        assertThat(actual.items.find { it.id == fixtRemovedItem.id }).isNull()
+    }
+
+    @Test
+    fun `remove - is not same playlist id before current`() {
+        val fixtCurrentIndex = 3
+        val removedIndex = 2
+        val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
+        fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
+        val fixtRemovedItem = fixture.build<PlaylistItemDomain>().copy(
+            id = fixtPlaylistWithIndex.items.get(removedIndex).id,
+            playlistId = fixtPlaylistWithIndex.id!! + 1
+        )
+
+        val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
+        actual.scanOrder().apply { println(this.toString()) }
+
+        assertThat(actual.items.size).isEqualTo(fixtPlaylistWithIndex.items.size - 1)
+        assertThat(actual).isNotEqualTo(fixtPlaylistWithIndex)
+        assertThat(actual.currentIndex).isEqualTo(fixtCurrentIndex - 1)
+        assertThat(actual.items.find { it.id == fixtRemovedItem.id }).isNull()
     }
 }

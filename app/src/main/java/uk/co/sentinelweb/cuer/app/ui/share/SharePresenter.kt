@@ -94,7 +94,7 @@ class SharePresenter constructor(
             try {
                 if (add) {// fixme if playlist items are changed then they arent saved here
                     view.commitPlaylistItems()
-                    queue.refreshQueue()
+                    //queue.switchToPlaylist(state.playlistIdentifier)// todo fix this
                 }
                 val isConnected = ytContextHolder.isConnected()
                 val playlistItemList = view.getCommittedItems() as List<PlaylistItemDomain>? // todo change for playlist - will crash

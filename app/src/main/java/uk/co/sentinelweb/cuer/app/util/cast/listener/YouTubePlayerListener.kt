@@ -105,7 +105,7 @@ class YouTubePlayerListener(
             )
         }
         if (shouldUpdateMedia(throttle)) {
-            state.currentMedia?.apply { queue.updateMediaItem(this) }
+            state.currentMedia?.apply { queue.updateCurrentMediaItem(this) }
             setTimeUpdateMedia()
         }
     }

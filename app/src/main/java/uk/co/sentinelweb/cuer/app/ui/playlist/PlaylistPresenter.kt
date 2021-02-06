@@ -463,9 +463,10 @@ class PlaylistPresenter(
     override fun undoDelete() {
         state.deletedPlaylistItem?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistItemOrchestrator.save(itemDomain, state.playlistIdentifier.toFlatOptions<Long>(false))
+                playlistItemOrchestrator.save(itemDomain, state.playlistIdentifier.toFlatOptions<Long>(true))
                 state.focusIndex = state.lastFocusIndex
                 executeRefresh()
+                // todo delete a lot of this
                 (state.playlist?.items?.indexOfFirst { it.id == itemDomain.id } ?: -2).let { restoredIndex ->
                     if (restoredIndex >= 0) {
                         state.playlist?.currentIndex?.also { currentIndex ->
@@ -478,9 +479,9 @@ class PlaylistPresenter(
 //                                    )
 //                                }
                                 view.scrollToItem(restoredIndex)
-                                queueExecIf {
-                                    refreshQueueBackground()
-                                }
+//                                queueExecIf {
+//                                    refreshQueueBackground()
+//                                }
                                 //view.highlightPlayingItem(currentIndex + 1)
                             }
                         }

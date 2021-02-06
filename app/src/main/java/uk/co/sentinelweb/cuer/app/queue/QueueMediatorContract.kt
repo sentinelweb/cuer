@@ -19,10 +19,12 @@ interface QueueMediatorContract {
     interface Producer : Shared {
         fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean = false, resetPosition: Boolean = false)
         fun destroy()
-        fun refreshQueueBackground()
-        suspend fun refreshQueue()
-        fun playNow()
+
+        // fun refreshQueueBackground()
+        // suspend fun refreshQueue(identifier: OrchestratorContract.Identifier<*>)
+        //fun playNow()
         suspend fun playNow(identifier: OrchestratorContract.Identifier<*>, playlistItemId: Long?)
+
         //fun deleteItem(index: Int)
         suspend fun switchToPlaylist(identifier: OrchestratorContract.Identifier<*>)
     }
@@ -32,7 +34,7 @@ interface QueueMediatorContract {
         fun onTrackEnded(media: MediaDomain?)
         fun nextItem()
         fun previousItem()
-        fun updateMediaItem(updatedMedia: MediaDomain)
+        fun updateCurrentMediaItem(updatedMedia: MediaDomain)
     }
 
 }

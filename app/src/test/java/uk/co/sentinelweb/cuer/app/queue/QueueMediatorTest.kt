@@ -2,9 +2,7 @@ package uk.co.sentinelweb.cuer.app.queue
 
 import com.flextrade.jfixture.JFixture
 import com.google.common.truth.Truth.assertThat
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,14 +15,11 @@ import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
@@ -34,7 +29,9 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.matchesHeader
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
@@ -93,11 +90,15 @@ class QueueMediatorTest {
         MockKAnnotations.init(this, relaxed = true)
 
         fixtCurrentPlaylist = fixture.build<PlaylistDomain>()
-            .copy(
-                currentIndex = fixtCurrentCurentIndex,
-                items = fixture.buildCollection<PlaylistItemDomain, List<PlaylistItemDomain>>(10).map { it.copy(id = idCounter) })
+        fixtCurrentPlaylist = fixtCurrentPlaylist.copy(
+            currentIndex = fixtCurrentCurentIndex,
+            mode = SINGLE,
+            items = fixture.buildCollection<PlaylistItemDomain, List<PlaylistItemDomain>>(10)
+                .map { it.copy(id = idCounter, order = idCounter * 1000, playlistId = fixtCurrentPlaylist.id) })
+
         fixtPlaylistDefault = fixture.build<PlaylistDomain>()
             .copy(currentIndex = fixtDefaultCurentIndex, items = fixture.buildCollection(10))
+
         fixtCurrentIdentifier = Identifier(fixtCurrentPlaylist.id!!, fixtSource)
         fixtPlaylistOrchestratorFlow = MutableSharedFlow()
         fixtPlaylistItemOrchestratorFlow = MutableSharedFlow()
@@ -147,13 +148,13 @@ class QueueMediatorTest {
     @Test
     fun getCurrentItem() {
         createSut()
-        assertThat(sut.currentItem).isEqualTo(fixtCurrentPlaylist.items[0])
+        assertThat(sut.currentItem).isEqualTo(fixtCurrentPlaylist.items[fixtCurrentCurentIndex])
     }
 
     @Test
     fun getCurrentItemIndex() {
         createSut()
-        assertThat(sut.currentItemIndex).isEqualTo(0)
+        assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
     }
 
     @Test
@@ -174,9 +175,13 @@ class QueueMediatorTest {
             createSut()
             val fixChangedHeader = fixtCurrentPlaylist.copy(currentIndex = 1)
 
+            // test
             fixtPlaylistOrchestratorFlow
                 .emit((FLAT to fixtSource then fixChangedHeader))
 
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
+            assertThat(sut.playlist!!.items).isEqualTo(fixtCurrentPlaylist.items)
             assertThat(sut.currentItemIndex).isEqualTo(1)
             assertThat(captureItemFlow.last()).isEqualTo(fixtCurrentPlaylist.items.get(1))
             assertTrue(sut.playlist?.matchesHeader(fixChangedHeader) ?: false)
@@ -192,9 +197,13 @@ class QueueMediatorTest {
             val fixChanged = fixture.build<PlaylistDomain>()
                 .copy(id = fixtCurrentPlaylist.id, currentIndex = currentIndex, items = fixture.buildCollection(15))
 
+            // test
             fixtPlaylistOrchestratorFlow
                 .emit((Operation.FULL to fixtSource then fixChanged))
 
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixChanged.items.size)
+            assertThat(sut.playlist).isEqualTo(fixChanged)
             assertThat(sut.currentItemIndex).isEqualTo(currentIndex)
             assertThat(captureItemFlow.last()).isEqualTo(fixChanged.items.get(currentIndex))
         }
@@ -212,6 +221,9 @@ class QueueMediatorTest {
             fixtPlaylistOrchestratorFlow
                 .emit((DELETE to fixtSource then fixtCurrentPlaylist))
 
+            //verify
+            assertThat(sut.playlist).isEqualTo(fixtPlaylistDefault)
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtPlaylistDefault.items.size)
             assertThat(sut.currentItemIndex).isEqualTo(fixtDefaultCurentIndex)
             assertThat(captureItemFlow.last()).isEqualTo(fixtPlaylistDefault.items.get(fixtDefaultCurentIndex))
             assertThat(capturePlaylistFlow.last()).isEqualTo(fixtPlaylistDefault)
@@ -225,12 +237,17 @@ class QueueMediatorTest {
             val replaceItemIndex = 3
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
                 id = fixtCurrentPlaylist.items.get(replaceItemIndex).id,
-                playlistId = fixtCurrentPlaylist.id
+                playlistId = fixtCurrentPlaylist.id,
+                order = fixtCurrentPlaylist.items.get(replaceItemIndex).order
             )
+            // test
             fixtPlaylistItemOrchestratorFlow
                 .emit((FLAT to fixtSource then fixtChanged))
 
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
             assertThat(sut.playlist!!.items.get(replaceItemIndex)).isEqualTo(fixtChanged)
+            assertThat(captureItemFlow.last()).isEqualTo(fixtCurrentPlaylist.items.get(fixtCurrentCurentIndex))
         }
     }
 
@@ -238,88 +255,489 @@ class QueueMediatorTest {
     fun `test flow current playlistitem changed`() {
         testCoroutineScope.runBlockingTest {
             createSut()
+            val replaceItemIndex = fixtCurrentCurentIndex
+            val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
+                id = fixtCurrentPlaylist.items.get(replaceItemIndex).id,
+                playlistId = fixtCurrentPlaylist.id,
+                order = fixtCurrentPlaylist.items.get(replaceItemIndex).order
+            )
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((FLAT to fixtSource then fixtChanged))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
+            assertThat(sut.playlist!!.items.get(replaceItemIndex)).isEqualTo(fixtChanged)
+            assertThat(captureItemFlow.last()).isEqualTo(fixtChanged)
         }
     }
 
     @Test
-    fun `test flow playlistitem deleted`() {
+    fun `test flow current playlistitem moved`() {
         testCoroutineScope.runBlockingTest {
             createSut()
+            val replaceItemIndex = fixtCurrentCurentIndex
+            val targetItemIndex = 5
+            val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
+                id = fixtCurrentPlaylist.items.get(replaceItemIndex).id,
+                playlistId = fixtCurrentPlaylist.id,
+                order = fixtCurrentPlaylist.items.get(targetItemIndex).order
+            )
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((FLAT to fixtSource then fixtChanged))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
+            assertThat(sut.playlist!!.items.get(targetItemIndex)).isEqualTo(fixtChanged)
+            assertThat(captureItemFlow.last()).isEqualTo(fixtChanged)
+            assertThat(sut.currentItemIndex).isEqualTo(targetItemIndex)
         }
     }
 
     @Test
-    fun `test flow current playlistitem deleted`() {
+    fun `test flow current playlistitem moved out of playlist - should play next item`() {
         testCoroutineScope.runBlockingTest {
             createSut()
+            val replaceItemIndex = fixtCurrentCurentIndex
+            val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
+                id = fixtCurrentPlaylist.items.get(replaceItemIndex).id,
+                playlistId = fixtCurrentPlaylist.id?.let { it + 100L }
+            )
+            val nextItem = fixtCurrentPlaylist.items.get(replaceItemIndex + 1)
+
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((FLAT to fixtSource then fixtChanged))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
+            assertThat(sut.playlist!!.items.find { it.id == fixtChanged.id }).isNull()
+            assertThat(captureItemFlow.last()).isEqualTo(nextItem)
+            assertThat(sut.currentItemIndex).isEqualTo(replaceItemIndex)
         }
     }
 
     @Test
-    fun get_currentItemFlow() {
+    fun `test flow playlistitem moved out of playlist before current`() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val replaceItemIndex = fixtCurrentCurentIndex - 1
+            val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
+                id = fixtCurrentPlaylist.items.get(replaceItemIndex).id,
+                playlistId = fixtCurrentPlaylist.id?.let { it + 100L }
+            )
+            val currentItemBefore = sut.currentItem
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((FLAT to fixtSource then fixtChanged))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
+            assertThat(sut.playlist!!.items.find { it.id == fixtChanged.id }).isNull()
+            assertThat(captureItemFlow.last()).isEqualTo(currentItemBefore)
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex - 1)
+        }
     }
 
     @Test
-    fun set_currentItemFlow() {
+    fun `test flow playlistitem moved out of playlist after current`() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val replaceItemIndex = fixtCurrentCurentIndex + 1
+            val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
+                id = fixtCurrentPlaylist.items.get(replaceItemIndex).id,
+                playlistId = fixtCurrentPlaylist.id?.let { it + 100L }
+            )
+            val currentItemBefore = sut.currentItem
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((FLAT to fixtSource then fixtChanged))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
+            assertThat(sut.playlist!!.items.find { it.id == fixtChanged.id }).isNull()
+            assertThat(captureItemFlow.last()).isEqualTo(currentItemBefore)
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
+        }
     }
 
     @Test
-    fun getCurrentItemFlow() {
+    fun `test flow playlistitem added to playlist before current`() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val addItemIndex = fixtCurrentCurentIndex - 1
+            val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
+                id = fixture.build(),
+                playlistId = fixtCurrentPlaylist.id,
+                order = fixtCurrentPlaylist.items.get(addItemIndex).order - 100
+            )
+            val currentItemBefore = sut.currentItem
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((FLAT to fixtSource then fixtChanged))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size + 1)
+            assertThat(sut.playlist!!.items.find { it.id == fixtChanged.id }).isEqualTo(fixtChanged)
+            assertThat(sut.playlist!!.items.indexOfFirst { it.id == fixtChanged.id }).isEqualTo(addItemIndex)
+            assertThat(captureItemFlow.last()).isEqualTo(currentItemBefore)
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex + 1)
+        }
     }
 
     @Test
-    fun get_currentPlaylistFlow() {
+    fun `test flow playlistitem added to playlist after current`() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val addItemIndex = fixtCurrentCurentIndex + 1
+            val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
+                id = fixture.build(),
+                playlistId = fixtCurrentPlaylist.id,
+                order = fixtCurrentPlaylist.items.get(addItemIndex).order - 100
+            )
+            val currentItemBefore = sut.currentItem
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((FLAT to fixtSource then fixtChanged))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size + 1)
+            assertThat(sut.playlist!!.items.find { it.id == fixtChanged.id }).isEqualTo(fixtChanged)
+            assertThat(sut.playlist!!.items.indexOfFirst { it.id == fixtChanged.id }).isEqualTo(addItemIndex)
+            assertThat(captureItemFlow.last()).isEqualTo(currentItemBefore)
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
+        }
     }
 
     @Test
-    fun set_currentPlaylistFlow() {
+    fun `test flow playlistitem deleted before current`() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val deleteItemIndex = fixtCurrentCurentIndex - 1
+            val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
+                id = fixtCurrentPlaylist.items.get(deleteItemIndex).id,
+                playlistId = fixtCurrentPlaylist.id?.let { it + 100L }
+            )
+            val currentItemBefore = sut.currentItem
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((DELETE to fixtSource then fixtChanged))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
+            assertThat(sut.playlist!!.items.find { it.id == fixtChanged.id }).isNull()
+            assertThat(captureItemFlow.last()).isEqualTo(currentItemBefore)
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex - 1)
+        }
     }
 
     @Test
-    fun getCurrentPlaylistFlow() {
+    fun `test flow playlistitem deleted after current`() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val deleteItemIndex = fixtCurrentCurentIndex + 1
+            val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
+                id = fixtCurrentPlaylist.items.get(deleteItemIndex).id,
+                playlistId = fixtCurrentPlaylist.id?.let { it + 100L }
+            )
+            val currentItemBefore = sut.currentItem
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((DELETE to fixtSource then fixtChanged))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
+            assertThat(sut.playlist!!.items.find { it.id == fixtChanged.id }).isNull()
+            assertThat(captureItemFlow.last()).isEqualTo(currentItemBefore)
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
+        }
+    }
+
+    @Test
+    fun `test flow playlistitem deleted is current`() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val deleteItemIndex = fixtCurrentCurentIndex
+            val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
+                id = fixtCurrentPlaylist.items.get(deleteItemIndex).id,
+                playlistId = fixtCurrentPlaylist.id?.let { it + 100L }
+            )
+            val expectedPlayingAfter = fixtCurrentPlaylist.items.get(deleteItemIndex + 1)
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((DELETE to fixtSource then fixtChanged))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
+            assertThat(sut.playlist!!.items.find { it.id == fixtChanged.id }).isNull()
+            assertThat(captureItemFlow.last()).isEqualTo(expectedPlayingAfter)
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
+        }
+    }
+
+    @Test
+    fun `test flow playlistitem replace same item (no change) does not emit`() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val sameItemIndex = fixtCurrentCurentIndex - 1
+            val fixtSame = fixtCurrentPlaylist.items.get(sameItemIndex)
+            val currentItem = sut.currentItem
+            val emitSizeBefore = captureItemFlow.size
+            // test
+            fixtPlaylistItemOrchestratorFlow
+                .emit((FLAT to fixtSource then fixtSame))
+
+            //verify
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
+            assertThat(sut.playlist!!.items.find { it.id == fixtSame.id }).isEqualTo(fixtSame)
+            assertThat(captureItemFlow.last()).isEqualTo(currentItem)
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
+            assertThat(emitSizeBefore).isEqualTo(captureItemFlow.size)
+        }
     }
 
     @Test
     fun switchToPlaylist() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+
+            val switchPlaylistId: Long = fixture.build()
+            val fixtSwitchPlaylist = fixture.build<PlaylistDomain>().copy(
+                id = switchPlaylistId,
+                currentIndex = 3,
+                items = fixture.buildCollection<PlaylistItemDomain, List<PlaylistItemDomain>>(13)
+                    .map { it.copy(id = idCounter, order = idCounter * 1000, playlistId = switchPlaylistId) })
+            val fixtSwitchSource: Source = fixture.build()
+            val switchIdentifier = switchPlaylistId.toIdentifier(fixtSwitchSource)
+            coEvery {
+                mockPlaylistOrchestrator.getPlaylistOrDefault(fixtSwitchPlaylist.id, Options(fixtSwitchSource, flat = false))
+            } returns (fixtSwitchPlaylist to fixtSwitchSource)
+            // test
+            sut.switchToPlaylist(switchIdentifier)
+
+            //verify
+            val expectedCurrentItem = fixtSwitchPlaylist.items.get(fixtSwitchPlaylist.currentIndex)
+            assertThat(sut.playlist!!.items.size).isEqualTo(fixtSwitchPlaylist.items.size)
+            assertThat(sut.currentItemIndex).isEqualTo(fixtSwitchPlaylist.currentIndex)
+            assertThat(sut.currentItem).isEqualTo(expectedCurrentItem)
+            assertThat(captureItemFlow.last()).isEqualTo(expectedCurrentItem)
+            assertThat(capturePlaylistFlow.last()).isEqualTo(fixtSwitchPlaylist)
+            verify { mockPrefsWrapper.putPair(CURRENT_PLAYLIST, switchIdentifier.toPair()) }
+        }
     }
 
     @Test
-    fun onItemSelected() {
+    fun `onItemSelected - simple`() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val selectedItemIndex = 8
+            val selectedItem = fixtCurrentPlaylist.items.get(selectedItemIndex)
+            captureItemFlow.clear()
+
+            // test
+            sut.onItemSelected(selectedItem)
+
+            //verify
+            assertThat(sut.currentItemIndex).isEqualTo(selectedItemIndex)
+            assertThat(sut.currentItem).isEqualTo(selectedItem)
+            assertThat(captureItemFlow.last()).isEqualTo(selectedItem)
+            assertThat(captureItemFlow.size).isEqualTo(1) // should emit
+            verify { mockMediaSessionManager.setMedia(selectedItem.media) }
+        }
     }
 
     @Test
-    fun playNow() {
+    fun `onItemSelected - same no force play`() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val currentItem = sut.currentItem!!
+            val itemFlowSize = captureItemFlow.size
+
+            sut.onItemSelected(currentItem, forcePlay = false)
+
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
+            assertThat(sut.currentItem).isEqualTo(currentItem)
+            assertThat(captureItemFlow.last()).isEqualTo(currentItem)
+            assertThat(itemFlowSize).isEqualTo(itemFlowSize)
+            verify { mockMediaSessionManager.setMedia(currentItem.media) }
+        }
     }
 
     @Test
-    fun testPlayNow() {
+    fun `onItemSelected - same force play`() {// todo test force play , reset position
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val currentItem = sut.currentItem!!
+            val itemFlowSize = captureItemFlow.size
+
+            sut.onItemSelected(currentItem, forcePlay = true)
+
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
+            assertThat(sut.currentItem).isEqualTo(currentItem)
+            assertThat(captureItemFlow.last()).isEqualTo(currentItem)
+            verify { mockMediaSessionManager.setMedia(currentItem.media) }
+            coVerify { mockPlaylistOrchestrator.updateCurrentIndex(fixtCurrentPlaylist, fixtCurrentIdentifier.toFlatOptions<Long>(true)) }
+            assertThat(itemFlowSize).isEqualTo(itemFlowSize) // doesnt emit same object
+        }
     }
 
     @Test
-    fun updateMediaItem() {
+    fun `onItemSelected - reset position`() {// todo test force play , reset position
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val currentItemBefore = sut.currentItem!!
+            captureItemFlow.clear()
+            val expectedCurrentItem = currentItemBefore.copy(media = currentItemBefore.media.copy(positon = 0, watched = true))
+
+            sut.onItemSelected(currentItemBefore, forcePlay = true, resetPosition = true)
+
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
+            assertThat(sut.currentItem).isNotEqualTo(currentItemBefore) // position changed
+            assertThat(sut.currentItem).isEqualTo(expectedCurrentItem) // position changed
+            assertThat(captureItemFlow.last()).isEqualTo(expectedCurrentItem)
+            verify { mockMediaSessionManager.setMedia(expectedCurrentItem.media) }
+            coVerify { mockPlaylistOrchestrator.updateCurrentIndex(fixtCurrentPlaylist, fixtCurrentIdentifier.toFlatOptions<Long>(true)) }
+            assertThat(captureItemFlow.size).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `onItemSelected - reset position - different item - no force`() {// todo test force play , reset position
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val selectedItemIndex = 8
+            val selectedItem = fixtCurrentPlaylist.items.get(selectedItemIndex)
+            captureItemFlow.clear()
+            val expectedSelectedItem = selectedItem.copy(media = selectedItem.media.copy(positon = 0, watched = true))
+
+            sut.onItemSelected(selectedItem, resetPosition = true)
+
+            assertThat(sut.currentItemIndex).isEqualTo(selectedItemIndex)
+            assertThat(sut.currentItem).isNotEqualTo(selectedItem) // position changed
+            assertThat(sut.currentItem).isEqualTo(expectedSelectedItem) // position changed
+            assertThat(captureItemFlow.last()).isEqualTo(expectedSelectedItem)
+            verify { mockMediaSessionManager.setMedia(expectedSelectedItem.media) }
+            coVerify {
+                mockPlaylistOrchestrator.updateCurrentIndex(
+                    fixtCurrentPlaylist.copy(currentIndex = selectedItemIndex),
+                    fixtCurrentIdentifier.toFlatOptions<Long>(true)
+                )
+            }
+            assertThat(captureItemFlow.size).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `playNow - playlist only`() {
+        // todo
+    }
+
+    @Test
+    fun `playNow - with playlist item`() {
+        // todo
+    }
+
+    @Test
+    fun updateCurrentMediaItem() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val fixtUpdateMedia: MediaDomain = fixture.build()
+            val expectedMediaAfterUpdate = sut.currentItem!!.media.copy(
+                positon = fixtUpdateMedia.positon,
+                duration = fixtUpdateMedia.duration,
+                dateLastPlayed = fixtUpdateMedia.dateLastPlayed,
+                watched = true
+            )
+            // test
+            sut.updateCurrentMediaItem(fixtUpdateMedia)
+
+            // verify
+            assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
+            assertThat(sut.currentItem!!.media).isEqualTo(expectedMediaAfterUpdate) // position changed
+            coVerify {
+                mockMediaOrchestrator.save(expectedMediaAfterUpdate, sut.playlistId!!.toFlatOptions<Long>(true))
+            }
+        }
+
     }
 
     @Test
     fun destroy() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            // test
+            sut.destroy()
+            // todo check how to verify
+        }
     }
 
     @Test
     fun nextItem() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val expectedIndex = fixtCurrentCurentIndex + 1
+
+            // test
+            sut.nextItem()
+
+            // verify
+            assertThat(sut.currentItemIndex).isEqualTo(expectedIndex)
+            assertThat(sut.currentItem).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
+            assertThat(captureItemFlow.last()).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
+            verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media) }
+            coVerify {
+                mockPlaylistOrchestrator.updateCurrentIndex(
+                    fixtCurrentPlaylist.copy(currentIndex = expectedIndex),
+                    fixtCurrentIdentifier.toFlatOptions<Long>(true)
+                )
+            }
+        }
     }
 
     @Test
     fun previousItem() {
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val expectedIndex = fixtCurrentCurentIndex - 1
+
+            // test
+            sut.previousItem()
+
+            // verify
+            assertThat(sut.currentItemIndex).isEqualTo(expectedIndex)
+            assertThat(sut.currentItem).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
+            assertThat(captureItemFlow.last()).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
+            verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media) }
+            coVerify {
+                mockPlaylistOrchestrator.updateCurrentIndex(
+                    fixtCurrentPlaylist.copy(currentIndex = expectedIndex),
+                    fixtCurrentIdentifier.toFlatOptions<Long>(true)
+                )
+            }
+        }
     }
 
     @Test
     fun onTrackEnded() {
-    }
+        testCoroutineScope.runBlockingTest {
+            createSut()
+            val expectedIndex = fixtCurrentCurentIndex + 1
 
-    @Test
-    fun refreshQueueBackground() {
-    }
+            // test
+            sut.onTrackEnded(sut.currentItem?.media)
 
-    @Test
-    fun refreshQueue() {
+            // verify
+            assertThat(sut.currentItemIndex).isEqualTo(expectedIndex)
+            assertThat(sut.currentItem).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
+            assertThat(captureItemFlow.last()).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
+            verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media) }
+            coVerify {
+                mockPlaylistOrchestrator.updateCurrentIndex(
+                    fixtCurrentPlaylist.copy(currentIndex = expectedIndex),
+                    fixtCurrentIdentifier.toFlatOptions<Long>(true)
+                )
+            }
+        }
     }
 }

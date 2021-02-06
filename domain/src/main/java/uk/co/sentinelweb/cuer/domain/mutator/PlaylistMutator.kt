@@ -150,10 +150,9 @@ class PlaylistMutator {
                 items = items,
                 currentIndex = newIndex
             )
-        } else throw IllegalStateException("Item is not on this playlist")
+        } else throw IllegalArgumentException("Item is not on this playlist")
 
     fun remove(playlist: PlaylistDomain, plistItem: PlaylistItemDomain): PlaylistDomain =
-        if (playlist.id == plistItem.playlistId) {
             playlist.items.indexOfFirst { plistItem.id == it.id }
                 .takeIf { it != -1 }
                 ?.let { index ->
@@ -164,6 +163,5 @@ class PlaylistMutator {
                     toMutableList.removeAt(index)
                     playlist.copy(currentIndex = newIndex, items = toMutableList)
                 } ?: playlist
-        } else playlist
 
 }
