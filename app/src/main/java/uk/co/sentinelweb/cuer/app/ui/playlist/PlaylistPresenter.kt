@@ -97,7 +97,7 @@ class PlaylistPresenter(
     override fun onResume() {
         ytContextHolder.addConnectionListener(castConnectionListener)
         state.queueItemJob = queue.currentItemFlow
-            //.onEach { log.d("q.index = ${queue.currentItemIndex}, queue.currentItem = ${it?.id} title = ${it?.media?.title} isQueuedPlaylist = $isQueuedPlaylist") }
+            .onEach { log.d("q.index = ${queue.currentItemIndex}, queue.currentItem = ${it?.id} title = ${it?.media?.title} isQueuedPlaylist = $isQueuedPlaylist") }
             .filter { isQueuedPlaylist }
             .onEach { view.highlightPlayingItem(queue.currentItemIndex) }
             .launchIn(coroutines.mainScope)
@@ -406,26 +406,32 @@ class PlaylistPresenter(
 
     override fun commitMove() {
         if (state.dragFrom != null && state.dragTo != null) {
-            val moveditem = state.playlist!!.items.get(state.dragFrom!!)
-            state.playlist = state.playlist?.let { playlist ->
-                playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!)
-            }?.also { plist ->
-                plist.let { modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier) }
-                    .also { view.setModel(it, false) }
-            }?.also { plist ->
-                state.viewModelScope.launch {
-                    //playlistOrchestrator.save(plist, state.playlistIdentifier.toDeep<Long>())
-                    moveditem.id
-                        ?.toIdentifier(state.playlistIdentifier.source)
-                        ?.toFlatOptions<Long>()?.let {
-                            playlistItemOrchestrator.save(moveditem, it)
-                        }
-                    queueExecIf {// todo remove
+            state.playlist
+                ?.let { playlist -> playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!) }
+                ?.also { state.playlist = it }
+                ?.also {
+                    modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier)
+                        .also { view.setModel(it, false) }
+                }
+                ?.also { playlistModified ->
+                    state.viewModelScope.launch {
+                        //playlistOrchestrator.save(plist, state.playlistIdentifier.toDeep<Long>())
+                        state.dragTo
+                            ?.let { playlistModified.items[it] }
+                            ?.let { item ->
+                                item to (item.id ?: throw java.lang.IllegalStateException("Moved item has no ID"))
+                                    .toIdentifier(state.playlistIdentifier.source)
+                                    .toFlatOptions<Long>()
+                            }
+                            ?.let {
+                                playlistItemOrchestrator.save(it.first, it.second)
+                            }
+//                    queueExecIf {// todo remove
                         //refreshQueueFrom(plist) // refresh from flow
-                        view.highlightPlayingItem(currentItemIndex)
+//                        view.highlightPlayingItem(currentItemIndex)
+//                    }
                     }
                 }
-            }
         } else {
             //toastWrapper.show("Move failed ..")
             log.d("commitMove: Move failed .. ")

@@ -4,22 +4,21 @@ import com.flextrade.jfixture.JFixture
 import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.State
@@ -125,7 +124,7 @@ class PlaylistPresenterTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
+        Dispatchers.setMain(testCoroutineDispatcher)
         // current
         fixtCurrentPlaylist = fixture.build<PlaylistDomain>()
         fixtCurrentPlaylist = fixtCurrentPlaylist.copy(
@@ -162,7 +161,7 @@ class PlaylistPresenterTest {
 
         // queue
         every {
-            mockPrefsWrapper.getPair(LAST_PLAYLIST_VIEWED, OrchestratorContract.NO_PLAYLIST.toPair())
+            mockPrefsWrapper.getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair())
         } returns (fixtCurrentIdentifier.id to fixtCurrentIdentifier.source)
     }
 
@@ -198,7 +197,7 @@ class PlaylistPresenterTest {
         playlist = fixtCurrentPlaylist
     )
 
-    private fun setCurrentlyPlaying(id: Identifier<Long>, playlist: PlaylistDomain, currentIndex: Int) {
+    private fun setCurrentlyPlaying(id: Identifier<Long>, playlist: PlaylistDomain, currentIndex: Int = playlist.currentIndex) {
         every { mockQueue.playlistId } returns id
         every { mockQueue.playlist } returns playlist
         every { mockQueue.currentItem } returns playlist.items.get(currentIndex)
@@ -516,6 +515,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun onItemSwipeRight() {
+
     }
 
     @Test
@@ -588,7 +588,40 @@ class PlaylistPresenterTest {
     }
 
     @Test
-    fun commitMove() {
+    fun `commitMove ahead to behind - current playlist`() {
+        testCoroutineScope.runBlockingTest {
+            fixtState = createDefaultState().copy(
+                dragFrom = 2, dragTo = 0
+            )
+            createSut()
+            val movedItem = fixtCurrentPlaylist.items.get(2)
+            val fixtExpectedPlaylist = playlistMutator.moveItem(fixtCurrentPlaylist, 2, 0)
+            val fixtExpectedChangedItem = fixtExpectedPlaylist.items[0]
+            val fixtExpectedMapped: PlaylistContract.Model = fixture.build()
+            setCurrentlyPlaying(fixtCurrentIdentifier, fixtExpectedPlaylist)
+            every { mockModelMapper.map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier) } returns fixtExpectedMapped //
+
+            // test
+            sut.commitMove()
+            queueItemFlow.emit(fixtExpectedChangedItem)
+
+            // verify
+            assertThat(fixtState!!.playlist!!).isEqualTo(fixtExpectedPlaylist)
+            assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtCurrentIdentifier)
+            assertThat(movedItem.id).isEqualTo(fixtExpectedChangedItem.id)
+            verify { mockModelMapper.map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier) }
+            verify(exactly = 0) { mockView.scrollToItem(any()) }
+            verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
+            coVerify {
+                mockPlaylistItemOrchestrator.save(
+                    fixtExpectedChangedItem,
+                    fixtExpectedChangedItem.id!!.toIdentifier(fixtCurrentSource).toFlatOptions<Long>()
+                )
+            }
+            verify { mockView.setModel(fixtExpectedMapped, false) }
+            assertThat(fixtState!!.dragFrom).isNull()
+            assertThat(fixtState!!.dragTo).isNull()
+        }
     }
 
     @Test
@@ -598,8 +631,10 @@ class PlaylistPresenterTest {
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
 
+            // test
             sut.setPlaylistData()
 
+            // verify
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtCurrentPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtCurrentIdentifier)
             verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier) }
@@ -618,8 +653,10 @@ class PlaylistPresenterTest {
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
 
+            // test
             sut.setPlaylistData(fixtNextPlaylist.id, source = fixtNextSource)
 
+            // verify
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtNextPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtNextIdentifier)
             verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier) }
@@ -637,10 +674,12 @@ class PlaylistPresenterTest {
             fixtState = State()
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
-
             val selectedItemIndex = 8
+
+            // test
             sut.setPlaylistData(fixtNextPlaylist.id, fixtNextPlaylist.items[selectedItemIndex].id, source = fixtNextSource)
 
+            // verify
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtNextPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtNextIdentifier)
             verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier) }
@@ -658,13 +697,15 @@ class PlaylistPresenterTest {
             fixtState = State()
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
-
             val selectedItemIndex = 8
             val plItem = fixtNextPlaylist.items[selectedItemIndex]
+
+            // test
             sut.setPlaylistData(fixtNextPlaylist.id, plItem.id, true, source = fixtNextSource)
             setCurrentlyPlaying(fixtNextIdentifier, fixtNextPlaylist, selectedItemIndex)
             queueItemFlow.emit(plItem)
 
+            // verify
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtNextPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtNextIdentifier)
             coVerify { mockQueue.playNow(fixtNextIdentifier, plItem.id) }
