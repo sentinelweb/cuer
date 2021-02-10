@@ -30,6 +30,7 @@ interface QueueMediatorContract {
     }
 
     interface Consumer : Shared {
+        val source: OrchestratorContract.Source
         val currentPlaylistFlow: Flow<PlaylistDomain>
         fun onTrackEnded(media: MediaDomain?)
         fun nextItem()

@@ -108,14 +108,6 @@ class PlaylistsPresenter(
         }
     }
 
-//    override fun onPlaylistUpdated(list: PlaylistDomain) {
-//        refreshPlaylist()
-//    }
-//
-//    override fun onItemChanged() {
-//
-//    }
-
     private fun refreshPlaylists() {
         state.viewModelScope.launch { executeRefresh(false) }
     }
@@ -133,8 +125,9 @@ class PlaylistsPresenter(
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
             .let { modelMapper.map(it, queue.playlistId) }
-            .also { view.setList(it, animate) }
-            .takeIf { focusCurrent }
+            .takeIf { coroutines.mainScopeActive }
+            ?.also { view.setList(it, animate) }
+            ?.takeIf { focusCurrent }
             ?.let {
                 state.playlists.apply {
                     prefsWrapper.getPairNonNull(CURRENT_PLAYLIST, NO_PLAYLIST.toPair())

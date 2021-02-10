@@ -49,7 +49,7 @@ class YouTubePlayerListener(
         youTubePlayer?.removeListener(this)
         youTubePlayer = null
         queue.currentItem?.apply {
-            playerUi?.setPlaylistItem(this)
+            playerUi?.setPlaylistItem(this, queue.source)
             playerUi?.setConnectionState(CastPlayerContract.ConnectionState.CC_DISCONNECTED)
             playerUi?.setPlayerState(PlayerStateDomain.PAUSED)
             playerUi?.setCurrentSecond(0f)
@@ -239,12 +239,12 @@ class YouTubePlayerListener(
             log.d("loadVideo: play position: pos =  $startPos sec")
             youTubePlayer?.loadVideo(media.platformId, startPos)
             state.currentMedia = media
-            playerUi?.setPlaylistItem(queue.currentItem)
+            playerUi?.setPlaylistItem(queue.currentItem, queue.source)
         } ?: run {
             state.currentMedia = null
             youTubePlayer?.pause()
             playerUi?.reset()
-            playerUi?.setPlaylistItem(null)
+            playerUi?.setPlaylistItem(null, queue.source)
         }
     }
 
@@ -260,7 +260,7 @@ class YouTubePlayerListener(
                 state.currentMedia = queue.currentItem?.media
             }
             //log.d("setupPlayer: state.currentMedia=${state.currentMedia?.stringMedia()}")
-            setPlaylistItem(queue.currentItem)
+            setPlaylistItem(queue.currentItem, queue.source)
         }
     }
 

@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Presenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -134,7 +135,7 @@ class PlayerControlsNotification constructor(
         // not needed here
     }
 
-    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) {
+    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?, source: OrchestratorContract.Source) {
         if (state.media?.id != playlistItem?.media?.id) {
             state.bitmap = null
         }

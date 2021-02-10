@@ -16,6 +16,8 @@ open class CoroutineContextProvider constructor(
             return _scope ?: CoroutineScope(dispatcher).apply { _scope = this }
         }
 
+        fun isActive() = _scope != null
+
         fun cancel() {
             _scope?.cancel()
             _scope = null
@@ -26,13 +28,22 @@ open class CoroutineContextProvider constructor(
     val mainScope: CoroutineScope
         get() = _mainScope.get()
 
+    val mainScopeActive: Boolean
+        get() = _mainScope.isActive()
+
     private var _computationScope = ScopeHolder(Computation)
     val computationScope: CoroutineScope
         get() = _computationScope.get()
 
+    val computationScopeActive: Boolean
+        get() = _computationScope.isActive()
+
     private var _ioScope = ScopeHolder(IO)
     val ioScope: CoroutineScope
         get() = _ioScope.get()
+
+    val ioScopeActive: Boolean
+        get() = _ioScope.isActive()
 
     fun cancel() {
         _mainScope.cancel()

@@ -46,6 +46,8 @@ class QueueMediator constructor(
     override val currentItemFlow: Flow<PlaylistItemDomain?>
         get() = _currentItemFlow
     private var _currentPlaylistFlow: MutableSharedFlow<PlaylistDomain> = MutableSharedFlow()
+    override val source: Source
+        get() = state.playlistIdentifier.source
     override val currentPlaylistFlow: Flow<PlaylistDomain>
         get() = _currentPlaylistFlow
 
@@ -67,7 +69,8 @@ class QueueMediator constructor(
                         when (op) {
                             FLAT -> {
                                 if (!plist.matchesHeader(state.playlist)) {
-                                    state.playlist?.apply { refreshQueueFrom(replaceHeader(plist), source) }
+                                    state.playlist
+                                        ?.apply { refreshQueueFrom(replaceHeader(plist), source) }
                                         ?: refreshQueueFrom(plist, source)
                                 }
                             }

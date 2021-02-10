@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
@@ -174,7 +175,8 @@ class CastPlayerPresenter(
         view.setPlaylistName(name)
     }
 
-    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) {
+    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?, source: OrchestratorContract.Source) {
+        state.source = source
         state.playlistItem = playlistItem?.apply {
             media.thumbNail?.url?.apply { view.setImage(this) }
             media.title?.apply { state.title = this }
@@ -205,20 +207,21 @@ class CastPlayerPresenter(
         view.setPlaylistImage(image?.url)
     }
 
-    override fun onPlaylistClick() {
+    override fun onPlaylistClick() {// todo get source
         state.playlistItem?.playlistId?.let {
-            view.navigate(NavigationModel(PLAYLIST_FRAGMENT, mapOf(PLAYLIST_ID to it, PLAY_NOW to false)))
+            view.navigate(NavigationModel(PLAYLIST_FRAGMENT, mapOf(PLAYLIST_ID to it, PLAY_NOW to false, SOURCE to state.source)))
         }
     }
 
-    override fun onPlaylistItemClick() {
+    override fun onPlaylistItemClick() {// todo get source
         state.playlistItem?.let {
             view.navigate(
                 NavigationModel(
                     PLAYLIST_ITEM_FRAGMENT,
                     mapOf(
                         PLAYLIST_ITEM to it,
-                        FRAGMENT_NAV_EXTRAS to view.makeItemTransitionExtras()
+                        FRAGMENT_NAV_EXTRAS to view.makeItemTransitionExtras(),
+                        SOURCE to state.source
                     )
                 )
             )
