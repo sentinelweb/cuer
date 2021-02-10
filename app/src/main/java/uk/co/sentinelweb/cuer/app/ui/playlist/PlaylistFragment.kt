@@ -72,7 +72,7 @@ class PlaylistFragment :
 
     private val starMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_star)
-    private val playMenuItem: MenuItem
+    private val playMenuItem: MenuItem?
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_play)
     private val editMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_edit)
@@ -135,11 +135,11 @@ class PlaylistFragment :
                     isShow = true
                     // only show the menu items for the non-empty state
                     modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == lastPlayModeIndex }
-                    playMenuItem.isVisible = true
+                    playMenuItem?.isVisible = true
                 } else if (isShow) {
                     isShow = false
                     modeMenuItems.forEach { it.isVisible = false }
-                    playMenuItem.isVisible = false
+                    playMenuItem?.isVisible = false
                 }
             }
         })
@@ -158,8 +158,8 @@ class PlaylistFragment :
         inflater.inflate(R.menu.playlist_actionbar, menu)
         modeMenuItems.forEach { it.isVisible = false }
         modeMenuItems.forEach { it.setOnMenuItemClickListener { presenter.onPlayModeChange() } }
-        playMenuItem.isVisible = false
-        playMenuItem.setOnMenuItemClickListener { presenter.onPlayPlaylist() }
+        playMenuItem?.isVisible = false
+        playMenuItem?.setOnMenuItemClickListener { presenter.onPlayPlaylist() }
         starMenuItem.setOnMenuItemClickListener { presenter.onStarPlaylist() }
         newMenuItem.setOnMenuItemClickListener { presenter.onFilterNewItems() }
         editMenuItem.setOnMenuItemClickListener { presenter.onEdit() }
@@ -237,8 +237,8 @@ class PlaylistFragment :
         binding.playlistCollapsingToolbar.title = model.title
         binding.playlistFabPlay.setImageResource(model.playIcon)
         binding.playlistFabPlay.isEnabled = model.canPlay
-        playMenuItem.setIcon(model.playIcon)
-        playMenuItem.setEnabled(model.canPlay)
+        playMenuItem?.setIcon(model.playIcon)
+        playMenuItem?.setEnabled(model.canPlay)
         starMenuItem.setIcon(model.starredIcon)
         //playlist_items.setText("${model.items.size}")
         binding.playlistFlags.isVisible = model.isDefault
@@ -358,20 +358,22 @@ class PlaylistFragment :
         when (state) {
             PLAYING -> {
                 binding.playlistFabPlay.setImageResource(R.drawable.ic_baseline_playlist_close_24)
-                playMenuItem.setIcon(R.drawable.ic_baseline_playlist_close_24)
+                playMenuItem?.setIcon(R.drawable.ic_baseline_playlist_close_24)
                 //binding.playlistFabPlay.showProgress(false)
             }
             NOT_CONNECTED -> {
                 binding.playlistFabPlay.setImageResource(R.drawable.ic_baseline_playlist_play_24)
-                playMenuItem.setIcon(R.drawable.ic_baseline_playlist_play_24)
+                playMenuItem?.setIcon(R.drawable.ic_baseline_playlist_play_24)
                 //binding.playlistFabPlay.showProgress(false)
             }
             CONNECTING -> {
                 //binding.playlistFabPlay.showProgress(true)
-                playMenuItem.setIcon(R.drawable.ic_notif_buffer_black)
+                playMenuItem?.setIcon(R.drawable.ic_notif_buffer_black)
             }
         }
     }
+
+    override fun exit() = TODO()
     //endregion
 
     // region ItemContract.ItemMoveInteractions

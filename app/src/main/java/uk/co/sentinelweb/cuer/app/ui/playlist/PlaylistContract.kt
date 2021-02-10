@@ -79,6 +79,7 @@ interface PlaylistContract {
         fun gotoEdit(id: Long, source: Source)
         fun showCastRouteSelectorDialog()
         fun setPlayState(state: PlayState)
+        fun exit()
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
@@ -93,7 +94,7 @@ interface PlaylistContract {
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
         var selectedPlaylistItem: PlaylistItemDomain? = null,
-        var initialLoadJob: Job? = null
+        var queueItemJob: Job? = null
     ) : ViewModel()
 
     data class Model constructor(
@@ -132,7 +133,8 @@ interface PlaylistContract {
                         log = get(),
                         playlistDialogModelCreator = get(),
                         timeProvider = get(),
-                        coroutines = get()
+                        coroutines = get(),
+                        res = get()
                     )
                 }
                 scoped {

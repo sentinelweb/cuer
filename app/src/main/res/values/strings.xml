@@ -120,6 +120,7 @@
 
     <string name="new_items_below">New Items v</string>
     <string name="dialog_button_dont_save">Don\'t save</string>
+    <string name="playlist_msg_deleted">This playlist was deleted</string>
 
 
 </resources>
