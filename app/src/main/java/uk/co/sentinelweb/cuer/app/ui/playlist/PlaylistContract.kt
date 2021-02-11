@@ -34,7 +34,6 @@ interface PlaylistContract {
         fun initialise()
         fun destroy()
         fun refreshList()
-        fun setFocusMedia(mediaDomain: MediaDomain)
         fun onItemSwipeRight(item: ItemContract.Model)
         fun onItemSwipeLeft(item: ItemContract.Model)
         fun onItemClicked(item: ItemContract.Model)

@@ -32,7 +32,6 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -59,7 +58,7 @@ class PlaylistPresenter(
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider,
     private val res: ResourceWrapper
-) : PlaylistContract.Presenter/*, QueueMediatorContract.ProducerListener*/ {
+) : PlaylistContract.Presenter {
 
     init {
         log.tag(this)
@@ -69,10 +68,6 @@ class PlaylistPresenter(
 
     private val isQueuedPlaylist: Boolean
         get() = state.playlistIdentifier == queue.playlistId
-
-    private fun queueExecIf(block: QueueMediatorContract.Producer.() -> Unit) {
-        if (isQueuedPlaylist) block(queue)
-    }
 
     private val castConnectionListener = object : ChromecastConnectionListener {
         override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
@@ -161,21 +156,14 @@ class PlaylistPresenter(
     }
 
     override fun initialise() {
-        //queue.addProducerListener(this)
         state.playlistIdentifier = prefsWrapper.getPair(CURRENT_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
-        //log.d("initialise state.playlistId=${state.playlistId}")
     }
 
     override fun refreshList() {
         refreshPlaylist()
     }
 
-    override fun setFocusMedia(mediaDomain: MediaDomain) {
-        //state.addedMedia = mediaDomain
-    }
-
     override fun destroy() {
-        //queue.removeProducerListener(this)
     }
 
     // move item to playlist
@@ -322,7 +310,6 @@ class PlaylistPresenter(
         return true
     }
 
-
     private fun playItem(itemDomain: PlaylistItemDomain, resetPos: Boolean) {
         if (isQueuedPlaylist) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
@@ -403,7 +390,6 @@ class PlaylistPresenter(
                 }
                 ?.also { playlistModified ->
                     state.viewModelScope.launch {
-                        //playlistOrchestrator.save(plist, state.playlistIdentifier.toDeep<Long>())
                         state.dragTo
                             ?.let { playlistModified.items[it] }
                             ?.let { item ->
@@ -468,13 +454,10 @@ class PlaylistPresenter(
     }
 
     private suspend fun executeRefresh(animate: Boolean = true, scrollToItem: Boolean = false) {
-        //log.d("executeRefresh state.playlistId=${state.playlistId}")
         try {
             playlistOrchestrator
-                .getPlaylistOrDefault(
-                    state.playlistIdentifier.id as Long,
-                    Options(state.playlistIdentifier.source, false)
-                ).also { state.playlist = it?.first }
+                .getPlaylistOrDefault(state.playlistIdentifier.id as Long, Options(state.playlistIdentifier.source, false))
+                .also { state.playlist = it?.first }
                 ?.also { (playlist, source) ->
                     playlist.id
                         ?.also { id -> state.playlistIdentifier = id.toIdentifier(source) }
