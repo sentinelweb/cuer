@@ -83,7 +83,7 @@ interface PlaylistContract {
     enum class ScrollDirection { Up, Down, Top, Bottom }
     enum class PlayState { PLAYING, CONNECTING, NOT_CONNECTED }
 
-    data class State constructor(
+    data class State(
         var playlistIdentifier: Identifier<*> = NO_PLAYLIST,
         var playlist: PlaylistDomain? = null,
         var deletedPlaylistItem: PlaylistItemDomain? = null,
@@ -91,7 +91,8 @@ interface PlaylistContract {
         var lastFocusIndex: Int? = null, // used for undo
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
-        var selectedPlaylistItem: PlaylistItemDomain? = null
+        var selectedPlaylistItem: PlaylistItemDomain? = null,
+        var model: Model? = null
     ) : ViewModel()
 
     data class Model constructor(
@@ -116,6 +117,7 @@ interface PlaylistContract {
                     PlaylistPresenter(
                         view = get(),
                         state = get(),
+                        mediaOrchestrator = get(),
                         playlistOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         modelMapper = get(),

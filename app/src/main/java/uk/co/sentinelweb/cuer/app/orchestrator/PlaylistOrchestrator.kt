@@ -20,7 +20,7 @@ class PlaylistOrchestrator constructor(
 
     override val updates: Flow<Triple<Operation, Source, PlaylistDomain>>
         get() = merge(
-            playlistDatabaseRepository.playlistFlow
+            playlistDatabaseRepository.updates
                 .map { it.first to LOCAL then it.second },
             (playlistMemoryRepository.updates
                 .map { it.first to MEMORY then it.second })

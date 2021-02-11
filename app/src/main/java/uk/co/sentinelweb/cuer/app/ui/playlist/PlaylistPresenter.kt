@@ -32,6 +32,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -42,6 +43,7 @@ import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 class PlaylistPresenter(
     private val view: PlaylistContract.View,
     private val state: PlaylistContract.State,
+    private val mediaOrchestrator: MediaOrchestrator,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val modelMapper: PlaylistModelMapper,
@@ -95,6 +97,7 @@ class PlaylistPresenter(
             .filter { isQueuedPlaylist }
             .onEach { view.highlightPlayingItem(it.currentIndex) }
             .launchIn(coroutines.mainScope)
+
         listen()
     }
 
@@ -151,6 +154,17 @@ class PlaylistPresenter(
                         ?.takeIf { it != state.playlist }
                         ?.also { state.playlist = it }
                         ?.also { updateView() }
+            }
+        }.launchIn(coroutines.mainScope)
+
+        mediaOrchestrator.updates.onEach { (op, source, media) ->
+            log.d("media changed: $op, $source, ${media.id} ${media.title}")
+            when (op) {
+                FLAT,
+                FULL -> if (source == state.playlistIdentifier.source) {
+                    updateMediaItem(media)
+                }
+                DELETE -> Unit
             }
         }.launchIn(coroutines.mainScope)
     }
@@ -475,6 +489,7 @@ class PlaylistPresenter(
             .takeIf { coroutines.mainScopeActive }
             .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
             ?.let { modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier) }
+            ?.also { state.model = it }
             ?.also { view.setModel(it, animate) }
             .also {
                 state.focusIndex
@@ -500,6 +515,24 @@ class PlaylistPresenter(
                 state.playlist?.currentIndex?.also {
                     view.highlightPlayingItem(it)
                 }
+            }
+    }
+
+    private suspend fun updateMediaItem(m: MediaDomain) {
+        state.playlist
+            ?.items
+            ?.apply {
+                indexOfFirst { it.media.id == m.id }
+                    .takeIf { it > -1 }
+                    ?.let { index ->
+                        val changedItem = get(index).copy(media = m)
+                        state.playlist = state.playlist
+                            ?.copy(items = toMutableList().apply { set(index, changedItem) })
+
+                        state.model = state.model
+                            ?.copy(items = state.model!!.items!!.toMutableList().apply { set(index, modelMapper.map(changedItem, index)) })
+                            ?.apply { view.setModel(this, false) }// todo  set item
+                    }
             }
     }
 

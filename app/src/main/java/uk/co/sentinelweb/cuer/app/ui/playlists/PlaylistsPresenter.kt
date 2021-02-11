@@ -56,7 +56,7 @@ class PlaylistsPresenter(
             state.playlists.apply {
                 find { it.id == item.id }?.let { playlist ->
                     state.deletedPlaylist = playlist
-                    playlistRepository.delete(playlist)
+                    playlistRepository.delete(playlist, emit = true)
                     view.showDeleteUndo("Deleted playlist: ${playlist.title}")
                     executeRefresh(false, false)
                 }
@@ -142,7 +142,7 @@ class PlaylistsPresenter(
         coroutines.mainScope.launch {
             // todo a better job - might refresh too much
             // todo listen for stat changes
-            playlistRepository.playlistFlow.collect { (_, _) ->
+            playlistRepository.updates.collect { (_, _) ->
                 refreshPlaylists()
             }
         }

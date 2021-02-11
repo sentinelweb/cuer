@@ -45,7 +45,7 @@ class PlaylistModelMapper constructor(
         }
     )
 
-    private fun map(item: PlaylistItemDomain, index: Int): ItemContract.Model {
+    fun map(item: PlaylistItemDomain, index: Int): ItemContract.Model {
         val top = item.media.title ?: "No title"
         val pos = item.media.positon?.toFloat() ?: 0f
         val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f

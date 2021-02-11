@@ -200,7 +200,7 @@ class PlaylistPresenterTest {
 
     private fun createDefaultState() = State(
         playlistIdentifier = fixtCurrentIdentifier,
-        playlist = fixtCurrentPlaylist
+        playlist = fixtCurrentPlaylist,
     )
 
     private fun setCurrentlyPlaying(id: Identifier<Long>, playlist: PlaylistDomain, currentIndex: Int = playlist.currentIndex) {
@@ -510,10 +510,6 @@ class PlaylistPresenterTest {
 
     @Test
     fun refreshList() {
-    }
-
-    @Test
-    fun setFocusMedia() {
     }
 
     @Test
