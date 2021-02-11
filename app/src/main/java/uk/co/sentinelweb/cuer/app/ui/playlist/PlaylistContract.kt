@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
-import kotlinx.coroutines.Job
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -93,8 +92,7 @@ interface PlaylistContract {
         var lastFocusIndex: Int? = null, // used for undo
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
-        var selectedPlaylistItem: PlaylistItemDomain? = null,
-        var queueItemJob: Job? = null
+        var selectedPlaylistItem: PlaylistItemDomain? = null
     ) : ViewModel()
 
     data class Model constructor(

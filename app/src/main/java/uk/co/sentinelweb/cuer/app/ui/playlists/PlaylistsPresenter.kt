@@ -29,7 +29,7 @@ class PlaylistsPresenter(
     private val toastWrapper: ToastWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
     private val coroutines: CoroutineContextProvider
-) : PlaylistsContract.Presenter/*, QueueMediatorContract.ProducerListener*/ {
+) : PlaylistsContract.Presenter {
 
     override fun initialise() {
 

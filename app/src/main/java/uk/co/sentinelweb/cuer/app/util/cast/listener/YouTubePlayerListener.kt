@@ -3,8 +3,9 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants.*
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
@@ -23,8 +24,7 @@ class YouTubePlayerListener(
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider
 ) : AbstractYouTubePlayerListener(),
-    CastPlayerContract.PlayerControls.Listener//,
-/*QueueMediatorContract.ConsumerListener*/ {
+    CastPlayerContract.PlayerControls.Listener {
 
     private var youTubePlayer: YouTubePlayer? = null
 
@@ -39,10 +39,10 @@ class YouTubePlayerListener(
 
     init {
         log.tag(this)
-        //queue.addConsumerListener(this)
-        coroutines.mainScope.launch {
-            queue.currentItemFlow.collect { loadVideo(queue.currentItem) }
-        }
+        queue.currentItemFlow
+            .distinctUntilChanged { old, new -> old?.media?.id == new?.media?.id }
+            .onEach { loadVideo(it) }
+            .launchIn(coroutines.mainScope)
     }
 
     fun onDisconnected() {
@@ -58,7 +58,6 @@ class YouTubePlayerListener(
             playerUi = null
         }
         coroutines.cancel()
-        // queue.removeConsumerListener(this)
     }
 
     // region AbstractYouTubePlayerListener
@@ -207,17 +206,6 @@ class YouTubePlayerListener(
     }
     // endregion
 
-    // region  QueueMediatorContract.ConsumerListener
-//    override fun onItemChanged() {
-//        //log.d("onItemChanged: currentItemId = ${queue.currentItem?.id}")
-//        loadVideo(queue.currentItem)
-//    }
-//
-//    override fun onPlaylistUpdated() {
-//
-//    }
-    // endregion
-
     private fun handleError(e: Exception) {
         playerUi?.error("Error: ${e.message ?: "Unknown - check log"}")
         log.e("Error playing", e)
@@ -259,11 +247,9 @@ class YouTubePlayerListener(
             if (state.currentMedia == null) {
                 state.currentMedia = queue.currentItem?.media
             }
-            //log.d("setupPlayer: state.currentMedia=${state.currentMedia?.stringMedia()}")
             setPlaylistItem(queue.currentItem, queue.source)
         }
     }
-
 
     private fun cleanupPlayer(controls: CastPlayerContract.PlayerControls?) {
         controls?.apply {

@@ -41,15 +41,15 @@ class QueueMediator constructor(
         get() = state.playlist
     override val playlistId: Identifier<*>?
         get() = if (state.playlistIdentifier != NO_PLAYLIST) state.playlistIdentifier else null
+    override val source: Source
+        get() = state.playlistIdentifier.source
 
     private lateinit var _currentItemFlow: MutableStateFlow<PlaylistItemDomain?>
     override val currentItemFlow: Flow<PlaylistItemDomain?>
-        get() = _currentItemFlow
+        get() = _currentItemFlow.distinctUntilChanged { old, new -> old == new }
     private var _currentPlaylistFlow: MutableSharedFlow<PlaylistDomain> = MutableSharedFlow()
-    override val source: Source
-        get() = state.playlistIdentifier.source
     override val currentPlaylistFlow: Flow<PlaylistDomain>
-        get() = _currentPlaylistFlow
+        get() = _currentPlaylistFlow.distinctUntilChanged()
 
     init {
         log.tag(this)
@@ -91,6 +91,7 @@ class QueueMediator constructor(
 
         playlistItemOrchestrator.updates
             .onEach { (op, source, plistItem) ->
+                log.d("item changed: $op, $source, ${plistItem.id} ${plistItem.media.title}")
                 try {
                     when (op) {
                         FLAT,
@@ -240,15 +241,12 @@ class QueueMediator constructor(
 
     private suspend fun refreshQueueFrom(playlistDomain: PlaylistDomain, source: Source) {
         // if the playlist is the same then don't change the current item
-        val itemBefore = currentItem
-        var playlistChanged = false
         val playlistIdentifier = playlistDomain.id?.toIdentifier(source)
         if (state.playlistIdentifier != playlistIdentifier) {
             state.playlistIdentifier = playlistIdentifier
                 ?: throw java.lang.IllegalStateException("No playlist ID")
             state.currentItem = playlistDomain.currentItemOrStart()
             playlistIdentifier.toPair().apply { prefsWrapper.putPair(CURRENT_PLAYLIST, this) }
-            playlistChanged = true
         } else {
             state.currentItem = playlistDomain.currentItem()
         }
@@ -256,12 +254,11 @@ class QueueMediator constructor(
         state.currentItem?.apply {
             mediaSessionManager.setMedia(media)
         }
-        if (itemBefore != currentItem && this::_currentItemFlow.isInitialized) {
+        log.d("playlist: ${state.playlist?.scanOrder()}")
+        if (this::_currentItemFlow.isInitialized) {
             _currentItemFlow.emit(currentItem)
         }
-        if (playlistChanged) {
-            state.playlist?.also { _currentPlaylistFlow.emit(it) }
-        }
+        state.playlist?.also { _currentPlaylistFlow.emit(it) }
     }
 
     private suspend fun refreshQueue(identifier: Identifier<*>) {

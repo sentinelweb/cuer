@@ -533,7 +533,6 @@ class QueueMediatorTest {
             createSut()
             val selectedItemIndex = 8
             val selectedItem = fixtCurrentPlaylist.items.get(selectedItemIndex)
-            captureItemFlow.clear()
 
             // test
             sut.onItemSelected(selectedItem)
@@ -542,7 +541,7 @@ class QueueMediatorTest {
             assertThat(sut.currentItemIndex).isEqualTo(selectedItemIndex)
             assertThat(sut.currentItem).isEqualTo(selectedItem)
             assertThat(captureItemFlow.last()).isEqualTo(selectedItem)
-            assertThat(captureItemFlow.size).isEqualTo(1) // should emit
+            assertThat(captureItemFlow.size).isEqualTo(2) // should emit
             verify { mockMediaSessionManager.setMedia(selectedItem.media) }
         }
     }
@@ -587,7 +586,6 @@ class QueueMediatorTest {
         testCoroutineScope.runBlockingTest {
             createSut()
             val currentItemBefore = sut.currentItem!!
-            captureItemFlow.clear()
             val expectedCurrentItem = currentItemBefore.copy(media = currentItemBefore.media.copy(positon = 0, watched = true))
 
             sut.onItemSelected(currentItemBefore, forcePlay = true, resetPosition = true)
@@ -598,7 +596,7 @@ class QueueMediatorTest {
             assertThat(captureItemFlow.last()).isEqualTo(expectedCurrentItem)
             verify { mockMediaSessionManager.setMedia(expectedCurrentItem.media) }
             coVerify { mockPlaylistOrchestrator.updateCurrentIndex(fixtCurrentPlaylist, fixtCurrentIdentifier.toFlatOptions<Long>(true)) }
-            assertThat(captureItemFlow.size).isEqualTo(1)
+            assertThat(captureItemFlow.size).isEqualTo(2)
         }
     }
 
@@ -608,7 +606,6 @@ class QueueMediatorTest {
             createSut()
             val selectedItemIndex = 8
             val selectedItem = fixtCurrentPlaylist.items.get(selectedItemIndex)
-            captureItemFlow.clear()
             val expectedSelectedItem = selectedItem.copy(media = selectedItem.media.copy(positon = 0, watched = true))
 
             sut.onItemSelected(selectedItem, resetPosition = true)
@@ -624,7 +621,7 @@ class QueueMediatorTest {
                     fixtCurrentIdentifier.toFlatOptions<Long>(true)
                 )
             }
-            assertThat(captureItemFlow.size).isEqualTo(1)
+            assertThat(captureItemFlow.size).isEqualTo(2)
         }
     }
 
