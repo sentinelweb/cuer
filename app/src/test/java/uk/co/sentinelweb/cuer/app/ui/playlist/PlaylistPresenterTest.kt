@@ -53,6 +53,9 @@ class PlaylistPresenterTest {
     lateinit var mockView: PlaylistContract.View
 
     @MockK
+    lateinit var mockMediaOrchestrator: MediaOrchestrator
+
+    @MockK
     lateinit var mockPlaylistOrchestrator: PlaylistOrchestrator
 
     @MockK
@@ -178,6 +181,7 @@ class PlaylistPresenterTest {
         sut = PlaylistPresenter(
             mockView,
             fixtState!!,
+            mockMediaOrchestrator,
             mockPlaylistOrchestrator,
             mockPlaylistItemOrchestrator,
             mockModelMapper,
