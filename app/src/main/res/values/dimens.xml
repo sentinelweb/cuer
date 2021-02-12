@@ -18,8 +18,8 @@
     <dimen name="list_item_swipe_dismiss_dist">100dp</dimen>
     <dimen name="list_item_swipe_dismiss_toerance">4dp</dimen>
     <dimen name="list_item_height">76dp</dimen>
-    <dimen name="list_item_top_text_size">16sp</dimen>
-    <dimen name="list_item_bottom_text_size">14sp</dimen>
+    <dimen name="list_item_top_text_size">14sp</dimen>
+    <dimen name="list_item_bottom_text_size">13sp</dimen>
     <dimen name="list_item_progress_height">4dp</dimen>
     <dimen name="item_swipe_icon_size">28dp</dimen>
     <dimen name="button_icon_size">24dp</dimen>

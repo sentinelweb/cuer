@@ -93,7 +93,6 @@
             android:id="@+id/listitem_top"
             style="@style/ItemView.TopText"
             android:layout_width="0dp"
-
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toRightOf="@id/listitem_icon"
             app:layout_constraintRight_toLeftOf="@id/listitem_overflow_img"

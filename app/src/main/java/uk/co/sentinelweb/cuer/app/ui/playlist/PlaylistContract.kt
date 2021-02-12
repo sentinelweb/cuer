@@ -143,7 +143,7 @@ interface PlaylistContract {
                         res = get(),
                         timeFormatter = get(),
                         timeSinceFormatter = get(),
-                        loopModeMapper = get(),
+                        iconMapper = get(),
                         backgroundMapper = get()
                     )
                 }

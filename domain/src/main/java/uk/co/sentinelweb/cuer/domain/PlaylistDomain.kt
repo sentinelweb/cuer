@@ -33,7 +33,6 @@ data class PlaylistDomain constructor(
 
     enum class PlaylistTypeDomain {
         USER,
-        CHANNEL, /* link to a channel */
         PLATFORM /* External playlist do allow adding - just fix to source - maybe allow archiving of items */
     }
 

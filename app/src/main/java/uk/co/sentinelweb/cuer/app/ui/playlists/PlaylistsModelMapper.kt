@@ -21,7 +21,9 @@ class PlaylistsModelMapper constructor() {
                     count = domains[pl]?.itemCount ?: -1,
                     newItems = domains[pl]?.let { it.itemCount - it.watchedItemCount } ?: -1,
                     starred = pl.starred,
-                    loopMode = pl.mode
+                    loopMode = pl.mode,
+                    type = pl.type,
+                    platform = pl.platform
                 )
             }
         )

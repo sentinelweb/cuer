@@ -3,12 +3,12 @@ package uk.co.sentinelweb.cuer.app.ui.playlist.item
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.PlatformMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class ItemFactory constructor(
     private val res: ResourceWrapper,
-    private val platformMapper: PlatformMapper
+    private val iconMapper: IconMapper
 ) {
 
     fun createItemViewHolder(
@@ -26,7 +26,7 @@ class ItemFactory constructor(
         view: ItemContract.View,
         interactions: ItemContract.Interactions
     ): ItemContract.External {
-        val itemPresenter = ItemPresenter(view, interactions, ItemContract.State(), ItemModelMapper(res, platformMapper))
+        val itemPresenter = ItemPresenter(view, interactions, ItemContract.State(), ItemModelMapper(res, iconMapper))
         view.setPresenter(itemPresenter)
         return itemPresenter
     }

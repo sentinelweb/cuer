@@ -21,7 +21,7 @@ import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.PlatformMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -76,7 +76,7 @@ object Modules {
 
     private val uiModule = module {
         factory { PlaylistSelectDialogModelCreator(get(), get()) }
-        factory { PlatformMapper() }
+        factory { IconMapper() }
         factory { LoopModeMapper() }
         factory { BackgroundMapper(get()) }
     }

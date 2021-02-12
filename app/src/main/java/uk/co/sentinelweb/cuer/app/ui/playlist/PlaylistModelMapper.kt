@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
@@ -19,7 +19,7 @@ class PlaylistModelMapper constructor(
     private val res: ResourceWrapper,
     private val timeSinceFormatter: TimeSinceFormatter,
     private val timeFormatter: TimeFormatter,
-    private val loopModeMapper: LoopModeMapper,
+    private val iconMapper: IconMapper,
     private val backgroundMapper: BackgroundMapper
 ) {
 
@@ -32,7 +32,7 @@ class PlaylistModelMapper constructor(
         domain.title,
         domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         domain.mode.ordinal,
-        loopModeMapper.mapIcon(domain.mode),
+        iconMapper.map(domain.mode),
         if (isPlaying) R.drawable.ic_baseline_playlist_close_24 else R.drawable.ic_baseline_playlist_play_24,
         if (domain.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_unstarred_white,
         domain.default,

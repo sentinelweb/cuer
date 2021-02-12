@@ -4,12 +4,12 @@ import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class ItemModelMapper constructor(
     private val res: ResourceWrapper,
-    private val loopModeMapper: LoopModeMapper
+    private val iconMapper: IconMapper
 ) {
 
     private val playDrawable: Drawable by lazy {
@@ -54,7 +54,7 @@ class ItemModelMapper constructor(
     }
 
     fun mapBottomText(model: ItemContract.Model): SpannableString {
-        return SpannableString(model.run { "       $newItems / $count" }).apply {
+        return SpannableString(model.run { "          $newItems / $count" }).apply {
             res.replaceSpannableIcon(
                 this,
                 if (model.starred) starDrawable else unstarDrawable,
@@ -63,7 +63,7 @@ class ItemModelMapper constructor(
 
             res.replaceSpannableIcon(
                 this,
-                bottomDrawable(loopModeMapper.mapIcon(model.loopMode)),
+                bottomDrawable(iconMapper.map(model.loopMode)),
                 2, 3
             )
 
@@ -71,6 +71,12 @@ class ItemModelMapper constructor(
                 this,
                 unwatchDrawable,
                 5, 6
+            )
+
+            res.replaceSpannableIcon(
+                this,
+                bottomDrawable(iconMapper.map(model.type, model.platform)),
+                8, 9
             )
         }
     }
