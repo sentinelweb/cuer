@@ -20,7 +20,6 @@ import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
@@ -77,7 +76,6 @@ object Modules {
     private val uiModule = module {
         factory { PlaylistSelectDialogModelCreator(get(), get()) }
         factory { IconMapper() }
-        factory { LoopModeMapper() }
         factory { BackgroundMapper(get()) }
     }
 
@@ -94,7 +92,6 @@ object Modules {
     private val utilModule = module {
         factory {
             LinkScanner(
-                c = androidApplication(),
                 log = get(),
                 mappers = urlMediaMappers
             )

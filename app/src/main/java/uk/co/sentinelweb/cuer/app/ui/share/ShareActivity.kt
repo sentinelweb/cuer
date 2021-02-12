@@ -101,9 +101,9 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
     override fun onResume() {
         super.onResume()
         if (!intent.getBooleanExtra(EXTRA_PASTE, false)) {
-            shareWrapper.getLinkFromIntent(intent) {
-                scanFragment?.fromShareUrl(it) ?: throw IllegalStateException("Scan fragment not visible")
-            }
+            (shareWrapper.getLinkFromIntent(intent) ?: shareWrapper.getTextFromIntent(intent))?.apply {
+                scanFragment?.fromShareUrl(this) ?: throw IllegalStateException("Scan fragment not visible")
+            } ?: presenter.linkError("Could not find a link to process")
         }
     }
 

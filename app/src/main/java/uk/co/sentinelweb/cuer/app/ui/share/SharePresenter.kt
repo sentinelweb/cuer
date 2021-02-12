@@ -53,6 +53,10 @@ class SharePresenter constructor(
 
     private fun mapDisplayModel() {
         (state.scanResult
+            ?.also {
+                if (!it.isNew)
+                    view.warning("${it.type.toString().toLowerCase().capitalize()} already exists ...")
+            }
             ?.let {
                 mapper.mapShareModel(it, ::finish)
             }
@@ -78,7 +82,6 @@ class SharePresenter constructor(
         state.scanResult = result
         when (result.type) {
             MEDIA -> (result.result as MediaDomain).let {
-                // todo handle existing?
                 view.showMedia(PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null), MEMORY)
                 mapDisplayModel()
             }

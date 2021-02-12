@@ -48,17 +48,21 @@ class ShareWrapper(
                     """
     }
 
-    fun getLinkFromIntent(intent: Intent, callback: (String) -> Unit) {
-        (intent.data?.toString()
+    fun getLinkFromIntent(intent: Intent): String? =
+        intent.data?.toString()
             ?.takeIf { it.startsWith("http") }
             ?: intent.clipData
                 ?.takeIf { it.itemCount > 0 }
                 ?.let { it.getItemAt(0)?.let { it.uri ?: it.text }.toString() }
                 ?.takeIf { it.startsWith("http") }
             ?: intent.getStringExtra(Intent.EXTRA_TEXT)
-                ?.takeIf { it.startsWith("http") })
-            ?.apply {
-                callback(this)
-            }
-    }
+                ?.takeIf { it.startsWith("http") }
+
+    fun getTextFromIntent(intent: Intent): String? =
+        intent.data?.toString()
+            ?: intent.clipData
+                ?.takeIf { it.itemCount > 0 }
+                ?.let { it.getItemAt(0)?.let { it.uri ?: it.text }.toString() }
+            ?: intent.getStringExtra(Intent.EXTRA_TEXT)
+
 }
