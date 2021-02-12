@@ -1,5 +1,5 @@
 package uk.co.sentinelweb.cuer.domain
 
 enum class ObjectTypeDomain {
-    MEDIA, PLAYLIST, UNKNOWN
+    MEDIA, PLAYLIST, PLAYLIST_ITEM, UNKNOWN
 }

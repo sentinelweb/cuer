@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import kotlinx.coroutines.Job
 import kotlinx.serialization.Transient
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -22,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 
@@ -36,42 +36,43 @@ interface ShareContract {
 
     interface View {
         fun exit()
-        fun gotoMain(playlistItemDomain: PlaylistItemDomain?, play: Boolean = false)
+        fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean = false)
         fun setData(model: Model)
         fun error(msg: String)
         fun warning(msg: String)
-        suspend fun commitPlaylistItems()
-        fun getCommittedItems(): List<Any>?
+        suspend fun commit(onCommit: Committer.OnCommit)
         fun showMedia(itemDomain: PlaylistItemDomain, source: Source)
         fun showPlaylist(id: OrchestratorContract.Identifier<Long>)
         fun navigate(nav: NavigationModel)
     }
 
-    interface Committer<T> {
-        suspend fun commit()
-        fun getEditedDomains(): List<T>?
+    interface Committer {
+        suspend fun commit(onCommit: OnCommit)
+        interface OnCommit {
+            suspend fun onCommit(type: ObjectTypeDomain, data: List<*>)
+        }
     }
 
-    data class Model constructor(
+    data class Model constructor(// todo make button type
         val isNew: Boolean,
-        val topRightButtonText: String?,
-        @DrawableRes val topRightButtonIcon: Int,
-        val topRightButtonAction: () -> Unit,
-        val bottomRightButtonText: String?,
-        @DrawableRes val bottomRightButtonIcon: Int,
-        val bottomRightButtonAction: () -> Unit,
-        val bottomLeftButtonText: String?,
-        @DrawableRes val bottomLeftButtonIcon: Int,
-        val bottomLeftButtonAction: () -> Unit,
-        val topLeftButtonAction: () -> Unit,
-        val topLeftButtonText: String?,
-        @DrawableRes val topLeftButtonIcon: Int
-    )
+        val topRight: Button,
+        val bottomRight: Button,
+        val bottomLeft: Button,
+        val topLeft: Button
+    ) {
+        data class Button constructor(
+            val text: String? = null,
+            @DrawableRes val icon: Int = 0,
+            val action: () -> Unit = { }
+        ) {
+            val isVisible: Boolean
+                get() = text != null
+        }
+    }
 
     //    @Serializable
     data class State(
         @Transient var model: Model? = null,
-        @Transient val jobs: MutableList<Job> = mutableListOf(),
         var scanResult: ScanContract.Result? = null
     ) : ViewModel()
 
@@ -83,7 +84,7 @@ interface ShareContract {
                 scoped<Presenter> {
                     SharePresenter(
                         view = get(),
-                        contextProvider = get(),
+                        coroutines = get(),
                         toast = get(),
                         queue = get(),
                         state = get(),

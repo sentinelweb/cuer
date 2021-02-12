@@ -27,7 +27,7 @@ class MediaOrchestrator constructor(
         when (options.source) {
             MEMORY -> throw NotImplementedException()
             LOCAL -> mediaDatabaseRepository.loadList(filter, options.flat)
-                .forceDatabaseListResultNotEmpty("Media $filter does not exist")
+                .allowDatabaseListResultEmpty()
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> when (filter) {
@@ -66,9 +66,15 @@ class MediaOrchestrator constructor(
         }
 
 
-    suspend override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> {
-        throw NotImplementedException()
-    }
+    suspend override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> =
+        when (options.source) {
+            MEMORY -> throw NotImplementedException()
+            LOCAL -> mediaDatabaseRepository.save(domains, options.flat, options.emit)
+                .forceDatabaseSuccessNotNull("Save failed ${domains.map { it.platformId }}")
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
+            PLATFORM -> throw NotImplementedException()
+        }
 
     override suspend fun count(filter: Filter, options: Options): Int {
         throw NotImplementedException()

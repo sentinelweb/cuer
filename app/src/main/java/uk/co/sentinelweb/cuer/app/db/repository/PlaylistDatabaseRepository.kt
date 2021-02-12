@@ -216,6 +216,7 @@ class PlaylistDatabaseRepository constructor(
                     .also { playlistDao.delete(it) }
                     .also { playlistItemDao.deletePlaylistItems(it.id) }
                     .also { database.setTransactionSuccessful() }
+                    .also { database.endTransaction() }
                     .also {
                         if (emit) {
                             _playlistFlow.emit(DELETE to domain)
@@ -225,8 +226,10 @@ class PlaylistDatabaseRepository constructor(
             } catch (e: Throwable) {
                 val msg = "couldn't delete ${domain.id}"
                 log.e(msg, e)
+                database.endTransaction()
                 RepoResult.Error<Boolean>(e, msg)
-            }.also { database.endTransaction() }
+
+            }
         }
 
     override suspend fun deleteAll(): RepoResult<Boolean> =

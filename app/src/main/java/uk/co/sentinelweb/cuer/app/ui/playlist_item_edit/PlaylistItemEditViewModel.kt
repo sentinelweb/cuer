@@ -21,13 +21,14 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
+import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
@@ -196,7 +197,7 @@ class PlaylistItemEditViewModel constructor(
         _navigateLiveData.value =
             NavigationModel(
                 WEB_LINK,
-                mapOf(LINK to urlString)
+                mapOf(NavigationModel.Param.LINK to urlString)
             )
     }
 
@@ -249,7 +250,7 @@ class PlaylistItemEditViewModel constructor(
 
     fun onChannelClick() {
         state.media?.channelData?.platformId?.let { channelId ->
-            _navigateLiveData.value = NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to channelId))
+            _navigateLiveData.value = NavigationModel(YOUTUBE_CHANNEL, mapOf(NavigationModel.Param.CHANNEL_ID to channelId))
         }
     }
 
@@ -286,7 +287,7 @@ class PlaylistItemEditViewModel constructor(
         }
     }
 
-    suspend fun commitPlaylistItems() =
+    suspend fun commitPlaylistItems(onCommit: ShareContract.Committer.OnCommit? = null) =
         try {
             val selectedPlaylists = if (state.selectedPlaylistIds.size > 0) {
                 selectedPlaylists
@@ -304,27 +305,28 @@ class PlaylistItemEditViewModel constructor(
                     }
                 }
             }
-            state.committedItems = state.media
-                ?.let {
-                    if (state.isMediaChanged) {
-                        mediaOrchestrator.save(it, Options(state.source, flat = false))
-                    } else it
-                }
-                ?.let { savedMedia ->
-                    state.media = savedMedia
-                    selectedPlaylists.mapNotNull { playlist ->
-                        playlistItemOrchestrator.run {
-                            save(itemCreator.buildPlayListItem(savedMedia, playlist), Options(state.source))
+            state.committedItems = (
+                    state.media
+                        ?.let {
+                            if (state.isMediaChanged) {
+                                mediaOrchestrator.save(it, Options(state.source, flat = false))
+                            } else it
                         }
-                    }
-                } ?: listOf()
+                        ?.let { savedMedia ->
+                            state.media = savedMedia
+                            selectedPlaylists.mapNotNull { playlist ->
+                                playlistItemOrchestrator.save(
+                                    itemCreator.buildPlayListItem(savedMedia, playlist), Options(state.source)
+                                )
+                            }
+                        }
+                        ?: listOf()
+                    )
+                .also { onCommit?.onCommit(ObjectTypeDomain.PLAYLIST_ITEM, it) }
             state.isSaved = true
         } catch (e: Exception) {
             log.e("Error saving playlistItem", e)
-        } finally {
-            Unit
+            throw IllegalStateException("Save failed")
         }
-
-    fun getCommittedItems() = state.committedItems
 
 }

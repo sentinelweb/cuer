@@ -34,6 +34,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.PlayState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
+import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
@@ -53,7 +54,8 @@ class PlaylistFragment :
     Fragment(),
     PlaylistContract.View,
     ItemContract.Interactions,
-    ItemBaseContract.ItemMoveInteractions {
+    ItemBaseContract.ItemMoveInteractions,
+    ShareContract.Committer {
 
     private val presenter: PlaylistContract.Presenter by currentScope.inject()
     private val adapter: PlaylistAdapter by currentScope.inject()
@@ -423,27 +425,28 @@ class PlaylistFragment :
     override fun onShare(item: ItemContract.Model) {
         presenter.onItemShare(item)
     }
+    // endregion
 
-    //endregion
+    // region ItemContract.Interactions
+    override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) {
+        presenter.commitPlaylist(onCommit)
+    }
+    // endregion
 
     companion object {
-        fun makeNav(item: PlaylistItemDomain, play: Boolean, source: Source?): NavigationModel = NavigationModel(
-            PLAYLIST_FRAGMENT, mapOf(
-                PLAYLIST_ID to (item.playlistId ?: throw IllegalArgumentException("No Playlist Id")),
-                PLAYLIST_ITEM_ID to (item.id ?: throw IllegalArgumentException("No Playlist tem Id")),
-                PLAY_NOW to play,
-                SOURCE to (source ?: Source.LOCAL)// todo enforce source
-            )
-        )
 
-        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean, source: Source?): NavigationModel = NavigationModel(
-            PLAYLIST_FRAGMENT, mapOf(
+        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean, source: Source?): NavigationModel {
+            val params = mapOf(
                 PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
-                PLAYLIST_ITEM_ID to (plItemId ?: throw IllegalArgumentException("No Playlist tem Id")),
                 PLAY_NOW to play,
-                SOURCE to (source ?: Source.LOCAL)// todo enforce source
+                SOURCE to (source ?: throw IllegalArgumentException("No Source"))
+            ).apply {
+                plItemId?.also { PLAYLIST_ITEM_ID to it }
+            }
+            return NavigationModel(
+                PLAYLIST_FRAGMENT, params
             )
-        )
+        }
 
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
 

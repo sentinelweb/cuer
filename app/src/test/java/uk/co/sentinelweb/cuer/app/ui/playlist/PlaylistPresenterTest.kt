@@ -507,51 +507,88 @@ class PlaylistPresenterTest {
             verify(exactly = 0) { mockView.highlightPlayingItem(fixtTestValue.currentIndex) }
         }
     }
+//
+//    @Test
+//    fun initialise() {
+//    }
+//
+//    @Test
+//    fun refreshList() {
+//    }
+//
+//    @Test
+//    fun destroy() {
+//    }
+//
+//    @Test
+//    fun onItemSwipeRight() {
+//
+//    }
+//
+//    @Test
+//    fun onPlaylistSelected() {
+//    }
+//
+//    @Test
+//    fun onPlayModeChange() {
+//    }
+//
+//    @Test
+//    fun onPlayPlaylist() {
+//    }
+//
+//    @Test
+//    fun onStarPlaylist() {
+//    }
+//
+//    @Test
+//    fun onFilterNewItems() {
+//    }
+//
+//    @Test
+//    fun onEdit() {
+//    }
+//
+//    @Test
+//    fun onFilterPlaylistItems() {
+//    }
 
-    @Test
-    fun initialise() {
-    }
-
-    @Test
-    fun refreshList() {
-    }
-
-    @Test
-    fun destroy() {
-    }
-
-    @Test
-    fun onItemSwipeRight() {
-
-    }
-
-    @Test
-    fun onPlaylistSelected() {
-    }
-
-    @Test
-    fun onPlayModeChange() {
-    }
-
-    @Test
-    fun onPlayPlaylist() {
-    }
-
-    @Test
-    fun onStarPlaylist() {
-    }
-
-    @Test
-    fun onFilterNewItems() {
-    }
-
-    @Test
-    fun onEdit() {
-    }
-
-    @Test
-    fun onFilterPlaylistItems() {
-    }
+//    @Test
+//    fun onItemViewClick() {
+//    }
+//
+//    @Test
+//    fun onItemClicked() {
+//    }
+//
+//    @Test
+//    fun onPlayStartClick() {
+//    }
+//
+//    @Test
+//    fun scroll() {
+//    }
+//
+//    @Test
+//    fun onItemPlay() {
+//    }
+//
+//    @Test
+//    fun onItemShowChannel() {
+//    }
+//
+//    @Test
+//    fun onItemStar() {
+//        // todo
+//    }
+//
+//    @Test
+//    fun onItemShare() {
+//    }
+//
+//    @Test
+//    fun moveItem() {
+//    }
 
     @Test
     fun `onItemSwipeLeft - delete item before current`() {
@@ -589,43 +626,6 @@ class PlaylistPresenterTest {
             verify { mockView.setModel(fixtExpectedMapped) }
             assertThat(fixtState!!.deletedPlaylistItem).isEqualTo(deletedItem)
         }
-    }
-
-    @Test
-    fun onItemViewClick() {
-    }
-
-    @Test
-    fun onItemClicked() {
-    }
-
-    @Test
-    fun onPlayStartClick() {
-    }
-
-    @Test
-    fun scroll() {
-    }
-
-    @Test
-    fun onItemPlay() {
-    }
-
-    @Test
-    fun onItemShowChannel() {
-    }
-
-    @Test
-    fun onItemStar() {
-        // todo
-    }
-
-    @Test
-    fun onItemShare() {
-    }
-
-    @Test
-    fun moveItem() {
     }
 
     @Test

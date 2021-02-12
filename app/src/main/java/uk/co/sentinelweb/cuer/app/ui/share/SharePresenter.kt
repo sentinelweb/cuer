@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
@@ -19,14 +18,14 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.PLAYLIST
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class SharePresenter constructor(
     private val view: ShareContract.View,
-    private val contextProvider: CoroutineContextProvider,
+    private val coroutines: CoroutineContextProvider,
     private val toast: ToastWrapper,
     private val queue: QueueMediatorContract.Producer,
     private val state: ShareContract.State,
@@ -39,6 +38,17 @@ class SharePresenter constructor(
 
     init {
         log.tag(this)
+    }
+
+    override fun onStop() {
+        coroutines.cancel()
+    }
+
+    private fun errorLoading(token: String) {
+        "Couldn't get youtube info for $token".apply {
+            log.e(this)
+            view.warning(this)
+        }
     }
 
     private fun mapDisplayModel() {
@@ -90,65 +100,74 @@ class SharePresenter constructor(
     }
 
     private fun finish(add: Boolean, play: Boolean, forward: Boolean) {
-        state.viewModelScope.launch {
-            try {
-                if (add) {// fixme if playlist items are changed then they arent saved here
-                    view.commitPlaylistItems()
-                    //queue.switchToPlaylist(state.playlistIdentifier)// todo fix this
-                }
-                val isConnected = ytContextHolder.isConnected()
-                val playlistItemList = view.getCommittedItems() as List<PlaylistItemDomain>? // todo change for playlist - will crash
-//                val playlistItemList: List<PlaylistItemDomain>? = if (add)
-//                    view.getPlaylistItems()
-//                else {
-//                    // todo fragment need to load playlist items for media here
-//                    listOf()// todo existing state.playlistItems
-//                }
-                val size = playlistItemList?.size ?: 0
-                val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYLIST)
-                val playlistItem: PlaylistItemDomain? = if (size == 1) {
-                    playlistItemList?.get(0)
-                } else if (size > 1) {
-                    val indexOfFirst = playlistItemList?.indexOfFirst { it.playlistId == currentPlaylistId }
-                    playlistItemList?.get(
-                        indexOfFirst?.let { if (it > -1) it else 0 } ?: 0
-                    )
-                } else null
-
-                if (forward) {
-                    log.d("finish:play = $play, item = $playlistItem")
-                    view.gotoMain(playlistItem, play)
-                    view.exit()
-                } else { // return play is hidden for not connected
-                    playlistItem
-                        ?.takeIf { play }
-                        ?.takeIf { isConnected }
-                        ?.let { pli ->
-                            pli.playlistId?.let { itemPlaylistId ->
-                                queue.playNow(itemPlaylistId.toIdentifier(LOCAL), pli.id)
-                            } ?: throw IllegalArgumentException("Item had no playlist")
-                        }
-                    view.exit()
-                }
-            } catch (t: Throwable) {
-                when (t) {
-                    is NoDefaultPlaylistException -> // todo make a dialog or just create the playlist
-                        view.error("No default playlist - select a playlist to save the item")
-                    else -> view.error(t.message ?: (t::class.java.simpleName + " error ... sorry"))
-                }
+        coroutines.mainScope.launch {
+            if (add) {// fixme if playlist items are changed then they aren't saved here
+                view.commit(object : ShareContract.Committer.OnCommit {
+                    override suspend fun onCommit(type: ObjectTypeDomain, data: List<*>) {
+                        afterCommit(type, data, play, forward)
+                    }
+                })
             }
         }
     }
 
-    override fun onStop() {
-        state.jobs.forEach { it.cancel() }
+    private suspend fun afterCommit(type: ObjectTypeDomain, data: List<*>, play: Boolean, forward: Boolean) {
+        try {
+            val isConnected = ytContextHolder.isConnected()
+            val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYLIST)
+            val playId: Pair<Long, Long?> = when (type) {
+                PLAYLIST -> (data as List<PlaylistDomain>).let {
+                    (if (it.size > 0) {
+                        it[0].id!!
+                    } else currentPlaylistId!!) to (null as Long?)
+                }
+                PLAYLIST_ITEM -> (data as List<PlaylistItemDomain>)
+                    .let { playlistItemList ->
+                        val playlistItem: PlaylistItemDomain? = chooseItem(playlistItemList, currentPlaylistId)
+                        playlistItem
+                            ?.let { it.playlistId!! to it.id }
+                            ?: let { currentPlaylistId!! to (null as Long?) }
+                    }
+                else -> throw java.lang.IllegalStateException("Unsupported type")
+            }
+            if (forward) {
+                log.d("finish:play = $play, playlistId,itemId = $playId")
+                view.gotoMain(playId.first, plItemId = playId.second, LOCAL, play)
+                view.exit()
+            } else { // return play is hidden for not connected
+                playId
+                    .takeIf { play }
+                    ?.takeIf { isConnected }
+                    ?.let { pli ->
+                        playId.first.let { itemPlaylistId ->
+                            queue.playNow(itemPlaylistId.toIdentifier(LOCAL), playId.second)
+                        }
+                    }
+                view.exit()
+            }
+        } catch (t: Throwable) {
+            when (t) {
+                is NoDefaultPlaylistException -> // todo make a dialog or just create the playlist
+                    view.error("No default playlist - select a playlist to save the item")
+                else -> view.error(t.message ?: (t::class.java.simpleName + " error ... sorry"))
+            }
+        }
     }
 
-    private fun errorLoading(token: String) {
-        "Couldn't get youtube info for $token".apply {
-            log.e(this)
-            view.warning(this)
-        }
+    private fun chooseItem(
+        playlistItemList: List<PlaylistItemDomain>,
+        currentPlaylistId: Long?
+    ): PlaylistItemDomain? {
+        val size = playlistItemList.size
+        val playlistItem: PlaylistItemDomain? = if (size == 1) {
+            playlistItemList.get(0)
+        } else if (size > 1) {
+            val indexOfFirst = playlistItemList.indexOfFirst { it.playlistId == currentPlaylistId }
+            playlistItemList.get(
+                indexOfFirst.let { if (it > -1) it else 0 }
+            )
+        } else null
+        return playlistItem
     }
 
 }

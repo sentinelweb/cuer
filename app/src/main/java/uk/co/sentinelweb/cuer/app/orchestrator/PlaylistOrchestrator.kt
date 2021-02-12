@@ -66,7 +66,7 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> playlistMemoryRepository.save(domain, options)
             LOCAL ->
-                playlistDatabaseRepository.save(domain, options.emit)
+                playlistDatabaseRepository.save(domain, options.flat, options.emit)
                     .forceDatabaseSuccessNotNull("Save failed ${domain.id}")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
@@ -77,7 +77,7 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> throw NotImplementedException()
             LOCAL ->
-                playlistDatabaseRepository.save(domains, options.emit)
+                playlistDatabaseRepository.save(domains, options.flat, options.emit)
                     .forceDatabaseListResultNotEmpty("Save failed ${domains.map { it.id }}")
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()

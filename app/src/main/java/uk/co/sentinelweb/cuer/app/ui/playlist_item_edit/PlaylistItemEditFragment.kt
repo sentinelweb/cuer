@@ -46,7 +46,7 @@ import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
 class PlaylistItemEditFragment
     : Fragment(R.layout.playlist_item_edit_fragment),
-    ShareContract.Committer<PlaylistItemDomain> {
+    ShareContract.Committer {
 
     private val viewModel: PlaylistItemEditViewModel by currentScope.inject()
     private val log: LogWrapper by inject()
@@ -348,17 +348,14 @@ class PlaylistItemEditFragment
         )
     }
 
-    override suspend fun commit() =
-        viewModel.commitPlaylistItems()
-
-
-    override fun getEditedDomains(): List<PlaylistItemDomain>? = viewModel.getCommittedItems()
+    override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) {
+        viewModel.commitPlaylistItems(onCommit)
+    }
 
     companion object {
-
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
         val TRANS_IMAGE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
-        val TRANS_TITLE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
 
+        val TRANS_TITLE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
     }
 }
