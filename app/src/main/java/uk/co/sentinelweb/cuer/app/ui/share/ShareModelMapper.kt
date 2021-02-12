@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
 
 class ShareModelMapper constructor(
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
@@ -14,14 +15,13 @@ class ShareModelMapper constructor(
         finish: (Boolean, Boolean, Boolean) -> Unit
     ): ShareContract.Model {
         val isConnected = ytContextHolder.isConnected()
-        val isNew = scanResult.isNew || !scanResult.isOnPlaylist
+        val isNew = scanResult.isNew || (scanResult.type == MEDIA && !scanResult.isOnPlaylist)
         return if (isNew) {
             ShareContract.Model(
+                isNew = isNew,
                 topRight = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ true, /*forward = */ true) },
-                    text = if (isConnected) res.getString(R.string.share_button_play_now) else res.getString(
-                        R.string.share_button_play_locally
-                    ),
+                    text = if (isConnected) res.getString(R.string.share_button_play_now) else null,
                     icon = if (isConnected)
                         R.drawable.ic_notif_status_cast_conn_white
                     else R.drawable.ic_button_play_black,
@@ -35,23 +35,23 @@ class ShareModelMapper constructor(
                 ),
                 bottomRight = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ false, /*forward = */ true) },
-                    text = res.getString(R.string.share_button_add_to_queue),
-                    icon = R.drawable.ic_button_add_black
+                    text = res.getString(R.string.share_button_goto_item),
+                    icon = R.drawable.ic_button_forward_black
                 ),
                 bottomLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ false, /*forward = */ false) },
-                    text = res.getString(R.string.share_button_add_return),
-                    icon = R.drawable.ic_button_add_black
-                ),
-                isNew = isNew
+                    text = res.getString(R.string.share_button_return),
+                    icon = R.drawable.ic_button_back_black
+                )
             )
         } else {
             ShareContract.Model(
+                isNew = isNew,
                 topRight = ShareContract.Model.Button(
                     action = { finish(/*add = */false, /*play = */ true, /*forward = */ true) },
                     text = if (isConnected)
                         res.getString(R.string.share_button_play_now)
-                    else res.getString(R.string.share_button_play_locally),
+                    else null,
                     icon = if (isConnected)
                         R.drawable.ic_notif_status_cast_conn_white
                     else R.drawable.ic_button_play_black
@@ -74,8 +74,7 @@ class ShareModelMapper constructor(
                     action = { finish(/*add = */false, /*play = */ false, /*forward = */ false) },
                     text = res.getString(R.string.share_button_return),
                     icon = R.drawable.ic_button_back_black
-                ),
-                isNew = isNew
+                )
             )
         }
     }

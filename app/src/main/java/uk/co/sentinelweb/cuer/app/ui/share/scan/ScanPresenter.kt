@@ -42,7 +42,8 @@ class ScanPresenter(
                         PLAYLIST -> (scannedMedia.second as PlaylistDomain).apply {
                             view.setModel(modelMapper.map(scannedMedia.second as PlaylistDomain))
                             log.d("Scanned Playlist = $this")
-                            checkPlaylist(this)?.apply { view.setResult(this) }
+                            checkPlaylist(this)
+                                ?.apply { view.setResult(this) }
                                 ?: linkError(uriString)
                         }
                         else -> linkError(uriString)
@@ -72,19 +73,24 @@ class ScanPresenter(
             }
 
     private suspend fun checkPlaylist(scannedPlaylist: PlaylistDomain): ScanContract.Result? {
-        return (scannedPlaylist.platformId
-            ?.let {
-                playlistOrchestrator.load(it, Options(LOCAL))
-                    ?.also { log.d("found playlist = $it") }
-                    ?.let { it to false }
-                    ?: playlistOrchestrator.load(it, Options(PLATFORM))
-                        ?.copy(id = SHARED_PLAYLIST)
-                        ?.also { log.d("loaded playlist = ${it.title} id = ${it.id} platformId = ${it.id}") }
-                        ?.let { playlistOrchestrator.save(it, Options(MEMORY, flat = false, emit = false)) to true }
-                    ?: throw DoesNotExistException()
-            })?.let { (playlist, isNew) ->
-                modelMapper.mapPlaylistResult(isNew, playlist)
-            }
+        try {
+            return (scannedPlaylist.platformId
+                ?.let {
+                    playlistOrchestrator.load(it, Options(LOCAL))
+                        ?.also { log.d("found playlist = $it") }
+                        ?.let { it to false }
+                        ?: playlistOrchestrator.load(it, Options(PLATFORM))
+                            ?.copy(id = SHARED_PLAYLIST)
+                            ?.also { log.d("loaded playlist = ${it.title} id = ${it.id} platformId = ${it.id}") }
+                            ?.let { playlistOrchestrator.save(it, Options(MEMORY, flat = false, emit = false)) to true }
+                        ?: throw DoesNotExistException()
+                })?.let { (playlist, isNew) ->
+                    modelMapper.mapPlaylistResult(isNew, playlist)
+                }
+        } catch (e: Exception) {
+            view.showMessage("Exception loading : ${e.message}")
+            return null
+        }
     }
 //
 //    private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? =

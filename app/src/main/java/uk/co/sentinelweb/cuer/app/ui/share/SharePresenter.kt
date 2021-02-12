@@ -2,8 +2,11 @@ package uk.co.sentinelweb.cuer.app.ui.share
 
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.MediaIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -33,6 +36,7 @@ class SharePresenter constructor(
     private val log: LogWrapper,
     private val mapper: ShareModelMapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val timeProvider: TimeProvider
 ) : ShareContract.Presenter {
 
@@ -110,8 +114,19 @@ class SharePresenter constructor(
                         afterCommit(type, data, play, forward)
                     }
                 })
+            } else {
+                when (state.scanResult?.type) {
+                    MEDIA ->
+                        (state.scanResult?.result as MediaDomain)
+                            .let { playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it.id!!)), Options(LOCAL)) }
+                            .let {
+                                afterCommit(MEDIA, it, play, forward)
+                            }
+                    PLAYLIST -> afterCommit(PLAYLIST, listOf(state.scanResult?.result as PlaylistDomain), play, forward)
+                }
             }
         }
+
     }
 
     private suspend fun afterCommit(type: ObjectTypeDomain, data: List<*>, play: Boolean, forward: Boolean) {

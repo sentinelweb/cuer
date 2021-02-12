@@ -92,7 +92,8 @@ interface ShareContract {
                         ytContextHolder = get(),
                         mapper = get(),
                         prefsWrapper = get(named<GeneralPreferences>()),
-                        timeProvider = get()
+                        timeProvider = get(),
+                        playlistItemOrchestrator = get()
                     )
                 }
                 scoped { ShareWrapper(getSource()) }
