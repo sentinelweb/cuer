@@ -5,10 +5,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
+import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -25,7 +29,7 @@ class PlaylistsPresenter(
     private val toastWrapper: ToastWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
     private val coroutines: CoroutineContextProvider
-) : PlaylistsContract.Presenter/*, QueueMediatorContract.ProducerListener*/ {
+) : PlaylistsContract.Presenter {
 
     override fun initialise() {
 
@@ -43,7 +47,7 @@ class PlaylistsPresenter(
     }
 
     override fun onItemSwipeRight(item: ItemContract.Model) {
-        view.gotoEdit(item.id)
+        view.gotoEdit(item.id, LOCAL)
     }
 
     override fun onItemSwipeLeft(item: ItemContract.Model) {
@@ -52,7 +56,7 @@ class PlaylistsPresenter(
             state.playlists.apply {
                 find { it.id == item.id }?.let { playlist ->
                     state.deletedPlaylist = playlist
-                    playlistRepository.delete(playlist)
+                    playlistRepository.delete(playlist, emit = true)
                     view.showDeleteUndo("Deleted playlist: ${playlist.title}")
                     executeRefresh(false, false)
                 }
@@ -61,11 +65,11 @@ class PlaylistsPresenter(
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        view.gotoPlaylist(item.id, false)
+        view.gotoPlaylist(item.id, false, LOCAL)
     }
 
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
-        view.gotoPlaylist(item.id, true)
+        view.gotoPlaylist(item.id, true, LOCAL)
     }
 
     override fun onItemStar(item: ItemContract.Model) {
@@ -104,14 +108,6 @@ class PlaylistsPresenter(
         }
     }
 
-//    override fun onPlaylistUpdated(list: PlaylistDomain) {
-//        refreshPlaylist()
-//    }
-//
-//    override fun onItemChanged() {
-//
-//    }
-
     private fun refreshPlaylists() {
         state.viewModelScope.launch { executeRefresh(false) }
     }
@@ -129,12 +125,14 @@ class PlaylistsPresenter(
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
             .let { modelMapper.map(it, queue.playlistId) }
-            .also { view.setList(it, animate) }
-            .takeIf { focusCurrent }
+            .takeIf { coroutines.mainScopeActive }
+            ?.also { view.setList(it, animate) }
+            ?.takeIf { focusCurrent }
             ?.let {
                 state.playlists.apply {
-                    prefsWrapper.getLong(CURRENT_PLAYLIST_ID)
-                        ?.let { focusId -> view.scrollToItem(indexOf(find { it.id == focusId })) }
+                    prefsWrapper.getPairNonNull(CURRENT_PLAYLIST, NO_PLAYLIST.toPair())
+                        ?.toIdentifier()
+                        ?.let { focusId -> view.scrollToItem(indexOf(find { it.id == focusId.id })) }
                 }
             }
     }
@@ -144,7 +142,7 @@ class PlaylistsPresenter(
         coroutines.mainScope.launch {
             // todo a better job - might refresh too much
             // todo listen for stat changes
-            playlistRepository.playlistFlow.collect { (_, _) ->
+            playlistRepository.updates.collect { (_, _) ->
                 refreshPlaylists()
             }
         }

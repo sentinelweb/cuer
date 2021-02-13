@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
@@ -21,7 +22,7 @@ class PlaylistsAdapter constructor(
     val data: List<ItemContract.Model>
         get() = _data
 
-    var currentPlaylistId: Long? = null
+    var currentPlaylistId: OrchestratorContract.Identifier<*>? = null
 
     fun setData(data: List<ItemContract.Model>, animate: Boolean = true) {
         if (animate) {
@@ -55,7 +56,7 @@ class PlaylistsAdapter constructor(
     @Override
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         _data.get(position).apply {
-            holder.itemPresenter.update(this, this.id == currentPlaylistId)
+            holder.itemPresenter.update(this, this.id == currentPlaylistId?.id)// todo add identifier to model
         }
     }
 

@@ -6,6 +6,7 @@ import androidx.navigation.fragment.FragmentNavigator
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -51,7 +52,7 @@ interface CastPlayerContract {
         //fun setMedia(media: MediaDomain)// todo remove - use playlistitem
         fun setPlaylistName(name: String)
         fun setPlaylistImage(image: ImageDomain?)
-        fun setPlaylistItem(playlistItem: PlaylistItemDomain?)
+        fun setPlaylistItem(playlistItem: PlaylistItemDomain?, source: OrchestratorContract.Source)
 
         interface Listener {
             fun play()
@@ -101,7 +102,8 @@ interface CastPlayerContract {
         var isDestroyed: Boolean = false,
         var playlistItem: PlaylistItemDomain? = null,
         var isLiveStream: Boolean = false,
-        var isUpcoming: Boolean = false
+        var isUpcoming: Boolean = false,
+        var source: OrchestratorContract.Source = OrchestratorContract.Source.LOCAL
     ) : ViewModel() {
 
     }

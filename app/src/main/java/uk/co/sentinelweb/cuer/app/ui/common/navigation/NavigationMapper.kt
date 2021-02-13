@@ -7,11 +7,11 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.FragmentNavigator
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.Companion.KEY
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -43,8 +43,7 @@ class NavigationMapper constructor(
                         )
                     )
                 } ?: throw IllegalArgumentException("$WEB_LINK: $LINK param required")
-            NAV_BACK -> fragment?.findNavController()?.popBackStack()
-                ?: throw IllegalStateException("Fragment unavailable")
+            NAV_BACK -> navController.popBackStack()
             NAV_FINISH -> activity.finish()
             YOUTUBE_CHANNEL -> if (!ytJavaApi.launchChannel(nav.params[CHANNEL_ID] as String)) {
                 toastWrapper.show("can't launch channel")
@@ -54,7 +53,8 @@ class NavigationMapper constructor(
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
                     PLAYLIST_ITEM_ID.name to nav.params[PLAYLIST_ITEM_ID],
-                    PLAY_NOW.name to nav.params[PLAY_NOW]
+                    PLAY_NOW.name to nav.params[PLAY_NOW],
+                    SOURCE.name to nav.params[SOURCE].toString()
                 ),
                 navOptions(optionsBuilder = {
                     launchSingleTop = true
@@ -76,15 +76,17 @@ class NavigationMapper constructor(
     }
 
     fun clearArgs(intent: Intent, target: NavigationModel.Target) {
-        log.d("clearPendingNavigation:$target > ${intent.getStringExtra(NavigationModel.Target.KEY)}")
-        intent.getStringExtra(NavigationModel.Target.KEY)
+        log.d("clearPendingNavigation:$target > ${intent.getStringExtra(KEY)}")
+        intent.getStringExtra(KEY)
             ?.takeIf { it == target.name }
             ?.also {
                 when (target) {
                     PLAYLIST_FRAGMENT -> {
-                        intent.removeExtra(NavigationModel.Target.KEY)
+                        intent.removeExtra(KEY)
+                        intent.removeExtra(PLAYLIST_ID.name)
+                        intent.removeExtra(PLAYLIST_ITEM_ID.name)
                         intent.removeExtra(PLAY_NOW.toString())
-                        intent.removeExtra(PLAYLIST_ITEM.name)
+                        intent.removeExtra(SOURCE.name)
                     }
                     else -> Unit
                 }

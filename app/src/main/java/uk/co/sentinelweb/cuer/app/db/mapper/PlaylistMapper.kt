@@ -47,7 +47,7 @@ class PlaylistMapper(
             ?.map {
                 playlistItemMapper.map(
                     it,
-                    medias!!.find { media -> media.media.id == it.mediaId }!!
+                    medias!!.find { media -> media.media.id == it.mediaId }!! //todo issue here in pixel
                 )
             }?.sortedBy { it.order }
             ?: listOf(),

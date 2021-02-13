@@ -55,7 +55,18 @@ interface ScanContract {
         val fragmentModule = module {
             scope(named<ScanFragment>()) {
                 scoped<View> { getSource() }
-                scoped<Presenter> { ScanPresenter(get(), get(), get(), get(), get(), get(), get(), get()) }
+                scoped<Presenter> {
+                    ScanPresenter(
+                        view = get(),
+                        state = get(),
+                        playlistItemOrchestrator = get(),
+                        playlistOrchestrator = get(),
+                        mediaOrchestrator = get(),
+                        linkScanner = get(),
+                        modelMapper = get(),
+                        log = get()
+                    )
+                }
                 scoped { ScanMapper() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource<ScanFragment>().requireActivity()) }
                 viewModel { State() }

@@ -48,7 +48,7 @@ internal class YoutubePlaylistDomainMapper(
         videoLookup: Map<String, YoutubeVideosDto.VideoDto>,
         channelLookup: Map<String, ChannelDomain>
     ): List<PlaylistItemDomain> = items.map {
-        itemCreator.buildPlayListItem(mapMedia(it, videoLookup, channelLookup), null)
+        itemCreator.buildPlayListItem(mapMedia(it, videoLookup, channelLookup), null, order = it.snippet.position * 1000L)
     }
 
     private fun mapMedia(

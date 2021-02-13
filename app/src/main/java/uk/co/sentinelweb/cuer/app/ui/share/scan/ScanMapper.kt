@@ -21,7 +21,7 @@ class ScanMapper constructor() {
 
     fun map(domain: PlaylistDomain): ScanContract.Model =
         ScanContract.Model(
-            domain.config.updateUrl!!,
+            domain.config.platformUrl!!,
             ObjectTypeDomain.PLAYLIST,
             domain.title ?: "-",
             PlatformDomain.YOUTUBE,

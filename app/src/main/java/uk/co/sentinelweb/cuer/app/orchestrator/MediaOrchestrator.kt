@@ -1,7 +1,11 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
+import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
@@ -11,71 +15,73 @@ class MediaOrchestrator constructor(
     private val ytInteractor: YoutubeInteractor
 ) : OrchestratorContract<MediaDomain> {
 
-    override val updates: Flow<Pair<OrchestratorContract.Operation, MediaDomain>>
-        get() = TODO("Not yet implemented")
+    override val updates: Flow<Triple<Operation, Source, MediaDomain>>
+        get() = mediaDatabaseRepository.updates
+            .map { it.first to LOCAL then it.second }
 
-    suspend override fun load(id: Long, options: OrchestratorContract.Options): MediaDomain? {
-        TODO("Not yet implemented")
+    suspend override fun load(id: Long, options: Options): MediaDomain? {
+        throw NotImplementedException()
     }
 
-    suspend override fun loadList(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): List<MediaDomain>? =
+    suspend override fun loadList(filter: Filter, options: Options): List<MediaDomain> =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> TODO()
-            OrchestratorContract.Source.LOCAL -> mediaDatabaseRepository.loadList(filter, options.flat)
-                .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
-                ?.data
-            OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
-            OrchestratorContract.Source.REMOTE -> TODO()
-            OrchestratorContract.Source.PLATFORM -> when (filter) {
-                is OrchestratorContract.PlatformIdListFilter ->
+            MEMORY -> throw NotImplementedException()
+            LOCAL -> mediaDatabaseRepository.loadList(filter, options.flat)
+                .allowDatabaseListResultEmpty()
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
+            PLATFORM -> when (filter) {
+                is PlatformIdListFilter ->
                     ytInteractor.videos(filter.ids, listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS))
-                        .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
-                        ?.data
-                else -> throw OrchestratorContract.InvalidOperationException(this::class, filter, options)
+                        .forceNetListResultNotEmpty("Youtube ${filter.ids} does not exist")
+                else -> throw InvalidOperationException(this::class, filter, options)
             }
         }
 
 
-    suspend override fun load(platformId: String, options: OrchestratorContract.Options): MediaDomain? =
+    suspend override fun load(platformId: String, options: Options): MediaDomain? =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> TODO()
-            OrchestratorContract.Source.LOCAL -> TODO()
-            OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
-            OrchestratorContract.Source.REMOTE -> TODO()
-            OrchestratorContract.Source.PLATFORM ->
+            MEMORY -> throw NotImplementedException()
+            LOCAL -> throw NotImplementedException()
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
+            PLATFORM ->
                 ytInteractor.videos(listOf(platformId), listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS))
-                    .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
-                    ?.data?.get(0)
-                    ?: throw OrchestratorContract.DoesNotExistException("Youtube $platformId does not exist")
+                    .forceNetListResultNotEmpty("Youtube $platformId does not exist")
+                    .get(0)
         }
 
-
-    suspend override fun load(domain: MediaDomain, options: OrchestratorContract.Options): MediaDomain? {
-        TODO("Not yet implemented")
+    suspend override fun load(domain: MediaDomain, options: Options): MediaDomain? {
+        throw NotImplementedException()
     }
 
-    suspend override fun save(domain: MediaDomain, options: OrchestratorContract.Options): MediaDomain? =
+    suspend override fun save(domain: MediaDomain, options: Options): MediaDomain =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> TODO()
-            OrchestratorContract.Source.LOCAL -> mediaDatabaseRepository.save(domain, options.flat)
-                .takeIf { it.isSuccessful }
-                ?.data
-            OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
-            OrchestratorContract.Source.REMOTE -> TODO()
-            OrchestratorContract.Source.PLATFORM -> TODO()
+            MEMORY -> throw NotImplementedException()
+            LOCAL -> mediaDatabaseRepository.save(domain, options.flat, options.emit)
+                .forceDatabaseSuccessNotNull("Save failed $domain")
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
+            PLATFORM -> throw NotImplementedException()
         }
 
 
-    suspend override fun save(domains: List<MediaDomain>, options: OrchestratorContract.Options): MediaDomain? {
-        TODO("Not yet implemented")
+    suspend override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> =
+        when (options.source) {
+            MEMORY -> throw NotImplementedException()
+            LOCAL -> mediaDatabaseRepository.save(domains, options.flat, options.emit)
+                .forceDatabaseSuccessNotNull("Save failed ${domains.map { it.platformId }}")
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
+            PLATFORM -> throw NotImplementedException()
+        }
+
+    override suspend fun count(filter: Filter, options: Options): Int {
+        throw NotImplementedException()
     }
 
-    override suspend fun count(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): Int {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun delete(domain: MediaDomain, options: OrchestratorContract.Options): Boolean {
-        TODO("Not yet implemented")
+    override suspend fun delete(domain: MediaDomain, options: Options): Boolean {
+        throw NotImplementedException()
     }
 
 

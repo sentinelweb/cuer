@@ -12,21 +12,13 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.KoinContextHandler.get
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
@@ -143,7 +135,7 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
     override fun setPlaylistImage(url: String?) {
 //        url?.apply {
 //            Glide.with(requireContext())
-//                .load(imageProvider.makeRef(this))
+//        .loadFirebaseOrOtherUrl(this, imageProvider)
 //                .into(binding.castPlayerPlaylistImage)
 //        } ?: binding.castPlayerPlaylistImage.setImageResource(R.drawable.ic_nav_playlist_black)
     }

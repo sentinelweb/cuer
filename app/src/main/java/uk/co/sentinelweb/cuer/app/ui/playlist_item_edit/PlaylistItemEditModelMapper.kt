@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
+import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -27,12 +29,9 @@ class PlaylistItemEditModelMapper(
         channelTitle = domain.channelData.title,
         channelThumbUrl = (domain.channelData.thumbNail ?: domain.channelData.image)?.url,
         channelDescription = domain.channelData.description,
-        chips = mutableListOf(ChipModel(ChipModel.Type.PLAYLIST_SELECT)).apply {
+        chips = mutableListOf(PLAYLIST_SELECT_MODEL).apply {
             selectedPlaylists.forEachIndexed { index, playlist ->
-                add(
-                    index,
-                    ChipModel(ChipModel.Type.PLAYLIST, playlist.title, playlist.id.toString(), playlist.thumb ?: playlist.image)
-                )
+                add(index, ChipModel(PLAYLIST, playlist.title, playlist.id.toString(), playlist.thumb ?: playlist.image))
             }
         },
         starred = domain.starred,

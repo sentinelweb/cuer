@@ -11,23 +11,24 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
+import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
@@ -81,37 +82,38 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun delayedSetData(item: PlaylistItemDomain) {
+    fun delayedSetData(item: PlaylistItemDomain, source: Source) {
         viewModelScope.launch {
             delay(400)
-            setData(item) // loads data after delay
+            setData(item, source) // loads data after delay
         }
     }
 
-    fun setData(item: PlaylistItemDomain) {
+    fun setData(item: PlaylistItemDomain, source: Source) {
         item.let {
             state.editingPlaylistItem = it
-            it.media.let { setData(it) }
+            state.source = source
+            it.media.let { setData(it, source) }
         }
     }
 
-    private fun setData(media: MediaDomain?) {
+    private fun setData(media: MediaDomain?, source: Source) {
         viewModelScope.launch {
             state.isMediaChanged = media?.id == null
             media?.let { originalMedia ->
                 state.media = originalMedia
                 playlistDialogModelCreator.loadPlaylists { state.allPlaylists = it }
                 originalMedia.id?.let {
-                    playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it)), Options(LOCAL))
-                        ?.takeIf { it.size > 0 }
+                    playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it)), Options(state.source))
+                        .takeIf { it.size > 0 }
                         ?.also { if (isNew) state.editingPlaylistItem = it[0] }
                         ?.also {
                             it.map { it.playlistId }
                                 .distinct()
                                 .filterNotNull()
                                 .also {
-                                    playlistOrchestrator.loadList(IdListFilter(it), Options(LOCAL))
-                                        ?.also { state.selectedPlaylistIds.addAll(it.map { it.id!! }) }
+                                    playlistOrchestrator.loadList(IdListFilter(it), Options(state.source))
+                                        .also { state.selectedPlaylistIds.addAll(it.map { it.id!! }) }
                                 }
                         }
                 }
@@ -167,7 +169,7 @@ class PlaylistItemEditViewModel constructor(
         state.editingPlaylistItem?.let { item ->
             viewModelScope.launch {
                 item.playlistId?.let {
-                    queue.playNow(it, item.id)
+                    queue.playNow(it.toIdentifier(LOCAL), item.id) // todo store source
                 }
             }
             if (!ytContextHolder.isConnected()) {
@@ -195,7 +197,7 @@ class PlaylistItemEditViewModel constructor(
         _navigateLiveData.value =
             NavigationModel(
                 WEB_LINK,
-                mapOf(LINK to urlString)
+                mapOf(NavigationModel.Param.LINK to urlString)
             )
     }
 
@@ -248,7 +250,7 @@ class PlaylistItemEditViewModel constructor(
 
     fun onChannelClick() {
         state.media?.channelData?.platformId?.let { channelId ->
-            _navigateLiveData.value = NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to channelId))
+            _navigateLiveData.value = NavigationModel(YOUTUBE_CHANNEL, mapOf(NavigationModel.Param.CHANNEL_ID to channelId))
         }
     }
 
@@ -285,42 +287,46 @@ class PlaylistItemEditViewModel constructor(
         }
     }
 
-    suspend fun commitPlaylistItems() =
+    suspend fun commitPlaylistItems(onCommit: ShareContract.Committer.OnCommit? = null) =
         try {
             val selectedPlaylists = if (state.selectedPlaylistIds.size > 0) {
                 selectedPlaylists
-            } else {
+            } else if (state.source != MEMORY) {
                 playlistOrchestrator.loadList(DefaultFilter(), Options(LOCAL))
+                    .takeIf { it.size > 0 }
                     ?: throw NoDefaultPlaylistException()
+            } else {
+                listOf()
             }
             if (state.isPlaylistsChanged && state.editingPlaylistItem?.playlistId != null) {
                 state.editingPlaylistItem?.also { item ->
                     if (!state.selectedPlaylistIds.contains(item.playlistId)) {
-                        playlistItemOrchestrator.delete(item, DeleteOptions(LOCAL))
+                        playlistItemOrchestrator.delete(item, Options(state.source))// todo use identifier
                     }
                 }
             }
-            state.committedItems = state.media
-                ?.let {
-                    if (state.isMediaChanged) {
-                        mediaOrchestrator.save(it, Options(LOCAL, flat = false))
-                    } else it
-                }
-                ?.let { savedMedia ->
-                    state.media = savedMedia
-                    selectedPlaylists.mapNotNull { playlist ->
-                        playlistItemOrchestrator.run {
-                            save(itemCreator.buildPlayListItem(savedMedia, playlist), Options(LOCAL))
+            state.committedItems = (
+                    state.media
+                        ?.let {
+                            if (state.isMediaChanged) {
+                                mediaOrchestrator.save(it, Options(state.source, flat = false))
+                            } else it
                         }
-                    }
-                } ?: listOf()
+                        ?.let { savedMedia ->
+                            state.media = savedMedia
+                            selectedPlaylists.mapNotNull { playlist ->
+                                playlistItemOrchestrator.save(
+                                    itemCreator.buildPlayListItem(savedMedia, playlist), Options(state.source)
+                                )
+                            }
+                        }
+                        ?: listOf()
+                    )
+                .also { onCommit?.onCommit(ObjectTypeDomain.PLAYLIST_ITEM, it) }
             state.isSaved = true
         } catch (e: Exception) {
             log.e("Error saving playlistItem", e)
-        } finally {
-            Unit
+            throw IllegalStateException("Save failed")
         }
-
-    fun getCommittedItems() = state.committedItems
 
 }

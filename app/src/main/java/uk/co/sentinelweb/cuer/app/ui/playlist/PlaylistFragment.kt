@@ -20,6 +20,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistFragmentBinding
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
@@ -33,9 +34,11 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.PlayState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
+import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -51,7 +54,8 @@ class PlaylistFragment :
     Fragment(),
     PlaylistContract.View,
     ItemContract.Interactions,
-    ItemBaseContract.ItemMoveInteractions {
+    ItemBaseContract.ItemMoveInteractions,
+    ShareContract.Committer {
 
     private val presenter: PlaylistContract.Presenter by currentScope.inject()
     private val adapter: PlaylistAdapter by currentScope.inject()
@@ -70,7 +74,7 @@ class PlaylistFragment :
 
     private val starMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_star)
-    private val playMenuItem: MenuItem
+    private val playMenuItem: MenuItem?
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_play)
     private val editMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_edit)
@@ -120,6 +124,7 @@ class PlaylistFragment :
         binding.playlistFabUp.setOnLongClickListener { presenter.scroll(Top);true }
         binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }
         binding.playlistFabDown.setOnLongClickListener { presenter.scroll(Bottom);true }
+        binding.playlistFabRefresh.setOnClickListener { presenter.refreshPlaylist() }
         binding.playlistAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false
@@ -133,18 +138,18 @@ class PlaylistFragment :
                     isShow = true
                     // only show the menu items for the non-empty state
                     modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == lastPlayModeIndex }
-                    playMenuItem.isVisible = true
+                    playMenuItem?.isVisible = true
                 } else if (isShow) {
                     isShow = false
                     modeMenuItems.forEach { it.isVisible = false }
-                    playMenuItem.isVisible = false
+                    playMenuItem?.isVisible = false
                 }
             }
         })
         binding.playlistFabPlaymode.setOnClickListener { presenter.onPlayModeChange() }
         //playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
         binding.playlistFabPlay.setOnClickListener { presenter.onPlayPlaylist() }
-        binding.playlistSwipe.setOnRefreshListener { presenter.refreshList() }
+        binding.playlistSwipe.setOnRefreshListener { presenter.refreshPlaylist() }
         postponeEnterTransition()
         binding.playlistList.doOnPreDraw {
             startPostponedEnterTransition()
@@ -156,8 +161,8 @@ class PlaylistFragment :
         inflater.inflate(R.menu.playlist_actionbar, menu)
         modeMenuItems.forEach { it.isVisible = false }
         modeMenuItems.forEach { it.setOnMenuItemClickListener { presenter.onPlayModeChange() } }
-        playMenuItem.isVisible = false
-        playMenuItem.setOnMenuItemClickListener { presenter.onPlayPlaylist() }
+        playMenuItem?.isVisible = false
+        playMenuItem?.setOnMenuItemClickListener { presenter.onPlayPlaylist() }
         starMenuItem.setOnMenuItemClickListener { presenter.onStarPlaylist() }
         newMenuItem.setOnMenuItemClickListener { presenter.onFilterNewItems() }
         editMenuItem.setOnMenuItemClickListener { presenter.onEdit() }
@@ -176,32 +181,32 @@ class PlaylistFragment :
 
     override fun onResume() {
         super.onResume()
-        // todo clean up after i m sure it works for all cases
+        // todo clean up after im sure it works for all cases
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
-        ((activity as NavigationProvider?)?.checkForPendingNavigation(PLAYLIST_FRAGMENT)?.apply {
+        ((activity as? NavigationProvider)?.checkForPendingNavigation(PLAYLIST_FRAGMENT)?.apply {
             //onResumeGotArguments = true
             log.d("onResume: got nav on callup model = $this")
         } ?: let {
             val plId = PLAYLIST_ID.getLong(arguments)
-            val onResumeGotArguments = plId?.let { it > 0L } ?: false
+            val source: Source? = SOURCE.getEnum<Source>(arguments)
+            val plItemId = PLAYLIST_ITEM_ID.getLong(arguments)
+            val playNow = PLAY_NOW.getBoolean(arguments) ?: false
+            arguments?.putBoolean(PLAY_NOW.name, false)
+            log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source")
+            val onResumeGotArguments = plId?.let { it != -1L } ?: false
             if (onResumeGotArguments) {
-                log.d(
-                    "onResume: got nav on args model = plid = $plId plitemId = ${PLAYLIST_ITEM_ID.getLong(arguments)} playNow = ${
-                        PLAY_NOW.getBoolean(
-                            arguments
-                        )
-                    }"
-                )
-                makeNav(plId, PLAYLIST_ITEM_ID.getLong(arguments), PLAY_NOW.getBoolean(arguments) ?: false)
+                //log.d("onResume: got nav on args model = plid = $plId plitemId = ${PLAYLIST_ITEM_ID.getLong(arguments)} playNow = ${PLAY_NOW.getBoolean(arguments) }" )
+                makeNav(plId, plItemId, playNow, source)
             } else null
         })?.apply {
             log.d("onResume: apply nav args model = $this")
             presenter.setPlaylistData(
                 params[PLAYLIST_ID] as Long?,
                 params[PLAYLIST_ITEM_ID] as Long?,
-                params[PLAY_NOW] as Boolean? ?: false
+                params[PLAY_NOW] as Boolean? ?: false,
+                params[SOURCE] as Source
             )
-            (activity as NavigationProvider?)?.clearPendingNavigation(PLAYLIST_FRAGMENT)
+            (activity as? NavigationProvider)?.clearPendingNavigation(PLAYLIST_FRAGMENT)
         } ?: run {
             log.d("onResume: got no nav args")
             presenter.setPlaylistData()
@@ -226,18 +231,23 @@ class PlaylistFragment :
     override fun setList(items: List<ItemContract.Model>, animate: Boolean) {
         binding.playlistSwipe.isRefreshing = false
         adapter.setData(items, animate)
-        binding.playlistFabUp.isVisible = items.size > 30
-        binding.playlistFabDown.isVisible = items.size > 30
+        val isListLarge = items.size > 30
+        binding.playlistFabUp.isVisible = isListLarge
+        binding.playlistFabDown.isVisible = isListLarge
+        binding.playlistFabRefresh.isVisible = isListLarge
     }
 
     override fun setHeaderModel(model: PlaylistContract.Model) {
+
         Glide.with(requireContext())
-            .load(imageProvider.makeRef(model.imageUrl))
+            .loadFirebaseOrOtherUrl(model.imageUrl, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.playlistHeaderImage)
         binding.playlistCollapsingToolbar.title = model.title
         binding.playlistFabPlay.setImageResource(model.playIcon)
-        playMenuItem.setIcon(model.playIcon)
+        binding.playlistFabPlay.isEnabled = model.canPlay
+        playMenuItem?.setIcon(model.playIcon)
+        playMenuItem?.setEnabled(model.canPlay)
         starMenuItem.setIcon(model.starredIcon)
         //playlist_items.setText("${model.items.size}")
         binding.playlistFlags.isVisible = model.isDefault
@@ -310,9 +320,9 @@ class PlaylistFragment :
         selectDialogCreator.createSingle(model).apply { show() }
     }
 
-    override fun showPlaylistCreateDialog() {
+    override fun showPlaylistCreateDialog() {// add playlist
         createPlaylistDialog?.dismissAllowingStateLoss()
-        createPlaylistDialog = PlaylistEditFragment.newInstance(null).apply {
+        createPlaylistDialog = PlaylistEditFragment.newInstance().apply {
             listener = object : PlaylistEditFragment.Listener {
                 override fun onPlaylistCommit(domain: PlaylistDomain?) {
                     domain?.apply { presenter.onPlaylistSelected(this) }
@@ -327,17 +337,17 @@ class PlaylistFragment :
         presenter.onItemViewClick(item)
     }
 
-    override fun showItemDescription(itemWitId: PlaylistItemDomain) {
+    override fun showItemDescription(itemWitId: PlaylistItemDomain, source: Source) {
         itemWitId.id?.also { id ->
             adapter.getItemViewForId(id)?.let { view ->
-                PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise())
+                PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise(), source.toString())
                     .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
             }
         }
     }
 
-    override fun gotoEdit(id: Long) {
-        PlaylistFragmentDirections.actionGotoEditPlaylist(id)
+    override fun gotoEdit(id: Long, source: Source) {
+        PlaylistFragmentDirections.actionGotoEditPlaylist(id, source.toString())
             .apply { findNavController().navigate(this) }
     }
 
@@ -357,20 +367,22 @@ class PlaylistFragment :
         when (state) {
             PLAYING -> {
                 binding.playlistFabPlay.setImageResource(R.drawable.ic_baseline_playlist_close_24)
-                playMenuItem.setIcon(R.drawable.ic_baseline_playlist_close_24)
+                playMenuItem?.setIcon(R.drawable.ic_baseline_playlist_close_24)
                 //binding.playlistFabPlay.showProgress(false)
             }
             NOT_CONNECTED -> {
                 binding.playlistFabPlay.setImageResource(R.drawable.ic_baseline_playlist_play_24)
-                playMenuItem.setIcon(R.drawable.ic_baseline_playlist_play_24)
+                playMenuItem?.setIcon(R.drawable.ic_baseline_playlist_play_24)
                 //binding.playlistFabPlay.showProgress(false)
             }
             CONNECTING -> {
                 //binding.playlistFabPlay.showProgress(true)
-                playMenuItem.setIcon(R.drawable.ic_notif_buffer_black)
+                playMenuItem?.setIcon(R.drawable.ic_notif_buffer_black)
             }
         }
     }
+
+    override fun exit() = TODO()
     //endregion
 
     // region ItemContract.ItemMoveInteractions
@@ -420,25 +432,28 @@ class PlaylistFragment :
     override fun onShare(item: ItemContract.Model) {
         presenter.onItemShare(item)
     }
+    // endregion
 
-    //endregion
+    // region ItemContract.Interactions
+    override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) {
+        presenter.commitPlaylist(onCommit)
+    }
+    // endregion
 
     companion object {
-        fun makeNav(item: PlaylistItemDomain, play: Boolean): NavigationModel = NavigationModel(
-            PLAYLIST_FRAGMENT, mapOf(
-                PLAYLIST_ID to (item.playlistId ?: throw IllegalArgumentException("No Playlist Id")),
-                PLAYLIST_ITEM_ID to (item.id ?: throw IllegalArgumentException("No Playlist tem Id")),
-                PLAY_NOW to play
-            )
-        )
 
-        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean): NavigationModel = NavigationModel(
-            PLAYLIST_FRAGMENT, mapOf(
+        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean, source: Source?): NavigationModel {
+            val params = mapOf(
                 PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
-                PLAYLIST_ITEM_ID to (plItemId ?: throw IllegalArgumentException("No Playlist tem Id")),
-                PLAY_NOW to play
+                PLAY_NOW to play,
+                SOURCE to (source ?: throw IllegalArgumentException("No Source"))
+            ).apply {
+                plItemId?.also { PLAYLIST_ITEM_ID to it }
+            }
+            return NavigationModel(
+                PLAYLIST_FRAGMENT, params
             )
-        )
+        }
 
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
 

@@ -49,21 +49,6 @@ class PlaylistMutator {
         return domain
     }
 
-    fun addOrReplaceItem(playlist: PlaylistDomain, item: PlaylistItemDomain) =
-        if (item.playlistId == playlist.id) {
-            val items = playlist.items.toMutableList()
-            val isReplace = items.removeIf { it.id == item.id }
-            var index = items.indexOfFirst { it.order < item.order }
-            if (index == -1) index = items.size;
-            val newIndex = if (!isReplace && index < playlist.currentIndex) {
-                playlist.currentIndex + 1
-            } else playlist.currentIndex
-            items.add(index, item)
-            playlist.copy(
-                items = items,
-                currentIndex = newIndex
-            )
-        } else throw IllegalStateException("Item is not on this playlist")
 
     fun gotoPreviousItem(playlist: PlaylistDomain): PlaylistDomain {
         var newPosition = playlist.currentIndex
@@ -135,4 +120,48 @@ class PlaylistMutator {
             )
         }
     }
+
+    // todo  this needs not only to replace by id but also to synchronise the order and change the current index if necessary
+    fun addOrReplaceItem(playlist: PlaylistDomain, item: PlaylistItemDomain) =
+        if (item.playlistId == playlist.id) {
+            val items = playlist.items.toMutableList()
+            //val isReplace = items.removeIf { it.id == item.id }
+            val removeIndex = items.indexOfFirst { it.id == item.id }
+            if (removeIndex > -1) {
+                items.removeAt(removeIndex)
+            }
+            var insertIndex = items.indexOfFirst { it.order > item.order }
+            if (insertIndex == -1) insertIndex = items.size
+
+            val newIndex = if (removeIndex == -1 && insertIndex <= playlist.currentIndex) {// add case
+                playlist.currentIndex + 1
+            } else if (removeIndex == -1 && insertIndex > playlist.currentIndex) {// add case
+                playlist.currentIndex
+            } else if (removeIndex == playlist.currentIndex) {// move current item
+                insertIndex
+            } else if (removeIndex < playlist.currentIndex && insertIndex >= playlist.currentIndex) {
+                playlist.currentIndex - 1
+            } else if (removeIndex > playlist.currentIndex && insertIndex <= playlist.currentIndex) {
+                playlist.currentIndex + 1
+            } else playlist.currentIndex
+
+            items.add(insertIndex, item)
+            playlist.copy(
+                items = items,
+                currentIndex = newIndex
+            )
+        } else throw IllegalArgumentException("Item is not on this playlist")
+
+    fun remove(playlist: PlaylistDomain, plistItem: PlaylistItemDomain): PlaylistDomain =
+            playlist.items.indexOfFirst { plistItem.id == it.id }
+                .takeIf { it != -1 }
+                ?.let { index ->
+                    val newIndex = if (index < playlist.currentIndex) {
+                        playlist.currentIndex - 1
+                    } else playlist.currentIndex
+                    val toMutableList = playlist.items.toMutableList()
+                    toMutableList.removeAt(index)
+                    playlist.copy(currentIndex = newIndex, items = toMutableList)
+                } ?: playlist
+
 }

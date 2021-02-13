@@ -4,12 +4,12 @@ import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.PlatformMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class ItemModelMapper constructor(
     private val res: ResourceWrapper,
-    private val platformMapper: PlatformMapper
+    private val iconMapper: IconMapper
 ) {
 
     private val playDrawable: Drawable by lazy {
@@ -67,7 +67,7 @@ class ItemModelMapper constructor(
             val platPos = indexOf(PLAT)
             res.replaceSpannableIcon(
                 this,
-                bottomDrawable(platformMapper.mapIcon(model.platform)),
+                bottomDrawable(iconMapper.map(model.platform)),
                 platPos, platPos + PLAT.length
             )
             val watchPos = indexOf(WATCH)

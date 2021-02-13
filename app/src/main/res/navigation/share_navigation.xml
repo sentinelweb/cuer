@@ -44,6 +44,12 @@
             app:nullable="false"
             />
 
+        <argument
+            android:name="SOURCE"
+            app:argType="string"
+            app:nullable="false"
+            />
+
         <action
             android:id="@+id/action_goto_playlist_item"
             app:destination="@id/navigation_playlist_item_edit"
@@ -73,6 +79,11 @@
             app:nullable="false"
             />
 
+        <argument
+            android:name="SOURCE"
+            app:argType="string"
+            app:nullable="false"
+            />
     </fragment>
 
     <fragment
@@ -85,6 +96,11 @@
             android:name="PLAYLIST_ID"
             android:defaultValue="-1L"
             app:argType="long"
+            app:nullable="false"
+            />
+        <argument
+            android:name="SOURCE"
+            app:argType="string"
             app:nullable="false"
             />
     </fragment>

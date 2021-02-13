@@ -1,9 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
@@ -17,18 +19,25 @@ class PlaylistModelMapper constructor(
     private val res: ResourceWrapper,
     private val timeSinceFormatter: TimeSinceFormatter,
     private val timeFormatter: TimeFormatter,
-    private val loopModeMapper: LoopModeMapper,
+    private val iconMapper: IconMapper,
     private val backgroundMapper: BackgroundMapper
 ) {
 
-    fun map(domain: PlaylistDomain, isPlaying: Boolean, mapItems: Boolean = true): PlaylistContract.Model = PlaylistContract.Model(
+    fun map(
+        domain: PlaylistDomain,
+        isPlaying: Boolean,
+        mapItems: Boolean = true,
+        id: OrchestratorContract.Identifier<*>
+    ): PlaylistContract.Model = PlaylistContract.Model(
         domain.title,
         domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         domain.mode.ordinal,
-        loopModeMapper.mapIcon(domain.mode),
+        iconMapper.map(domain.mode),
         if (isPlaying) R.drawable.ic_baseline_playlist_close_24 else R.drawable.ic_baseline_playlist_play_24,
         if (domain.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_unstarred_white,
         domain.default,
+        id.source == LOCAL,
+        id.source == LOCAL,
         if (mapItems) {
             domain.items.mapIndexed { index, item -> map(item, index) }
         } else {
@@ -36,7 +45,7 @@ class PlaylistModelMapper constructor(
         }
     )
 
-    private fun map(item: PlaylistItemDomain, index: Int): ItemContract.Model {
+    fun map(item: PlaylistItemDomain, index: Int): ItemContract.Model {
         val top = item.media.title ?: "No title"
         val pos = item.media.positon?.toFloat() ?: 0f
         val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f

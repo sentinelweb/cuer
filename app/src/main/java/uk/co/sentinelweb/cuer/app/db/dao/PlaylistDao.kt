@@ -32,6 +32,9 @@ interface PlaylistDao {
     @Query("SELECT * FROM playlist WHERE id IN (:playlistIds)")
     suspend fun loadAllByIds(playlistIds: LongArray): List<PlaylistEntity>
 
+    @Query("SELECT * FROM playlist WHERE platform_id IN (:platformIds)")
+    suspend fun loadAllByPlatformIds(platformIds: List<String>): List<PlaylistEntity>
+
     @Query("SELECT * FROM playlist WHERE flags & :flags == :flags")
     suspend fun loadAllByFlags(flags: Long): List<PlaylistEntity>
 
@@ -44,12 +47,18 @@ interface PlaylistDao {
     suspend fun loadAllByIdsWithItems(playlistIds: LongArray): List<PlaylistAndItems>
 
     //@Transaction
+    @Query("SELECT * FROM playlist WHERE platform_id IN (:platformIds)")
+    suspend fun loadAllByPlatformIdsWithItems(platformIds: List<String>): List<PlaylistAndItems>
+
+    //@Transaction
     @Query("SELECT * FROM playlist WHERE flags & :flags == :flags")
     suspend fun loadAllByFlagsWithItems(flags: Long): List<PlaylistAndItems>
 
     @Query("UPDATE playlist SET currentIndex=:index WHERE id=:id")
     suspend fun updateIndex(id: Long, index: Int): Int
 
+    // todo can make partial updates entities for fields
+    // https://stackoverflow.com/questions/45789325/update-some-specific-field-of-an-entity-in-android-room/59834309#59834309
     @Update
     suspend fun update(playlist: PlaylistEntity): Int
 

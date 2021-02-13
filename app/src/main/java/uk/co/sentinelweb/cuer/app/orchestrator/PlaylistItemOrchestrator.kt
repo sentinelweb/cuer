@@ -1,89 +1,97 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
+import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlaylistItemOrchestrator constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
+    private val playlistItemMemoryRepository: MemoryRepository<PlaylistItemDomain>,
     private val log: LogWrapper
 ) : OrchestratorContract<PlaylistItemDomain> {
 
-    override val updates: Flow<Pair<OrchestratorContract.Operation, PlaylistItemDomain>>
+    override val updates: Flow<Triple<Operation, Source, PlaylistItemDomain>>
         get() = playlistDatabaseRepository.playlistItemFlow
+            .map { it.first to LOCAL then it.second }
 
-    suspend override fun load(id: Long, options: OrchestratorContract.Options): PlaylistItemDomain? =
+    suspend override fun load(id: Long, options: Options): PlaylistItemDomain? =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> TODO()
-            OrchestratorContract.Source.LOCAL -> (playlistDatabaseRepository.loadPlaylistItem(id)
+            MEMORY -> TODO()
+            LOCAL -> (playlistDatabaseRepository.loadPlaylistItem(id)
                 .takeIf { it.isSuccessful }
-                ?: throw OrchestratorContract.DoesNotExistException("PlaylistItemDomain($id)"))
+                ?: throw DoesNotExistException("PlaylistItemDomain($id)"))
                 .data
 
-            OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
-            OrchestratorContract.Source.REMOTE -> TODO()
-            OrchestratorContract.Source.PLATFORM -> throw OrchestratorContract.InvalidOperationException(this::class, null, options)
+            LOCAL_NETWORK -> TODO()
+            REMOTE -> TODO()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
-    suspend override fun loadList(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): List<PlaylistItemDomain>? =
+    suspend override fun loadList(filter: Filter, options: Options): List<PlaylistItemDomain> =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> TODO()
-            OrchestratorContract.Source.LOCAL -> playlistDatabaseRepository.loadPlaylistItems(filter)
-                .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
-                ?.data
-            OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
-            OrchestratorContract.Source.REMOTE -> TODO()
-            OrchestratorContract.Source.PLATFORM -> throw OrchestratorContract.InvalidOperationException(this::class, filter, options)
+            MEMORY -> playlistItemMemoryRepository.loadList(filter, options)
+            LOCAL -> playlistDatabaseRepository.loadPlaylistItems(filter)
+                .forceDatabaseListResultNotEmpty("Playlist item $filter does not exist")
+            LOCAL_NETWORK -> TODO()
+            REMOTE -> TODO()
+            PLATFORM -> throw InvalidOperationException(this::class, filter, options)
         }
 
-    suspend override fun load(platformId: String, options: OrchestratorContract.Options): PlaylistItemDomain? {
-        throw OrchestratorContract.InvalidOperationException(this::class, null, options)
+    suspend override fun load(platformId: String, options: Options): PlaylistItemDomain? {
+        throw InvalidOperationException(this::class, null, options)
     }
 
-    suspend override fun load(domain: PlaylistItemDomain, options: OrchestratorContract.Options): PlaylistItemDomain? =
+    suspend override fun load(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain? =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> TODO()
-            OrchestratorContract.Source.LOCAL -> domain.id?.let {
+            MEMORY -> TODO()
+            LOCAL -> domain.id?.let {
                 playlistDatabaseRepository.loadPlaylistItem(it)
-                    .takeIf { it.isSuccessful }
-                    ?.data
+                    .forceDatabaseSuccess()
             }
-                ?: throw OrchestratorContract.DoesNotExistException("PlaylistItemDomain($domain?.id)")
 
-            OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
-            OrchestratorContract.Source.REMOTE -> TODO()
-            OrchestratorContract.Source.PLATFORM -> throw OrchestratorContract.InvalidOperationException(this::class, null, options)
+            LOCAL_NETWORK -> TODO()
+            REMOTE -> TODO()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
-    suspend override fun save(domain: PlaylistItemDomain, options: OrchestratorContract.Options): PlaylistItemDomain? =
+    suspend override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> TODO()
-            OrchestratorContract.Source.LOCAL -> playlistDatabaseRepository.savePlaylistItem(domain, options.flat)
-                .takeIf { it.isSuccessful }
-                ?.data
-            OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
-            OrchestratorContract.Source.REMOTE -> TODO()
-            OrchestratorContract.Source.PLATFORM -> throw OrchestratorContract.InvalidOperationException(this::class, null, options)
+            MEMORY -> playlistItemMemoryRepository.save(domain, options)
+            LOCAL -> playlistDatabaseRepository.savePlaylistItem(domain, options.flat)
+                .forceDatabaseSuccessNotNull("Save failed $domain")
+            LOCAL_NETWORK -> TODO()
+            REMOTE -> TODO()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
-    suspend override fun save(domains: List<PlaylistItemDomain>, options: OrchestratorContract.Options): PlaylistItemDomain? {
-        TODO("Not yet implemented")
+    suspend override fun save(domains: List<PlaylistItemDomain>, options: Options): List<PlaylistItemDomain> {
+        throw NotImplementedException()
     }
 
-    override suspend fun count(filter: OrchestratorContract.Filter, options: OrchestratorContract.Options): Int {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun delete(domain: PlaylistItemDomain, options: OrchestratorContract.Options): Boolean =
+    override suspend fun count(filter: Filter, options: Options): Int =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> TODO()
-            OrchestratorContract.Source.LOCAL -> playlistDatabaseRepository.delete(domain, options.emit)
-                .takeIf { it.isSuccessful }
-                ?.data ?: throw IllegalStateException("Delete result is null")
-            OrchestratorContract.Source.LOCAL_NETWORK -> TODO()
-            OrchestratorContract.Source.REMOTE -> TODO()
-            OrchestratorContract.Source.PLATFORM -> throw OrchestratorContract.InvalidOperationException(this::class, null, options)
+            MEMORY -> playlistItemMemoryRepository.count(filter, options)
+            LOCAL -> playlistDatabaseRepository.count(filter)
+                .forceDatabaseSuccessNotNull("Count failed $filter")
+            LOCAL_NETWORK -> TODO()
+            REMOTE -> TODO()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)
+        }
+
+    override suspend fun delete(domain: PlaylistItemDomain, options: Options): Boolean =
+        when (options.source) {
+            MEMORY -> playlistItemMemoryRepository.delete(domain, options)
+            LOCAL -> playlistDatabaseRepository.delete(domain, options.emit)
+                .forceDatabaseSuccessNotNull("Delete failed $domain")
+            LOCAL_NETWORK -> TODO()
+            REMOTE -> TODO()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
 }

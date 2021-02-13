@@ -35,7 +35,7 @@ class PlaylistDatabaseRepository constructor(
 ) : DatabaseRepository<PlaylistDomain> {// todo , DatabaseRepository<PlaylistItemDomain>
 
     private val _playlistFlow = MutableSharedFlow<Pair<Operation, PlaylistDomain>>()
-    val playlistFlow: Flow<Pair<Operation, PlaylistDomain>>
+    override val updates: Flow<Pair<Operation, PlaylistDomain>>
         get() = _playlistFlow
 
     private val _playlistItemFlow = MutableSharedFlow<Pair<Operation, PlaylistItemDomain>>()
@@ -60,9 +60,7 @@ class PlaylistDatabaseRepository constructor(
 //        }
     }
 
-    override suspend fun save(domain: PlaylistDomain, flat: Boolean): RepoResult<PlaylistDomain> = save(domain, flat, true)
-
-    private suspend fun save(domain: PlaylistDomain, flat: Boolean, emit: Boolean = false): RepoResult<PlaylistDomain> =
+    override suspend fun save(domain: PlaylistDomain, flat: Boolean, emit: Boolean): RepoResult<PlaylistDomain> =
         withContext(coProvider.IO) {
             try {
                 var insertId = -1L
@@ -89,9 +87,7 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
-    override suspend fun save(domains: List<PlaylistDomain>, flat: Boolean): RepoResult<List<PlaylistDomain>> = save(domains, flat, true)
-
-    private suspend fun save(domains: List<PlaylistDomain>, flat: Boolean, emit: Boolean = false): RepoResult<List<PlaylistDomain>> =
+    override suspend fun save(domains: List<PlaylistDomain>, flat: Boolean, emit: Boolean): RepoResult<List<PlaylistDomain>> =
         withContext(coProvider.IO) {
             try {
                 var insertIds = listOf<Long>()
@@ -112,7 +108,7 @@ class PlaylistDatabaseRepository constructor(
                     .also { database.endTransaction() }
 
                 RepoResult.Data(loadList(IdListFilter(insertIds), flat).data)
-                // todo emit
+                    .also { if (emit) it.data?.forEach { _playlistFlow.emit((if (flat) FLAT else FULL) to it) } }
             } catch (e: Throwable) {
                 val msg = "couldn't save playlists ${domains.joinToString { it.title }}"
                 log.e(msg, e)
@@ -179,6 +175,13 @@ class PlaylistDatabaseRepository constructor(
                                 else playlistDao
                                     .getAllPlaylistsWithItems()
                                     .map { mapDeep(it) }
+                            is PlatformIdListFilter ->
+                                if (flat) playlistDao
+                                    .loadAllByPlatformIds(filter.ids)
+                                    .map { playlistMapper.map(it, null, null, null) }/* todo channels */
+                                else playlistDao
+                                    .loadAllByPlatformIdsWithItems(filter.ids)
+                                    .map { mapDeep(it) }
                             else ->// todo return empty for else
                                 playlistDao
                                     .getAllPlaylists()
@@ -204,9 +207,7 @@ class PlaylistDatabaseRepository constructor(
             RepoResult.Error<Int>(e, msg)
         }
 
-    override suspend fun delete(domain: PlaylistDomain) = delete(domain, true)
-
-    private suspend fun delete(domain: PlaylistDomain, emit: Boolean = false): RepoResult<Boolean> =
+    override suspend fun delete(domain: PlaylistDomain, emit: Boolean): RepoResult<Boolean> =
         withContext(coProvider.IO) {
             try {
                 domain
@@ -215,6 +216,7 @@ class PlaylistDatabaseRepository constructor(
                     .also { playlistDao.delete(it) }
                     .also { playlistItemDao.deletePlaylistItems(it.id) }
                     .also { database.setTransactionSuccessful() }
+                    .also { database.endTransaction() }
                     .also {
                         if (emit) {
                             _playlistFlow.emit(DELETE to domain)
@@ -224,8 +226,10 @@ class PlaylistDatabaseRepository constructor(
             } catch (e: Throwable) {
                 val msg = "couldn't delete ${domain.id}"
                 log.e(msg, e)
+                database.endTransaction()
                 RepoResult.Error<Boolean>(e, msg)
-            }.also { database.endTransaction() }
+
+            }
         }
 
     override suspend fun deleteAll(): RepoResult<Boolean> =

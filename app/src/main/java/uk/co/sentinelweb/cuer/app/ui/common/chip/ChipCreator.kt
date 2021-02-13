@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import java.security.MessageDigest
 
@@ -27,7 +28,7 @@ class ChipCreator(
     private val res: ResourceWrapper
 ) {
 
-    fun create(model: ChipModel, parent: ViewGroup): Chip? = when (model.type) {
+    fun create(model: ChipModel, parent: ViewGroup): Chip = when (model.type) {
         PLAYLIST_SELECT -> {
             (LayoutInflater.from(c)
                 .inflate(R.layout.playlist_chip_select, parent, false) as Chip).apply {
@@ -38,11 +39,12 @@ class ChipCreator(
             (LayoutInflater.from(c)
                 .inflate(R.layout.playlist_chip, parent, false) as Chip).apply {
                 tag = model
-                text = model.text
+                text = if (model.text.length > 15) model.text.substring(0, 14) + "\u2026" else model.text
                 model.thumb?.let {
                     Glide.with(c)
                         .asBitmap()
-                        .load(imageProvider.makeRef(it))
+                        .loadFirebaseOrOtherUrl(it.url, imageProvider)
+//                        .load(imageProvider.makeRef(it))
                         .transform(CropTransformation(it.url))
                         .circleCrop()
                         .into(ChipLoadTarget(this))

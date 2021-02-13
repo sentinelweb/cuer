@@ -8,26 +8,13 @@
     tools:context=".ui.share.ShareActivity"
     >
 
-    <!--    <fragment-->
-    <!--        android:id="@+id/playlist_edit_fragment"-->
-    <!--        android:name="uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="0dp"-->
-    <!--        android:layout_marginBottom="4dp"-->
-    <!--        app:layout_constraintBottom_toTopOf="@+id/share_warning"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        tools:layout="@layout/playlist_item_edit_fragment"-->
-    <!--        tools:ignore="FragmentTagUsage"-->
-    <!--        />-->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/top_left_button"
+        app:layout_constraintBottom_toTopOf="@id/share_button_barrier"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/share_navigation"
         />
@@ -41,9 +28,17 @@
         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
         android:textColor="@color/white"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/top_right_button"
+        app:layout_constraintBottom_toTopOf="@id/share_button_barrier"
         tools:text="Video already in queue ..."
         tools:visibility="visible"
+        />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/share_button_barrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="top_left_button,top_right_button,bottom_left_button,bottom_right_button"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -60,6 +55,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/bottom_right_button"
         app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -76,6 +72,7 @@
         app:layout_constraintBottom_toTopOf="@id/bottom_right_button"
         app:layout_constraintEnd_toStartOf="@id/top_right_button"
         app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -92,6 +89,7 @@
         app:layout_constraintBottom_toTopOf="@id/bottom_right_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/top_left_button"
+        android:visibility="gone"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -108,6 +106,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/bottom_left_button"
+        android:visibility="gone"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

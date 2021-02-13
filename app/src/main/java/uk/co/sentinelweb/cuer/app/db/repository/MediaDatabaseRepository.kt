@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.app.db.repository
 
 import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.dao.ChannelDao
@@ -10,12 +12,14 @@ import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data.Empty
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import java.io.InvalidObjectException
 
+// todo emit
 @Suppress("DEPRECATION")
 class MediaDatabaseRepository constructor(
     private val mediaDao: MediaDao,
@@ -25,14 +29,18 @@ class MediaDatabaseRepository constructor(
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
     private val database: AppDatabase
-) : DatabaseRepository<MediaDomain> {
+) : DatabaseRepository<MediaDomain> {// todo extract channel repo
 
     init {
         log.tag(this)
     }
 
+    private val _mediaFlow = MutableSharedFlow<Pair<OrchestratorContract.Operation, MediaDomain>>()
+    override val updates: Flow<Pair<OrchestratorContract.Operation, MediaDomain>>
+        get() = _mediaFlow
+
     @Transaction
-    override suspend fun save(domain: MediaDomain, flat: Boolean): RepoResult<MediaDomain> =
+    override suspend fun save(domain: MediaDomain, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             try {
                 domain
@@ -40,6 +48,7 @@ class MediaDatabaseRepository constructor(
                     .let { mediaMapper.map(it) }
                     .let { mediaDao.insert(it) }
                     .let { Data(load(id = it).data) }
+                    .also { if (emit) it.data?.also { _mediaFlow.emit((if (flat) FLAT else FULL) to it) } }
             } catch (e: Exception) {
                 val msg = "couldn't save ${domain.url}"
                 log.e(msg, e)
@@ -47,7 +56,7 @@ class MediaDatabaseRepository constructor(
             }
         }
 
-    override suspend fun save(domains: List<MediaDomain>, flat: Boolean)
+    override suspend fun save(domains: List<MediaDomain>, flat: Boolean, emit: Boolean)
             : RepoResult<List<MediaDomain>> =
         withContext(coProvider.IO) {
             try { // todo better transactions
@@ -59,6 +68,7 @@ class MediaDatabaseRepository constructor(
                     .also { database.setTransactionSuccessful() }
                     .also { database.endTransaction() }
                     .let { idlist -> Data(loadList(OrchestratorContract.IdListFilter(idlist)).data) }
+                    .also { if (emit) it.data?.forEach { _mediaFlow.emit((if (flat) FLAT else FULL) to it) } }
             } catch (e: Throwable) {
                 val msg = "Couldn't save ${domains.map { it.url }}"
                 log.e(msg, e)
@@ -111,13 +121,13 @@ class MediaDatabaseRepository constructor(
         }.also { database.endTransaction() }
     }
 
-    override suspend fun delete(domain: MediaDomain): RepoResult<Boolean> =
+    override suspend fun delete(domain: MediaDomain, emit: Boolean): RepoResult<Boolean> =
         withContext(coProvider.IO) {
             try {
                 domain
                     .let { mediaMapper.map(it) }
                     .also { mediaDao.delete(it) }
-
+                    .also { if (emit) _mediaFlow.emit(DELETE to domain) }
                 Empty(true)
             } catch (e: Throwable) {
                 val msg = "couldn't delete ${domain.id}"
@@ -203,4 +213,3 @@ class MediaDatabaseRepository constructor(
 
 
 }
-

@@ -28,12 +28,21 @@ fun PlaylistDomain.indexOfItemId(id1: Long?): Int? {
     }
 }
 
+fun PlaylistDomain.matchesHeader(playlist: PlaylistDomain?): Boolean =
+    this.copy(items = listOf()) == playlist?.copy(items = listOf())
+
 fun PlaylistDomain.replaceHeader(header: PlaylistDomain) = header.copy(items = items)
 
 fun PlaylistDomain.replaceHeaderKeepIndex(header: PlaylistDomain) = header.copy(items = items, currentIndex = currentIndex)
 
-fun PlaylistDomain.removeItem(item: PlaylistItemDomain) =
-    this.items.find { it.id == item.id }
+fun PlaylistDomain.removeItem(item: PlaylistItemDomain): PlaylistDomain? =
+    this.items
+        .find { it.id == item.id }
+        ?.let { this.copy(items = this.items.minus(it)) }
+
+fun PlaylistDomain.removeItemByPlatformId(item: PlaylistItemDomain): PlaylistDomain? =
+    this.items
+        .find { matchPlatform(it, item) }
         ?.let { this.copy(items = this.items.minus(it)) }
 
 fun PlaylistDomain.replaceItem(item: PlaylistItemDomain) =
@@ -43,6 +52,18 @@ fun PlaylistDomain.replaceItem(item: PlaylistItemDomain) =
                 this.copy(items = this.items.toMutableList().apply { set(index, item) }.toList())
             } else this
         }
+
+fun PlaylistDomain.replaceItemByPlatformId(item: PlaylistItemDomain) =
+    this.items
+        .indexOfFirst { matchPlatform(it, item) }
+        .let { index ->
+            if (index > -1) {
+                this.copy(items = this.items.toMutableList().apply { set(index, item) }.toList())
+            } else this
+        }
+
+private fun matchPlatform(it: PlaylistItemDomain, item: PlaylistItemDomain) =
+    it.media.platformId == item.media.platformId && it.media.platform == item.media.platform
 
 fun PlaylistDomain.scanOrder(): StringBuilder {
     var lastorder = -1L

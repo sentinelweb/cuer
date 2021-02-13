@@ -15,10 +15,10 @@ import kotlinx.android.synthetic.main.main_activity.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -27,8 +27,8 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.WindowWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
 class MainActivity :
     AppCompatActivity(),
@@ -42,6 +42,7 @@ class MainActivity :
     private val log: LogWrapper by currentScope.inject()
     private val navMapper: NavigationMapper by currentScope.inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
+    private val windowWrapper: WindowWrapper by inject()
 
     private lateinit var navController: NavController
 
@@ -52,7 +53,7 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-
+        //windowWrapper.setDecorFitsSystemWindows(this, true)
 //        navController = findNavController(R.id.nav_host_fragment)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
@@ -151,14 +152,14 @@ class MainActivity :
             ?.let {
                 return when (it) {
                     PLAYLIST_FRAGMENT.name ->
-                        PLAYLIST_ITEM.getString(intent)
-                            ?.let { deserialisePlaylistItem(it) }
-                            ?.let { item ->
-                                PlaylistFragment.makeNav(item, PLAY_NOW.getBoolean(intent)).apply {
-                                    log.d("got nav:$this")
-                                }
-                            }
-
+                        PlaylistFragment.makeNav(
+                            PLAYLIST_ID.getLong(intent) ?: throw IllegalArgumentException("Playlist ID is required"),
+                            PLAYLIST_ITEM_ID.getLong(intent),
+                            PLAY_NOW.getBoolean(intent),
+                            SOURCE.getEnum<Source>(intent)
+                        ).apply {
+                            log.d("got nav:$this")
+                        }
                     else -> null
                 }
             }

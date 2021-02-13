@@ -46,12 +46,12 @@ class ChromecastYouTubePlayerContextHolder constructor(
 
     fun addConnectionListener(listener: ChromecastConnectionListener) {
         context?.addChromecastConnectionListener(listener)
-            ?: throw IllegalStateException("No context created")
+            // ?: throw IllegalStateException("No context created") // todo checkj this
     }
 
     fun removeConnectionListener(listener: ChromecastConnectionListener) {
         context?.removeChromecastConnectionListener(listener)
-            ?: throw IllegalStateException("No context created")
+        //?: throw IllegalStateException("No context created") // todo checkj this
     }
 
 }

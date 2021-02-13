@@ -3,17 +3,17 @@ package uk.co.sentinelweb.cuer.app.ui.share.scan
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SHARED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.PLAYLIST
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
 class ScanPresenter(
     private val view: ScanContract.View,
@@ -23,8 +23,12 @@ class ScanPresenter(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val linkScanner: LinkScanner,
-    private val ytInteractor: YoutubeInteractor
+    private val log: LogWrapper
 ) : ScanContract.Presenter {
+
+    init {
+        log.tag(this)
+    }
 
     override fun fromShareUrl(uriString: String) {
         linkScanner
@@ -38,12 +42,13 @@ class ScanPresenter(
                         }
                         PLAYLIST -> (scannedMedia.second as PlaylistDomain).apply {
                             view.setModel(modelMapper.map(scannedMedia.second as PlaylistDomain))
-                            checkPlaylist(this)?.apply { view.setResult(this) }
+                            log.d("Scanned Playlist = $this")
+                            checkPlaylist(this)
+                                ?.apply { view.setResult(this) }
                                 ?: linkError(uriString)
                         }
                         else -> linkError(uriString)
                     }
-
                 }
             } ?: linkError(uriString)
     }
@@ -55,12 +60,12 @@ class ScanPresenter(
 
     private suspend fun checkMedia(scannedMedia: MediaDomain): ScanContract.Result =// todo return playlistItem if exists
         scannedMedia.let {
-            mediaOrchestrator.loadList(OrchestratorContract.PlatformIdListFilter(listOf(scannedMedia.platformId)), Options(LOCAL))
-        }?.firstOrNull()
+            mediaOrchestrator.loadList(PlatformIdListFilter(listOf(scannedMedia.platformId)), Options(LOCAL))
+        }.firstOrNull()
             ?.let { media ->
                 playlistItemOrchestrator
-                    .loadList(OrchestratorContract.MediaIdListFilter(listOf(media.id!!)), Options(LOCAL))
-                    ?.let {
+                    .loadList(MediaIdListFilter(listOf(media.id!!)), Options(LOCAL))
+                    .let {
                         modelMapper.mapMediaResult(false, it.size > 0, media)
                     }
             }
@@ -68,14 +73,26 @@ class ScanPresenter(
                 modelMapper.mapMediaResult(false, false, scannedMedia)
             }
 
-    private suspend fun checkPlaylist(scannedPlaylist: PlaylistDomain): ScanContract.Result? =
-        scannedPlaylist.platformId
-            ?.let { ytInteractor.playlist(it) }
-            ?.data
-            ?.also { playlistOrchestrator.save(it, Options(OrchestratorContract.Source.MEMORY, false)) }
-            ?.let { loadedPlaylist ->
-                modelMapper.mapPlaylistResult(true, scannedPlaylist)
-            }
+    private suspend fun checkPlaylist(scannedPlaylist: PlaylistDomain): ScanContract.Result? {
+        try {
+            return (scannedPlaylist.platformId
+                ?.let {
+                    playlistOrchestrator.load(it, Options(LOCAL))
+                        ?.also { log.d("found playlist = $it") }
+                        ?.let { it to false }
+                        ?: playlistOrchestrator.load(it, Options(PLATFORM))
+                            ?.copy(id = SHARED_PLAYLIST)
+                            ?.also { log.d("loaded playlist = ${it.title} id = ${it.id} platformId = ${it.id}") }
+                            ?.let { playlistOrchestrator.save(it, Options(MEMORY, flat = false, emit = false)) to true }
+                        ?: throw DoesNotExistException()
+                })?.let { (playlist, isNew) ->
+                    modelMapper.mapPlaylistResult(isNew, playlist)
+                }
+        } catch (e: Exception) {
+            view.showMessage("Exception loading : ${e.message}")
+            return null
+        }
+    }
 //
 //    private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? =
 //        scannedMedia.let {

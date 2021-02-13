@@ -1,52 +1,41 @@
 package uk.co.sentinelweb.cuer.app.queue
 
+import kotlinx.coroutines.flow.Flow
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface QueueMediatorContract {
 
-
     interface Shared {
         val currentItem: PlaylistItemDomain?
         val currentItemIndex: Int?
         val playlist: PlaylistDomain?
-        val playlistId: Long?
+        val playlistId: OrchestratorContract.Identifier<*>?
+        val currentItemFlow: Flow<PlaylistItemDomain?>
+        val currentPlaylistFlow: Flow<PlaylistDomain>
     }
 
     interface Producer : Shared {
         fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean = false, resetPosition: Boolean = false)
-        fun addProducerListener(l: ProducerListener)
-        fun removeProducerListener(l: ProducerListener)
         fun destroy()
-        fun refreshQueueBackground()//after: (() -> Unit)? = null
-        fun refreshQueueFrom(playlistDomain: PlaylistDomain)//after: (() -> Unit)? = null
 
-        //fun itemRemoved(playlistItemDomain: PlaylistItemDomain)
-        suspend fun refreshQueue()//after: (() -> Unit)? = null
-        fun playNow()
-        suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?)
-        suspend fun playNow(playlistId: Long, playlistItemId: Long?)
-        fun deleteItem(index: Int)
-        fun refreshHeaderData()
+        // fun refreshQueueBackground()
+        // suspend fun refreshQueue(identifier: OrchestratorContract.Identifier<*>)
+        //fun playNow()
+        suspend fun playNow(identifier: OrchestratorContract.Identifier<*>, playlistItemId: Long?)
+
+        //fun deleteItem(index: Int)
+        suspend fun switchToPlaylist(identifier: OrchestratorContract.Identifier<*>)
     }
 
     interface Consumer : Shared {
+        val source: OrchestratorContract.Source
         fun onTrackEnded(media: MediaDomain?)
         fun nextItem()
         fun previousItem()
-        fun addConsumerListener(l: ConsumerListener)
-        fun removeConsumerListener(l: ConsumerListener)
-        fun updateMediaItem(updatedMedia: MediaDomain)
+        fun updateCurrentMediaItem(updatedMedia: MediaDomain)
     }
 
-    interface ConsumerListener {
-        fun onItemChanged()
-        fun onPlaylistUpdated()
-    }
-
-    interface ProducerListener {
-        fun onPlaylistUpdated(list: PlaylistDomain)
-        fun onItemChanged()
-    }
 }

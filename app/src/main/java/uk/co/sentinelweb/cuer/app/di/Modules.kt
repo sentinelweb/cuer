@@ -11,6 +11,8 @@ import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
@@ -18,8 +20,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.LoopModeMapper
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.PlatformMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -47,6 +48,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.di.DomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.NetModule
@@ -73,23 +75,23 @@ object Modules {
 
     private val uiModule = module {
         factory { PlaylistSelectDialogModelCreator(get(), get()) }
-        factory { PlatformMapper() }
-        factory { LoopModeMapper() }
+        factory { IconMapper() }
         factory { BackgroundMapper(get()) }
     }
 
     private val orchestratorModule = module {
-        single { PlaylistOrchestrator(get(), get()) }
-        single { PlaylistItemOrchestrator(get(), get()) }
+        single { PlaylistOrchestrator(get(), get(), get()) }
+        single { PlaylistItemOrchestrator(get(), get(), get()) }
         single { MediaOrchestrator(get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
         single { PlaylistStatsOrchestrator(get()) }
+        single { PlaylistMemoryRepository(get()) }
+        single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
     }
 
     private val utilModule = module {
         factory {
             LinkScanner(
-                c = androidApplication(),
                 log = get(),
                 mappers = urlMediaMappers
             )
@@ -99,9 +101,10 @@ object Modules {
         single<QueueMediatorContract.Producer> {
             QueueMediator(
                 state = QueueMediatorState(),
-                repository = get(),
-                playlistRepository = get(),
-                contextProvider = get(),
+                mediaOrchestrator = get(),
+                playlistOrchestrator = get(),
+                playlistItemOrchestrator = get(),
+                coroutines = get(),
                 mediaSessionManager = get(),
                 playlistMutator = get(),
                 prefsWrapper = get(named<GeneralPreferences>()),
@@ -129,9 +132,10 @@ object Modules {
         factory { FileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
         single(named<GeneralPreferences>()) {
-            SharedPrefsWrapper(GeneralPreferences::class.java, androidApplication(), get())
+            SharedPrefsWrapper(GeneralPreferences::class, androidApplication(), get())
         }
         factory { ServiceWrapper(androidApplication(), get()) }
+        factory { WindowWrapper() }
     }
 
     private val appNetModule = module {

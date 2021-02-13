@@ -19,13 +19,16 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 
-class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFragment() {
+class PlaylistEditFragment : DialogFragment() {
 
     private val viewModel: PlaylistEditViewModel by currentScope.inject()
     private val log: LogWrapper by inject()
@@ -108,10 +111,9 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
 
     override fun onResume() {
         super.onResume()
-
-        arguments?.getLong(NavigationModel.Param.PLAYLIST_ID.toString())?.also {
-            viewModel.setData(it)
-        } ?: run { id.let { viewModel.setData(it) } }
+        (PLAYLIST_ID.getLong(arguments) to (SOURCE.getEnum(arguments) ?: Source.LOCAL)).apply {
+            viewModel.setData(first, second)
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -137,15 +139,11 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
                     pe_star_fab.setImageResource(starIconResource)
                     model.button?.apply { pe_commit_button.text = this }
                     model.imageUrl?.let {
-                        //if (lastImageUrl != it) {
                         Glide.with(pe_image.context)
-                            .load(imageProvider.makeRef(it))
+                            .loadFirebaseOrOtherUrl(it, imageProvider)
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .into(pe_image)
-                        //Picasso.get().load(model.imageUrl).into(ple_image)
-                        //}
                     }
-                    //lastImageUrl = model.imageUrl
                     model.validation?.apply {
                         pe_commit_button.isEnabled = valid
                         if (!valid) {
@@ -177,8 +175,8 @@ class PlaylistEditFragment constructor(private val id: Long? = null) : DialogFra
 
     companion object {
 
-        fun newInstance(id: Long?): PlaylistEditFragment {
-            return PlaylistEditFragment(id)
+        fun newInstance(): PlaylistEditFragment {
+            return PlaylistEditFragment()
         }
 
         @JvmStatic

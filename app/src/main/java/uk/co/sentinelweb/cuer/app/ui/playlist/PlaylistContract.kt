@@ -5,10 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
-import kotlinx.coroutines.Job
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
@@ -16,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -30,8 +34,7 @@ interface PlaylistContract {
     interface Presenter {
         fun initialise()
         fun destroy()
-        fun refreshList()
-        fun setFocusMedia(mediaDomain: MediaDomain)
+        fun refreshPlaylist()
         fun onItemSwipeRight(item: ItemContract.Model)
         fun onItemSwipeLeft(item: ItemContract.Model)
         fun onItemClicked(item: ItemContract.Model)
@@ -45,7 +48,7 @@ interface PlaylistContract {
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
         fun commitMove()
-        fun setPlaylistData(plId: Long? = null, plItemId: Long? = null, playNow: Boolean = false)
+        fun setPlaylistData(plId: Long? = null, plItemId: Long? = null, playNow: Boolean = false, source: Source = LOCAL)
         fun onPlaylistSelected(playlist: PlaylistDomain)
         fun onPlayModeChange(): Boolean
         fun onPlayPlaylist(): Boolean
@@ -55,6 +58,7 @@ interface PlaylistContract {
         fun onFilterPlaylistItems(): Boolean
         fun onResume()
         fun onPause()
+        suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit)
     }
 
     interface View {
@@ -71,17 +75,18 @@ interface PlaylistContract {
         fun showPlaylistCreateDialog()
         fun showAlertDialog(model: AlertDialogModel)
         fun resetItemsState()
-        fun showItemDescription(itemWitId: PlaylistItemDomain)
-        fun gotoEdit(id: Long)
+        fun showItemDescription(itemWitId: PlaylistItemDomain, source: Source)
+        fun gotoEdit(id: Long, source: Source)
         fun showCastRouteSelectorDialog()
         fun setPlayState(state: PlayState)
+        fun exit()
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
     enum class PlayState { PLAYING, CONNECTING, NOT_CONNECTED }
 
-    data class State constructor(
-        var playlistId: Long? = null,
+    data class State(
+        var playlistIdentifier: Identifier<*> = NO_PLAYLIST,
         var playlist: PlaylistDomain? = null,
         var deletedPlaylistItem: PlaylistItemDomain? = null,
         var focusIndex: Int? = null,
@@ -89,7 +94,7 @@ interface PlaylistContract {
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
         var selectedPlaylistItem: PlaylistItemDomain? = null,
-        var initialLoadJob: Job? = null
+        var model: Model? = null
     ) : ViewModel()
 
     data class Model constructor(
@@ -100,6 +105,8 @@ interface PlaylistContract {
         @DrawableRes val playIcon: Int,
         @DrawableRes val starredIcon: Int,
         val isDefault: Boolean,
+        val isSaved: Boolean,
+        val canPlay: Boolean,
         val items: List<ItemContract.Model>?
     )
 
@@ -112,8 +119,9 @@ interface PlaylistContract {
                     PlaylistPresenter(
                         view = get(),
                         state = get(),
-                        repository = get(),
-                        playlistRepository = get(),
+                        mediaOrchestrator = get(),
+                        playlistOrchestrator = get(),
+                        playlistItemOrchestrator = get(),
                         modelMapper = get(),
                         queue = get(),
                         toastWrapper = get(),
@@ -126,7 +134,8 @@ interface PlaylistContract {
                         log = get(),
                         playlistDialogModelCreator = get(),
                         timeProvider = get(),
-                        coroutines = get()
+                        coroutines = get(),
+                        res = get()
                     )
                 }
                 scoped {
@@ -134,7 +143,7 @@ interface PlaylistContract {
                         res = get(),
                         timeFormatter = get(),
                         timeSinceFormatter = get(),
-                        loopModeMapper = get(),
+                        iconMapper = get(),
                         backgroundMapper = get()
                     )
                 }

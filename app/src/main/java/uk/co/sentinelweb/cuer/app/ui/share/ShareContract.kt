@@ -1,18 +1,27 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
 import androidx.annotation.DrawableRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.Job
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import kotlinx.serialization.Transient
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 
@@ -22,52 +31,50 @@ interface ShareContract {
         fun onStop()
         fun linkError(clipText: String?)
         fun scanResult(result: ScanContract.Result)
+        fun afterItemEditNavigation()
     }
 
     interface View {
         fun exit()
-        fun gotoMain(playlistItemDomain: PlaylistItemDomain?, play: Boolean = false)
+        fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean = false)
         fun setData(model: Model)
         fun error(msg: String)
         fun warning(msg: String)
-        suspend fun commitPlaylistItems()
-        fun getCommittedItems(): List<Any>?
-        fun showMedia(itemDomain: PlaylistItemDomain)
+        suspend fun commit(onCommit: Committer.OnCommit)
+        fun showMedia(itemDomain: PlaylistItemDomain, source: Source)
+        fun showPlaylist(id: OrchestratorContract.Identifier<Long>)
+        fun navigate(nav: NavigationModel)
     }
 
-    interface Committer<T> {
-        suspend fun commit()
-        fun getEditedDomains(): List<T>?
+    interface Committer {
+        suspend fun commit(onCommit: OnCommit)
+        interface OnCommit {
+            suspend fun onCommit(type: ObjectTypeDomain, data: List<*>)
+        }
     }
 
-    data class Model constructor(
+    data class Model constructor(// todo make button type
         val isNew: Boolean,
-        val topRightButtonText: String?,
-        @DrawableRes val topRightButtonIcon: Int,
-        val topRightButtonAction: () -> Unit,
-        val bottomRightButtonText: String?,
-        @DrawableRes val bottomRightButtonIcon: Int,
-        val bottomRightButtonAction: () -> Unit,
-        val bottomLeftButtonText: String?,
-        @DrawableRes val bottomLeftButtonIcon: Int,
-        val bottomLeftButtonAction: () -> Unit,
-        val topLeftButtonAction: () -> Unit,
-        val topLeftButtonText: String?,
-        @DrawableRes val topLeftButtonIcon: Int
-    )
+        val topRight: Button,
+        val bottomRight: Button,
+        val bottomLeft: Button,
+        val topLeft: Button
+    ) {
+        data class Button constructor(
+            val text: String? = null,
+            @DrawableRes val icon: Int = 0,
+            val action: () -> Unit = { }
+        ) {
+            val isVisible: Boolean
+                get() = text != null
+        }
+    }
 
     //    @Serializable
     data class State(
         @Transient var model: Model? = null,
-        @Transient val jobs: MutableList<Job> = mutableListOf(),
         var scanResult: ScanContract.Result? = null
     ) : ViewModel()
-
-    class ShareDoneNavigation(private val activity: ShareActivity) : PlaylistItemEditContract.DoneNavigation {
-        override fun navigateDone() {
-            activity.finish()
-        }
-    }
 
     companion object {
         @JvmStatic
@@ -77,7 +84,7 @@ interface ShareContract {
                 scoped<Presenter> {
                     SharePresenter(
                         view = get(),
-                        contextProvider = get(),
+                        coroutines = get(),
                         toast = get(),
                         queue = get(),
                         state = get(),
@@ -85,7 +92,8 @@ interface ShareContract {
                         ytContextHolder = get(),
                         mapper = get(),
                         prefsWrapper = get(named<GeneralPreferences>()),
-                        timeProvider = get()
+                        timeProvider = get(),
+                        playlistItemOrchestrator = get()
                     )
                 }
                 scoped { ShareWrapper(getSource()) }
@@ -97,9 +105,23 @@ interface ShareContract {
                         res = get()
                     )
                 }
-                scoped<PlaylistItemEditContract.DoneNavigation> {
-                    ShareDoneNavigation(getSource())
+                scoped<PlaylistItemEditContract.DoneNavigation> { getSource() }
+                scoped {
+                    NavigationMapper(
+                        activity = getSource(),
+                        toastWrapper = get(),
+                        ytJavaApi = get(),
+                        navController = get(),
+                        log = get()
+                    )
                 }
+                scoped<NavController> {
+                    (getSource<AppCompatActivity>()
+                        .supportFragmentManager
+                        .findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+                        .navController
+                }
+                scoped { YoutubeJavaApiWrapper(getSource()) }
             }
         }
     }

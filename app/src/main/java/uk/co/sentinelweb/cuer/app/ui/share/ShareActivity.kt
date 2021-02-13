@@ -10,29 +10,37 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_share.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAY_NOW
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.WindowWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.Listener {
+class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.Listener, PlaylistItemEditContract.DoneNavigation {
     private val presenter: ShareContract.Presenter by currentScope.inject()
     private val shareWrapper: ShareWrapper by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
+    private val windowWrapper: WindowWrapper by inject()
+    private val navMapper: NavigationMapper by currentScope.inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
@@ -43,14 +51,15 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
             ?.run { (getChildFragmentManager().getFragments().get(0) as ScanContract.View?)!! }
     }
 
-    private val commitFragment: ShareContract.Committer<*>? by lazy {
+    private val commitFragment: ShareContract.Committer by lazy {
         supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            ?.run { (getChildFragmentManager().getFragments().get(0) as ShareContract.Committer<*>?)!! }
+            ?.run { (getChildFragmentManager().getFragments().get(0) as ShareContract.Committer?)!! }
             ?: throw IllegalStateException("Not a commit fragment")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //windowWrapper.setDecorFitsSystemWindows(this, true)
         setContentView(R.layout.activity_share)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
@@ -92,9 +101,9 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
     override fun onResume() {
         super.onResume()
         if (!intent.getBooleanExtra(EXTRA_PASTE, false)) {
-            shareWrapper.getLinkFromIntent(intent) {
-                scanFragment?.fromShareUrl(it) ?: throw IllegalStateException("Scan fragment not visible")
-            }
+            (shareWrapper.getLinkFromIntent(intent) ?: shareWrapper.getTextFromIntent(intent))?.apply {
+                scanFragment?.fromShareUrl(this) ?: throw IllegalStateException("Scan fragment not visible")
+            } ?: presenter.linkError("Could not find a link to process")
         }
     }
 
@@ -103,67 +112,62 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         presenter.onStop()
     }
 
-    override fun gotoMain(playlistItemDomain: PlaylistItemDomain?, play: Boolean) {
+    override fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean) {//playlistItemDomain: PlaylistItemDomain?,
         startActivity( // todo map in NavigationMapper
             Intent(this, MainActivity::class.java).apply {
-                playlistItemDomain?.let {
-                    putExtra(Target.KEY, PLAYLIST_FRAGMENT.name)
-                    putExtra(PLAYLIST_ITEM.name, it.serialise())
-                    if (play) putExtra(PLAY_NOW.name, true)
-                }
+                putExtra(Target.KEY, PLAYLIST_FRAGMENT.name)
+                putExtra(PLAYLIST_ID.name, plId)
+                plItemId?.also { putExtra(PLAYLIST_ITEM_ID.name, it) }
+                putExtra(PLAY_NOW.name, play)
+                putExtra(SOURCE.name, source.toString())
             })
     }
 
     override fun setData(model: ShareContract.Model) {
-        //model.media.apply { editFragment.setData(this) }
-
-        top_left_button.apply {
-            isVisible = model.topLeftButtonText?.isNotBlank() ?: false
-            setOnClickListener { model.topLeftButtonAction() }
-            setText(model.topLeftButtonText)
-            setIconResource(model.topLeftButtonIcon)
-        }
-
-        bottom_left_button.apply {
-            isVisible = model.bottomLeftButtonText?.isNotBlank() ?: false
-            setOnClickListener { model.bottomLeftButtonAction() }
-            setText(model.bottomLeftButtonText)
-            setIconResource(model.bottomLeftButtonIcon)
-        }
-
-        top_right_button.apply {
-            isVisible = model.topRightButtonText?.isNotBlank() ?: false
-            setOnClickListener { model.topRightButtonAction() }
-            top_right_button.setText(model.topRightButtonText)
-            top_right_button.setIconResource(model.topRightButtonIcon)
-        }
-
-        bottom_right_button.apply {
-            isVisible = model.bottomRightButtonText?.isNotBlank() ?: false
-            setOnClickListener { model.bottomRightButtonAction() }
-            setText(model.bottomRightButtonText)
-            setIconResource(model.bottomRightButtonIcon)
-        }
+        top_left_button.applyButton(model.topLeft)
+        bottom_left_button.applyButton(model.bottomLeft)
+        top_right_button.applyButton(model.topRight)
+        bottom_right_button.applyButton(model.bottomRight)
     }
 
-    override fun showMedia(itemDomain: PlaylistItemDomain) {
-        ScanFragmentDirections.actionGotoPlaylistItem(itemDomain.serialise())
+    private fun MaterialButton.applyButton(model: ShareContract.Model.Button) {
+        isVisible = model.isVisible
+        setOnClickListener { model.action() }
+        setText(model.text)
+        setIconResource(model.icon)
+    }
+
+    override fun showMedia(itemDomain: PlaylistItemDomain, source: Source) {
+        ScanFragmentDirections.actionGotoPlaylistItem(itemDomain.serialise(), source.toString())
             .apply { navController.navigate(this) }
         //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
+    }
+
+    override fun showPlaylist(id: OrchestratorContract.Identifier<Long>) {
+        ScanFragmentDirections.actionGotoPlaylist(id.id, id.source.toString())
+            .apply { navController.navigate(this) }
     }
 
     override fun scanResult(result: ScanContract.Result) {
         presenter.scanResult(result)
     }
 
-    override suspend fun commitPlaylistItems() {
-        commitFragment?.commit()
+    override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) =
+        commitFragment.commit(onCommit)
+
+//
+//    override fun getCommittedItems() =
+//        commitFragment?.getEditedDomains()
+//            ?.filterNotNull()
+
+    // PlaylistItemEditContract.DoneNavigation
+    override fun navigateDone() {
+        presenter.afterItemEditNavigation()
     }
 
-    override fun getCommittedItems() =
-        commitFragment?.getEditedDomains()
-            ?.filterNotNull()
-
+    override fun navigate(nav: NavigationModel) {
+        navMapper.map(nav)
+    }
 
     companion object {
 

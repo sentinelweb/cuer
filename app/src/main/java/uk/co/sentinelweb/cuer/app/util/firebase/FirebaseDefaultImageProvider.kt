@@ -1,5 +1,8 @@
 package uk.co.sentinelweb.cuer.app.util.firebase
 
+import android.graphics.Bitmap
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.RequestManager
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
@@ -94,3 +97,15 @@ class FirebaseDefaultImageProvider constructor(
         private val ROOT = "gs://cuer-275020.appspot.com/playlist_header/"
     }
 }
+
+inline fun RequestManager.loadFirebaseOrOtherUrl(url: String, imageProvider: FirebaseDefaultImageProvider) = this.run {
+    if (url.startsWith("gs://")) load(imageProvider.makeRef(url))
+    else load(url)
+}
+
+inline fun RequestBuilder<Bitmap>.loadFirebaseOrOtherUrl(url: String, imageProvider: FirebaseDefaultImageProvider) = this.run {
+    if (url.startsWith("gs://")) load(imageProvider.makeRef(url))
+    else load(url)
+}
+
+

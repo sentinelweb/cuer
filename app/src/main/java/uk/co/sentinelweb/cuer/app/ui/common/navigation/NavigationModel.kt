@@ -26,10 +26,10 @@ data class NavigationModel constructor(
         MAIN_MEDIA(listOf(MEDIA)),
         MAIN_MEDIA_PLAY(listOf(MEDIA), listOf(PLAY_NOW)),
         SHARE(listOf(MEDIA)),
-        PLAYLIST_EDIT(listOf(PLAYLIST_ID)),
+        PLAYLIST_EDIT(listOf(PLAYLIST_ID, SOURCE)),
         PLAYLIST_CREATE(),
-        PLAYLIST_FRAGMENT(listOf(PLAYLIST_ID), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
-        PLAYLIST_ITEM_FRAGMENT(listOf(PLAYLIST_ITEM), listOf(FRAGMENT_NAV_EXTRAS)),
+        PLAYLIST_FRAGMENT(listOf(PLAYLIST_ID, SOURCE), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
+        PLAYLIST_ITEM_FRAGMENT(listOf(PLAYLIST_ITEM, SOURCE), listOf(FRAGMENT_NAV_EXTRAS)),
         PLAYLISTS_FRAGMENT(),
         BROWSE_FRAGMENT(),
         PLAYER_FRAGMENT(),
@@ -53,7 +53,8 @@ data class NavigationModel constructor(
         PLAYLIST_ID, /* Long */
         PLAYLIST_ITEM_ID, /* Long */
         PLAYLIST_ITEM, /* PlaylistItemDomain */
-        FRAGMENT_NAV_EXTRAS /**/
+        FRAGMENT_NAV_EXTRAS, /* FragmentNavigator.Extras */
+        SOURCE /* uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source */
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)
@@ -62,6 +63,11 @@ data class NavigationModel constructor(
         fun getBoolean(i: Intent?) = i?.getBooleanExtra(name, false) ?: false
         fun getString(b: Bundle?) = b?.getString(name)
         fun getString(i: Intent?) = i?.getStringExtra(name)
+        inline fun <reified T : Enum<T>> getEnum(b: Bundle?): T? =
+            b?.getString(name)?.let { pref -> enumValues<T>().find { it.name == pref } }
+
+        inline fun <reified T : Enum<T>> getEnum(i: Intent?): T? =
+            i?.getStringExtra(name)?.let { pref -> enumValues<T>().find { it.name == pref } }
     }
 
 }

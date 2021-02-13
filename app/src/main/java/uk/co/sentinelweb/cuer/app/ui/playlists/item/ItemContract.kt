@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item
 import android.text.SpannableString
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 interface ItemContract {
@@ -41,7 +42,7 @@ interface ItemContract {
     data class State constructor(var item: Model? = null)
 
     data class Model(
-        override val id: Long,
+        override val id: Long,// todo OrchestratorContract.Identifier
         val index: Int,
         val title: String,
         val checkIcon: Boolean,
@@ -49,7 +50,9 @@ interface ItemContract {
         val starred: Boolean,
         val count: Int,
         val newItems: Int,
-        val loopMode: PlaylistDomain.PlaylistModeDomain
+        val loopMode: PlaylistDomain.PlaylistModeDomain,
+        val type: PlaylistDomain.PlaylistTypeDomain,
+        val platform: PlatformDomain?
     ) : ItemBaseModel(id)
 
 }
