@@ -25,6 +25,7 @@ class ScanPresenter(
     private val linkScanner: LinkScanner,
     private val log: LogWrapper
 ) : ScanContract.Presenter {
+
     init {
         log.tag(this)
     }

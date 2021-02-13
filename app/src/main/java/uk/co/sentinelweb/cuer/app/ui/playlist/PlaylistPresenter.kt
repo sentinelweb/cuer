@@ -135,6 +135,7 @@ class PlaylistPresenter(
 
         playlistItemOrchestrator.updates.onEach { (op, source, plistItem) ->
             log.d("item changed: $op, $source, ${plistItem.id} ${plistItem.media.title}")
+            val currentIndexBefore = state.playlist?.currentIndex
             when (op) { // todo just apply model updates (instead of full rebuild)
                 FLAT,
                 FULL -> if (plistItem.playlistId?.toIdentifier(source) == state.playlistIdentifier) {
@@ -156,7 +157,10 @@ class PlaylistPresenter(
                         ?.takeIf { it != state.playlist }
                         ?.also { state.playlist = it }
                         ?.also { updateView() }
-            }
+            }.takeIf { !isQueuedPlaylist && currentIndexBefore != state.playlist?.currentIndex }
+                ?.apply {
+                    state.playlist?.apply { playlistOrchestrator.updateCurrentIndex(this, state.playlistIdentifier.toFlatOptions()) }
+                }
         }.launchIn(coroutines.mainScope)
 
         mediaOrchestrator.updates.onEach { (op, source, media) ->
@@ -252,7 +256,7 @@ class PlaylistPresenter(
             ?.let { moveItem ->
                 state.viewModelScope.launch {
                     moveItem.copy(playlistId = it, order = timeProvider.currentTimeMillis())
-                        .apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.toFlatOptions<Long>()) }
+                        .apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.toFlatOptions()) }
                 }
             }
     }
@@ -268,7 +272,7 @@ class PlaylistPresenter(
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
                     // todo handle exceptions
-                    playlistItemOrchestrator.delete(deleteItem, state.playlistIdentifier.toFlatOptions<Long>())
+                    playlistItemOrchestrator.delete(deleteItem, state.playlistIdentifier.toFlatOptions())
                     view.showDeleteUndo("Deleted: ${deleteItem.media.title}") // todo extract
                 }
         }
@@ -347,7 +351,7 @@ class PlaylistPresenter(
 
     private fun commitHeaderChange(plist: PlaylistDomain) {
         state.viewModelScope.launch {
-            playlistOrchestrator.save(plist, state.playlistIdentifier.toFlatOptions<Long>())
+            playlistOrchestrator.save(plist, state.playlistIdentifier.toFlatOptions())
         }
     }
 
@@ -403,6 +407,7 @@ class PlaylistPresenter(
                 ?.also {
                     modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier)
                         .also { view.setModel(it, false) }
+                    view.highlightPlayingItem(it.currentIndex)
                 }
                 ?.also { playlistModified ->
                     state.viewModelScope.launch {
@@ -411,7 +416,7 @@ class PlaylistPresenter(
                             ?.let { item ->
                                 item to (item.id ?: throw java.lang.IllegalStateException("Moved item has no ID"))
                                     .toIdentifier(state.playlistIdentifier.source)
-                                    .toFlatOptions<Long>()
+                                    .toFlatOptions()
                             }
                             ?.let {
                                 playlistItemOrchestrator.save(it.first, it.second)
@@ -459,7 +464,7 @@ class PlaylistPresenter(
     override fun undoDelete() {
         state.deletedPlaylistItem?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistItemOrchestrator.save(itemDomain, state.playlistIdentifier.toFlatOptions<Long>())
+                playlistItemOrchestrator.save(itemDomain, state.playlistIdentifier.toFlatOptions())
                 state.deletedPlaylistItem = null
             }
         }
@@ -480,6 +485,7 @@ class PlaylistPresenter(
                     val existingMediaPlatformIds = existingMedia.map { it.platformId }
                     val mediaLookup = playlist.items.map { it.media }.toMutableList()
                         .apply { removeIf { existingMediaPlatformIds.contains(it.platformId) } }
+                        .map { it.copy(id = null) }
                         .let { mediaOrchestrator.save(it, Options(LOCAL, flat = false)) }
                         .toMutableList()
                         .apply { addAll(existingMedia) }
@@ -487,6 +493,7 @@ class PlaylistPresenter(
                     playlist.copy(id = null,
                         items = playlist.items.map {
                             it.copy(
+                                id = null,
                                 media = mediaLookup.get(it.media.platformId)
                                     ?: throw java.lang.IllegalStateException("Media save failed")
                             )

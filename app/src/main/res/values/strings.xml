@@ -36,6 +36,7 @@
     <string name="share_button_reject">Reject</string>
     <string name="share_button_play_now">Play Now</string>
     <string name="share_button_add_to_queue">Add to queue</string>
+    <string name="share_button_add_playlist">Add playlist</string>
     <string name="share_button_play_locally">Play locally</string>
     <string name="share_button_play_return">Play / Return</string>
     <string name="share_button_goto_item">Go to item</string>

@@ -80,6 +80,7 @@ class QueueMediator constructor(
                                 }
                             }
                             DELETE -> {
+                                _currentItemFlow.emit(null)
                                 refreshQueue(state.playlistIdentifier)// should load default
                             }
                         }
@@ -181,7 +182,7 @@ class QueueMediator constructor(
                     dateLastPlayed = updatedMedia.dateLastPlayed,
                     watched = true
                 )
-                mediaOrchestrator.save(mediaUpdated, state.playlistIdentifier.toFlatOptions<Long>(true))
+                mediaOrchestrator.save(mediaUpdated, state.playlistIdentifier.toFlatOptions(true))
                 copy(media = mediaUpdated)
             }
             state.playlist = state.playlist?.let {
@@ -221,7 +222,7 @@ class QueueMediator constructor(
     private suspend fun updateCurrentItem(resetPosition: Boolean) {
         state.currentItem = state.playlist
             ?.let { playlist ->
-                playlistOrchestrator.updateCurrentIndex(playlist, state.playlistIdentifier.toFlatOptions<Long>(true))
+                playlistOrchestrator.updateCurrentIndex(playlist, state.playlistIdentifier.toFlatOptions(true))
                 playlist.currentIndex.let { playlist.items[it] }
             }
             ?: throw NullPointerException("playlist should not be null")

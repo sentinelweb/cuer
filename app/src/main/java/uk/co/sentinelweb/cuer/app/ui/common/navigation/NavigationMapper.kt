@@ -53,7 +53,8 @@ class NavigationMapper constructor(
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
                     PLAYLIST_ITEM_ID.name to nav.params[PLAYLIST_ITEM_ID],
-                    PLAY_NOW.name to nav.params[PLAY_NOW]
+                    PLAY_NOW.name to nav.params[PLAY_NOW],
+                    SOURCE.name to nav.params[SOURCE]
                 ),
                 navOptions(optionsBuilder = {
                     launchSingleTop = true

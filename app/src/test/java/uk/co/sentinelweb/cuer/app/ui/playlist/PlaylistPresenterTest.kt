@@ -618,10 +618,7 @@ class PlaylistPresenterTest {
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
-                mockPlaylistItemOrchestrator.delete(
-                    deletedItem,
-                    deletedItem.id!!.toIdentifier(fixtCurrentSource).toFlatOptions<Long>()
-                )
+                mockPlaylistItemOrchestrator.delete(deletedItem, fixtCurrentSource.toFlatOptions())
             }
             verify { mockView.setModel(fixtExpectedMapped) }
             assertThat(fixtState!!.deletedPlaylistItem).isEqualTo(deletedItem)
@@ -654,10 +651,7 @@ class PlaylistPresenterTest {
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
-                mockPlaylistItemOrchestrator.save(
-                    fixtExpectedChangedItem,
-                    fixtExpectedChangedItem.id!!.toIdentifier(fixtCurrentSource).toFlatOptions<Long>()
-                )
+                mockPlaylistItemOrchestrator.save(fixtExpectedChangedItem, fixtCurrentSource.toFlatOptions())
             }
             verify { mockView.setModel(fixtExpectedMapped, false) }
             assertThat(fixtState!!.dragFrom).isNull()
@@ -786,10 +780,7 @@ class PlaylistPresenterTest {
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
-                mockPlaylistItemOrchestrator.save(
-                    deletedItem,
-                    deletedItem.id!!.toIdentifier(fixtCurrentSource).toFlatOptions<Long>()
-                )
+                mockPlaylistItemOrchestrator.save(deletedItem, fixtCurrentSource.toFlatOptions())
             }
             verify { mockView.setModel(fixtExpectedMapped) }
             assertThat(fixtState!!.deletedPlaylistItem).isNull()

@@ -187,11 +187,14 @@ class PlaylistFragment :
             log.d("onResume: got nav on callup model = $this")
         } ?: let {
             val plId = PLAYLIST_ID.getLong(arguments)
-            val source: Source? = SOURCE.getEnum<Source>(arguments)// todo enforce source?
+            val source: Source? = SOURCE.getEnum<Source>(arguments)
+            val plItemId = PLAYLIST_ITEM_ID.getLong(arguments)
+            val playNow = PLAY_NOW.getBoolean(arguments) ?: false
+            log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source")
             val onResumeGotArguments = plId?.let { it != -1L } ?: false
             if (onResumeGotArguments) {
                 //log.d("onResume: got nav on args model = plid = $plId plitemId = ${PLAYLIST_ITEM_ID.getLong(arguments)} playNow = ${PLAY_NOW.getBoolean(arguments) }" )
-                makeNav(plId, PLAYLIST_ITEM_ID.getLong(arguments), PLAY_NOW.getBoolean(arguments) ?: false, source)
+                makeNav(plId, plItemId, playNow, source)
             } else null
         })?.apply {
             log.d("onResume: apply nav args model = $this")

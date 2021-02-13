@@ -104,7 +104,9 @@ class YouTubePlayerListener(
             )
         }
         if (shouldUpdateMedia(throttle)) {
-            state.currentMedia?.apply { queue.updateCurrentMediaItem(this) }
+            if (state.receivedVideoId != null && state.receivedVideoId == state.currentMedia?.platformId) {
+                state.currentMedia?.apply { queue.updateCurrentMediaItem(this) }
+            } else log.d("Not updating media: ${state.receivedVideoId} != ${state.currentMedia?.platformId}")
             setTimeUpdateMedia()
         }
     }
@@ -156,6 +158,7 @@ class YouTubePlayerListener(
 
     override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
         this.youTubePlayer = youTubePlayer
+        state.receivedVideoId = videoId
         log.d("Got id: $videoId media=${state.currentMedia?.stringMedia()}")
     }
 
@@ -230,6 +233,7 @@ class YouTubePlayerListener(
             playerUi?.setPlaylistItem(queue.currentItem, queue.source)
         } ?: run {
             state.currentMedia = null
+            state.receivedVideoId = null
             youTubePlayer?.pause()
             playerUi?.reset()
             playerUi?.setPlaylistItem(null, queue.source)

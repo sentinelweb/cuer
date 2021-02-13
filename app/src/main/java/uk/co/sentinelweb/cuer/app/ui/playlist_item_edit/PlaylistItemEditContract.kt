@@ -10,6 +10,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
@@ -28,9 +29,7 @@ interface PlaylistItemEditContract {
         val imageUrl: String?,
         val title: CharSequence?,
         val description: String?,
-        val chips: List<ChipModel> = listOf(
-            ChipModel(ChipModel.Type.PLAYLIST_SELECT)
-        ),
+        val chips: List<ChipModel> = listOf(PLAYLIST_SELECT_MODEL),
         val channelTitle: String?,
         val channelThumbUrl: String?,
         val channelDescription: String?,

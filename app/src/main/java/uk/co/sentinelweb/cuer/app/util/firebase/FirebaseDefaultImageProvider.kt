@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.firebase
 
+import android.graphics.Bitmap
+import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
@@ -100,3 +102,10 @@ inline fun RequestManager.loadFirebaseOrOtherUrl(url: String, imageProvider: Fir
     if (url.startsWith("gs://")) load(imageProvider.makeRef(url))
     else load(url)
 }
+
+inline fun RequestBuilder<Bitmap>.loadFirebaseOrOtherUrl(url: String, imageProvider: FirebaseDefaultImageProvider) = this.run {
+    if (url.startsWith("gs://")) load(imageProvider.makeRef(url))
+    else load(url)
+}
+
+
