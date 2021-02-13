@@ -191,6 +191,7 @@ class PlaylistFragment :
             val source: Source? = SOURCE.getEnum<Source>(arguments)
             val plItemId = PLAYLIST_ITEM_ID.getLong(arguments)
             val playNow = PLAY_NOW.getBoolean(arguments) ?: false
+            arguments?.putBoolean(PLAY_NOW.name, false)
             log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source")
             val onResumeGotArguments = plId?.let { it != -1L } ?: false
             if (onResumeGotArguments) {

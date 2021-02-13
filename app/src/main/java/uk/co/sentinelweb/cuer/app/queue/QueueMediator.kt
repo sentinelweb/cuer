@@ -143,16 +143,19 @@ class QueueMediator constructor(
     }
 
     private suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?, source: Source) {
-        playlist.indexOfItemId(playlistItemId)?.let { foundIndex ->
-            playlist.let {
-                it.copy(currentIndex = foundIndex).apply {
-                    playlistOrchestrator.save(it, Options(source, true))
-                }
+        playlist
+            .let {
+                it.indexOfItemId(playlistItemId)?.let { foundIndex ->
+                    playlist.let {
+                        it.copy(currentIndex = foundIndex).apply {
+                            playlistOrchestrator.save(it, Options(source, true))
+                        }
+                    }
+                } ?: playlist
+            }.also {
+                refreshQueueFrom(it, source)
+                playNow()
             }
-        }?.also {
-            refreshQueueFrom(it, source)
-            playNow()
-        }
     }
 
     private fun playNow() {
