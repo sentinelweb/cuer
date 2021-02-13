@@ -230,8 +230,10 @@ class PlaylistFragment :
     override fun setList(items: List<ItemContract.Model>, animate: Boolean) {
         binding.playlistSwipe.isRefreshing = false
         adapter.setData(items, animate)
-        binding.playlistFabUp.isVisible = items.size > 30
-        binding.playlistFabDown.isVisible = items.size > 30
+        val isListLarge = items.size > 30
+        binding.playlistFabUp.isVisible = isListLarge
+        binding.playlistFabDown.isVisible = isListLarge
+        binding.playlistFabRefresh.isVisible = isListLarge
     }
 
     override fun setHeaderModel(model: PlaylistContract.Model) {

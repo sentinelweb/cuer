@@ -32,6 +32,7 @@
     <color name="player_button_progress">@color/primary_dark</color>
 
     <!--    custom colors-->
+    <color name="fab_disabled">@color/grey_400</color>
     <color name="dark_red">#961717</color>
     <color name="dark_indigo">#1e245f</color>
     <color name="black_transparent_background">#8a000000</color>

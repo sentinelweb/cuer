@@ -239,7 +239,7 @@
     </style>
 
     <style name="FabButton" parent="Widget.MaterialComponents.FloatingActionButton">
-        <item name="backgroundTint">?colorPrimary</item>
+        <item name="backgroundTint">@color/fab_primary_csl</item>
         <item name="tint">?colorOnPrimary</item>
     </style>
 
