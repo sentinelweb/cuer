@@ -97,6 +97,7 @@ class PlaylistPresenter(
         ytContextHolder.addConnectionListener(castConnectionListener)
         queue.currentPlaylistFlow
             .filter { isQueuedPlaylist }
+            .onEach { log.d("q.playlist change id=${it.id} index = ${it.currentIndex}") }
             .onEach { view.highlightPlayingItem(it.currentIndex) }
             .launchIn(coroutines.mainScope)
 
@@ -570,9 +571,10 @@ class PlaylistPresenter(
                         val changedItem = get(index).copy(media = m)
                         state.playlist = state.playlist
                             ?.copy(items = toMutableList().apply { set(index, changedItem) })
-
-                        state.model = state.model
-                            ?.copy(items = state.model!!.items!!.toMutableList().apply { set(index, modelMapper.map(changedItem, index)) })
+                        log.d("updateMediaItem: idx: $index - plId: ${changedItem.id}")
+                        state.model = state.model?.let {
+                            it.copy(items = it.items?.toMutableList()?.apply { set(index, modelMapper.map(changedItem, index)) })
+                        }
                             ?.apply { view.setModel(this, false) }// todo  set item
                     }
             }

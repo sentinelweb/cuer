@@ -80,8 +80,10 @@ class YouTubePlayerListener(
 
     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
         this.youTubePlayer = youTubePlayer
-        state.positionSec = second
-        updateMedia(true, posSec = second)
+        if (state.positionSec != second) {
+            state.positionSec = second
+            updateMedia(true, posSec = second)
+        }
         if (shouldUpdateUi()) {
             playerUi?.setCurrentSecond(second)
             setTimeUpdateUi()
