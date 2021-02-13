@@ -34,7 +34,7 @@ interface PlaylistContract {
     interface Presenter {
         fun initialise()
         fun destroy()
-        fun refreshList()
+        fun refreshPlaylist()
         fun onItemSwipeRight(item: ItemContract.Model)
         fun onItemSwipeLeft(item: ItemContract.Model)
         fun onItemClicked(item: ItemContract.Model)

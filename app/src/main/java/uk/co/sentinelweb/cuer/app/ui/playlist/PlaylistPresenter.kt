@@ -180,10 +180,6 @@ class PlaylistPresenter(
         state.playlistIdentifier = prefsWrapper.getPair(CURRENT_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
     }
 
-    override fun refreshList() {
-        refreshPlaylist()
-    }
-
     override fun destroy() {
     }
 
@@ -471,7 +467,7 @@ class PlaylistPresenter(
         }
     }
 
-    private fun refreshPlaylist() {
+    override fun refreshPlaylist() {
         state.viewModelScope.launch { executeRefresh() }
     }
 

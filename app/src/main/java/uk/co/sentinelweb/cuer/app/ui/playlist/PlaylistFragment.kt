@@ -124,6 +124,7 @@ class PlaylistFragment :
         binding.playlistFabUp.setOnLongClickListener { presenter.scroll(Top);true }
         binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }
         binding.playlistFabDown.setOnLongClickListener { presenter.scroll(Bottom);true }
+        binding.playlistFabRefresh.setOnClickListener { presenter.refreshPlaylist() }
         binding.playlistAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false
@@ -148,7 +149,7 @@ class PlaylistFragment :
         binding.playlistFabPlaymode.setOnClickListener { presenter.onPlayModeChange() }
         //playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
         binding.playlistFabPlay.setOnClickListener { presenter.onPlayPlaylist() }
-        binding.playlistSwipe.setOnRefreshListener { presenter.refreshList() }
+        binding.playlistSwipe.setOnRefreshListener { presenter.refreshPlaylist() }
         postponeEnterTransition()
         binding.playlistList.doOnPreDraw {
             startPostponedEnterTransition()
