@@ -37,7 +37,7 @@ class PlaylistItemOrchestrator constructor(
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.loadList(filter, options)
             LOCAL -> playlistDatabaseRepository.loadPlaylistItems(filter)
-                .forceDatabaseListResultNotEmpty("Playlist item $filter does not exist")
+                .allowDatabaseListResultEmpty()
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, filter, options)

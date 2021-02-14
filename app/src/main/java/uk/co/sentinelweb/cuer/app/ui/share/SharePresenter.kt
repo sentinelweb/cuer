@@ -58,7 +58,7 @@ class SharePresenter constructor(
     private fun mapDisplayModel() {
         (state.scanResult
             ?.also {
-                if (!it.isNew)
+                if (it.isOnPlaylist)
                     view.warning("${it.type.toString().toLowerCase().capitalize()} already exists ...")
             }
             ?.let {
@@ -86,7 +86,8 @@ class SharePresenter constructor(
         state.scanResult = result
         when (result.type) {
             MEDIA -> (result.result as MediaDomain).let {
-                view.showMedia(PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null), MEMORY)
+                val itemDomain = PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null)
+                view.showMedia(itemDomain, if (result.isNew) MEMORY else LOCAL)
                 mapDisplayModel()
             }
             PLAYLIST -> (result.result as PlaylistDomain).let {
@@ -120,7 +121,7 @@ class SharePresenter constructor(
                         (state.scanResult?.result as MediaDomain)
                             .let { playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it.id!!)), Options(LOCAL)) }
                             .let {
-                                afterCommit(MEDIA, it, play, forward)
+                                afterCommit(PLAYLIST_ITEM, it, play, forward)
                             }
                     PLAYLIST -> afterCommit(PLAYLIST, listOf(state.scanResult?.result as PlaylistDomain), play, forward)
                 }
