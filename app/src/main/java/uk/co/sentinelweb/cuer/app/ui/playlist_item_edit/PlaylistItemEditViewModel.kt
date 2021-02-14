@@ -291,17 +291,16 @@ class PlaylistItemEditViewModel constructor(
         try {
             val selectedPlaylists = if (state.selectedPlaylistIds.size > 0) {
                 selectedPlaylists
-            } else if (state.source != MEMORY) {
+            } else {
                 playlistOrchestrator.loadList(DefaultFilter(), Options(LOCAL))
                     .takeIf { it.size > 0 }
                     ?: throw NoDefaultPlaylistException()
-            } else {
-                listOf()
             }
+            val saveSource = if (isNew) LOCAL else state.source
             if (state.isPlaylistsChanged && state.editingPlaylistItem?.playlistId != null) {
                 state.editingPlaylistItem?.also { item ->
                     if (!state.selectedPlaylistIds.contains(item.playlistId)) {
-                        playlistItemOrchestrator.delete(item, Options(state.source))// todo use identifier
+                        playlistItemOrchestrator.delete(item, Options(state.source))
                     }
                 }
             }
@@ -309,14 +308,14 @@ class PlaylistItemEditViewModel constructor(
                     state.media
                         ?.let {
                             if (state.isMediaChanged) {
-                                mediaOrchestrator.save(it, Options(state.source, flat = false))
+                                mediaOrchestrator.save(it, Options(saveSource, flat = false))
                             } else it
                         }
                         ?.let { savedMedia ->
                             state.media = savedMedia
                             selectedPlaylists.mapNotNull { playlist ->
                                 playlistItemOrchestrator.save(
-                                    itemCreator.buildPlayListItem(savedMedia, playlist), Options(state.source)
+                                    itemCreator.buildPlayListItem(savedMedia, playlist), Options(saveSource)
                                 )
                             }
                         }

@@ -70,7 +70,7 @@ class ScanPresenter(
                     }
             }
             ?: let {
-                modelMapper.mapMediaResult(false, false, scannedMedia)
+                modelMapper.mapMediaResult(true, false, scannedMedia)
             }
 
     private suspend fun checkPlaylist(scannedPlaylist: PlaylistDomain): ScanContract.Result? {
