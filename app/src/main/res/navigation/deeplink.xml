@@ -6,7 +6,7 @@
     >
 
     <deepLink
-        android:id="@+id/www_youtube"
+        android:id="@+id/wwwYoutube"
         app:uri="https://www.youtube.com/watch?v={id}"
         />
 
@@ -23,5 +23,14 @@
     <deepLink
         android:id="@+id/deepLinkShort"
         app:uri="https://youtu.be/{id}"
+        />
+
+    <deepLink
+        android:id="@+id/wwwYoutubePlaylist"
+        app:uri="https://www.youtube.com/playlist?list={id}"
+        />
+    <deepLink
+        android:id="@+id/youtubePlaylist"
+        app:uri="https://youtube.com/playlist?list={id}"
         />
 </navigation>
