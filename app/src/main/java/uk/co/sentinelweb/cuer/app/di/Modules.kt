@@ -87,7 +87,7 @@ object Modules {
         single { PlaylistStatsOrchestrator(get()) }
         single { PlaylistMemoryRepository(get()) }
         single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
-        factory { PlaylistUpdateOrchestrator(get(), get(), get(), get()) }
+        factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get()) }
         factory { PlaylistMediaCommitOrchestrator(get()) }
     }
 
