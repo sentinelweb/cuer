@@ -72,7 +72,7 @@ class PlaylistFragment :
     private var _binding: PlaylistFragmentBinding? = null
     private val binding get() = _binding!!
 
-    private val starMenuItem: MenuItem
+    private val starMenuItem: MenuItem?
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_star)
     private val playMenuItem: MenuItem?
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_play)
@@ -92,7 +92,12 @@ class PlaylistFragment :
     private var snackbar: Snackbar? = null
     private var createPlaylistDialog: DialogFragment? = null
 
-    private var lastPlayModeIndex = 0
+    private data class MenuState constructor(
+        var lastPlayModeIndex: Int = 0,
+        var reloadHeaderAfterMenuInit: Boolean = false
+    )
+
+    private val menuState = MenuState()
 
     init {
         log.tag(this)
@@ -137,7 +142,7 @@ class PlaylistFragment :
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == lastPlayModeIndex }
+                    modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == menuState.lastPlayModeIndex }
                     playMenuItem?.isVisible = true
                 } else if (isShow) {
                     isShow = false
@@ -163,10 +168,14 @@ class PlaylistFragment :
         modeMenuItems.forEach { it.setOnMenuItemClickListener { presenter.onPlayModeChange() } }
         playMenuItem?.isVisible = false
         playMenuItem?.setOnMenuItemClickListener { presenter.onPlayPlaylist() }
-        starMenuItem.setOnMenuItemClickListener { presenter.onStarPlaylist() }
+        starMenuItem?.setOnMenuItemClickListener { presenter.onStarPlaylist() }
         newMenuItem.setOnMenuItemClickListener { presenter.onFilterNewItems() }
         editMenuItem.setOnMenuItemClickListener { presenter.onEdit() }
         filterMenuItem.setOnMenuItemClickListener { presenter.onFilterPlaylistItems() }
+        if (menuState.reloadHeaderAfterMenuInit) {
+            presenter.reloadHeader()
+            menuState.reloadHeaderAfterMenuInit = false
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -250,15 +259,15 @@ class PlaylistFragment :
         binding.playlistCollapsingToolbar.title = model.title
         binding.playlistFabPlay.setImageResource(model.playIcon)
         binding.playlistFabPlay.isEnabled = model.canPlay
-        playMenuItem?.setIcon(model.playIcon)
+        playMenuItem?.setIcon(model.playIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
         playMenuItem?.setEnabled(model.canPlay)
-        starMenuItem.setIcon(model.starredIcon)
+        starMenuItem?.setIcon(model.starredIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
         //playlist_items.setText("${model.items.size}")
         binding.playlistFlags.isVisible = model.isDefault
         binding.playlistFabPlaymode.setImageResource(model.loopModeIcon)
-        lastPlayModeIndex = model.loopModeIndex
+        menuState.lastPlayModeIndex = model.loopModeIndex
         if (!binding.playlistFabPlaymode.isVisible) {
-            modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == lastPlayModeIndex }
+            modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == menuState.lastPlayModeIndex }
         }
     }
 

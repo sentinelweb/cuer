@@ -497,6 +497,10 @@ class PlaylistPresenter(
         }
     }
 
+    override fun reloadHeader() {
+        coroutines.mainScope.launch { updateHeader() }
+    }
+
     private suspend fun executeRefresh(animate: Boolean = true, scrollToItem: Boolean = false) {
         try {
             playlistOrchestrator
@@ -561,7 +565,7 @@ class PlaylistPresenter(
                         log.d("updateMediaItem: idx: $index - plId: ${changedItem.id}")
                         state.model = state.model?.let {
                             it.copy(items = it.items?.toMutableList()?.apply { set(index, modelMapper.map(changedItem, index)) })
-                        }
+                        }.takeIf { coroutines.mainScopeActive }
                             ?.apply { view.setModel(this, false) }// todo  set item
                     }
             }

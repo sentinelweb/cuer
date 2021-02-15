@@ -59,6 +59,7 @@ interface PlaylistContract {
         fun onResume()
         fun onPause()
         suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit)
+        fun reloadHeader()
     }
 
     interface View {
