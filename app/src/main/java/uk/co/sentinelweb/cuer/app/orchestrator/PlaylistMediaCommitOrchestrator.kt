@@ -3,9 +3,6 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
-/**
- * Checks for any existing media items in the playlist. then save the ones not existing
- */
 class PlaylistMediaCommitOrchestrator constructor(
     private val mediaOrchestrator: MediaOrchestrator
 ) {
@@ -28,6 +25,7 @@ class PlaylistMediaCommitOrchestrator constructor(
         return playlist.copy(id = null,
             items = playlist.items.map {
                 it.copy(
+                    id = null,
                     media = mediaLookup.get(it.media.platformId)
                         ?: throw java.lang.IllegalStateException("Media save failed")
                 )
