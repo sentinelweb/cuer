@@ -39,6 +39,8 @@ class YoutubeCastConnectionListener constructor(
         this.context = context
         if (state.connectionState == CC_CONNECTED) {
             setupPlayerListener()
+            youTubePlayerListener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
+            pushUpdateFromQueue()
         }
     }
 
@@ -64,11 +66,11 @@ class YoutubeCastConnectionListener constructor(
         }
         youTubePlayerListener?.let {
             it.playerUi = playerUi
+            mediaSessionManager.checkCreateMediaSession(it)
         } ?: run {
             context?.apply { setupPlayerListener() }
         }
 
-        mediaSessionManager.checkCreateMediaSession(youTubePlayerListener!!)
         pushUpdateFromQueue()
     }
 
