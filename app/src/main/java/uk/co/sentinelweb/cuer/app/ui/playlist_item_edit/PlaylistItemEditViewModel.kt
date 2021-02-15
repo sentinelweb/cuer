@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -56,7 +57,7 @@ class PlaylistItemEditViewModel constructor(
         val type: Type,
         val data: Any?
     ) {
-        enum class Type { REFRESHING }
+        enum class Type { REFRESHING, ERROR }
     }
 
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
@@ -140,19 +141,25 @@ class PlaylistItemEditViewModel constructor(
         withContext(viewModelScope.coroutineContext) {
             state.media?.let { originalMedia ->
                 _uiLiveData.value = UiEvent(REFRESHING, true)
-                mediaOrchestrator.load(originalMedia.platformId, Options(PLATFORM))
-                    ?.let {
-                        it.copy(
-                            id = originalMedia.id,
-                            dateLastPlayed = originalMedia.dateLastPlayed,
-                            starred = originalMedia.starred,
-                            watched = originalMedia.watched,
-                        )
-                            .also { state.media = it }
-                            .also { state.isMediaChanged = true }
-                            .also { update() }
-                    }
-                    ?: also { updateError() }
+                try {
+                    mediaOrchestrator.load(originalMedia.platformId, Options(PLATFORM))
+                        ?.let {
+                            it.copy(
+                                id = originalMedia.id,
+                                dateLastPlayed = originalMedia.dateLastPlayed,
+                                starred = originalMedia.starred,
+                                watched = originalMedia.watched,
+                            )
+                                .also { state.media = it }
+                                .also { state.isMediaChanged = true }
+                                .also { update() }
+                        }
+                        ?: also { updateError() }
+                } catch (e: Exception) {
+                    log.e("Caught Exception updating media", e)
+                    _uiLiveData.value = UiEvent(REFRESHING, false)
+                    _uiLiveData.value = UiEvent(ERROR, "Error ${e.message}")
+                }
             }
         }
 

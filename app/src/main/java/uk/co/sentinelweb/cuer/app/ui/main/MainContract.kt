@@ -80,7 +80,7 @@ interface MainContract {
                 }
                 scoped { YoutubeJavaApiWrapper(getSource()) }
                 viewModel { State() }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
                 scoped<PlaylistItemEditContract.DoneNavigation> {
                     MainDoneNavigation(get())
                 }

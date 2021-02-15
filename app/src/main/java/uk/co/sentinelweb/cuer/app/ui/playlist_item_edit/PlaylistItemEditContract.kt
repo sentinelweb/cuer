@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SE
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -98,6 +99,7 @@ interface PlaylistItemEditContract {
                     SelectDialogCreator((getSource() as Fragment).requireActivity())
                 }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
+                scoped { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
             }
         }
 

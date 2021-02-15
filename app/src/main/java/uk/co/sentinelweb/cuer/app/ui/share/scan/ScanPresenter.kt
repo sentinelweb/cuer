@@ -89,7 +89,8 @@ class ScanPresenter(
                     modelMapper.mapPlaylistResult(isNew, playlist)
                 }
         } catch (e: Exception) {
-            view.showMessage("Exception loading : ${e.message}")
+            log.e("Caught Error loading playlist", e)
+            view.showError("${e.message}")
             return null
         }
     }

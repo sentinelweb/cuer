@@ -472,13 +472,17 @@ class PlaylistPresenter(
 
     override fun refreshPlaylist() {
         state.viewModelScope.launch {
-            state.playlist
-                ?.takeIf { playlistUpdateOrchestrator.checkToUpdate(it) }
-                ?.also { playlistUpdateOrchestrator.update(it) }
-                ?.also { view.hideRefresh() }
-                ?: executeRefresh()
 
-
+            try {
+                state.playlist
+                    ?.takeIf { playlistUpdateOrchestrator.checkToUpdate(it) }
+                    ?.also { playlistUpdateOrchestrator.update(it) }
+                    ?.also { view.hideRefresh() }
+                    ?: executeRefresh()
+            } catch (e: Exception) {
+                log.e("Caught Error updating playlist", e)
+                view.showError(e.message ?: "Error updating ...")
+            }
         }
     }
 
@@ -495,6 +499,10 @@ class PlaylistPresenter(
         } else {
             throw IllegalStateException("Can't save non Memory playlist")
         }
+    }
+
+    override fun reloadHeader() {
+        coroutines.mainScope.launch { updateHeader() }
     }
 
     private suspend fun executeRefresh(animate: Boolean = true, scrollToItem: Boolean = false) {
@@ -561,7 +569,7 @@ class PlaylistPresenter(
                         log.d("updateMediaItem: idx: $index - plId: ${changedItem.id}")
                         state.model = state.model?.let {
                             it.copy(items = it.items?.toMutableList()?.apply { set(index, modelMapper.map(changedItem, index)) })
-                        }
+                        }.takeIf { coroutines.mainScopeActive }
                             ?.apply { view.setModel(this, false) }// todo  set item
                     }
             }

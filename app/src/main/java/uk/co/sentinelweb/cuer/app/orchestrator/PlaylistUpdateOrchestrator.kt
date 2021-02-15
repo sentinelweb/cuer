@@ -1,13 +1,11 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM as PLATFORM_SOURCE
 
 class PlaylistUpdateOrchestrator constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
@@ -25,7 +23,7 @@ class PlaylistUpdateOrchestrator constructor(
             when (p.platform) {
                 YOUTUBE -> p.platformId?.apply {
                     playlistOrchestrator
-                        .load(this, Options(PLATFORM_SOURCE, flat = false))
+                        .load(this, Options(Source.PLATFORM, flat = false))
                         ?.let { removeExistingItems(it, p) }
                         ?.takeIf { it.items.size > 0 }
                         ?.let { playlistMediaCommitOrchestrator.commitMediaAndReplace(it, LOCAL) }
