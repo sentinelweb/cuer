@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 class YoutubeCastConnectionListener constructor(
+    private val state: State,
     private val creator: YoutubePlayerContextCreator,
     private val mediaSessionManager: MediaSessionManager,
     private val castWrapper: ChromeCastWrapper,
@@ -21,14 +22,24 @@ class YoutubeCastConnectionListener constructor(
     private val coroutines: CoroutineContextProvider
 ) : ChromecastConnectionListener {
 
-    lateinit var context: ChromecastYouTubePlayerContext
+    data class State constructor(
+        var connectionState: ConnectionState? = null
+    )
+
+    private var context: ChromecastYouTubePlayerContext? = null
     private var youTubePlayerListener: YouTubePlayerListener? = null
-    private var connectionState: ConnectionState? = null
 
     init {
         queue.currentPlaylistFlow
             .onEach { pushUpdateFromQueue() }
             .launchIn(coroutines.mainScope)
+    }
+
+    fun setContext(context: ChromecastYouTubePlayerContext) {
+        this.context = context
+        if (state.connectionState == CC_CONNECTED) {
+            setupPlayerListener()
+        }
     }
 
     var playerUi: CastPlayerContract.PlayerControls? = null
@@ -42,18 +53,20 @@ class YoutubeCastConnectionListener constructor(
         }
 
     override fun onChromecastConnecting() {
-        connectionState = CC_CONNECTING.also {
+        state.connectionState = CC_CONNECTING.also {
             playerUi?.setConnectionState(it)
         }
     }
 
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        connectionState = CC_CONNECTED.also {
+        state.connectionState = CC_CONNECTED.also {
             playerUi?.setConnectionState(it)
         }
         youTubePlayerListener?.let {
             it.playerUi = playerUi
-        } ?: setupPlayerListener() // todo crash here https://github.com/sentinelweb/cuer/issues/137
+        } ?: run {
+            context?.apply { setupPlayerListener() }
+        }
 
         mediaSessionManager.checkCreateMediaSession(youTubePlayerListener!!)
         pushUpdateFromQueue()
@@ -61,13 +74,13 @@ class YoutubeCastConnectionListener constructor(
 
     private fun setupPlayerListener() {
         youTubePlayerListener = creator.createPlayerListener().also {
-            context.initialize(it)
+            context?.initialize(it) ?: throw IllegalStateException("context has not been initialised")
             it.playerUi = playerUi
         }
     }
 
     override fun onChromecastDisconnected() {
-        connectionState = CC_DISCONNECTED.also {
+        state.connectionState = CC_DISCONNECTED.also {
             playerUi?.setConnectionState(it)
         }
         youTubePlayerListener?.onDisconnected()
@@ -76,11 +89,11 @@ class YoutubeCastConnectionListener constructor(
     }
 
     private fun restoreState() {
-        connectionState?.apply { playerUi?.setConnectionState(this) }
+        state.connectionState?.apply { playerUi?.setConnectionState(this) }
     }
 
     fun isConnected(): Boolean {
-        return connectionState == CC_CONNECTED
+        return state.connectionState == CC_CONNECTED
     }
 
     fun destroy() {

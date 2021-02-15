@@ -12,12 +12,13 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.stringMedia
 
 class YouTubePlayerListener(
-    private val state: YouTubePlayerListenerState,
+    private val state: State,
     private val queue: QueueMediatorContract.Consumer,
     private val mediaSessionManager: MediaSessionManager,
     private val log: LogWrapper,
@@ -25,6 +26,17 @@ class YouTubePlayerListener(
     private val coroutines: CoroutineContextProvider
 ) : AbstractYouTubePlayerListener(),
     CastPlayerContract.PlayerControls.Listener {
+
+
+    data class State constructor(
+        var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
+        var positionSec: Float = 0f, // todo remove these mutate media
+        var durationSec: Float = 0f, // todo remove these mutate media
+        var currentMedia: MediaDomain? = null,
+        var lastUpdateMedia: Long = -1L,
+        var lastUpdateUI: Long = -1L,
+        var receivedVideoId: String? = null
+    )
 
     private var youTubePlayer: YouTubePlayer? = null
 
