@@ -97,7 +97,7 @@ interface ShareContract {
                     )
                 }
                 scoped { ShareWrapper(getSource()) }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
                 viewModel { State() }
                 scoped {
                     ShareModelMapper(

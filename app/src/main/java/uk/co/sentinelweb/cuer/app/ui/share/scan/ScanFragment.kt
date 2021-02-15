@@ -40,6 +40,10 @@ class ScanFragment : Fragment(R.layout.scan_fragment), ScanContract.View {
         snackbarWrapper.make(msg).show()
     }
 
+    override fun showError(msg: String) {
+        snackbarWrapper.makeError(msg).show()
+    }
+
     override fun setModel(model: ScanContract.Model) {
         binding.scanResult.setImageResource(model.resultIcon)
         binding.scanText.isVisible = true

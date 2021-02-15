@@ -395,6 +395,10 @@ class PlaylistFragment :
         }
     }
 
+    override fun showError(message: String) {
+        snackbarWrapper.makeError(message).show()
+    }
+
     override fun exit() = TODO()
     //endregion
 

@@ -34,11 +34,13 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -57,6 +59,7 @@ class PlaylistItemEditFragment
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
     private val doneNavigation: PlaylistItemEditContract.DoneNavigation by currentScope.inject()// from activity (see onAttach)
+    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
 
     private val starMenuItem: MenuItem
         get() = ple_toolbar.menu.findItem(R.id.plie_star)
@@ -199,6 +202,7 @@ class PlaylistItemEditFragment
                 override fun onChanged(model: PlaylistItemEditViewModel.UiEvent) {
                     when (model.type) {
                         REFRESHING -> ple_swipe.isRefreshing = model.data as Boolean
+                        ERROR -> snackbarWrapper.makeError(model.data as String).show()
                     }
                 }
             })

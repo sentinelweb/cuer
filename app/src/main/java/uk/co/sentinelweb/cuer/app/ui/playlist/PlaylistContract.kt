@@ -82,6 +82,7 @@ interface PlaylistContract {
         fun setPlayState(state: PlayState)
         fun exit()
         fun hideRefresh()
+        fun showError(message: String)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
@@ -154,7 +155,7 @@ interface PlaylistContract {
                 scoped { PlaylistAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory(get(), get()) }

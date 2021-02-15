@@ -20,6 +20,7 @@ interface ScanContract {
         var listener: Listener
         fun fromShareUrl(uriString: String)
         fun showMessage(msg: String)
+        fun showError(msg: String)
         fun setModel(model: Model)
         fun setResult(result: Result)
     }
@@ -68,7 +69,7 @@ interface ScanContract {
                     )
                 }
                 scoped { ScanMapper() }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource<ScanFragment>().requireActivity()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource<ScanFragment>().requireActivity(), get()) }
                 viewModel { State() }
             }
         }

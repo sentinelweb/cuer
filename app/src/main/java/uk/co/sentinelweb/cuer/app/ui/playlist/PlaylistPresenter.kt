@@ -472,13 +472,17 @@ class PlaylistPresenter(
 
     override fun refreshPlaylist() {
         state.viewModelScope.launch {
-            state.playlist
-                ?.takeIf { playlistUpdateOrchestrator.checkToUpdate(it) }
-                ?.also { playlistUpdateOrchestrator.update(it) }
-                ?.also { view.hideRefresh() }
-                ?: executeRefresh()
 
-
+            try {
+                state.playlist
+                    ?.takeIf { playlistUpdateOrchestrator.checkToUpdate(it) }
+                    ?.also { playlistUpdateOrchestrator.update(it) }
+                    ?.also { view.hideRefresh() }
+                    ?: executeRefresh()
+            } catch (e: Exception) {
+                log.e("Caught Error updating playlist", e)
+                view.showError(e.message ?: "Error updating ...")
+            }
         }
     }
 

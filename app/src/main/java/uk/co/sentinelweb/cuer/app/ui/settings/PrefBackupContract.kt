@@ -47,7 +47,7 @@ interface PrefBackupContract {
                         log = get()
                     )
                 }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
                 viewModel { State() }
             }
         }

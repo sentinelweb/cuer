@@ -36,7 +36,7 @@ interface PrefRootContract {
                         timeProvider = get()
                     )
                 }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
                 viewModel { State() }
             }
         }

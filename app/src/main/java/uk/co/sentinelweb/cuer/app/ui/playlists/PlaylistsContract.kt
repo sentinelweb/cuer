@@ -97,7 +97,7 @@ interface PlaylistsContract {
                     )
                 }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory(get()) }
