@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
@@ -11,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATF
 class PlaylistUpdateOrchestrator constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val mediaOrchestrator: MediaOrchestrator,
     private val playlistMediaCommitOrchestrator: PlaylistMediaCommitOrchestrator,
     private val timeProvider: TimeProvider,
     private val updateChecker: UpdateCheck = PlatformUpdateCheck()
@@ -34,10 +36,14 @@ class PlaylistUpdateOrchestrator constructor(
         }
     }
 
-    private fun removeExistingItems(platform: PlaylistDomain, existing: PlaylistDomain): PlaylistDomain {
-        val existingMediaPlatformIds = existing.items.map { it.media.platformId }
+    private suspend fun removeExistingItems(platform: PlaylistDomain, existing: PlaylistDomain): PlaylistDomain {
+        val existingPlaylistMediaPlatformIds = existing.items.map { it.media.platformId }
+        val platformPlaylistExistingMediaPlatformIds =
+            mediaOrchestrator.loadList(PlatformIdListFilter(platform.items.map { it.media.platformId }), Options(LOCAL))
+                .map { it.platformId }
         val maxOrder = existing.items.maxOf { it.order }
-        val newItems = platform.items.toMutableList().apply { removeIf { existingMediaPlatformIds.contains(it.media.platformId) } }
+        val newItems =
+            platform.items.toMutableList().apply { removeIf { platformPlaylistExistingMediaPlatformIds.contains(it.media.platformId) } }
         return existing.copy(items = newItems.mapIndexed { i, item ->
             item.copy(
                 id = null,

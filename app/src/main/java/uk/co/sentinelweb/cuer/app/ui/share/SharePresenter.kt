@@ -58,7 +58,7 @@ class SharePresenter constructor(
     private fun mapDisplayModel() {
         (state.scanResult
             ?.also {
-                if (it.isOnPlaylist)
+                if ((it.type == MEDIA && (!it.isNew || !it.isOnPlaylist)) || (it.type == PLAYLIST && !it.isNew))
                     view.warning("${it.type.toString().toLowerCase().capitalize()} already exists ...")
             }
             ?.let {
