@@ -485,9 +485,8 @@ class PlaylistPresenter(
     override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit) {
         if (state.playlistIdentifier.source == MEMORY) {
             state.playlist
-                ?.let {
-                    playlistMediaCommitOrchestrator.commitMediaAndReplace(it, LOCAL)
-                }
+                ?.let { playlistMediaCommitOrchestrator.commitMediaAndReplace(it, LOCAL) }
+                ?.let { it.copy(items = it.items.map { it.copy(id = null) }) }
                 ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
                 ?.also { state.playlistIdentifier = it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure") }
                 ?.also { state.playlist = it }
