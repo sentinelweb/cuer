@@ -237,6 +237,10 @@ class PlaylistFragment :
         binding.playlistFabRefresh.isVisible = isListLarge
     }
 
+    override fun hideRefresh() {
+        binding.playlistSwipe.isRefreshing = false
+    }
+
     override fun setHeaderModel(model: PlaylistContract.Model) {
 
         Glide.with(requireContext())

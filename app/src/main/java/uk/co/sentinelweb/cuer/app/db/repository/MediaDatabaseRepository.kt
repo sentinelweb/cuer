@@ -12,7 +12,9 @@ import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data.Empty
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
@@ -67,7 +69,7 @@ class MediaDatabaseRepository constructor(
                     .let { mediaDao.insertAll(it) }
                     .also { database.setTransactionSuccessful() }
                     .also { database.endTransaction() }
-                    .let { idlist -> Data(loadList(OrchestratorContract.IdListFilter(idlist)).data) }
+                    .let { idlist -> Data(loadList(IdListFilter(idlist)).data) }
                     .also { if (emit) it.data?.forEach { _mediaFlow.emit((if (flat) FLAT else FULL) to it) } }
             } catch (e: Throwable) {
                 val msg = "Couldn't save ${domains.map { it.url }}"
@@ -96,17 +98,16 @@ class MediaDatabaseRepository constructor(
         try {// todo better transactions
             database.beginTransaction()
             when (filter) {
-                is OrchestratorContract.IdListFilter ->
+                is IdListFilter ->
                     mediaDao
                         .loadAllByIds(filter.ids.toLongArray())
                         .map { mediaMapper.map(it) }
                         .let { Data(it) }
-                is OrchestratorContract.PlatformIdListFilter ->
-                    mediaDao
-                        .findByMediaId(filter.ids[0])
-                        ?.let { listOf(mediaMapper.map(it)) }
-                        ?.let { Data.dataOrEmpty(it) }
-                        ?: Empty(listOf())
+                is PlatformIdListFilter ->
+                    filter.ids
+                        .mapNotNull { mediaDao.findByMediaId(it) }
+                        .map { mediaMapper.map(it) }
+                        .let { Data.dataOrEmpty(it) }
                 else ->// todo return empty for else
                     mediaDao
                         .getAll()

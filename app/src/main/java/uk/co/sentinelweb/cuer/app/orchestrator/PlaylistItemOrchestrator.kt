@@ -63,16 +63,25 @@ class PlaylistItemOrchestrator constructor(
     suspend override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.save(domain, options)
-            LOCAL -> playlistDatabaseRepository.savePlaylistItem(domain, options.flat)
+            LOCAL -> playlistDatabaseRepository.savePlaylistItem(domain, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
-    suspend override fun save(domains: List<PlaylistItemDomain>, options: Options): List<PlaylistItemDomain> {
-        throw NotImplementedException()
-    }
+    suspend override fun save(domains: List<PlaylistItemDomain>, options: Options): List<PlaylistItemDomain> =
+        when (options.source) {
+            MEMORY -> domains.map {
+                playlistItemMemoryRepository.save(it, options)
+            }
+            LOCAL -> playlistDatabaseRepository.savePlaylistItems(domains, options.emit)
+                .forceDatabaseSuccessNotNull("Save failed $domains")
+            LOCAL_NETWORK -> TODO()
+            REMOTE -> TODO()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)
+        }
+
 
     override suspend fun count(filter: Filter, options: Options): Int =
         when (options.source) {
