@@ -53,7 +53,7 @@ class YoutubeCastConnectionListener constructor(
         }
         youTubePlayerListener?.let {
             it.playerUi = playerUi
-        } ?: setupPlayerListener()
+        } ?: setupPlayerListener() // todo crash here https://github.com/sentinelweb/cuer/issues/137
 
         mediaSessionManager.checkCreateMediaSession(youTubePlayerListener!!)
         pushUpdateFromQueue()

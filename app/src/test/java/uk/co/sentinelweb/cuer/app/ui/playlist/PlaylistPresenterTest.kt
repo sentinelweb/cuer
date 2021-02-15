@@ -56,10 +56,16 @@ class PlaylistPresenterTest {
     lateinit var mockMediaOrchestrator: MediaOrchestrator
 
     @MockK
+    lateinit var mockPlaylistMediaCommitOrchestrator: PlaylistMediaCommitOrchestrator
+
+    @MockK
     lateinit var mockPlaylistOrchestrator: PlaylistOrchestrator
 
     @MockK
     lateinit var mockPlaylistItemOrchestrator: PlaylistItemOrchestrator
+
+    @MockK
+    lateinit var mockPlaylistUpdateOrchestrator: PlaylistUpdateOrchestrator
 
     @MockK
     lateinit var mockModelMapper: PlaylistModelMapper
@@ -182,8 +188,10 @@ class PlaylistPresenterTest {
             mockView,
             fixtState!!,
             mockMediaOrchestrator,
+            mockPlaylistMediaCommitOrchestrator,
             mockPlaylistOrchestrator,
             mockPlaylistItemOrchestrator,
+            mockPlaylistUpdateOrchestrator,
             mockModelMapper,
             mockQueue,
             mockToastWrapper,

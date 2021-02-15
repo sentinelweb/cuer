@@ -80,6 +80,7 @@ interface PlaylistContract {
         fun showCastRouteSelectorDialog()
         fun setPlayState(state: PlayState)
         fun exit()
+        fun hideRefresh()
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
@@ -135,7 +136,9 @@ interface PlaylistContract {
                         playlistDialogModelCreator = get(),
                         timeProvider = get(),
                         coroutines = get(),
-                        res = get()
+                        res = get(),
+                        playlistMediaCommitOrchestrator = get(),
+                        playlistUpdateOrchestrator = get()
                     )
                 }
                 scoped {

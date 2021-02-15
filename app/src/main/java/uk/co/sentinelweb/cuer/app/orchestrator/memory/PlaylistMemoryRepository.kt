@@ -126,7 +126,7 @@ class PlaylistMemoryRepository constructor(
                         }
                         domain
                     }
-                } ?: throw DoesNotExistException()
+                } ?: throw DoesNotExistException("Playlist ${domain.playlistId} does not exist")
 
         override fun save(domains: List<PlaylistItemDomain>, options: Options): List<PlaylistItemDomain> {
             throw NotImplementedException()

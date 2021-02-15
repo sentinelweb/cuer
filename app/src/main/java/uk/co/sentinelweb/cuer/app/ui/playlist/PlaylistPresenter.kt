@@ -11,9 +11,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -46,8 +47,10 @@ class PlaylistPresenter(
     private val view: PlaylistContract.View,
     private val state: PlaylistContract.State,
     private val mediaOrchestrator: MediaOrchestrator,
+    private val playlistMediaCommitOrchestrator: PlaylistMediaCommitOrchestrator,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val playlistUpdateOrchestrator: PlaylistUpdateOrchestrator,
     private val modelMapper: PlaylistModelMapper,
     private val queue: QueueMediatorContract.Producer,
     private val toastWrapper: ToastWrapper,
@@ -468,34 +471,22 @@ class PlaylistPresenter(
     }
 
     override fun refreshPlaylist() {
-        state.viewModelScope.launch { executeRefresh() }
+        state.viewModelScope.launch {
+            state.playlist
+                ?.takeIf { playlistUpdateOrchestrator.checkToUpdate(it) }
+                ?.also { playlistUpdateOrchestrator.update(it) }
+                ?.also { view.hideRefresh() }
+                ?: executeRefresh()
+
+
+        }
     }
 
     override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit) {
         if (state.playlistIdentifier.source == MEMORY) {
             state.playlist
-                ?.let { playlist ->
-                    val existingMedia = mediaOrchestrator.loadList(
-                        PlatformIdListFilter(playlist.items.map { it.media.platformId }),
-                        Options(LOCAL, flat = false)
-                    )
-                    val existingMediaPlatformIds = existingMedia.map { it.platformId }
-                    val mediaLookup = playlist.items.map { it.media }.toMutableList()
-                        .apply { removeIf { existingMediaPlatformIds.contains(it.platformId) } }
-                        .map { it.copy(id = null) }
-                        .let { mediaOrchestrator.save(it, Options(LOCAL, flat = false)) }
-                        .toMutableList()
-                        .apply { addAll(existingMedia) }
-                        .associate { it.platformId to it }
-                    playlist.copy(id = null,
-                        items = playlist.items.map {
-                            it.copy(
-                                id = null,
-                                media = mediaLookup.get(it.media.platformId)
-                                    ?: throw java.lang.IllegalStateException("Media save failed")
-                            )
-                        })
-                }
+                ?.let { playlistMediaCommitOrchestrator.commitMediaAndReplace(it, LOCAL) }
+                ?.let { it.copy(items = it.items.map { it.copy(id = null) }) }
                 ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
                 ?.also { state.playlistIdentifier = it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure") }
                 ?.also { state.playlist = it }
