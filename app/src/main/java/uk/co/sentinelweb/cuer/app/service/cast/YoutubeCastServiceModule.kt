@@ -27,7 +27,8 @@ object YoutubeCastServiceModule {
                     log = get(),
                     state = get(),
                     toastWrapper = get(),
-                    skipControl = get()
+                    skipControl = get(),
+                    mediaSessionManager = get()
                 )
             }
             scoped<SkipContract.External> {

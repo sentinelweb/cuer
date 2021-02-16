@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.CC_DISCONNECTED
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.PlayerControls.Listener
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -26,7 +27,8 @@ class PlayerControlsNotification constructor(
     private val toastWrapper: ToastWrapper,
     private val log: LogWrapper,
     private val context: Context,
-    private val skipControl: SkipContract.External
+    private val skipControl: SkipContract.External,
+    private val mediaSessionManager: MediaSessionManager
 ) : External, Presenter, SkipContract.Listener {
 
     private val listeners: MutableList<Listener> = mutableListOf()
@@ -75,6 +77,7 @@ class PlayerControlsNotification constructor(
 
     private fun updateNotification() {
         //log.d("updateNotification: state.media=${state.media?.stringMedia()}")
+        listeners.first().apply { mediaSessionManager.checkCreateMediaSession(this) }
         state.media?.apply {
             state.bitmap?.let { view.showNotification(state.playState, state.media, it) }
                 ?: state.media?.image?.let { image ->
