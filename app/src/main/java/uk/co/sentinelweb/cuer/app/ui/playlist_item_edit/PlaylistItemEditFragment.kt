@@ -36,6 +36,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NA
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
@@ -67,7 +69,7 @@ class PlaylistItemEditFragment
         get() = ple_toolbar.menu.findItem(R.id.plie_play)
 
     private var dialog: AppCompatDialog? = null
-    private var createPlaylistDialog: DialogFragment? = null
+    private var dialogFragment: DialogFragment? = null
 
     // todo extract
     private val ytDrawable: Drawable by lazy {
@@ -317,27 +319,33 @@ class PlaylistItemEditFragment
             object : Observer<DialogModel> {
                 override fun onChanged(model: DialogModel) {
                     dialog?.dismiss()
-                    createPlaylistDialog?.let {
+                    dialogFragment?.let {
                         val ft = childFragmentManager.beginTransaction()
                         ft.hide(it)
                         ft.commit()
                     }
                     when (model.type) {
-                        DialogModel.Type.PLAYLIST ->
-                            dialog = selectDialogCreator
-                                .createMulti(model as SelectDialogModel)
-                                .apply { show() }
+                        DialogModel.Type.PLAYLIST_FULL -> {
+                            dialogFragment =
+                                PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+                            dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
+                        }
                         DialogModel.Type.PLAYLIST_ADD -> {
-                            createPlaylistDialog = PlaylistEditFragment.newInstance()
+                            dialogFragment = PlaylistEditFragment.newInstance()
                                 .apply {
                                     listener = object : PlaylistEditFragment.Listener {
                                         override fun onPlaylistCommit(domain: PlaylistDomain?) {
                                             domain?.apply { viewModel.onPlaylistSelected(this) }
-                                            createPlaylistDialog?.dismissAllowingStateLoss()
+                                            dialogFragment?.dismissAllowingStateLoss()
                                         }
                                     }
                                 }
-                            createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
+                            dialogFragment?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
+                        }
+                        DialogModel.Type.PLAYLIST -> {
+                            selectDialogCreator
+                                .createMulti(model as SelectDialogModel)
+                                .apply { show() }
                         }
                         DialogModel.Type.SELECT_ROUTE -> {
                             castDialogWrapper.showRouteSelector(childFragmentManager)
@@ -358,6 +366,8 @@ class PlaylistItemEditFragment
 
     companion object {
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
+        private val SELECT_PLAYLIST_TAG = "pdf_dialog"
+
         val TRANS_IMAGE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
 
         val TRANS_TITLE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }

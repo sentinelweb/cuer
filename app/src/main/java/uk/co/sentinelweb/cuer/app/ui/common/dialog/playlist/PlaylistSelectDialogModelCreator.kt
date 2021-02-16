@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
@@ -48,5 +49,23 @@ class PlaylistSelectDialogModelCreator constructor(
         itemClick = itemClick,
         confirm = confirm,
         dismiss = dismiss
+    )
+
+    fun mapPlaylistSelectionForFullDialog(
+        selected: Set<PlaylistDomain>,
+        multi: Boolean = false,
+        itemClick: (Int, Boolean) -> Unit,
+        confirm: (() -> Unit)? = null,
+        dismiss: () -> Unit = {}
+    ) = PlaylistsDialogContract.Config(
+        model = SelectDialogModel(
+            type = DialogModel.Type.PLAYLIST_FULL,
+            multi = multi,
+            title = R.string.playlist_dialog_title,
+            items = listOf(),
+            itemClick = itemClick,
+            confirm = confirm,
+            dismiss = dismiss
+        )
     )
 }

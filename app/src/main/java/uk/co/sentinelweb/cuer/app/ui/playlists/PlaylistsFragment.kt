@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.playlists_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
@@ -66,6 +65,7 @@ class PlaylistsFragment :
         playlists_list.layoutManager = LinearLayoutManager(context)
         playlists_list.adapter = adapter
         itemTouchHelper.attachToRecyclerView(playlists_list)
+        playlists_swipe.setOnRefreshListener { presenter.refreshList() }
 //        playlist_fab_up.setOnClickListener { presenter.scroll(Up) }
 //        playlist_fab_up.setOnLongClickListener { presenter.scroll(Top);true }
 //        playlist_fab_down.setOnClickListener { presenter.scroll(Down) }

@@ -12,6 +12,7 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.android.synthetic.main.view_playlists_item.view.*
@@ -100,6 +101,11 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
             .loadFirebaseOrOtherUrl(url, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(listitem_icon)
+    }
+
+    override fun showOverflow(showOverflow: Boolean) {
+        listitem_overflow_img.isVisible = showOverflow
+        listitem_overflow_click.isVisible = showOverflow
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////

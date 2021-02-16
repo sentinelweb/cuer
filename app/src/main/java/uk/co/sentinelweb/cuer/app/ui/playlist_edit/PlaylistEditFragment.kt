@@ -53,11 +53,7 @@ class PlaylistEditFragment : DialogFragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        parent: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.playlist_edit_fragment, parent, false)
     }
 

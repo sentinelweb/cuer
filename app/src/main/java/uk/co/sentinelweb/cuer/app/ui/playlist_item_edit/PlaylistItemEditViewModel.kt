@@ -210,14 +210,22 @@ class PlaylistItemEditViewModel constructor(
 
     fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
         _selectModelLiveData.value =
-            playlistDialogModelCreator.mapPlaylistSelectionForDialog(
-                state.allPlaylists,
+            playlistDialogModelCreator.mapPlaylistSelectionForFullDialog(
                 selectedPlaylists,
                 true,
                 this@PlaylistItemEditViewModel::onPlaylistSelected,
                 { },
                 this@PlaylistItemEditViewModel::onPlaylistDialogClose
             )
+//            playlistDialogModelCreator.mapPlaylistSelectionForDialog(
+//                state.allPlaylists,
+//                selectedPlaylists,
+//                true,
+//                this@PlaylistItemEditViewModel::onPlaylistSelected,
+//                { },
+//                this@PlaylistItemEditViewModel::onPlaylistDialogClose
+//            )
+
     }
 
     fun onPlaylistSelected(index: Int, checked: Boolean) {

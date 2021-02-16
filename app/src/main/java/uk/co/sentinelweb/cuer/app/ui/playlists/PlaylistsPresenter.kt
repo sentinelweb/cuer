@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
@@ -124,7 +124,7 @@ class PlaylistsPresenter(
 
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
-            .let { modelMapper.map(it, queue.playlistId) }
+            .let { modelMapper.map(it, queue.playlistId, true) }
             .takeIf { coroutines.mainScopeActive }
             ?.also { view.setList(it, animate) }
             ?.takeIf { focusCurrent }
@@ -139,13 +139,12 @@ class PlaylistsPresenter(
 
     override fun onResume() {
         state.viewModelScope.launch { executeRefresh(true) }
-        coroutines.mainScope.launch {
-            // todo a better job - might refresh too much
-            // todo listen for stat changes
-            playlistRepository.updates.collect { (_, _) ->
-                refreshPlaylists()
-            }
-        }
+        // todo a better job - might refresh too much
+        // todo listen for stat changes
+        playlistRepository.updates
+            .onEach { refreshPlaylists() }
+            .let { coroutines.mainScope }
+
     }
 
     override fun onPause() {
