@@ -181,7 +181,7 @@ class PlaylistDatabaseRepository constructor(
                                     .map { playlistMapper.map(it, null, null, null) }
                                 else playlistDao
                                     .loadAllByPlatformIdsWithItems(filter.ids)
-                                    .map { mapDeep(it) }
+                                    .map { mapDeep(it) }/* todo channels */
                             is ChannelPlatformIdFilter ->
                                 if (flat) playlistDao
                                     .findPlaylistsForChannePlatformlId(filter.platformId)
@@ -190,7 +190,7 @@ class PlaylistDatabaseRepository constructor(
                             else ->// todo return empty for else
                                 playlistDao
                                     .getAllPlaylists()
-                                    .map { playlistMapper.map(it, null, null, null) }/* todo channels */
+                                    .map { playlistMapper.map(it, null, null, null) }
                         }
                     }.let { RepoResult.Data(it) }
                     .also { database.setTransactionSuccessful() }

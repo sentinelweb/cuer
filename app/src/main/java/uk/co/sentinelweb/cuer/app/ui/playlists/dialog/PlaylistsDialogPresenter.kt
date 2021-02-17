@@ -75,6 +75,10 @@ class PlaylistsDialogPresenter(
 
     }
 
+    override fun onDismiss() {
+        state.config.dismiss()
+    }
+
     override fun setConfig(config: PlaylistsDialogContract.Config) {
         state.config = config
         prefsWrapper.getLong(LAST_PLAYLIST_ADDED_TO)

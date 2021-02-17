@@ -32,6 +32,7 @@ interface PlaylistsDialogContract {
         fun onPause()
         fun setConfig(config: Config)
         fun onAddPlaylist()
+        fun onDismiss()
     }
 
     interface View {

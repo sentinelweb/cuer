@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.DialogFragment
@@ -53,6 +54,10 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
         //itemTouchHelper.attachToRecyclerView(pdf_list)
 
         presenter.setConfig(config)
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        presenter.onDismiss()
     }
 
     override fun onDestroyView() {
