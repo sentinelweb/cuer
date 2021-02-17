@@ -157,31 +157,36 @@ class PlaylistDatabaseRepository constructor(
                             is IdListFilter ->
                                 if (flat)
                                     playlistDao.loadAllByIds(filter.ids.toLongArray())
-                                        .map { playlistMapper.map(it, null, null, null) }/* todo channels */
+                                        .map { playlistMapper.map(it, null, null, null) }
                                 else playlistDao
                                     .loadAllByIdsWithItems(filter.ids.toLongArray())
-                                    .map { mapDeep(it) }
+                                    .map { mapDeep(it) }/* todo channels */
                             is DefaultFilter ->
                                 if (flat) playlistDao
                                     .loadAllByFlags(PlaylistEntity.FLAG_DEFAULT)
-                                    .map { playlistMapper.map(it, null, null, null) }/* todo channels */
+                                    .map { playlistMapper.map(it, null, null, null) }
                                 else playlistDao
                                     .loadAllByFlagsWithItems(PlaylistEntity.FLAG_DEFAULT)
-                                    .map { mapDeep(it) }
+                                    .map { mapDeep(it) }/* todo channels */
                             is AllFilter ->
                                 if (flat) playlistDao
                                     .getAllPlaylists()
-                                    .map { playlistMapper.map(it, null, null, null) }/* todo channels */
+                                    .map { playlistMapper.map(it, null, null, null) }
                                 else playlistDao
                                     .getAllPlaylistsWithItems()
-                                    .map { mapDeep(it) }
+                                    .map { mapDeep(it) }/* todo channels */
                             is PlatformIdListFilter ->
                                 if (flat) playlistDao
                                     .loadAllByPlatformIds(filter.ids)
-                                    .map { playlistMapper.map(it, null, null, null) }/* todo channels */
+                                    .map { playlistMapper.map(it, null, null, null) }
                                 else playlistDao
                                     .loadAllByPlatformIdsWithItems(filter.ids)
                                     .map { mapDeep(it) }
+                            is ChannelPlatformIdFilter ->
+                                if (flat) playlistDao
+                                    .findPlaylistsForChannePlatformlId(filter.platformId)
+                                    .map { playlistMapper.map(it, null, null, null) }
+                                else throw IllegalArgumentException("Only flat supported for ChannelPlatformIdFilter")
                             else ->// todo return empty for else
                                 playlistDao
                                     .getAllPlaylists()

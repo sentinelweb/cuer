@@ -217,17 +217,9 @@ class PlaylistItemEditViewModel constructor(
                 true,
                 this@PlaylistItemEditViewModel::onPlaylistSelected,
                 { },
-                this@PlaylistItemEditViewModel::onPlaylistDialogClose
+                this@PlaylistItemEditViewModel::onPlaylistDialogClose,
+                state.media
             )
-//            playlistDialogModelCreator.mapPlaylistSelectionForDialog(
-//                state.allPlaylists,
-//                selectedPlaylists,
-//                true,
-//                this@PlaylistItemEditViewModel::onPlaylistSelected,
-//                { },
-//                this@PlaylistItemEditViewModel::onPlaylistDialogClose
-//            )
-
     }
 
     fun onPlaylistSelected(playlist: PlaylistDomain?, checked: Boolean) {

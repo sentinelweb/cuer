@@ -12,9 +12,8 @@ import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data.Empty
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
@@ -108,11 +107,13 @@ class MediaDatabaseRepository constructor(
                         .mapNotNull { mediaDao.findByMediaId(it) }
                         .map { mediaMapper.map(it) }
                         .let { Data.dataOrEmpty(it) }
-                else ->// todo return empty for else
-                    mediaDao
-                        .getAll()
-                        .map { mediaMapper.map(it) }
-                        .let { Data(it) }
+                is ChannelPlatformIdFilter -> TODO()
+                else -> throw IllegalArgumentException("$filter not implemented")
+//                else ->// todo return empty for else
+//                    mediaDao
+//                        .getAll()
+//                        .map { mediaMapper.map(it) }
+//                        .let { Data(it) }
             }.also { database.setTransactionSuccessful() }
 //            }})
         } catch (e: Throwable) {

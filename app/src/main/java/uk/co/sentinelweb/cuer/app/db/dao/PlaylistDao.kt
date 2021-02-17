@@ -67,4 +67,7 @@ interface PlaylistDao {
 
     @Query("DELETE FROM playlist")
     suspend fun deleteAll()
+
+    @Query("select distinct playlist.* from playlist, playlist_item, media, channel where playlist.id==playlist_item.playlist_id and playlist_item.media_id==media.id and media.channel_id==channel.id and channel.remote_id=:channelId")
+    suspend fun findPlaylistsForChannePlatformlId(channelId: String): List<PlaylistEntity>
 }

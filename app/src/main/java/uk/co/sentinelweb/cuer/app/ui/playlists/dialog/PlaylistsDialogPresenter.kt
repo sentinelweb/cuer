@@ -5,6 +5,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.ChannelPlatformIdFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
@@ -50,10 +53,14 @@ class PlaylistsDialogPresenter(
     }
 
     private suspend fun executeRefresh(animate: Boolean = true) {
-        state.playlists = playlistOrchestrator.loadList(
-            OrchestratorContract.AllFilter(),
-            OrchestratorContract.Options(OrchestratorContract.Source.LOCAL)
-        )
+        if (!state.channelSearchApplied) {
+            state.config.suggestionsMedia?.apply {
+                playlistOrchestrator.loadList(ChannelPlatformIdFilter(this.channelData.platformId!!), Options(LOCAL))
+                    .apply { state.priorityPlaylistIds.addAll(this.map { it.id!! }) }
+            }
+            state.channelSearchApplied = true
+        }
+        state.playlists = playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), Options(LOCAL))
             .sortedWith(compareBy({ !state.priorityPlaylistIds.contains(it.id) }, { !it.starred }, { it.title.toLowerCase() }))
 
         state.playlistStats = playlistRepository

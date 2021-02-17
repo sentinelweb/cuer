@@ -53,7 +53,8 @@ interface PlaylistsDialogContract {
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
         var playlistStats: List<PlaylistStatDomain> = listOf(),
-        var priorityPlaylistIds: MutableList<Long> = mutableListOf()
+        var priorityPlaylistIds: MutableList<Long> = mutableListOf(),
+        var channelSearchApplied: Boolean = false
     ) : ViewModel() {
         lateinit var config: Config
     }

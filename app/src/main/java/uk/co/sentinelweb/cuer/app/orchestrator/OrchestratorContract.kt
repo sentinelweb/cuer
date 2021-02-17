@@ -48,6 +48,7 @@ interface OrchestratorContract<Domain> {
     class PlatformIdListFilter(val ids: List<String>) : Filter
     class DefaultFilter() : Filter
     class AllFilter() : Filter
+    class ChannelPlatformIdFilter(val platformId: String) : Filter
 
     class InvalidOperationException(clazz: KClass<out OrchestratorContract<out Any>>, filter: Filter?, options: Options) :
         java.lang.UnsupportedOperationException("class = ${clazz.simpleName} filter = $filter options = $options")
