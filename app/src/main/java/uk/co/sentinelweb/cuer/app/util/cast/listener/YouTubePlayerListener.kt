@@ -27,7 +27,6 @@ class YouTubePlayerListener(
 ) : AbstractYouTubePlayerListener(),
     CastPlayerContract.PlayerControls.Listener {
 
-
     data class State constructor(
         var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
         var positionSec: Float = 0f, // todo remove these mutate media

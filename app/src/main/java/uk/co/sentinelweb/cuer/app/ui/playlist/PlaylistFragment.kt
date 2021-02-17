@@ -23,8 +23,6 @@ import uk.co.sentinelweb.cuer.app.databinding.PlaylistFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -34,6 +32,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.PlayState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
@@ -63,7 +63,6 @@ class PlaylistFragment :
     private val toastWrapper: ToastWrapper by inject()
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
     private val log: LogWrapper by inject()
-    private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
     private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
@@ -90,7 +89,7 @@ class PlaylistFragment :
         )
 
     private var snackbar: Snackbar? = null
-    private var createPlaylistDialog: DialogFragment? = null
+    private var dialogFragment: DialogFragment? = null
 
     private data class MenuState constructor(
         var lastPlayModeIndex: Int = 0,
@@ -329,21 +328,24 @@ class PlaylistFragment :
         (activity as AppCompatActivity?)?.supportActionBar?.setTitle(subtitle)
     }
 
-    override fun showPlaylistSelector(model: SelectDialogModel) {
-        selectDialogCreator.createSingle(model).apply { show() }
+    override fun showPlaylistSelector(model: PlaylistsDialogContract.Config) {
+        //selectDialogCreator.createSingle(model).apply { show() }
+        dialogFragment?.dismissAllowingStateLoss()
+        dialogFragment = PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+        dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
     }
 
     override fun showPlaylistCreateDialog() {// add playlist
-        createPlaylistDialog?.dismissAllowingStateLoss()
-        createPlaylistDialog = PlaylistEditFragment.newInstance().apply {
+        dialogFragment?.dismissAllowingStateLoss()
+        dialogFragment = PlaylistEditFragment.newInstance().apply {
             listener = object : PlaylistEditFragment.Listener {
                 override fun onPlaylistCommit(domain: PlaylistDomain?) {
-                    domain?.apply { presenter.onPlaylistSelected(this) }
-                    createPlaylistDialog?.dismissAllowingStateLoss()
+                    domain?.apply { presenter.onPlaylistSelected(this, true) }
+                    dialogFragment?.dismissAllowingStateLoss()
                 }
             }
         }
-        createPlaylistDialog?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
+        dialogFragment?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
     }
 
     override fun onView(item: ItemContract.Model) {
@@ -473,6 +475,7 @@ class PlaylistFragment :
         }
 
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
+        private val SELECT_PLAYLIST_TAG = "pdf_dialog"
 
     }
 

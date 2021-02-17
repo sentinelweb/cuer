@@ -21,7 +21,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.State
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
@@ -90,9 +89,6 @@ class PlaylistPresenterTest {
 
     @MockK
     lateinit var mockPrefsWrapper: SharedPrefsWrapper<GeneralPreferences>
-
-    @MockK
-    lateinit var mockPlaylistDialogModelCreator: PlaylistSelectDialogModelCreator
 
     @MockK
     lateinit var mockTimeProvider: TimeProvider
@@ -202,7 +198,6 @@ class PlaylistPresenterTest {
             mockPrefsWrapper,
             playlistMutator,
             log,
-            mockPlaylistDialogModelCreator,
             mockTimeProvider,
             coroutines,
             mockResources

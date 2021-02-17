@@ -38,7 +38,7 @@ class PlaylistOrchestrator constructor(
     suspend override fun loadList(filter: Filter, options: Options): List<PlaylistDomain> =
         when (options.source) {
             MEMORY -> playlistMemoryRepository.loadList(filter, options)
-            LOCAL -> playlistDatabaseRepository.loadList(filter)
+            LOCAL -> playlistDatabaseRepository.loadList(filter, options.flat)
                 .allowDatabaseListResultEmpty()
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()

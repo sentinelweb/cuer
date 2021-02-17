@@ -14,11 +14,10 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
@@ -49,7 +48,7 @@ interface PlaylistContract {
         fun undoDelete()
         fun commitMove()
         fun setPlaylistData(plId: Long? = null, plItemId: Long? = null, playNow: Boolean = false, source: Source = LOCAL)
-        fun onPlaylistSelected(playlist: PlaylistDomain)
+        fun onPlaylistSelected(playlist: PlaylistDomain, selected: Boolean)
         fun onPlayModeChange(): Boolean
         fun onPlayPlaylist(): Boolean
         fun onStarPlaylist(): Boolean
@@ -72,7 +71,7 @@ interface PlaylistContract {
         fun showDeleteUndo(msg: String)
         fun highlightPlayingItem(currentItemIndex: Int?)
         fun setSubTitle(subtitle: String)
-        fun showPlaylistSelector(model: SelectDialogModel)
+        fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
         fun showPlaylistCreateDialog()
         fun showAlertDialog(model: AlertDialogModel)
         fun resetItemsState()
@@ -135,7 +134,6 @@ interface PlaylistContract {
                         prefsWrapper = get(named<GeneralPreferences>()),
                         playlistMutator = get(),
                         log = get(),
-                        playlistDialogModelCreator = get(),
                         timeProvider = get(),
                         coroutines = get(),
                         res = get(),
@@ -159,7 +157,6 @@ interface PlaylistContract {
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory(get(), get()) }
-                scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
                 viewModel { State() }
             }

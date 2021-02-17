@@ -15,9 +15,6 @@ import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
 import kotlinx.android.synthetic.main.playlist_edit_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
@@ -53,11 +50,7 @@ class PlaylistEditFragment : DialogFragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        parent: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.playlist_edit_fragment, parent, false)
     }
 
@@ -124,8 +117,8 @@ class PlaylistEditFragment : DialogFragment() {
     private fun observeModel() {
         viewModel.getModelObservable().observe(
             this.viewLifecycleOwner,
-            object : Observer<PlaylistEditModel> {
-                override fun onChanged(model: PlaylistEditModel) {
+            object : Observer<PlaylistEditContract.Model> {
+                override fun onChanged(model: PlaylistEditContract.Model) {
                     if (pe_title_edit.text.toString() != model.titleEdit) {
                         pe_title_edit.setText(model.titleEdit)
                         pe_title_edit.setSelection(model.titleEdit.length)
@@ -174,32 +167,8 @@ class PlaylistEditFragment : DialogFragment() {
     }
 
     companion object {
-
         fun newInstance(): PlaylistEditFragment {
             return PlaylistEditFragment()
-        }
-
-        @JvmStatic
-        val fragmentModule = module {
-            scope(named<PlaylistEditFragment>()) {
-                viewModel {
-                    PlaylistEditViewModel(
-                        state = get(),
-                        mapper = get(),
-                        playlistRepo = get(),
-                        log = get(),
-                        imageProvider = get()
-                    )
-                }
-                factory { PlaylistEditState() }
-                factory {
-                    PlaylistEditModelMapper(
-                        res = get(),
-                        validator = get()
-                    )
-                }
-                factory { PlaylistValidator(get()) }
-            }
         }
     }
 }

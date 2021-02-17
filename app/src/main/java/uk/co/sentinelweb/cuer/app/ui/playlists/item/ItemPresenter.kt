@@ -18,6 +18,7 @@ class ItemPresenter(
             ?: R.drawable.ic_chip_playlist_black
                 .apply { view.setIconResource(this) }
         state.item = item
+        view.showOverflow(item.showOverflow)
     }
 
     override fun doClick() {

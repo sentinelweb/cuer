@@ -15,6 +15,7 @@ interface ItemContract {
         fun setCheckedVisible(checked: Boolean)
         fun setPresenter(itemPresenter: Presenter)
         fun setIconUrl(url: String)
+        fun showOverflow(showOverflow: Boolean)
     }
 
     interface Presenter {
@@ -52,7 +53,8 @@ interface ItemContract {
         val newItems: Int,
         val loopMode: PlaylistDomain.PlaylistModeDomain,
         val type: PlaylistDomain.PlaylistTypeDomain,
-        val platform: PlatformDomain?
+        val platform: PlatformDomain?,
+        val showOverflow: Boolean
     ) : ItemBaseModel(id)
 
 }

@@ -18,14 +18,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_VIEWED
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -61,7 +60,6 @@ class PlaylistPresenter(
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
     private val playlistMutator: PlaylistMutator,
     private val log: LogWrapper,
-    private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator,
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider,
     private val res: ResourceWrapper
@@ -194,26 +192,25 @@ class PlaylistPresenter(
                 updateView()
             } else {
                 state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
-                playlistDialogModelCreator.loadPlaylists { allPlaylists ->
-                    view.showPlaylistSelector(
-                        playlistDialogModelCreator.mapPlaylistSelectionForDialog(
-                            allPlaylists, setOf(state.playlist!!), false,
-                            itemClick = { which: Int, _ ->
-                                if (which < allPlaylists.size) {
-                                    allPlaylists[which].id?.let { moveItemToPlaylist(it) }
-                                } else {
-                                    view.showPlaylistCreateDialog()
-                                }
-                            },
-                            dismiss = { view.resetItemsState() }
-                        )
+                view.showPlaylistSelector(
+                    PlaylistsDialogContract.Config(
+                        selectedPlaylists = setOf(state.playlist!!),
+                        multi = true,
+                        itemClick = { which: PlaylistDomain?, _ ->
+                            which
+                                ?.let { moveItemToPlaylist(it.id!!) }
+                                ?: view.showPlaylistCreateDialog()
+                        },
+                        confirm = { },
+                        dismiss = { view.resetItemsState() },
+                        state.selectedPlaylistItem?.media
                     )
-                }
+                )
             }
         }
     }
 
-    override fun onPlaylistSelected(playlist: PlaylistDomain) {
+    override fun onPlaylistSelected(playlist: PlaylistDomain, selected: Boolean) {
         playlist.id?.let { moveItemToPlaylist(it) }
     }
 
@@ -496,6 +493,7 @@ class PlaylistPresenter(
                 ?.also { state.playlist = it }
                 ?.also { updateView() }
                 ?.also { onCommit.onCommit(PLAYLIST, listOf(it)) }
+                ?.also { prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!) }
         } else {
             throw IllegalStateException("Can't save non Memory playlist")
         }

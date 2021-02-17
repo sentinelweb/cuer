@@ -7,7 +7,11 @@ import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class PlaylistsModelMapper constructor() {
 
-    fun map(domains: Map<PlaylistDomain, PlaylistStatDomain?>, current: OrchestratorContract.Identifier<*>?): PlaylistsContract.Model =
+    fun map(
+        domains: Map<PlaylistDomain, PlaylistStatDomain?>,
+        current: OrchestratorContract.Identifier<*>?,
+        showOverflow: Boolean
+    ): PlaylistsContract.Model =
         PlaylistsContract.Model(
             DEFAULT_HEADER_IMAGE,
             current,
@@ -23,7 +27,8 @@ class PlaylistsModelMapper constructor() {
                     starred = pl.starred,
                     loopMode = pl.mode,
                     type = pl.type,
-                    platform = pl.platform
+                    platform = pl.platform,
+                    showOverflow = showOverflow
                 )
             }
         )

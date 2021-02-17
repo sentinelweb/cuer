@@ -81,7 +81,7 @@ class PlayerControlsNotificationMedia constructor(
                         if (Build.VERSION.SDK_INT >= 30) {
                             setShowActionsInCompactView(2, 4) // #2: pause or play button
                         } else {
-                            setShowActionsInCompactView(2, 6, 5)
+                            setShowActionsInCompactView(2, 5, 0)
                         }
                     }
             )
@@ -92,7 +92,8 @@ class PlayerControlsNotificationMedia constructor(
 
         bitmap?.apply { builder.setLargeIcon(this) }
 
-        builder.addAction(R.drawable.ic_notif_track_b_black, "Prev", trackbPendingIntent) // #0
+        //builder.addAction(R.drawable.ic_notif_track_b_black, "Prev", trackbPendingIntent) // #0
+        builder.addAction(R.drawable.ic_notif_close_white, "Close", disconnectPendingIntent) // #0
         builder.addAction(R.drawable.ic_notif_fast_rewind_black, "-30s", skipbPendingIntent) // #1
         when (state) {
             PLAYING ->
@@ -107,9 +108,8 @@ class PlayerControlsNotificationMedia constructor(
         }
         builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent) // #3
         builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
-        builder.addAction(R.drawable.ic_notif_close_white, "Close", disconnectPendingIntent) // #5
         // #6 todo star function
-        builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #6
+        builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #5
         return builder.build()
     }
 
