@@ -24,8 +24,7 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_VIEWED
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -496,6 +495,7 @@ class PlaylistPresenter(
                 ?.also { state.playlist = it }
                 ?.also { updateView() }
                 ?.also { onCommit.onCommit(PLAYLIST, listOf(it)) }
+                ?.also { prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!) }
         } else {
             throw IllegalStateException("Can't save non Memory playlist")
         }

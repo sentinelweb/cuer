@@ -8,7 +8,7 @@ class PlaylistEditModelMapper constructor(
     private val res: ResourceWrapper,
     private val validator: PlaylistValidator
 ) {
-    fun mapModel(domain: PlaylistDomain) = PlaylistEditModel(
+    fun mapModel(domain: PlaylistDomain) = PlaylistEditContract.Model(
         titleDisplay = if (domain.title.isBlank()) res.getString(R.string.pe_default_display_title) else domain.title,
         titleEdit = domain.title,
         starred = domain.starred,

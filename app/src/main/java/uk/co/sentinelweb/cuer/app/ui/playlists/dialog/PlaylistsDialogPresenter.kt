@@ -4,9 +4,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -16,6 +20,7 @@ class PlaylistsDialogPresenter(
     private val view: PlaylistsDialogContract.View,
     private val state: PlaylistsDialogContract.State,
     private val playlistRepository: PlaylistDatabaseRepository,
+    private val playlistOrchestrator: PlaylistOrchestrator,
     private val modelMapper: PlaylistsModelMapper,
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
@@ -34,37 +39,10 @@ class PlaylistsDialogPresenter(
     override fun destroy() {
     }
 
-    override fun onItemSwipeRight(item: ItemContract.Model) {
-        refreshPlaylists()
-    }
-
-    override fun onItemSwipeLeft(item: ItemContract.Model) {
-        refreshPlaylists()
-    }
-
     override fun onItemClicked(item: ItemContract.Model) {
-        state.playlists.indexOfFirst { it.id == item.id }
-            .takeIf { it > -1 }
-            ?.apply { state.config.model.itemClick(this, true) }
+        state.playlists.find { it.id == item.id }
+            ?.apply { state.config.itemClick(this, true) }
             ?.also { view.dismiss() }
-    }
-
-    override fun moveItem(fromPosition: Int, toPosition: Int) {
-        if (state.dragFrom == null) {
-            state.dragFrom = fromPosition
-        }
-        state.dragTo = toPosition
-    }
-
-    override fun commitMove() {
-        if (state.dragFrom != null && state.dragTo != null) {
-            toastWrapper.show("todo save move ..")
-        } else {
-            toastWrapper.show("Move failed ..")
-            refreshPlaylists()
-        }
-        state.dragFrom = null
-        state.dragTo = null
     }
 
     private fun refreshPlaylists() {
@@ -72,10 +50,11 @@ class PlaylistsDialogPresenter(
     }
 
     private suspend fun executeRefresh(animate: Boolean = true) {
-        state.playlists = playlistRepository.loadList(null)
-            .takeIf { it.isSuccessful }
-            ?.data
-            ?: listOf()
+        state.playlists = playlistOrchestrator.loadList(
+            OrchestratorContract.AllFilter(),
+            OrchestratorContract.Options(OrchestratorContract.Source.LOCAL)
+        )
+            .sortedWith(compareBy({ !state.priorityPlaylistIds.contains(it.id) }, { !it.starred }, { it.title.toLowerCase() }))
 
         state.playlistStats = playlistRepository
             .loadPlaylistStatList(state.playlists.mapNotNull { it.id }).data
@@ -91,11 +70,16 @@ class PlaylistsDialogPresenter(
 
     override fun setConfig(config: PlaylistsDialogContract.Config) {
         state.config = config
+        prefsWrapper.getLong(LAST_PLAYLIST_ADDED_TO)
+            ?.apply { state.priorityPlaylistIds.add(this) }
+        prefsWrapper.getLong(LAST_PLAYLIST_CREATED)
+            ?.takeIf { !state.priorityPlaylistIds.contains(it) }
+            ?.apply { state.priorityPlaylistIds.add(this) }
     }
 
     override fun onAddPlaylist() {
         (state.playlists.size + 1)
-            .apply { state.config.model.itemClick(this, true) }
+            .apply { state.config.itemClick(null, true) }
             .also { view.dismiss() }
     }
 

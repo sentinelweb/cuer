@@ -24,8 +24,12 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
+import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -50,7 +54,8 @@ class PlaylistItemEditViewModel constructor(
     private val toast: ToastWrapper,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
-    private val mediaOrchestrator: MediaOrchestrator
+    private val mediaOrchestrator: MediaOrchestrator,
+    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
 ) : ViewModel() {
 
     data class UiEvent(
@@ -72,9 +77,6 @@ class PlaylistItemEditViewModel constructor(
 
     private val isNew: Boolean
         get() = state.editingPlaylistItem?.id == null
-
-    private val selectedPlaylists: Set<PlaylistDomain>
-        get() = state.allPlaylists.filter { state.selectedPlaylistIds.contains(it.id) }.toSet()
 
     @Suppress("RedundantOverride") // for note
     override fun onCleared() {
@@ -103,7 +105,7 @@ class PlaylistItemEditViewModel constructor(
             state.isMediaChanged = media?.id == null
             media?.let { originalMedia ->
                 state.media = originalMedia
-                playlistDialogModelCreator.loadPlaylists { state.allPlaylists = it }
+                //playlistDialogModelCreator.loadPlaylists { state.allPlaylists = it }
                 originalMedia.id?.let {
                     playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it)), Options(state.source))
                         .takeIf { it.size > 0 }
@@ -114,7 +116,7 @@ class PlaylistItemEditViewModel constructor(
                                 .filterNotNull()
                                 .also {
                                     playlistOrchestrator.loadList(IdListFilter(it), Options(state.source))
-                                        .also { state.selectedPlaylistIds.addAll(it.map { it.id!! }) }
+                                        .also { state.selectedPlaylists.addAll(it) }
                                 }
                         }
                 }
@@ -210,8 +212,8 @@ class PlaylistItemEditViewModel constructor(
 
     fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
         _selectModelLiveData.value =
-            playlistDialogModelCreator.mapPlaylistSelectionForFullDialog(
-                selectedPlaylists,
+            PlaylistsDialogContract.Config(
+                state.selectedPlaylists,
                 true,
                 this@PlaylistItemEditViewModel::onPlaylistSelected,
                 { },
@@ -228,27 +230,44 @@ class PlaylistItemEditViewModel constructor(
 
     }
 
-    fun onPlaylistSelected(index: Int, checked: Boolean) {
+    fun onPlaylistSelected(playlist: PlaylistDomain?, checked: Boolean) {
         state.isPlaylistsChanged = true
-        if (index < state.allPlaylists.size) {
-            state.allPlaylists.get(index).apply {
+        playlist
+            ?.apply {
                 if (checked) {
-                    this.id?.let { state.selectedPlaylistIds.add(it) }
+                    state.selectedPlaylists.add(this)
                 } else {
-                    this.id?.let { state.selectedPlaylistIds.remove(it) }
+                    state.selectedPlaylists.remove(this)
                 }
-            }.also { update() }
-        } else {
-            _selectModelLiveData.value =
-                DialogModel(PLAYLIST_ADD, R.string.create_playlist_dialog_title)
-        }
+            }
+            ?.also { update() }
+            ?: apply {
+                _selectModelLiveData.value =
+                    DialogModel(PLAYLIST_ADD, R.string.create_playlist_dialog_title)
+            }
     }
 
-    fun onPlaylistSelected(domain: PlaylistDomain) {
+//    fun onPlaylistSelected(index: Int, checked: Boolean) {
+//        state.isPlaylistsChanged = true
+//        if (index < state.allPlaylists.size) {
+//            state.allPlaylists.get(index).apply {
+//                if (checked) {
+//                    this.id?.let { state.selectedPlaylists.add(it) }
+//                } else {
+//                    this.id?.let { state.selectedPlaylists.remove(it) }
+//                }
+//            }.also { update() }
+//        } else {
+//            _selectModelLiveData.value =
+//                DialogModel(PLAYLIST_ADD, R.string.create_playlist_dialog_title)
+//        }
+//    }
+
+    fun onPlaylistCreated(domain: PlaylistDomain) {
         viewModelScope.launch {
             state.isPlaylistsChanged = true
-            state.selectedPlaylistIds.add(domain.id!!)
-            playlistDialogModelCreator.loadPlaylists { state.allPlaylists = it }
+            state.selectedPlaylists.add(domain)
+            //playlistDialogModelCreator.loadPlaylists { state.allPlaylists = it }
             update()
         }
     }
@@ -259,7 +278,7 @@ class PlaylistItemEditViewModel constructor(
 
     fun onRemovePlaylist(chipModel: ChipModel) {
         state.isPlaylistsChanged = true
-        state.selectedPlaylistIds.remove(chipModel.value?.toLong())
+        state.selectedPlaylists.removeIf { it.id == chipModel.value?.toLong() }
         update()
     }
 
@@ -270,7 +289,7 @@ class PlaylistItemEditViewModel constructor(
     }
 
     private fun update() {
-        state.model = modelMapper.map(state.media!!, selectedPlaylists)
+        state.model = modelMapper.map(state.media!!, state.selectedPlaylists)
         _modelLiveData.value = state.model
     }
 
@@ -304,17 +323,17 @@ class PlaylistItemEditViewModel constructor(
 
     suspend fun commitPlaylistItems(onCommit: ShareContract.Committer.OnCommit? = null) =
         try {
-            val selectedPlaylists = if (state.selectedPlaylistIds.size > 0) {
-                selectedPlaylists
+            val selectedPlaylists = if (state.selectedPlaylists.size > 0) {
+                state.selectedPlaylists
             } else {
                 playlistOrchestrator.loadList(DefaultFilter(), Options(LOCAL))
                     .takeIf { it.size > 0 }
                     ?: throw NoDefaultPlaylistException()
             }
             val saveSource = if (isNew) LOCAL else state.source
-            if (state.isPlaylistsChanged && state.editingPlaylistItem?.playlistId != null) {
+            if (state.isPlaylistsChanged && state.editingPlaylistItem?.playlistId != null) {// todo need original playlists (not editingPlaylistItem)
                 state.editingPlaylistItem?.also { item ->
-                    if (!state.selectedPlaylistIds.contains(item.playlistId)) {
+                    if (!state.selectedPlaylists.contains(item.playlistId)) {
                         playlistItemOrchestrator.delete(item, Options(state.source))
                     }
                 }
@@ -328,11 +347,14 @@ class PlaylistItemEditViewModel constructor(
                         }
                         ?.let { savedMedia ->
                             state.media = savedMedia
-                            selectedPlaylists.mapNotNull { playlist ->
-                                playlistItemOrchestrator.save(
-                                    itemCreator.buildPlayListItem(savedMedia, playlist), Options(saveSource)
-                                )
-                            }
+                            selectedPlaylists
+                                .filter { it.id != state.editingPlaylistItem?.playlistId }// todo need original playlists (not editingPlaylistItem)
+                                .mapNotNull { playlist ->
+                                    playlistItemOrchestrator.save(
+                                        itemCreator.buildPlayListItem(savedMedia, playlist), Options(saveSource)
+                                    ).takeIf { saveSource == LOCAL && isNew }
+                                        ?.also { prefsWrapper.putLong(LAST_PLAYLIST_ADDED_TO, it.playlistId!!) }
+                                }
                         }
                         ?: listOf()
                     )

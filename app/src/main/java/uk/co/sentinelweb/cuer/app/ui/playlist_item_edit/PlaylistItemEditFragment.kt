@@ -335,7 +335,7 @@ class PlaylistItemEditFragment
                                 .apply {
                                     listener = object : PlaylistEditFragment.Listener {
                                         override fun onPlaylistCommit(domain: PlaylistDomain?) {
-                                            domain?.apply { viewModel.onPlaylistSelected(this) }
+                                            domain?.apply { viewModel.onPlaylistCreated(this) }
                                             dialogFragment?.dismissAllowingStateLoss()
                                         }
                                     }
@@ -371,5 +371,7 @@ class PlaylistItemEditFragment
         val TRANS_IMAGE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
 
         val TRANS_TITLE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
+
+
     }
 }

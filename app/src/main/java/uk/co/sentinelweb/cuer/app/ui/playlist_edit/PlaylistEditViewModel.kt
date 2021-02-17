@@ -9,23 +9,27 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
+import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 
 class PlaylistEditViewModel constructor(
-    private val state: PlaylistEditState,
+    private val state: PlaylistEditContract.State,
     private val mapper: PlaylistEditModelMapper,
     private val playlistRepo: PlaylistOrchestrator,
     private val log: LogWrapper,
-    private val imageProvider: FirebaseDefaultImageProvider
+    private val imageProvider: FirebaseDefaultImageProvider,
+    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
 ) : ViewModel() {
 
-    private val _modelLiveData: MutableLiveData<PlaylistEditModel> = MutableLiveData()
+    private val _modelLiveData: MutableLiveData<PlaylistEditContract.Model> = MutableLiveData()
     private val _domainLiveData: MutableLiveData<PlaylistDomain> = MutableLiveData()
 
-    fun getModelObservable(): LiveData<PlaylistEditModel> = _modelLiveData
+    fun getModelObservable(): LiveData<PlaylistEditContract.Model> = _modelLiveData
     fun getDomainObservable(): LiveData<PlaylistDomain> = _domainLiveData
 
     @Suppress("RedundantOverride") // for note
@@ -67,12 +71,12 @@ class PlaylistEditViewModel constructor(
     }
 
     fun onImageClick(forward: Boolean) {
-            imageProvider.getNextImage(state.playlist.image, forward) { next ->
-                if (next != null) {
-                    state.playlist = state.playlist.copy(image = next)
-                    update()
-                }
+        imageProvider.getNextImage(state.playlist.image, forward) { next ->
+            if (next != null) {
+                state.playlist = state.playlist.copy(image = next)
+                update()
             }
+        }
     }
 
     fun onTitleChanged(text: String) {
@@ -87,9 +91,12 @@ class PlaylistEditViewModel constructor(
         if (state.model?.validation?.valid ?: false) {
             viewModelScope.launch {
                 playlistRepo.save(state.playlist, Options(state.source))
-                    .let {
+                    .also {
                         it.apply { state.playlist = this }
                         _domainLiveData.value = it
+                    }.takeIf { state.isCreate }
+                    ?.also {
+                        prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!)
                     }
             }
         }

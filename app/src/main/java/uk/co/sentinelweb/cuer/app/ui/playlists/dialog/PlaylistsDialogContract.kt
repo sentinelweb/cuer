@@ -8,7 +8,6 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsAdapter
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
@@ -28,13 +27,9 @@ interface PlaylistsDialogContract {
     interface Presenter {
         fun destroy()
         fun refreshList()
-        fun onItemSwipeRight(item: ItemContract.Model)
-        fun onItemSwipeLeft(item: ItemContract.Model)
         fun onItemClicked(item: ItemContract.Model)
-        fun moveItem(fromPosition: Int, toPosition: Int)
         fun onResume()
         fun onPause()
-        fun commitMove()
         fun setConfig(config: Config)
         fun onAddPlaylist()
     }
@@ -45,7 +40,11 @@ interface PlaylistsDialogContract {
     }
 
     data class Config constructor(
-        val model: SelectDialogModel,
+        val selectedPlaylists: Set<PlaylistDomain>,
+        val multi: Boolean,
+        val itemClick: (PlaylistDomain?, Boolean) -> Unit,
+        val confirm: (() -> Unit)?,
+        val dismiss: () -> Unit,
         val suggestionsMedia: MediaDomain? = null
     ) : DialogModel(Type.PLAYLIST_FULL, R.string.playlist_dialog_title)
 
@@ -54,6 +53,7 @@ interface PlaylistsDialogContract {
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
         var playlistStats: List<PlaylistStatDomain> = listOf(),
+        var priorityPlaylistIds: MutableList<Long> = mutableListOf()
     ) : ViewModel() {
         lateinit var config: Config
     }
@@ -68,6 +68,7 @@ interface PlaylistsDialogContract {
                     PlaylistsDialogPresenter(
                         view = get(),
                         state = get(),
+                        playlistOrchestrator = get(),
                         playlistRepository = get(),
                         modelMapper = get(),
                         log = get(),

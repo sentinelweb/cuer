@@ -25,7 +25,7 @@ import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
-import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -69,7 +69,7 @@ object Modules {
         ShareContract.activityModule,
         ScanContract.fragmentModule,
         PlaylistItemEditContract.fragmentModule,
-        PlaylistEditFragment.fragmentModule,
+        PlaylistEditContract.fragmentModule,
         YoutubeCastServiceModule.serviceModule,
         PrefBackupContract.fragmentModule,
         PrefRootContract.fragmentModule

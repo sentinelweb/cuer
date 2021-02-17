@@ -90,14 +90,11 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-        presenter.moveItem(fromPosition, toPosition)
-        // shows the move while dragging
-        adapter.notifyItemMoved(fromPosition, toPosition)
         return true
     }
 
     override fun onItemClear() {
-        presenter.commitMove()
+
     }
     //endregion
 
@@ -107,13 +104,11 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     }
 
     override fun onRightSwipe(item: ItemContract.Model) {
-        presenter.onItemSwipeRight(item)
+
     }
 
     override fun onLeftSwipe(item: ItemContract.Model) {
-        val playlistItemModel = item
-        //adapter.notifyItemRemoved(playlistItemModel.index)
-        presenter.onItemSwipeLeft(playlistItemModel) // delays for animation
+
     }
 
     override fun onPlay(item: ItemContract.Model, external: Boolean) {
@@ -138,5 +133,6 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
         fun newInstance(config: PlaylistsDialogContract.Config): PlaylistsDialogFragment {
             return PlaylistsDialogFragment(config)
         }
+
     }
 }

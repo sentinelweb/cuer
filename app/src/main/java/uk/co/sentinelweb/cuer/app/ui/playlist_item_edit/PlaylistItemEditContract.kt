@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SE
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -49,8 +50,7 @@ interface PlaylistItemEditContract {
     data class State(
         var model: Model? = null,
         var media: MediaDomain? = null,
-        val selectedPlaylistIds: MutableSet<Long> = mutableSetOf(),
-        var allPlaylists: List<PlaylistDomain> = listOf(),
+        val selectedPlaylists: MutableSet<PlaylistDomain> = mutableSetOf(),
         var committedItems: List<PlaylistItemDomain>? = null,
         var editingPlaylistItem: PlaylistItemDomain? = null,
         var isPlaylistsChanged: Boolean = false,
@@ -76,7 +76,8 @@ interface PlaylistItemEditContract {
                         toast = get(),
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get(),
-                        playlistOrchestrator = get()
+                        playlistOrchestrator = get(),
+                        prefsWrapper = get(named<GeneralPreferences>())
                     )
                 }
                 scoped { State() }

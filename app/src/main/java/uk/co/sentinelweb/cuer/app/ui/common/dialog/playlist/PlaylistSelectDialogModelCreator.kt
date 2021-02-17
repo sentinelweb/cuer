@@ -51,21 +51,5 @@ class PlaylistSelectDialogModelCreator constructor(
         dismiss = dismiss
     )
 
-    fun mapPlaylistSelectionForFullDialog(
-        selected: Set<PlaylistDomain>,
-        multi: Boolean = false,
-        itemClick: (Int, Boolean) -> Unit,
-        confirm: (() -> Unit)? = null,
-        dismiss: () -> Unit = {}
-    ) = PlaylistsDialogContract.Config(
-        model = SelectDialogModel(
-            type = DialogModel.Type.PLAYLIST_FULL,
-            multi = multi,
-            title = R.string.playlist_dialog_title,
-            items = listOf(),
-            itemClick = itemClick,
-            confirm = confirm,
-            dismiss = dismiss
-        )
-    )
+
 }
