@@ -48,17 +48,10 @@ class SharePresenter constructor(
         coroutines.cancel()
     }
 
-    private fun errorLoading(token: String) {
-        "Couldn't get youtube info for $token".apply {
-            log.e(this)
-            view.warning(this)
-        }
-    }
-
     private fun mapDisplayModel() {
         (state.scanResult
             ?.also {
-                if ((it.type == MEDIA && (!it.isNew || !it.isOnPlaylist)) || (it.type == PLAYLIST && !it.isNew))
+                if ((it.type == MEDIA && (!it.isNew || it.isOnPlaylist)) || (it.type == PLAYLIST && !it.isNew))
                     view.warning("${it.type.toString().toLowerCase().capitalize()} already exists ...")
             }
             ?.let {

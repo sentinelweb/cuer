@@ -333,9 +333,8 @@ class PlaylistItemEditViewModel constructor(
             val saveSource = if (isNew) LOCAL else state.source
             if (state.isPlaylistsChanged && state.editingPlaylistItem?.playlistId != null) {// todo need original playlists (not editingPlaylistItem)
                 state.editingPlaylistItem?.also { item ->
-                    if (!state.selectedPlaylists.contains(item.playlistId)) {
-                        playlistItemOrchestrator.delete(item, Options(state.source))
-                    }
+                    state.selectedPlaylists.find { it.id == item.playlistId }
+                        ?: playlistItemOrchestrator.delete(item, Options(state.source))
                 }
             }
             state.committedItems = (
