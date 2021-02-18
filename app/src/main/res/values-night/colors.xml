@@ -25,7 +25,7 @@
     <color name="player_button_progress">@color/white</color>
     <color name="player_button_background_tint">@android:color/transparent</color>
     <color name="player_button_ripple_tint">@color/grey_300</color>
-
+    <color name="text_edit_background">@color/grey_800</color>
     <!--    custom colors-->
     <!--    <color name="dark_red">#961717</color>-->
     <!--    <color name="dark_indigo">#1e245f</color>-->

@@ -123,7 +123,7 @@ class PlaylistEditFragment : DialogFragment() {
                         pe_title_edit.setText(model.titleEdit)
                         pe_title_edit.setSelection(model.titleEdit.length)
                     }
-                    pe_toolbar.title = model.titleDisplay
+                    pe_collapsing_toolbar.title = model.titleDisplay
 
                     val starIconResource =
                         if (model.starred) R.drawable.ic_button_starred_white

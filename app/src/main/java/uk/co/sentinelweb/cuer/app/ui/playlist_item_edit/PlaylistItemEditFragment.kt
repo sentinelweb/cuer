@@ -319,11 +319,7 @@ class PlaylistItemEditFragment
             object : Observer<DialogModel> {
                 override fun onChanged(model: DialogModel) {
                     dialog?.dismiss()
-                    dialogFragment?.let {
-                        val ft = childFragmentManager.beginTransaction()
-                        ft.hide(it)
-                        ft.commit()
-                    }
+                    hideDialogFragment()
                     when (model.type) {
                         DialogModel.Type.PLAYLIST_FULL -> {
                             dialogFragment =
@@ -337,6 +333,7 @@ class PlaylistItemEditFragment
                                         override fun onPlaylistCommit(domain: PlaylistDomain?) {
                                             domain?.apply { viewModel.onPlaylistCreated(this) }
                                             dialogFragment?.dismissAllowingStateLoss()
+                                            hideDialogFragment()
                                         }
                                     }
                                 }
@@ -358,6 +355,15 @@ class PlaylistItemEditFragment
                 }
             }
         )
+    }
+
+    private fun hideDialogFragment() {
+        dialogFragment?.let {
+            val ft = childFragmentManager.beginTransaction()
+            ft.hide(it)
+            ft.commit()
+        }
+        dialogFragment = null
     }
 
     override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) {

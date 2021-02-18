@@ -11,6 +11,7 @@
     <attr name="headlineFont" format="reference" />
     <attr name="headlineFontLetterSpacing" format="float" />
     <attr name="headlineFontXScaling" format="float" />
+    <attr name="textEditBackground" format="color" />
 
     <declare-styleable name="FABProgress">
         <attr name="progressColor" format="color" />

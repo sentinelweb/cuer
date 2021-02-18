@@ -8,11 +8,11 @@
     tools:context=".ui.main.MainActivity"
     >
 
+    <!-- fixme something is very wrong with the way this work in a dialog - in pix3a the height goes to nothing with match_parentT -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/pdf_swipe"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="64dp"
+        android:layout_height="500dp"
         app:layout_constraintBottom_toTopOf="@id/pdf_add_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

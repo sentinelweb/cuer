@@ -29,13 +29,11 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     init {
         log.tag(this)
-        log.d("${hashCode()} - init")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        log.d("${hashCode()} - onCreate")
     }
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -44,7 +42,6 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        log.d("${hashCode()} - onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
         pdf_list.layoutManager = LinearLayoutManager(context)
@@ -61,24 +58,20 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     }
 
     override fun onDestroyView() {
-        log.d("${hashCode()} - onDestroyView")
         presenter.destroy()
         super.onDestroyView()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        log.d("${hashCode()} - onCreateOptionsMenu")
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onResume() {
-        log.d("${hashCode()} - onResume")
         super.onResume()
         presenter.onResume()
     }
 
     override fun onPause() {
-        log.d("${hashCode()} - onPause")
         super.onPause()
         presenter.onPause()
     }
@@ -89,7 +82,6 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
         pdf_swipe.isRefreshing = false
         adapter.currentPlaylistId = model.currentPlaylistId
         adapter.setData(model.items, animate)
-        pdf_swipe.setOnRefreshListener { presenter.refreshList() }
     }
     //endregion
 

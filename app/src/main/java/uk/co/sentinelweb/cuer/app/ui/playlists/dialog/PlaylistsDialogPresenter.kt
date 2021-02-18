@@ -1,12 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.ChannelPlatformIdFilter
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsModelMapper
@@ -49,10 +46,10 @@ class PlaylistsDialogPresenter(
     }
 
     private fun refreshPlaylists() {
-        state.viewModelScope.launch { executeRefresh() }
+        coroutines.mainScope.launch { executeRefresh() }
     }
 
-    private suspend fun executeRefresh(animate: Boolean = true) {
+    private suspend fun executeRefresh(animate: Boolean = false) {
         if (!state.channelSearchApplied) {
             state.config.suggestionsMedia?.apply {
                 playlistOrchestrator.loadList(ChannelPlatformIdFilter(this.channelData.platformId!!), Options(LOCAL))
@@ -60,7 +57,8 @@ class PlaylistsDialogPresenter(
             }
             state.channelSearchApplied = true
         }
-        state.playlists = playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), Options(LOCAL))
+
+        state.playlists = playlistOrchestrator.loadList(AllFilter(), Options(LOCAL))
             .sortedWith(compareBy({ !state.priorityPlaylistIds.contains(it.id) }, { !it.starred }, { it.title.toLowerCase() }))
 
         state.playlistStats = playlistRepository
@@ -95,7 +93,7 @@ class PlaylistsDialogPresenter(
     }
 
     override fun onResume() {
-        state.viewModelScope.launch { executeRefresh(true) }
+        coroutines.mainScope.launch { executeRefresh() }
         playlistRepository.updates
             .onEach { refreshPlaylists() }
             .let { coroutines.mainScope }

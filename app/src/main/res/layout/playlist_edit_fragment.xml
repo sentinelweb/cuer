@@ -17,6 +17,7 @@
         >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/pe_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
@@ -105,8 +106,8 @@
                     android:id="@+id/pe_title_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
                     android:fontFamily="Montserrat"
+                    android:background="?textEditBackground"
                     tools:text="Edit input"
                     android:maxLines="1"
                     />
