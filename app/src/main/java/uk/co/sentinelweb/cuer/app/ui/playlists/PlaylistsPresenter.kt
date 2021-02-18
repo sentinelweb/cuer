@@ -116,6 +116,7 @@ class PlaylistsPresenter(
         state.playlists = playlistRepository.loadList(null)
             .takeIf { it.isSuccessful }
             ?.data
+            ?.sortedWith(compareBy({ !it.starred }, { it.title.toLowerCase() }))
             ?: listOf()
 
         state.playlistStats = playlistRepository
