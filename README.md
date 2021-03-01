@@ -38,7 +38,8 @@ Using
   - Room test
   - Koin test
   - Coroutines test
- 
+- Github Actions (Build / Test)
+
 ## screenshots
 ### Playlist
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/playlist-2021-01-14-101002.png" width="400">
