@@ -1,13 +1,13 @@
 # Cuer
 [![Actions Status](https://github.com/sentinelweb/cuer/workflows/Android%20CI/badge.svg)](https://github.com/sentinelweb/cuer/actions)
 
-## MVP Youtube Media que manager for Android
+## Youtube Media queue manager for Android
 
 This project is a playlist manager for Youtube content. (In development)
 
-It's a learning project to hone my Material / Jetpack / Kotlin / Coroutines / Chromecast skillz
+Youtube has very bad playlist & chromecast queue useability.
 
-Architecture MVP (Some MVVM for practice)
+It's a learning project to hone my Material / Jetpack / Kotlin / Coroutines / Chromecast skillz
 
 Using
 - Material Design Libraries & Themes (Day/Night)
@@ -16,6 +16,9 @@ Using
    - Lifecycle
    - Androidx/ ktx
    - Navigation
+- Architecture 
+   - MVP - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui
+   - Some MVVM for practice - e.g. https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/playlist_item_edit
 - Kotlin (1.4)
   - Coroutines
   - Serialisation
@@ -36,7 +39,8 @@ Using
   - Room test
   - Koin test
   - Coroutines test
- 
+- Github Actions (Build / Test)
+
 ## screenshots
 ### Playlist
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/playlist-2021-01-14-101002.png" width="400">
