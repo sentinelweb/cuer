@@ -110,11 +110,18 @@ class PlaylistsFragment :
     }
 
     override fun showDeleteUndo(msg: String) {
+        snackbar?.dismiss()
         snackbar = snackbarWrapper.make(msg, length = Snackbar.LENGTH_LONG, actionText = "UNDO") {
             presenter.undoDelete()
             snackbar?.dismiss()
         }
         snackbar?.show()
+    }
+
+    override fun showMessage(msg: String) {
+        snackbar?.dismiss()
+        snackbar = snackbarWrapper.make(msg, length = Snackbar.LENGTH_LONG)
+            .apply { show() }
     }
 
     override fun gotoPlaylist(id: Long, play: Boolean, source: Source) {

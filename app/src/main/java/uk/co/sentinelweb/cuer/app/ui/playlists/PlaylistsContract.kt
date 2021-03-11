@@ -52,6 +52,7 @@ interface PlaylistsContract {
         fun showDeleteUndo(msg: String)
         fun gotoPlaylist(id: Long, play: Boolean, source: Source)
         fun gotoEdit(id: Long, source: Source)
+        fun showMessage(msg: String)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }

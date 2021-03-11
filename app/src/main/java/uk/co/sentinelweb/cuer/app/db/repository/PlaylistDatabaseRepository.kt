@@ -233,7 +233,6 @@ class PlaylistDatabaseRepository constructor(
                 log.e(msg, e)
                 database.endTransaction()
                 RepoResult.Error<Boolean>(e, msg)
-
             }
         }
 
@@ -260,7 +259,6 @@ class PlaylistDatabaseRepository constructor(
                         _playlistFlow.emit(FLAT to playlist)
                     }
                 }
-
             } catch (e: Exception) {
                 val msg = "couldn't delete all media"
                 log.e(msg, e)

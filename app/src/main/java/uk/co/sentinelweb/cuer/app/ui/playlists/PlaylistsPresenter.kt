@@ -55,10 +55,19 @@ class PlaylistsPresenter(
             delay(400)
             state.playlists.apply {
                 find { it.id == item.id }?.let { playlist ->
-                    state.deletedPlaylist = playlist
-                    playlistRepository.delete(playlist, emit = true)
-                    view.showDeleteUndo("Deleted playlist: ${playlist.title}")
-                    executeRefresh(false, false)
+                    state.deletedPlaylist = playlist.id
+                        ?.let { playlistRepository.load(it, flat = false) }
+                        ?.takeIf { it.isSuccessful }
+                        ?.data
+                        ?.apply {
+                            playlistRepository.delete(playlist, emit = true)
+                            view.showDeleteUndo("Deleted playlist: ${playlist.title}")
+                            executeRefresh(false, false)
+                        }
+                        ?: let {
+                            view.showMessage("Cannot load playlist backup")
+                            null
+                        }
                 }
             }
         }
