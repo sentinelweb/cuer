@@ -34,6 +34,7 @@ interface ScanContract {
     ) : ViewModel()
 
     data class Result constructor(
+        val url: String,
         val isNew: Boolean,
         val isOnPlaylist: Boolean,
         val type: ObjectTypeDomain,

@@ -92,6 +92,19 @@ class SharePresenter constructor(
         }
     }
 
+    override fun isAlreadyScanned(urlOrText: String): Boolean {
+        return state.scanResult
+            ?.let {
+                it.url.substring(it.url.indexOf("://") // sometimes protocol is prepended
+                    .takeIf { it > -1 }
+                    ?.let { it + 3 }
+                    ?: 0
+                )
+            }
+            ?.let { url -> urlOrText.contains(url) }
+            ?: false
+    }
+
     override fun afterItemEditNavigation() {
         if (state.scanResult?.type == PLAYLIST) {
             view.navigate(NavigationModel(NAV_BACK))

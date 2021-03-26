@@ -32,6 +32,7 @@ interface ShareContract {
         fun linkError(clipText: String?)
         fun scanResult(result: ScanContract.Result)
         fun afterItemEditNavigation()
+        fun isAlreadyScanned(urlOrText: String): Boolean
     }
 
     interface View {

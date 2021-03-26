@@ -38,12 +38,12 @@ class ScanPresenter(
                     when (scannedMedia.first) {
                         MEDIA -> (scannedMedia.second as MediaDomain).apply {
                             view.setModel(modelMapper.map(this))
-                            view.setResult(checkMedia(this))
+                            view.setResult(checkMedia(uriString, this))
                         }
                         PLAYLIST -> (scannedMedia.second as PlaylistDomain).apply {
                             view.setModel(modelMapper.map(scannedMedia.second as PlaylistDomain))
                             log.d("Scanned Playlist = $this")
-                            checkPlaylist(this)
+                            checkPlaylist(uriString, this)
                                 ?.apply { view.setResult(this) }
                                 ?: linkError(uriString)
                         }
@@ -58,7 +58,7 @@ class ScanPresenter(
         view.setModel(modelMapper.mapError(uriString))
     }
 
-    private suspend fun checkMedia(scannedMedia: MediaDomain): ScanContract.Result =// todo return playlistItem if exists
+    private suspend fun checkMedia(uriString: String, scannedMedia: MediaDomain): ScanContract.Result =// todo return playlistItem if exists
         scannedMedia.let {
             mediaOrchestrator.loadList(PlatformIdListFilter(listOf(scannedMedia.platformId)), Options(LOCAL))
         }.firstOrNull()
@@ -66,14 +66,14 @@ class ScanPresenter(
                 playlistItemOrchestrator
                     .loadList(MediaIdListFilter(listOf(media.id!!)), Options(LOCAL))
                     .let {
-                        modelMapper.mapMediaResult(false, it.size > 0, media)
+                        modelMapper.mapMediaResult(uriString, false, it.size > 0, media)
                     }
             }
             ?: let {
-                modelMapper.mapMediaResult(true, false, scannedMedia)
+                modelMapper.mapMediaResult(uriString, true, false, scannedMedia)
             }
 
-    private suspend fun checkPlaylist(scannedPlaylist: PlaylistDomain): ScanContract.Result? {
+    private suspend fun checkPlaylist(uriString: String, scannedPlaylist: PlaylistDomain): ScanContract.Result? {
         try {
             return (scannedPlaylist.platformId
                 ?.let {
@@ -86,7 +86,7 @@ class ScanPresenter(
                             ?.let { playlistOrchestrator.save(it, Options(MEMORY, flat = false, emit = false)) to true }
                         ?: throw DoesNotExistException()
                 })?.let { (playlist, isNew) ->
-                    modelMapper.mapPlaylistResult(isNew, playlist)
+                    modelMapper.mapPlaylistResult(uriString, isNew, playlist)
                 }
         } catch (e: Exception) {
             log.e("Caught Error loading playlist", e)
@@ -94,19 +94,4 @@ class ScanPresenter(
             return null
         }
     }
-//
-//    private suspend fun loadOrInfo(scannedMedia: MediaDomain): MediaDomain? =
-//        scannedMedia.let {
-//            mediaDatabaseRepository.loadList(MediaDatabaseRepository.MediaIdFilter(scannedMedia.platformId))
-//        }.takeIf { it.isSuccessful }
-//            ?.let { it.data?.firstOrNull() }
-//            ?: run {
-//                ytInteractor.videos(
-//                    ids = listOf(scannedMedia.platformId),
-//                    parts = listOf(YoutubePart.ID, YoutubePart.SNIPPET, YoutubePart.CONTENT_DETAILS)
-//                ).takeIf { it.isSuccessful }
-//                    ?.let {
-//                        it.data?.firstOrNull()
-//                    }
-//            }
 }
