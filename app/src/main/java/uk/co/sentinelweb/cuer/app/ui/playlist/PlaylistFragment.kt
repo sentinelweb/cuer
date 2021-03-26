@@ -270,9 +270,9 @@ class PlaylistFragment :
         }
     }
 
-    override fun showDeleteUndo(msg: String) {
+    override fun showUndo(msg: String, undoFunction: () -> Unit) {
         snackbar = snackbarWrapper.make(msg, length = Snackbar.LENGTH_LONG, actionText = "UNDO") {
-            presenter.undoDelete()
+            undoFunction()
             snackbar?.dismiss()
         }
         snackbar?.show()
