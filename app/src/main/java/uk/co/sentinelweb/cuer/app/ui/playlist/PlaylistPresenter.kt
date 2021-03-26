@@ -198,7 +198,7 @@ class PlaylistPresenter(
                         multi = true,
                         itemClick = { which: PlaylistDomain?, _ ->
                             which
-                                ?.let { moveItemToPlaylist(it.id!!) }
+                                ?.let { moveItemToPlaylist(it) }
                                 ?: view.showPlaylistCreateDialog()
                         },
                         confirm = { },
@@ -211,7 +211,7 @@ class PlaylistPresenter(
     }
 
     override fun onPlaylistSelected(playlist: PlaylistDomain, selected: Boolean) {
-        playlist.id?.let { moveItemToPlaylist(it) }
+        playlist.id?.let { if (selected) moveItemToPlaylist(playlist) }
     }
 
     override fun onPlayModeChange(): Boolean {
@@ -248,14 +248,27 @@ class PlaylistPresenter(
         return true
     }
 
-    private fun moveItemToPlaylist(it: Long) {
+    private fun moveItemToPlaylist(playlist: PlaylistDomain) {
         state.selectedPlaylistItem
             ?.let { moveItem ->
                 state.viewModelScope.launch {
-                    moveItem.copy(playlistId = it, order = timeProvider.currentTimeMillis())
+                    moveItem
+                        .copy(playlistId = playlist.id!!)
+                        .apply { state.movedPlaylistItem = this }
+                        .copy(order = timeProvider.currentTimeMillis())
                         .apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.toFlatOptions()) }
+                        .apply { view.showUndo("Moved to : ${playlist.title}", ::undoMoveItem) }
                 }
             }
+    }
+
+    override fun undoMoveItem() {
+        state.viewModelScope.launch {
+            state.movedPlaylistItem
+                ?.copy(playlistId = state.playlistIdentifier.id!! as Long)
+                ?.apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.toFlatOptions()) }
+                ?.apply { state.movedPlaylistItem = null }
+        }
     }
 
     // delete item
@@ -270,7 +283,7 @@ class PlaylistPresenter(
                     state.deletedPlaylistItem = deleteItem
                     // todo handle exceptions
                     playlistItemOrchestrator.delete(deleteItem, state.playlistIdentifier.toFlatOptions())
-                    view.showDeleteUndo("Deleted: ${deleteItem.media.title}") // todo extract
+                    view.showUndo("Deleted: ${deleteItem.media.title}", ::undoDelete) // todo extract
                 }
         }
     }

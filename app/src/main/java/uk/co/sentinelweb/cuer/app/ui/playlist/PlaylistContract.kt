@@ -59,6 +59,7 @@ interface PlaylistContract {
         fun onPause()
         suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit)
         fun reloadHeader()
+        fun undoMoveItem()
     }
 
     interface View {
@@ -68,7 +69,7 @@ interface PlaylistContract {
         fun scrollToItem(index: Int)
         fun scrollTo(direction: ScrollDirection)
         fun playLocal(media: MediaDomain)
-        fun showDeleteUndo(msg: String)
+        fun showUndo(msg: String, undoFunction: () -> Unit)
         fun highlightPlayingItem(currentItemIndex: Int?)
         fun setSubTitle(subtitle: String)
         fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
@@ -91,6 +92,7 @@ interface PlaylistContract {
         var playlistIdentifier: Identifier<*> = NO_PLAYLIST,
         var playlist: PlaylistDomain? = null,
         var deletedPlaylistItem: PlaylistItemDomain? = null,
+        var movedPlaylistItem: PlaylistItemDomain? = null,
         var focusIndex: Int? = null,
         var lastFocusIndex: Int? = null, // used for undo
         var dragFrom: Int? = null,
