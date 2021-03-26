@@ -197,6 +197,11 @@ class PlaylistItemEditFragment
         observeDialog()
     }
 
+    override fun onStop() {
+        super.onStop()
+        dialogFragment?.dismissAllowingStateLoss()
+    }
+
     private fun observeUi() {
         viewModel.getUiObservable().observe(
             this.viewLifecycleOwner,

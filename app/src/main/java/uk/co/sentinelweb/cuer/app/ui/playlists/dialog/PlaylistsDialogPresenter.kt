@@ -75,6 +75,7 @@ class PlaylistsDialogPresenter(
 
     override fun onDismiss() {
         state.config.dismiss()
+        view.dismiss()
     }
 
     override fun setConfig(config: PlaylistsDialogContract.Config) {

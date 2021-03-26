@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -48,12 +49,12 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
 
     private val scanFragment: ScanContract.View? by lazy {
         supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            ?.run { (getChildFragmentManager().getFragments().get(0) as ScanContract.View?)!! }
+            ?.run { (getChildFragmentManager().getFragments().get(0) as? ScanContract.View?) }
     }
 
-    private val commitFragment: ShareContract.Committer by lazy {
+    private val commitFragment: ShareContract.Committer? by lazy {
         supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            ?.run { (getChildFragmentManager().getFragments().get(0) as ShareContract.Committer?)!! }
+            ?.run { (getChildFragmentManager().getFragments().get(0) as? ShareContract.Committer?) }
             ?: throw IllegalStateException("Not a commit fragment")
     }
 
@@ -63,7 +64,6 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         setContentView(R.layout.activity_share)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        scanFragment!!.listener = this
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
@@ -93,6 +93,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
                 ?.apply {
                     if (!presenter.isAlreadyScanned(this.toString())) {
                         scanFragment?.fromShareUrl(this.toString()) ?: throw IllegalStateException("Scan fragment not visible")
+                        clipboard.primaryClip = null
                     }
                 }
                 ?: presenter.linkError(
@@ -159,7 +160,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
     }
 
     override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) =
-        commitFragment.commit(onCommit)
+        commitFragment?.commit(onCommit) ?: throw IllegalStateException("Commit fragment not visible")
 
 //
 //    override fun getCommittedItems() =
@@ -173,6 +174,10 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
 
     override fun navigate(nav: NavigationModel) {
         navMapper.map(nav)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        super.onSaveInstanceState(outState, outPersistentState)
     }
 
     companion object {

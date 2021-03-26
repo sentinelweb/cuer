@@ -17,7 +17,6 @@ interface ScanContract {
     }
 
     interface View {
-        var listener: Listener
         fun fromShareUrl(uriString: String)
         fun showMessage(msg: String)
         fun showError(msg: String)
@@ -32,6 +31,7 @@ interface ScanContract {
     class State constructor(
 
     ) : ViewModel()
+
 
     data class Result constructor(
         val url: String,

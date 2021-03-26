@@ -71,7 +71,7 @@ interface ShareContract {
         }
     }
 
-    //    @Serializable
+    // @Serializable
     data class State(
         @Transient var model: Model? = null,
         var scanResult: ScanContract.Result? = null
