@@ -30,7 +30,7 @@ class ScanFragment : Fragment(R.layout.scan_fragment), ScanContract.View {
         super.onViewCreated(view, savedInstanceState)
     }
 
-    override fun fromShareUrl(uriString: String) {
+    override fun fromShareUrl(uriString: String) {// called from activity
         binding.scanProgress.isVisible = true
         binding.scanResult.isVisible = false
         presenter.fromShareUrl(uriString)

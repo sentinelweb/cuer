@@ -90,7 +90,11 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
             clipboard.getPrimaryClip()
                 ?.getItemAt(0)
                 ?.text
-                ?.apply { scanFragment?.fromShareUrl(this.toString()) ?: throw IllegalStateException("Scan fragment not visible") }
+                ?.apply {
+                    if (!presenter.isAlreadyScanned(this.toString())) {
+                        scanFragment?.fromShareUrl(this.toString()) ?: throw IllegalStateException("Scan fragment not visible")
+                    }
+                }
                 ?: presenter.linkError(
                     clipboard.getPrimaryClip()
                         ?.getItemAt(0)?.text?.toString()
@@ -98,11 +102,13 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         if (!intent.getBooleanExtra(EXTRA_PASTE, false)) {
             (shareWrapper.getLinkFromIntent(intent) ?: shareWrapper.getTextFromIntent(intent))?.apply {
-                scanFragment?.fromShareUrl(this) ?: throw IllegalStateException("Scan fragment not visible")
+                if (!presenter.isAlreadyScanned(this)) {
+                    scanFragment?.fromShareUrl(this) ?: throw IllegalStateException("Scan fragment not visible")
+                }
             } ?: presenter.linkError("Could not find a link to process")
         }
     }

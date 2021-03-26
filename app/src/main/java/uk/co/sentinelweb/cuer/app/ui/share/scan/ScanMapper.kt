@@ -41,14 +41,16 @@ class ScanMapper constructor() {
             false
         )
 
-    fun mapMediaResult(isNew: Boolean, isOnPlaylist: Boolean, media: MediaDomain) = ScanContract.Result(
+    fun mapMediaResult(url: String, isNew: Boolean, isOnPlaylist: Boolean, media: MediaDomain) = ScanContract.Result(
+        url,
         isNew,
         isOnPlaylist,
         ObjectTypeDomain.MEDIA,
         media
     )
 
-    fun mapPlaylistResult(isNew: Boolean, playlist: PlaylistDomain) = ScanContract.Result(
+    fun mapPlaylistResult(url: String, isNew: Boolean, playlist: PlaylistDomain) = ScanContract.Result(
+        url,
         isNew,
         isNew,
         ObjectTypeDomain.PLAYLIST,
