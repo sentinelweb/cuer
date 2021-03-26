@@ -13,6 +13,8 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
 class ScanFragment : Fragment(R.layout.scan_fragment), ScanContract.View {
 
+    override lateinit var listener: ScanContract.Listener
+
     private val presenter: ScanContract.Presenter by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
 
@@ -51,7 +53,7 @@ class ScanFragment : Fragment(R.layout.scan_fragment), ScanContract.View {
     }
 
     override fun setResult(result: ScanContract.Result) {
-        (requireActivity() as ScanContract.Listener).scanResult(result)
+        listener.scanResult(result)
     }
 
 }

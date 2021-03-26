@@ -64,6 +64,8 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         setContentView(R.layout.activity_share)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
+        // todo fix with https://github.com/sentinelweb/cuer/issues/158
+        scanFragment?.listener = this
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
@@ -93,7 +95,6 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
                 ?.apply {
                     if (!presenter.isAlreadyScanned(this.toString())) {
                         scanFragment?.fromShareUrl(this.toString()) ?: throw IllegalStateException("Scan fragment not visible")
-                        clipboard.primaryClip = null
                     }
                 }
                 ?: presenter.linkError(
@@ -178,6 +179,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         super.onSaveInstanceState(outState, outPersistentState)
+        // todo save state see issue https://github.com/sentinelweb/cuer/issues/158
     }
 
     companion object {

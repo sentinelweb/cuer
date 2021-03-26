@@ -17,6 +17,7 @@ interface ScanContract {
     }
 
     interface View {
+        var listener: Listener
         fun fromShareUrl(uriString: String)
         fun showMessage(msg: String)
         fun showError(msg: String)
