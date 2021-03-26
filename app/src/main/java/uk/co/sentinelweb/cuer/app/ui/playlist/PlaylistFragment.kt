@@ -226,6 +226,11 @@ class PlaylistFragment :
         super.onPause()
         presenter.onPause()
     }
+
+    override fun onStop() {
+        super.onStop()
+        dialogFragment?.dismissAllowingStateLoss()
+    }
     // endregion
 
     // region PlaylistContract.View
