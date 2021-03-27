@@ -140,7 +140,7 @@ class CastPlayerPresenter(
                     ?.getLiveOffsetMs()
                     ?.takeIf { it > 9 * 1000 }
                     ?.apply { view.setCurrentSecond("-" + mapper.formatTime(this)) }
-                    ?: view.setCurrentSecond("-")
+                    ?: view.setCurrentSecond("")
             }
         }
     }

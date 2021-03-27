@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
+import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -23,7 +26,8 @@ class YouTubePlayerListener(
     private val mediaSessionManager: MediaSessionManager,
     private val log: LogWrapper,
     private val timeProvider: TimeProvider,
-    private val coroutines: CoroutineContextProvider
+    private val coroutines: CoroutineContextProvider,
+    private val prefs: SharedPrefsWrapper<GeneralPreferences>
 ) : AbstractYouTubePlayerListener(),
     CastPlayerContract.PlayerControls.Listener {
 
@@ -75,7 +79,7 @@ class YouTubePlayerListener(
     // region AbstractYouTubePlayerListener
     override fun onReady(youTubePlayer: YouTubePlayer) {
         this.youTubePlayer = youTubePlayer
-        state.durationObtainedTime = -1
+        log.d("ready")
         loadVideo(queue.currentItem)
     }
 
@@ -84,13 +88,18 @@ class YouTubePlayerListener(
     }
 
     override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
+        log.d("onVideoDuration dur=${state.durationSec} durObTime=${state.durationObtainedTime}")
         this.youTubePlayer = youTubePlayer
-        state.durationSec = duration
-        // fixme: ?? if the app is restarting then this will likely be off - as the duration on the chromecast wont update
-        // one fix could be to save [durationSec,durationObtainedTime, videoId] to shared prefs and then wipe it when a new video is played - though there might be issues there too
-        if (state.durationObtainedTime == -1L) { // the duration doesnt update after the video first loads so only set it the first time if possible
-            state.durationObtainedTime = timeProvider.currentTimeMillis()
-        }
+        state.currentMedia
+            ?.takeIf { it.isLiveBroadcast }
+            ?.apply {
+                if (state.durationObtainedTime == -1L) {
+                    state.durationSec = duration
+                    state.durationObtainedTime = timeProvider.currentTimeMillis()
+                    state.receivedVideoId?.let { saveLiveDurationPref() }
+                }
+            }
+            ?: run { state.durationSec = duration }
         playerUi?.setDuration(duration)
         updateMedia(false, durSec = duration)
         state.currentMedia?.apply { mediaSessionManager.setMedia(this) }
@@ -189,6 +198,7 @@ class YouTubePlayerListener(
     override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
         this.youTubePlayer = youTubePlayer
         state.receivedVideoId = videoId
+        restoreLiveDurationPref(videoId)
         log.d("Got id: $videoId media=${state.currentMedia?.stringMedia()}")
     }
 
@@ -268,6 +278,7 @@ class YouTubePlayerListener(
                 }
             }
             state.durationObtainedTime = -1
+            clearLiveDurationPrefIfNotSame(media.platformId)
             log.d("loadVideo: play position: pos =  $startPos sec")
             youTubePlayer?.loadVideo(media.platformId, startPos)
             state.currentMedia = media
@@ -300,6 +311,33 @@ class YouTubePlayerListener(
         controls?.apply {
             removeListener(this@YouTubePlayerListener)
             reset()
+        }
+    }
+
+    private fun saveLiveDurationPref() {
+        prefs.putLong(LIVE_DURATION_TIME, state.durationObtainedTime)
+        prefs.putString(LIVE_DURATION_ID, state.receivedVideoId ?: throw IllegalStateException("Should have id"))
+        prefs.putLong(LIVE_DURATION_DURATION, state.durationSec.toLong())
+    }
+
+    private fun restoreLiveDurationPref(id: String) {
+        if (prefs.getString(LIVE_DURATION_ID, null) == id) {
+            state.durationSec = prefs.getLong(LIVE_DURATION_DURATION)?.toFloat() ?: 0f
+            state.durationObtainedTime = prefs.getLong(LIVE_DURATION_TIME) ?: -1
+            log.d("restored duration")
+        } else {
+            log.d("did not restore")
+        }
+    }
+
+    private fun clearLiveDurationPrefIfNotSame(id: String) {
+        if (prefs.getString(LIVE_DURATION_ID, null) != id) {
+            prefs.remove(LIVE_DURATION_DURATION)
+            prefs.remove(LIVE_DURATION_TIME)
+            prefs.remove(LIVE_DURATION_ID)
+            log.d("cleared duration")
+        } else {
+            log.d("did not clear duration")
         }
     }
 
