@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
+import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter.Format.SECS
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -59,7 +60,7 @@ class PlaylistModelMapper constructor(
                     if (item.media.isLiveBroadcast) {
                         if (item.media.isLiveBroadcastUpcoming) res.getString(R.string.upcoming)
                         else res.getString(R.string.live)
-                    } else (item.media.duration?.let { item.media.duration?.let { timeFormatter.formatMillis(it) } } ?: "-")
+                    } else (item.media.duration?.let { item.media.duration?.let { timeFormatter.formatMillis(it, SECS) } } ?: "-")
                     ),
             positon = if (item.media.isLiveBroadcast) res.getString(R.string.live) else (progress * 100).toInt().toString() + "%",
             thumbNailUrl = item.media.thumbNail?.url,

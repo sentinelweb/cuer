@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.DateFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
+import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter.Format.SECS
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
@@ -40,9 +41,9 @@ class PlaylistItemEditModelMapper(
                 if (domain.isLiveBroadcast) {
                     if (domain.isLiveBroadcastUpcoming) res.getString(R.string.upcoming)
                     else res.getString(R.string.live)
-                } else domain.duration?.let { timeFormater.formatMillis(it, TimeFormatter.Format.SECS) }
+                } else domain.duration?.let { timeFormater.formatMillis(it, SECS) }
                 ),
-        positionText = domain.positon?.let { timeFormater.formatMillis(it, TimeFormatter.Format.SECS) },
+        positionText = domain.positon?.let { timeFormater.formatMillis(it, SECS) },
         position = domain.positon
             ?.takeIf { domain.duration != null && domain.duration!! > 0L }
             ?.let { (it / domain.duration!!).toFloat() },
