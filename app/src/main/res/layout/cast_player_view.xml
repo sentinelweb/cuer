@@ -170,6 +170,17 @@
                 />
 
             <TextView
+                android:id="@+id/cast_player_current_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@id/cast_player_title"
+                app:layout_constraintLeft_toRightOf="@id/cast_player_seek_back"
+                app:layout_constraintRight_toLeftOf="@id/cast_player_seek_forward"
+                tools:ignore="RtlHardcoded"
+                tools:text="STATE"
+                />
+
+            <TextView
                 android:id="@+id/cast_player_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

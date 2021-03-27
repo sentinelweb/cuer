@@ -60,6 +60,7 @@ interface CastPlayerContract {
             fun trackBack()
             fun trackFwd()
             fun seekTo(positionMs: Long)
+            fun getLiveOffsetMs(): Long
         }
 
     }
@@ -86,6 +87,7 @@ interface CastPlayerContract {
         fun makeItemTransitionExtras(): FragmentNavigator.Extras
         fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int)
         fun setSeekEnabled(enabled: Boolean)
+        fun setState(state: PlayerStateDomain?)
     }
 
     enum class ConnectionState {
@@ -93,7 +95,6 @@ interface CastPlayerContract {
     }
 
     data class State(
-        val listeners: MutableList<PlayerControls.Listener> = mutableListOf(), // todo data only here move to presenter?
         var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
         var positionMs: Long = 0,
         var seekPositionMs: Long = 0,
@@ -139,7 +140,7 @@ interface CastPlayerContract {
                         )
                     )
                 }
-                scoped { CastPlayerUiMapper(get()) }
+                scoped { CastPlayerUiMapper(get(), get()) }
                 viewModel { State() }
             }
         }

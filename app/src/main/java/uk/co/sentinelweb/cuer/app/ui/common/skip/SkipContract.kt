@@ -42,7 +42,7 @@ interface SkipContract {
         var accumulator: Long = 0,
         var targetPosition: Long? = null,
         var position: Long = 0,
-        var currentStateState: PlayerStateDomain? = null
+        var currentPlayState: PlayerStateDomain? = null
     )
 
     class Mapper constructor(

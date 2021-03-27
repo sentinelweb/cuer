@@ -10,28 +10,28 @@ class TimeFormatter {
     enum class Format { SECS, MILLIS }
 
     fun formatTime(date: LocalTime, format: Format = Format.SECS): String =
-        formatter().format(date).strip00()
+        formatter(format).format(date).strip00()
 
     fun formatTime(timeSecs: Float, format: Format = Format.SECS): String =
         try {
-            formatter().format(LocalTime.ofNanoOfDay((timeSecs * 1_000_000_000).toLong())).strip00()
+            formatter(format).format(LocalTime.ofNanoOfDay((timeSecs * 1_000_000_000).toLong())).strip00()
         } catch (e: Exception) {
             "-"
         }
 
     fun formatNow(format: Format = Format.SECS): String =
-        formatter().format(LocalTime.now()).strip00()
+        formatter(format).format(LocalTime.now()).strip00()
 
     fun formatMillis(l: Long, format: Format = Format.MILLIS): String =
         try {
-            formatter().format(LocalTime.ofNanoOfDay(l * 1_000_000)).strip00()
+            formatter(format).format(LocalTime.ofNanoOfDay(l * 1_000_000)).strip00()
         } catch (e: Exception) {
             "-"
         }
 
     fun formatFrom(time: LocalTime, format: Format = Format.SECS): String =
         try {
-            formatter().format(LocalTime.now().minusNanos(time.toNanoOfDay())).strip00()
+            formatter(format).format(LocalTime.now().minusNanos(time.toNanoOfDay())).strip00()
         } catch (e: Exception) {
             "-"
         }

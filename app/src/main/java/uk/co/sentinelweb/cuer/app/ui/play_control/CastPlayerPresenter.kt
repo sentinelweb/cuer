@@ -29,6 +29,8 @@ class CastPlayerPresenter(
         skipControl.listener = this
     }
 
+    private var listener: CastPlayerContract.PlayerControls.Listener? = null // todo data only here move to presenter?
+
     override fun initialise() {
         state.isDestroyed = false
         view.setSkipBackText(skipControl.skipBackText)
@@ -47,8 +49,8 @@ class CastPlayerPresenter(
 
     override fun onPlayPausePressed() {
         when (state.playState) {
-            PLAYING -> state.listeners.forEach { it.pause() }
-            VIDEO_CUED, UNSTARTED, PAUSED, UNKNOWN -> state.listeners.forEach { it.play() }
+            PLAYING -> listener?.pause()
+            VIDEO_CUED, UNSTARTED, PAUSED, UNKNOWN -> listener?.play()
             else -> Unit
         }
     }
@@ -58,13 +60,13 @@ class CastPlayerPresenter(
     }
 
     override fun addListener(l: CastPlayerContract.PlayerControls.Listener) {
-        if (!state.listeners.contains(l)) {
-            state.listeners.add(l)
-        }
+        listener = l
     }
 
     override fun removeListener(l: CastPlayerContract.PlayerControls.Listener) {
-        state.listeners.remove(l)
+        if (listener == l) {
+            listener = null;
+        }
     }
 
     override fun onSeekBackPressed() {
@@ -76,11 +78,11 @@ class CastPlayerPresenter(
     }
 
     override fun onTrackBackPressed() {
-        state.listeners.forEach { it.trackBack() }
+        listener?.trackBack()
     }
 
     override fun onTrackFwdPressed() {
-        state.listeners.forEach { it.trackFwd() }
+        listener?.trackFwd()
     }
 
     override fun onSeekChanged(ratio: Float) {
@@ -91,7 +93,7 @@ class CastPlayerPresenter(
     }
 
     override fun onSeekFinished() {
-        state.listeners.forEach { it.seekTo(state.seekPositionMs) }
+        listener?.seekTo(state.seekPositionMs)
         state.seekPositionMs = 0
     }
 
@@ -123,6 +125,7 @@ class CastPlayerPresenter(
                 view.setPaused(); view.showMessage("An error occurred")
             }
         }
+        view.setState(playState)
     }
 
     override fun setCurrentSecond(second: Float) {
@@ -132,6 +135,12 @@ class CastPlayerPresenter(
             if (!state.isLiveStream) {
                 view.setCurrentSecond(mapper.formatTime(state.positionMs))
                 view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
+            } else {
+                listener
+                    ?.getLiveOffsetMs()
+                    ?.takeIf { it > 9 * 1000 }
+                    ?.apply { view.setCurrentSecond("-" + mapper.formatTime(this)) }
+                    ?: view.setCurrentSecond("-")
             }
         }
     }
@@ -229,9 +238,7 @@ class CastPlayerPresenter(
     }
 
     override fun skipSeekTo(target: Long) {
-        state.listeners.forEach {
-            it.seekTo(target)
-        }
+        listener?.seekTo(target)
     }
 
     override fun skipSetBackText(text: String) {

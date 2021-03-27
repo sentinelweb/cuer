@@ -8,9 +8,9 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 class PlaybackStateMapper {
 
     @Suppress("RemoveRedundantQualifierName")
-    fun map(domain: MediaDomain, state: PlayerStateDomain): PlaybackStateCompat = if (domain.isLiveBroadcast) {
+    fun map(domain: MediaDomain, state: PlayerStateDomain, liveOffset: Long?): PlaybackStateCompat = if (domain.isLiveBroadcast) {
         PlaybackStateCompat.Builder()
-            .setState(mapState(state), 0, 1f)
+            .setState(mapState(state), liveOffset ?: 0, 1f)
             .setActions(PlaybackStateCompat.ACTION_REWIND or PlaybackStateCompat.ACTION_FAST_FORWARD)
             .build()
     } else {

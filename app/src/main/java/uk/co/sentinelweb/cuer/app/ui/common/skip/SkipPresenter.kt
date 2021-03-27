@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import kotlin.math.abs
 
 class SkipPresenter constructor(
@@ -26,7 +27,7 @@ class SkipPresenter constructor(
     override lateinit var listener: SkipContract.Listener
 
     private val isSeeking: Boolean
-        get() = state.targetPosition != null
+        get() = state.targetPosition != null && state.currentPlayState == BUFFERING // todo check
     private val forwardJumpInterval: Int
         get() = state.forwardJumpInterval
 
@@ -83,10 +84,10 @@ class SkipPresenter constructor(
     }
 
     override fun stateChange(playState: PlayerStateDomain) {
-        if (state.currentStateState == PlayerStateDomain.BUFFERING && playState == PlayerStateDomain.PLAYING) {
+        if ((state.currentPlayState == BUFFERING || state.currentPlayState == PAUSED) && playState == PLAYING) {
             state.targetPosition = null
         }
-        state.currentStateState = playState
+        state.currentPlayState = playState
     }
 
     override fun onSelectSkipTime(fwd: Boolean) {

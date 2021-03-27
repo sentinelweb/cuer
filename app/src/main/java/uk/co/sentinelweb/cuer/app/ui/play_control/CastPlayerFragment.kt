@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 
@@ -150,6 +151,10 @@ class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
 
     override fun setSeekEnabled(enabled: Boolean) {
         binding.castPlayerSeek.isEnabled = enabled
+    }
+
+    override fun setState(state: PlayerStateDomain?) {
+        binding.castPlayerCurrentState.text = state?.toString()
     }
 
     override fun updateSeekPosition(ratio: Float) {
