@@ -31,7 +31,7 @@ class PlayerControlsNotification constructor(
     private val mediaSessionManager: MediaSessionManager
 ) : External, Presenter, SkipContract.Listener {
 
-    private val listeners: MutableList<Listener> = mutableListOf()
+    private var listener: Listener? = null
 
     init {
         log.tag(this)
@@ -41,17 +41,17 @@ class PlayerControlsNotification constructor(
     override fun handleAction(action: String?) {
         when (action) {
             ACTION_PAUSE ->
-                listeners.forEach { it.pause() }
+                listener?.pause()
             ACTION_PLAY ->
-                listeners.forEach { it.play() }
+                listener?.play()
             ACTION_SKIPF ->
                 skipControl.skipFwd()
             ACTION_SKIPB ->
                 skipControl.skipBack()
             ACTION_TRACKB ->
-                listeners.forEach { it.trackBack() }
+                listener?.trackBack()
             ACTION_TRACKF ->
-                listeners.forEach { it.trackFwd() }
+                listener?.trackFwd()
             else -> Unit
         }
     }
@@ -77,7 +77,7 @@ class PlayerControlsNotification constructor(
 
     private fun updateNotification() {
         //log.d("updateNotification: state.media=${state.media?.stringMedia()}")
-        listeners.first().apply { mediaSessionManager.checkCreateMediaSession(this) }
+        listener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
         state.media?.apply {
             state.bitmap?.let { view.showNotification(state.playState, state.media, it) }
                 ?: state.media?.image?.let { image ->
@@ -99,11 +99,13 @@ class PlayerControlsNotification constructor(
     }
 
     override fun addListener(l: Listener) {
-        listeners.add(l)
+        listener = l
     }
 
     override fun removeListener(l: Listener) {
-        listeners.remove(l)
+        if (listener == l) {
+            listener = null;
+        }
     }
 
     override fun setCurrentSecond(second: Float) {
@@ -175,7 +177,7 @@ class PlayerControlsNotification constructor(
     }
 
     override fun skipSeekTo(target: Long) {
-        listeners.forEach { it.seekTo(target) }
+        listener?.seekTo(target)
     }
 
     override fun skipSetBackText(text: String) {

@@ -29,8 +29,9 @@ class YouTubePlayerListener(
 
     data class State constructor(
         var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
-        var positionSec: Float = 0f, // todo remove these mutate media
-        var durationSec: Float = 0f, // todo remove these mutate media
+        var positionSec: Float = 0f,
+        var durationSec: Float = 0f,
+        var durationObtainedTime: Long = -1,
         var currentMedia: MediaDomain? = null,
         var lastUpdateMedia: Long = -1L,
         var lastUpdateUI: Long = -1L,
@@ -74,6 +75,7 @@ class YouTubePlayerListener(
     // region AbstractYouTubePlayerListener
     override fun onReady(youTubePlayer: YouTubePlayer) {
         this.youTubePlayer = youTubePlayer
+        state.durationObtainedTime = -1
         loadVideo(queue.currentItem)
     }
 
@@ -84,6 +86,11 @@ class YouTubePlayerListener(
     override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
         this.youTubePlayer = youTubePlayer
         state.durationSec = duration
+        // fixme: ?? if the app is restarting then this will likely be off - as the duration on the chromecast wont update
+        // one fix could be to save [durationSec,durationObtainedTime, videoId] to shared prefs and then wipe it when a new video is played - though there might be issues there too
+        if (state.durationObtainedTime == -1L) { // the duration doesnt update after the video first loads so only set it the first time if possible
+            state.durationObtainedTime = timeProvider.currentTimeMillis()
+        }
         playerUi?.setDuration(duration)
         updateMedia(false, durSec = duration)
         state.currentMedia?.apply { mediaSessionManager.setMedia(this) }
@@ -98,7 +105,17 @@ class YouTubePlayerListener(
         if (shouldUpdateUi()) {
             playerUi?.setCurrentSecond(second)
             setTimeUpdateUi()
-            state.currentMedia?.apply { mediaSessionManager.updatePlaybackState(this, state.playState) }
+            updateMediaSessionManagerPlaybackState()
+        }
+    }
+
+    private fun updateMediaSessionManagerPlaybackState() {
+        state.currentMedia?.apply {
+            mediaSessionManager.updatePlaybackState(
+                this,
+                state.playState,
+                if (isLiveBroadcast) getLiveOffsetMs() else null
+            )
         }
     }
 
@@ -163,7 +180,7 @@ class YouTubePlayerListener(
             PlayerState.VIDEO_CUED -> PlayerStateDomain.VIDEO_CUED
         }
         playerUi?.setPlayerState(state.playState)
-        state.currentMedia?.apply { mediaSessionManager.updatePlaybackState(this, state.playState) }
+        updateMediaSessionManagerPlaybackState()
         if (state.playState == PlayerStateDomain.ENDED) {
             queue.onTrackEnded(state.currentMedia)
         }
@@ -220,6 +237,16 @@ class YouTubePlayerListener(
             handleError(e)
         }
     }
+
+    override fun getLiveOffsetMs(): Long {
+        if (state.durationObtainedTime > -1) {
+            val timeSinceDurationMs = timeProvider.currentTimeMillis() - state.durationObtainedTime
+            val currentDurationSec = state.durationSec + (timeSinceDurationMs / 1000f)
+            val offsetSec = currentDurationSec - state.positionSec - timeProvider.timeZomeOffsetSecs()
+            return (offsetSec * 1000).toLong()
+        }
+        return -1
+    }
     // endregion
 
     private fun handleError(e: Exception) {
@@ -240,6 +267,7 @@ class YouTubePlayerListener(
                     0f
                 }
             }
+            state.durationObtainedTime = -1
             log.d("loadVideo: play position: pos =  $startPos sec")
             youTubePlayer?.loadVideo(media.platformId, startPos)
             state.currentMedia = media
