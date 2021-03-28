@@ -19,9 +19,15 @@ class MediaOrchestrator constructor(
         get() = mediaDatabaseRepository.updates
             .map { it.first to LOCAL then it.second }
 
-    suspend override fun load(id: Long, options: Options): MediaDomain? {
-        throw NotImplementedException()
-    }
+    suspend override fun load(id: Long, options: Options): MediaDomain? =
+        when (options.source) {
+            MEMORY -> throw NotImplementedException()
+            LOCAL -> mediaDatabaseRepository.load(id, options.flat)
+                .forceDatabaseSuccess()
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)// no platform id available
+        }
 
     suspend override fun loadList(filter: Filter, options: Options): List<MediaDomain> =
         when (options.source) {

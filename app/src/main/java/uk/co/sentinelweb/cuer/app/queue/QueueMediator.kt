@@ -179,14 +179,16 @@ class QueueMediator constructor(
     override fun updateCurrentMediaItem(updatedMedia: MediaDomain) {
         coroutines.computationScope.launch {
             state.currentItem = state.currentItem?.run {
-                val mediaUpdated = media.copy(
-                    positon = updatedMedia.positon,
-                    duration = updatedMedia.duration,
-                    dateLastPlayed = updatedMedia.dateLastPlayed,
-                    watched = true
-                )
-                mediaOrchestrator.save(mediaUpdated, state.playlistIdentifier.toFlatOptions(true))
-                copy(media = mediaUpdated)
+                mediaOrchestrator.load(media.id!!, state.playlistIdentifier.toFlatOptions())
+                    ?.copy(
+                        positon = updatedMedia.positon,
+                        duration = updatedMedia.duration,
+                        dateLastPlayed = updatedMedia.dateLastPlayed,
+                        watched = true
+                    )?.let {
+                        mediaOrchestrator.save(it, state.playlistIdentifier.toFlatOptions(true))
+                        copy(media = it)
+                    }
             }
             state.playlist = state.playlist?.let {
                 it.copy(items = it.items.toMutableList().apply {
