@@ -1,9 +1,11 @@
 package uk.co.sentinelweb.cuer.app.util.cast
 
 import org.koin.android.ext.koin.androidApplication
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 
 object CastModule {
     val castModule = module {
@@ -17,7 +19,8 @@ object CastModule {
                 log = get(),
                 mediaSessionManager = get(),
                 castWrapper = get(),
-                timeProvider = get()
+                timeProvider = get(),
+                prefs = get(named<GeneralPreferences>())
             )
         }
         factory { CastDialogWrapper(get()) }

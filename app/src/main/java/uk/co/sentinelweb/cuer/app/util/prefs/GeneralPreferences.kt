@@ -11,5 +11,7 @@ enum class GeneralPreferences constructor(
     SKIP_BACK_TIME("skipBackTime"),
     YT_LIVE_STREAM_VIDEO_ID("ytLiveStreamId"),
     YT_LIVE_STREAM_VIDEO_START_POSITION("ytLiveStreamStartPos"),
-
+    LIVE_DURATION_DURATION("liveDuration"),
+    LIVE_DURATION_TIME("liveDurationTime"),
+    LIVE_DURATION_ID("liveDurationId")
 }
