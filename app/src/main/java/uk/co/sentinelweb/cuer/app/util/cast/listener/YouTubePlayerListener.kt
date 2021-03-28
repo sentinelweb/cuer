@@ -252,7 +252,8 @@ class YouTubePlayerListener(
         if (state.durationObtainedTime > -1) {
             val timeSinceDurationMs = timeProvider.currentTimeMillis() - state.durationObtainedTime
             val currentDurationSec = state.durationSec + (timeSinceDurationMs / 1000f)
-            val offsetSec = currentDurationSec - state.positionSec - timeProvider.timeZomeOffsetSecs()
+            val offsetSec =
+                currentDurationSec - state.positionSec - 3600 //  - timeProvider.timeZomeOffsetSecs() // some problem here 1 hour more (not timezone?)
             return (offsetSec * 1000).toLong()
         }
         return -1
