@@ -179,6 +179,7 @@ class QueueMediator constructor(
     override fun updateCurrentMediaItem(updatedMedia: MediaDomain) {
         coroutines.computationScope.launch {
             state.currentItem = state.currentItem?.run {
+                //fixme special case for APP playlists?
                 mediaOrchestrator.load(media.id!!, state.playlistIdentifier.toFlatOptions())
                     ?.copy(
                         positon = updatedMedia.positon,

@@ -34,12 +34,7 @@ interface OrchestratorContract<Domain> {
         val source: Source,
         val flat: Boolean = true,
         val emit: Boolean = true
-    ) {
-        companion object {
-//            val LOCAL_FLAT = Options(LOCAL)
-//            val LOCAL_DEEP = Options(LOCAL, flat = false)
-        }
-    }
+    )
 
     enum class Operation { FLAT, FULL, DELETE }
 
@@ -49,6 +44,8 @@ interface OrchestratorContract<Domain> {
     class DefaultFilter() : Filter
     class AllFilter() : Filter
     class ChannelPlatformIdFilter(val platformId: String) : Filter
+    class NewMediaFilter() : Filter
+    class RecentMediaFilter() : Filter
 
     class InvalidOperationException(clazz: KClass<out OrchestratorContract<out Any>>, filter: Filter?, options: Options) :
         java.lang.UnsupportedOperationException("class = ${clazz.simpleName} filter = $filter options = $options")

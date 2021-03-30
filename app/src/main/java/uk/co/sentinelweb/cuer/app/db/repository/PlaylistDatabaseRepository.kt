@@ -372,11 +372,14 @@ class PlaylistDatabaseRepository constructor(
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                     is MediaIdListFilter -> playlistItemDao.loadItemsByMediaId(filter.ids)
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
+                    is NewMediaFilter ->
+                        playlistItemDao.loadAllPlayListItemsWithNewMedia()
+                            .map { playlistItemMapper.map(it) }
                     else -> playlistItemDao.loadAllItems()
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                 }.let { RepoResult.Data(it) }
             } catch (e: Throwable) {
-                val msg = "couldn't save playlist item"
+                val msg = "couldn't load playlist item list for: $filter"
                 log.e(msg, e)
                 RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
             }

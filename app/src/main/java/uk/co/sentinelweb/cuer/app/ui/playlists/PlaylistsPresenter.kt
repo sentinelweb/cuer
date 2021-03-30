@@ -5,10 +5,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPair
+import uk.co.sentinelweb.cuer.app.orchestrator.util.NewMediaPlayistOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -28,7 +30,8 @@ class PlaylistsPresenter(
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
-    private val coroutines: CoroutineContextProvider
+    private val coroutines: CoroutineContextProvider,
+    private val newMedia: NewMediaPlayistOrchestrator
 ) : PlaylistsContract.Presenter {
 
     override fun initialise() {
@@ -74,7 +77,7 @@ class PlaylistsPresenter(
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        view.gotoPlaylist(item.id, false, LOCAL)
+        view.gotoPlaylist(item.id, false, OrchestratorContract.Source.MEMORY)// todo map to list (add to model)
     }
 
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
@@ -126,6 +129,8 @@ class PlaylistsPresenter(
             .takeIf { it.isSuccessful }
             ?.data
             ?.sortedWith(compareBy({ !it.starred }, { it.title.toLowerCase() }))
+            ?.toMutableList()
+            ?.apply { add(0, newMedia.makeNewItemsHeader()) }
             ?: listOf()
 
         state.playlistStats = playlistRepository

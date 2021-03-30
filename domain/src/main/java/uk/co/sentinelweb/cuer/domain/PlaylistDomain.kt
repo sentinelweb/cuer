@@ -32,6 +32,7 @@ data class PlaylistDomain constructor(
     }
 
     enum class PlaylistTypeDomain {
+        APP,
         USER,
         PLATFORM /* External playlist do allow adding - just fix to source - maybe allow archiving of items */
     }

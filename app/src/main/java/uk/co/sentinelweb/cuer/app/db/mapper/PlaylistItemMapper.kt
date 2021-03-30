@@ -1,10 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.mapper
 
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
-import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
-import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
-import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
-import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
+import uk.co.sentinelweb.cuer.app.db.entity.*
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity.Companion.FLAG_ARCHIVED
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -48,6 +45,17 @@ class PlaylistItemMapper(
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
         dateAdded = entity.dateAdded,
         playlistId = entity.playlistId
+    )
+
+    fun map(
+        entity: PlaylistItemAndMediaAndChannel
+    ): PlaylistItemDomain = PlaylistItemDomain(
+        id = entity.item.id,
+        media = mediaMapper.map(entity.media.media, entity.media.channel),
+        order = entity.item.order,
+        archived = entity.item.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
+        dateAdded = entity.item.dateAdded,
+        playlistId = entity.item.playlistId
     )
 
 }

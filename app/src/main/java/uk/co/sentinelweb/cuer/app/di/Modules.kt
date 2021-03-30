@@ -13,6 +13,8 @@ import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.util.NewMediaPlayistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaCommitOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
@@ -87,10 +89,11 @@ object Modules {
         single { MediaOrchestrator(get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
         single { PlaylistStatsOrchestrator(get()) }
-        single { PlaylistMemoryRepository(get()) }
+        single { PlaylistMemoryRepository(get(), get()) }
         single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get()) }
         factory { PlaylistMediaCommitOrchestrator(get()) }
+        factory { NewMediaPlayistOrchestrator(get()) }
     }
 
     private val utilModule = module {

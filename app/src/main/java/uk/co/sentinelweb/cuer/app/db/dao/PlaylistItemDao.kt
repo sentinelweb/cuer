@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.dao
 
 import androidx.room.*
+import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemAndMediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
 
 @Dao
@@ -42,5 +43,8 @@ interface PlaylistItemDao {
     @Query("SELECT count() FROM playlist_item WHERE playlist_id ==:playlistId")
     suspend fun countItems(playlistId: Long): Int
 
+    @Transaction  //and media.id=playlist_item.media_id and channel.id=media.channel_id
+    @Query("SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 0 and media.id=playlist_item.media_id order by playlist_item.date_added desc LIMIT 500")
+    suspend fun loadAllPlayListItemsWithNewMedia(): List<PlaylistItemAndMediaAndChannel>
 
 }

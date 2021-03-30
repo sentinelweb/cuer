@@ -10,7 +10,7 @@ interface MemoryRepository<Domain> {
 
     fun load(domain: Domain, options: Options): Domain?
 
-    fun load(id: Long, options: Options): Domain?
+    suspend fun load(id: Long, options: Options): Domain?
 
     fun loadList(filter: Filter, options: Options): List<Domain>
 

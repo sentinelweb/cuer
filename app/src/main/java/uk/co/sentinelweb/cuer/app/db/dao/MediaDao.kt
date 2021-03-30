@@ -40,4 +40,7 @@ interface MediaDao {
     @Query("DELETE FROM media")
     suspend fun deleteAll()
 
+    @Query("SELECT * FROM media WHERE flags & :flags == :flags")
+    suspend fun loadAllByFlags(flags: Long): List<MediaAndChannel>
+
 }
