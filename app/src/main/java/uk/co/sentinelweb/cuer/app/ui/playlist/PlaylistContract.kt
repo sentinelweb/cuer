@@ -83,6 +83,7 @@ interface PlaylistContract {
         fun exit()
         fun hideRefresh()
         fun showError(message: String)
+        fun updateItemModel(model: ItemContract.Model)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }

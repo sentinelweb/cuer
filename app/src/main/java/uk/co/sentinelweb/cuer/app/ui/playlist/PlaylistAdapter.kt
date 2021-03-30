@@ -18,7 +18,7 @@ class PlaylistAdapter constructor(
 
     private lateinit var recyclerView: RecyclerView
 
-    private var _data: List<ItemContract.Model> = listOf()
+    private var _data: MutableList<ItemContract.Model> = mutableListOf()
 
     val data: List<ItemContract.Model>
         get() = _data
@@ -37,14 +37,14 @@ class PlaylistAdapter constructor(
                     this._data
                 )
             ).apply {
-                this@PlaylistAdapter._data = data
+                this@PlaylistAdapter._data = data.toMutableList()
                 // this stops random scrolling out of view
                 val recyclerViewState = recyclerView.layoutManager?.onSaveInstanceState()
                 dispatchUpdatesTo(this@PlaylistAdapter)
                 recyclerView.layoutManager?.onRestoreInstanceState(recyclerViewState)
             }
         } else {
-            this@PlaylistAdapter._data = data
+            this@PlaylistAdapter._data = data.toMutableList()
             notifyDataSetChanged()
         }
 
@@ -60,7 +60,9 @@ class PlaylistAdapter constructor(
 
     @Override
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.itemPresenter.update(_data.get(position), position == highlightItem)
+        holder
+            .itemPresenter
+            .update(_data.get(position), position == highlightItem)
     }
 
     override fun getItemCount(): Int = _data.size
@@ -74,5 +76,12 @@ class PlaylistAdapter constructor(
             }
         }
         return null
+    }
+
+    fun updateItemModel(model: ItemContract.Model) {
+        data.indexOfFirst { it.id == model.id }
+            .takeIf { it > -1 }
+            ?.also { _data.set(it, model) }
+            ?.also { notifyItemChanged(it) }
     }
 }

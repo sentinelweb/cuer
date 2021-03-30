@@ -578,10 +578,14 @@ class PlaylistPresenter(
                         state.playlist = state.playlist
                             ?.copy(items = toMutableList().apply { set(index, changedItem) })
                         log.d("updateMediaItem: idx: $index - plId: ${changedItem.id}")
-                        state.model = state.model?.let {
-                            it.copy(items = it.items?.toMutableList()?.apply { set(index, modelMapper.map(changedItem, index)) })
-                        }.takeIf { coroutines.mainScopeActive }
-                            ?.apply { view.setModel(this, false) }// todo  set item
+                        val element = modelMapper.map(changedItem, index)
+                        state.model = state.model
+                            ?.let {
+                                it.copy(items = it.items?.toMutableList()?.apply { set(index, element) })
+                            }
+                        element
+                            .takeIf { coroutines.mainScopeActive }
+                            ?.apply { view.updateItemModel(this) }
                     }
             }
     }
