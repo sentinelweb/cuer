@@ -23,6 +23,7 @@ interface ItemContract {
         fun showProgress(live: Boolean)
         fun makeTransitionExtras(): FragmentNavigator.Extras
         fun setDurationBackground(@ColorRes infoTextBackgroundColor: Int)
+        fun dismissMenu()
     }
 
     interface Presenter {

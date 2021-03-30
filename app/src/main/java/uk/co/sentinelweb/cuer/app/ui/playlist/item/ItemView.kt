@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.text.SpannableString
 import android.util.AttributeSet
+import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
@@ -37,6 +38,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     private lateinit var presenter: ItemContract.Presenter
     private val log: LogWrapper by inject()
     private val res: ResourceWrapper by inject()
+    private var menu: PopupMenu? = null
 
     private var _binding: ViewPlaylistItemBinding? = null
     private val binding get() = _binding!!
@@ -66,13 +68,24 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         binding.listitemIcon.setOnClickListener { presenter.doView() }
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        menu?.dismiss()
+    }
+
+    override fun onCreateContextMenu(menu: ContextMenu?) {
+        super.onCreateContextMenu(menu)
+        log.d("onCreateContextMenu")
+    }
+
     @SuppressLint("RestrictedApi")
     private fun showContextualMenu() {
-
+        log.d("showContextualMenu")
         val wrapper = ContextThemeWrapper(context, R.style.ContextMenu)
-        val popup = PopupMenu(wrapper, binding.listitemOverflowClick)
-        popup.inflate(R.menu.playlist_context)
-        popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
+        menu?.dismiss()
+        menu = PopupMenu(wrapper, binding.listitemOverflowClick)
+        menu?.inflate(R.menu.playlist_context)
+        menu?.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem): Boolean {
                 when (item.itemId) {
                     R.id.playlist_context_view -> presenter.doView()
@@ -86,10 +99,15 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
                 return true
             }
         })
-        MenuPopupHelper(wrapper, popup.menu as MenuBuilder, binding.listitemOverflowClick).apply {
+        menu?.setOnDismissListener { menu = null }
+        MenuPopupHelper(wrapper, menu?.menu as MenuBuilder, binding.listitemOverflowClick).apply {
             setForceShowIcon(true)
             show()
         }
+    }
+
+    override fun dismissMenu() {
+        menu?.dismiss()
     }
 
     fun resetBackground() {

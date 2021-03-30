@@ -25,6 +25,7 @@ class ItemPresenter(
         if (!item.isLive) {
             view.setProgress(item.progress)
         }
+        view.dismissMenu()
         state.item = item
     }
 

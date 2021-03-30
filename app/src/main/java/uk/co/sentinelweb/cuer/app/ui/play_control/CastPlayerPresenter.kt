@@ -88,7 +88,8 @@ class CastPlayerPresenter(
     override fun onSeekChanged(ratio: Float) {
         if (state.durationMs > 0) {
             state.seekPositionMs = (ratio * state.durationMs).toLong()
-            view.setCurrentSecond("${state.seekPositionMs / 1000} s") // todo map time
+            view.setCurrentSecond(mapper.formatTime(state.seekPositionMs))
+
         }
     }
 

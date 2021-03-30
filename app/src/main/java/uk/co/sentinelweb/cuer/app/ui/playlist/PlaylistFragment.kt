@@ -242,12 +242,17 @@ class PlaylistFragment :
     }
 
     override fun setList(items: List<ItemContract.Model>, animate: Boolean) {
+        log.d("refresh playlist")
         binding.playlistSwipe.isRefreshing = false
         adapter.setData(items, animate)
         val isListLarge = items.size > 30
         binding.playlistFabUp.isVisible = isListLarge
         binding.playlistFabDown.isVisible = isListLarge
         binding.playlistFabRefresh.isVisible = isListLarge
+    }
+
+    override fun updateItemModel(model: ItemContract.Model) {
+        adapter.updateItemModel(model)
     }
 
     override fun hideRefresh() {
