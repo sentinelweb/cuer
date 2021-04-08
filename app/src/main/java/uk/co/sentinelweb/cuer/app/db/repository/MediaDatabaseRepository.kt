@@ -180,7 +180,7 @@ class MediaDatabaseRepository constructor(
 
                             .let { it to mediaDao.getFlags(it.id) }
                             .let { mediaUpdateMapper.map(it.first, it.second) }
-                            .also { mediaDao.updatePosition(it) }
+                            .also { mediaDao.updatePosition(it.id, it.dateLastPlayed, it.positon, it.duration, it.flags) }
 //                                    .also { database.setTransactionSuccessful() }
 //                                    .also { database.endTransaction() }
                             .let { Data(load(id = it.id, flat).data) }

@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.mapper.*
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 
 object DatabaseModule {
     val dbModule = module {
@@ -50,8 +51,9 @@ object DatabaseModule {
         factory { PlaylistMapper(get(), get(), get()) }
         factory { PlaylistItemMapper(get()) }
         factory { MediaMapper(get(), get()) }
-        factory { MediaUpdateMapper() }
+        factory { MediaUpdateMapper(get()) }
         factory { ImageMapper() }
         factory { ChannelMapper(get()) }
+        factory { InstantTypeConverter() }
     }
 }

@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.app.db.dao
 import androidx.room.*
 import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
-import uk.co.sentinelweb.cuer.app.db.entity.update.MediaPositionUpdateEntity
 
 @Dao
 interface MediaDao {
@@ -47,7 +46,8 @@ interface MediaDao {
     @Query("SELECT flags FROM media WHERE id == :id")
     suspend fun getFlags(id: Long): Long
 
-    @Update(entity = MediaPositionUpdateEntity::class, onConflict = OnConflictStrategy.REPLACE)
-    fun updatePosition(it: MediaPositionUpdateEntity)
+    //@Update(entity = MediaPositionUpdateEntity::class, onConflict = OnConflictStrategy.REPLACE)
+    @Query("UPDATE media SET date_last_played=:dateLastPlayed, positon=:position, duration=:duration, flags=:flags where id=:id")
+    fun updatePosition(id: Long, dateLastPlayed: String, position: Long?, duration: Long?, flags: Long)
 
 }
