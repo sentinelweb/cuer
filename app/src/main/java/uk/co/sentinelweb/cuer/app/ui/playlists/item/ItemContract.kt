@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import android.text.SpannableString
 import androidx.annotation.DrawableRes
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -54,7 +55,8 @@ interface ItemContract {
         val loopMode: PlaylistDomain.PlaylistModeDomain,
         val type: PlaylistDomain.PlaylistTypeDomain,
         val platform: PlatformDomain?,
-        val showOverflow: Boolean
+        val showOverflow: Boolean,
+        val source: OrchestratorContract.Source
     ) : ItemBaseModel(id)
 
 }

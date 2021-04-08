@@ -348,9 +348,10 @@ class PlaylistPresenter(
             view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
                 state.playlist?.let {
                     // todo merge with above onPlayPlaylist
-                    prefsWrapper.putPair(CURRENT_PLAYLIST, state.playlistIdentifier.toPairType<Long>())
+                    val toIdentifier = itemDomain.playlistId!!.toIdentifier(LOCAL)
+                    prefsWrapper.putPair(CURRENT_PLAYLIST, toIdentifier.toPairType<Long>())
                     coroutines.computationScope.launch {
-                        it.id?.apply { queue.switchToPlaylist(state.playlistIdentifier) }
+                        it.id?.apply { queue.switchToPlaylist(toIdentifier) }
                         queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)
                     }
                 }

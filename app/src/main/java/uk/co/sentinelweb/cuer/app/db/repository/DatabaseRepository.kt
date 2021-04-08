@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.db.repository
 
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.domain.update.UpdateObject
 
 interface DatabaseRepository<Domain> {
 
@@ -20,4 +21,6 @@ interface DatabaseRepository<Domain> {
     suspend fun delete(domain: Domain, emit: Boolean = false): RepoResult<Boolean>
 
     suspend fun deleteAll(): RepoResult<Boolean>
+
+    suspend fun update(update: UpdateObject<Domain>, flat: Boolean = false, emit: Boolean = false): RepoResult<Domain>
 }

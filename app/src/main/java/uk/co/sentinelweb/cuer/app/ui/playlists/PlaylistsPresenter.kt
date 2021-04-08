@@ -5,7 +5,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
@@ -20,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 
 class PlaylistsPresenter(
     private val view: PlaylistsContract.View,
@@ -57,31 +57,33 @@ class PlaylistsPresenter(
         state.viewModelScope.launch {
             delay(400)
             state.playlists.apply {
-                find { it.id == item.id }?.let { playlist ->
-                    state.deletedPlaylist = playlist.id
-                        ?.let { playlistRepository.load(it, flat = false) }
-                        ?.takeIf { it.isSuccessful }
-                        ?.data
-                        ?.apply {
-                            playlistRepository.delete(playlist, emit = true)
-                            view.showDeleteUndo("Deleted playlist: ${playlist.title}")
-                            executeRefresh(false, false)
-                        }
-                        ?: let {
-                            view.showMessage("Cannot load playlist backup")
-                            null
-                        }
-                }
+                find { it.id == item.id }
+                    ?.takeIf { it.type != APP }
+                    ?.let { playlist ->
+                        state.deletedPlaylist = playlist.id
+                            ?.let { playlistRepository.load(it, flat = false) }
+                            ?.takeIf { it.isSuccessful }
+                            ?.data
+                            ?.apply {
+                                playlistRepository.delete(playlist, emit = true)
+                                view.showDeleteUndo("Deleted playlist: ${playlist.title}")
+                                executeRefresh(false, false)
+                            }
+                            ?: let {
+                                view.showMessage("Cannot load playlist backup")
+                                null
+                            }
+                    } ?: let { view.showMessage("Cannot delete playlist") }
             }
         }
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        view.gotoPlaylist(item.id, false, OrchestratorContract.Source.MEMORY)// todo map to list (add to model)
+        view.gotoPlaylist(item.id, false, item.source)// todo map to list (add to model)
     }
 
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
-        view.gotoPlaylist(item.id, true, LOCAL)
+        view.gotoPlaylist(item.id, true, item.source)
     }
 
     override fun onItemStar(item: ItemContract.Model) {

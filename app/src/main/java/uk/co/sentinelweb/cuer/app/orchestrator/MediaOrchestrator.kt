@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.update.UpdateObject
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
@@ -22,7 +23,8 @@ class MediaOrchestrator constructor(
     suspend override fun load(id: Long, options: Options): MediaDomain? =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> mediaDatabaseRepository.load(id, options.flat)
+            LOCAL -> mediaDatabaseRepository
+                .load(id, options.flat)
                 .forceDatabaseSuccess()
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
@@ -32,18 +34,19 @@ class MediaOrchestrator constructor(
     suspend override fun loadList(filter: Filter, options: Options): List<MediaDomain> =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> mediaDatabaseRepository.loadList(filter, options.flat)
+            LOCAL -> mediaDatabaseRepository
+                .loadList(filter, options.flat)
                 .allowDatabaseListResultEmpty()
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> when (filter) {
                 is PlatformIdListFilter ->
-                    ytInteractor.videos(filter.ids, listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS))
+                    ytInteractor
+                        .videos(filter.ids, listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS))
                         .forceNetListResultNotEmpty("Youtube ${filter.ids} does not exist")
                 else -> throw InvalidOperationException(this::class, filter, options)
             }
         }
-
 
     suspend override fun load(platformId: String, options: Options): MediaDomain? =
         when (options.source) {
@@ -52,7 +55,8 @@ class MediaOrchestrator constructor(
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM ->
-                ytInteractor.videos(listOf(platformId), listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS))
+                ytInteractor
+                    .videos(listOf(platformId), listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS))
                     .forceNetListResultNotEmpty("Youtube $platformId does not exist")
                     .get(0)
         }
@@ -64,7 +68,8 @@ class MediaOrchestrator constructor(
     suspend override fun save(domain: MediaDomain, options: Options): MediaDomain =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> mediaDatabaseRepository.save(domain, options.flat, options.emit)
+            LOCAL -> mediaDatabaseRepository
+                .save(domain, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
@@ -75,7 +80,8 @@ class MediaOrchestrator constructor(
     suspend override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> mediaDatabaseRepository.save(domains, options.flat, options.emit)
+            LOCAL -> mediaDatabaseRepository
+                .save(domains, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed ${domains.map { it.platformId }}")
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
@@ -90,5 +96,15 @@ class MediaOrchestrator constructor(
         throw NotImplementedException()
     }
 
+    override suspend fun update(update: UpdateObject<MediaDomain>, options: Options): MediaDomain? =
+        when (options.source) {
+            MEMORY -> throw NotImplementedException()
+            LOCAL -> mediaDatabaseRepository
+                .update(update, options.flat, options.emit)
+                .forceDatabaseSuccessNotNull("Update failed: ${update}")
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
+            PLATFORM -> throw NotImplementedException()
+        }
 
 }

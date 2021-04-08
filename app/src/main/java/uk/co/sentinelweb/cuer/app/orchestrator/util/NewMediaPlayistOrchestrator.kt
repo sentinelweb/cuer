@@ -24,6 +24,7 @@ class NewMediaPlayistOrchestrator constructor(
         id = NEWITEMS_PLAYLIST,
         title = "New items",
         type = APP,
+        currentIndex = -1,
         image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-cottonbro-4088009-600.jpg")
     )
 

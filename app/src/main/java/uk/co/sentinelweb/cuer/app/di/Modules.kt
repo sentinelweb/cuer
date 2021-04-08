@@ -84,7 +84,7 @@ object Modules {
     }
 
     private val orchestratorModule = module {
-        single { PlaylistOrchestrator(get(), get(), get()) }
+        single { PlaylistOrchestrator(get(), get(), get(), get()) }
         single { PlaylistItemOrchestrator(get(), get(), get()) }
         single { MediaOrchestrator(get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
@@ -108,7 +108,6 @@ object Modules {
         single<QueueMediatorContract.Producer> {
             QueueMediator(
                 state = QueueMediatorState(),
-                mediaOrchestrator = get(),
                 playlistOrchestrator = get(),
                 playlistItemOrchestrator = get(),
                 coroutines = get(),

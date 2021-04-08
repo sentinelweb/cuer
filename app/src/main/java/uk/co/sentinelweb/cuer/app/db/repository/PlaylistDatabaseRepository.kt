@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.update.UpdateObject
 
 // todo update stats automatically on save/delete
 @Suppress("DEPRECATION")
@@ -415,6 +416,10 @@ class PlaylistDatabaseRepository constructor(
                     .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
                     ?.data?.get(0)
             })
+
+    override suspend fun update(update: UpdateObject<PlaylistDomain>, flat: Boolean, emit: Boolean): RepoResult<PlaylistDomain> {
+        TODO("Not yet implemented")
+    }
 
 
 }

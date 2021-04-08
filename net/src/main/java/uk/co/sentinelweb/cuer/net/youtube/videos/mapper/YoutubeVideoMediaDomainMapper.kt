@@ -28,7 +28,7 @@ internal class YoutubeVideoMediaDomainMapper(
                 thumbNail = imageMapper.mapThumb(it.snippet.thumbnails),
                 image = imageMapper.mapImage(it.snippet.thumbnails),
                 channelData = ChannelDomain( // todo fix
-                    platformId = it.snippet.channelId ?: "",
+                    platformId = it.snippet.channelId,
                     title = it.snippet.channelTitle,
                     platform = PlatformDomain.YOUTUBE
                 ),
