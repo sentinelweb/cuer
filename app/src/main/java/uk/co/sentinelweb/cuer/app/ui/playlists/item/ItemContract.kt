@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item
 import android.text.SpannableString
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -26,7 +27,7 @@ interface ItemContract {
         fun doShare()
     }
 
-    interface External {
+    interface External : ItemBaseContract.ItemPresenterBase {
         fun update(item: Model, current: Boolean)
         fun doLeft()
         fun doRight()
@@ -56,7 +57,11 @@ interface ItemContract {
         val type: PlaylistDomain.PlaylistTypeDomain,
         val platform: PlatformDomain?,
         val showOverflow: Boolean,
-        val source: OrchestratorContract.Source
+        val source: OrchestratorContract.Source,
+        val canPlay: Boolean,
+        val canEdit: Boolean,
+        val canLaunch: Boolean,
+        val canShare: Boolean
     ) : ItemBaseModel(id)
 
 }

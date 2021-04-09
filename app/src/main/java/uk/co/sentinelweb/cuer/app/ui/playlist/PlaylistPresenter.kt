@@ -38,6 +38,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.PLAYLIST
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.*
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
@@ -291,7 +292,14 @@ class PlaylistPresenter(
 
     override fun onItemViewClick(item: ItemContract.Model) {
         state.playlist?.itemWitId(item.id)
-            ?.apply { view.showItemDescription(this, state.playlistIdentifier.source) }// todo pass identifier?
+            ?.apply {
+                val source = if (state.playlist?.type != APP) {
+                    state.playlistIdentifier.source
+                } else {
+                    LOCAL
+                }
+                view.showItemDescription(this, source)
+            }// todo pass identifier?
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
@@ -299,7 +307,12 @@ class PlaylistPresenter(
             ?.itemWitId(item.id)
             ?.let { itemDomain ->
                 if (!(ytContextHolder.isConnected())) {
-                    view.showItemDescription(itemDomain, state.playlistIdentifier.source)
+                    val source = if (state.playlist?.type != APP) {
+                        state.playlistIdentifier.source
+                    } else {
+                        LOCAL
+                    }
+                    view.showItemDescription(itemDomain, source)
                 } else {
                     playItem(itemDomain, false)
                 }
@@ -348,7 +361,11 @@ class PlaylistPresenter(
             view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
                 state.playlist?.let {
                     // todo merge with above onPlayPlaylist
-                    val toIdentifier = itemDomain.playlistId!!.toIdentifier(LOCAL)
+                    val toIdentifier = if (it.config.playable) {
+                        state.playlistIdentifier
+                    } else {
+                        itemDomain.playlistId!!.toIdentifier(LOCAL)
+                    }
                     prefsWrapper.putPair(CURRENT_PLAYLIST, toIdentifier.toPairType<Long>())
                     coroutines.computationScope.launch {
                         it.id?.apply { queue.switchToPlaylist(toIdentifier) }
@@ -417,7 +434,7 @@ class PlaylistPresenter(
                 ?.let { playlist -> playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!) }
                 ?.also { state.playlist = it }
                 ?.also {
-                    modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier)
+                    modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap)
                         .also { view.setModel(it, false) }
                     view.highlightPlayingItem(it.currentIndex)
                 }
@@ -502,7 +519,7 @@ class PlaylistPresenter(
         if (state.playlistIdentifier.source == MEMORY) {
             state.playlist
                 ?.let { playlistMediaCommitOrchestrator.commitMediaAndReplace(it, LOCAL) }
-                ?.let { it.copy(items = it.items.map { it.copy(id = null) }) }
+                ?.let { it.copy(items = it.items.map { it.copy(id = null) }, config = it.config.copy(playable = true)) }
                 ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
                 ?.also { state.playlistIdentifier = it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure") }
                 ?.also { state.playlist = it }
@@ -528,6 +545,12 @@ class PlaylistPresenter(
                         ?.also { id -> state.playlistIdentifier = id.toIdentifier(source) }
                         ?: throw IllegalStateException("Need an id")
                 }
+                ?.also {
+                    if (it.first.type == APP) {
+                        state.playlistsMap = playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), Options(LOCAL))
+                            .associateBy { it.id!! }
+                    }
+                }
                 .also { updateView(animate) }
         } catch (e: Throwable) {
             log.e("Error loading playlist", e)
@@ -539,7 +562,7 @@ class PlaylistPresenter(
             .also { log.d("updateView: playlist: ${state.playlist?.scanOrder()}") }
             .takeIf { coroutines.mainScopeActive }
             .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
-            ?.let { modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier) }
+            ?.let { modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap) }
             ?.also { state.model = it }
             ?.also { view.setModel(it, animate) }
             .also {
@@ -561,7 +584,7 @@ class PlaylistPresenter(
             .takeIf { coroutines.mainScopeActive }
             ?.apply {
                 view.setHeaderModel(
-                    modelMapper.map(this, isPlaylistPlaying(), false, id = state.playlistIdentifier)
+                    modelMapper.map(this, isPlaylistPlaying(), false, id = state.playlistIdentifier, playlists = state.playlistsMap)
                 )
                 state.playlist?.currentIndex?.also {
                     view.highlightPlayingItem(it)
@@ -580,7 +603,8 @@ class PlaylistPresenter(
                         state.playlist = state.playlist
                             ?.copy(items = toMutableList().apply { set(index, changedItem) })
                         log.d("updateMediaItem: idx: $index - plId: ${changedItem.id}")
-                        val element = modelMapper.map(changedItem, index)
+                        val element =
+                            modelMapper.map(changedItem, index, state.playlist?.config?.editable ?: false, playlists = state.playlistsMap)
                         state.model = state.model
                             ?.let {
                                 it.copy(items = it.items?.toMutableList()?.apply { set(index, element) })

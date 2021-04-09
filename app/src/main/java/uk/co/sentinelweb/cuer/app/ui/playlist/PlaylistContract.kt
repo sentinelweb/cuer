@@ -99,7 +99,8 @@ interface PlaylistContract {
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
         var selectedPlaylistItem: PlaylistItemDomain? = null,
-        var model: Model? = null
+        var model: Model? = null,
+        var playlistsMap: Map<Long, PlaylistDomain>? = null
     ) : ViewModel()
 
     data class Model constructor(
@@ -112,6 +113,7 @@ interface PlaylistContract {
         val isDefault: Boolean,
         val isSaved: Boolean,
         val canPlay: Boolean,
+        val canEdit: Boolean,
         val items: List<ItemContract.Model>?
     )
 

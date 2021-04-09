@@ -44,7 +44,7 @@ interface PlaylistItemDao {
     suspend fun countItems(playlistId: Long): Int
 
     @Transaction  //and media.id=playlist_item.media_id and channel.id=media.channel_id
-    @Query("SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 0 and media.id=playlist_item.media_id order by playlist_item.date_added desc LIMIT 500")
-    suspend fun loadAllPlayListItemsWithNewMedia(): List<PlaylistItemAndMediaAndChannel>
+    @Query("SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 0 and media.id=playlist_item.media_id order by playlist_item.date_added desc LIMIT :limit")
+    suspend fun loadAllPlayListItemsWithNewMedia(limit: Int): List<PlaylistItemAndMediaAndChannel>
 
 }

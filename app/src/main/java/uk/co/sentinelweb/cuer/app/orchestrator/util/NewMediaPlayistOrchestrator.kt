@@ -25,7 +25,8 @@ class NewMediaPlayistOrchestrator constructor(
         title = "New items",
         type = APP,
         currentIndex = -1,
-        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-cottonbro-4088009-600.jpg")
+        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-cottonbro-4088009-600.jpg"),
+        config = PlaylistDomain.PlaylistConfigDomain(playable = false, editable = false)
     )
 
 }

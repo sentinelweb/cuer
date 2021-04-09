@@ -58,7 +58,7 @@ class ItemModelMapper constructor(
     }
 
     fun mapBottomText(model: ItemContract.Model): SpannableString {
-        return SpannableString(model.run { "  $positon   $WATCH $watchedSince   $PLAT $published" }).apply {
+        return SpannableString(model.run { "  $positon   $WATCH $watchedSince   $PLAT $published  ${playlistName ?: ""}" }).apply {
             res.replaceSpannableIcon(
                 this,
                 if (model.starred) starDrawable else unstarDrawable,

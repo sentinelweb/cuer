@@ -41,6 +41,12 @@ class ItemPresenter(
         interactions.onRightSwipe(state.item!!)
     }
 
+    override fun canDragLeft(): Boolean = state.item?.canEdit ?: false
+
+    override fun canDragRight(): Boolean = state.item?.canEdit ?: false
+
+    override fun canReorder(): Boolean = state.item?.canEdit ?: false
+
     override fun updateProgress() {
         view.setProgress(state.item?.progress ?: 0f)
     }

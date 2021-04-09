@@ -81,7 +81,7 @@ class ScanPresenter(
                         ?.also { log.d("found playlist = $it") }
                         ?.let { it to false }
                         ?: playlistOrchestrator.load(it, Options(PLATFORM))
-                            ?.copy(id = SHARED_PLAYLIST)
+                            ?.copy(id = SHARED_PLAYLIST, config = scannedPlaylist.config.copy(playable = false))
                             ?.also { log.d("loaded playlist = ${it.title} id = ${it.id} platformId = ${it.id}") }
                             ?.let { playlistOrchestrator.save(it, Options(MEMORY, flat = false, emit = false)) to true }
                         ?: throw DoesNotExistException()

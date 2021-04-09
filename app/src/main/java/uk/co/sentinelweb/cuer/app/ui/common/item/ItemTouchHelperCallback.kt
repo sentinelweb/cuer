@@ -57,9 +57,18 @@ class ItemTouchHelperCallback(
             val swipeFlags = 0
             makeMovementFlags(dragFlags, swipeFlags)
         } else {
-            val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-            val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
-            makeMovementFlags(dragFlags, swipeFlags)
+            (viewHolder as? ItemTouchHelperViewHolder)
+                ?.let {
+                    val dragFlags = if (it.canReorder()) ItemTouchHelper.UP or ItemTouchHelper.DOWN else 0
+                    var swipeFlags = if (it.canDragLeft()) ItemTouchHelper.START else 0
+                    swipeFlags = swipeFlags or if (it.canDragRight()) ItemTouchHelper.END else 0
+                    makeMovementFlags(dragFlags, swipeFlags)
+                } ?: let {
+                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
+                makeMovementFlags(dragFlags, swipeFlags)
+            }
+
         }
     }
 

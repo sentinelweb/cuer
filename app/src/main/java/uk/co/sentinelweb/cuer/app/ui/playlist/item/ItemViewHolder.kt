@@ -28,6 +28,12 @@ class ItemViewHolder(
         }
     }
 
+    override fun canDragLeft(): Boolean = itemPresenter.canDragLeft()
+
+    override fun canDragRight(): Boolean = itemPresenter.canDragRight()
+
+    override fun canReorder(): Boolean = itemPresenter.canReorder()
+
     override fun onItemSelected() {
         // itemPresenter.doClick()
     }

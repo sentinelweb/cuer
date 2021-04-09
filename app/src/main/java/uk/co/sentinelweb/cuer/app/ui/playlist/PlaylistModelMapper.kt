@@ -28,7 +28,8 @@ class PlaylistModelMapper constructor(
         domain: PlaylistDomain,
         isPlaying: Boolean,
         mapItems: Boolean = true,
-        id: OrchestratorContract.Identifier<*>
+        id: OrchestratorContract.Identifier<*>,
+        playlists: Map<Long, PlaylistDomain>?
     ): PlaylistContract.Model = PlaylistContract.Model(
         domain.title,
         domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
@@ -38,15 +39,21 @@ class PlaylistModelMapper constructor(
         if (domain.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_unstarred_white,
         domain.default,
         id.source == LOCAL,
-        id.source == LOCAL,
+        domain.config.playable,
+        domain.config.editable,
         if (mapItems) {
-            domain.items.mapIndexed { index, item -> map(item, index) }
+            domain.items.mapIndexed { index, item -> map(item, index, domain.config.editable, playlists) }
         } else {
             null
         }
     )
 
-    fun map(item: PlaylistItemDomain, index: Int): ItemContract.Model {
+    fun map(
+        item: PlaylistItemDomain,
+        index: Int,
+        editable: Boolean,
+        playlists: Map<Long, PlaylistDomain>?
+    ): ItemContract.Model {
         val top = item.media.title ?: "No title"
         val pos = item.media.positon?.toFloat() ?: 0f
         val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f
@@ -76,7 +83,9 @@ class PlaylistModelMapper constructor(
             platform = item.media.platform,
             isLive = item.media.isLiveBroadcast,
             isUpcoming = item.media.isLiveBroadcastUpcoming,
-            infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media)
+            infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media),
+            canEdit = editable,
+            playlistName = playlists?.get(item.playlistId!!)?.title
         )
     }
 

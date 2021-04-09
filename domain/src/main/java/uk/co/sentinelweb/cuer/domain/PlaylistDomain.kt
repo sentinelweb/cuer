@@ -44,7 +44,9 @@ data class PlaylistDomain constructor(
         @Contextual val lastUpdate: Instant? = null,
         @Contextual val published: LocalDateTime? = null,
         val updateInterval: Long? = null,
-        val description: String? = null
+        val description: String? = null,
+        val playable: Boolean = true,
+        val editable: Boolean = true
     )
 }
 

@@ -13,6 +13,15 @@ interface ItemBaseContract {
         fun onItemSelected()
         fun onItemClear()
         fun onItemSwiped(left: Boolean)
+        fun canDragLeft(): Boolean
+        fun canDragRight(): Boolean
+        fun canReorder(): Boolean
+    }
+
+    interface ItemPresenterBase {
+        fun canDragLeft(): Boolean
+        fun canDragRight(): Boolean
+        fun canReorder(): Boolean
     }
 
     interface ItemMoveInteractions {
