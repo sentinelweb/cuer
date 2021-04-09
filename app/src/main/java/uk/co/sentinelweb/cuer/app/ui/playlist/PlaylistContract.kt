@@ -82,6 +82,7 @@ interface PlaylistContract {
         fun setPlayState(state: PlayState)
         fun exit()
         fun hideRefresh()
+        fun showRefresh()
         fun showError(message: String)
         fun updateItemModel(model: ItemContract.Model)
     }

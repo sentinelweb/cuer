@@ -467,9 +467,6 @@ class PlaylistPresenter(
                 ?.toIdentifier(source)
                 ?.apply {
                     state.playlistIdentifier = this
-                    if (source == Source.LOCAL) {
-                        prefsWrapper.putPair(LAST_PLAYLIST_VIEWED, this.toPair())
-                    }
                 }
                 ?.apply { executeRefresh() }
                 ?.apply {
@@ -501,7 +498,6 @@ class PlaylistPresenter(
 
     override fun refreshPlaylist() {
         state.viewModelScope.launch {
-
             try {
                 state.playlist
                     ?.takeIf { playlistUpdateOrchestrator.checkToUpdate(it) }
@@ -536,6 +532,7 @@ class PlaylistPresenter(
     }
 
     private suspend fun executeRefresh(animate: Boolean = true, scrollToItem: Boolean = false) {
+        view.showRefresh()
         try {
             playlistOrchestrator
                 .getPlaylistOrDefault(state.playlistIdentifier.id as Long, Options(state.playlistIdentifier.source, false))
@@ -549,6 +546,11 @@ class PlaylistPresenter(
                     if (it.first.type == APP) {
                         state.playlistsMap = playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), Options(LOCAL))
                             .associateBy { it.id!! }
+                    }
+                }
+                ?.also {
+                    if (it.second == LOCAL || it.first.type == APP) {
+                        prefsWrapper.putPair(LAST_PLAYLIST_VIEWED, state.playlistIdentifier.toPairType<Long>())
                     }
                 }
                 .also { updateView(animate) }

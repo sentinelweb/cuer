@@ -268,6 +268,10 @@ class PlaylistFragment :
         binding.playlistSwipe.isRefreshing = false
     }
 
+    override fun showRefresh() {
+        binding.playlistSwipe.isRefreshing = true
+    }
+
     override fun setHeaderModel(model: PlaylistContract.Model) {
 
         Glide.with(requireContext())
@@ -282,6 +286,7 @@ class PlaylistFragment :
         playMenuItem?.setEnabled(model.canPlay)
         starMenuItem?.setIcon(model.starredIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
         editMenuItem?.isVisible = model.canEdit
+        starMenuItem?.isVisible = model.canEdit
         //playlist_items.setText("${model.items.size}")
         binding.playlistFlags.isVisible = model.isDefault
         binding.playlistFabPlaymode.setImageResource(model.loopModeIcon)
