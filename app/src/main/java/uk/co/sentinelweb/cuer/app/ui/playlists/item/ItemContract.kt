@@ -25,6 +25,10 @@ interface ItemContract {
         fun doPlay(external: Boolean)
         fun doStar()
         fun doShare()
+        fun canEdit(): Boolean
+        fun canShare(): Boolean
+        fun canPlay(): Boolean
+        fun canLaunch(): Boolean
     }
 
     interface External : ItemBaseContract.ItemPresenterBase {

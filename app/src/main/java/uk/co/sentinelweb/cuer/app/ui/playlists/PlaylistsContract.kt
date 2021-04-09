@@ -88,7 +88,8 @@ interface PlaylistsContract {
                         toastWrapper = get(),
                         prefsWrapper = get(named<GeneralPreferences>()),
                         coroutines = get(),
-                        newMedia = get()
+                        newMedia = get(),
+                        ytJavaApi = get()
                     )
                 }
                 scoped { PlaylistsModelMapper() }

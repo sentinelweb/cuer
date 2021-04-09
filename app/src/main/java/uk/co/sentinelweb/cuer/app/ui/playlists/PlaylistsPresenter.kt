@@ -16,10 +16,12 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 
 class PlaylistsPresenter(
     private val view: PlaylistsContract.View,
@@ -31,7 +33,8 @@ class PlaylistsPresenter(
     private val toastWrapper: ToastWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
     private val coroutines: CoroutineContextProvider,
-    private val newMedia: NewMediaPlayistOrchestrator
+    private val newMedia: NewMediaPlayistOrchestrator,
+    private val ytJavaApi: YoutubeJavaApiWrapper
 ) : PlaylistsContract.Presenter {
 
     override fun initialise() {
@@ -83,7 +86,15 @@ class PlaylistsPresenter(
     }
 
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
-        view.gotoPlaylist(item.id, true, item.source)
+        if (!external) {
+            view.gotoPlaylist(item.id, true, item.source)
+        } else {
+            state.playlists
+                .find { it.id == item.id }
+                ?.takeIf { it.type == PLATFORM }
+                ?.apply { ytJavaApi.launchPlaylist(platformId!!) }
+                ?: let { view.showMessage("Cannot launch playlist") }
+        }
     }
 
     override fun onItemStar(item: ItemContract.Model) {

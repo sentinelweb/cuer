@@ -56,13 +56,16 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
                 when (item.itemId) {
                     R.id.playlists_context_play -> presenter.doPlay(false)
                     R.id.playlists_context_play_external -> presenter.doPlay(true)
-//                    R.id.context_channel_external -> presenter.doShowChannel()
                     R.id.playlists_context_star -> presenter.doStar()
                     R.id.playlists_context_share -> presenter.doShare()
                 }
                 return true
             }
         })
+        popup.menu.findItem(R.id.playlists_context_play).isVisible = presenter.canPlay()
+        popup.menu.findItem(R.id.playlists_context_play_external).isVisible = presenter.canLaunch()
+        popup.menu.findItem(R.id.playlists_context_star).isVisible = presenter.canEdit()
+        popup.menu.findItem(R.id.playlists_context_share).isVisible = presenter.canShare()
         MenuPopupHelper(wrapper, popup.menu as MenuBuilder, listitem_overflow_click).apply {
             setForceShowIcon(true)
             show()

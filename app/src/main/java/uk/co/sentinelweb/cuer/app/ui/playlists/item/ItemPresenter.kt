@@ -18,7 +18,7 @@ class ItemPresenter(
             ?: R.drawable.ic_chip_playlist_black
                 .apply { view.setIconResource(this) }
         state.item = item
-        view.showOverflow(item.showOverflow)
+        view.showOverflow(item.showOverflow && (canPlay() || canLaunch() || canEdit() || canShare()))
     }
 
     override fun doClick() {
@@ -54,5 +54,13 @@ class ItemPresenter(
     override fun doShare() {
         interactions.onShare(state.item!!)
     }
+
+    override fun canEdit(): Boolean = state.item?.canEdit ?: false
+
+    override fun canShare(): Boolean = state.item?.canShare ?: false
+
+    override fun canPlay(): Boolean = state.item?.canPlay ?: false
+
+    override fun canLaunch(): Boolean = state.item?.canLaunch ?: false
 
 }
