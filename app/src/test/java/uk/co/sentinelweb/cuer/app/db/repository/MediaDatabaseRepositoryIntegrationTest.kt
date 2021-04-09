@@ -18,9 +18,11 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import uk.co.sentinelweb.cuer.app.CuerTestApp
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
+import uk.co.sentinelweb.cuer.app.db.entity.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
+import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
@@ -50,6 +52,7 @@ class MediaDatabaseRepositoryIntegrationTest {
     private val imageMapper = ImageMapper()
     private val channelMapper = ChannelMapper(imageMapper)
     private val mediaMapper = MediaMapper(imageMapper, channelMapper)
+    private val mediaUpdateMapper = MediaUpdateMapper(InstantTypeConverter())
 
     private lateinit var sut: MediaDatabaseRepository
 
@@ -74,7 +77,8 @@ class MediaDatabaseRepositoryIntegrationTest {
             channelMapper = channelMapper,
             log = log,
             coProvider = coCxtProvider,
-            database = database
+            database = database,
+            mediaUpdateMapper = mediaUpdateMapper
         )
 
         fixtMedia = fixtMedia.copy(
