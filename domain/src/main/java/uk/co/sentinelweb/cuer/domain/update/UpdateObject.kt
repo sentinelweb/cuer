@@ -7,11 +7,9 @@ abstract class UpdateObject<T>
 
 sealed class MediaUpdateObject : UpdateObject<MediaDomain>() {
 
-
 }
 
-
-class MediaPositionUpdate(
+data class MediaPositionUpdate(
     val id: Long,
     val duration: Long?,
     val positon: Long?,

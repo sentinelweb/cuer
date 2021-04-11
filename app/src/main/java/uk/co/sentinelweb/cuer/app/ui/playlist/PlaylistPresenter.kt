@@ -561,7 +561,6 @@ class PlaylistPresenter(
 
     private suspend fun updateView(animate: Boolean = true) = withContext(coroutines.Main) {
         state.playlist
-            .also { log.d("updateView: playlist: ${state.playlist?.scanOrder()}") }
             .takeIf { coroutines.mainScopeActive }
             .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
             ?.let { modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap) }
@@ -594,7 +593,7 @@ class PlaylistPresenter(
             }
     }
 
-    private suspend fun updateMediaItem(m: MediaDomain) {
+    private fun updateMediaItem(m: MediaDomain) {
         state.playlist
             ?.items
             ?.apply {
@@ -604,14 +603,12 @@ class PlaylistPresenter(
                         val changedItem = get(index).copy(media = m)
                         state.playlist = state.playlist
                             ?.copy(items = toMutableList().apply { set(index, changedItem) })
-                        log.d("updateMediaItem: idx: $index - plId: ${changedItem.id}")
-                        val element =
+                        val mappedItem =
                             modelMapper.map(changedItem, index, state.playlist?.config?.editable ?: false, playlists = state.playlistsMap)
-                        state.model = state.model
-                            ?.let {
-                                it.copy(items = it.items?.toMutableList()?.apply { set(index, element) })
-                            }
-                        element
+                        state.model = state.model?.let {
+                            it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
+                        }
+                        mappedItem
                             .takeIf { coroutines.mainScopeActive }
                             ?.apply { view.updateItemModel(this) }
                     }

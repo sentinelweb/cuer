@@ -139,6 +139,7 @@ class PlaylistPresenterTest {
         fixtCurrentPlaylist = fixture.build<PlaylistDomain>()
         fixtCurrentPlaylist = fixtCurrentPlaylist.copy(
             currentIndex = fixtCurrentCurentIndex,
+            type = PlaylistDomain.PlaylistTypeDomain.USER, // todo APP playlists
             mode = PlaylistDomain.PlaylistModeDomain.SINGLE,
             items = fixture.buildCollection<PlaylistItemDomain, List<PlaylistItemDomain>>(10)
                 .map { it.copy(id = idCounter, order = idCounter * 1000, playlistId = fixtCurrentPlaylist.id) })
@@ -151,13 +152,20 @@ class PlaylistPresenterTest {
 
         // next
         fixtNextPlaylist = fixture.build<PlaylistDomain>()
-            .copy(currentIndex = fixtNextCurrentIndex, items = fixture.buildCollection(12))
+            .copy(
+                type = PlaylistDomain.PlaylistTypeDomain.USER, // todo APP playlists
+                currentIndex = fixtNextCurrentIndex,
+                items = fixture.buildCollection(12)
+            )
         fixtNextIdentifier = Identifier(fixtNextPlaylist.id!!, fixtNextSource)
         fixtNextPlaylistMapped = fixture.build<PlaylistContract.Model>().copy(items = fixture.buildCollection(12))
         coEvery {
             mockPlaylistOrchestrator.getPlaylistOrDefault(fixtNextIdentifier.id, Options(fixtNextIdentifier.source, flat = false))
         } returns (fixtNextPlaylist to fixtNextSource)
         every { mockModelMapper.map(any(), any(), true, fixtNextIdentifier, null) } returns fixtNextPlaylistMapped
+
+        // fixme this *should* work for app playlists (executeRefresh.if (it.first.type == APP) {)
+        //coEvery{mockPlaylistOrchestrator.loadList(AllFilter(), Options(Source.LOCAL))} returns listOf(fixtCurrentPlaylist)
 
         // orchestrator
         fixtPlaylistOrchestratorFlow = MutableSharedFlow()
@@ -704,7 +712,6 @@ class PlaylistPresenterTest {
             verify { mockView.highlightPlayingItem(fixtNextPlaylist.currentIndex) }
             verify { mockPrefsWrapper.putPair(LAST_PLAYLIST_VIEWED, fixtNextIdentifier.toPair()) }
         }
-
     }
 
     @Test
@@ -727,7 +734,6 @@ class PlaylistPresenterTest {
             verify { mockView.highlightPlayingItem(fixtNextPlaylist.currentIndex) }
             verify { mockPrefsWrapper.putPair(LAST_PLAYLIST_VIEWED, fixtNextIdentifier.toPair()) }
         }
-
     }
 
     @Test
