@@ -171,8 +171,11 @@ class PlaylistPresenter(
             log.d("media changed: $op, $source, ${media.id} ${media.title}")
             when (op) {
                 FLAT,
-                FULL -> if (source == state.playlistIdentifier.source) {
-                    updateMediaItem(media)
+                FULL -> {
+                    val containsMedia = state.playlist?.items?.find { it.media.platformId == media.platformId } != null
+                    if (containsMedia) {
+                        updateMediaItem(media)
+                    }
                 }
                 DELETE -> Unit
             }
