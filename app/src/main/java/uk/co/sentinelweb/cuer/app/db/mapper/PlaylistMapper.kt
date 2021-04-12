@@ -8,13 +8,19 @@ import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_ARCHIV
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_DEFAULT
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistMapper(
     private val imageMapper: ImageMapper,
     private val playlistItemMapper: PlaylistItemMapper,
-    private val channelMapper: ChannelMapper
+    private val channelMapper: ChannelMapper,
+    private val log: LogWrapper
 ) {
+    init {
+        log.tag(this)
+    }
+
     fun map(domain: PlaylistDomain): PlaylistEntity = PlaylistEntity(
         id = domain.id ?: INITIAL_ID,
         currentIndex = domain.currentIndex, // todo enforce consistency better
@@ -36,7 +42,7 @@ class PlaylistMapper(
     fun map(
         entity: PlaylistEntity,
         items: List<PlaylistItemEntity>?,
-        medias: List<MediaAndChannel>?,
+        medias: Map<Long, MediaAndChannel>?,
         channelEntity: ChannelEntity?
     ): PlaylistDomain = PlaylistDomain(
         id = entity.id,
@@ -44,12 +50,11 @@ class PlaylistMapper(
         starred = entity.flags and FLAG_STARRED == FLAG_STARRED,
         default = entity.flags and FLAG_DEFAULT == FLAG_DEFAULT,
         items = items
-            ?.map {
-                playlistItemMapper.map(
-                    it,
-                    medias!!.find { media -> media.media.id == it.mediaId }!! //todo issue here in pixel
-                )
-            }?.sortedBy { it.order }
+            ?.mapNotNull { item ->
+                medias!!.get(item.mediaId)?.let { mediaAndChannel -> playlistItemMapper.map(item, mediaAndChannel) }
+                    ?: let { log.e("No media for ${item.mediaId}"); null } // todo possibly should have a flag here db inconsistent .. but likely legacy data
+            }
+            ?.sortedBy { it.order }
             ?: listOf(),
         mode = entity.mode,
         thumb = imageMapper.mapImage(entity.thumb),
@@ -63,5 +68,6 @@ class PlaylistMapper(
         platform = entity.platform,
         type = entity.type
     )
+
 
 }

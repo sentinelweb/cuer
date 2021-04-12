@@ -45,7 +45,7 @@ object DatabaseModule {
                 log = get()
             )
         }
-        factory { PlaylistMapper(get(), get(), get()) }
+        factory { PlaylistMapper(get(), get(), get(), get()) }
         factory { PlaylistItemMapper(get()) }
         factory { MediaMapper(get(), get()) }
         factory { ImageMapper() }
