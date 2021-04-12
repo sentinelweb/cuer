@@ -25,7 +25,7 @@ class RecentItemsPlayistOrchestrator constructor(
         title = "Recent items",
         type = APP,
         currentIndex = -1,
-        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-jacoby-clarke-5249311-600.jpg"),
+        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-ketut-subiyanto-4474038-600.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(playable = false, editable = false)
     )
 
