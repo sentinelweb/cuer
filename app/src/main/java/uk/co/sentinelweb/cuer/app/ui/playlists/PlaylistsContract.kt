@@ -89,6 +89,7 @@ interface PlaylistsContract {
                         prefsWrapper = get(named<GeneralPreferences>()),
                         coroutines = get(),
                         newMedia = get(),
+                        recentItems = get(),
                         ytJavaApi = get()
                     )
                 }

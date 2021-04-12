@@ -378,7 +378,10 @@ class PlaylistDatabaseRepository constructor(
                     is MediaIdListFilter -> playlistItemDao.loadItemsByMediaId(filter.ids)
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                     is NewMediaFilter ->
-                        playlistItemDao.loadAllPlayListItemsWithNewMedia(200)
+                        playlistItemDao.loadAllPlaylistItemsWithNewMedia(200)
+                            .map { playlistItemMapper.map(it) }
+                    is RecentMediaFilter ->
+                        playlistItemDao.loadAllPlaylistItemsRecent(200)
                             .map { playlistItemMapper.map(it) }
                     else -> playlistItemDao.loadAllItems()
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
