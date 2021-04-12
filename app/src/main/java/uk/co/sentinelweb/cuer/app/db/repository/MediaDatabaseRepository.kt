@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.dao.ChannelDao
 import uk.co.sentinelweb.cuer.app.db.dao.MediaDao
+import uk.co.sentinelweb.cuer.app.db.entity.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data
@@ -18,6 +19,10 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdate
+import uk.co.sentinelweb.cuer.domain.update.MediaUpdateObject
+import uk.co.sentinelweb.cuer.domain.update.UpdateObject
+import java.io.InvalidClassException
 import java.io.InvalidObjectException
 
 // todo emit
@@ -29,7 +34,8 @@ class MediaDatabaseRepository constructor(
     private val channelMapper: ChannelMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val mediaUpdateMapper: MediaUpdateMapper
 ) : DatabaseRepository<MediaDomain> {// todo extract channel repo
 
     init {
@@ -48,7 +54,7 @@ class MediaDatabaseRepository constructor(
                     .let { if (!flat) checkToSaveChannel(it) else it }
                     .let { mediaMapper.map(it) }
                     .let { mediaDao.insert(it) }
-                    .let { Data(load(id = it).data) }
+                    .let { Data(load(id = it, flat).data) }
                     .also { if (emit) it.data?.also { _mediaFlow.emit((if (flat) FLAT else FULL) to it) } }
             } catch (e: Exception) {
                 val msg = "couldn't save ${domain.url}"
@@ -68,7 +74,7 @@ class MediaDatabaseRepository constructor(
                     .let { mediaDao.insertAll(it) }
                     .also { database.setTransactionSuccessful() }
                     .also { database.endTransaction() }
-                    .let { idlist -> Data(loadList(IdListFilter(idlist)).data) }
+                    .let { idlist -> Data(loadList(IdListFilter(idlist), flat).data) }
                     .also { if (emit) it.data?.forEach { _mediaFlow.emit((if (flat) FLAT else FULL) to it) } }
             } catch (e: Throwable) {
                 val msg = "Couldn't save ${domains.map { it.url }}"
@@ -92,7 +98,7 @@ class MediaDatabaseRepository constructor(
             }
         }
 
-    override suspend fun loadList(filter: OrchestratorContract.Filter?, flat: Boolean)
+    override suspend fun loadList(filter: Filter?, flat: Boolean)
             : RepoResult<List<MediaDomain>> = withContext(coProvider.IO) {
         try {// todo better transactions
             database.beginTransaction()
@@ -153,7 +159,7 @@ class MediaDatabaseRepository constructor(
             }
         }.also { database.endTransaction() }
 
-    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> =
+    override suspend fun count(filter: Filter?): RepoResult<Int> =
         try {
             withContext(coProvider.IO) {
                 mediaDao.count()
@@ -162,6 +168,32 @@ class MediaDatabaseRepository constructor(
             val msg = "couldn't count ${filter}"
             log.e(msg, e)
             RepoResult.Error<Int>(e, msg)
+        }
+
+    override suspend fun update(update: UpdateObject<MediaDomain>, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
+        withContext(coProvider.IO) {
+            try {
+                when (update as? MediaUpdateObject) {
+                    is MediaPositionUpdate ->
+                        (update as MediaPositionUpdate)
+                            // .apply { database.beginTransaction() }
+
+                            .let { it to mediaDao.getFlags(it.id) }
+                            .let { mediaUpdateMapper.map(it.first, it.second) }
+                            .also { mediaDao.updatePosition(it.id, it.dateLastPlayed, it.positon, it.duration, it.flags) }
+//                                    .also { database.setTransactionSuccessful() }
+//                                    .also { database.endTransaction() }
+                            .let { Data(load(id = it.id, flat).data) }
+                            .also { log.d("media: ${it.data?.dateLastPlayed}") }
+                            .also { if (emit) it.data?.also { _mediaFlow.emit((if (flat) FLAT else FULL) to it) } }
+                    else -> throw InvalidClassException("update object not valid: ${update::class.simpleName}")
+                }
+            } catch (e: Throwable) {
+                val msg = "couldn't delete all channels"
+                log.e(msg, e)
+//                database.endTransaction()
+                RepoResult.Error<MediaDomain>(e, msg)
+            }
         }
 
     suspend fun loadChannel(id: Long): RepoResult<ChannelDomain> =

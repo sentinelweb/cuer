@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.domain.update.UpdateObject
 import uk.co.sentinelweb.cuer.net.NetResult
 import kotlin.reflect.KClass
 
@@ -28,18 +29,15 @@ interface OrchestratorContract<Domain> {
 
     suspend fun delete(domain: Domain, options: Options): Boolean
 
+    suspend fun update(update: UpdateObject<Domain>, options: Options): Domain?
+
     interface Filter
 
     data class Options constructor(
         val source: Source,
         val flat: Boolean = true,
         val emit: Boolean = true
-    ) {
-        companion object {
-//            val LOCAL_FLAT = Options(LOCAL)
-//            val LOCAL_DEEP = Options(LOCAL, flat = false)
-        }
-    }
+    )
 
     enum class Operation { FLAT, FULL, DELETE }
 
@@ -49,6 +47,8 @@ interface OrchestratorContract<Domain> {
     class DefaultFilter() : Filter
     class AllFilter() : Filter
     class ChannelPlatformIdFilter(val platformId: String) : Filter
+    class NewMediaFilter() : Filter
+    class RecentMediaFilter() : Filter
 
     class InvalidOperationException(clazz: KClass<out OrchestratorContract<out Any>>, filter: Filter?, options: Options) :
         java.lang.UnsupportedOperationException("class = ${clazz.simpleName} filter = $filter options = $options")

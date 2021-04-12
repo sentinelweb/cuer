@@ -4,6 +4,7 @@ import android.text.SpannableString
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.navigation.fragment.FragmentNavigator
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
@@ -38,7 +39,7 @@ interface ItemContract {
         fun isViewForId(id: Long): Boolean
     }
 
-    interface External {
+    interface External : ItemBaseContract.ItemPresenterBase {
         fun update(item: Model, highlightPlaying: Boolean)
         fun doLeft()
         fun doRight()
@@ -73,7 +74,9 @@ interface ItemContract {
         val platform: PlatformDomain,
         val isLive: Boolean,
         val isUpcoming: Boolean,
-        @ColorRes val infoTextBackgroundColor: Int
+        @ColorRes val infoTextBackgroundColor: Int,
+        val canEdit: Boolean,
+        val playlistName: String?
     ) : ItemBaseModel(id)
 
     data class State constructor(var item: Model? = null)

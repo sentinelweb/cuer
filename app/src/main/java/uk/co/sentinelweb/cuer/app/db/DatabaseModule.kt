@@ -2,10 +2,12 @@ package uk.co.sentinelweb.cuer.app.db
 
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.db.entity.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.mapper.*
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 
 object DatabaseModule {
     val dbModule = module {
@@ -20,7 +22,8 @@ object DatabaseModule {
                 channelMapper = get(),
                 coProvider = get(),
                 log = get(),
-                database = get()
+                database = get(),
+                mediaUpdateMapper = get()
             )
         }
         single {
@@ -48,7 +51,9 @@ object DatabaseModule {
         factory { PlaylistMapper(get(), get(), get()) }
         factory { PlaylistItemMapper(get()) }
         factory { MediaMapper(get(), get()) }
+        factory { MediaUpdateMapper(get()) }
         factory { ImageMapper() }
         factory { ChannelMapper(get()) }
+        factory { InstantTypeConverter() }
     }
 }

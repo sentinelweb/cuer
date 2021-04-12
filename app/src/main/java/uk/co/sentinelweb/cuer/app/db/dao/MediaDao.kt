@@ -40,4 +40,14 @@ interface MediaDao {
     @Query("DELETE FROM media")
     suspend fun deleteAll()
 
+    @Query("SELECT * FROM media WHERE flags & :flags == :flags")
+    suspend fun loadAllByFlags(flags: Long): List<MediaAndChannel>
+
+    @Query("SELECT flags FROM media WHERE id == :id")
+    suspend fun getFlags(id: Long): Long
+
+    //@Update(entity = MediaPositionUpdateEntity::class, onConflict = OnConflictStrategy.REPLACE)
+    @Query("UPDATE media SET date_last_played=:dateLastPlayed, positon=:position, duration=:duration, flags=:flags where id=:id")
+    fun updatePosition(id: Long, dateLastPlayed: String, position: Long?, duration: Long?, flags: Long)
+
 }

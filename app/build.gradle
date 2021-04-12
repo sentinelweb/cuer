@@ -140,7 +140,7 @@ dependencies {
     annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
     kapt "com.github.bumptech.glide:compiler:$ver_glide"
 
-    debugImplementation ('androidx.fragment:fragment-testing:1.2.5'){// hack
+    debugImplementation ("androidx.fragment:fragment-testing:$ver_androidx_fragment_test"){// hack
         exclude group:"androidx.test"
     }
 
@@ -148,6 +148,7 @@ dependencies {
     testImplementation "org.koin:koin-test:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.google.truth:truth:$ver_truth"
+    testImplementation "org.mockito:mockito-core:$ver_mockito"
     testImplementation "org.mockito:mockito-inline:$ver_mockito_inline"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$ver_mockito_kotlin"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
@@ -162,6 +163,7 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
+//    testImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.16.0'
 
     androidTestImplementation "org.koin:koin-test:$ver_koin"
     androidTestImplementation "com.google.truth:truth:$ver_truth"

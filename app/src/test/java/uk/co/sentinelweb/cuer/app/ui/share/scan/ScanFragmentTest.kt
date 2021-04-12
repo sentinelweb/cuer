@@ -41,7 +41,7 @@ class ScanFragmentTest : FragmentScenarioProvider<ScanFragment> {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         sharedTest = ScanFragmentSharedTest(this, mockPresenter)
         startKoin {
             modules(module {

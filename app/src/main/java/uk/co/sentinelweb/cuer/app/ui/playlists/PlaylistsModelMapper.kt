@@ -1,8 +1,12 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class PlaylistsModelMapper constructor() {
@@ -28,7 +32,12 @@ class PlaylistsModelMapper constructor() {
                     loopMode = pl.mode,
                     type = pl.type,
                     platform = pl.platform,
-                    showOverflow = showOverflow
+                    showOverflow = showOverflow,
+                    source = if (pl.type == APP) MEMORY else LOCAL,
+                    canEdit = pl.config.editable,
+                    canPlay = pl.config.playable,
+                    canLaunch = pl.type == PLATFORM,
+                    canShare = pl.type == PLATFORM
                 )
             }
         )

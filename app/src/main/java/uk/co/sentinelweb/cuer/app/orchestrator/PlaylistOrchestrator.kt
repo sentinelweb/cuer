@@ -9,12 +9,16 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.core.ntuple.then
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
+import uk.co.sentinelweb.cuer.domain.update.UpdateObject
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
 class PlaylistOrchestrator constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
     private val playlistMemoryRepository: PlaylistMemoryRepository,
+    private val mediaOrchestrator: MediaOrchestrator,
     private val ytInteractor: YoutubeInteractor
 ) : OrchestratorContract<PlaylistDomain> {
 
@@ -110,8 +114,8 @@ class PlaylistOrchestrator constructor(
     suspend fun getPlaylistOrDefault(playlistId: Long?, options: Options): Pair<PlaylistDomain, Source>? =
         when (options.source) {
             MEMORY ->
-                playlistMemoryRepository.load(playlistId!!, options)// TODO FALLBACK OR ERROR?
-                    ?.apply { delay(20) }// fixme: fucking menu items don't load in time sine memory is sequential
+                playlistMemoryRepository.load(playlistId!!, options) // TODO FALLBACK OR ERROR?
+                    ?.apply { delay(20) } // fixme: fucking menu items don't load in time sine memory is sequential
                     ?.let { it to MEMORY }
                     ?: playlistDatabaseRepository.getPlaylistOrDefault(null, options.flat)
                         ?.let { it to LOCAL }
@@ -124,7 +128,7 @@ class PlaylistOrchestrator constructor(
     // todo make update db better
     suspend fun updateCurrentIndex(it: PlaylistDomain, options: Options): Boolean =
         when (options.source) {
-            MEMORY -> true // since the value just stay in memory its ok
+            MEMORY -> true // todo : persist current item? for new
             LOCAL ->
                 playlistDatabaseRepository.updateCurrentIndex(it, options.emit)
                     .forceDatabaseSuccessNotNull("Update did not succeed")
@@ -132,5 +136,17 @@ class PlaylistOrchestrator constructor(
             else -> throw InvalidOperationException(this::class, null, options)
         }
 
+    suspend fun updateMedia(playlist: PlaylistDomain, update: UpdateObject<MediaDomain>, options: Options): MediaDomain? =
+        when (options.source) {
+            MEMORY -> if (playlist.type == APP) {
+                mediaOrchestrator.update(update, options.copy(source = LOCAL))
+            } else null
+            LOCAL -> mediaOrchestrator.update(update, options)
+            else -> throw InvalidOperationException(this::class, null, options)
+        }
+
+    override suspend fun update(update: UpdateObject<PlaylistDomain>, options: Options): PlaylistDomain? {
+        throw NotImplementedException()
+    }
 
 }

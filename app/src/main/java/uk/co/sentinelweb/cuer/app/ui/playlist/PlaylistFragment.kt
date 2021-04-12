@@ -75,7 +75,7 @@ class PlaylistFragment :
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_star)
     private val playMenuItem: MenuItem?
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_play)
-    private val editMenuItem: MenuItem
+    private val editMenuItem: MenuItem?
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_edit)
     private val newMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_new)
@@ -92,6 +92,8 @@ class PlaylistFragment :
     private var dialogFragment: DialogFragment? = null
 
     private data class MenuState constructor(
+        var isShow: Boolean = false,
+        var isPlayable: Boolean = false,
         var lastPlayModeIndex: Int = 0,
         var reloadHeaderAfterMenuInit: Boolean = false
     )
@@ -131,7 +133,7 @@ class PlaylistFragment :
         binding.playlistFabRefresh.setOnClickListener { presenter.refreshPlaylist() }
         binding.playlistAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
-            var isShow = false
+            //var isShow = false
             var scrollRange = -1
 
             override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
@@ -139,13 +141,15 @@ class PlaylistFragment :
                     scrollRange = appBarLayout.getTotalScrollRange()
                 }
                 if (scrollRange + verticalOffset == 0) {
-                    isShow = true
+                    menuState.isShow = true
                     // only show the menu items for the non-empty state
-                    modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == menuState.lastPlayModeIndex }
-                    playMenuItem?.isVisible = true
-                } else if (isShow) {
-                    isShow = false
-                    modeMenuItems.forEach { it.isVisible = false }
+                    //modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == menuState.lastPlayModeIndex }
+                    updatePlayModeMenuItems()
+                    playMenuItem?.isVisible = menuState.isPlayable
+                } else if (menuState.isShow) {
+                    menuState.isShow = false
+                    //modeMenuItems.forEach { it.isVisible = false }
+                    updatePlayModeMenuItems()
                     playMenuItem?.isVisible = false
                 }
             }
@@ -160,6 +164,11 @@ class PlaylistFragment :
         }
     }
 
+    private fun updatePlayModeMenuItems() {
+        val shouldShow = menuState.isShow && menuState.isPlayable
+        modeMenuItems.forEachIndexed { i, item -> item.isVisible = shouldShow && i == menuState.lastPlayModeIndex }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlist_actionbar, menu)
@@ -169,7 +178,7 @@ class PlaylistFragment :
         playMenuItem?.setOnMenuItemClickListener { presenter.onPlayPlaylist() }
         starMenuItem?.setOnMenuItemClickListener { presenter.onStarPlaylist() }
         newMenuItem.setOnMenuItemClickListener { presenter.onFilterNewItems() }
-        editMenuItem.setOnMenuItemClickListener { presenter.onEdit() }
+        editMenuItem?.setOnMenuItemClickListener { presenter.onEdit() }
         filterMenuItem.setOnMenuItemClickListener { presenter.onFilterPlaylistItems() }
         if (menuState.reloadHeaderAfterMenuInit) {
             presenter.reloadHeader()
@@ -259,6 +268,10 @@ class PlaylistFragment :
         binding.playlistSwipe.isRefreshing = false
     }
 
+    override fun showRefresh() {
+        binding.playlistSwipe.isRefreshing = true
+    }
+
     override fun setHeaderModel(model: PlaylistContract.Model) {
 
         Glide.with(requireContext())
@@ -267,17 +280,22 @@ class PlaylistFragment :
             .into(binding.playlistHeaderImage)
         binding.playlistCollapsingToolbar.title = model.title
         binding.playlistFabPlay.setImageResource(model.playIcon)
-        binding.playlistFabPlay.isEnabled = model.canPlay
+        binding.playlistFabPlay.isVisible = model.canPlay
+        binding.playlistFabPlaymode.isVisible = model.canPlay
         playMenuItem?.setIcon(model.playIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
         playMenuItem?.setEnabled(model.canPlay)
         starMenuItem?.setIcon(model.starredIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
+        editMenuItem?.isVisible = model.canEdit
+        starMenuItem?.isVisible = model.canEdit
         //playlist_items.setText("${model.items.size}")
         binding.playlistFlags.isVisible = model.isDefault
         binding.playlistFabPlaymode.setImageResource(model.loopModeIcon)
         menuState.lastPlayModeIndex = model.loopModeIndex
-        if (!binding.playlistFabPlaymode.isVisible) {
-            modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == menuState.lastPlayModeIndex }
-        }
+        menuState.isPlayable = model.canPlay
+        updatePlayModeMenuItems()
+//        if (!binding.playlistFabPlaymode.isVisible && model.canPlay) {
+//            modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == menuState.lastPlayModeIndex }
+//        }
     }
 
     override fun showUndo(msg: String, undoFunction: () -> Unit) {

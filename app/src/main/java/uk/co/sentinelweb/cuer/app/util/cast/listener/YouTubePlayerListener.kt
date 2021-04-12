@@ -284,12 +284,15 @@ class YouTubePlayerListener(
             youTubePlayer?.loadVideo(media.platformId, startPos)
             state.currentMedia = media
             playerUi?.setPlaylistItem(queue.currentItem, queue.source)
+            playerUi?.setPlaylistName(queue.playlist?.title ?: "none")
+            playerUi?.setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
         } ?: run {
             state.currentMedia = null
             state.receivedVideoId = null
             youTubePlayer?.pause()
             playerUi?.reset()
             playerUi?.setPlaylistItem(null, queue.source)
+            playerUi?.setPlaylistName("No Item")
         }
     }
 

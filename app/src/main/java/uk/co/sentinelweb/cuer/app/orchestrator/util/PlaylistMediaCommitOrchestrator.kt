@@ -1,5 +1,6 @@
-package uk.co.sentinelweb.cuer.app.orchestrator
+package uk.co.sentinelweb.cuer.app.orchestrator.util
 
+import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 

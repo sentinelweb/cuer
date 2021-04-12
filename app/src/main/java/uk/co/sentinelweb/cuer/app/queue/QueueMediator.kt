@@ -20,10 +20,10 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.*
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdate
 
 class QueueMediator constructor(
     private val state: QueueMediatorState,
-    private val mediaOrchestrator: MediaOrchestrator,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val coroutines: CoroutineContextProvider,
@@ -179,16 +179,18 @@ class QueueMediator constructor(
     override fun updateCurrentMediaItem(updatedMedia: MediaDomain) {
         coroutines.computationScope.launch {
             state.currentItem = state.currentItem?.run {
-                mediaOrchestrator.load(media.id!!, state.playlistIdentifier.toFlatOptions())
-                    ?.copy(
+                media.let {
+                    MediaPositionUpdate(
+                        id = it.id!!,
                         positon = updatedMedia.positon,
                         duration = updatedMedia.duration,
                         dateLastPlayed = updatedMedia.dateLastPlayed,
                         watched = true
-                    )?.let {
-                        mediaOrchestrator.save(it, state.playlistIdentifier.toFlatOptions(true))
-                        copy(media = it)
-                    }
+                    )
+                }.let {
+                    playlistOrchestrator.updateMedia(playlist!!, it, state.playlistIdentifier.toFlatOptions(true))
+                        ?.let { copy(media = it) }
+                }
             }
             state.playlist = state.playlist?.let {
                 it.copy(items = it.items.toMutableList().apply {

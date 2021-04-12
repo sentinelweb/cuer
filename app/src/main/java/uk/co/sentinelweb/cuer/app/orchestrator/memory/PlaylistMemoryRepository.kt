@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.util.NewMediaPlayistOrchestrator
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -12,7 +13,8 @@ import uk.co.sentinelweb.cuer.domain.ext.removeItemByPlatformId
 import uk.co.sentinelweb.cuer.domain.ext.replaceItemByPlatformId
 
 class PlaylistMemoryRepository constructor(
-    private val coroutines: CoroutineContextProvider
+    private val coroutines: CoroutineContextProvider,
+    private val newItemsLoader: NewMediaPlayistOrchestrator
 ) : MemoryRepository<PlaylistDomain> {
 
     private val data: MutableMap<Long, PlaylistDomain> = mutableMapOf()
@@ -31,7 +33,11 @@ class PlaylistMemoryRepository constructor(
         throw NotImplementedException()
     }
 
-    override fun load(id: Long, options: Options): PlaylistDomain? = data[id]
+    override suspend fun load(id: Long, options: Options): PlaylistDomain? = when (id) {
+        NEWITEMS_PLAYLIST -> newItemsLoader.getPlaylist()
+        SHARED_PLAYLIST -> data[id]
+        else -> throw NotImplementedException("$id is invalid memory playlist")
+    }
 
     override fun loadList(filter: Filter, options: Options): List<PlaylistDomain> = when (filter) {
         is IdListFilter -> data.keys
@@ -101,7 +107,7 @@ class PlaylistMemoryRepository constructor(
             throw NotImplementedException()
         }
 
-        override fun load(id: Long, options: Options): PlaylistItemDomain? {
+        override suspend fun load(id: Long, options: Options): PlaylistItemDomain? {
             throw NotImplementedException()
         }
 

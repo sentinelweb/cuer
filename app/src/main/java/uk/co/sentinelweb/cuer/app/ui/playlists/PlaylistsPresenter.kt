@@ -9,15 +9,19 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPair
+import uk.co.sentinelweb.cuer.app.orchestrator.util.NewMediaPlayistOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 
 class PlaylistsPresenter(
     private val view: PlaylistsContract.View,
@@ -28,7 +32,9 @@ class PlaylistsPresenter(
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
-    private val coroutines: CoroutineContextProvider
+    private val coroutines: CoroutineContextProvider,
+    private val newMedia: NewMediaPlayistOrchestrator,
+    private val ytJavaApi: YoutubeJavaApiWrapper
 ) : PlaylistsContract.Presenter {
 
     override fun initialise() {
@@ -54,31 +60,41 @@ class PlaylistsPresenter(
         state.viewModelScope.launch {
             delay(400)
             state.playlists.apply {
-                find { it.id == item.id }?.let { playlist ->
-                    state.deletedPlaylist = playlist.id
-                        ?.let { playlistRepository.load(it, flat = false) }
-                        ?.takeIf { it.isSuccessful }
-                        ?.data
-                        ?.apply {
-                            playlistRepository.delete(playlist, emit = true)
-                            view.showDeleteUndo("Deleted playlist: ${playlist.title}")
-                            executeRefresh(false, false)
-                        }
-                        ?: let {
-                            view.showMessage("Cannot load playlist backup")
-                            null
-                        }
-                }
+                find { it.id == item.id }
+                    ?.takeIf { it.type != APP }
+                    ?.let { playlist ->
+                        state.deletedPlaylist = playlist.id
+                            ?.let { playlistRepository.load(it, flat = false) }
+                            ?.takeIf { it.isSuccessful }
+                            ?.data
+                            ?.apply {
+                                playlistRepository.delete(playlist, emit = true)
+                                view.showDeleteUndo("Deleted playlist: ${playlist.title}")
+                                executeRefresh(false, false)
+                            }
+                            ?: let {
+                                view.showMessage("Cannot load playlist backup")
+                                null
+                            }
+                    } ?: let { view.showMessage("Cannot delete playlist") }
             }
         }
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        view.gotoPlaylist(item.id, false, LOCAL)
+        view.gotoPlaylist(item.id, false, item.source)// todo map to list (add to model)
     }
 
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
-        view.gotoPlaylist(item.id, true, LOCAL)
+        if (!external) {
+            view.gotoPlaylist(item.id, true, item.source)
+        } else {
+            state.playlists
+                .find { it.id == item.id }
+                ?.takeIf { it.type == PLATFORM }
+                ?.apply { ytJavaApi.launchPlaylist(platformId!!) }
+                ?: let { view.showMessage("Cannot launch playlist") }
+        }
     }
 
     override fun onItemStar(item: ItemContract.Model) {
@@ -126,6 +142,8 @@ class PlaylistsPresenter(
             .takeIf { it.isSuccessful }
             ?.data
             ?.sortedWith(compareBy({ !it.starred }, { it.title.toLowerCase() }))
+            ?.toMutableList()
+            ?.apply { add(0, newMedia.makeNewItemsHeader()) }
             ?: listOf()
 
         state.playlistStats = playlistRepository

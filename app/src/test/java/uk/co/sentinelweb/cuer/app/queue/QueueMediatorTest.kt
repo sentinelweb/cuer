@@ -35,14 +35,12 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.matchesHeader
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdate
 import uk.co.sentinelweb.cuer.tools.ext.build
 import uk.co.sentinelweb.cuer.tools.ext.buildCollection
 
 @ExperimentalCoroutinesApi
 class QueueMediatorTest {
-
-    @MockK
-    lateinit var mockMediaOrchestrator: MediaOrchestrator
 
     @MockK
     lateinit var mockPlaylistOrchestrator: PlaylistOrchestrator
@@ -118,7 +116,6 @@ class QueueMediatorTest {
     private fun createSut(state: QueueMediatorState = QueueMediatorState()) {
         sut = QueueMediator(
             state,
-            mockMediaOrchestrator,
             mockPlaylistOrchestrator,
             mockPlaylistItemOrchestrator,
             coroutines,
@@ -586,13 +583,25 @@ class QueueMediatorTest {
         testCoroutineScope.runBlockingTest {
             createSut()
             val currentItemBefore = sut.currentItem!!
-            coEvery {
-                mockMediaOrchestrator.load(
-                    currentItemBefore.media.id!!,
-                    fixtCurrentIdentifier.toFlatOptions()
-                )
-            } returns currentItemBefore.media
             val expectedCurrentItem = currentItemBefore.copy(media = currentItemBefore.media.copy(positon = 0, watched = true))
+            val mediaPositionUpdate = MediaPositionUpdate(
+                id = expectedCurrentItem.media.id!!,
+                positon = expectedCurrentItem.media.positon,
+                duration = expectedCurrentItem.media.duration,
+                dateLastPlayed = expectedCurrentItem.media.dateLastPlayed,
+                watched = true
+            )
+            val expectedMediaAfterUpdate = expectedCurrentItem.media.copy(
+                positon = mediaPositionUpdate.positon,
+                duration = mediaPositionUpdate.duration,
+                dateLastPlayed = mediaPositionUpdate.dateLastPlayed,
+                watched = mediaPositionUpdate.watched
+            )
+            coEvery {
+                mockPlaylistOrchestrator.updateMedia(
+                    fixtCurrentPlaylist, mediaPositionUpdate, fixtCurrentIdentifier.toFlatOptions(emit = true)
+                )
+            } returns expectedMediaAfterUpdate
 
             sut.onItemSelected(currentItemBefore, forcePlay = true, resetPosition = true)
 
@@ -612,13 +621,26 @@ class QueueMediatorTest {
             createSut()
             val selectedItemIndex = 8
             val selectedItem = fixtCurrentPlaylist.items.get(selectedItemIndex)
+            val fixtUpdatedPlaylist = fixtCurrentPlaylist.copy(currentIndex = selectedItemIndex)
             val expectedSelectedItem = selectedItem.copy(media = selectedItem.media.copy(positon = 0, watched = true))
+            val mediaPositionUpdate = MediaPositionUpdate(
+                id = expectedSelectedItem.media.id!!,
+                positon = expectedSelectedItem.media.positon,
+                duration = expectedSelectedItem.media.duration,
+                dateLastPlayed = expectedSelectedItem.media.dateLastPlayed,
+                watched = expectedSelectedItem.media.watched
+            )
+            val expectedMediaAfterUpdate = expectedSelectedItem.media.copy(
+                positon = mediaPositionUpdate.positon,
+                duration = mediaPositionUpdate.duration,
+                dateLastPlayed = mediaPositionUpdate.dateLastPlayed,
+                watched = mediaPositionUpdate.watched
+            )
             coEvery {
-                mockMediaOrchestrator.load(
-                    selectedItem.media.id!!,
-                    fixtCurrentIdentifier.toFlatOptions()
+                mockPlaylistOrchestrator.updateMedia(
+                    fixtUpdatedPlaylist, mediaPositionUpdate, fixtCurrentIdentifier.toFlatOptions(emit = true)
                 )
-            } returns selectedItem.media
+            } returns expectedMediaAfterUpdate
 
             sut.onItemSelected(selectedItem, resetPosition = true)
 
@@ -652,18 +674,25 @@ class QueueMediatorTest {
         testCoroutineScope.runBlockingTest {
             createSut()
             val fixtUpdateMedia: MediaDomain = fixture.build()
-            coEvery {
-                mockMediaOrchestrator.load(
-                    sut.currentItem!!.media.id!!,
-                    fixtCurrentIdentifier.toFlatOptions()
-                )
-            } returns sut.currentItem!!.media
-            val expectedMediaAfterUpdate = sut.currentItem!!.media.copy(
+            val mediaPositionUpdate = MediaPositionUpdate(
+                id = sut.currentItem!!.media.id!!,
                 positon = fixtUpdateMedia.positon,
                 duration = fixtUpdateMedia.duration,
                 dateLastPlayed = fixtUpdateMedia.dateLastPlayed,
                 watched = true
             )
+            val expectedMediaAfterUpdate = sut.currentItem!!.media.copy(
+                positon = mediaPositionUpdate.positon,
+                duration = mediaPositionUpdate.duration,
+                dateLastPlayed = mediaPositionUpdate.dateLastPlayed,
+                watched = mediaPositionUpdate.watched
+            )
+            coEvery {
+                mockPlaylistOrchestrator.updateMedia(
+                    fixtCurrentPlaylist, mediaPositionUpdate, fixtCurrentIdentifier.toFlatOptions(emit = true)
+                )
+            } returns expectedMediaAfterUpdate
+
             // test
             sut.updateCurrentMediaItem(fixtUpdateMedia)
 
@@ -671,8 +700,9 @@ class QueueMediatorTest {
             assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
             assertThat(sut.currentItem!!.media).isEqualTo(expectedMediaAfterUpdate) // position changed
             coVerify {
-                mockMediaOrchestrator.save(expectedMediaAfterUpdate, sut.playlistId!!.toFlatOptions(true))
+                mockPlaylistOrchestrator.updateMedia(fixtCurrentPlaylist, mediaPositionUpdate, sut.playlistId!!.toFlatOptions(true))
             }
+            // todo fix
         }
 
     }

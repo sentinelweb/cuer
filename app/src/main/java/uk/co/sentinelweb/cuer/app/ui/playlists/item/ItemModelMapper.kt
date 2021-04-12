@@ -29,6 +29,7 @@ class ItemModelMapper constructor(
     }
 
     private val _bottomDrawables: MutableMap<Int, Drawable> = mutableMapOf()
+
     private fun bottomDrawable(@DrawableRes id: Int): Drawable {
         return if (_bottomDrawables.containsKey(id)) {
             _bottomDrawables[id] ?: throw IllegalArgumentException("no drawable for $id")

@@ -47,7 +47,7 @@ data class MediaEntity(
     @ColumnInfo(name = "duration")
     val duration: Long?,
 
-    @ColumnInfo(name = "positon")
+    @ColumnInfo(name = "positon")// todo posit*i*on
     val positon: Long?,
 
     @ColumnInfo(name = "date_last_played")

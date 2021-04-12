@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.update.UpdateObject
 
 // todo update stats automatically on save/delete
 @Suppress("DEPRECATION")
@@ -372,11 +373,14 @@ class PlaylistDatabaseRepository constructor(
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                     is MediaIdListFilter -> playlistItemDao.loadItemsByMediaId(filter.ids)
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
+                    is NewMediaFilter ->
+                        playlistItemDao.loadAllPlayListItemsWithNewMedia(200)
+                            .map { playlistItemMapper.map(it) }
                     else -> playlistItemDao.loadAllItems()
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                 }.let { RepoResult.Data(it) }
             } catch (e: Throwable) {
-                val msg = "couldn't save playlist item"
+                val msg = "couldn't load playlist item list for: $filter"
                 log.e(msg, e)
                 RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
             }
@@ -412,6 +416,10 @@ class PlaylistDatabaseRepository constructor(
                     .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
                     ?.data?.get(0)
             })
+
+    override suspend fun update(update: UpdateObject<PlaylistDomain>, flat: Boolean, emit: Boolean): RepoResult<PlaylistDomain> {
+        TODO("Not yet implemented")
+    }
 
 
 }

@@ -28,5 +28,6 @@ class IconMapper {
         when (type) {
             PlaylistDomain.PlaylistTypeDomain.USER -> R.drawable.ic_baseline_person_black_24
             PlaylistDomain.PlaylistTypeDomain.PLATFORM -> map(platform)
+            PlaylistDomain.PlaylistTypeDomain.APP -> R.drawable.ic_menu_settings_black
         }
 }
