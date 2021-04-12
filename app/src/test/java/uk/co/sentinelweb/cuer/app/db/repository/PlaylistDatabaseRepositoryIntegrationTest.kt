@@ -80,7 +80,7 @@ class PlaylistDatabaseRepositoryIntegrationTest {
         )
         sut = PlaylistDatabaseRepository(
             playlistDao = database.playlistDao(),
-            playlistMapper = PlaylistMapper(imageMapper, playlistItemMapper, channelMapper),
+            playlistMapper = PlaylistMapper(imageMapper, playlistItemMapper, channelMapper, systemLogWrapper),
             playlistItemDao = database.playlistItemDao(),
             playlistItemMapper = playlistItemMapper,
             mediaDao = database.mediaDao(),

@@ -140,10 +140,14 @@ class PlaylistDatabaseRepository constructor(
     private suspend fun mapDeep(loadWithItems: PlaylistAndItems): PlaylistDomain =
         loadWithItems
             .let {
+                val medias = mediaDao
+                    .loadAllByIds(it.items.map { it.mediaId }.toLongArray())
+                    .associateBy { it.media.id }
+
                 playlistMapper.map(
                     it.playlist,
                     it.items,
-                    mediaDao.loadAllByIds(it.items.map { it.mediaId }.toLongArray()),
+                    medias,
                     null/* todo channels */
                 )
             }
