@@ -55,14 +55,12 @@ class MainActivity :
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
-//        navController = findNavController(R.id.nav_host_fragment)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         // setup nav draw https://developer.android.com/guide/navigation/navigation-ui#add_a_navigation_drawer
         bottom_nav_view.setupWithNavController(navController)
-        // from https://medium.com/androiddevelopers/windowinsets-listeners-to-layouts-8f9ccc8fa4d1
+
         edgeToEdgeWrapper.doOnApplyWindowInsets(bottom_nav_view) { view, insets, padding ->
-            // padding contains the original padding values after inflation
             view.updatePadding(
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
@@ -83,7 +81,6 @@ class MainActivity :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.paste_add -> startActivity(ShareActivity.intent(this, true))
-            //R.id.restart_conn -> presenter.restartYtCastContext()
             R.id.settings -> navController.navigate(R.id.navigation_settings_root)
         }
         return super.onOptionsItemSelected(item)

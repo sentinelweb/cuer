@@ -65,14 +65,12 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
         setContentView(R.layout.activity_share)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        // todo fix with https://github.com/sentinelweb/cuer/issues/158
         edgeToEdgeWrapper.doOnApplyWindowInsets(share_root) { view, insets, padding ->
-            // padding contains the original padding values after inflation
             view.updatePadding(
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
         }
-
+        // todo fix with https://github.com/sentinelweb/cuer/issues/158
         scanFragment?.listener = this
     }
 
