@@ -25,7 +25,6 @@ class PlayerFragment : Fragment(R.layout.player_fragment), PlayerContract.View {
         super.onViewCreated(view, savedInstanceState)
         player_toolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
-            //it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
 //        listFragment = childFragmentManager.findFragmentById(R.id.player_list_fragment)?.apply {
 //            arguments = bundleOf(

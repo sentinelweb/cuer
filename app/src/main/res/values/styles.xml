@@ -82,7 +82,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">top|end</item>
-        <item name="android:layout_marginTop">78dp</item>
+        <item name="android:layout_marginTop">48dp</item>
         <item name="android:background">@color/info_text_overlay_background</item>
         <item name="android:padding">4dp</item>
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1

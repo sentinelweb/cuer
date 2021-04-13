@@ -9,11 +9,10 @@ class EdgeToEdgeWrapper {
         val flags = (View.SYSTEM_UI_FLAG_LOW_PROFILE
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_IMMERSIVE/*_STICKY*/
+                or View.SYSTEM_UI_FLAG_IMMERSIVE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
         a.window.decorView.systemUiVisibility = flags
     }
-
     // from https://medium.com/androiddevelopers/windowinsets-listeners-to-layouts-8f9ccc8fa4d1
     fun doOnApplyWindowInsets(v: View, f: (View, WindowInsets, InitialPadding) -> Unit) {
         // Create a snapshot of the view's padding state

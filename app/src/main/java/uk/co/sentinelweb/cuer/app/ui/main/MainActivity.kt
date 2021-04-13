@@ -57,10 +57,10 @@ class MainActivity :
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        // setup nav draw https://developer.android.com/guide/navigation/navigation-ui#add_a_navigation_drawer
         bottom_nav_view.setupWithNavController(navController)
 
         edgeToEdgeWrapper.doOnApplyWindowInsets(bottom_nav_view) { view, insets, padding ->
+            log.d("Inset change: $insets padding:$padding")
             view.updatePadding(
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
@@ -87,7 +87,6 @@ class MainActivity :
     }
 
     override fun checkPlayServices() {
-        // can't use CastContext until I'm sure the user has GooglePlayServices
         chromeCastWrapper.checkPlayServices(
             this,
             SERVICES_REQUEST_CODE,

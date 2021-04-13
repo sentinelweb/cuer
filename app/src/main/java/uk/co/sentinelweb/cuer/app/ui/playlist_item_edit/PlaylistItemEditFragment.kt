@@ -41,6 +41,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
+import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -62,6 +63,7 @@ class PlaylistItemEditFragment
     private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
     private val doneNavigation: PlaylistItemEditContract.DoneNavigation by currentScope.inject()// from activity (see onAttach)
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
+    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
     private val starMenuItem: MenuItem
         get() = ple_toolbar.menu.findItem(R.id.plie_star)
@@ -159,10 +161,12 @@ class PlaylistItemEditFragment
                     // only show the menu items for the non-empty state
                     //starMenuItem.isVisible = !menuState.modelEmpty
                     playMenuItem.isVisible = !menuState.modelEmpty
+                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
                     //starMenuItem.isVisible = false
                     playMenuItem.isVisible = false
+                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
                 menuState.scrolledDown = isShow
             }
@@ -195,6 +199,11 @@ class PlaylistItemEditFragment
         observeModel()
         observeNavigation()
         observeDialog()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
     }
 
     override fun onStop() {
