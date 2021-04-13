@@ -114,9 +114,9 @@ class PlaylistItemEditFragment
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
         //ple_play_button.setOnClickListener { viewModel.onPlayVideoLocal() }
-        ple_star_fab.setOnClickListener { viewModel.onStarClick() }
+        //ple_star_fab.setOnClickListener { viewModel.onStarClick() }
         ple_play_fab.setOnClickListener { viewModel.onPlayVideo() }
-        starMenuItem.isVisible = false
+        starMenuItem.isVisible = true
         playMenuItem.isVisible = false
         ple_author_image.setOnClickListener { viewModel.onChannelClick() }
         ple_desc.setMovementMethod(object : LinkMovementMethod() {
@@ -157,11 +157,11 @@ class PlaylistItemEditFragment
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    starMenuItem.isVisible = !menuState.modelEmpty
+                    //starMenuItem.isVisible = !menuState.modelEmpty
                     playMenuItem.isVisible = !menuState.modelEmpty
                 } else if (isShow) {
                     isShow = false
-                    starMenuItem.isVisible = false
+                    //starMenuItem.isVisible = false
                     playMenuItem.isVisible = false
                 }
                 menuState.scrolledDown = isShow
@@ -181,8 +181,8 @@ class PlaylistItemEditFragment
                 ple_author_image.isVisible = false
                 ple_title_pos.isVisible = false
                 ple_title_bg.isVisible = false
-                ple_star_fab.isVisible = false
-                starMenuItem.isVisible = false
+                //ple_star_fab.isVisible = false
+                //starMenuItem.isVisible = false
                 playMenuItem.isVisible = false
 
 
@@ -240,12 +240,12 @@ class PlaylistItemEditFragment
                     ple_author_image.isVisible = !model.empty
                     ple_title_pos.isVisible = !model.empty
                     ple_duration.isVisible = !model.empty
-                    ple_star_fab.isVisible = !model.empty
+                    //ple_star_fab.isVisible = !model.empty
                     if (menuState.scrolledDown) {
-                        starMenuItem.isVisible = !model.empty
+                        //starMenuItem.isVisible = !model.empty
                         playMenuItem.isVisible = !model.empty
                     } else {
-                        starMenuItem.isVisible = false
+                        //starMenuItem.isVisible = false
                         playMenuItem.isVisible = false
                     }
                     Glide.with(requireContext())
@@ -300,8 +300,7 @@ class PlaylistItemEditFragment
                         if (model.starred) R.drawable.ic_button_starred_white
                         else R.drawable.ic_button_unstarred_white
                     starMenuItem.setIcon(starIconResource)
-                    ple_star_fab.setImageResource(starIconResource)
-                    ple_star_fab.setImageResource(starIconResource)
+//                    ple_star_fab.setImageResource(starIconResource)
                 }
             })
     }

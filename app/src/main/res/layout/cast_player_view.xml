@@ -178,6 +178,7 @@
                 app:layout_constraintRight_toLeftOf="@id/cast_player_seek_forward"
                 tools:ignore="RtlHardcoded"
                 tools:text="STATE"
+                android:visibility="gone"
                 />
 
             <TextView

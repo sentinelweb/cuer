@@ -166,7 +166,7 @@ class PlaylistFragment :
 
     private fun updatePlayModeMenuItems() {
         val shouldShow = menuState.isShow && menuState.isPlayable
-        modeMenuItems.forEachIndexed { i, item -> item.isVisible = shouldShow && i == menuState.lastPlayModeIndex }
+        modeMenuItems.forEachIndexed { i, item -> item?.isVisible = (shouldShow && i == menuState.lastPlayModeIndex) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -288,7 +288,7 @@ class PlaylistFragment :
         editMenuItem?.isVisible = model.canEdit
         starMenuItem?.isVisible = model.canEdit
         //playlist_items.setText("${model.items.size}")
-        binding.playlistFlags.isVisible = model.isDefault
+        //binding.playlistFlags.isVisible = model.isDefault
         binding.playlistFabPlaymode.setImageResource(model.loopModeIcon)
         menuState.lastPlayModeIndex = model.loopModeIndex
         menuState.isPlayable = model.canPlay

@@ -34,7 +34,7 @@
         android:icon="@drawable/ic_menu_paste_add_black"
         android:title="@string/menu_paste"
         app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:orderInCategory="1100"
 
         />

@@ -33,7 +33,7 @@ class PlaylistEditFragment : DialogFragment() {
     private val softKeyboard: SoftKeyboardWrapper by inject()
 
     private val starMenuItem: MenuItem
-        get() = pe_toolbar.menu.findItem(R.id.plie_star)
+        get() = pe_toolbar.menu.findItem(R.id.ple_star)
 
     internal var listener: Listener? = null
 

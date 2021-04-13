@@ -53,12 +53,18 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        //windowWrapper.setDecorFitsSystemWindows(this, true)
+        windowWrapper.setDecorFitsSystemWindows(this, false)
 //        navController = findNavController(R.id.nav_host_fragment)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         // setup nav draw https://developer.android.com/guide/navigation/navigation-ui#add_a_navigation_drawer
         bottom_nav_view.setupWithNavController(navController)
+//        windowWrapper.doOnApplyWindowInsets(bottom_nav_view) { view, insets, padding ->
+//            // padding contains the original padding values after inflation
+//            view.updatePadding(
+//                bottom = padding.bottom + insets.systemWindowInsetBottom
+//            )
+//        }
         intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
         presenter.initialise()
     }

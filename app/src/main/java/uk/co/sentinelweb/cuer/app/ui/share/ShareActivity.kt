@@ -60,7 +60,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //windowWrapper.setDecorFitsSystemWindows(this, true)
+        windowWrapper.setDecorFitsSystemWindows(this, false)//
         setContentView(R.layout.activity_share)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
