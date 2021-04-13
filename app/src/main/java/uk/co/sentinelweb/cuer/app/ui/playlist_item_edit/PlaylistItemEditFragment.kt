@@ -274,7 +274,7 @@ class PlaylistItemEditFragment
                     model.channelThumbUrl?.also { url ->
                         Glide.with(requireContext())
                             .load(url)
-                            .circleCrop()
+                            //.circleCrop()
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .addListener(GlideFallbackLoadListener(ple_author_image, url, ytDrawable, log))
                             .into(ple_author_image)

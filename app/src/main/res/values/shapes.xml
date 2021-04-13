@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ShapeAppearance.Item.Icon" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">cut</item>
+
+        <item name="cornerSizeTopLeft">@dimen/item_corner_cut</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">@dimen/item_corner_cut</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Player.Icon" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">cut</item>
+
+        <item name="cornerSizeTopLeft">@dimen/player_corner_cut</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">@dimen/player_corner_cut</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+</resources>
+
+

@@ -16,6 +16,7 @@ import com.google.android.material.chip.Chip
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
+import uk.co.sentinelweb.cuer.app.util.extension.cropShapedBitmap
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -46,7 +47,7 @@ class ChipCreator(
                         .loadFirebaseOrOtherUrl(it.url, imageProvider)
 //                        .load(imageProvider.makeRef(it))
                         .transform(CropTransformation(it.url))
-                        .circleCrop()
+                        //.circleCrop()
                         .into(ChipLoadTarget(this))
                 }
             }
@@ -93,6 +94,7 @@ class ChipCreator(
             return Bitmap
                 .createBitmap(toTransform, left, top, dimension, dimension)
                 //.getCircularBitmap()
+                .cropShapedBitmap(c)
                 .scale(targetSize, targetSize)
         }
     }

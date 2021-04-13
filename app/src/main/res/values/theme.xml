@@ -36,7 +36,7 @@
             @drawable/ic_ripple_item_background_borderless
         </item>
         <item name="android:actionOverflowButtonStyle">@style/Cuer.AppBar.OverFlow</item>
-
+<!--        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Item.Icon</item>-->
 
         <!-- custom attributes -->
         <item name="colorCheckIcon">@color/green_700</item>

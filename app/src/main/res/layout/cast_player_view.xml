@@ -37,7 +37,7 @@
             <!--                app:layout_constraintBottom_toBottomOf="parent"-->
             <!--                />-->
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
                 android:id="@+id/cast_player_image"
                 android:layout_width="64dp"
                 android:layout_height="48dp"
@@ -45,6 +45,8 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:transitionName="@string/cast_player_trans_image"
+                android:background="@color/surface"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Player.Icon"
                 />
 
             <LinearLayout
@@ -52,10 +54,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:translationX="10dp"
                 android:translationY="4dp"
                 app:layout_constraintBottom_toBottomOf="@+id/cast_player_image"
-                app:layout_constraintRight_toLeftOf="@id/cast_player_track_last"
+                app:layout_constraintLeft_toLeftOf="@id/cast_player_image"
                 >
 
                 <!--                <androidx.appcompat.widget.AppCompatImageView-->
@@ -73,9 +74,11 @@
                     android:id="@+id/cast_player_playlist_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_gravity="left"
                     android:background="#ccffffff"
-                    android:padding="2dp"
+                    android:paddingLeft="2dp"
+                    android:paddingTop="0dp"
+                    android:paddingRight="2dp"
                     android:textColor="@color/black"
                     android:textSize="12sp"
                     android:ellipsize="end"

@@ -117,13 +117,14 @@
                 tools:context=".ui.playlist_item_edit.PlaylistItemEditFragment"
                 >
 
-                <ImageView
+                <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
                     android:id="@+id/ple_author_image"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:contentDescription="@null"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Item.Icon"
                     />
 
                 <TextView
