@@ -32,7 +32,7 @@
         android:layout_height="56dp"
         >
 
-        <ImageView
+        <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
             android:id="@+id/listitem_icon"
             style="@style/ItemView.Thumb.Row"
             android:contentDescription="@null"
@@ -41,7 +41,8 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription"
             tools:src="@drawable/ic_player_play_black"
-            android:background="@color/background"
+            android:background="@color/surface"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Item.Icon"
             />
 
         <TextView
@@ -52,7 +53,7 @@
             android:padding="2dp"
             android:textColor="@color/white"
             android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/listitem_icon"
+            app:layout_constraintTop_toTopOf="@+id/listitem_icon"
             app:layout_constraintRight_toRightOf="@+id/listitem_icon"
             tools:text="0:00"
             />
@@ -62,13 +63,16 @@
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="0dp"
             android:layout_height="@dimen/list_item_progress_height"
-            android:layout_margin="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="@dimen/item_corner_cut"
             android:padding="0dp"
             android:progressDrawable="@drawable/item_progress_bar"
             app:layout_constraintRight_toRightOf="@+id/listitem_icon"
             app:layout_constraintBottom_toBottomOf="@+id/listitem_icon"
             app:layout_constraintLeft_toLeftOf="@+id/listitem_icon"
+            android:layout_marginBottom="0dp"
             tools:progress="50"
+            tools:ignore="RtlHardcoded"
             />
 
         <ImageView
@@ -77,6 +81,7 @@
             app:layout_constraintBottom_toBottomOf="@id/listitem_icon"
             app:layout_constraintLeft_toLeftOf="@id/listitem_icon"
             android:contentDescription="@string/cd_check"
+
             />
 
         <View

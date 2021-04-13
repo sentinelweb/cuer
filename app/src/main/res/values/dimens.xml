@@ -16,7 +16,7 @@
     <dimen name="list_item_swipe_margin">8dp</dimen>
     <dimen name="list_item_elevation">2dp</dimen>
     <dimen name="list_item_swipe_dismiss_dist">100dp</dimen>
-    <dimen name="list_item_swipe_dismiss_toerance">4dp</dimen>
+    <dimen name="list_item_swipe_dismiss_tolerance">4dp</dimen>
     <dimen name="list_item_height">76dp</dimen>
     <dimen name="list_item_top_text_size">14sp</dimen>
     <dimen name="list_item_bottom_text_size">13sp</dimen>
@@ -27,6 +27,8 @@
     <dimen name="button_elevation">1dp</dimen>
     <dimen name="share_button_width">250dp</dimen>
     <dimen name="pref_icon_size">36dp</dimen>
+    <dimen name="item_corner_cut">16dp</dimen>
+    <dimen name="player_corner_cut">16dp</dimen>
 
     <dimen name="chip_thumb_icon_size">48dp</dimen>
     <dimen name="app_bar_header_height">200dp</dimen>
