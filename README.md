@@ -52,6 +52,6 @@ Using
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/info-2021-04-13-23.33.19.jpeg" width="400">
 
 ### Add via Share
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/share-2021-04-13-23.35.07.jpeg  width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/share-2021-04-13-23.35.07.jpeg"  width="400">
 
 
