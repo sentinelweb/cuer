@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.orchestrator.util.NewMediaPlayistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.RecentItemsPlayistOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -34,6 +35,7 @@ class PlaylistsPresenter(
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
     private val coroutines: CoroutineContextProvider,
     private val newMedia: NewMediaPlayistOrchestrator,
+    private val recentItems: RecentItemsPlayistOrchestrator,
     private val ytJavaApi: YoutubeJavaApiWrapper
 ) : PlaylistsContract.Presenter {
 
@@ -144,6 +146,7 @@ class PlaylistsPresenter(
             ?.sortedWith(compareBy({ !it.starred }, { it.title.toLowerCase() }))
             ?.toMutableList()
             ?.apply { add(0, newMedia.makeNewItemsHeader()) }
+            ?.apply { add(1, recentItems.makeRecentItemsHeader()) }
             ?: listOf()
 
         state.playlistStats = playlistRepository
