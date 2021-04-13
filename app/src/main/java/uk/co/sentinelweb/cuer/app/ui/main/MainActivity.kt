@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -26,8 +27,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
+import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.WindowWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class MainActivity :
@@ -42,7 +43,7 @@ class MainActivity :
     private val log: LogWrapper by currentScope.inject()
     private val navMapper: NavigationMapper by currentScope.inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
-    private val windowWrapper: WindowWrapper by inject()
+    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
     private lateinit var navController: NavController
 
@@ -53,18 +54,19 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        windowWrapper.setDecorFitsSystemWindows(this, false)
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
 //        navController = findNavController(R.id.nav_host_fragment)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         // setup nav draw https://developer.android.com/guide/navigation/navigation-ui#add_a_navigation_drawer
         bottom_nav_view.setupWithNavController(navController)
-//        windowWrapper.doOnApplyWindowInsets(bottom_nav_view) { view, insets, padding ->
-//            // padding contains the original padding values after inflation
-//            view.updatePadding(
-//                bottom = padding.bottom + insets.systemWindowInsetBottom
-//            )
-//        }
+        // from https://medium.com/androiddevelopers/windowinsets-listeners-to-layouts-8f9ccc8fa4d1
+        edgeToEdgeWrapper.doOnApplyWindowInsets(bottom_nav_view) { view, insets, padding ->
+            // padding contains the original padding values after inflation
+            view.updatePadding(
+                bottom = padding.bottom + insets.systemWindowInsetBottom
+            )
+        }
         intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
         presenter.initialise()
     }
@@ -116,6 +118,7 @@ class MainActivity :
 
     override fun onStart() {
         super.onStart()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         presenter.onStart()
         //checkIntent(intent)
         checkForPendingNavigation(null)?.apply { navMapper.map(this) }
