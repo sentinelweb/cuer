@@ -43,15 +43,15 @@ Using
 
 ## screenshots
 ### Playlist
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/playlist-20210413-171849.png">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/playlist-2021-04-13-23.31.47.jpeg">
 
 ### Playlists
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/playlists-20210413-172206.png" >
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/playlists-2021-04-13-23.41.42.jpeg" >
 
 ### Video info
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/info-20210413-172805.png">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/info-2021-04-13-23.33.19.jpeg">
 
 ### Add via Share
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/share-20210413-172659.png" >
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/share-2021-04-13-23.35.07.jpeg" >
 
 

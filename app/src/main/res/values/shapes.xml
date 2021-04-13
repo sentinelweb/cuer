@@ -18,6 +18,7 @@
         <item name="cornerSizeBottomRight">@dimen/player_corner_cut</item>
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>
+
 </resources>
 
 
