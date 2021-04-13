@@ -68,6 +68,4 @@ class PlaylistMapper(
         platform = entity.platform,
         type = entity.type
     )
-
-
 }

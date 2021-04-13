@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -38,27 +39,24 @@ class PlaylistsFragment :
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val log: LogWrapper by inject()
+    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
     private var snackbar: Snackbar? = null
 
     init {
         log.tag(this)
-        log.d("${hashCode()} - init")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        log.d("${hashCode()} - onCreate")
     }
 
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        log.d("${hashCode()} - onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         playlists_toolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
-            //it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
 
         //presenter.initialise()
@@ -73,24 +71,21 @@ class PlaylistsFragment :
     }
 
     override fun onDestroyView() {
-        log.d("${hashCode()} - onDestroyView")
         presenter.destroy()
         super.onDestroyView()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        log.d("${hashCode()} - onCreateOptionsMenu")
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onResume() {
-        log.d("${hashCode()} - onResume")
         super.onResume()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         presenter.onResume()
     }
 
     override fun onPause() {
-        log.d("${hashCode()} - onPause")
         super.onPause()
         presenter.onPause()
     }

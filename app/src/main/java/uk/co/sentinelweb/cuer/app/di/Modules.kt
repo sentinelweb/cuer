@@ -143,7 +143,7 @@ object Modules {
             SharedPrefsWrapper(GeneralPreferences::class, androidApplication(), get())
         }
         factory { ServiceWrapper(androidApplication(), get()) }
-        factory { WindowWrapper() }
+        factory { EdgeToEdgeWrapper() }
     }
 
     private val appNetModule = module {

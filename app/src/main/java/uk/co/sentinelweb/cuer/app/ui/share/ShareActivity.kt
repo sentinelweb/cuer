@@ -9,6 +9,7 @@ import android.os.PersistableBundle
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.button.MaterialButton
@@ -30,8 +31,8 @@ import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.WindowWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
@@ -40,7 +41,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
     private val shareWrapper: ShareWrapper by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
-    private val windowWrapper: WindowWrapper by inject()
+    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navMapper: NavigationMapper by currentScope.inject()
 
     private lateinit var navController: NavController
@@ -60,10 +61,15 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //windowWrapper.setDecorFitsSystemWindows(this, true)
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         setContentView(R.layout.activity_share)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
+        edgeToEdgeWrapper.doOnApplyWindowInsets(share_root) { view, insets, padding ->
+            view.updatePadding(
+                bottom = padding.bottom + insets.systemWindowInsetBottom
+            )
+        }
         // todo fix with https://github.com/sentinelweb/cuer/issues/158
         scanFragment?.listener = this
     }

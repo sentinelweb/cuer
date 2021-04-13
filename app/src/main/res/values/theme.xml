@@ -29,12 +29,14 @@
         <item name="colorSurface">@color/surface</item>
         <item name="android:colorBackground">@color/background</item>
 
-        <item name="android:statusBarColor">?colorPrimaryDark</item>
-        <item name="android:navigationBarColor">?colorPrimaryDark</item>
+        <item name="android:statusBarColor">?attr/colorNavigation</item>
+        <item name="android:navigationBarColor">?attr/colorNavigation</item>
         <item name="android:selectableItemBackground">@drawable/ic_ripple_item_background</item>
         <item name="android:selectableItemBackgroundBorderless">
             @drawable/ic_ripple_item_background_borderless
         </item>
+        <item name="android:actionOverflowButtonStyle">@style/Cuer.AppBar.OverFlow</item>
+
 
         <!-- custom attributes -->
         <item name="colorCheckIcon">@color/green_700</item>
@@ -49,6 +51,7 @@
         <item name="headlineFontLetterSpacing">0.02</item>
         <item name="headlineFontXScaling">1.05</item>
         <item name="textEditBackground">@color/text_edit_background</item>
+        <item name="colorNavigation">@color/nav_bar</item>
 
         <!--        <item name="android:windowActivityTransitions">true</item>--><!-- only for activities -->
         <item name="android:popupMenuStyle">@style/ContextMenu</item>

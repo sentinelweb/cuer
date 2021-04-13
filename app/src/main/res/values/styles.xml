@@ -63,6 +63,17 @@
         <item name="android:textScaleX">?headlineFontXScaling</item>
     </style>
     <!-- end TextAppearance -->
+    <style name="Cuer" />
+
+    <style name="Cuer.AppBar" />
+
+    <style name="Cuer.AppBar.OverFlow">
+        <item name="android:src">@drawable/ic_more_vert_black</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:tint">@color/white</item>
+        <item name="android:elevation">4dp</item>
+    </style>
+
     <!-- Headers =========================== -->
     <style name="Header" />
 
@@ -71,7 +82,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">top|end</item>
-        <item name="android:layout_marginTop">84dp</item>
+        <item name="android:layout_marginTop">48dp</item>
         <item name="android:background">@color/info_text_overlay_background</item>
         <item name="android:padding">4dp</item>
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1

@@ -11,7 +11,7 @@
         android:orderInCategory="275"
         android:title="@string/menu_edit"
         app:iconTint="@color/white"
-        app:showAsAction="always"
+        app:showAsAction="never"
         />
 
     <item
@@ -19,6 +19,7 @@
         android:icon="@drawable/ic_button_unstarred_white"
         android:orderInCategory="300"
         android:title="@string/menu_star"
+        android:visible="false"
         app:iconTint="@color/white"
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction"
@@ -31,7 +32,7 @@
         android:title="@string/menu_filter"
         android:visible="false"
         app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="always"
+        app:showAsAction="never"
         />
 
     <item

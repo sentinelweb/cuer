@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
     <item
-        android:id="@+id/plie_star"
+        android:id="@+id/ple_star"
         android:icon="@drawable/ic_button_unstarred_white"
         android:title="@string/menu_star"
         app:iconTint="@color/menu_button_icon_tint"

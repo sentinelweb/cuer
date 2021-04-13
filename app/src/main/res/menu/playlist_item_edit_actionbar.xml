@@ -11,7 +11,7 @@
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="ifRoom"
         android:visible="false"
-        android:orderInCategory="200"
+        android:orderInCategory="100"
         />
 
     <item
@@ -20,8 +20,8 @@
         android:title="@string/menu_star"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="ifRoom"
-        android:visible="false"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
+        android:visible="true"
         />
 
 </menu>

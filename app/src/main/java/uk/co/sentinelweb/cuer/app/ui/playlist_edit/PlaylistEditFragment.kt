@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
@@ -31,9 +32,10 @@ class PlaylistEditFragment : DialogFragment() {
     private val log: LogWrapper by inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val softKeyboard: SoftKeyboardWrapper by inject()
+    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
     private val starMenuItem: MenuItem
-        get() = pe_toolbar.menu.findItem(R.id.plie_star)
+        get() = pe_toolbar.menu.findItem(R.id.ple_star)
 
     internal var listener: Listener? = null
 
@@ -92,9 +94,11 @@ class PlaylistEditFragment : DialogFragment() {
                     isShow = true
                     // only show the menu items for the non-empty state
                     starMenuItem.isVisible = pe_star_fab.isVisible
+                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
                     starMenuItem.isVisible = false
+                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
             }
         })
@@ -104,6 +108,7 @@ class PlaylistEditFragment : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         (PLAYLIST_ID.getLong(arguments) to (SOURCE.getEnum(arguments) ?: Source.LOCAL)).apply {
             viewModel.setData(first, second)
         }

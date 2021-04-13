@@ -39,6 +39,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -66,6 +67,7 @@ class PlaylistFragment :
     private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
+    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
     // todo consider making binding nulll - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
@@ -120,9 +122,11 @@ class PlaylistFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.playlistToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
-            //it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
         presenter.initialise()
+//        edgeToEdgeWrapper.doOnApplyWindowInsets(binding.playlistToolbar) { view, insets, padding ->
+//            view.updatePadding( top = insets.)
+//        }
         binding.playlistList.layoutManager = LinearLayoutManager(context)
         binding.playlistList.adapter = adapter
         itemTouchHelper.attachToRecyclerView(binding.playlistList)
@@ -146,11 +150,13 @@ class PlaylistFragment :
                     //modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == menuState.lastPlayModeIndex }
                     updatePlayModeMenuItems()
                     playMenuItem?.isVisible = menuState.isPlayable
+                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (menuState.isShow) {
                     menuState.isShow = false
                     //modeMenuItems.forEach { it.isVisible = false }
                     updatePlayModeMenuItems()
                     playMenuItem?.isVisible = false
+                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
             }
         })
@@ -166,7 +172,7 @@ class PlaylistFragment :
 
     private fun updatePlayModeMenuItems() {
         val shouldShow = menuState.isShow && menuState.isPlayable
-        modeMenuItems.forEachIndexed { i, item -> item.isVisible = shouldShow && i == menuState.lastPlayModeIndex }
+        modeMenuItems.forEachIndexed { i, item -> item?.isVisible = (shouldShow && i == menuState.lastPlayModeIndex) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -198,6 +204,7 @@ class PlaylistFragment :
 
     override fun onResume() {
         super.onResume()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         // todo clean up after im sure it works for all cases
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
         ((activity as? NavigationProvider)?.checkForPendingNavigation(PLAYLIST_FRAGMENT)?.apply {
@@ -288,7 +295,7 @@ class PlaylistFragment :
         editMenuItem?.isVisible = model.canEdit
         starMenuItem?.isVisible = model.canEdit
         //playlist_items.setText("${model.items.size}")
-        binding.playlistFlags.isVisible = model.isDefault
+        //binding.playlistFlags.isVisible = model.isDefault
         binding.playlistFabPlaymode.setImageResource(model.loopModeIcon)
         menuState.lastPlayModeIndex = model.loopModeIndex
         menuState.isPlayable = model.canPlay

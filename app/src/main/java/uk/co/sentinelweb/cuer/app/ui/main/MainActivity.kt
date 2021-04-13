@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -26,8 +27,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
+import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.WindowWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class MainActivity :
@@ -42,7 +43,7 @@ class MainActivity :
     private val log: LogWrapper by currentScope.inject()
     private val navMapper: NavigationMapper by currentScope.inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
-    private val windowWrapper: WindowWrapper by inject()
+    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
     private lateinit var navController: NavController
 
@@ -53,12 +54,17 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        //windowWrapper.setDecorFitsSystemWindows(this, true)
-//        navController = findNavController(R.id.nav_host_fragment)
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        // setup nav draw https://developer.android.com/guide/navigation/navigation-ui#add_a_navigation_drawer
         bottom_nav_view.setupWithNavController(navController)
+
+        edgeToEdgeWrapper.doOnApplyWindowInsets(bottom_nav_view) { view, insets, padding ->
+            log.d("Inset change: $insets padding:$padding")
+            view.updatePadding(
+                bottom = padding.bottom + insets.systemWindowInsetBottom
+            )
+        }
         intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
         presenter.initialise()
     }
@@ -75,14 +81,12 @@ class MainActivity :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.paste_add -> startActivity(ShareActivity.intent(this, true))
-            //R.id.restart_conn -> presenter.restartYtCastContext()
             R.id.settings -> navController.navigate(R.id.navigation_settings_root)
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun checkPlayServices() {
-        // can't use CastContext until I'm sure the user has GooglePlayServices
         chromeCastWrapper.checkPlayServices(
             this,
             SERVICES_REQUEST_CODE,
@@ -110,6 +114,7 @@ class MainActivity :
 
     override fun onStart() {
         super.onStart()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         presenter.onStart()
         //checkIntent(intent)
         checkForPendingNavigation(null)?.apply { navMapper.map(this) }
