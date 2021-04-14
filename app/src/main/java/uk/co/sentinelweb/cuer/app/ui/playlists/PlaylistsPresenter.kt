@@ -7,10 +7,10 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPair
-import uk.co.sentinelweb.cuer.app.orchestrator.util.NewMediaPlayistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.RecentItemsPlayistOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -34,8 +34,8 @@ class PlaylistsPresenter(
     private val toastWrapper: ToastWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
     private val coroutines: CoroutineContextProvider,
-    private val newMedia: NewMediaPlayistOrchestrator,
-    private val recentItems: RecentItemsPlayistOrchestrator,
+    private val newMedia: NewMediaPlayistInteractor,
+    private val recentItems: RecentItemsPlayistInteractor,
     private val ytJavaApi: YoutubeJavaApiWrapper
 ) : PlaylistsContract.Presenter {
 
@@ -150,7 +150,11 @@ class PlaylistsPresenter(
             ?: listOf()
 
         state.playlistStats = playlistRepository
-            .loadPlaylistStatList(state.playlists.mapNotNull { it.id }).data
+            .loadPlaylistStatList(state.playlists.mapNotNull { if (it.type != APP) it.id else null })
+            .data
+            ?.toMutableList()
+            ?.apply { add(newMedia.makeNewItemsStats()) }
+            ?.apply { add(recentItems.makeRecentItemsStats()) }
             ?: listOf()
 
         state.playlists

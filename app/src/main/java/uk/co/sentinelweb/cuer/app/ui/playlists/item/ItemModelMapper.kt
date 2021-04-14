@@ -28,6 +28,10 @@ class ItemModelMapper constructor(
         res.getDrawable(R.drawable.ic_baseline_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
+    private val watchDrawable: Drawable by lazy {
+        res.getDrawable(R.drawable.ic_baseline_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+    }
+
     private val _bottomDrawables: MutableMap<Int, Drawable> = mutableMapOf()
 
     private fun bottomDrawable(@DrawableRes id: Int): Drawable {
@@ -55,28 +59,29 @@ class ItemModelMapper constructor(
     }
 
     fun mapBottomText(model: ItemContract.Model): SpannableString {
-        return SpannableString(model.run { "          $newItems / $count" }).apply {
+        val countText = if (model.count > 0) model.run { "$newItems / $count" } else ""
+        return SpannableString("          $countText").apply {
             res.replaceSpannableIcon(
                 this,
-                if (model.starred) starDrawable else unstarDrawable,
+                bottomDrawable(iconMapper.map(model.type, model.platform)),
                 0, 1
             )
 
             res.replaceSpannableIcon(
                 this,
-                bottomDrawable(iconMapper.map(model.loopMode)),
+                if (model.starred) starDrawable else unstarDrawable,
                 2, 3
             )
 
             res.replaceSpannableIcon(
                 this,
-                unwatchDrawable,
+                bottomDrawable(iconMapper.map(model.loopMode)),
                 5, 6
             )
 
             res.replaceSpannableIcon(
                 this,
-                bottomDrawable(iconMapper.map(model.type, model.platform)),
+                if (model.watched) watchDrawable else unwatchDrawable,
                 8, 9
             )
         }

@@ -130,6 +130,16 @@
     <style name="ItemView.Thumb.Row">
         <item name="android:layout_width">100dp</item>
         <item name="android:layout_height">56dp</item>
+        <item name="android:background">@color/surface</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
+        <!--        <item name="android:elevation">4dp</item>-->
+    </style>
+
+    <style name="ItemView.Thumb.InfoText">
+        <item name="android:background">@color/black_transparent_background</item>
+        <item name="android:padding">2dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="ItemView.TopText" parent="@style/TextAppearance.MaterialComponents.Body1">

@@ -65,7 +65,8 @@ interface ItemContract {
         val canPlay: Boolean,
         val canEdit: Boolean,
         val canLaunch: Boolean,
-        val canShare: Boolean
+        val canShare: Boolean,
+        val watched: Boolean
     ) : ItemBaseModel(id)
 
 }
