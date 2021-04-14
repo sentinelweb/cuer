@@ -37,7 +37,8 @@ class PlaylistsModelMapper constructor() {
                     canEdit = pl.config.editable,
                     canPlay = pl.config.playable,
                     canLaunch = pl.type == PLATFORM,
-                    canShare = pl.type == PLATFORM
+                    canShare = pl.type == PLATFORM,
+                    watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false
                 )
             }
         )

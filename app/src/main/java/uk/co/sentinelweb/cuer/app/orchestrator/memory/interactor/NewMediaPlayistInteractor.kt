@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.orchestrator.util
+package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.NewMediaFilter
@@ -6,8 +6,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.C
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
+import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
-class NewMediaPlayistOrchestrator constructor(
+class NewMediaPlayistInteractor constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository
 ) {
     suspend fun getPlaylist(): PlaylistDomain? =
@@ -25,8 +26,15 @@ class NewMediaPlayistOrchestrator constructor(
         title = "New items",
         type = APP,
         currentIndex = -1,
+        starred = true,
         image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-pixabay-40663-600.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(playable = false, editable = false)
+    )
+
+    fun makeNewItemsStats(): PlaylistStatDomain = PlaylistStatDomain(
+        playlistId = NEWITEMS_PLAYLIST,
+        itemCount = -1, // todo log in a background process and save to pref
+        watchedItemCount = 0 // todo log in a background process and save to pref
     )
 
 }
