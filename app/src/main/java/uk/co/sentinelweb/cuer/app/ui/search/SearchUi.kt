@@ -10,10 +10,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.android.material.composethemeadapter.MdcTheme
+import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
 
 @Composable
 fun SearchView(viewModel: SearchViewModel) {
@@ -30,13 +32,19 @@ fun SearchParametersUi(
     textChange: (String) -> Unit,
     submit: () -> Unit
 ) {
-    MdcTheme {
+    CuerTheme {
         Surface {
             Column(
                 modifier = Modifier
-                    .height(300.dp)
-                    .padding(8.dp)
+                    .height(dimensionResource(R.dimen.search_height))
+                    .padding(dimensionResource(R.dimen.page_margin))
             ) {
+                Text(
+                    text = "Search",
+                    style = MaterialTheme.typography.h3,
+//                    fontFamily = Didact
+                )
+                Divider()
                 SearchTextEntryInput(
                     text = searchState.text,
                     textChange = textChange,
@@ -44,7 +52,9 @@ fun SearchParametersUi(
                 )
                 Text(
                     text = searchState.text,
-                    modifier = Modifier.padding(top = 16.dp)
+                    modifier = Modifier.padding(top = 16.dp),
+                    style = MaterialTheme.typography.body1,
+//                    fontFamily = Montserrat
                 )
                 Button(
                     onClick = submit,
@@ -52,7 +62,11 @@ fun SearchParametersUi(
                         .padding(top = 16.dp)
                         .align(Alignment.End)
                 ) {
-                    Text(text = "Search")
+                    Text(
+                        text = "Search",
+                        style = MaterialTheme.typography.button,
+//                        fontFamily = Montserrat
+                    )
                 }
             }
         }
@@ -125,6 +139,7 @@ fun TodoInputText(
             onImeAction()
             keyboardController?.hideSoftwareKeyboard()
         }),
+        textStyle = MaterialTheme.typography.body1,
         modifier = modifier
     )
 }

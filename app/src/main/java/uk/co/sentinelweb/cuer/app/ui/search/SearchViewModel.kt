@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class SearchViewModel(
-    private state: SearchContract.State,
+    state: SearchContract.State,
     private val log: LogWrapper
 ) : ViewModel() {
 
