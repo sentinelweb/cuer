@@ -83,6 +83,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$ver_kotlinx_serialization_runtime"
     implementation "androidx.appcompat:appcompat:$ver_appcompat"
+    implementation "androidx.fragment:fragment-ktx:$ver_fragment_ktx"
     implementation "androidx.core:core:$ver_androidx_core"
     implementation "androidx.core:core-ktx:$ver_androidx_core"
     implementation "androidx.annotation:annotation:$ver_androidx_annotation"
@@ -92,7 +93,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
 
     implementation "androidx.recyclerview:recyclerview:$ver_recyclerview"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$ver_recyclerview"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$ver_swipe_refresh"
 
     implementation "androidx.preference:preference-ktx:$ver_preference"
 
