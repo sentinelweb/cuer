@@ -40,7 +40,6 @@
                 tools:src="@drawable/im_test_nietzche"
                 />
 
-
             <View
                 android:id="@+id/ple_title_bg"
                 android:layout_width="match_parent"

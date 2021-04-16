@@ -14,6 +14,6 @@ class ChipModel constructor(
     }
 
     companion object {
-        val PLAYLIST_SELECT_MODEL = ChipModel(Type.PLAYLIST_SELECT, "")
+        val PLAYLIST_SELECT_MODEL = ChipModel(Type.PLAYLIST_SELECT, "Playlists ...")
     }
 }
