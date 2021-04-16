@@ -28,8 +28,9 @@
     <dimen name="button_elevation">1dp</dimen>
     <dimen name="share_button_width">250dp</dimen>
     <dimen name="pref_icon_size">36dp</dimen>
-    <dimen name="item_corner_cut">16dp</dimen>
-    <dimen name="player_corner_cut">16dp</dimen>
+    <dimen name="small_corner_cut">8dp</dimen>
+    <dimen name="large_corner_cut">24dp</dimen>
+    <dimen name="medium_corner_cut">16dp</dimen>
 
     <dimen name="chip_thumb_icon_size">48dp</dimen>
     <dimen name="app_bar_header_height">200dp</dimen>

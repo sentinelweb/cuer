@@ -174,7 +174,6 @@
         <item name="android:layout_height">56dp</item>
         <item name="android:background">@color/surface</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
-        <!--        <item name="android:elevation">4dp</item>-->
     </style>
 
     <style name="ItemView.Thumb.InfoText">

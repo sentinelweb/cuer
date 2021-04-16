@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
@@ -61,6 +62,7 @@ fun SearchParametersUi(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .align(Alignment.End)
+                        .clip(shape = MaterialTheme.shapes.small)
                 ) {
                     Text(
                         text = "Search",

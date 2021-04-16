@@ -125,6 +125,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_title"
                 tools:text="Commit"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
