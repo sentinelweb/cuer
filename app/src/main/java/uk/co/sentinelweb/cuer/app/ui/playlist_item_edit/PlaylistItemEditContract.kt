@@ -89,7 +89,7 @@ interface PlaylistItemEditContract {
                     SelectDialogCreator((getSource() as Fragment).requireActivity())
                 }
                 scoped {
-                    getSource<Fragment>().requireActivity() as DoneNavigation
+                    getSource<Fragment>().requireActivity()
                 }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
                 scoped { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }

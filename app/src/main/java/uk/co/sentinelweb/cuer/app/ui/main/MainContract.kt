@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.main
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -36,12 +35,6 @@ interface MainContract {
         var playControlsInit: Boolean = false
     ) : ViewModel()
 
-    class MainDoneNavigation(private val navController: NavController) : PlaylistItemEditContract.DoneNavigation {
-        override fun navigateDone() {
-            navController.popBackStack()
-        }
-    }
-
     companion object {
         @JvmStatic
         val activityModule = module {
@@ -66,9 +59,7 @@ interface MainContract {
                 scoped { YoutubeJavaApiWrapper(getSource()) }
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
-                scoped<PlaylistItemEditContract.DoneNavigation> {
-                    MainDoneNavigation(get())
-                }
+                scoped<PlaylistItemEditContract.DoneNavigation> { getSource() }
             }
         }
     }

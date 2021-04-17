@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
@@ -35,7 +36,8 @@ class MainActivity :
     AppCompatActivity(),
     MainContract.View,
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
-    NavigationProvider {
+    NavigationProvider,
+    PlaylistItemEditContract.DoneNavigation {
 
     private val presenter: MainContract.Presenter by currentScope.inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
@@ -173,6 +175,10 @@ class MainActivity :
 
     override fun clearPendingNavigation(target: Target) {
         navMapper.clearArgs(intent, target)
+    }
+
+    override fun navigateDone() {
+        navController.popBackStack()
     }
 
     companion object {
