@@ -16,14 +16,13 @@ class LocalSearchPlayistInteractor constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
 ) {
-    val search: SearchDomain?
-        // todo lazy?
-        get() = prefsWrapper
+    fun search(): SearchDomain? =
+        prefsWrapper
             .getString(GeneralPreferences.LAST_SEARCH, null)
             ?.let { deserialiseSearch(it) }
 
     suspend fun getPlaylist(): PlaylistDomain? =
-        search
+        search()
             ?.let { mapToFilter(it) }
             ?.let {
                 playlistDatabaseRepository
@@ -47,7 +46,7 @@ class LocalSearchPlayistInteractor constructor(
 
     fun makeSearchHeader(): PlaylistDomain = PlaylistDomain(
         id = SEARCH_PLAYLIST,
-        title = "Last Search",// todo build description
+        title = "Search: " + search()?.let { it.text + it.localParams.playlists.let { if (it.isNotEmpty()) " " + it.map { it.title } else "" } },
         type = APP,
         currentIndex = -1,
         starred = true,

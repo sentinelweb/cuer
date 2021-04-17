@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
@@ -15,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_SEARCH
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -36,6 +38,7 @@ class PlaylistsPresenter(
     private val coroutines: CoroutineContextProvider,
     private val newMedia: NewMediaPlayistInteractor,
     private val recentItems: RecentItemsPlayistInteractor,
+    private val searchItems: LocalSearchPlayistInteractor,
     private val ytJavaApi: YoutubeJavaApiWrapper
 ) : PlaylistsContract.Presenter {
 
@@ -147,6 +150,11 @@ class PlaylistsPresenter(
             ?.toMutableList()
             ?.apply { add(0, newMedia.makeNewItemsHeader()) }
             ?.apply { add(1, recentItems.makeRecentItemsHeader()) }
+            ?.apply {
+                if (prefsWrapper.has(LAST_SEARCH)) {
+                    add(2, searchItems.makeSearchHeader())
+                }
+            }
             ?: listOf()
 
         state.playlistStats = playlistRepository
@@ -155,6 +163,11 @@ class PlaylistsPresenter(
             ?.toMutableList()
             ?.apply { add(newMedia.makeNewItemsStats()) }
             ?.apply { add(recentItems.makeRecentItemsStats()) }
+            ?.apply {
+                if (prefsWrapper.has(LAST_SEARCH)) {
+                    add(2, searchItems.makeSearchItemsStats())
+                }
+            }
             ?: listOf()
 
         state.playlists
