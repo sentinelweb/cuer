@@ -1,9 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.View
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -12,13 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.playlists_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.databinding.PlaylistsFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -27,7 +26,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class PlaylistsFragment :
-    Fragment(R.layout.playlists_fragment),
+    Fragment(),
     PlaylistsContract.View,
     ItemContract.Interactions,
     ItemBaseContract.ItemMoveInteractions {
@@ -41,6 +40,12 @@ class PlaylistsFragment :
     private val log: LogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
+    private var _binding: PlaylistsFragmentBinding? = null
+    private val binding get() = _binding!!
+
+    private val searchMenuItem: MenuItem
+        get() = binding.playlistsToolbar.menu.findItem(R.id.playlists_search)
+
     private var snackbar: Snackbar? = null
 
     init {
@@ -52,18 +57,23 @@ class PlaylistsFragment :
         setHasOptionsMenu(true)
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = PlaylistsFragmentBinding.inflate(layoutInflater)
+        return binding.root
+    }
+
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        playlists_toolbar.let {
+        binding.playlistsToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
 
         //presenter.initialise()
-        playlists_list.layoutManager = LinearLayoutManager(context)
-        playlists_list.adapter = adapter
-        itemTouchHelper.attachToRecyclerView(playlists_list)
-        playlists_swipe.setOnRefreshListener { presenter.refreshList() }
+        binding.playlistsList.layoutManager = LinearLayoutManager(context)
+        binding.playlistsList.adapter = adapter
+        itemTouchHelper.attachToRecyclerView(binding.playlistsList)
+        binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
 //        playlist_fab_up.setOnClickListener { presenter.scroll(Up) }
 //        playlist_fab_up.setOnLongClickListener { presenter.scroll(Top);true }
 //        playlist_fab_down.setOnClickListener { presenter.scroll(Down) }
@@ -77,6 +87,12 @@ class PlaylistsFragment :
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.playlists_actionbar, menu)
+        searchMenuItem.setOnMenuItemClickListener {
+            val bottomSheetFragment = SearchBottomSheetFragment()
+            bottomSheetFragment.show(childFragmentManager, "bottomSheetFragment.tag")
+            true
+        }
     }
 
     override fun onResume() {
@@ -96,12 +112,12 @@ class PlaylistsFragment :
         Glide.with(requireContext())
             .loadFirebaseOrOtherUrl(model.imageUrl, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
-            .into(playlists_header_image)
-        playlists_swipe.isRefreshing = false
-        playlists_items.text = "${model.items.size}"
+            .into(binding.playlistsHeaderImage)
+        binding.playlistsSwipe.isRefreshing = false
+        binding.playlistsItems.text = "${model.items.size}"
         adapter.currentPlaylistId = model.currentPlaylistId
         adapter.setData(model.items, animate)
-        playlists_swipe.setOnRefreshListener { presenter.refreshList() }
+        binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
     }
 
     override fun showDeleteUndo(msg: String) {
@@ -130,13 +146,13 @@ class PlaylistsFragment :
     }
 
     override fun scrollToItem(index: Int) {
-        (playlists_list.layoutManager as LinearLayoutManager).run {
+        (binding.playlistsList.layoutManager as LinearLayoutManager).run {
             val useIndex = if (index > 0 && index < adapter.data.size) {
                 index
             } else 0
 
             if (index !in this.findFirstCompletelyVisibleItemPosition()..this.findLastCompletelyVisibleItemPosition()) {
-                playlists_list.scrollToPosition(useIndex)
+                binding.playlistsList.scrollToPosition(useIndex)
             }
         }
     }
