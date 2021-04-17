@@ -68,41 +68,41 @@ fun SearchParametersUi(
                     submit = submit
                 )
                 Column(modifier = Modifier.weight(1f)) {
-                    Row(modifier = Modifier.padding(8.dp)) {
-                        val spacing = Modifier.padding(horizontal = 4.dp)
-                        val text = spacing
-                            .align(Alignment.CenterVertically)
-                        Checkbox(
-                            checked = model.localParams.isWatched,
-                            onCheckedChange = watchedChange,
-                            modifier = spacing
-                        )
-                        Text(
-                            text = "Watched",
-                            style = MaterialTheme.typography.body2,
-                            modifier = text
-                        )
-                        Checkbox(
-                            checked = model.localParams.isNew,
-                            onCheckedChange = newChange,
-                            modifier = spacing
-                        )
-                        Text(
-                            text = "New",
-                            style = MaterialTheme.typography.body2,
-                            modifier = text
-                        )
-                        Checkbox(
-                            checked = model.localParams.isLive,
-                            onCheckedChange = liveChange,
-                            modifier = spacing
-                        )
-                        Text(
-                            text = "Live",
-                            style = MaterialTheme.typography.body2,
-                            modifier = text
-                        )
-                    }
+//                    Row(modifier = Modifier.padding(8.dp)) {
+//                        val spacing = Modifier.padding(horizontal = 4.dp)
+//                        val text = spacing
+//                            .align(Alignment.CenterVertically)
+//                        Checkbox(
+//                            checked = model.localParams.isWatched,
+//                            onCheckedChange = watchedChange,
+//                            modifier = spacing
+//                        )
+//                        Text(
+//                            text = "Watched",
+//                            style = MaterialTheme.typography.body2,
+//                            modifier = text
+//                        )
+//                        Checkbox(
+//                            checked = model.localParams.isNew,
+//                            onCheckedChange = newChange,
+//                            modifier = spacing
+//                        )
+//                        Text(
+//                            text = "New",
+//                            style = MaterialTheme.typography.body2,
+//                            modifier = text
+//                        )
+//                        Checkbox(
+//                            checked = model.localParams.isLive,
+//                            onCheckedChange = liveChange,
+//                            modifier = spacing
+//                        )
+//                        Text(
+//                            text = "Live",
+//                            style = MaterialTheme.typography.body2,
+//                            modifier = text
+//                        )
+//                    }
                     Row(
                         modifier = Modifier
                             .padding(8.dp)

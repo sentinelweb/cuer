@@ -10,67 +10,75 @@ import uk.co.sentinelweb.cuer.domain.serialization.LocalDateTimeSerializer
 import java.time.Instant
 import java.time.LocalDateTime
 
-fun ChannelDomain.serialise() = json.encodeToString(
+fun ChannelDomain.serialise() = domainJsonSerializer.encodeToString(
     ChannelDomain.serializer(), this
 )
 
-fun MediaDomain.serialise() = json.encodeToString(
+fun MediaDomain.serialise() = domainJsonSerializer.encodeToString(
     MediaDomain.serializer(), this
 )
 
-fun List<MediaDomain>.serialiseList() = json.encodeToString(
+fun List<MediaDomain>.serialiseList() = domainJsonSerializer.encodeToString(
     ListSerializer(MediaDomain.serializer()), this
 )
 
-fun PlaylistDomain.serialise() = json.encodeToString(
+fun PlaylistDomain.serialise() = domainJsonSerializer.encodeToString(
     PlaylistDomain.serializer(), this
 )
 
-fun PlaylistDomain.PlaylistConfigDomain.serialise() = json.encodeToString(
+fun PlaylistDomain.PlaylistConfigDomain.serialise() = domainJsonSerializer.encodeToString(
     PlaylistDomain.PlaylistConfigDomain.serializer(), this
 )
 
-fun ImageDomain.serialise() = json.encodeToString(
+fun ImageDomain.serialise() = domainJsonSerializer.encodeToString(
     ImageDomain.serializer(), this
 )
 
-fun PlaylistItemDomain.serialise() = json.encodeToString(
+fun PlaylistItemDomain.serialise() = domainJsonSerializer.encodeToString(
     PlaylistItemDomain.serializer(), this
 )
 
-fun deserialiseChannel(input: String) = json.decodeFromString(
+fun SearchDomain.serialise() = domainJsonSerializer.encodeToString(
+    SearchDomain.serializer(), this
+)
+
+fun deserialiseSearch(input: String) = domainJsonSerializer.decodeFromString(
+    SearchDomain.serializer(), input
+)
+
+fun deserialiseChannel(input: String) = domainJsonSerializer.decodeFromString(
     ChannelDomain.serializer(), input
 )
 
-fun deserialiseMedia(input: String) = json.decodeFromString(
+fun deserialiseMedia(input: String) = domainJsonSerializer.decodeFromString(
     MediaDomain.serializer(), input
 )
 
-fun deserialiseMediaList(input: String) = json.decodeFromString(
+fun deserialiseMediaList(input: String) = domainJsonSerializer.decodeFromString(
     MediaDomain.serializer(), input
 )
 
-fun deserialisePlaylist(input: String) = json.decodeFromString(
+fun deserialisePlaylist(input: String) = domainJsonSerializer.decodeFromString(
     PlaylistDomain.serializer(), input
 )
 
-fun deserialisePlaylistList(input: String) = json.decodeFromString(
+fun deserialisePlaylistList(input: String) = domainJsonSerializer.decodeFromString(
     PlaylistDomain.serializer(), input
 )
 
-fun deserialisePlaylistConfig(input: String) = json.decodeFromString(
+fun deserialisePlaylistConfig(input: String) = domainJsonSerializer.decodeFromString(
     PlaylistDomain.PlaylistConfigDomain.serializer(), input
 )
 
-fun deserialiseImage(input: String) = json.decodeFromString(
+fun deserialiseImage(input: String) = domainJsonSerializer.decodeFromString(
     ImageDomain.serializer(), input
 )
 
-fun deserialisePlaylistItem(input: String) = json.decodeFromString(
+fun deserialisePlaylistItem(input: String) = domainJsonSerializer.decodeFromString(
     PlaylistItemDomain.serializer(), input
 )
 
-private val json = Json {
+val domainJsonSerializer = Json {
     prettyPrint = true
     serializersModule = SerializersModule {
         mapOf(
@@ -78,7 +86,8 @@ private val json = Json {
             PlaylistDomain.PlaylistConfigDomain::class to PlaylistDomain.PlaylistConfigDomain.serializer(),
             PlaylistDomain::class to PlaylistDomain.serializer(),
             ChannelDomain::class to ChannelDomain.serializer(),
-            MediaDomain::class to MediaDomain.serializer()
+            MediaDomain::class to MediaDomain.serializer(),
+            SearchDomain to SearchDomain.serializer()
         )
     }.plus(SerializersModule {
         contextual(Instant::class, InstantSerializer)
@@ -88,3 +97,4 @@ private val json = Json {
     }
     )
 }
+

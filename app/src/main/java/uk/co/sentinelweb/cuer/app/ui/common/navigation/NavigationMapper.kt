@@ -3,11 +3,15 @@ package uk.co.sentinelweb.cuer.app.ui.common.navigation
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.FragmentNavigator
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
@@ -15,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.Co
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -93,3 +98,19 @@ class NavigationMapper constructor(
             }
     }
 }
+
+fun Scope.navigationMapper(isFragment: Boolean, sourceActivity: AppCompatActivity) = NavigationMapper(
+    activity = sourceActivity,
+    toastWrapper = ToastWrapper(sourceActivity),
+    fragment = if (isFragment) (getSource() as Fragment) else null,
+    ytJavaApi = YoutubeJavaApiWrapper(sourceActivity),
+    navController = if (isFragment) {
+        (getSource() as Fragment).findNavController()
+    } else {
+        (getSource<AppCompatActivity>()
+            .supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+            .navController
+    },
+    log = AndroidLogWrapper()
+)

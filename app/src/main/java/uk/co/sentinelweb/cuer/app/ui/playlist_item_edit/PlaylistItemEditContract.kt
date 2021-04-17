@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -13,10 +12,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -82,22 +80,16 @@ interface PlaylistItemEditContract {
                 }
                 scoped { State() }
                 scoped { PlaylistItemEditModelMapper(get(), get(), get(), get()) }
-                scoped {
-                    NavigationMapper(
-                        activity = (getSource() as Fragment).requireActivity(),
-                        toastWrapper = get(),
-                        fragment = (getSource() as Fragment),
-                        ytJavaApi = get(),
-                        navController = (getSource() as Fragment).findNavController(),
-                        log = get()
-                    )
-                }
-                scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
+                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
+                //scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped {
                     ChipCreator((getSource() as Fragment).requireActivity(), get(), get())
                 }
                 scoped {
                     SelectDialogCreator((getSource() as Fragment).requireActivity())
+                }
+                scoped {
+                    getSource<Fragment>().requireActivity() as DoneNavigation
                 }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
                 scoped { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }

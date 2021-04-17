@@ -7,23 +7,23 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 class SearchMapper {
 
     fun map(state: SearchContract.State): SearchContract.Model {
-        val playlistQuantity = if (state.localParams.playlists.size > 0) "(${state.localParams.playlists.size})" else ""
+        val playlistQuantity = if (state.search.localParams.playlists.size > 0) "(${state.search.localParams.playlists.size})" else ""
         return SearchContract.Model(
-            state.text,
-            state.isLocal,
-            state.localParams.let {
+            state.search.text,
+            state.search.isLocal,
+            state.search.localParams.let {
                 SearchContract.LocalModel(
                     isWatched = it.isWatched,
                     isNew = it.isNew,
                     isLive = it.isLive,
                     playlists = listOf(PLAYLIST_SELECT_MODEL.copy(text = "Playlists $playlistQuantity ..."))
-                        .plus(state.localParams.playlists
+                        .plus(state.search.localParams.playlists
                             .map { pl -> ChipModel(type = PLAYLIST, text = pl.title, value = pl.id?.toString()) }
                             .sortedBy { it.text.toLowerCase() }
                         )
                 )
             },
-            state.remoteParams.copy()
+            state.search.remoteParams.copy()
         )
     }
 }

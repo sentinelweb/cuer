@@ -49,6 +49,8 @@ interface OrchestratorContract<Domain> {
     class ChannelPlatformIdFilter(val platformId: String) : Filter
     class NewMediaFilter() : Filter
     class RecentMediaFilter() : Filter
+    class SearchFilter(val text: String, val isWatched: Boolean, val isNew: Boolean, val isLive: Boolean, val playlistIds: List<Long>?) :
+        Filter
 
     class InvalidOperationException(clazz: KClass<out OrchestratorContract<out Any>>, filter: Filter?, options: Options) :
         java.lang.UnsupportedOperationException("class = ${clazz.simpleName} filter = $filter options = $options")

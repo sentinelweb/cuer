@@ -196,8 +196,6 @@ class PlaylistFragment :
             menuState.reloadHeaderAfterMenuInit = false
         }
         searchMenuItem.setOnMenuItemClickListener {
-            log.d("show bottom sheet")
-
             val bottomSheetFragment = SearchBottomSheetFragment()
             bottomSheetFragment.show(childFragmentManager, "bottomSheetFragment.tag")
             true

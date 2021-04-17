@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -16,7 +17,8 @@ import uk.co.sentinelweb.cuer.domain.ext.replaceItemByPlatformId
 class PlaylistMemoryRepository constructor(
     private val coroutines: CoroutineContextProvider,
     private val newItemsInteractor: NewMediaPlayistInteractor,
-    private val recentItemsInteractor: RecentItemsPlayistInteractor
+    private val recentItemsInteractor: RecentItemsPlayistInteractor,
+    private val localSearchInteractor: LocalSearchPlayistInteractor
 ) : MemoryRepository<PlaylistDomain> {
 
     private val data: MutableMap<Long, PlaylistDomain> = mutableMapOf()
@@ -38,6 +40,7 @@ class PlaylistMemoryRepository constructor(
     override suspend fun load(id: Long, options: Options): PlaylistDomain? = when (id) {
         NEWITEMS_PLAYLIST -> newItemsInteractor.getPlaylist()
         RECENT_PLAYLIST -> recentItemsInteractor.getPlaylist()
+        SEARCH_PLAYLIST -> localSearchInteractor.getPlaylist()
         SHARED_PLAYLIST -> data[id]
         else -> throw NotImplementedException("$id is invalid memory playlist")
     }
@@ -163,8 +166,9 @@ class PlaylistMemoryRepository constructor(
     }
 
     companion object {
-        val SHARED_PLAYLIST: Long = -100
-        val NEWITEMS_PLAYLIST: Long = -101
-        val RECENT_PLAYLIST: Long = -102
+        const val SHARED_PLAYLIST: Long = -100
+        const val NEWITEMS_PLAYLIST: Long = -101
+        const val RECENT_PLAYLIST: Long = -102
+        const val SEARCH_PLAYLIST: Long = -103
     }
 }

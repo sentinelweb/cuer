@@ -1,40 +1,26 @@
 package uk.co.sentinelweb.cuer.app.ui.search
 
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.domain.SearchDomain
 
 interface SearchContract {
 
     data class State(
-        var text: String = "",
-        var isLocal: Boolean = true,
-        var localParams: LocalParms = LocalParms(),
-        var remoteParams: RemoteParms = RemoteParms()
-    )
-
-    data class LocalParms(
-        val isWatched: Boolean = true,
-        val isNew: Boolean = true,
-        val isLive: Boolean = false,
-        val playlists: MutableSet<PlaylistDomain> = mutableSetOf()
-    )
-
-    data class RemoteParms(
-        val platform: PlatformDomain = PlatformDomain.YOUTUBE,
-        val relatedToPlatformId: String? = null,
-        val channelPlatformId: String? = null,
-        val isLive: Boolean? = null
+        var search: SearchDomain = SearchDomain()
     )
 
     data class Model(
         val text: String = "",
         val isLocal: Boolean = true,
         val localParams: LocalModel = LocalModel(),
-        val remoteParams: RemoteParms = RemoteParms()
+        val remoteParams: SearchDomain.RemoteParms = SearchDomain.RemoteParms()
     )
 
     data class LocalModel(
@@ -53,12 +39,13 @@ interface SearchContract {
                     SearchViewModel(
                         state = get(),
                         log = get(),
-                        mapper = get()
+                        mapper = get(),
+                        prefsWrapper = get(named<GeneralPreferences>()),
                     )
                 }
                 scoped { State() }
                 scoped { SearchMapper() }
-
+                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
             }
         }
 

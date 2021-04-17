@@ -43,6 +43,7 @@ interface PlaylistItemDao {
     @Query("SELECT count() FROM playlist_item WHERE playlist_id ==:playlistId")
     suspend fun countItems(playlistId: Long): Int
 
+    // todo try select distinct on plylist field (have to add te field explicitly)
     @Transaction
     @Query("SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 0 and media.id=playlist_item.media_id order by playlist_item.date_added desc LIMIT :limit")
     suspend fun loadAllPlaylistItemsWithNewMedia(limit: Int): List<PlaylistItemAndMediaAndChannel>
@@ -51,4 +52,11 @@ interface PlaylistItemDao {
     @Query("SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 1 and media.id = playlist_item.media_id and media.date_last_played != 'null' order by media.date_last_played desc LIMIT :limit")
     suspend fun loadAllPlaylistItemsRecent(limit: Int): List<PlaylistItemAndMediaAndChannel>
 
+    @Transaction
+    @Query("SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),:text) and media.id = playlist_item.media_id order by media.date_last_played desc LIMIT :limit")
+    suspend fun search(text: String, limit: Int): List<PlaylistItemAndMediaAndChannel>
+
+    @Transaction
+    @Query("SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),:text) and playlist_item.playlist_id IN (:playlistIds) and media.id = playlist_item.media_id order by media.date_last_played desc LIMIT :limit")
+    suspend fun search(text: String, playlistIds: List<Long>, limit: Int): List<PlaylistItemAndMediaAndChannel>
 }

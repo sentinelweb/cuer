@@ -11,12 +11,15 @@ import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentSearchBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 
 class SearchBottomSheetFragment : BottomSheetDialogFragment() {
 
     private val viewModel: SearchViewModel by currentScope.inject()
+    private val navMapper: NavigationMapper by currentScope.inject()
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
@@ -38,6 +41,7 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeDialog()
+        observeNavigation()
     }
 
     override fun onStop() {
@@ -57,6 +61,18 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
                             dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
                         }
                         else -> Unit
+                    }
+                }
+            }
+        )
+    }
+
+    private fun observeNavigation() {
+        viewModel.getNavigationObservable().observe(this.viewLifecycleOwner,
+            object : Observer<NavigationModel> {
+                override fun onChanged(nav: NavigationModel) {
+                    when (nav.target) {
+                        else -> navMapper.map(nav)
                     }
                 }
             }
