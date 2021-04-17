@@ -10,6 +10,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentSearchBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 
@@ -50,7 +51,7 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
                 override fun onChanged(model: DialogModel) {
                     hideDialogFragment()
                     when (model.type) {
-                        DialogModel.Type.PLAYLIST_FULL -> {
+                        PLAYLIST_FULL -> {
                             dialogFragment =
                                 PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
                             dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)

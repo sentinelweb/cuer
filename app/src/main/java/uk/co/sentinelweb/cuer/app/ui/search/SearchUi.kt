@@ -135,7 +135,7 @@ fun Chip(model: ChipModel, onClick: (ChipModel) -> Unit) {
     Button(
         onClick = { onClick(model) },
         modifier = Modifier
-            .padding(4.dp)
+            .padding(2.dp)
             .clip(shape = MaterialTheme.shapes.small)
 //            .background(colorResource(id = R.color.grey_400))
     ) {
@@ -144,7 +144,7 @@ fun Chip(model: ChipModel, onClick: (ChipModel) -> Unit) {
                 imageVector = Icons.Default.Clear,
                 tint = MaterialTheme.colors.onPrimary,
                 contentDescription = stringResource(id = R.string.clear),
-                modifier = Modifier
+                modifier = Modifier.size(16.dp)
             )
         }
         Text(
