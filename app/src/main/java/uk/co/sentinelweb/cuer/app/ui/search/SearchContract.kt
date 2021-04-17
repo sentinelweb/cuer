@@ -20,7 +20,7 @@ interface SearchContract {
         val isWatched: Boolean = true,
         val isNew: Boolean = true,
         val isLive: Boolean = false,
-        val playlists: MutableList<PlaylistDomain> = mutableListOf()
+        val playlists: MutableSet<PlaylistDomain> = mutableSetOf()
     )
 
     data class RemoteParms(

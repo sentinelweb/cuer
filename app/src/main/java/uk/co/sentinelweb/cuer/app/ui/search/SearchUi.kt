@@ -36,7 +36,7 @@ fun SearchView(viewModel: SearchViewModel) {
         watchedChange = viewModel::onWatchedClick,
         newChange = viewModel::onNewClick,
         liveChange = viewModel::onLiveClick,
-        playlistSelect = viewModel::onPlaylistSelect,
+        playlistSelect = viewModel::onPlaylistSelect
     )
 }
 
@@ -137,6 +137,7 @@ fun Chip(model: ChipModel, onClick: (ChipModel) -> Unit) {
         modifier = Modifier
             .padding(4.dp)
             .clip(shape = MaterialTheme.shapes.small)
+//            .background(colorResource(id = R.color.grey_400))
     ) {
         if (model.type != ChipModel.Type.PLAYLIST_SELECT) {
             Icon(

@@ -208,7 +208,7 @@ class PlaylistPresenter(
                         },
                         confirm = { },
                         dismiss = { view.resetItemsState() },
-                        state.selectedPlaylistItem?.media
+                        suggestionsMedia = state.selectedPlaylistItem?.media,
                     )
                 )
             }

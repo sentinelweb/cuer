@@ -67,7 +67,7 @@ class PlaylistsDialogPresenter(
 
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
-            .let { modelMapper.map(it, null, false) }
+            .let { modelMapper.map(it, null, false, state.config.showAdd) }
             .takeIf { coroutines.mainScopeActive }
             ?.also { view.setList(it, animate) }
 

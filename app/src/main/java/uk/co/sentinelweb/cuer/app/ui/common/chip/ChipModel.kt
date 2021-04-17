@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.common.chip
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 
 
-class ChipModel constructor(
+data class ChipModel constructor(
     val type: Type,
     val text: String,
     val value: String? = null,
