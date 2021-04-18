@@ -9,9 +9,8 @@ enum class GeneralPreferences constructor(
     LAST_PLAYLIST_ADDED_TO("lastPlaylistAddedTo"),
     SKIP_FWD_TIME("skipFwdTime"),
     SKIP_BACK_TIME("skipBackTime"),
-    YT_LIVE_STREAM_VIDEO_ID("ytLiveStreamId"),
-    YT_LIVE_STREAM_VIDEO_START_POSITION("ytLiveStreamStartPos"),
     LIVE_DURATION_DURATION("liveDuration"),
     LIVE_DURATION_TIME("liveDurationTime"),
-    LIVE_DURATION_ID("liveDurationId")
+    LIVE_DURATION_ID("liveDurationId"),
+    LAST_SEARCH("lastSearch")
 }

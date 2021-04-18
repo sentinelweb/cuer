@@ -109,6 +109,13 @@
     <string name="dialog_message_save_check">Do you want to save the item?</string>
     <string name="dialog_button_save">Save</string>
 
+    <!-- search -->
+    <string name="search_title">Search</string>
+    <string name="search_local">Local</string>
+    <string name="search_remote">Remote</string>
+    <string name="search_watched">Watched</string>
+    <string name="search_live">Live</string>
+
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -118,6 +125,7 @@
     <string name="chip_select">Select &#8230;</string>
     <string name="live">LIVE</string>
     <string name="upcoming">Upcoming</string>
+    <string name="clear">Clear</string>
 
     <string name="new_items_below">New Items v</string>
     <string name="dialog_button_dont_save">Don\'t save</string>

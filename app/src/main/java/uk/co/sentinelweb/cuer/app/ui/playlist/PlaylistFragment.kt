@@ -34,6 +34,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
@@ -50,6 +51,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+
 
 class PlaylistFragment :
     Fragment(),
@@ -83,6 +85,8 @@ class PlaylistFragment :
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_new)
     private val filterMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_filter)
+    private val searchMenuItem: MenuItem
+        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_search)
     private val modeMenuItems: List<MenuItem>
         get() = listOf( // same order as the enum in PlaylistDomain
             binding.playlistToolbar.menu.findItem(R.id.playlist_mode_single),
@@ -168,6 +172,7 @@ class PlaylistFragment :
         binding.playlistList.doOnPreDraw {
             startPostponedEnterTransition()
         }
+
     }
 
     private fun updatePlayModeMenuItems() {
@@ -189,6 +194,11 @@ class PlaylistFragment :
         if (menuState.reloadHeaderAfterMenuInit) {
             presenter.reloadHeader()
             menuState.reloadHeaderAfterMenuInit = false
+        }
+        searchMenuItem.setOnMenuItemClickListener {
+            val bottomSheetFragment = SearchBottomSheetFragment()
+            bottomSheetFragment.show(childFragmentManager, "bottomSheetFragment.tag")
+            true
         }
     }
 

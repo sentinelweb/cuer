@@ -67,13 +67,13 @@ class PlaylistItemEditViewModel constructor(
 
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
     private val _modelLiveData: MutableLiveData<PlaylistItemEditContract.Model> = MutableLiveData()
-    private val _selectModelLiveData: MutableLiveData<DialogModel> = MutableLiveData()
+    private val _dialogModelLiveData: MutableLiveData<DialogModel> = MutableLiveData()
     private val _navigateLiveData: MutableLiveData<NavigationModel> = MutableLiveData()
 
     fun getUiObservable(): LiveData<UiEvent> = _uiLiveData
     fun getModelObservable(): LiveData<PlaylistItemEditContract.Model> = _modelLiveData
     fun getNavigationObservable(): LiveData<NavigationModel> = _navigateLiveData
-    fun getDialogObservable(): LiveData<DialogModel> = _selectModelLiveData
+    fun getDialogObservable(): LiveData<DialogModel> = _dialogModelLiveData
 
     private val isNew: Boolean
         get() = state.editingPlaylistItem?.id == null
@@ -182,7 +182,7 @@ class PlaylistItemEditViewModel constructor(
                 }
             }
             if (!ytContextHolder.isConnected()) {
-                _selectModelLiveData.value = DialogModel(DialogModel.Type.SELECT_ROUTE, R.string.select_route_dialog_title)
+                _dialogModelLiveData.value = DialogModel(DialogModel.Type.SELECT_ROUTE, R.string.select_route_dialog_title)
             }
         } ?: run { toast.show("Please save the item first ...") }
 
@@ -211,14 +211,15 @@ class PlaylistItemEditViewModel constructor(
     }
 
     fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
-        _selectModelLiveData.value =
+        _dialogModelLiveData.value =
             PlaylistsDialogContract.Config(
                 state.selectedPlaylists,
                 true,
                 this@PlaylistItemEditViewModel::onPlaylistSelected,
                 { },
                 this@PlaylistItemEditViewModel::onPlaylistDialogClose,
-                state.media
+                state.media,
+                showAdd = true
             )
     }
 
@@ -234,32 +235,15 @@ class PlaylistItemEditViewModel constructor(
             }
             ?.also { update() }
             ?: apply {
-                _selectModelLiveData.value =
+                _dialogModelLiveData.value =
                     DialogModel(PLAYLIST_ADD, R.string.create_playlist_dialog_title)
             }
     }
-
-//    fun onPlaylistSelected(index: Int, checked: Boolean) {
-//        state.isPlaylistsChanged = true
-//        if (index < state.allPlaylists.size) {
-//            state.allPlaylists.get(index).apply {
-//                if (checked) {
-//                    this.id?.let { state.selectedPlaylists.add(it) }
-//                } else {
-//                    this.id?.let { state.selectedPlaylists.remove(it) }
-//                }
-//            }.also { update() }
-//        } else {
-//            _selectModelLiveData.value =
-//                DialogModel(PLAYLIST_ADD, R.string.create_playlist_dialog_title)
-//        }
-//    }
 
     fun onPlaylistCreated(domain: PlaylistDomain) {
         viewModelScope.launch {
             state.isPlaylistsChanged = true
             state.selectedPlaylists.add(domain)
-            //playlistDialogModelCreator.loadPlaylists { state.allPlaylists = it }
             update()
         }
     }
@@ -293,7 +277,7 @@ class PlaylistItemEditViewModel constructor(
     fun checkToSave() {
         if (!state.isSaved && (state.isMediaChanged || state.isPlaylistsChanged)) {
             if (isNew) {
-                _selectModelLiveData.value = modelMapper.mapSaveConfirmAlert({
+                _dialogModelLiveData.value = modelMapper.mapSaveConfirmAlert({
                     viewModelScope.launch {
                         commitPlaylistItems()
                         _navigateLiveData.value = NavigationModel(NAV_DONE)

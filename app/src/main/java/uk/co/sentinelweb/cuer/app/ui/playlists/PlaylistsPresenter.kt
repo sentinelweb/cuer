@@ -7,6 +7,8 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
@@ -15,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_SEARCH
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -36,6 +39,7 @@ class PlaylistsPresenter(
     private val coroutines: CoroutineContextProvider,
     private val newMedia: NewMediaPlayistInteractor,
     private val recentItems: RecentItemsPlayistInteractor,
+    private val searchItems: LocalSearchPlayistInteractor,
     private val ytJavaApi: YoutubeJavaApiWrapper
 ) : PlaylistsContract.Presenter {
 
@@ -63,21 +67,32 @@ class PlaylistsPresenter(
             delay(400)
             state.playlists.apply {
                 find { it.id == item.id }
-                    ?.takeIf { it.type != APP }
                     ?.let { playlist ->
-                        state.deletedPlaylist = playlist.id
-                            ?.let { playlistRepository.load(it, flat = false) }
-                            ?.takeIf { it.isSuccessful }
-                            ?.data
-                            ?.apply {
-                                playlistRepository.delete(playlist, emit = true)
-                                view.showDeleteUndo("Deleted playlist: ${playlist.title}")
-                                executeRefresh(false, false)
-                            }
-                            ?: let {
-                                view.showMessage("Cannot load playlist backup")
-                                null
-                            }
+                        if (playlist.type != APP) {
+                            state.deletedPlaylist = playlist.id
+                                ?.let { playlistRepository.load(it, flat = false) }
+                                ?.takeIf { it.isSuccessful }
+                                ?.data
+                                ?.apply {
+                                    playlistRepository.delete(playlist, emit = true)
+                                    view.showUndo("Deleted playlist: ${playlist.title}", this@PlaylistsPresenter::undoDelete)
+                                    executeRefresh(false, false)
+                                }
+                                ?: let {
+                                    view.showMessage("Cannot load playlist backup")
+                                    null
+                                }
+                        } else if (playlist.id == SEARCH_PLAYLIST) {
+                            val lastSearch = prefsWrapper.getString(LAST_SEARCH, null)
+                            prefsWrapper.remove(LAST_SEARCH)
+                            view.showUndo("Deleted last search", {
+                                prefsWrapper.putString(LAST_SEARCH, lastSearch!!)
+                                state.viewModelScope.launch {
+                                    executeRefresh(false, false)
+                                }
+                            })
+                            executeRefresh(false, false)
+                        }
                     } ?: let { view.showMessage("Cannot delete playlist") }
             }
         }
@@ -147,6 +162,11 @@ class PlaylistsPresenter(
             ?.toMutableList()
             ?.apply { add(0, newMedia.makeNewItemsHeader()) }
             ?.apply { add(1, recentItems.makeRecentItemsHeader()) }
+            ?.apply {
+                if (prefsWrapper.has(LAST_SEARCH)) {
+                    add(2, searchItems.makeSearchHeader())
+                }
+            }
             ?: listOf()
 
         state.playlistStats = playlistRepository
@@ -155,11 +175,16 @@ class PlaylistsPresenter(
             ?.toMutableList()
             ?.apply { add(newMedia.makeNewItemsStats()) }
             ?.apply { add(recentItems.makeRecentItemsStats()) }
+            ?.apply {
+                if (prefsWrapper.has(LAST_SEARCH)) {
+                    add(2, searchItems.makeSearchItemsStats())
+                }
+            }
             ?: listOf()
 
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
-            .let { modelMapper.map(it, queue.playlistId, true) }
+            .let { modelMapper.map(it, queue.playlistId, true, false) }
             .takeIf { coroutines.mainScopeActive }
             ?.also { view.setList(it, animate) }
             ?.takeIf { focusCurrent }

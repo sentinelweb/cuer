@@ -13,9 +13,10 @@ import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaCommitOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaCommitOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
@@ -32,6 +33,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
@@ -75,7 +77,8 @@ object Modules {
         PlaylistEditContract.fragmentModule,
         YoutubeCastServiceModule.serviceModule,
         PrefBackupContract.fragmentModule,
-        PrefRootContract.fragmentModule
+        PrefRootContract.fragmentModule,
+        SearchContract.fragmentModule
     )
 
     private val uiModule = module {
@@ -90,12 +93,13 @@ object Modules {
         single { MediaOrchestrator(get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
         single { PlaylistStatsOrchestrator(get()) }
-        single { PlaylistMemoryRepository(get(), get(), get()) }
+        single { PlaylistMemoryRepository(get(), get(), get(), get()) }
         single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get()) }
         factory { PlaylistMediaCommitOrchestrator(get()) }
         factory { NewMediaPlayistInteractor(get()) }
         factory { RecentItemsPlayistInteractor(get()) }
+        factory { LocalSearchPlayistInteractor(get(), get(named<GeneralPreferences>())) }
     }
 
     private val utilModule = module {

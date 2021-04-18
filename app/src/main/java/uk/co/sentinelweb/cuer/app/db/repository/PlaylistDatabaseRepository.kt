@@ -383,6 +383,12 @@ class PlaylistDatabaseRepository constructor(
                     is RecentMediaFilter ->
                         playlistItemDao.loadAllPlaylistItemsRecent(200)
                             .map { playlistItemMapper.map(it) }
+                    is SearchFilter ->
+                        if (filter.playlistIds.isNullOrEmpty()) {
+                            playlistItemDao.search(filter.text.toLowerCase(), 200)
+                        } else {
+                            playlistItemDao.search(filter.text.toLowerCase(), filter.playlistIds, 200)
+                        }.map { playlistItemMapper.map(it) }
                     else -> playlistItemDao.loadAllItems()
                         .map { playlistItemMapper.map(it, mediaDao.load(it.mediaId)!!) }
                 }.let { RepoResult.Data(it) }

@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.common.chip
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 
 
-class ChipModel constructor(
+data class ChipModel constructor(
     val type: Type,
     val text: String,
     val value: String? = null,
@@ -14,6 +14,6 @@ class ChipModel constructor(
     }
 
     companion object {
-        val PLAYLIST_SELECT_MODEL = ChipModel(Type.PLAYLIST_SELECT, "")
+        val PLAYLIST_SELECT_MODEL = ChipModel(Type.PLAYLIST_SELECT, "Playlists ...")
     }
 }

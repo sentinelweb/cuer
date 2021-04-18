@@ -14,11 +14,13 @@ class PlaylistsModelMapper constructor() {
     fun map(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         current: OrchestratorContract.Identifier<*>?,
-        showOverflow: Boolean
+        showOverflow: Boolean,
+        showAdd: Boolean
     ): PlaylistsContract.Model =
         PlaylistsContract.Model(
             DEFAULT_HEADER_IMAGE,
             current,
+            showAdd,
             domains.keys.mapIndexed { index, pl ->
                 ItemContract.Model(
                     pl.id!!,
@@ -36,6 +38,7 @@ class PlaylistsModelMapper constructor() {
                     source = if (pl.type == APP) MEMORY else LOCAL,
                     canEdit = pl.config.editable,
                     canPlay = pl.config.playable,
+                    canDelete = pl.config.deletable,
                     canLaunch = pl.type == PLATFORM,
                     canShare = pl.type == PLATFORM,
                     watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false

@@ -143,7 +143,8 @@ class PlaylistPresenterTest {
             mode = PlaylistDomain.PlaylistModeDomain.SINGLE,
             items = fixture.buildCollection<PlaylistItemDomain, List<PlaylistItemDomain>>(10)
                 .map { it.copy(id = idCounter, order = idCounter * 1000, playlistId = fixtCurrentPlaylist.id) })
-        fixtCurrentPlaylistMapped = fixture.build<PlaylistContract.Model>().copy(items = fixture.buildCollection(10))
+        fixtCurrentPlaylistMapped = fixture.build<PlaylistContract.Model>()
+            .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(10))
         fixtCurrentIdentifier = Identifier(fixtCurrentPlaylist.id!!, fixtCurrentSource)
         coEvery {
             mockPlaylistOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id, Options(fixtCurrentIdentifier.source, flat = false))
@@ -158,7 +159,8 @@ class PlaylistPresenterTest {
                 items = fixture.buildCollection(12)
             )
         fixtNextIdentifier = Identifier(fixtNextPlaylist.id!!, fixtNextSource)
-        fixtNextPlaylistMapped = fixture.build<PlaylistContract.Model>().copy(items = fixture.buildCollection(12))
+        fixtNextPlaylistMapped = fixture.build<PlaylistContract.Model>()
+            .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(12))
         coEvery {
             mockPlaylistOrchestrator.getPlaylistOrDefault(fixtNextIdentifier.id, Options(fixtNextIdentifier.source, flat = false))
         } returns (fixtNextPlaylist to fixtNextSource)
@@ -204,8 +206,8 @@ class PlaylistPresenterTest {
             mockChromeCastWrapper,
             mockYtJavaApi,
             mockShareWrapper,
-            mockPrefsWrapper,
             playlistMutator,
+            mockPrefsWrapper,
             log,
             mockTimeProvider,
             coroutines,

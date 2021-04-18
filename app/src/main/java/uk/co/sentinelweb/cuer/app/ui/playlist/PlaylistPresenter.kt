@@ -59,8 +59,8 @@ class PlaylistPresenter(
     private val chromeCastWrapper: ChromeCastWrapper,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val shareWrapper: ShareWrapper,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
     private val playlistMutator: PlaylistMutator,
+    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
     private val log: LogWrapper,
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider,
@@ -208,7 +208,7 @@ class PlaylistPresenter(
                         },
                         confirm = { },
                         dismiss = { view.resetItemsState() },
-                        state.selectedPlaylistItem?.media
+                        suggestionsMedia = state.selectedPlaylistItem?.media,
                     )
                 )
             }

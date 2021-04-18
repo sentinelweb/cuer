@@ -49,7 +49,7 @@ interface PlaylistsContract {
         fun scrollToItem(index: Int)
 
         //fun scrollTo(direction: ScrollDirection)
-        fun showDeleteUndo(msg: String)
+        fun showUndo(msg: String, undo: () -> Unit)
         fun gotoPlaylist(id: Long, play: Boolean, source: Source)
         fun gotoEdit(id: Long, source: Source)
         fun showMessage(msg: String)
@@ -68,6 +68,7 @@ interface PlaylistsContract {
     data class Model(
         val imageUrl: String = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         val currentPlaylistId: Identifier<*>?, // todo non null?
+        val showAdd: Boolean = true,
         val items: List<ItemContract.Model>
     )
 
@@ -90,6 +91,7 @@ interface PlaylistsContract {
                         coroutines = get(),
                         newMedia = get(),
                         recentItems = get(),
+                        searchItems = get(),
                         ytJavaApi = get()
                     )
                 }

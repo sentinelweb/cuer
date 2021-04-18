@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -81,6 +82,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     override fun setList(model: PlaylistsContract.Model, animate: Boolean) {
         pdf_swipe.isRefreshing = false
         adapter.currentPlaylistId = model.currentPlaylistId
+        pdf_add_button.isVisible = model.showAdd
         adapter.setData(model.items, animate)
     }
     //endregion

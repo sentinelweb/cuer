@@ -40,13 +40,14 @@ interface PlaylistsDialogContract {
         fun dismiss()
     }
 
-    data class Config constructor(
+    data class Config(
         val selectedPlaylists: Set<PlaylistDomain>,
         val multi: Boolean,
         val itemClick: (PlaylistDomain?, Boolean) -> Unit,
         val confirm: (() -> Unit)?,
         val dismiss: () -> Unit,
-        val suggestionsMedia: MediaDomain? = null
+        val suggestionsMedia: MediaDomain? = null,
+        val showAdd: Boolean = true
     ) : DialogModel(Type.PLAYLIST_FULL, R.string.playlist_dialog_title)
 
     data class State(
