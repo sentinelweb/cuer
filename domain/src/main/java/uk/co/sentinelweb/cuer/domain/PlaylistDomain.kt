@@ -46,7 +46,8 @@ data class PlaylistDomain constructor(
         val updateInterval: Long? = null,
         val description: String? = null,
         val playable: Boolean = true,
-        val editable: Boolean = true
+        val editable: Boolean = true,
+        val deletable: Boolean = true
     )
 }
 

@@ -38,6 +38,7 @@ class PlaylistsModelMapper constructor() {
                     source = if (pl.type == APP) MEMORY else LOCAL,
                     canEdit = pl.config.editable,
                     canPlay = pl.config.playable,
+                    canDelete = pl.config.deletable,
                     canLaunch = pl.type == PLATFORM,
                     canShare = pl.type == PLATFORM,
                     watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false

@@ -64,6 +64,7 @@ interface ItemContract {
         val source: OrchestratorContract.Source,
         val canPlay: Boolean,
         val canEdit: Boolean,
+        val canDelete: Boolean,
         val canLaunch: Boolean,
         val canShare: Boolean,
         val watched: Boolean

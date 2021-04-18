@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -55,7 +54,7 @@ interface MainContract {
                         .supportFragmentManager
                         .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).playerControls
                 }
-                scoped { navigationMapper(false, getSource<AppCompatActivity>()) }
+                scoped { navigationMapper(false, getSource()) }
                 scoped { YoutubeJavaApiWrapper(getSource()) }
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }

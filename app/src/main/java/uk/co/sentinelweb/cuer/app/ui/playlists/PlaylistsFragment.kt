@@ -120,10 +120,10 @@ class PlaylistsFragment :
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
     }
 
-    override fun showDeleteUndo(msg: String) {
+    override fun showUndo(msg: String, undo: () -> Unit) {
         snackbar?.dismiss()
         snackbar = snackbarWrapper.make(msg, length = Snackbar.LENGTH_LONG, actionText = "UNDO") {
-            presenter.undoDelete()
+            undo()
             snackbar?.dismiss()
         }
         snackbar?.show()

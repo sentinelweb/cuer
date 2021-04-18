@@ -49,7 +49,7 @@ interface PlaylistsContract {
         fun scrollToItem(index: Int)
 
         //fun scrollTo(direction: ScrollDirection)
-        fun showDeleteUndo(msg: String)
+        fun showUndo(msg: String, undo: () -> Unit)
         fun gotoPlaylist(id: Long, play: Boolean, source: Source)
         fun gotoEdit(id: Long, source: Source)
         fun showMessage(msg: String)
