@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_SEARCH
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_LOCAL_SEARCH
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -32,7 +32,7 @@ class SearchViewModel(
 
     init {
         state.search = prefsWrapper
-            .getString(LAST_SEARCH, null)
+            .getString(LAST_LOCAL_SEARCH, null)
             ?.let { deserialiseSearch(it) }
             ?: SearchDomain()
     }
@@ -46,7 +46,7 @@ class SearchViewModel(
     fun getNavigationObservable(): LiveData<NavigationModel> = _navigateLiveData
 
     fun onSearchTextChange(text: String) {
-        state.search.text = text
+        state.search.localParams.text = text
         model = mapper.map(state)
     }
 
@@ -66,16 +66,16 @@ class SearchViewModel(
     }
 
     fun onSubmit() {
-        prefsWrapper.putString(LAST_SEARCH, state.search.serialise())
+        prefsWrapper.putString(LAST_LOCAL_SEARCH, state.search.serialise())
         _navigateLiveData.value = NavigationModel(
             NavigationModel.Target.PLAYLIST_FRAGMENT,
             mapOf(
-                NavigationModel.Param.PLAYLIST_ID to PlaylistMemoryRepository.SEARCH_PLAYLIST,
+                NavigationModel.Param.PLAYLIST_ID to PlaylistMemoryRepository.LOCAL_SEARCH_PLAYLIST,
                 NavigationModel.Param.PLAY_NOW to false,
                 NavigationModel.Param.SOURCE to OrchestratorContract.Source.MEMORY
             )
         )
-        log.d("Execute search ... ${state.search.text}")
+        log.d("Execute search ... ${state.search.localParams.text}")
     }
 
     fun onPlaylistSelect(@Suppress("UNUSED_PARAMETER") chipModel: ChipModel) {

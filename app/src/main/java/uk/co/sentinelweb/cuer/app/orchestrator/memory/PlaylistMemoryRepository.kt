@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -18,7 +19,8 @@ class PlaylistMemoryRepository constructor(
     private val coroutines: CoroutineContextProvider,
     private val newItemsInteractor: NewMediaPlayistInteractor,
     private val recentItemsInteractor: RecentItemsPlayistInteractor,
-    private val localSearchInteractor: LocalSearchPlayistInteractor
+    private val localSearchInteractor: LocalSearchPlayistInteractor,
+    private val remoteSearchInteractor: RemoteSearchPlayistInteractor
 ) : MemoryRepository<PlaylistDomain> {
 
     private val data: MutableMap<Long, PlaylistDomain> = mutableMapOf()
@@ -40,7 +42,8 @@ class PlaylistMemoryRepository constructor(
     override suspend fun load(id: Long, options: Options): PlaylistDomain? = when (id) {
         NEWITEMS_PLAYLIST -> newItemsInteractor.getPlaylist()
         RECENT_PLAYLIST -> recentItemsInteractor.getPlaylist()
-        SEARCH_PLAYLIST -> localSearchInteractor.getPlaylist()
+        LOCAL_SEARCH_PLAYLIST -> localSearchInteractor.getPlaylist()
+        REMOTE_SEARCH_PLAYLIST -> remoteSearchInteractor.getPlaylist()
         SHARED_PLAYLIST -> data[id]
         else -> throw NotImplementedException("$id is invalid memory playlist")
     }
@@ -169,6 +172,7 @@ class PlaylistMemoryRepository constructor(
         const val SHARED_PLAYLIST: Long = -100
         const val NEWITEMS_PLAYLIST: Long = -101
         const val RECENT_PLAYLIST: Long = -102
-        const val SEARCH_PLAYLIST: Long = -103
+        const val LOCAL_SEARCH_PLAYLIST: Long = -103
+        const val REMOTE_SEARCH_PLAYLIST: Long = -104
     }
 }

@@ -7,17 +7,18 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_SEARCH
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_LOCAL_SEARCH
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -39,7 +40,8 @@ class PlaylistsPresenter(
     private val coroutines: CoroutineContextProvider,
     private val newMedia: NewMediaPlayistInteractor,
     private val recentItems: RecentItemsPlayistInteractor,
-    private val searchItems: LocalSearchPlayistInteractor,
+    private val localSearch: LocalSearchPlayistInteractor,
+    private val remoteSearch: RemoteSearchPlayistInteractor,
     private val ytJavaApi: YoutubeJavaApiWrapper
 ) : PlaylistsContract.Presenter {
 
@@ -82,11 +84,11 @@ class PlaylistsPresenter(
                                     view.showMessage("Cannot load playlist backup")
                                     null
                                 }
-                        } else if (playlist.id == SEARCH_PLAYLIST) {
-                            val lastSearch = prefsWrapper.getString(LAST_SEARCH, null)
-                            prefsWrapper.remove(LAST_SEARCH)
+                        } else if (playlist.id == LOCAL_SEARCH_PLAYLIST) {
+                            val lastSearch = prefsWrapper.getString(LAST_LOCAL_SEARCH, null)
+                            prefsWrapper.remove(LAST_LOCAL_SEARCH)
                             view.showUndo("Deleted last search", {
-                                prefsWrapper.putString(LAST_SEARCH, lastSearch!!)
+                                prefsWrapper.putString(LAST_LOCAL_SEARCH, lastSearch!!)
                                 state.viewModelScope.launch {
                                     executeRefresh(false, false)
                                 }
@@ -163,8 +165,13 @@ class PlaylistsPresenter(
             ?.apply { add(0, newMedia.makeNewItemsHeader()) }
             ?.apply { add(1, recentItems.makeRecentItemsHeader()) }
             ?.apply {
-                if (prefsWrapper.has(LAST_SEARCH)) {
-                    add(2, searchItems.makeSearchHeader())
+                if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
+                    add(2, localSearch.makeSearchHeader())
+                }
+            }
+            ?.apply {
+                if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {// todo remote
+                    add(2, remoteSearch.makeSearchHeader())
                 }
             }
             ?: listOf()
@@ -176,8 +183,13 @@ class PlaylistsPresenter(
             ?.apply { add(newMedia.makeNewItemsStats()) }
             ?.apply { add(recentItems.makeRecentItemsStats()) }
             ?.apply {
-                if (prefsWrapper.has(LAST_SEARCH)) {
-                    add(2, searchItems.makeSearchItemsStats())
+                if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
+                    add(2, localSearch.makeSearchItemsStats())
+                }
+            }
+            ?.apply {
+                if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {// todo remote
+                    add(2, remoteSearch.makeSearchItemsStats())
                 }
             }
             ?: listOf()

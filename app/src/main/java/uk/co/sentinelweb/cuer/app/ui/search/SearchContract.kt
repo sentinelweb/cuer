@@ -8,6 +8,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.SearchDomain
 
 interface SearchContract {
@@ -17,17 +18,24 @@ interface SearchContract {
     )
 
     data class Model(
-        val text: String = "",
-        val isLocal: Boolean = true,
-        val localParams: LocalModel = LocalModel(),
-        val remoteParams: SearchDomain.RemoteParms = SearchDomain.RemoteParms()
+        val text: String,
+        val isLocal: Boolean,
+        val localParams: LocalModel,
+        val remoteParams: RemoteModel
     )
 
     data class LocalModel(
-        val isWatched: Boolean = true,
-        val isNew: Boolean = true,
-        val isLive: Boolean = false,
-        val playlists: List<ChipModel> = mutableListOf()
+        val isWatched: Boolean,
+        val isNew: Boolean,
+        val isLive: Boolean,
+        val playlists: List<ChipModel>
+    )
+
+    data class RemoteModel(
+        val platform: PlatformDomain,
+        val relatedToPlatformId: String?,
+        val channelPlatformId: String?,
+        val isLive: Boolean?
     )
 
 

@@ -91,7 +91,8 @@ interface PlaylistsContract {
                         coroutines = get(),
                         newMedia = get(),
                         recentItems = get(),
-                        searchItems = get(),
+                        localSearch = get(),
+                        remoteSearch = get(),
                         ytJavaApi = get()
                     )
                 }

@@ -2,8 +2,9 @@ package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_LOCAL_SEARCH
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -12,13 +13,13 @@ import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.SearchDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearch
 
-class LocalSearchPlayistInteractor constructor(
+class RemoteSearchPlayistInteractor constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
 ) {
     fun search(): SearchDomain? =
         prefsWrapper
-            .getString(GeneralPreferences.LAST_LOCAL_SEARCH, null)
+            .getString(LAST_LOCAL_SEARCH, null)
             ?.let { deserialiseSearch(it) }
 
     suspend fun getPlaylist(): PlaylistDomain? =
@@ -45,26 +46,25 @@ class LocalSearchPlayistInteractor constructor(
     )
 
     fun makeSearchHeader(): PlaylistDomain = PlaylistDomain(
-        id = LOCAL_SEARCH_PLAYLIST,
+        id = REMOTE_SEARCH_PLAYLIST,
         title = mapTitle(),
         type = APP,
         currentIndex = -1,
         starred = true,
-        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-noelle-otto-906055.jpg"),
+        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/telescope-122960_640.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(playable = false, editable = false)
     )
 
     private fun mapTitle() =
-        "Local Search: " +
+        "Remote Search: " +
                 search()?.let {
                     it.localParams.text + it.localParams.playlists.let {
                         if (it.isNotEmpty()) " " + it.map { it.title } else ""
                     }
                 }
 
-
     fun makeSearchItemsStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = LOCAL_SEARCH_PLAYLIST,
+        playlistId = REMOTE_SEARCH_PLAYLIST,
         itemCount = -1,
         watchedItemCount = -1
     )

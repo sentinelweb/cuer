@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaCommitOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -93,13 +94,14 @@ object Modules {
         single { MediaOrchestrator(get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
         single { PlaylistStatsOrchestrator(get()) }
-        single { PlaylistMemoryRepository(get(), get(), get(), get()) }
+        single { PlaylistMemoryRepository(get(), get(), get(), get(), get()) }
         single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get()) }
         factory { PlaylistMediaCommitOrchestrator(get()) }
         factory { NewMediaPlayistInteractor(get()) }
         factory { RecentItemsPlayistInteractor(get()) }
         factory { LocalSearchPlayistInteractor(get(), get(named<GeneralPreferences>())) }
+        factory { RemoteSearchPlayistInteractor(get(), get(named<GeneralPreferences>())) }
     }
 
     private val utilModule = module {

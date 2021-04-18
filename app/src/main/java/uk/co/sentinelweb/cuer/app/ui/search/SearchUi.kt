@@ -26,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
 @Composable
 fun SearchView(viewModel: SearchViewModel) {
@@ -254,13 +255,23 @@ fun TodoInputText(
 fun PreviewSearchParametersUi() {
     SearchParametersUi(SearchContract.Model(
         text = "philosophy",
+        isLocal = true,
         localParams = SearchContract.LocalModel(
+            isWatched = false,
+            isLive = false,
+            isNew = false,
             playlists = listOf(
                 PLAYLIST_SELECT_MODEL,
                 ChipModel(PLAYLIST, "philosophy"),
                 ChipModel(PLAYLIST, "music"),
                 ChipModel(PLAYLIST, "doco"),
             )
+        ),
+        remoteParams = SearchContract.RemoteModel(
+            platform = PlatformDomain.YOUTUBE,
+            isLive = false,
+            channelPlatformId = null,
+            relatedToPlatformId = null
         )
     ), {}, {}, {}, {}, {}, {})
 }
