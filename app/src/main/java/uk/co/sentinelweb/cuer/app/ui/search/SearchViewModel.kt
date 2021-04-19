@@ -16,11 +16,14 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_LOCAL_SEARCH
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_REMOTE_SEARCH
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.SearchDomain
-import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearch
+import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
+import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class SearchViewModel(
@@ -31,10 +34,14 @@ class SearchViewModel(
 ) : ViewModel() {
 
     init {
-        state.search = prefsWrapper
+        state.local = prefsWrapper
             .getString(LAST_LOCAL_SEARCH, null)
-            ?.let { deserialiseSearch(it) }
-            ?: SearchDomain()
+            ?.let { deserialiseSearchLocal(it) }
+            ?: SearchLocalDomain()
+        state.remote = prefsWrapper
+            .getString(LAST_REMOTE_SEARCH, null)
+            ?.let { deserialiseSearchRemote(it) }
+            ?: SearchRemoteDomain()
     }
 
     var model: SearchContract.Model by mutableStateOf(mapper.map(state))
@@ -46,27 +53,27 @@ class SearchViewModel(
     fun getNavigationObservable(): LiveData<NavigationModel> = _navigateLiveData
 
     fun onSearchTextChange(text: String) {
-        state.search.localParams.text = text
+        state.local.text = text
         model = mapper.map(state)
     }
 
     fun onWatchedClick(isWatched: Boolean) {
-        state.search.localParams = state.search.localParams.copy(isWatched = isWatched)
+        state.local = state.local.copy(isWatched = isWatched)
         model = mapper.map(state)
     }
 
     fun onNewClick(isNew: Boolean) {
-        state.search.localParams = state.search.localParams.copy(isNew = isNew)
+        state.local = state.local.copy(isNew = isNew)
         model = mapper.map(state)
     }
 
     fun onLiveClick(isLive: Boolean) {
-        state.search.localParams = state.search.localParams.copy(isLive = isLive)
+        state.local = state.local.copy(isLive = isLive)
         model = mapper.map(state)
     }
 
     fun onSubmit() {
-        prefsWrapper.putString(LAST_LOCAL_SEARCH, state.search.serialise())
+        prefsWrapper.putString(LAST_LOCAL_SEARCH, state.local.serialise())
         _navigateLiveData.value = NavigationModel(
             NavigationModel.Target.PLAYLIST_FRAGMENT,
             mapOf(
@@ -75,14 +82,14 @@ class SearchViewModel(
                 NavigationModel.Param.SOURCE to OrchestratorContract.Source.MEMORY
             )
         )
-        log.d("Execute search ... ${state.search.localParams.text}")
+        log.d("Execute search ... ${state.local.text}")
     }
 
     fun onPlaylistSelect(@Suppress("UNUSED_PARAMETER") chipModel: ChipModel) {
         if (chipModel.type == PLAYLIST_SELECT) {
             _dialogModelLiveData.value =
                 PlaylistsDialogContract.Config(
-                    state.search.localParams.playlists,
+                    state.local.playlists,
                     true,
                     this@SearchViewModel::onPlaylistSelected,
                     { },
@@ -90,7 +97,7 @@ class SearchViewModel(
                     showAdd = false
                 )
         } else if (chipModel.type == PLAYLIST) {
-            state.search.localParams.playlists
+            state.local.playlists
                 .removeIf { it.id == chipModel.value?.toLong() }
                 .also { model = mapper.map(state) }
         }
@@ -100,9 +107,9 @@ class SearchViewModel(
         playlist
             ?.apply {
                 if (checked) {
-                    state.search.localParams.playlists.add(this)
+                    state.local.playlists.add(this)
                 } else {
-                    state.search.localParams.playlists.remove(this)
+                    state.local.playlists.remove(this)
                 }
             }
             ?.also { model = mapper.map(state) }

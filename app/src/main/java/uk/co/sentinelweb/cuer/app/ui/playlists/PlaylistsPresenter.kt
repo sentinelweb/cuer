@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.C
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistInteractor
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -41,7 +41,7 @@ class PlaylistsPresenter(
     private val newMedia: NewMediaPlayistInteractor,
     private val recentItems: RecentItemsPlayistInteractor,
     private val localSearch: LocalSearchPlayistInteractor,
-    private val remoteSearch: RemoteSearchPlayistInteractor,
+    private val remoteSearch: RemoteSearchPlayistOrchestrator,
     private val ytJavaApi: YoutubeJavaApiWrapper
 ) : PlaylistsContract.Presenter {
 
@@ -157,33 +157,35 @@ class PlaylistsPresenter(
     }
 
     private suspend fun executeRefresh(focusCurrent: Boolean, animate: Boolean = true) {
-        state.playlists = playlistRepository.loadList(null)
-            .takeIf { it.isSuccessful }
-            ?.data
-            ?.sortedWith(compareBy({ !it.starred }, { it.title.toLowerCase() }))
-            ?.toMutableList()
-            ?.apply { add(0, newMedia.makeNewItemsHeader()) }
-            ?.apply { add(1, recentItems.makeRecentItemsHeader()) }
-            ?.apply {
-                if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
-                    add(2, localSearch.makeSearchHeader())
+        try {
+            state.playlists = playlistRepository.loadList(null)
+                .takeIf { it.isSuccessful }
+                ?.data
+                ?.sortedWith(compareBy({ !it.starred }, { it.title.toLowerCase() }))
+                ?.toMutableList()
+                ?.apply { add(0, newMedia.makeNewItemsHeader()) }
+                ?.apply { add(1, recentItems.makeRecentItemsHeader()) }
+                ?.apply {
+                    if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
+                        add(2, localSearch.makeSearchHeader())
+                    }
                 }
-            }
-            ?.apply {
-                if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {// todo remote
-                    add(2, remoteSearch.makeSearchHeader())
+                ?.apply {
+                    if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {// todo remote
+                        add(2, remoteSearch.makeSearchHeader())
+                    }
                 }
-            }
-            ?: listOf()
+                ?: listOf()
 
-        state.playlistStats = playlistRepository
-            .loadPlaylistStatList(state.playlists.mapNotNull { if (it.type != APP) it.id else null })
-            .data
-            ?.toMutableList()
-            ?.apply { add(newMedia.makeNewItemsStats()) }
-            ?.apply { add(recentItems.makeRecentItemsStats()) }
-            ?.apply {
-                if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
+
+            state.playlistStats = playlistRepository
+                .loadPlaylistStatList(state.playlists.mapNotNull { if (it.type != APP) it.id else null })
+                .data
+                ?.toMutableList()
+                ?.apply { add(newMedia.makeNewItemsStats()) }
+                ?.apply { add(recentItems.makeRecentItemsStats()) }
+                ?.apply {
+                    if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
                     add(2, localSearch.makeSearchItemsStats())
                 }
             }
@@ -207,6 +209,11 @@ class PlaylistsPresenter(
                         ?.let { focusId -> view.scrollToItem(indexOf(find { it.id == focusId.id })) }
                 }
             }
+        } catch (e: Exception) {
+            log.e("Load failed", e)
+            view.showMessage("Load failed: ${e::class.java.simpleName}")
+            view.hideRefresh()
+        }
     }
 
     override fun onResume() {

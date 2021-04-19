@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.core.mappers
 
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -28,6 +29,8 @@ class TimeStampMapper constructor(
     }
 
     fun mapTimestamp(date: LocalDateTime) = timeStampFormatter.format(date)
+
+    fun mapTimestamp(date: Instant) = timeStampFormatter.format(date)
 
     fun mapDuration(duration: String) = try {
         Duration.parse(duration).toMillis()

@@ -47,6 +47,7 @@ interface PlaylistsContract {
     interface View {
         fun setList(model: Model, animate: Boolean = true)
         fun scrollToItem(index: Int)
+        fun hideRefresh()
 
         //fun scrollTo(direction: ScrollDirection)
         fun showUndo(msg: String, undo: () -> Unit)

@@ -74,7 +74,7 @@ class ScanPresenter(
             }
 
     private suspend fun checkPlaylist(uriString: String, scannedPlaylist: PlaylistDomain): ScanContract.Result? {
-        try {
+        try {// todo make orchestrator
             return (scannedPlaylist.platformId
                 ?.let {
                     playlistOrchestrator.load(it, Options(LOCAL))

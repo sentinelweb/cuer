@@ -38,12 +38,20 @@ fun PlaylistItemDomain.serialise() = domainJsonSerializer.encodeToString(
     PlaylistItemDomain.serializer(), this
 )
 
-fun SearchDomain.serialise() = domainJsonSerializer.encodeToString(
-    SearchDomain.serializer(), this
+fun SearchLocalDomain.serialise() = domainJsonSerializer.encodeToString(
+    SearchLocalDomain.serializer(), this
 )
 
-fun deserialiseSearch(input: String) = domainJsonSerializer.decodeFromString(
-    SearchDomain.serializer(), input
+fun deserialiseSearchLocal(input: String) = domainJsonSerializer.decodeFromString(
+    SearchLocalDomain.serializer(), input
+)
+
+fun SearchRemoteDomain.serialise() = domainJsonSerializer.encodeToString(
+    SearchRemoteDomain.serializer(), this
+)
+
+fun deserialiseSearchRemote(input: String) = domainJsonSerializer.decodeFromString(
+    SearchRemoteDomain.serializer(), input
 )
 
 fun deserialiseChannel(input: String) = domainJsonSerializer.decodeFromString(
@@ -87,7 +95,8 @@ val domainJsonSerializer = Json {
             PlaylistDomain::class to PlaylistDomain.serializer(),
             ChannelDomain::class to ChannelDomain.serializer(),
             MediaDomain::class to MediaDomain.serializer(),
-            SearchDomain to SearchDomain.serializer()
+            SearchRemoteDomain to SearchRemoteDomain.serializer(),
+            SearchLocalDomain to SearchLocalDomain.serializer(),
         )
     }.plus(SerializersModule {
         contextual(Instant::class, InstantSerializer)

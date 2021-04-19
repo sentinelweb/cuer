@@ -7,10 +7,7 @@ import uk.co.sentinelweb.cuer.net.retrofit.RetrofitBuilder
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubeRetrofitInteractor
-import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeChannelDomainMapper
-import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeImageMapper
-import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubePlaylistDomainMapper
-import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainMapper
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.*
 
 object NetModule {
 
@@ -27,12 +24,14 @@ object NetModule {
                 coContext = get(),
                 errorMapper = get(),
                 connectivity = get(),
-                playlistMapper = get()
+                playlistMapper = get(),
+                searchMapper = get()
             )
         }
         factory { YoutubeVideoMediaDomainMapper(get(), get()) }
         factory { YoutubeChannelDomainMapper(get(), get()) }
         factory { YoutubePlaylistDomainMapper(get(), get(), get(), get()) }
+        factory { YoutubeSearchMapper(get(), get(), get(), get(), get()) }
         factory { YoutubeImageMapper() }
         factory { ErrorMapper(log = get()) }
     }

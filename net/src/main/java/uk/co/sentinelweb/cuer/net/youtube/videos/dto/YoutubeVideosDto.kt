@@ -3,20 +3,20 @@ package uk.co.sentinelweb.cuer.net.youtube.videos.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class YoutubeVideosDto constructor(
+internal data class YoutubeVideosDto constructor(
     val items: List<VideoDto>,
     val nextPageToken: String?,
     val prevPageToken: String?,
     val pageInfo: PageInfoDto
 ) {
     @Serializable
-    data class VideoDto constructor(
+    internal data class VideoDto constructor(
         val id: String,
         val snippet: SnippetDto, // optional field (declared as part)
         val contentDetails: ContentDto? = null// optional field (declared as part)
     ) {
         @Serializable
-        data class SnippetDto constructor(
+        internal data class SnippetDto constructor(
             val title: String,
             val description: String,
             val channelId: String,
@@ -28,19 +28,19 @@ data class YoutubeVideosDto constructor(
         )
 
         @Serializable
-        data class ContentDto constructor(
+        internal data class ContentDto constructor(
             val duration: String,
             val definition: String
         )
     }
 
     @Serializable
-    data class PageInfoDto constructor(
+    internal data class PageInfoDto constructor(
         val totalResults: Int,
         val resultsPerPage: Int
     )
 
-    companion object {
+    internal companion object {
         val LIVE = "live"
         val UPCOMING = "upcoming"
     }

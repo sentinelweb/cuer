@@ -559,6 +559,8 @@ class PlaylistPresenter(
                 .also { updateView(animate) }
         } catch (e: Throwable) {
             log.e("Error loading playlist", e)
+            view.showError("Load failed: ${e::class.java.simpleName}")
+            view.hideRefresh()
         }
     }
 

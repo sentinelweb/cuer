@@ -9,12 +9,15 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
-import uk.co.sentinelweb.cuer.domain.SearchDomain
+import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
+import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 
 interface SearchContract {
 
     data class State(
-        var search: SearchDomain = SearchDomain()
+        var isLocal: Boolean = true,
+        var local: SearchLocalDomain = SearchLocalDomain(),
+        var remote: SearchRemoteDomain = SearchRemoteDomain()
     )
 
     data class Model(

@@ -4,7 +4,7 @@ import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.ThumbnailDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.ThumbnailsDto
 
-class YoutubeImageMapper {
+internal class YoutubeImageMapper {
     fun mapThumb(thumbnails: ThumbnailsDto) =
         map(thumbnails
             .let { thumbnailsDto -> thumbnailsDto.medium ?: thumbnailsDto.default })

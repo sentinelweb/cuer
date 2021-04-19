@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.exception.InvalidPartsException
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
@@ -17,15 +18,16 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeService.Companion.MAX_RESULTS
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.CONTENT_DETAILS
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.SNIPPET
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
+import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubePlaylistDto.Companion.MAX_PLAYLIST_ITEMS
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubePlaylistItemDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeChannelDomainMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubePlaylistDomainMapper
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeSearchMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainMapper
 
 /**
  * Youtube interactor implementation
- * todo search
  * todo categories : https://www.googleapis.com/youtube/v3/videoCategories?regionCode=uk&key=
  */
 internal class YoutubeRetrofitInteractor constructor(
@@ -34,6 +36,7 @@ internal class YoutubeRetrofitInteractor constructor(
     private val videoMapper: YoutubeVideoMediaDomainMapper,
     private val channelMapper: YoutubeChannelDomainMapper,
     private val playlistMapper: YoutubePlaylistDomainMapper,
+    private val searchMapper: YoutubeSearchMapper,
     private val coContext: CoroutineContextProvider,
     private val errorMapper: ErrorMapper,
     private val connectivity: ConnectivityWrapper
@@ -206,7 +209,47 @@ internal class YoutubeRetrofitInteractor constructor(
             }
         }
 
-    companion object {
-        private val MAX_PLAYLIST_ITEMS = 1000
-    }
+    override suspend fun search(search: SearchRemoteDomain): NetResult<PlaylistDomain> =
+        withContext(coContext.IO) {
+            try {
+                if (connectivity.isConnected()) {
+                    searchMapper.mapRequest(search)
+                        .let {
+                            service.search(
+                                q = it.q,
+                                type = it.type,
+                                relatedToVideoId = it.relatedToVideoId,
+                                channelId = it.channelId,
+                                publishedBefore = it.publishedBefore,
+                                publishedAfter = it.publishedAfter,
+                                order = it.order,
+                                eventType = it.eventType,
+                                maxResults = it.maxResults,
+                                pageToken = null,
+                                key = keyProvider.key
+                            )
+                        }
+                        .let { searchResult ->
+                            searchResult to searchResult.items.map { it.snippet.channelId }
+                                .distinct()
+                                .chunked(MAX_RESULTS)
+                                .let {
+                                    service.getChannelInfos(
+                                        ids = it.joinToString(separator = ","),
+                                        parts = listOf(SNIPPET).map { it.part }
+                                            .joinToString(separator = ","),
+                                        key = keyProvider.key
+                                    )
+                                }.items
+                        }
+                        .let { searchMapper.map(it.first, it.second) }
+                        .let { NetResult.Data(it) }
+                } else {
+                    errorMapper.notConnected<PlaylistDomain>()
+                }
+            } catch (ex: Throwable) {
+                errorMapper.map<PlaylistDomain>(ex, "search: error: ${search.text}")
+            }
+        }
+
 }
