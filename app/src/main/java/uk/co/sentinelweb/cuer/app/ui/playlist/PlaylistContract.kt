@@ -143,7 +143,7 @@ interface PlaylistContract {
                         timeProvider = get(),
                         coroutines = get(),
                         res = get(),
-                        playlistMediaCommitOrchestrator = get(),
+                        playlistMediaLookupOrchestrator = get(),
                         playlistUpdateOrchestrator = get()
                     )
                 }

@@ -7,7 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
@@ -53,7 +54,16 @@ class SearchViewModel(
     fun getNavigationObservable(): LiveData<NavigationModel> = _navigateLiveData
 
     fun onSearchTextChange(text: String) {
-        state.local.text = text
+        if (state.isLocal) {
+            state.local.text = text
+        } else {
+            state.remote.text = text
+        }
+        model = mapper.map(state)
+    }
+
+    fun switchLocalOrRemote() {
+        state.isLocal = !state.isLocal
         model = mapper.map(state)
     }
 
@@ -73,11 +83,15 @@ class SearchViewModel(
     }
 
     fun onSubmit() {
-        prefsWrapper.putString(LAST_LOCAL_SEARCH, state.local.serialise())
+        if (state.isLocal) {
+            prefsWrapper.putString(LAST_LOCAL_SEARCH, state.local.serialise())
+        } else {
+            prefsWrapper.putString(LAST_REMOTE_SEARCH, state.remote.serialise())
+        }
         _navigateLiveData.value = NavigationModel(
             NavigationModel.Target.PLAYLIST_FRAGMENT,
             mapOf(
-                NavigationModel.Param.PLAYLIST_ID to PlaylistMemoryRepository.LOCAL_SEARCH_PLAYLIST,
+                NavigationModel.Param.PLAYLIST_ID to if (state.isLocal) LOCAL_SEARCH_PLAYLIST else REMOTE_SEARCH_PLAYLIST,
                 NavigationModel.Param.PLAY_NOW to false,
                 NavigationModel.Param.SOURCE to OrchestratorContract.Source.MEMORY
             )

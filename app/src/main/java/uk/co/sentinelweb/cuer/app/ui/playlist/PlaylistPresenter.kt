@@ -17,7 +17,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaCommitOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -48,7 +48,7 @@ class PlaylistPresenter(
     private val view: PlaylistContract.View,
     private val state: PlaylistContract.State,
     private val mediaOrchestrator: MediaOrchestrator,
-    private val playlistMediaCommitOrchestrator: PlaylistMediaCommitOrchestrator,
+    private val playlistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val playlistUpdateOrchestrator: PlaylistUpdateOrchestrator,
@@ -517,7 +517,7 @@ class PlaylistPresenter(
     override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit) {
         if (state.playlistIdentifier.source == MEMORY) {
             state.playlist
-                ?.let { playlistMediaCommitOrchestrator.commitMediaAndReplace(it, LOCAL) }
+                ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it, LOCAL) }
                 ?.let { it.copy(items = it.items.map { it.copy(id = null) }, config = it.config.copy(playable = true)) }
                 ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
                 ?.also { state.playlistIdentifier = it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure") }

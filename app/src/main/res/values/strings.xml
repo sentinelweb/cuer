@@ -113,6 +113,7 @@
     <string name="search_title">Search</string>
     <string name="search_local">Local</string>
     <string name="search_remote">Remote</string>
+    <string name="search_youtube">YouTube</string>
     <string name="search_watched">Watched</string>
     <string name="search_live">Live</string>
 

@@ -75,13 +75,13 @@ internal class YoutubeSearchMapper(
             description = it.snippet.description,
             mediaType = MediaDomain.MediaTypeDomain.VIDEO,
             platform = PlatformDomain.YOUTUBE,
-            platformId = it.id.videoId ?: throw BadDataException("No video ID"),
+            platformId = it.id.videoId,
             duration = -1,
             thumbNail = imageMapper.mapThumb(it.snippet.thumbnails),
             image = imageMapper.mapImage(it.snippet.thumbnails),
             channelData = channelLookup[it.snippet.channelId] ?: throw BadDataException("Channel not found"),
             published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) },
-            isLiveBroadcast = (EVENT_TYPE_MAP[it.snippet.liveBroadcastContent] != COMPLETED),
+            isLiveBroadcast = !(listOf(COMPLETED, NONE).contains(EVENT_TYPE_MAP[it.snippet.liveBroadcastContent])),
             isLiveBroadcastUpcoming = (EVENT_TYPE_MAP[it.snippet.liveBroadcastContent] == UPCOMING)
         )
     }

@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaCommitOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -12,7 +12,7 @@ class PlaylistUpdateOrchestrator constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
-    private val playlistMediaCommitOrchestrator: PlaylistMediaCommitOrchestrator,
+    private val playlistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator,
     private val timeProvider: TimeProvider,
     private val updateChecker: UpdateCheck = PlatformUpdateCheck()
 ) {
@@ -27,7 +27,7 @@ class PlaylistUpdateOrchestrator constructor(
                         .load(this, Options(Source.PLATFORM, flat = false))
                         ?.let { removeExistingItems(it, p) }
                         ?.takeIf { it.items.size > 0 }
-                        ?.let { playlistMediaCommitOrchestrator.commitMediaAndReplace(it, LOCAL) }
+                        ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it, LOCAL) }
                         ?.let { playlistItemOrchestrator.save(it.items, Options(LOCAL, flat = false)) }
                 }
                 else -> Unit

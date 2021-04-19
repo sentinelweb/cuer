@@ -85,7 +85,7 @@ class PlaylistModelMapper constructor(
             isUpcoming = item.media.isLiveBroadcastUpcoming,
             infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media),
             canEdit = editable,
-            playlistName = playlists?.get(item.playlistId!!)?.title
+            playlistName = playlists?.get(item.playlistId)?.title
         )
     }
 

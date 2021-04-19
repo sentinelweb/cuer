@@ -33,6 +33,7 @@ fun SearchView(viewModel: SearchViewModel) {
     SearchParametersUi(
         model = viewModel.model,
         textChange = viewModel::onSearchTextChange,
+        localOrRemoteChange = viewModel::switchLocalOrRemote,
         submit = viewModel::onSubmit,
         watchedChange = viewModel::onWatchedClick,
         newChange = viewModel::onNewClick,
@@ -42,15 +43,21 @@ fun SearchView(viewModel: SearchViewModel) {
 }
 
 @Composable
+fun stringLocalOrRemote(local: Boolean) =
+    stringResource(if (local) R.string.search_local else R.string.search_youtube)
+
+@Composable
 fun SearchParametersUi(
     model: SearchContract.Model,
     textChange: (String) -> Unit,
+    localOrRemoteChange: () -> Unit,
     watchedChange: (Boolean) -> Unit,
     newChange: (Boolean) -> Unit,
     liveChange: (Boolean) -> Unit,
     playlistSelect: (ChipModel) -> Unit,
     submit: () -> Unit
 ) {
+
     CuerTheme {
         Surface {
             Column(
@@ -58,17 +65,67 @@ fun SearchParametersUi(
                     .height(dimensionResource(R.dimen.search_height))
                     .padding(dimensionResource(R.dimen.page_margin))
             ) {
-                Text(
-                    text = stringResource(id = R.string.search_title),
-                    style = MaterialTheme.typography.h4
-                )
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringLocalOrRemote(model.isLocal) + " " + stringResource(id = R.string.search_title),
+                        style = MaterialTheme.typography.h4
+                    )
+                    Button(
+                        onClick = localOrRemoteChange,
+                        modifier = Modifier
+                            .padding(2.dp)
+                            .align(Alignment.TopEnd)
+                            .clip(shape = MaterialTheme.shapes.small)
+                    ) {
+                        Text(
+                            text = stringLocalOrRemote(!model.isLocal),
+                            style = MaterialTheme.typography.button
+                        )
+                    }
+                }
                 Divider()
                 SearchTextEntryInput(
                     text = model.text,
                     textChange = textChange,
                     submit = submit
                 )
-                Column(modifier = Modifier.weight(1f)) {
+                val modifier = Modifier.weight(1f)
+                if (model.isLocal) {
+                    SearchLocal(modifier, model, playlistSelect)
+                } else {
+                    SearchRemote(modifier)
+                }
+                Button(
+                    onClick = submit,
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .align(Alignment.End)
+                        .clip(shape = MaterialTheme.shapes.small)
+                ) {
+                    Text(
+                        text = "Search",
+                        style = MaterialTheme.typography.button
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchRemote(modifier: Modifier) {
+    Column(modifier = modifier) {
+
+    }
+}
+
+@Composable
+private fun SearchLocal(
+    modifier: Modifier,
+    model: SearchContract.Model,
+    playlistSelect: (ChipModel) -> Unit
+) {
+    Column(modifier = modifier) {
 //                    Row(modifier = Modifier.padding(8.dp)) {
 //                        val spacing = Modifier.padding(horizontal = 4.dp)
 //                        val text = spacing
@@ -104,28 +161,13 @@ fun SearchParametersUi(
 //                            modifier = text
 //                        )
 //                    }
-                    Row(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .horizontalScroll(rememberScrollState())
-                    ) {
-                        model.localParams.playlists.forEach {
-                            Chip(model = it, onClick = playlistSelect)
-                        }
-                    }
-                }
-                Button(
-                    onClick = submit,
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .align(Alignment.End)
-                        .clip(shape = MaterialTheme.shapes.small)
-                ) {
-                    Text(
-                        text = "Search",
-                        style = MaterialTheme.typography.button
-                    )
-                }
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .horizontalScroll(rememberScrollState())
+        ) {
+            model.localParams.playlists.forEach {
+                Chip(model = it, onClick = playlistSelect)
             }
         }
     }
@@ -273,5 +315,5 @@ fun PreviewSearchParametersUi() {
             channelPlatformId = null,
             relatedToPlatformId = null
         )
-    ), {}, {}, {}, {}, {}, {})
+    ), {}, {}, {}, {}, {}, {}, {})
 }

@@ -20,7 +20,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaCommitOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.State
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -56,7 +56,7 @@ class PlaylistPresenterTest {
     lateinit var mockMediaOrchestrator: MediaOrchestrator
 
     @MockK
-    lateinit var mockPlaylistMediaCommitOrchestrator: PlaylistMediaCommitOrchestrator
+    lateinit var mockPlaylistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator
 
     @MockK
     lateinit var mockPlaylistOrchestrator: PlaylistOrchestrator
@@ -195,7 +195,7 @@ class PlaylistPresenterTest {
             mockView,
             fixtState!!,
             mockMediaOrchestrator,
-            mockPlaylistMediaCommitOrchestrator,
+            mockPlaylistMediaLookupOrchestrator,
             mockPlaylistOrchestrator,
             mockPlaylistItemOrchestrator,
             mockPlaylistUpdateOrchestrator,

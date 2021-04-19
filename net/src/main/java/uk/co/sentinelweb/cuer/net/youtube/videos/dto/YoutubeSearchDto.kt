@@ -60,6 +60,7 @@ internal data class YoutubeSearchDto constructor(
     }
 
     internal enum class EventType(val param: String) {
+        NONE("none"),
         COMPLETED("completed"),
         LIVE("live"),
         UPCOMING("upcoming")
