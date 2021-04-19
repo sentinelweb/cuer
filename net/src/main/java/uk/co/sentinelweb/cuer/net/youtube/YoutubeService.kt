@@ -51,6 +51,7 @@ internal interface YoutubeService {
         @Query("publishedAfter") publishedAfter: String?,// DATE STRING
         @Query("order") order: String,
         @Query("eventType") eventType: String?,
+        @Query("relevanceLanguage") relevanceLanguage: String = "en",
         @Query("key") key: String,
         @Query("maxResults") maxResults: Int = MAX_RESULTS,
         @Query("pageToken") pageToken: String? = null

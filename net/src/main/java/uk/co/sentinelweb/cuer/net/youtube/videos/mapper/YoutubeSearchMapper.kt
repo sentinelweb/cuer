@@ -34,8 +34,9 @@ internal class YoutubeSearchMapper(
                 (if (it) listOf(LIVE, UPCOMING) else listOf(COMPLETED)).joinToString()
             },
         maxResults = 50,
-        pageToken = null
-    )
+        pageToken = null,
+
+        )
 
     fun map(
         it: YoutubeSearchDto,

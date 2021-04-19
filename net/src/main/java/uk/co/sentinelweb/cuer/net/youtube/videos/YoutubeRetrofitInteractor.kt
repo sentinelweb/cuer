@@ -232,7 +232,6 @@ internal class YoutubeRetrofitInteractor constructor(
                         .let { searchResult ->
                             searchResult to searchResult.items.map { it.snippet.channelId }
                                 .distinct()
-                                .chunked(MAX_RESULTS)
                                 .let {
                                     service.getChannelInfos(
                                         ids = it.joinToString(separator = ","),

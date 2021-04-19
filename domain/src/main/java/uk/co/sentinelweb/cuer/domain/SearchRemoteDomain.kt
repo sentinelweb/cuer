@@ -12,5 +12,6 @@ data class SearchRemoteDomain(
     var channelPlatformId: String? = null,
     var isLive: Boolean? = null,
     @Contextual var fromDate: Instant? = null,
-    @Contextual var toDate: Instant? = null
+    @Contextual var toDate: Instant? = null,
+    val lang: String = "en"
 )

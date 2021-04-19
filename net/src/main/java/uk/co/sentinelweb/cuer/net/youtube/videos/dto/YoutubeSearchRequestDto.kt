@@ -12,5 +12,6 @@ internal data class YoutubeSearchRequestDto(
     val order: String,
     val eventType: String?,
     val maxResults: Int = YoutubeService.MAX_RESULTS,
-    val pageToken: String? = null
+    val pageToken: String? = null,
+    val relevanceLanguage: String? = "en"
 )
