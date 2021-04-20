@@ -24,6 +24,8 @@ internal data class YoutubePlaylistItemDto constructor(
             val publishedAt: String,
             val position: Int,
             val thumbnails: ThumbnailsDto,
+            val videoOwnerChannelTitle: String,
+            val videoOwnerChannelId: String,
             val resourceId: ResourceDto
         ) {
 
