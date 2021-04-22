@@ -190,29 +190,36 @@ class PlaylistPresenter(
     }
 
     // move item to playlist
-    override fun onItemSwipeRight(item: ItemContract.Model) { // move
+    override fun onItemSwipeRight(itemModel: ItemContract.Model) { // move
         state.viewModelScope.launch {
             if (state.playlistIdentifier.source == MEMORY) {
                 toastWrapper.show("Cant move the items before saving")
                 updateView()
             } else {
-                state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
-                view.showPlaylistSelector(
-                    PlaylistsDialogContract.Config(
-                        selectedPlaylists = setOf(state.playlist!!),
-                        multi = true,
-                        itemClick = { which: PlaylistDomain?, _ ->
-                            which
-                                ?.let { moveItemToPlaylist(it) }
-                                ?: view.showPlaylistCreateDialog()
-                        },
-                        confirm = { },
-                        dismiss = { view.resetItemsState() },
-                        suggestionsMedia = state.selectedPlaylistItem?.media,
-                    )
-                )
+                state.selectedPlaylistItem = state.playlist
+                    ?.itemWitId(itemModel.id)
+                    ?.also {
+                        showPlaylistSelector()
+                    }
             }
         }
+    }
+
+    private fun showPlaylistSelector() {
+        view.showPlaylistSelector(
+            PlaylistsDialogContract.Config(
+                selectedPlaylists = setOf(state.playlist!!),
+                multi = true,
+                itemClick = { which: PlaylistDomain?, _ ->
+                    which
+                        ?.let { moveItemToPlaylist(it) }
+                        ?: view.showPlaylistCreateDialog()
+                },
+                confirm = { },
+                dismiss = { view.resetItemsState() },
+                suggestionsMedia = state.selectedPlaylistItem?.media,
+            )
+        )
     }
 
     override fun onPlaylistSelected(playlist: PlaylistDomain, selected: Boolean) {
@@ -277,12 +284,13 @@ class PlaylistPresenter(
     }
 
     // delete item
-    override fun onItemSwipeLeft(item: ItemContract.Model) {
+    override fun onItemSwipeLeft(itemModel: ItemContract.Model) {
         state.viewModelScope.launch {
             delay(400)
 
-            state.playlist
-                ?.let { it.items.find { it.id == item.id } }
+            state.model
+                ?.itemsIdMap
+                ?.get(itemModel.id)
                 ?.also { log.d("found item ${it.id}") }
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
@@ -293,21 +301,24 @@ class PlaylistPresenter(
         }
     }
 
-    override fun onItemViewClick(item: ItemContract.Model) {
-        state.playlist?.itemWitId(item.id)
+    override fun onItemViewClick(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
             ?.apply {
                 val source = if (state.playlist?.type != APP) {
                     state.playlistIdentifier.source
                 } else {
                     LOCAL
                 }
-                view.showItemDescription(this, source)
+                view.showItemDescription(itemModel.id, this, source)
             }// todo pass identifier?
     }
 
-    override fun onItemClicked(item: ItemContract.Model) {
-        state.playlist
-            ?.itemWitId(item.id)
+    override fun onItemClicked(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
             ?.let { itemDomain ->
                 if (!(ytContextHolder.isConnected())) {
                     val source = if (state.playlist?.type != APP) {
@@ -315,21 +326,26 @@ class PlaylistPresenter(
                     } else {
                         LOCAL
                     }
-                    view.showItemDescription(itemDomain, source)
+                    view.showItemDescription(itemModel.id, itemDomain, source)
                 } else {
-                    playItem(itemDomain, false)
+                    itemDomain.playlistId?.let {
+                        playItem(itemModel.id, itemDomain, false)
+                    } ?: run {
+                        log.d("open playlist dialog")
+                    }
                 }
             } // todo error
     }
 
-    override fun onPlayStartClick(item: ItemContract.Model) {
-        state.playlist
-            ?.itemWitId(item.id)
+    override fun onPlayStartClick(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
             ?.let { itemDomain ->
                 if (!(ytContextHolder.isConnected())) {
-                    //view.showItemDescription(itemDomain)
+                    //view.showItemDescription(item.id, itemDomain)
                 } else {
-                    playItem(itemDomain, true)
+                    playItem(itemModel.id, itemDomain, true)
                 }
             } // todo error
     }
@@ -357,7 +373,7 @@ class PlaylistPresenter(
         return true
     }
 
-    private fun playItem(itemDomain: PlaylistItemDomain, resetPos: Boolean) {
+    private fun playItem(modelId: Long, itemDomain: PlaylistItemDomain, resetPos: Boolean) {
         if (isQueuedPlaylist) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
         } else { // todo only confirm if video is playing
@@ -376,7 +392,7 @@ class PlaylistPresenter(
                     }
                 }
             }, {// info
-                view.showItemDescription(itemDomain, state.playlistIdentifier.source)
+                view.showItemDescription(modelId, itemDomain, state.playlistIdentifier.source)
             }))
         }
     }
@@ -391,9 +407,10 @@ class PlaylistPresenter(
         view.scrollTo(direction)
     }
 
-    override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
-        state.playlist
-            ?.itemWitId(item.id)
+    override fun onItemPlay(itemModel: ItemContract.Model, external: Boolean) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
             ?.also {
                 if (external) {
                     if (!ytJavaApi.launchVideo(it.media)) {
@@ -406,22 +423,26 @@ class PlaylistPresenter(
             ?: toastWrapper.show("can't find video")
     }
 
-    override fun onItemShowChannel(item: ItemContract.Model) {
-        state.playlist
-            ?.itemWitId(item.id)
+    override fun onItemShowChannel(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
             ?.takeUnless { ytJavaApi.launchChannel(it.media) }
             ?.also { toastWrapper.show("can't launch channel") }
             ?: toastWrapper.show("can't find video")
     }
 
-    override fun onItemStar(item: ItemContract.Model) {
-        toastWrapper.show("todo: star ${item.id}")
+    override fun onItemStar(itemModel: ItemContract.Model) {
+        toastWrapper.show("todo: star ${itemModel.id}")
     }
 
-    override fun onItemShare(item: ItemContract.Model) {
-        state.playlist?.itemWitId(item.id)?.let { itemDomain ->
-            shareWrapper.share(itemDomain.media)
-        }
+    override fun onItemShare(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
+            ?.let { itemDomain ->
+                shareWrapper.share(itemDomain.media)
+            }
     }
 
     override fun moveItem(fromPosition: Int, toPosition: Int) {
@@ -605,17 +626,29 @@ class PlaylistPresenter(
                 indexOfFirst { it.media.id == m.id }
                     .takeIf { it > -1 }
                     ?.let { index ->
-                        val changedItem = get(index).copy(media = m)
-                        state.playlist = state.playlist
-                            ?.copy(items = toMutableList().apply { set(index, changedItem) })
-                        val mappedItem =
-                            modelMapper.map(changedItem, index, state.playlist?.config?.editable ?: false, playlists = state.playlistsMap)
-                        state.model = state.model?.let {
-                            it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
+                        state.model?.let { model ->
+                            val originalItem = get(index)
+                            val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
+                                ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
+                            val changedItem = originalItem.copy(media = m)
+                            state.playlist = state.playlist
+                                ?.copy(items = toMutableList().apply { set(index, changedItem) })
+                            val mappedItem =
+                                modelMapper.map(
+                                    modelId,
+                                    changedItem,
+                                    index,
+                                    state.playlist?.config?.editable ?: false,
+                                    playlists = state.playlistsMap,
+                                )
+                            state.model = model.let {
+                                it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
+                            }
+                            model.itemsIdMap[modelId] = changedItem
+                            mappedItem
+                                .takeIf { coroutines.mainScopeActive }
+                                ?.apply { view.updateItemModel(this) }
                         }
-                        mappedItem
-                            .takeIf { coroutines.mainScopeActive }
-                            ?.apply { view.updateItemModel(this) }
                     }
             }
     }

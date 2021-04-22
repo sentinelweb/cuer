@@ -34,15 +34,15 @@ interface PlaylistContract {
         fun initialise()
         fun destroy()
         fun refreshPlaylist()
-        fun onItemSwipeRight(item: ItemContract.Model)
-        fun onItemSwipeLeft(item: ItemContract.Model)
-        fun onItemClicked(item: ItemContract.Model)
-        fun onItemPlay(item: ItemContract.Model, external: Boolean)
-        fun onItemShowChannel(item: ItemContract.Model)
-        fun onItemStar(item: ItemContract.Model)
-        fun onItemShare(item: ItemContract.Model)
-        fun onPlayStartClick(item: ItemContract.Model)
-        fun onItemViewClick(item: ItemContract.Model)
+        fun onItemSwipeRight(itemModel: ItemContract.Model)
+        fun onItemSwipeLeft(itemModel: ItemContract.Model)
+        fun onItemClicked(itemModel: ItemContract.Model)
+        fun onItemPlay(itemModel: ItemContract.Model, external: Boolean)
+        fun onItemShowChannel(itemModel: ItemContract.Model)
+        fun onItemStar(itemModel: ItemContract.Model)
+        fun onItemShare(itemModel: ItemContract.Model)
+        fun onPlayStartClick(itemModel: ItemContract.Model)
+        fun onItemViewClick(itemModel: ItemContract.Model)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
@@ -76,7 +76,7 @@ interface PlaylistContract {
         fun showPlaylistCreateDialog()
         fun showAlertDialog(model: AlertDialogModel)
         fun resetItemsState()
-        fun showItemDescription(itemWitId: PlaylistItemDomain, source: Source)
+        fun showItemDescription(modelId: Long, item: PlaylistItemDomain, source: Source)
         fun gotoEdit(id: Long, source: Source)
         fun showCastRouteSelectorDialog()
         fun setPlayState(state: PlayState)
@@ -115,7 +115,8 @@ interface PlaylistContract {
         val isSaved: Boolean,
         val canPlay: Boolean,
         val canEdit: Boolean,
-        val items: List<ItemContract.Model>?
+        val items: List<ItemContract.Model>?,
+        val itemsIdMap: MutableMap<Long, PlaylistItemDomain>
     )
 
     companion object {

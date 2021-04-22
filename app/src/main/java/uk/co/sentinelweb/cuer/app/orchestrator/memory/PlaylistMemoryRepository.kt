@@ -59,12 +59,12 @@ class PlaylistMemoryRepository constructor(
     override fun save(domain: PlaylistDomain, options: Options): PlaylistDomain =
         domain.id?.let { playlistId ->
             if (!options.flat || !data.containsKey(playlistId)) {
-                domain.copy(
+                domain.copy(// todo fix this in share
                     items = domain.items.mapIndexed { index, item ->
                         item.copy(
-                            id = playlistItemMemoryRepository.idCounter,
+                            //id = playlistItemMemoryRepository.idCounter,
                             playlistId = playlistId,
-                            media = item.media.copy(id = playlistItemMemoryRepository.idCounter)
+                            //media = item.media.copy(id = playlistItemMemoryRepository.idCounter)
                         )
                     }
                 )
@@ -101,12 +101,12 @@ class PlaylistMemoryRepository constructor(
         override val updates: Flow<Pair<Operation, PlaylistItemDomain>>
             get() = _playlistItemFlow
 
-        private var _idCounter = 0L
-        val idCounter: Long
-            get() {
-                _idCounter--
-                return _idCounter
-            }
+//        private var _idCounter = 0L
+//        val idCounter: Long
+//            get() {
+//                _idCounter--
+//                return _idCounter
+//            }
 
         override fun load(platformId: String, options: Options): PlaylistItemDomain? {
             throw NotImplementedException()

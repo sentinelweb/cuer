@@ -397,12 +397,10 @@ class PlaylistFragment :
         presenter.onItemViewClick(item)
     }
 
-    override fun showItemDescription(itemWitId: PlaylistItemDomain, source: Source) {
-        itemWitId.id?.also { id ->
-            adapter.getItemViewForId(id)?.let { view ->
-                PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise(), source.toString())
-                    .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
-            }
+    override fun showItemDescription(modelId: Long, item: PlaylistItemDomain, source: Source) {
+        adapter.getItemViewForId(modelId)?.let { view ->
+            PlaylistFragmentDirections.actionGotoPlaylistItem(item.serialise(), source.toString())
+                .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
         }
     }
 

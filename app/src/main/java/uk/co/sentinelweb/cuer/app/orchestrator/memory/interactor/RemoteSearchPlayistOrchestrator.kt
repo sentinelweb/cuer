@@ -34,7 +34,7 @@ class RemoteSearchPlayistOrchestrator constructor(
                     ?.let {
                         makeSearchHeader()
                             .copy(
-                                items = it.mapIndexed { i, playlistItem -> playlistItem.copy(i * 1000L) }
+                                items = it.mapIndexed { i, playlistItem -> playlistItem.copy() } //i * 1000L
                             )
                     }
             }
