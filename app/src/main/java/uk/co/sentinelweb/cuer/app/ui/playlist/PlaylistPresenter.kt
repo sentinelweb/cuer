@@ -40,7 +40,10 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.ext.*
+import uk.co.sentinelweb.cuer.domain.ext.currentItemOrStart
+import uk.co.sentinelweb.cuer.domain.ext.indexOfItemId
+import uk.co.sentinelweb.cuer.domain.ext.matchesHeader
+import uk.co.sentinelweb.cuer.domain.ext.replaceHeader
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 // todo add error handling interface
@@ -196,8 +199,9 @@ class PlaylistPresenter(
                 toastWrapper.show("Cant move the items before saving")
                 updateView()
             } else {
-                state.selectedPlaylistItem = state.playlist
-                    ?.itemWitId(itemModel.id)
+                state.selectedPlaylistItem = state.model
+                    ?.itemsIdMap
+                    ?.get(itemModel.id)
                     ?.also {
                         showPlaylistSelector()
                     }
@@ -306,11 +310,7 @@ class PlaylistPresenter(
             ?.itemsIdMap
             ?.get(itemModel.id)
             ?.apply {
-                val source = if (state.playlist?.type != APP) {
-                    state.playlistIdentifier.source
-                } else {
-                    LOCAL
-                }
+                val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
                 view.showItemDescription(itemModel.id, this, source)
             }// todo pass identifier?
     }
@@ -321,17 +321,14 @@ class PlaylistPresenter(
             ?.get(itemModel.id)
             ?.let { itemDomain ->
                 if (!(ytContextHolder.isConnected())) {
-                    val source = if (state.playlist?.type != APP) {
-                        state.playlistIdentifier.source
-                    } else {
-                        LOCAL
-                    }
+                    val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
                     view.showItemDescription(itemModel.id, itemDomain, source)
                 } else {
                     itemDomain.playlistId?.let {
                         playItem(itemModel.id, itemDomain, false)
                     } ?: run {
-                        log.d("open playlist dialog")
+                        val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
+                        view.showItemDescription(itemModel.id, itemDomain, source)
                     }
                 }
             } // todo error
@@ -374,7 +371,7 @@ class PlaylistPresenter(
     }
 
     private fun playItem(modelId: Long, itemDomain: PlaylistItemDomain, resetPos: Boolean) {
-        if (isQueuedPlaylist) {
+        if (queue.playlistId == itemDomain.playlistId?.toIdentifier(LOCAL)) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
         } else { // todo only confirm if video is playing
             view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
