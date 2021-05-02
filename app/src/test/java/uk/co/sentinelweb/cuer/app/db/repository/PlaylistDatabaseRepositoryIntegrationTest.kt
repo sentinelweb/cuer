@@ -179,15 +179,15 @@ class PlaylistDatabaseRepositoryIntegrationTest {
             val domain = playlistItem.copy(
                 id = null,
                 media = playlistItem.media.copy(
-                    id = 2L,
-                    channelData = playlistItem.media.channelData.copy(id = 3L, platformId = "x")
+                    id = null,
+                    channelData = playlistItem.media.channelData.copy(id = null, platformId = "x")
                 )
             )
 
             val actual = sut.savePlaylistItem(domain)
             assertTrue(actual.isSuccessful)
-            database.mediaDao().insert(mediaMapper.map(domain.media))
-            database.channelDao().insert(channelMapper.map(domain.media.channelData))
+//            database.mediaDao().insert(mediaMapper.map(domain.media))
+//            database.channelDao().insert(channelMapper.map(domain.media.channelData))
 
             assertEquals(actual.data, sut.loadPlaylistItem(actual.data!!.id!!.toLong()).data)
         }
