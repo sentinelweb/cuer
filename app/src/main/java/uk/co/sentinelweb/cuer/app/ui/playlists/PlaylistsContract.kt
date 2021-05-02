@@ -94,7 +94,8 @@ interface PlaylistsContract {
                         recentItems = get(),
                         localSearch = get(),
                         remoteSearch = get(),
-                        ytJavaApi = get()
+                        ytJavaApi = get(),
+                        searchMapper = get()
                     )
                 }
                 scoped { PlaylistsModelMapper() }

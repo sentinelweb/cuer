@@ -47,7 +47,9 @@ data class PlaylistDomain constructor(
         val description: String? = null,
         val playable: Boolean = true,
         val editable: Boolean = true,
-        val deletable: Boolean = true
+        val deletable: Boolean = true,
+        val editableItems: Boolean = true,
+        val deletableItems: Boolean = true
     )
 }
 

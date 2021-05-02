@@ -116,6 +116,7 @@
     <string name="search_youtube">YouTube</string>
     <string name="search_watched">Watched</string>
     <string name="search_live">Live</string>
+    <string name="search_select_dates">Select Dates …</string>
 
     <!-- misc -->
     <string name="ok">OK</string>

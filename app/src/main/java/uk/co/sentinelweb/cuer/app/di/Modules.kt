@@ -101,7 +101,7 @@ object Modules {
         factory { NewMediaPlayistInteractor(get()) }
         factory { RecentItemsPlayistInteractor(get()) }
         factory { LocalSearchPlayistInteractor(get(), get(named<GeneralPreferences>())) }
-        factory { RemoteSearchPlayistOrchestrator(get(named<GeneralPreferences>()), get(), get()) }
+        factory { RemoteSearchPlayistOrchestrator(get(named<GeneralPreferences>()), get(), get(), RemoteSearchPlayistOrchestrator.State()) }
     }
 
     private val utilModule = module {

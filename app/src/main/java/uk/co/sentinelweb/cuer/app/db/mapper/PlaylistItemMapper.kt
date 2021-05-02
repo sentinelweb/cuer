@@ -19,6 +19,8 @@ class PlaylistItemMapper(
         dateAdded = domain.dateAdded
     )
 
+    fun map(domain: MediaDomain): MediaEntity = mediaMapper.map(domain)
+
     fun map(entity: PlaylistItemEntity, media: MediaAndChannel): PlaylistItemDomain =
         map(entity, media.media, media.channel)
 

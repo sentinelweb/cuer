@@ -57,7 +57,7 @@ interface ItemContract {
         fun onPlayStartClick(item: Model)
     }
 
-    data class Model constructor(
+    data class Model(
         override val id: Long,
         val index: Int,
         val url: String,
@@ -76,7 +76,9 @@ interface ItemContract {
         val isUpcoming: Boolean,
         @ColorRes val infoTextBackgroundColor: Int,
         val canEdit: Boolean,
-        val playlistName: String?
+        val playlistName: String?,
+        val canDelete: Boolean,
+        val canReorder: Boolean
     ) : ItemBaseModel(id)
 
     data class State constructor(var item: Model? = null)

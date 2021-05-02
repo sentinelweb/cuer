@@ -6,19 +6,23 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.DateRangePickerDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.LOCAL
+import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_LOCAL_SEARCH
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_REMOTE_SEARCH
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
@@ -26,15 +30,18 @@ import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
 import uk.co.sentinelweb.cuer.domain.ext.serialise
+import java.time.LocalDateTime
 
 class SearchViewModel(
     private val state: SearchContract.State,
     private val mapper: SearchMapper,
     private val log: LogWrapper,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
+    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
+    private val timeStampMapper: TimeStampMapper
 ) : ViewModel() {
 
     init {
+        state.searchType = prefsWrapper.getEnum(LAST_SEARCH_TYPE, LOCAL)
         state.local = prefsWrapper
             .getString(LAST_LOCAL_SEARCH, null)
             ?.let { deserialiseSearchLocal(it) }
@@ -54,16 +61,18 @@ class SearchViewModel(
     fun getNavigationObservable(): LiveData<NavigationModel> = _navigateLiveData
 
     fun onSearchTextChange(text: String) {
-        if (state.isLocal) {
-            state.local.text = text
-        } else {
-            state.remote.text = text
+        when (state.searchType) {
+            LOCAL -> state.local.text = text
+            REMOTE -> state.remote.text = text
         }
         model = mapper.map(state)
     }
 
     fun switchLocalOrRemote() {
-        state.isLocal = !state.isLocal
+        state.searchType = when (state.searchType) {
+            LOCAL -> REMOTE
+            REMOTE -> LOCAL
+        }
         model = mapper.map(state)
     }
 
@@ -78,20 +87,57 @@ class SearchViewModel(
     }
 
     fun onLiveClick(isLive: Boolean) {
-        state.local = state.local.copy(isLive = isLive)
+        when (state.searchType) {
+            LOCAL -> state.local = state.local.copy(isLive = isLive)
+            REMOTE -> state.remote = state.remote.copy(isLive = isLive)
+        }
+        model = mapper.map(state)
+    }
+
+    fun onClearRelated() {
+        state.remote = state.remote.copy(relatedToPlatformId = null)
+        model = mapper.map(state)
+    }
+
+    fun onClearDates() {
+        state.remote = state.remote.copy(fromDate = null, toDate = null)
+        model = mapper.map(state)
+    }
+
+    fun onSelectDates() {
+        _dialogModelLiveData.value =
+            DateRangePickerDialogModel(
+                R.string.search_select_dates,
+                state.remote.fromDate,
+                state.remote.toDate ?: LocalDateTime.now(),
+                this::onDatesSelected
+            )
+    }
+
+    fun onDatesSelected(start: Long, end: Long) {
+        state.remote = state.remote.copy(
+            fromDate = timeStampMapper.toLocalDateTimeNano(start),
+            toDate = timeStampMapper.toLocalDateTimeNano(end)
+        )
         model = mapper.map(state)
     }
 
     fun onSubmit() {
-        if (state.isLocal) {
-            prefsWrapper.putString(LAST_LOCAL_SEARCH, state.local.serialise())
-        } else {
-            prefsWrapper.putString(LAST_REMOTE_SEARCH, state.remote.serialise())
+        when (state.searchType) {
+            LOCAL -> {
+                prefsWrapper.putString(LAST_LOCAL_SEARCH, state.local.serialise())
+                prefsWrapper.putEnum(LAST_SEARCH_TYPE, LOCAL)
+            }
+            REMOTE -> {
+                prefsWrapper.putString(LAST_REMOTE_SEARCH, state.remote.serialise())
+                prefsWrapper.putEnum(LAST_SEARCH_TYPE, REMOTE)
+            }
         }
+
         _navigateLiveData.value = NavigationModel(
             NavigationModel.Target.PLAYLIST_FRAGMENT,
             mapOf(
-                NavigationModel.Param.PLAYLIST_ID to if (state.isLocal) LOCAL_SEARCH_PLAYLIST else REMOTE_SEARCH_PLAYLIST,
+                NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LOCAL_SEARCH_PLAYLIST else REMOTE_SEARCH_PLAYLIST,
                 NavigationModel.Param.PLAY_NOW to false,
                 NavigationModel.Param.SOURCE to OrchestratorContract.Source.MEMORY
             )

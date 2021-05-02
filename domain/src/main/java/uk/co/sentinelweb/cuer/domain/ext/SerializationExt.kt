@@ -88,6 +88,7 @@ fun deserialisePlaylistItem(input: String) = domainJsonSerializer.decodeFromStri
 
 val domainJsonSerializer = Json {
     prettyPrint = true
+    isLenient = true
     serializersModule = SerializersModule {
         mapOf(
             PlaylistItemDomain::class to PlaylistItemDomain.serializer(),

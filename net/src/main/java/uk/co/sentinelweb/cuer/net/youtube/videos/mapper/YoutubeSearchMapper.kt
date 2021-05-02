@@ -30,8 +30,8 @@ internal class YoutubeSearchMapper(
         publishedAfter = domain.fromDate?.let { timeStampMapper.mapTimestamp(it) },
         order = RATING.param,
         eventType = domain.isLive
-            ?.let {
-                (if (it) listOf(LIVE, UPCOMING) else listOf(COMPLETED)).joinToString()
+            .let {
+                if (it) LIVE.param else null
             },
         maxResults = 50,
         pageToken = null,
@@ -76,7 +76,7 @@ internal class YoutubeSearchMapper(
             mediaType = MediaDomain.MediaTypeDomain.VIDEO,
             platform = PlatformDomain.YOUTUBE,
             platformId = it.id.videoId,
-            duration = -1,
+            duration = null,
             thumbNail = imageMapper.mapThumb(it.snippet.thumbnails),
             image = imageMapper.mapImage(it.snippet.thumbnails),
             channelData = channelLookup[it.snippet.channelId] ?: throw BadDataException("Channel not found"),

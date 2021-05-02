@@ -195,17 +195,20 @@ class PlaylistPresenter(
     // move item to playlist
     override fun onItemSwipeRight(itemModel: ItemContract.Model) { // move
         state.viewModelScope.launch {
-            if (state.playlistIdentifier.source == MEMORY) {
-                toastWrapper.show("Cant move the items before saving")
-                updateView()
-            } else {
-                state.selectedPlaylistItem = state.model
-                    ?.itemsIdMap
-                    ?.get(itemModel.id)
-                    ?.also {
-                        showPlaylistSelector()
+            state.model
+                ?.itemsIdMap
+                ?.get(itemModel.id)
+                ?.also { itemDomain ->
+                    state.playlist?.apply {
+                        if (config.editableItems.not()) {
+                            toastWrapper.show("Cant move the items before saving")
+                            updateView()
+                        } else {
+                            state.selectedPlaylistItem = itemDomain
+                            showPlaylistSelector()
+                        }
                     }
-            }
+                }
         }
     }
 
@@ -272,8 +275,9 @@ class PlaylistPresenter(
                         .copy(playlistId = playlist.id!!)
                         .apply { state.movedPlaylistItem = this }
                         .copy(order = timeProvider.currentTimeMillis())
-                        .apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.toFlatOptions()) }
+                        .apply { playlistItemOrchestrator.save(this, LOCAL.toFlatOptions()) }
                         .apply { view.showUndo("Moved to : ${playlist.title}", ::undoMoveItem) }
+                        .also { state.selectedPlaylistItem = null }
                 }
             }
     }
@@ -373,7 +377,7 @@ class PlaylistPresenter(
     private fun playItem(modelId: Long, itemDomain: PlaylistItemDomain, resetPos: Boolean) {
         if (queue.playlistId == itemDomain.playlistId?.toIdentifier(LOCAL)) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
-        } else { // todo only confirm if video is playing
+        } else {
             view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
                 state.playlist?.let {
                     // todo merge with above onPlayPlaylist
@@ -635,6 +639,8 @@ class PlaylistPresenter(
                                     modelId,
                                     changedItem,
                                     index,
+                                    state.playlist?.config?.editableItems ?: false,
+                                    state.playlist?.config?.deletableItems ?: false,
                                     state.playlist?.config?.editable ?: false,
                                     playlists = state.playlistsMap,
                                 )

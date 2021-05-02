@@ -15,12 +15,14 @@ import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 interface SearchContract {
 
     data class State(
-        var isLocal: Boolean = true,
+        var searchType: SearchType = SearchType.LOCAL,
         var local: SearchLocalDomain = SearchLocalDomain(),
         var remote: SearchRemoteDomain = SearchRemoteDomain()
     )
 
     data class Model(
+        val type: String,
+        val otherType: String,
         val text: String,
         val isLocal: Boolean,
         val localParams: LocalModel,
@@ -38,9 +40,14 @@ interface SearchContract {
         val platform: PlatformDomain,
         val relatedToPlatformId: String?,
         val channelPlatformId: String?,
-        val isLive: Boolean?
+        val isLive: Boolean,
+        val fromDate: String?,
+        val toDate: String?
     )
 
+    enum class SearchType {
+        LOCAL, REMOTE
+    }
 
     companion object {
         @JvmStatic
@@ -52,12 +59,13 @@ interface SearchContract {
                         log = get(),
                         mapper = get(),
                         prefsWrapper = get(named<GeneralPreferences>()),
+                        timeStampMapper = get()
                     )
                 }
                 scoped { State() }
-                scoped { SearchMapper() }
                 scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
             }
+            factory { SearchMapper(get(), get()) }
         }
 
     }

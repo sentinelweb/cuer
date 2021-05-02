@@ -83,7 +83,7 @@ class PlaylistDatabaseRepositoryIntegrationTest {
             playlistMapper = PlaylistMapper(imageMapper, playlistItemMapper, channelMapper, systemLogWrapper),
             playlistItemDao = database.playlistItemDao(),
             playlistItemMapper = playlistItemMapper,
-            mediaDao = database.mediaDao(),
+            mediaRepository = mediaRepo,
             log = systemLogWrapper,
             coProvider = coCxtProvider,
             database = database

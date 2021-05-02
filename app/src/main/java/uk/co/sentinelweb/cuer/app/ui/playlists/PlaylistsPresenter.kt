@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
@@ -16,9 +17,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.search.SearchMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_LOCAL_SEARCH
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -42,7 +43,8 @@ class PlaylistsPresenter(
     private val recentItems: RecentItemsPlayistInteractor,
     private val localSearch: LocalSearchPlayistInteractor,
     private val remoteSearch: RemoteSearchPlayistOrchestrator,
-    private val ytJavaApi: YoutubeJavaApiWrapper
+    private val ytJavaApi: YoutubeJavaApiWrapper,
+    private val searchMapper: SearchMapper
 ) : PlaylistsContract.Presenter {
 
     override fun initialise() {
@@ -84,11 +86,15 @@ class PlaylistsPresenter(
                                     view.showMessage("Cannot load playlist backup")
                                     null
                                 }
-                        } else if (playlist.id == LOCAL_SEARCH_PLAYLIST) {
-                            val lastSearch = prefsWrapper.getString(LAST_LOCAL_SEARCH, null)
-                            prefsWrapper.remove(LAST_LOCAL_SEARCH)
-                            view.showUndo("Deleted last search", {
-                                prefsWrapper.putString(LAST_LOCAL_SEARCH, lastSearch!!)
+                        } else if (playlist.id == LOCAL_SEARCH_PLAYLIST || playlist.id == REMOTE_SEARCH_PLAYLIST) {
+                            val isLocal = playlist.id == LOCAL_SEARCH_PLAYLIST
+                            val type = searchMapper.searchTypeText(isLocal)
+                            val key = if (isLocal) LAST_LOCAL_SEARCH else LAST_REMOTE_SEARCH
+                            val lastSearch = prefsWrapper.getString(key, null)
+                            prefsWrapper.remove(key)
+                            if (!isLocal) remoteSearch.clearCached();
+                            view.showUndo("Deleted $type search", {
+                                prefsWrapper.putString(key, lastSearch!!)
                                 state.viewModelScope.launch {
                                     executeRefresh(false, false)
                                 }
@@ -171,7 +177,7 @@ class PlaylistsPresenter(
                     }
                 }
                 ?.apply {
-                    if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {// todo remote
+                    if (prefsWrapper.has(LAST_REMOTE_SEARCH)) {
                         add(2, remoteSearch.makeSearchHeader())
                     }
                 }
@@ -186,29 +192,29 @@ class PlaylistsPresenter(
                 ?.apply { add(recentItems.makeRecentItemsStats()) }
                 ?.apply {
                     if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
-                    add(2, localSearch.makeSearchItemsStats())
+                        add(2, localSearch.makeSearchItemsStats())
+                    }
                 }
-            }
-            ?.apply {
-                if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {// todo remote
-                    add(2, remoteSearch.makeSearchItemsStats())
+                ?.apply {
+                    if (prefsWrapper.has(LAST_REMOTE_SEARCH)) {
+                        add(3, remoteSearch.makeSearchItemsStats())
+                    }
                 }
-            }
-            ?: listOf()
+                ?: listOf()
 
-        state.playlists
-            .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
-            .let { modelMapper.map(it, queue.playlistId, true, false) }
-            .takeIf { coroutines.mainScopeActive }
-            ?.also { view.setList(it, animate) }
-            ?.takeIf { focusCurrent }
-            ?.let {
-                state.playlists.apply {
-                    prefsWrapper.getPairNonNull(CURRENT_PLAYLIST, NO_PLAYLIST.toPair())
-                        ?.toIdentifier()
-                        ?.let { focusId -> view.scrollToItem(indexOf(find { it.id == focusId.id })) }
+            state.playlists
+                .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
+                .let { modelMapper.map(it, queue.playlistId, true, false) }
+                .takeIf { coroutines.mainScopeActive }
+                ?.also { view.setList(it, animate) }
+                ?.takeIf { focusCurrent }
+                ?.let {
+                    state.playlists.apply {
+                        prefsWrapper.getPairNonNull(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair())
+                            ?.toIdentifier()
+                            ?.let { focusId -> view.scrollToItem(indexOf(find { it.id == focusId.id })) }
+                    }
                 }
-            }
         } catch (e: Exception) {
             log.e("Load failed", e)
             view.showMessage("Load failed: ${e::class.java.simpleName}")

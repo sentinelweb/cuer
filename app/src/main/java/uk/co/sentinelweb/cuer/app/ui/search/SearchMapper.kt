@@ -1,16 +1,26 @@
 package uk.co.sentinelweb.cuer.app.ui.search
 
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
+import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.LOCAL
+import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
 
-class SearchMapper {
+class SearchMapper constructor(
+    private val res: ResourceWrapper,
+    private val dateTimeFormatter: DateTimeFormatter
+) {
 
     fun map(state: SearchContract.State): SearchContract.Model {
         val playlistQuantity = if (state.local.playlists.size > 0) "(${state.local.playlists.size})" else ""
         return SearchContract.Model(
-            if (state.isLocal) state.local.text else state.remote.text,
-            state.isLocal,
+            searchTypeText(state.searchType),
+            searchTypeText(if (state.searchType == LOCAL) REMOTE else LOCAL),
+            if (state.searchType == LOCAL) state.local.text else state.remote.text,
+            state.searchType == LOCAL,
             state.local.let {
                 SearchContract.LocalModel(
                     isWatched = it.isWatched,
@@ -28,9 +38,19 @@ class SearchMapper {
                     platform = it.platform,
                     relatedToPlatformId = it.relatedToPlatformId,
                     channelPlatformId = it.channelPlatformId,
-                    isLive = it.isLive
+                    isLive = it.isLive,
+                    fromDate = it.fromDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) },
+                    toDate = it.toDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) }
                 )
             }
         )
     }
+
+    fun searchTypeText(isLocal: Boolean) = searchTypeText(if (isLocal) LOCAL else REMOTE)
+
+    private fun searchTypeText(type: SearchContract.SearchType) = when (type) {
+        LOCAL -> res.getString(R.string.search_local)
+        REMOTE -> res.getString(R.string.search_remote)
+    }
+
 }

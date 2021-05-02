@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.core.di
 
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.core.mappers.DateFormatter
+import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
@@ -14,7 +14,7 @@ object CoreModule {
         factory { CoroutineContextProvider() }
         factory { TimeProvider() }
         factory { TimeFormatter() }
-        factory { DateFormatter() }
+        factory { DateTimeFormatter() }
         factory { TimeSinceFormatter(get()) }
     }
 }

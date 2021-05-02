@@ -32,7 +32,8 @@ object DatabaseModule {
                 playlistMapper = get(),
                 playlistItemDao = get<AppDatabase>().playlistItemDao(),
                 playlistItemMapper = get(),
-                mediaDao = get<AppDatabase>().mediaDao(),
+                mediaRepository = get(),
+//                mediaDao = get<AppDatabase>().mediaDao(),
                 coProvider = get(),
                 log = get(),
                 database = get()
