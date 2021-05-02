@@ -15,6 +15,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -40,6 +42,7 @@ interface PlaylistContract {
         fun onItemPlay(itemModel: ItemContract.Model, external: Boolean)
         fun onItemShowChannel(itemModel: ItemContract.Model)
         fun onItemStar(itemModel: ItemContract.Model)
+        fun onItemRelated(itemModel: ItemContract.Model)
         fun onItemShare(itemModel: ItemContract.Model)
         fun onPlayStartClick(itemModel: ItemContract.Model)
         fun onItemViewClick(itemModel: ItemContract.Model)
@@ -85,6 +88,7 @@ interface PlaylistContract {
         fun showRefresh()
         fun showError(message: String)
         fun updateItemModel(model: ItemContract.Model)
+        fun navigate(nav: NavigationModel)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
@@ -165,6 +169,7 @@ interface PlaylistContract {
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory(get(), get()) }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
+                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
                 viewModel { State() }
             }
 

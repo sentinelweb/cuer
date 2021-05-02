@@ -17,10 +17,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -40,10 +43,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.ext.currentItemOrStart
-import uk.co.sentinelweb.cuer.domain.ext.indexOfItemId
-import uk.co.sentinelweb.cuer.domain.ext.matchesHeader
-import uk.co.sentinelweb.cuer.domain.ext.replaceHeader
+import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
+import uk.co.sentinelweb.cuer.domain.ext.*
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 // todo add error handling interface
@@ -303,7 +304,12 @@ class PlaylistPresenter(
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
                     // todo handle exceptions
-                    playlistItemOrchestrator.delete(deleteItem, state.playlistIdentifier.toFlatOptions())
+                    playlistItemOrchestrator.delete(deleteItem, LOCAL.toFlatOptions())
+                    state.playlist = state.playlist?.let {
+                        val items = it.items.toMutableList()
+                        items.remove(deleteItem)
+                        it.copy(items = items)
+                    }
                     view.showUndo("Deleted: ${deleteItem.media.title}", ::undoDelete) // todo extract
                 }
         }
@@ -374,6 +380,55 @@ class PlaylistPresenter(
         return true
     }
 
+    override fun onItemShowChannel(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
+            ?.takeUnless { ytJavaApi.launchChannel(it.media) }
+            ?.also { toastWrapper.show("can't launch channel") }
+            ?: toastWrapper.show("can't find video")
+    }
+
+    override fun onItemStar(itemModel: ItemContract.Model) {
+        toastWrapper.show("todo: star ${itemModel.id}")
+    }
+
+    override fun onItemRelated(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
+            ?.also { item ->
+                prefsWrapper.putString(
+                    LAST_REMOTE_SEARCH, SearchRemoteDomain(
+                        relatedToMediaPlatformId = item.media.platformId,
+                        relatedToMediaTitle = item.media.title
+                    ).serialise()
+                )
+                prefsWrapper.putEnum(LAST_SEARCH_TYPE, SearchContract.SearchType.REMOTE)
+
+                view.navigate(
+                    NavigationModel(
+                        NavigationModel.Target.PLAYLIST_FRAGMENT,
+                        mapOf(
+                            NavigationModel.Param.PLAYLIST_ID to REMOTE_SEARCH_PLAYLIST,
+                            NavigationModel.Param.PLAY_NOW to false,
+                            NavigationModel.Param.SOURCE to MEMORY
+                        )
+                    )
+                )
+
+            }
+    }
+
+    override fun onItemShare(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
+            ?.let { itemDomain ->
+                shareWrapper.share(itemDomain.media)
+            }
+    }
+
     private fun playItem(modelId: Long, itemDomain: PlaylistItemDomain, resetPos: Boolean) {
         if (queue.playlistId == itemDomain.playlistId?.toIdentifier(LOCAL)) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
@@ -422,28 +477,6 @@ class PlaylistPresenter(
                 }
             }
             ?: toastWrapper.show("can't find video")
-    }
-
-    override fun onItemShowChannel(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
-            ?.takeUnless { ytJavaApi.launchChannel(it.media) }
-            ?.also { toastWrapper.show("can't launch channel") }
-            ?: toastWrapper.show("can't find video")
-    }
-
-    override fun onItemStar(itemModel: ItemContract.Model) {
-        toastWrapper.show("todo: star ${itemModel.id}")
-    }
-
-    override fun onItemShare(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
-            ?.let { itemDomain ->
-                shareWrapper.share(itemDomain.media)
-            }
     }
 
     override fun moveItem(fromPosition: Int, toPosition: Int) {

@@ -6,9 +6,10 @@ import java.time.LocalDateTime
 
 @Serializable
 data class SearchRemoteDomain(
-    var text: String = "",
+    var text: String? = null,
     var platform: PlatformDomain = PlatformDomain.YOUTUBE,
-    var relatedToPlatformId: String? = null,
+    var relatedToMediaPlatformId: String? = null,
+    var relatedToMediaTitle: String? = null,
     var channelPlatformId: String? = null,
     var isLive: Boolean = false,
     @Contextual var fromDate: LocalDateTime? = null,

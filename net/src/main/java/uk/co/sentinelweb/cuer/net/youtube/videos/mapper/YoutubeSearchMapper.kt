@@ -21,22 +21,34 @@ internal class YoutubeSearchMapper(
     private val imageMapper: YoutubeImageMapper,
     private val channelMapper: YoutubeChannelDomainMapper
 ) {
-    fun mapRequest(domain: SearchRemoteDomain) = YoutubeSearchRequestDto(
-        q = domain.text,
-        type = VIDEO.param,
-        relatedToVideoId = domain.relatedToPlatformId,
-        channelId = domain.channelPlatformId,
-        publishedBefore = domain.toDate?.let { timeStampMapper.mapTimestamp(it) },
-        publishedAfter = domain.fromDate?.let { timeStampMapper.mapTimestamp(it) },
-        order = RATING.param,
-        eventType = domain.isLive
-            .let {
+    fun mapRequest(domain: SearchRemoteDomain) = if (domain.relatedToMediaPlatformId != null) {
+        YoutubeSearchRequestDto(
+            relatedToVideoId = domain.relatedToMediaPlatformId,
+            type = VIDEO.param,
+            order = RATING.param,
+            maxResults = 50,
+            channelId = null,
+            eventType = null,
+            q = null,
+            publishedBefore = null,
+            publishedAfter = null
+        )
+    } else {
+        YoutubeSearchRequestDto(
+            q = domain.text,
+            relatedToVideoId = null,
+            type = VIDEO.param,
+            channelId = domain.channelPlatformId,
+            publishedBefore = domain.toDate?.let { timeStampMapper.mapTimestamp(it) },
+            publishedAfter = domain.fromDate?.let { timeStampMapper.mapTimestamp(it) },
+            order = RATING.param,
+            eventType = domain.isLive.let {
                 if (it) LIVE.param else null
             },
-        maxResults = 50,
-        pageToken = null,
-
+            maxResults = 50,
+            pageToken = null
         )
+    }
 
     fun map(
         it: YoutubeSearchDto,

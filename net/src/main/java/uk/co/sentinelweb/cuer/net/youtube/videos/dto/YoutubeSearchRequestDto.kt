@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.net.youtube.videos.dto
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 
 internal data class YoutubeSearchRequestDto(
-    val q: String,
+    val q: String?,
     val type: String,
     val relatedToVideoId: String?,
     val channelId: String?,

@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
@@ -70,6 +71,7 @@ class PlaylistFragment :
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+    private val navMapper: NavigationMapper by currentScope.inject()
 
     // todo consider making binding nulll - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
@@ -281,6 +283,10 @@ class PlaylistFragment :
         adapter.updateItemModel(model)
     }
 
+    override fun navigate(nav: NavigationModel) {
+        navMapper.navigate(nav)
+    }
+
     override fun hideRefresh() {
         binding.playlistSwipe.isRefreshing = false
     }
@@ -489,6 +495,10 @@ class PlaylistFragment :
 
     override fun onStar(item: ItemContract.Model) {
         presenter.onItemStar(item)
+    }
+
+    override fun onRelated(item: ItemContract.Model) {
+        presenter.onItemRelated(item)
     }
 
     override fun onShare(item: ItemContract.Model) {

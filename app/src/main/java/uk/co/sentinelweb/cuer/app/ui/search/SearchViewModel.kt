@@ -63,7 +63,11 @@ class SearchViewModel(
     fun onSearchTextChange(text: String) {
         when (state.searchType) {
             LOCAL -> state.local.text = text
-            REMOTE -> state.remote.text = text
+            REMOTE -> {
+                state.remote.text = text
+                state.remote.relatedToMediaPlatformId = null
+                state.remote.relatedToMediaTitle = null
+            }
         }
         model = mapper.map(state)
     }
@@ -88,14 +92,14 @@ class SearchViewModel(
 
     fun onLiveClick(isLive: Boolean) {
         when (state.searchType) {
-            LOCAL -> state.local = state.local.copy(isLive = isLive)
-            REMOTE -> state.remote = state.remote.copy(isLive = isLive)
+            LOCAL -> state.local.isLive = isLive
+            REMOTE -> state.remote.isLive = isLive
         }
         model = mapper.map(state)
     }
 
     fun onClearRelated() {
-        state.remote = state.remote.copy(relatedToPlatformId = null)
+        state.remote.relatedToMediaPlatformId = null
         model = mapper.map(state)
     }
 
@@ -142,7 +146,6 @@ class SearchViewModel(
                 NavigationModel.Param.SOURCE to OrchestratorContract.Source.MEMORY
             )
         )
-        log.d("Execute search ... ${state.local.text}")
     }
 
     fun onPlaylistSelect(@Suppress("UNUSED_PARAMETER") chipModel: ChipModel) {

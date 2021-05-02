@@ -159,28 +159,28 @@ fun SearchRemote(
                 )
             }
         }
-
-        if (model.relatedToPlatformId != null) {
-            Row(modifier = Modifier.padding(8.dp)) {
-                val spacing = Modifier.padding(horizontal = 4.dp)
-                val text = spacing.align(Alignment.CenterVertically)
-                Icon(
-                    imageVector = Icons.Default.Clear,
-                    tint = MaterialTheme.colors.onSurface,
-                    contentDescription = stringResource(id = R.string.clear),
-                    modifier = Modifier
-                        .width(24.dp)
-                        .height(24.dp)
-                        .clickable { clearRelatedClick() }
-                        .align(Alignment.CenterVertically)
-                )
-                Text(
-                    text = model.relatedToPlatformId,
-                    style = MaterialTheme.typography.body2,
-                    modifier = text
-                )
-            }
-        }
+//
+//        if (model.relatedToPlatformId != null) {
+//            Row(modifier = Modifier.padding(8.dp)) {
+//                val spacing = Modifier.padding(horizontal = 4.dp)
+//                val text = spacing.align(Alignment.CenterVertically)
+//                Icon(
+//                    imageVector = Icons.Default.Clear,
+//                    tint = MaterialTheme.colors.onSurface,
+//                    contentDescription = stringResource(id = R.string.clear),
+//                    modifier = Modifier
+//                        .width(24.dp)
+//                        .height(24.dp)
+//                        .clickable { clearRelatedClick() }
+//                        .align(Alignment.CenterVertically)
+//                )
+//                Text(
+//                    text = model.relatedToPlatformId,
+//                    style = MaterialTheme.typography.body2,
+//                    modifier = text
+//                )
+//            }
+//        }
 
         Row(modifier = Modifier.padding(8.dp)) {
             val spacing = Modifier.padding(horizontal = 4.dp)

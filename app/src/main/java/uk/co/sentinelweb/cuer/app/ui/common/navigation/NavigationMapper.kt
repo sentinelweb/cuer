@@ -33,7 +33,7 @@ class NavigationMapper constructor(
     private val log: LogWrapper
 ) {
 
-    fun map(nav: NavigationModel) {
+    fun navigate(nav: NavigationModel) {
         when (nav.target) {
             LOCAL_PLAYER ->
                 nav.params[MEDIA_ID]?.let {

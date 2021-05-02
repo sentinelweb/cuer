@@ -91,7 +91,7 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
             object : Observer<NavigationModel> {
                 override fun onChanged(nav: NavigationModel) {
                     when (nav.target) {
-                        else -> navMapper.map(nav)
+                        else -> navMapper.navigate(nav)
                     }
                 }
             }

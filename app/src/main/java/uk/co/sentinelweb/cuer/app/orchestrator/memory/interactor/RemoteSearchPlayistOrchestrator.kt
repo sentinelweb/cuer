@@ -56,7 +56,6 @@ class RemoteSearchPlayistOrchestrator constructor(
                 }
             }
 
-
     fun makeSearchHeader(): PlaylistDomain = PlaylistDomain(
         id = REMOTE_SEARCH_PLAYLIST,
         title = mapTitle(),
@@ -68,7 +67,7 @@ class RemoteSearchPlayistOrchestrator constructor(
     )
 
     private fun mapTitle() =
-        "Remote Search: " + searchPref()?.text
+        "Remote Search: " + searchPref()?.let { it.text ?: "like -> ${it.relatedToMediaTitle}" }
 
     fun makeSearchItemsStats(): PlaylistStatDomain = PlaylistStatDomain(
         playlistId = REMOTE_SEARCH_PLAYLIST,

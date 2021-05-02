@@ -321,7 +321,7 @@ class PlaylistItemEditFragment
                 override fun onChanged(nav: NavigationModel) {
                     when (nav.target) {
                         NAV_DONE -> doneNavigation.navigateDone()//navigateDone()
-                        else -> navMapper.map(nav)
+                        else -> navMapper.navigate(nav)
                     }
                 }
             }

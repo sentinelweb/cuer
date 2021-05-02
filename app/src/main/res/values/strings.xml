@@ -63,6 +63,7 @@
     <string name="playlist_item_menu_channel_yt">Go to channel</string>
     <string name="playlist_item_menu_star">Star</string>
     <string name="playlist_item_menu_share">Share</string>
+    <string name="playlist_item_menu_related">Related</string>
 
     <!-- playlist edit fragemnt -->
     <string name="pe_fragment_title">Edit playlist</string>

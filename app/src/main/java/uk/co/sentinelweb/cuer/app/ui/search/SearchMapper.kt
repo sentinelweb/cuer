@@ -19,7 +19,7 @@ class SearchMapper constructor(
         return SearchContract.Model(
             searchTypeText(state.searchType),
             searchTypeText(if (state.searchType == LOCAL) REMOTE else LOCAL),
-            if (state.searchType == LOCAL) state.local.text else state.remote.text,
+            if (state.searchType == LOCAL) state.local.text else state.remote.text ?: "",
             state.searchType == LOCAL,
             state.local.let {
                 SearchContract.LocalModel(
@@ -36,7 +36,7 @@ class SearchMapper constructor(
             state.remote.let {
                 SearchContract.RemoteModel(
                     platform = it.platform,
-                    relatedToPlatformId = it.relatedToPlatformId,
+                    relatedToPlatformId = it.relatedToMediaPlatformId,
                     channelPlatformId = it.channelPlatformId,
                     isLive = it.isLive,
                     fromDate = it.fromDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) },
