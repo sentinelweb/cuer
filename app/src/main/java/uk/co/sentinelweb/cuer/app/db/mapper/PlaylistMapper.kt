@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_DEFAUL
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistMapper(
@@ -39,7 +40,7 @@ class PlaylistMapper(
         channelId = domain.channelData?.id
     )
 
-    fun map(
+    fun mapWithMediaEntities(
         entity: PlaylistEntity,
         items: List<PlaylistItemEntity>?,
         medias: Map<Long, MediaAndChannel>?,
@@ -51,8 +52,40 @@ class PlaylistMapper(
         default = entity.flags and FLAG_DEFAULT == FLAG_DEFAULT,
         items = items
             ?.mapNotNull { item ->
-                medias!!.get(item.mediaId)?.let { mediaAndChannel -> playlistItemMapper.map(item, mediaAndChannel) }
-                    ?: let { log.e("No media for ${item.mediaId}"); null } // todo possibly should have a flag here db inconsistent .. but likely legacy data
+                medias?.get(item.mediaId)
+                    ?.let { mediaAndChannel -> playlistItemMapper.map(item, mediaAndChannel) }
+                    ?: throw Exception("no media found for ${item.mediaId}")//let { log.e("No media for ${item.mediaId}"); null } // todo possibly should have a flag here db inconsistent .. but likely legacy data
+            }
+            ?.sortedBy { it.order }
+            ?: listOf(),
+        mode = entity.mode,
+        thumb = imageMapper.mapImage(entity.thumb),
+        image = imageMapper.mapImage(entity.image),
+        config = entity.config,
+        currentIndex = entity.currentIndex,
+        title = entity.title,
+        parentId = entity.parentId.takeIf { it > -1L },
+        platformId = entity.platformId,
+        channelData = channelEntity?.let { channelMapper.map(it) },
+        platform = entity.platform,
+        type = entity.type
+    )
+
+    fun mapWithMediaDomains(
+        entity: PlaylistEntity,
+        items: List<PlaylistItemEntity>?,
+        medias: Map<Long, MediaDomain>,
+        channelEntity: ChannelEntity?
+    ): PlaylistDomain = PlaylistDomain(
+        id = entity.id,
+        archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
+        starred = entity.flags and FLAG_STARRED == FLAG_STARRED,
+        default = entity.flags and FLAG_DEFAULT == FLAG_DEFAULT,
+        items = items
+            ?.mapNotNull { item ->
+                medias.get(item.mediaId)
+                    ?.let { mediaDomain -> playlistItemMapper.map(item, mediaDomain) }
+                    ?: throw Exception("no media found for ${item.mediaId}")//let { log.e("No media for ${item.mediaId}"); null }
             }
             ?.sortedBy { it.order }
             ?: listOf(),

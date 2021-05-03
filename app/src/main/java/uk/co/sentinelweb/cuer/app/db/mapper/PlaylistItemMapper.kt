@@ -19,6 +19,8 @@ class PlaylistItemMapper(
         dateAdded = domain.dateAdded
     )
 
+    fun map(domain: MediaDomain): MediaEntity = mediaMapper.map(domain)
+
     fun map(entity: PlaylistItemEntity, media: MediaAndChannel): PlaylistItemDomain =
         map(entity, media.media, media.channel)
 
@@ -40,7 +42,7 @@ class PlaylistItemMapper(
         mediaDomain: MediaDomain
     ): PlaylistItemDomain = PlaylistItemDomain(
         id = entity.id,
-        media = mediaDomain,
+        media = if (entity.mediaId == mediaDomain.id) mediaDomain else throw IllegalStateException("Media id does not match item"),
         order = entity.order,
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
         dateAdded = entity.dateAdded,

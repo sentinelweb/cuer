@@ -7,14 +7,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.datepicker.MaterialDatePicker
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentSearchBinding
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.DateRangePickerDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import java.time.ZoneOffset
 
 class SearchBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -54,11 +56,28 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
             object : Observer<DialogModel> {
                 override fun onChanged(model: DialogModel) {
                     hideDialogFragment()
-                    when (model.type) {
-                        PLAYLIST_FULL -> {
+                    when (model) {
+                        is PlaylistsDialogContract.Config -> {
                             dialogFragment =
                                 PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
                             dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
+                        }
+                        is DateRangePickerDialogModel -> {
+                            val picker = MaterialDatePicker.Builder.dateRangePicker()
+                                .setTitleText(model.title)
+                                .setSelection(
+                                    androidx.core.util.Pair(
+                                        model.fromDate?.toInstant(ZoneOffset.UTC)?.toEpochMilli(),
+                                        model.toDate?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
+                                    )
+                                )
+                                .build()
+                            picker.addOnPositiveButtonClickListener {
+                                model.confirm(it.first, it.second)
+                            }
+                            picker.addOnDismissListener { dialogFragment = null }
+                            dialogFragment = picker
+                            dialogFragment?.show(childFragmentManager, SELECT_DATES_TAG);
                         }
                         else -> Unit
                     }
@@ -72,7 +91,7 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
             object : Observer<NavigationModel> {
                 override fun onChanged(nav: NavigationModel) {
                     when (nav.target) {
-                        else -> navMapper.map(nav)
+                        else -> navMapper.navigate(nav)
                     }
                 }
             }
@@ -90,5 +109,6 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
 
     companion object {
         private val SELECT_PLAYLIST_TAG = "pdf_dialog"
+        private val SELECT_DATES_TAG = "date_picker"
     }
 }

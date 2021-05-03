@@ -1,9 +1,7 @@
 package uk.co.sentinelweb.cuer.core.mappers
 
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
+import java.time.*
 import java.time.format.DateTimeFormatter
 
 class TimeStampMapper constructor(
@@ -29,6 +27,8 @@ class TimeStampMapper constructor(
 
     fun mapTimestamp(date: LocalDateTime) = timeStampFormatter.format(date)
 
+    fun mapTimestamp(date: Instant) = timeStampFormatter.format(date)
+
     fun mapDuration(duration: String) = try {
         Duration.parse(duration).toMillis()
     } catch (e: Exception) {
@@ -38,7 +38,7 @@ class TimeStampMapper constructor(
 
     fun mapDateTimeSimple(date: LocalDateTime): String = simpleTimeStampFormatter.format(date)
 
-    fun mapDateTimeSimple(ms: Long): String = simpleTimeStampFormatter.format(localDateTime(ms))
+    fun mapDateTimeSimple(ms: Long): String = simpleTimeStampFormatter.format(toLocalDateTime(ms))
 
     fun mapDateTimeSimple(dateString: String): LocalDateTime? = try {
         LocalDateTime.parse(dateString, simpleTimeStampFormatter)
@@ -47,7 +47,11 @@ class TimeStampMapper constructor(
         null
     }
 
-    private fun localDateTime(ms: Long) = LocalDateTime.ofEpochSecond(ms * 1000, 0, OffsetDateTime.now().getOffset())
+    // fixme: looks like ofEpochSecond takes microseconds?
+    fun toLocalDateTime(ms: Long) = LocalDateTime.ofEpochSecond(ms * 1000, 0, OffsetDateTime.now().getOffset())
+    fun toLocalDateTimeNano(ns: Long) = LocalDateTime.ofEpochSecond(ns / 1000, 0, OffsetDateTime.now().getOffset())
+
+    fun toLocalDateNano(ns: Long) = LocalDate.ofEpochDay(ns / 1_000_000_000)
 
     companion object {
         private const val TIMESTAMP_PATTERN = "uuuu-MM-dd'T'HH:mm:ss[.n]'Z'"

@@ -15,6 +15,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -34,15 +36,16 @@ interface PlaylistContract {
         fun initialise()
         fun destroy()
         fun refreshPlaylist()
-        fun onItemSwipeRight(item: ItemContract.Model)
-        fun onItemSwipeLeft(item: ItemContract.Model)
-        fun onItemClicked(item: ItemContract.Model)
-        fun onItemPlay(item: ItemContract.Model, external: Boolean)
-        fun onItemShowChannel(item: ItemContract.Model)
-        fun onItemStar(item: ItemContract.Model)
-        fun onItemShare(item: ItemContract.Model)
-        fun onPlayStartClick(item: ItemContract.Model)
-        fun onItemViewClick(item: ItemContract.Model)
+        fun onItemSwipeRight(itemModel: ItemContract.Model)
+        fun onItemSwipeLeft(itemModel: ItemContract.Model)
+        fun onItemClicked(itemModel: ItemContract.Model)
+        fun onItemPlay(itemModel: ItemContract.Model, external: Boolean)
+        fun onItemShowChannel(itemModel: ItemContract.Model)
+        fun onItemStar(itemModel: ItemContract.Model)
+        fun onItemRelated(itemModel: ItemContract.Model)
+        fun onItemShare(itemModel: ItemContract.Model)
+        fun onPlayStartClick(itemModel: ItemContract.Model)
+        fun onItemViewClick(itemModel: ItemContract.Model)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
@@ -76,7 +79,7 @@ interface PlaylistContract {
         fun showPlaylistCreateDialog()
         fun showAlertDialog(model: AlertDialogModel)
         fun resetItemsState()
-        fun showItemDescription(itemWitId: PlaylistItemDomain, source: Source)
+        fun showItemDescription(modelId: Long, item: PlaylistItemDomain, source: Source)
         fun gotoEdit(id: Long, source: Source)
         fun showCastRouteSelectorDialog()
         fun setPlayState(state: PlayState)
@@ -85,6 +88,7 @@ interface PlaylistContract {
         fun showRefresh()
         fun showError(message: String)
         fun updateItemModel(model: ItemContract.Model)
+        fun navigate(nav: NavigationModel)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
@@ -115,7 +119,8 @@ interface PlaylistContract {
         val isSaved: Boolean,
         val canPlay: Boolean,
         val canEdit: Boolean,
-        val items: List<ItemContract.Model>?
+        val items: List<ItemContract.Model>?,
+        val itemsIdMap: MutableMap<Long, PlaylistItemDomain>
     )
 
     companion object {
@@ -143,7 +148,7 @@ interface PlaylistContract {
                         timeProvider = get(),
                         coroutines = get(),
                         res = get(),
-                        playlistMediaCommitOrchestrator = get(),
+                        playlistMediaLookupOrchestrator = get(),
                         playlistUpdateOrchestrator = get()
                     )
                 }
@@ -164,6 +169,7 @@ interface PlaylistContract {
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory(get(), get()) }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
+                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
                 viewModel { State() }
             }
 

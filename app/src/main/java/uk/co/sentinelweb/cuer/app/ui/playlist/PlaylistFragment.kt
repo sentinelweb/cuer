@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
@@ -70,6 +71,7 @@ class PlaylistFragment :
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+    private val navMapper: NavigationMapper by currentScope.inject()
 
     // todo consider making binding nulll - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
@@ -268,17 +270,22 @@ class PlaylistFragment :
     }
 
     override fun setList(items: List<ItemContract.Model>, animate: Boolean) {
-        log.d("refresh playlist")
         binding.playlistSwipe.isRefreshing = false
         adapter.setData(items, animate)
         val isListLarge = items.size > 30
         binding.playlistFabUp.isVisible = isListLarge
         binding.playlistFabDown.isVisible = isListLarge
-        binding.playlistFabRefresh.isVisible = isListLarge
+        binding.playlistFabRefresh.isVisible = isListLarge || items.size == 0
+        binding.playlistEmpty.isVisible = items.size == 0
+        binding.playlistSwipe.isVisible = items.size > 0
     }
 
     override fun updateItemModel(model: ItemContract.Model) {
         adapter.updateItemModel(model)
+    }
+
+    override fun navigate(nav: NavigationModel) {
+        navMapper.navigate(nav)
     }
 
     override fun hideRefresh() {
@@ -397,12 +404,10 @@ class PlaylistFragment :
         presenter.onItemViewClick(item)
     }
 
-    override fun showItemDescription(itemWitId: PlaylistItemDomain, source: Source) {
-        itemWitId.id?.also { id ->
-            adapter.getItemViewForId(id)?.let { view ->
-                PlaylistFragmentDirections.actionGotoPlaylistItem(itemWitId.serialise(), source.toString())
-                    .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
-            }
+    override fun showItemDescription(modelId: Long, item: PlaylistItemDomain, source: Source) {
+        adapter.getItemViewForId(modelId)?.let { view ->
+            PlaylistFragmentDirections.actionGotoPlaylistItem(item.serialise(), source.toString())
+                .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
         }
     }
 
@@ -491,6 +496,10 @@ class PlaylistFragment :
 
     override fun onStar(item: ItemContract.Model) {
         presenter.onItemStar(item)
+    }
+
+    override fun onRelated(item: ItemContract.Model) {
+        presenter.onItemRelated(item)
     }
 
     override fun onShare(item: ItemContract.Model) {

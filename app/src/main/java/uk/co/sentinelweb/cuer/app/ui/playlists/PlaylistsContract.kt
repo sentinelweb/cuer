@@ -47,6 +47,7 @@ interface PlaylistsContract {
     interface View {
         fun setList(model: Model, animate: Boolean = true)
         fun scrollToItem(index: Int)
+        fun hideRefresh()
 
         //fun scrollTo(direction: ScrollDirection)
         fun showUndo(msg: String, undo: () -> Unit)
@@ -91,8 +92,10 @@ interface PlaylistsContract {
                         coroutines = get(),
                         newMedia = get(),
                         recentItems = get(),
-                        searchItems = get(),
-                        ytJavaApi = get()
+                        localSearch = get(),
+                        remoteSearch = get(),
+                        ytJavaApi = get(),
+                        searchMapper = get()
                     )
                 }
                 scoped { PlaylistsModelMapper() }

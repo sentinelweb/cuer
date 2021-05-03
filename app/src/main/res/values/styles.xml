@@ -81,13 +81,13 @@
     </style>
 
     <style name="TextAppearance.App.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
     </style>
 
     <style name="TextAppearance.App.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
@@ -99,12 +99,13 @@
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
     </style>
+    <!-- end TextAppearance -->
 
     <style name="Toolbar" parent="@style/Widget.MaterialComponents.Toolbar">
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
     </style>
-    <!-- end TextAppearance -->
+
     <style name="Cuer" />
 
     <style name="Cuer.AppBar" />

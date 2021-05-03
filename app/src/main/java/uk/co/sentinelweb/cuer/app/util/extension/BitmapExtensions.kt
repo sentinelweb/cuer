@@ -49,7 +49,7 @@ fun Bitmap.cropShapedBitmap(c: Context): Bitmap {
     paint.setAntiAlias(true)
     val pathProvider = ShapeAppearancePathProvider()
     val path = Path()
-    val shapeModel = ShapeAppearanceModel.builder(c, R.style.ShapeAppearance_Item_Icon, 0).build()
+    val shapeModel = ShapeAppearanceModel.builder(c, 0, R.style.ShapeAppearance_Button).build()
     val rect = Rect(0, 0, squareBitmapWidth, squareBitmapWidth)
     val rectF = RectF(rect)
     pathProvider.calculatePath(shapeModel, 1f, rectF, path)

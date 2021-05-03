@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.net.youtube
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.ID
@@ -25,5 +26,10 @@ interface YoutubeInteractor {
     @Throws(Exception::class)
     suspend fun playlist(
         id: String
+    ): NetResult<PlaylistDomain>
+
+    @Throws(Exception::class)
+    suspend fun search(
+        search: SearchRemoteDomain
     ): NetResult<PlaylistDomain>
 }

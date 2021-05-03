@@ -180,7 +180,7 @@ class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.List
     }
 
     override fun navigate(nav: NavigationModel) {
-        navMapper.map(nav)
+        navMapper.navigate(nav)
     }
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {

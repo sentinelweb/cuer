@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.core.mappers.DateFormatter
+import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter.Format.SECS
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistItemEditModelMapper(
     private val timeFormater: TimeFormatter,
-    private val dateFormater: DateFormatter,
+    private val dateTimeFormater: DateTimeFormatter,
     private val res: ResourceWrapper,
     private val backgroundMapper: BackgroundMapper
 ) {
@@ -47,7 +47,7 @@ class PlaylistItemEditModelMapper(
         position = domain.positon
             ?.takeIf { domain.duration != null && domain.duration!! > 0L }
             ?.let { (it / domain.duration!!).toFloat() },
-        pubDate = dateFormater.formatDateNullable(domain.published),
+        pubDate = dateTimeFormater.formatDateTimeNullable(domain.published),
         empty = false,
         isLive = domain.isLiveBroadcast,
         isUpcoming = domain.isLiveBroadcastUpcoming,

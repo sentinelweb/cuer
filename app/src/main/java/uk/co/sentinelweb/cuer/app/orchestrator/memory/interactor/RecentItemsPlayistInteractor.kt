@@ -18,7 +18,7 @@ class RecentItemsPlayistInteractor constructor(
             ?.data
             ?.let {
                 makeRecentItemsHeader()
-                    .copy(items = it.mapIndexed { i, playlistItem -> playlistItem.copy(i * 1000L) })
+                    .copy(items = it.mapIndexed { i, playlistItem -> playlistItem.copy() })
             }
 
     fun makeRecentItemsHeader(): PlaylistDomain = PlaylistDomain(

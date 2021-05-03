@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
+import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
@@ -19,10 +20,7 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
-import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeChannelDomainMapper
-import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeImageMapper
-import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubePlaylistDomainMapper
-import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainMapper
+import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.*
 
 
 /**
@@ -67,6 +65,13 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
                 PlaylistItemCreator(TimeProvider()),
                 imageMapper,
                 channelMapper
+            ),
+            searchMapper = YoutubeSearchMapper(
+                timeStampMapper = TimeStampMapper(log),
+                timeProvider = TimeProvider(),
+                itemCreator = PlaylistItemCreator(TimeProvider()),
+                imageMapper = imageMapper,
+                channelMapper = channelMapper
             )
         )
     }
@@ -129,6 +134,22 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
             // note the items come out of order
             assertEquals(10, actualLive.data!!.items.size)
             assertTrue(actualLive.data!!.items[0].media.isLiveBroadcast)
+
+        }
+    }
+
+    //@Ignore("Real api test .. run manually only")
+    @Test
+    fun search() {
+        runBlocking {
+            val actual = sut.search(// long 170 items
+                SearchRemoteDomain("heidegger")
+            )
+
+            assertTrue(actual.isSuccessful)
+            assertNotNull(actual.data)
+            // note the items come out of order
+            assertEquals(50, actual.data!!.items.size)
 
         }
     }

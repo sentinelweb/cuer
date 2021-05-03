@@ -41,11 +41,11 @@ class ItemPresenter(
         interactions.onRightSwipe(state.item!!)
     }
 
-    override fun canDragLeft(): Boolean = state.item?.canEdit ?: false
+    override fun canDragLeft(): Boolean = state.item?.canDelete ?: false
 
     override fun canDragRight(): Boolean = state.item?.canEdit ?: false
 
-    override fun canReorder(): Boolean = state.item?.canEdit ?: false
+    override fun canReorder(): Boolean = state.item?.canReorder ?: false
 
     override fun updateProgress() {
         view.setProgress(state.item?.progress ?: 0f)
@@ -67,6 +67,10 @@ class ItemPresenter(
 
     override fun doShare() {
         interactions.onShare(state.item!!)
+    }
+
+    override fun doRelated() {
+        interactions.onRelated(state.item!!)
     }
 
     override fun doView() {

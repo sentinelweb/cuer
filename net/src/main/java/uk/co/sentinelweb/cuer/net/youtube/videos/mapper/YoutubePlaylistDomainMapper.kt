@@ -69,7 +69,7 @@ internal class YoutubePlaylistDomainMapper(
                 ?: -1,
             thumbNail = imageMapper.mapThumb(it.thumbnails),
             image = imageMapper.mapImage(it.thumbnails),
-            channelData = channelLookup[it.channelId] ?: throw BadDataException("Channel not found"),
+            channelData = channelLookup[it.videoOwnerChannelId] ?: throw BadDataException("Channel not found"),
             published = it.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) },
             isLiveBroadcast = videoLookup[it.resourceId.videoId]
                 ?.snippet?.liveBroadcastContent

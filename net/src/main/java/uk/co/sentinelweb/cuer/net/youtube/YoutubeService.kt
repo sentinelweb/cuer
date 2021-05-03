@@ -2,10 +2,7 @@ package uk.co.sentinelweb.cuer.net.youtube
 
 import retrofit2.http.GET
 import retrofit2.http.Query
-import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
-import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubePlaylistDto
-import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubePlaylistItemDto
-import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
+import uk.co.sentinelweb.cuer.net.youtube.videos.dto.*
 
 internal interface YoutubeService {
     // doc page : https://developers.google.com/youtube/v3/docs/videos/list
@@ -41,6 +38,24 @@ internal interface YoutubeService {
         @Query("maxResults") maxResults: Int = MAX_RESULTS,
         @Query("pageToken") pageToken: String? = null
     ): YoutubePlaylistItemDto
+
+    // doc: https://developers.google.com/youtube/v3/docs/search/list
+    // https://www.googleapis.com/youtube/v3/search?q=heidigger&type=video&part=snippet&maxResults=50&order=rating&eventType=live&&key=
+    @GET("search?part=snippet")
+    suspend fun search(
+        @Query("q") q: String?,
+        @Query("type") type: String,
+        @Query("relatedToVideoId") relatedToVideoId: String?,
+        @Query("channelId") channelId: String?,
+        @Query("publishedBefore") publishedBefore: String?, // DATE STRING
+        @Query("publishedAfter") publishedAfter: String?,// DATE STRING
+        @Query("order") order: String,
+        @Query("eventType") eventType: String?,
+        @Query("relevanceLanguage") relevanceLanguage: String = "en",
+        @Query("key") key: String,
+        @Query("maxResults") maxResults: Int = MAX_RESULTS,
+        @Query("pageToken") pageToken: String? = null
+    ): YoutubeSearchDto
 
     companion object {
         val MAX_RESULTS = 50

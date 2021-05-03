@@ -95,6 +95,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
                     R.id.playlist_context_channel_external -> presenter.doShowChannel()
                     R.id.playlist_context_star -> presenter.doStar()
                     R.id.playlist_context_share -> presenter.doShare()
+                    R.id.playlist_context_related -> presenter.doRelated()
                 }
                 return true
             }

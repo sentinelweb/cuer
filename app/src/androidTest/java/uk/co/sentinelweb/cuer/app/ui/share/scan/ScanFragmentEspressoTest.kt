@@ -20,6 +20,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.tools.provider.FragmentScenarioProvider
 
@@ -28,6 +29,9 @@ class ScanFragmentEspressoTest : FragmentScenarioProvider<ScanFragment> {
 
     @Mock
     lateinit var mockPresenter: ScanContract.Presenter
+
+    @Mock
+    lateinit var mockResources: ResourceWrapper
 
     private val fixture = JFixture()
 
@@ -44,7 +48,7 @@ class ScanFragmentEspressoTest : FragmentScenarioProvider<ScanFragment> {
             modules(module {
                 scope(named<ScanFragment>()) {
                     factory { mockPresenter }
-                    factory<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity()) }
+                    factory<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), mockResources) }
                 }
             })
         }

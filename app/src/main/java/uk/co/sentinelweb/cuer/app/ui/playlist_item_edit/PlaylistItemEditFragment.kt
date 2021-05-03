@@ -102,9 +102,11 @@ class PlaylistItemEditFragment
         }
     }
 
+    // todo something gone wrong with transition - so check to move this to on start or something - check values send in intenet
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        log.d("onCreate id = ${itemArg?.id}")
         itemArg?.id?.apply {
             sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         }
@@ -188,7 +190,6 @@ class PlaylistItemEditFragment
                 //ple_star_fab.isVisible = false
                 //starMenuItem.isVisible = false
                 playMenuItem.isVisible = false
-
 
                 viewModel.delayedSetData(this, sourceArg)
             } else {
@@ -320,7 +321,7 @@ class PlaylistItemEditFragment
                 override fun onChanged(nav: NavigationModel) {
                     when (nav.target) {
                         NAV_DONE -> doneNavigation.navigateDone()//navigateDone()
-                        else -> navMapper.map(nav)
+                        else -> navMapper.navigate(nav)
                     }
                 }
             }

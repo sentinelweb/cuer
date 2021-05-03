@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import java.util.concurrent.TimeUnit
 
-class RetrofitBuilder constructor(
+internal class RetrofitBuilder constructor(
     private val config: NetModuleConfig
 ) {
 

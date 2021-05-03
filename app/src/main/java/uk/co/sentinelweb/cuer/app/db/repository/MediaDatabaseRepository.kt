@@ -12,7 +12,6 @@ import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data.Empty
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -42,8 +41,8 @@ class MediaDatabaseRepository constructor(
         log.tag(this)
     }
 
-    private val _mediaFlow = MutableSharedFlow<Pair<OrchestratorContract.Operation, MediaDomain>>()
-    override val updates: Flow<Pair<OrchestratorContract.Operation, MediaDomain>>
+    private val _mediaFlow = MutableSharedFlow<Pair<Operation, MediaDomain>>()
+    override val updates: Flow<Pair<Operation, MediaDomain>>
         get() = _mediaFlow
 
     @Transaction

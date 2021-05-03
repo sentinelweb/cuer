@@ -3,17 +3,17 @@ package uk.co.sentinelweb.cuer.net.youtube.videos.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class YoutubePlaylistDto constructor(
+internal data class YoutubePlaylistDto constructor(
     val items: List<PlaylistDto>
 ) {
     @Serializable
-    data class PlaylistDto constructor(
+    internal data class PlaylistDto constructor(
         val id: String,
         val snippet: SnippetDto, // optional field (declared as part)
         val contentDetails: ContentDto? = null// optional field (declared as part)
     ) {
         @Serializable
-        data class SnippetDto constructor(
+        internal data class SnippetDto constructor(
             val title: String,
             val description: String,
             val channelId: String,
@@ -23,8 +23,12 @@ data class YoutubePlaylistDto constructor(
         )
 
         @Serializable
-        data class ContentDto constructor(
+        internal data class ContentDto constructor(
             val itemCount: Int
         )
+    }
+
+    companion object {
+        internal val MAX_PLAYLIST_ITEMS = 1000
     }
 }

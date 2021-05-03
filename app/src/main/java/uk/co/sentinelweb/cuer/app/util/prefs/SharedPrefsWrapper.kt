@@ -52,11 +52,10 @@ class SharedPrefsWrapper<T : Field> constructor(
         prefs.edit().putString(field.fname, value.toString()).apply()
     }
 
-    fun getEnum(field: T, def: Enum<*>): Enum<*> =
+    fun <E : Enum<E>> getEnum(field: T, def: E): E =
         getString(field, null)
             ?.let { pref -> def::class.java.enumConstants.find { it.name == pref } }
             ?: def
-
 
     fun getBoolean(field: T, def: Boolean): Boolean =
         prefs.getBoolean(field.fname, def)

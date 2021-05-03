@@ -112,7 +112,7 @@ class MainActivity :
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
-        checkForPendingNavigation(null)?.apply { navMapper.map(this) }
+        checkForPendingNavigation(null)?.apply { navMapper.navigate(this) }
     }
 
     override fun onStart() {
@@ -120,7 +120,7 @@ class MainActivity :
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         presenter.onStart()
         //checkIntent(intent)
-        checkForPendingNavigation(null)?.apply { navMapper.map(this) }
+        checkForPendingNavigation(null)?.apply { navMapper.navigate(this) }
     }
 
     override fun onStop() {
@@ -150,7 +150,7 @@ class MainActivity :
     }
 
     override fun navigate(destination: NavigationModel) {
-        navMapper.map(destination)
+        navMapper.navigate(destination)
     }
 
     override fun checkForPendingNavigation(target: Target?): NavigationModel? {

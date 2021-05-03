@@ -156,6 +156,10 @@ class PlaylistsFragment :
             }
         }
     }
+
+    override fun hideRefresh() {
+        binding.playlistsSwipe.isRefreshing = false
+    }
     //endregion
 
     // region ItemContract.ItemMoveInteractions

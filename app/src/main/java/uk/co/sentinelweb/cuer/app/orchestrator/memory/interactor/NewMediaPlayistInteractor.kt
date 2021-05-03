@@ -18,7 +18,7 @@ class NewMediaPlayistInteractor constructor(
             ?.data
             ?.let {
                 makeNewItemsHeader()
-                    .copy(items = it.mapIndexed { i, playlistItem -> playlistItem.copy(i * 1000L) })
+                    .copy(items = it.mapIndexed { i, playlistItem -> playlistItem.copy() })
             }
 
     fun makeNewItemsHeader(): PlaylistDomain = PlaylistDomain(
@@ -28,7 +28,7 @@ class NewMediaPlayistInteractor constructor(
         currentIndex = -1,
         starred = true,
         image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-pixabay-40663-600.jpg"),
-        config = PlaylistDomain.PlaylistConfigDomain(playable = false, editable = false, deletable = false)
+        config = PlaylistDomain.PlaylistConfigDomain(playable = false, editable = false, deletable = false, deletableItems = false)
     )
 
     fun makeNewItemsStats(): PlaylistStatDomain = PlaylistStatDomain(

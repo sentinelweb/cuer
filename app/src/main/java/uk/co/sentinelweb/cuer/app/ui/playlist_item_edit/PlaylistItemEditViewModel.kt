@@ -121,7 +121,7 @@ class PlaylistItemEditViewModel constructor(
                         }
                 }
                 if (originalMedia.channelData.thumbNail == null
-                    || (originalMedia.duration?.let { it > 1000 * 60 * 60 * 24 } ?: false)
+                    || (originalMedia.duration?.let { it > 1000 * 60 * 60 * 24 } ?: true)
                     || originalMedia.isLiveBroadcast
                     || originalMedia.isLiveBroadcastUpcoming
                 ) {

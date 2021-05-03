@@ -33,6 +33,7 @@ interface ItemContract {
         fun doShowChannel()
         fun doStar()
         fun doShare()
+        fun doRelated()
         fun doView()
         fun doPlayStartClick()
         fun updateProgress()
@@ -52,12 +53,13 @@ interface ItemContract {
         fun onPlay(item: Model, external: Boolean)
         fun onShowChannel(item: Model)
         fun onStar(item: Model)
+        fun onRelated(item: Model)
         fun onShare(item: Model)
         fun onView(item: Model)
         fun onPlayStartClick(item: Model)
     }
 
-    data class Model constructor(
+    data class Model(
         override val id: Long,
         val index: Int,
         val url: String,
@@ -76,7 +78,9 @@ interface ItemContract {
         val isUpcoming: Boolean,
         @ColorRes val infoTextBackgroundColor: Int,
         val canEdit: Boolean,
-        val playlistName: String?
+        val playlistName: String?,
+        val canDelete: Boolean,
+        val canReorder: Boolean
     ) : ItemBaseModel(id)
 
     data class State constructor(var item: Model? = null)

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -26,16 +27,21 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
 @Composable
 fun SearchView(viewModel: SearchViewModel) {
     SearchParametersUi(
         model = viewModel.model,
         textChange = viewModel::onSearchTextChange,
+        localOrRemoteClick = viewModel::switchLocalOrRemote,
         submit = viewModel::onSubmit,
-        watchedChange = viewModel::onWatchedClick,
-        newChange = viewModel::onNewClick,
-        liveChange = viewModel::onLiveClick,
+        watchedClick = viewModel::onWatchedClick,
+        newClick = viewModel::onNewClick,
+        liveClick = viewModel::onLiveClick,
+        clearRelatedClick = viewModel::onClearRelated,
+        clearDatesClick = viewModel::onClearDates,
+        selectDatesClick = viewModel::onSelectDates,
         playlistSelect = viewModel::onPlaylistSelect
     )
 }
@@ -44,12 +50,17 @@ fun SearchView(viewModel: SearchViewModel) {
 fun SearchParametersUi(
     model: SearchContract.Model,
     textChange: (String) -> Unit,
-    watchedChange: (Boolean) -> Unit,
-    newChange: (Boolean) -> Unit,
-    liveChange: (Boolean) -> Unit,
+    localOrRemoteClick: () -> Unit,
+    watchedClick: (Boolean) -> Unit,
+    newClick: (Boolean) -> Unit,
+    liveClick: (Boolean) -> Unit,
     playlistSelect: (ChipModel) -> Unit,
+    clearRelatedClick: () -> Unit,
+    clearDatesClick: () -> Unit,
+    selectDatesClick: () -> Unit,
     submit: () -> Unit
 ) {
+
     CuerTheme {
         Surface {
             Column(
@@ -57,21 +68,149 @@ fun SearchParametersUi(
                     .height(dimensionResource(R.dimen.search_height))
                     .padding(dimensionResource(R.dimen.page_margin))
             ) {
-                Text(
-                    text = stringResource(id = R.string.search_title),
-                    style = MaterialTheme.typography.h4
-                )
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = model.type + " " + stringResource(id = R.string.search_title),
+                        style = MaterialTheme.typography.h4
+                    )
+                    Button(
+                        onClick = localOrRemoteClick,
+                        modifier = Modifier
+                            .padding(2.dp)
+                            .align(Alignment.TopEnd)
+                            .clip(shape = MaterialTheme.shapes.small)
+                    ) {
+                        Text(
+                            text = model.otherType,
+                            style = MaterialTheme.typography.button
+                        )
+                    }
+                }
                 Divider()
                 SearchTextEntryInput(
                     text = model.text,
                     textChange = textChange,
                     submit = submit
                 )
-                Column(modifier = Modifier.weight(1f)) {
+                val modifier = Modifier.weight(1f)
+                if (model.isLocal) {
+                    SearchLocal(model.localParams, modifier, playlistSelect)
+                } else {
+                    SearchRemote(model.remoteParams, liveClick, clearRelatedClick, clearDatesClick, selectDatesClick, modifier)
+                }
+                Button(
+                    onClick = submit,
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .align(Alignment.End)
+                        .clip(shape = MaterialTheme.shapes.small)
+                ) {
+                    Text(
+                        text = "Search",
+                        style = MaterialTheme.typography.button
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchRemote(
+    model: SearchContract.RemoteModel,
+    liveClick: (Boolean) -> Unit,
+    clearRelatedClick: () -> Unit,
+    clearDateRangeClick: () -> Unit,
+    selectDatesClick: () -> Unit,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+    ) {
+        Row(modifier = Modifier.padding(8.dp)) {
+            val spacing = Modifier.padding(horizontal = 4.dp)
+            val text = spacing.align(Alignment.CenterVertically)
+            var dateSelectionText = stringResource(id = R.string.search_select_dates)
+            if (model.fromDate != null || model.toDate != null) {
+                dateSelectionText = "${model.fromDate} - ${model.toDate}"
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    tint = MaterialTheme.colors.onSurface,
+                    contentDescription = stringResource(id = R.string.clear),
+                    modifier = Modifier
+                        .width(24.dp)
+                        .height(24.dp)
+                        .clickable { clearDateRangeClick() }
+                        .align(Alignment.CenterVertically)
+                )
+            }
+            Button(
+                onClick = { selectDatesClick() },
+                modifier = Modifier
+                    .padding(2.dp)
+                    .clip(shape = MaterialTheme.shapes.small)
+            ) {
+                Text(
+                    text = dateSelectionText,
+                    style = MaterialTheme.typography.body2,
+                    modifier = text
+                )
+            }
+        }
+//
+//        if (model.relatedToPlatformId != null) {
+//            Row(modifier = Modifier.padding(8.dp)) {
+//                val spacing = Modifier.padding(horizontal = 4.dp)
+//                val text = spacing.align(Alignment.CenterVertically)
+//                Icon(
+//                    imageVector = Icons.Default.Clear,
+//                    tint = MaterialTheme.colors.onSurface,
+//                    contentDescription = stringResource(id = R.string.clear),
+//                    modifier = Modifier
+//                        .width(24.dp)
+//                        .height(24.dp)
+//                        .clickable { clearRelatedClick() }
+//                        .align(Alignment.CenterVertically)
+//                )
+//                Text(
+//                    text = model.relatedToPlatformId,
+//                    style = MaterialTheme.typography.body2,
+//                    modifier = text
+//                )
+//            }
+//        }
+
+        Row(modifier = Modifier.padding(8.dp)) {
+            val spacing = Modifier.padding(horizontal = 4.dp)
+            val text = spacing.align(Alignment.CenterVertically)
+            Checkbox(
+                checked = model.isLive,
+                onCheckedChange = liveClick,
+                modifier = spacing
+            )
+            Text(
+                text = "Live",
+                style = MaterialTheme.typography.body2,
+                modifier = text
+            )
+        }
+
+    }
+}
+
+
+@Composable
+private fun SearchLocal(
+    model: SearchContract.LocalModel,
+    modifier: Modifier,
+    playlistSelect: (ChipModel) -> Unit
+) {
+    Column(modifier = modifier) {
 //                    Row(modifier = Modifier.padding(8.dp)) {
 //                        val spacing = Modifier.padding(horizontal = 4.dp)
-//                        val text = spacing
-//                            .align(Alignment.CenterVertically)
+//                        val text = spacing.align(Alignment.CenterVertically)
 //                        Checkbox(
 //                            checked = model.localParams.isWatched,
 //                            onCheckedChange = watchedChange,
@@ -103,28 +242,13 @@ fun SearchParametersUi(
 //                            modifier = text
 //                        )
 //                    }
-                    Row(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .horizontalScroll(rememberScrollState())
-                    ) {
-                        model.localParams.playlists.forEach {
-                            Chip(model = it, onClick = playlistSelect)
-                        }
-                    }
-                }
-                Button(
-                    onClick = submit,
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .align(Alignment.End)
-                        .clip(shape = MaterialTheme.shapes.small)
-                ) {
-                    Text(
-                        text = "Search",
-                        style = MaterialTheme.typography.button
-                    )
-                }
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .horizontalScroll(rememberScrollState())
+        ) {
+            model.playlists.forEach {
+                Chip(model = it, onClick = playlistSelect)
             }
         }
     }
@@ -253,14 +377,28 @@ fun TodoInputText(
 @Composable
 fun PreviewSearchParametersUi() {
     SearchParametersUi(SearchContract.Model(
+        type = "Local",
+        otherType = "Remote",
         text = "philosophy",
+        isLocal = false,
         localParams = SearchContract.LocalModel(
+            isWatched = false,
+            isLive = false,
+            isNew = false,
             playlists = listOf(
                 PLAYLIST_SELECT_MODEL,
                 ChipModel(PLAYLIST, "philosophy"),
                 ChipModel(PLAYLIST, "music"),
                 ChipModel(PLAYLIST, "doco"),
             )
+        ),
+        remoteParams = SearchContract.RemoteModel(
+            platform = PlatformDomain.YOUTUBE,
+            isLive = false,
+            channelPlatformId = null,
+            relatedToPlatformId = "dfddffdfasdf",
+            fromDate = null,
+            toDate = null,
         )
-    ), {}, {}, {}, {}, {}, {})
+    ), {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
 }

@@ -49,9 +49,10 @@
     <string name="pie_add_playlist_dialog_title">Create Playlist</string>
     <string name="pie_empty_title">Sorry &#8230; ❤</string>
 
-    <!-- playlist fragemnt -->
+    <!-- playlist fragment -->
     <string name="playlist_fab_up_contentdesc">Up</string>
     <string name="playlist_fab_down_contentdesc">Down</string>
+    <string name="playlist_fab_refresh_contentdesc">Refresh</string>
     <string name="pl_item_delete"> Delete </string>
     <string name="pl_item_move"> Move </string>
     <string name="playlist_change_dialog_title">Change playlist?</string>
@@ -63,6 +64,7 @@
     <string name="playlist_item_menu_channel_yt">Go to channel</string>
     <string name="playlist_item_menu_star">Star</string>
     <string name="playlist_item_menu_share">Share</string>
+    <string name="playlist_item_menu_related">Related</string>
 
     <!-- playlist edit fragemnt -->
     <string name="pe_fragment_title">Edit playlist</string>
@@ -113,8 +115,10 @@
     <string name="search_title">Search</string>
     <string name="search_local">Local</string>
     <string name="search_remote">Remote</string>
+    <string name="search_youtube">YouTube</string>
     <string name="search_watched">Watched</string>
     <string name="search_live">Live</string>
+    <string name="search_select_dates">Select Dates …</string>
 
     <!-- misc -->
     <string name="ok">OK</string>

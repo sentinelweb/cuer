@@ -17,10 +17,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaCommitOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -40,6 +43,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.ext.*
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
@@ -48,7 +52,7 @@ class PlaylistPresenter(
     private val view: PlaylistContract.View,
     private val state: PlaylistContract.State,
     private val mediaOrchestrator: MediaOrchestrator,
-    private val playlistMediaCommitOrchestrator: PlaylistMediaCommitOrchestrator,
+    private val playlistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val playlistUpdateOrchestrator: PlaylistUpdateOrchestrator,
@@ -100,7 +104,7 @@ class PlaylistPresenter(
         ytContextHolder.addConnectionListener(castConnectionListener)
         queue.currentPlaylistFlow
             .filter { isQueuedPlaylist }
-            .onEach { log.d("q.playlist change id=${it.id} index = ${it.currentIndex}") }
+            .onEach { log.d("q.playlist change id=${it.id} index=${it.currentIndex}") }
             .onEach { view.highlightPlayingItem(it.currentIndex) }
             .launchIn(coroutines.mainScope)
 
@@ -115,6 +119,7 @@ class PlaylistPresenter(
     private fun listen() {
         playlistOrchestrator.updates
             .onEach { (op, source, plist) ->
+                log.d("playlist changed: $op, $source, id=${plist.id} items=${plist.items.size}")
                 if (plist.id?.toIdentifier(source) == state.playlistIdentifier) {
                     when (op) {
                         FLAT ->
@@ -138,7 +143,7 @@ class PlaylistPresenter(
             }.launchIn(coroutines.mainScope)
 
         playlistItemOrchestrator.updates.onEach { (op, source, plistItem) ->
-            log.d("item changed: $op, $source, ${plistItem.id} ${plistItem.media.title}")
+            log.d("item changed: $op, $source, id=${plistItem.id} media=${plistItem.media.title}")
             val currentIndexBefore = state.playlist?.currentIndex
             when (op) { // todo just apply model updates (instead of full rebuild)
                 FLAT,
@@ -168,7 +173,7 @@ class PlaylistPresenter(
         }.launchIn(coroutines.mainScope)
 
         mediaOrchestrator.updates.onEach { (op, source, media) ->
-            log.d("media changed: $op, $source, ${media.id} ${media.title}")
+            log.d("media changed: $op, $source, id=${media.id} title=${media.title}")
             when (op) {
                 FLAT,
                 FULL -> {
@@ -190,29 +195,40 @@ class PlaylistPresenter(
     }
 
     // move item to playlist
-    override fun onItemSwipeRight(item: ItemContract.Model) { // move
+    override fun onItemSwipeRight(itemModel: ItemContract.Model) { // move
         state.viewModelScope.launch {
-            if (state.playlistIdentifier.source == MEMORY) {
-                toastWrapper.show("Cant move the items before saving")
-                updateView()
-            } else {
-                state.selectedPlaylistItem = state.playlist?.itemWitId(item.id)
-                view.showPlaylistSelector(
-                    PlaylistsDialogContract.Config(
-                        selectedPlaylists = setOf(state.playlist!!),
-                        multi = true,
-                        itemClick = { which: PlaylistDomain?, _ ->
-                            which
-                                ?.let { moveItemToPlaylist(it) }
-                                ?: view.showPlaylistCreateDialog()
-                        },
-                        confirm = { },
-                        dismiss = { view.resetItemsState() },
-                        suggestionsMedia = state.selectedPlaylistItem?.media,
-                    )
-                )
-            }
+            state.model
+                ?.itemsIdMap
+                ?.get(itemModel.id)
+                ?.also { itemDomain ->
+                    state.playlist?.apply {
+                        if (config.editableItems.not()) {
+                            toastWrapper.show("Cant move the items before saving")
+                            updateView()
+                        } else {
+                            state.selectedPlaylistItem = itemDomain
+                            showPlaylistSelector()
+                        }
+                    }
+                }
         }
+    }
+
+    private fun showPlaylistSelector() {
+        view.showPlaylistSelector(
+            PlaylistsDialogContract.Config(
+                selectedPlaylists = setOf(state.playlist!!),
+                multi = true,
+                itemClick = { which: PlaylistDomain?, _ ->
+                    which
+                        ?.let { moveItemToPlaylist(it) }
+                        ?: view.showPlaylistCreateDialog()
+                },
+                confirm = { },
+                dismiss = { view.resetItemsState() },
+                suggestionsMedia = state.selectedPlaylistItem?.media,
+            )
+        )
     }
 
     override fun onPlaylistSelected(playlist: PlaylistDomain, selected: Boolean) {
@@ -261,8 +277,9 @@ class PlaylistPresenter(
                         .copy(playlistId = playlist.id!!)
                         .apply { state.movedPlaylistItem = this }
                         .copy(order = timeProvider.currentTimeMillis())
-                        .apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.toFlatOptions()) }
+                        .apply { playlistItemOrchestrator.save(this, LOCAL.toFlatOptions()) }
                         .apply { view.showUndo("Moved to : ${playlist.title}", ::undoMoveItem) }
+                        .also { state.selectedPlaylistItem = null }
                 }
             }
     }
@@ -277,59 +294,60 @@ class PlaylistPresenter(
     }
 
     // delete item
-    override fun onItemSwipeLeft(item: ItemContract.Model) {
+    override fun onItemSwipeLeft(itemModel: ItemContract.Model) {
         state.viewModelScope.launch {
             delay(400)
 
-            state.playlist
-                ?.let { it.items.find { it.id == item.id } }
+            state.model
+                ?.itemsIdMap
+                ?.get(itemModel.id)
                 ?.also { log.d("found item ${it.id}") }
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
-                    // todo handle exceptions
-                    playlistItemOrchestrator.delete(deleteItem, state.playlistIdentifier.toFlatOptions())
+                    playlistItemOrchestrator.delete(deleteItem, LOCAL.toFlatOptions())
                     view.showUndo("Deleted: ${deleteItem.media.title}", ::undoDelete) // todo extract
                 }
         }
     }
 
-    override fun onItemViewClick(item: ItemContract.Model) {
-        state.playlist?.itemWitId(item.id)
+    override fun onItemViewClick(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
             ?.apply {
-                val source = if (state.playlist?.type != APP) {
-                    state.playlistIdentifier.source
-                } else {
-                    LOCAL
-                }
-                view.showItemDescription(this, source)
+                val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
+                view.showItemDescription(itemModel.id, this, source)
             }// todo pass identifier?
     }
 
-    override fun onItemClicked(item: ItemContract.Model) {
-        state.playlist
-            ?.itemWitId(item.id)
+    override fun onItemClicked(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
             ?.let { itemDomain ->
                 if (!(ytContextHolder.isConnected())) {
-                    val source = if (state.playlist?.type != APP) {
-                        state.playlistIdentifier.source
-                    } else {
-                        LOCAL
-                    }
-                    view.showItemDescription(itemDomain, source)
+                    val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
+                    view.showItemDescription(itemModel.id, itemDomain, source)
                 } else {
-                    playItem(itemDomain, false)
+                    itemDomain.playlistId?.let {
+                        playItem(itemModel.id, itemDomain, false)
+                    } ?: run {
+                        val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
+                        view.showItemDescription(itemModel.id, itemDomain, source)
+                    }
                 }
             } // todo error
     }
 
-    override fun onPlayStartClick(item: ItemContract.Model) {
-        state.playlist
-            ?.itemWitId(item.id)
+    override fun onPlayStartClick(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
             ?.let { itemDomain ->
                 if (!(ytContextHolder.isConnected())) {
-                    //view.showItemDescription(itemDomain)
+                    //view.showItemDescription(item.id, itemDomain)
                 } else {
-                    playItem(itemDomain, true)
+                    playItem(itemModel.id, itemDomain, true)
                 }
             } // todo error
     }
@@ -357,10 +375,59 @@ class PlaylistPresenter(
         return true
     }
 
-    private fun playItem(itemDomain: PlaylistItemDomain, resetPos: Boolean) {
-        if (isQueuedPlaylist) {
+    override fun onItemShowChannel(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
+            ?.takeUnless { ytJavaApi.launchChannel(it.media) }
+            ?.also { toastWrapper.show("can't launch channel") }
+            ?: toastWrapper.show("can't find video")
+    }
+
+    override fun onItemStar(itemModel: ItemContract.Model) {
+        toastWrapper.show("todo: star ${itemModel.id}")
+    }
+
+    override fun onItemRelated(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
+            ?.also { item ->
+                prefsWrapper.putString(
+                    LAST_REMOTE_SEARCH, SearchRemoteDomain(
+                        relatedToMediaPlatformId = item.media.platformId,
+                        relatedToMediaTitle = item.media.title
+                    ).serialise()
+                )
+                prefsWrapper.putEnum(LAST_SEARCH_TYPE, SearchContract.SearchType.REMOTE)
+
+                view.navigate(
+                    NavigationModel(
+                        NavigationModel.Target.PLAYLIST_FRAGMENT,
+                        mapOf(
+                            NavigationModel.Param.PLAYLIST_ID to REMOTE_SEARCH_PLAYLIST,
+                            NavigationModel.Param.PLAY_NOW to false,
+                            NavigationModel.Param.SOURCE to MEMORY
+                        )
+                    )
+                )
+
+            }
+    }
+
+    override fun onItemShare(itemModel: ItemContract.Model) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
+            ?.let { itemDomain ->
+                shareWrapper.share(itemDomain.media)
+            }
+    }
+
+    private fun playItem(modelId: Long, itemDomain: PlaylistItemDomain, resetPos: Boolean) {
+        if (queue.playlistId == itemDomain.playlistId?.toIdentifier(LOCAL)) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
-        } else { // todo only confirm if video is playing
+        } else {
             view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
                 state.playlist?.let {
                     // todo merge with above onPlayPlaylist
@@ -376,7 +443,7 @@ class PlaylistPresenter(
                     }
                 }
             }, {// info
-                view.showItemDescription(itemDomain, state.playlistIdentifier.source)
+                view.showItemDescription(modelId, itemDomain, state.playlistIdentifier.source)
             }))
         }
     }
@@ -391,9 +458,10 @@ class PlaylistPresenter(
         view.scrollTo(direction)
     }
 
-    override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
-        state.playlist
-            ?.itemWitId(item.id)
+    override fun onItemPlay(itemModel: ItemContract.Model, external: Boolean) {
+        state.model
+            ?.itemsIdMap
+            ?.get(itemModel.id)
             ?.also {
                 if (external) {
                     if (!ytJavaApi.launchVideo(it.media)) {
@@ -404,24 +472,6 @@ class PlaylistPresenter(
                 }
             }
             ?: toastWrapper.show("can't find video")
-    }
-
-    override fun onItemShowChannel(item: ItemContract.Model) {
-        state.playlist
-            ?.itemWitId(item.id)
-            ?.takeUnless { ytJavaApi.launchChannel(it.media) }
-            ?.also { toastWrapper.show("can't launch channel") }
-            ?: toastWrapper.show("can't find video")
-    }
-
-    override fun onItemStar(item: ItemContract.Model) {
-        toastWrapper.show("todo: star ${item.id}")
-    }
-
-    override fun onItemShare(item: ItemContract.Model) {
-        state.playlist?.itemWitId(item.id)?.let { itemDomain ->
-            shareWrapper.share(itemDomain.media)
-        }
     }
 
     override fun moveItem(fromPosition: Int, toPosition: Int) {
@@ -456,8 +506,10 @@ class PlaylistPresenter(
                     }
                 }
         } else {
-            log.d("commitMove: Move failed .. ")
-            refreshPlaylist()
+            if (state.dragFrom != null || state.dragTo != null) {
+                log.d("commitMove: Move failed .. ")
+                refreshPlaylist()
+            }
         }
         state.dragFrom = null
         state.dragTo = null
@@ -517,7 +569,7 @@ class PlaylistPresenter(
     override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit) {
         if (state.playlistIdentifier.source == MEMORY) {
             state.playlist
-                ?.let { playlistMediaCommitOrchestrator.commitMediaAndReplace(it, LOCAL) }
+                ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it, LOCAL) }
                 ?.let { it.copy(items = it.items.map { it.copy(id = null) }, config = it.config.copy(playable = true)) }
                 ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
                 ?.also { state.playlistIdentifier = it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure") }
@@ -559,6 +611,8 @@ class PlaylistPresenter(
                 .also { updateView(animate) }
         } catch (e: Throwable) {
             log.e("Error loading playlist", e)
+            view.showError("Load failed: ${e::class.java.simpleName}")
+            view.hideRefresh()
         }
     }
 
@@ -603,17 +657,31 @@ class PlaylistPresenter(
                 indexOfFirst { it.media.id == m.id }
                     .takeIf { it > -1 }
                     ?.let { index ->
-                        val changedItem = get(index).copy(media = m)
-                        state.playlist = state.playlist
-                            ?.copy(items = toMutableList().apply { set(index, changedItem) })
-                        val mappedItem =
-                            modelMapper.map(changedItem, index, state.playlist?.config?.editable ?: false, playlists = state.playlistsMap)
-                        state.model = state.model?.let {
-                            it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
+                        state.model?.let { model ->
+                            val originalItem = get(index)
+                            val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
+                                ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
+                            val changedItem = originalItem.copy(media = m)
+                            state.playlist = state.playlist
+                                ?.copy(items = toMutableList().apply { set(index, changedItem) })
+                            val mappedItem =
+                                modelMapper.map(
+                                    modelId,
+                                    changedItem,
+                                    index,
+                                    state.playlist?.config?.editableItems ?: false,
+                                    state.playlist?.config?.deletableItems ?: false,
+                                    state.playlist?.config?.editable ?: false,
+                                    playlists = state.playlistsMap,
+                                )
+                            state.model = model.let {
+                                it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
+                            }
+                            model.itemsIdMap[modelId] = changedItem
+                            mappedItem
+                                .takeIf { coroutines.mainScopeActive }
+                                ?.apply { view.updateItemModel(this) }
                         }
-                        mappedItem
-                            .takeIf { coroutines.mainScopeActive }
-                            ?.apply { view.updateItemModel(this) }
                     }
             }
     }

@@ -23,6 +23,15 @@ class PlaylistModelMapper constructor(
     private val iconMapper: IconMapper,
     private val backgroundMapper: BackgroundMapper
 ) {
+    private var _modelIdGenerator = 0L
+    var modelIdGenerator: Long = 0
+        get() {
+            _modelIdGenerator--
+            return _modelIdGenerator
+        }
+        set(value) = if (value != 0L) {
+            throw IllegalArgumentException("You can only reset the generator")
+        } else field = value
 
     fun map(
         domain: PlaylistDomain,
@@ -30,35 +39,55 @@ class PlaylistModelMapper constructor(
         mapItems: Boolean = true,
         id: OrchestratorContract.Identifier<*>,
         playlists: Map<Long, PlaylistDomain>?
-    ): PlaylistContract.Model = PlaylistContract.Model(
-        domain.title,
-        domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
-        domain.mode.ordinal,
-        iconMapper.map(domain.mode),
-        if (isPlaying) R.drawable.ic_baseline_playlist_close_24 else R.drawable.ic_baseline_playlist_play_24,
-        if (domain.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_unstarred_white,
-        domain.default,
-        id.source == LOCAL,
-        domain.config.playable,
-        domain.config.editable,
-        if (mapItems) {
-            domain.items.mapIndexed { index, item -> map(item, index, domain.config.editable, playlists) }
-        } else {
-            null
-        }
-    )
+    ): PlaylistContract.Model {
+        modelIdGenerator = 0
+        val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
+        return PlaylistContract.Model(
+            domain.title,
+            domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
+            domain.mode.ordinal,
+            iconMapper.map(domain.mode),
+            if (isPlaying) R.drawable.ic_baseline_playlist_close_24 else R.drawable.ic_baseline_playlist_play_24,
+            if (domain.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_unstarred_white,
+            domain.default,
+            id.source == LOCAL,
+            domain.config.playable,
+            domain.config.editable,
+            items = if (mapItems) {
+                domain.items.mapIndexed { index, item ->
+                    val modelId = item.id ?: modelIdGenerator
+                    itemsIdMap[modelId] = item
+                    map(
+                        modelId,
+                        item,
+                        index,
+                        domain.config.editableItems,
+                        domain.config.deletableItems,
+                        domain.config.editable,
+                        playlists
+                    )
+                }
+            } else {
+                null
+            },
+            itemsIdMap = itemsIdMap
+        )
+    }
 
     fun map(
+        modelId: Long,
         item: PlaylistItemDomain,
         index: Int,
-        editable: Boolean,
+        canEdit: Boolean,
+        canDelete: Boolean,
+        canReorder: Boolean,
         playlists: Map<Long, PlaylistDomain>?
     ): ItemContract.Model {
         val top = item.media.title ?: "No title"
         val pos = item.media.positon?.toFloat() ?: 0f
         val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f
         return ItemContract.Model(
-            item.id!!,
+            modelId,
             index = index,
             url = item.media.url,
             type = item.media.mediaType,
@@ -84,8 +113,10 @@ class PlaylistModelMapper constructor(
             isLive = item.media.isLiveBroadcast,
             isUpcoming = item.media.isLiveBroadcastUpcoming,
             infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media),
-            canEdit = editable,
-            playlistName = playlists?.get(item.playlistId!!)?.title
+            canEdit = canEdit,
+            canDelete = canDelete,
+            playlistName = playlists?.get(item.playlistId)?.title,
+            canReorder = canReorder
         )
     }
 
