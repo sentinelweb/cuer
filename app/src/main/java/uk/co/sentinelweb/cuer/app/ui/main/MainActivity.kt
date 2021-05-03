@@ -62,7 +62,6 @@ class MainActivity :
         bottom_nav_view.setupWithNavController(navController)
 
         edgeToEdgeWrapper.doOnApplyWindowInsets(bottom_nav_view) { view, insets, padding ->
-            log.d("Inset change: $insets padding:$padding")
             view.updatePadding(
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )

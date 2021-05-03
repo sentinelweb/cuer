@@ -54,7 +54,7 @@ class PlaylistMapper(
             ?.mapNotNull { item ->
                 medias?.get(item.mediaId)
                     ?.let { mediaAndChannel -> playlistItemMapper.map(item, mediaAndChannel) }
-                    ?: throw Exception("no media found for ${item.mediaId}")//let { log.e("No media for ${item.mediaId}"); null } // todo possibly should have a flag here db inconsistent .. but likely legacy data
+                    ?: let { log.e("No media for ${item.mediaId}"); null } // throw Exception("no media found for ${item.mediaId}") // todo possibly should have a flag here db inconsistent .. but likely legacy data
             }
             ?.sortedBy { it.order }
             ?: listOf(),
@@ -85,7 +85,7 @@ class PlaylistMapper(
             ?.mapNotNull { item ->
                 medias.get(item.mediaId)
                     ?.let { mediaDomain -> playlistItemMapper.map(item, mediaDomain) }
-                    ?: throw Exception("no media found for ${item.mediaId}")//let { log.e("No media for ${item.mediaId}"); null }
+                    ?: let { log.e("No media for ${item.mediaId}"); null }//throw Exception("no media found for ${item.mediaId}")//
             }
             ?.sortedBy { it.order }
             ?: listOf(),
