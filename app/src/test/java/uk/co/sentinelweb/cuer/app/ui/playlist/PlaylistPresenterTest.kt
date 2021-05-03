@@ -772,7 +772,6 @@ class PlaylistPresenterTest {
     fun `undoDelete - item before current`() {
         testCoroutineScope.runBlockingTest {
             createSut()
-            val deletedItemIndex = 0
             val deletedItem = fixture.build<PlaylistItemDomain>().copy(
                 id = idCounter, order = fixtCurrentPlaylist.items.get(0).order - 100, playlistId = fixtCurrentPlaylist.id
             )
@@ -796,7 +795,7 @@ class PlaylistPresenterTest {
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
-                mockPlaylistItemOrchestrator.save(deletedItem, fixtCurrentSource.toFlatOptions())
+                mockPlaylistItemOrchestrator.save(deletedItem, Source.LOCAL.toFlatOptions())
             }
             verify { mockView.setModel(fixtExpectedMapped) }
             assertThat(fixtState!!.deletedPlaylistItem).isNull()
