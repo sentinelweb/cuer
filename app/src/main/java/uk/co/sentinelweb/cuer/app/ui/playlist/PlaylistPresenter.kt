@@ -301,6 +301,7 @@ class PlaylistPresenter(
             state.model
                 ?.itemsIdMap
                 ?.get(itemModel.id)
+                ?.takeIf { it.id != null }
                 ?.also { log.d("found item ${it.id}") }
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
@@ -545,8 +546,9 @@ class PlaylistPresenter(
     override fun undoDelete() {
         state.deletedPlaylistItem?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistItemOrchestrator.save(itemDomain, state.playlistIdentifier.toFlatOptions())
+                playlistItemOrchestrator.save(itemDomain, LOCAL.toFlatOptions())
                 state.deletedPlaylistItem = null
+                executeRefresh()
             }
         }
     }
