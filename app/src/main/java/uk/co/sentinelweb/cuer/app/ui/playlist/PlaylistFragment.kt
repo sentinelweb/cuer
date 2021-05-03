@@ -516,12 +516,12 @@ class PlaylistFragment :
     companion object {
 
         fun makeNav(plId: Long?, plItemId: Long?, play: Boolean, source: Source?): NavigationModel {
-            val params = mapOf(
+            val params = mutableMapOf(
                 PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
                 PLAY_NOW to play,
                 SOURCE to (source ?: throw IllegalArgumentException("No Source"))
             ).apply {
-                plItemId?.also { PLAYLIST_ITEM_ID to it }
+                plItemId?.also { put(PLAYLIST_ITEM_ID, it) }
             }
             return NavigationModel(
                 PLAYLIST_FRAGMENT, params

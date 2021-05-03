@@ -532,8 +532,7 @@ class PlaylistPresenter(
                 }
                 ?.apply {
                     if (playNow) {
-                        state.playlist
-                            ?.apply { queue.playNow(state.playlistIdentifier, plItemId) }
+                         queue.playNow(state.playlistIdentifier, plItemId)
                     }
                 }
                 ?: run {

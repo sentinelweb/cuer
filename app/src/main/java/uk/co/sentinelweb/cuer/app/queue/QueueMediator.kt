@@ -143,16 +143,14 @@ class QueueMediator constructor(
     }
 
     private suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?, source: Source) {
-        playlist
-            .let {
-                it.indexOfItemId(playlistItemId)?.let { foundIndex ->
-                    playlist.let {
-                        it.copy(currentIndex = foundIndex).apply {
-                            playlistOrchestrator.save(it, Options(source, true))
-                        }
-                    }
-                } ?: playlist
-            }.also {
+        (playlist.indexOfItemId(playlistItemId)
+            ?.let { foundIndex ->
+                playlist.copy(currentIndex = foundIndex).apply {
+                    playlistOrchestrator.save(this, Options(source, true))
+                }
+            }
+            ?: playlist)
+            .also {
                 refreshQueueFrom(it, source)
                 playNow()
             }
@@ -177,25 +175,30 @@ class QueueMediator constructor(
     }
 
     override fun updateCurrentMediaItem(updatedMedia: MediaDomain) {
-        coroutines.computationScope.launch {
-            state.currentItem = state.currentItem?.run {
-                media.let {
-                    MediaPositionUpdate(
-                        id = it.id!!,
-                        positon = updatedMedia.positon,
-                        duration = updatedMedia.duration,
-                        dateLastPlayed = updatedMedia.dateLastPlayed,
-                        watched = true
-                    )
-                }.let {
-                    playlistOrchestrator.updateMedia(playlist!!, it, state.playlistIdentifier.toFlatOptions(true))
-                        ?.let { copy(media = it) }
-                }
-            }
-            state.playlist = state.playlist?.let {
-                it.copy(items = it.items.toMutableList().apply {
-                    set(currentItemIndex ?: throw IllegalStateException(), state.currentItem ?: throw IllegalStateException())
-                })
+        val currentItemIsInPlaylist = currentItemIndex ?: -1 > -1
+        if (currentItemIsInPlaylist) {
+            coroutines.computationScope.launch {
+                state.currentItem = state.currentItem
+                    ?.run {
+                        media.let {
+                            MediaPositionUpdate(
+                                id = it.id!!,
+                                positon = updatedMedia.positon,
+                                duration = updatedMedia.duration,
+                                dateLastPlayed = updatedMedia.dateLastPlayed,
+                                watched = true
+                            )
+                        }.let {
+                            playlistOrchestrator.updateMedia(playlist!!, it, state.playlistIdentifier.toFlatOptions(true))
+                                ?.let { copy(media = it) }
+                        }
+                    }
+                state.playlist = state.playlist
+                    ?.let {
+                        it.copy(items = it.items.toMutableList().apply {
+                            set(currentItemIndex ?: throw IllegalStateException(), state.currentItem ?: throw IllegalStateException())
+                        })
+                    }
             }
         }
     }

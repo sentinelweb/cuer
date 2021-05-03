@@ -156,7 +156,7 @@ class SharePresenter constructor(
                 else -> throw java.lang.IllegalStateException("Unsupported type")
             }
             if (forward) {
-                log.d("finish:play = $play, playlistId,itemId = $playId")
+                log.d("finish:play = $play, playlistItemId=${playId.second}, itemId = $playId")
                 view.gotoMain(playId.first, plItemId = playId.second, LOCAL, play)
                 view.exit()
             } else { // return play is hidden for not connected
