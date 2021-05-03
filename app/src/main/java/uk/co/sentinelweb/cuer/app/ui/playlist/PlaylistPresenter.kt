@@ -104,7 +104,7 @@ class PlaylistPresenter(
         ytContextHolder.addConnectionListener(castConnectionListener)
         queue.currentPlaylistFlow
             .filter { isQueuedPlaylist }
-            .onEach { log.d("q.playlist change id=${it.id} index = ${it.currentIndex}") }
+            .onEach { log.d("q.playlist change id=${it.id} index=${it.currentIndex}") }
             .onEach { view.highlightPlayingItem(it.currentIndex) }
             .launchIn(coroutines.mainScope)
 
@@ -119,6 +119,7 @@ class PlaylistPresenter(
     private fun listen() {
         playlistOrchestrator.updates
             .onEach { (op, source, plist) ->
+                log.d("playlist changed: $op, $source, id=${plist.id} items=${plist.items.size}")
                 if (plist.id?.toIdentifier(source) == state.playlistIdentifier) {
                     when (op) {
                         FLAT ->
@@ -142,7 +143,7 @@ class PlaylistPresenter(
             }.launchIn(coroutines.mainScope)
 
         playlistItemOrchestrator.updates.onEach { (op, source, plistItem) ->
-            log.d("item changed: $op, $source, ${plistItem.id} ${plistItem.media.title}")
+            log.d("item changed: $op, $source, id=${plistItem.id} media=${plistItem.media.title}")
             val currentIndexBefore = state.playlist?.currentIndex
             when (op) { // todo just apply model updates (instead of full rebuild)
                 FLAT,
@@ -172,7 +173,7 @@ class PlaylistPresenter(
         }.launchIn(coroutines.mainScope)
 
         mediaOrchestrator.updates.onEach { (op, source, media) ->
-            log.d("media changed: $op, $source, ${media.id} ${media.title}")
+            log.d("media changed: $op, $source, id=${media.id} title=${media.title}")
             when (op) {
                 FLAT,
                 FULL -> {
@@ -505,8 +506,10 @@ class PlaylistPresenter(
                     }
                 }
         } else {
-            log.d("commitMove: Move failed .. ")
-            refreshPlaylist()
+            if (state.dragFrom != null || state.dragTo != null) {
+                log.d("commitMove: Move failed .. ")
+                refreshPlaylist()
+            }
         }
         state.dragFrom = null
         state.dragTo = null
