@@ -42,7 +42,7 @@ class PlaylistItemMapper(
         mediaDomain: MediaDomain
     ): PlaylistItemDomain = PlaylistItemDomain(
         id = entity.id,
-        media = mediaDomain,
+        media = if (entity.mediaId == mediaDomain.id) mediaDomain else throw IllegalStateException("Media id does not match item"),
         order = entity.order,
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
         dateAdded = entity.dateAdded,

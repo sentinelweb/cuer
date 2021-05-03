@@ -49,9 +49,10 @@
     <string name="pie_add_playlist_dialog_title">Create Playlist</string>
     <string name="pie_empty_title">Sorry &#8230; ❤</string>
 
-    <!-- playlist fragemnt -->
+    <!-- playlist fragment -->
     <string name="playlist_fab_up_contentdesc">Up</string>
     <string name="playlist_fab_down_contentdesc">Down</string>
+    <string name="playlist_fab_refresh_contentdesc">Refresh</string>
     <string name="pl_item_delete"> Delete </string>
     <string name="pl_item_move"> Move </string>
     <string name="playlist_change_dialog_title">Change playlist?</string>

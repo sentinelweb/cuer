@@ -230,16 +230,19 @@ internal class YoutubeRetrofitInteractor constructor(
                             )
                         }
                         .let { searchResult ->
-                            searchResult to searchResult.items.map { it.snippet.channelId }
+                            val channels = searchResult.items.map { it.snippet.channelId }
                                 .distinct()
-                                .let {
+                                .takeIf { it.size > 0 }
+                                ?.let {
                                     service.getChannelInfos(
                                         ids = it.joinToString(separator = ","),
                                         parts = listOf(SNIPPET).map { it.part }
                                             .joinToString(separator = ","),
                                         key = keyProvider.key
                                     )
-                                }.items
+                                }?.items
+                                ?: listOf()
+                            searchResult to channels
                         }
                         .let { searchMapper.map(it.first, it.second) }
                         .let { NetResult.Data(it) }

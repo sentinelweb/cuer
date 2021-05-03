@@ -303,13 +303,7 @@ class PlaylistPresenter(
                 ?.also { log.d("found item ${it.id}") }
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
-                    // todo handle exceptions
                     playlistItemOrchestrator.delete(deleteItem, LOCAL.toFlatOptions())
-                    state.playlist = state.playlist?.let {
-                        val items = it.items.toMutableList()
-                        items.remove(deleteItem)
-                        it.copy(items = items)
-                    }
                     view.showUndo("Deleted: ${deleteItem.media.title}", ::undoDelete) // todo extract
                 }
         }

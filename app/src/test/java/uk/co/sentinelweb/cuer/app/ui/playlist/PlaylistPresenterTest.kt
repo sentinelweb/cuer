@@ -151,6 +151,7 @@ class PlaylistPresenterTest {
         } returns (fixtCurrentPlaylist to fixtCurrentSource)
         every { mockModelMapper.map(any(), any(), true, fixtCurrentIdentifier, null) } returns fixtCurrentPlaylistMapped
 
+
         // next
         fixtNextPlaylist = fixture.build<PlaylistDomain>()
             .copy(
@@ -616,6 +617,9 @@ class PlaylistPresenterTest {
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtExpectedPlaylist)
             every { mockModelMapper.map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, null) } returns fixtExpectedMapped //
             log.d("before:${fixtCurrentPlaylist.scanOrder()}")
+            fixtState?.model = fixtCurrentPlaylistMapped.copy(
+                itemsIdMap = fixtCurrentPlaylistMapped.itemsIdMap.toMutableMap().apply { put(fixtSwipeItemModel.id, deletedItem) }
+            )
             // test
             sut.onItemSwipeLeft(fixtSwipeItemModel)
             testCoroutineDispatcher.advanceUntilIdle()

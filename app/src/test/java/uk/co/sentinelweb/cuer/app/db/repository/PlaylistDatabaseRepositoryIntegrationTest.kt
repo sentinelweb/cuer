@@ -41,10 +41,10 @@ class PlaylistDatabaseRepositoryIntegrationTest {
         CoroutineContextTestProvider(testCoroutineDispatcher)
 
     @Fixture
-    private lateinit var playlist: PlaylistDomain
+    private lateinit var playlists: List<PlaylistDomain>
 
     @Fixture
-    private lateinit var playlistItem: PlaylistItemDomain
+    private lateinit var playlistItems: List<PlaylistItemDomain>
 
     private val imageMapper = ImageMapper()
     private val channelMapper = ChannelMapper(imageMapper)
@@ -88,8 +88,12 @@ class PlaylistDatabaseRepositoryIntegrationTest {
             coProvider = coCxtProvider,
             database = database
         )
+
+    }
+
+    private fun savePlaylistMedia() {
         runBlocking {
-            mediaRepo.save(playlist.items.map { it.media.copy(channelData = it.media.channelData.copy(id = null)) })
+            mediaRepo.save(playlists.map { it.items.map { it.media.copy(channelData = it.media.channelData.copy(id = null)) } }.flatten())
         }
     }
 
@@ -102,6 +106,8 @@ class PlaylistDatabaseRepositoryIntegrationTest {
     @Test
     fun save() {
         runBlocking {
+            savePlaylistMedia()
+            val playlist = playlists[0]
             val domain = playlist.copy(id = null, items = playlist.items.map { it.copy(id = null) })
             val saved = sut.save(domain)
             assertTrue(saved.isSuccessful)
@@ -116,9 +122,10 @@ class PlaylistDatabaseRepositoryIntegrationTest {
     @Test
     fun saveList() {
         runBlocking {
-            val domain = playlist.copy(id = null, items = playlist.items.map { it.copy(id = null) })
-            val domain1 = domain.copy()
-            val domains = listOf(domain, domain1)
+            savePlaylistMedia()
+            val domains = playlists.map { it.copy(id = null, items = it.items.map { it.copy(id = null) }) }
+            savePlaylistMedia()
+
             val saved = sut.save(domains)
             assertTrue(saved.isSuccessful)
             assertEquals(
@@ -141,6 +148,8 @@ class PlaylistDatabaseRepositoryIntegrationTest {
     @Test
     fun count() {
         runBlocking {
+            savePlaylistMedia()
+            val playlist = playlists[0]
             val domain = playlist.copy(id = null, items = playlist.items.map { it.copy(id = null) })
             val actual = sut.save(domain)
             assertTrue(actual.isSuccessful)
@@ -151,6 +160,8 @@ class PlaylistDatabaseRepositoryIntegrationTest {
     @Test
     fun delete() {
         runBlocking {
+            savePlaylistMedia()
+            val playlist = playlists[0]
             val domain = playlist.copy(id = null, items = playlist.items.map { it.copy(id = null) })
 
             val actual = sut.save(domain)
@@ -164,8 +175,8 @@ class PlaylistDatabaseRepositoryIntegrationTest {
     @Test
     fun deleteAll() {
         runBlocking {
-            val domain = playlist.copy(id = null, items = playlist.items.map { it.copy(id = null) })
-            val actual = sut.save(domain)
+            savePlaylistMedia()
+            val actual = sut.save(playlists)
             assertTrue(actual.isSuccessful)
 
             sut.deleteAll()
@@ -176,6 +187,7 @@ class PlaylistDatabaseRepositoryIntegrationTest {
     @Test
     fun savePlaylistItem() {
         runBlocking {
+            val playlistItem = playlistItems[0]
             val domain = playlistItem.copy(
                 id = null,
                 media = playlistItem.media.copy(
@@ -184,17 +196,39 @@ class PlaylistDatabaseRepositoryIntegrationTest {
                 )
             )
 
-            val actual = sut.savePlaylistItem(domain)
-            assertTrue(actual.isSuccessful)
-//            database.mediaDao().insert(mediaMapper.map(domain.media))
-//            database.channelDao().insert(channelMapper.map(domain.media.channelData))
+            val saved = sut.savePlaylistItem(domain)
+            assertTrue(saved.isSuccessful)
 
-            assertEquals(actual.data, sut.loadPlaylistItem(actual.data!!.id!!.toLong()).data)
+            val actual = sut.loadPlaylistItem(saved.data!!.id!!.toLong()).data
+            assertEquals(saved.data, actual)
+        }
+    }
+
+    @Test
+    fun savePlaylistItems() {
+        runBlocking {
+            val domains = playlistItems.map {
+                it.copy(
+                    id = null,
+                    media = it.media.copy(
+                        id = null,
+                        channelData = it.media.channelData.copy(id = null)
+                    )
+                )
+            }
+
+            val saved = sut.savePlaylistItems(domains)
+            assertTrue(saved.isSuccessful)
+
+            val filter = OrchestratorContract.IdListFilter(saved.data!!.map { it.id!!.toLong() })
+            val actual = sut.loadPlaylistItems(filter).data
+            assertEquals(saved.data, actual)
         }
     }
 
     @Test
     fun deletePlaylistItem() {
+        val playlistItem = playlistItems[0]
         runBlocking {
             val domain = playlistItem.copy(
                 id = null,
