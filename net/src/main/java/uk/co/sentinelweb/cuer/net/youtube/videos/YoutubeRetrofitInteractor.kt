@@ -229,8 +229,10 @@ internal class YoutubeRetrofitInteractor constructor(
                                 key = keyProvider.key
                             )
                         }
+                        // filter out null snippets (deleted videos) in results
+                        .let { it.copy(items = it.items.filter { it.snippet != null }) }
                         .let { searchResult ->
-                            val channels = searchResult.items.map { it.snippet.channelId }
+                            val channels = searchResult.items.mapNotNull { it.snippet?.channelId }
                                 .distinct()
                                 .takeIf { it.size > 0 }
                                 ?.let {

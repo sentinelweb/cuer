@@ -14,5 +14,8 @@ data class SearchRemoteDomain(
     var isLive: Boolean = false,
     @Contextual var fromDate: LocalDateTime? = null,
     @Contextual var toDate: LocalDateTime? = null,
-    val lang: String = "en"
-)
+    val lang: String = "en",
+    val order: Order = Order.RATING
+) {
+    enum class Order { RELEVANCE, RATING, VIEWCOUNT, DATE, TITLE }
+}

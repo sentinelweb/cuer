@@ -11,7 +11,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -85,9 +84,9 @@ interface PlaylistItemEditContract {
                 scoped {
                     ChipCreator((getSource() as Fragment).requireActivity(), get(), get())
                 }
-                scoped {
-                    SelectDialogCreator((getSource() as Fragment).requireActivity())
-                }
+//                scoped {
+//                    SelectDialogCreator((getSource() as Fragment).requireActivity())
+//                }
                 scoped {
                     getSource<Fragment>().requireActivity()
                 }

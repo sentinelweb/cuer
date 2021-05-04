@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DateRangePickerDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.LOCAL
@@ -114,7 +115,8 @@ class SearchViewModel(
                 R.string.search_select_dates,
                 state.remote.fromDate,
                 state.remote.toDate ?: LocalDateTime.now(),
-                this::onDatesSelected
+                this::onDatesSelected,
+                { _dialogModelLiveData.value = DialogModel.DismissDialogModel() }
             )
     }
 
@@ -123,6 +125,23 @@ class SearchViewModel(
             fromDate = timeStampMapper.toLocalDateTimeNano(start),
             toDate = timeStampMapper.toLocalDateTimeNano(end)
         )
+        model = mapper.map(state)
+    }
+
+    fun onSelectOrder() {
+        log.d("Select order")
+        _dialogModelLiveData.value =
+            EnumValuesDialogModel(
+                R.string.search_select_dates,
+                SearchRemoteDomain.Order.values().toList(),
+                state.remote.order,
+                this::onOrderSelected,
+                { }
+            )
+    }
+
+    fun onOrderSelected(order: SearchRemoteDomain.Order) {
+        state.remote = state.remote.copy(order = order)
         model = mapper.map(state)
     }
 

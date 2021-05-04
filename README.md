@@ -14,8 +14,10 @@ Using
 - Jetpack Libraries
    - Room
    - Lifecycle
-   - Androidx/ ktx
+   - Androidx / KTX
    - Navigation
+   - Jetpack Compose
+     - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/search
 - Architecture 
    - MVP - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui
    - Some MVVM for practice - e.g. https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/playlist_item_edit
@@ -33,7 +35,7 @@ Using
   - Mockk
   - Hamcrest
   - JFixture
-  - Android X tTest
+  - Android X Test - enables the same code to be used for robolectric and espresso tests
   - Robolectric
   - Espresso
   - Room test
