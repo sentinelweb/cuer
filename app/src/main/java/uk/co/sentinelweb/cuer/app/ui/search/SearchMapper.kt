@@ -36,11 +36,12 @@ class SearchMapper constructor(
             state.remote.let {
                 SearchContract.RemoteModel(
                     platform = it.platform,
-                    relatedToPlatformId = it.relatedToMediaPlatformId,
+                    relatedTo = it.run { "$relatedToMediaTitle [$relatedToMediaPlatformId]" },
                     channelPlatformId = it.channelPlatformId,
                     isLive = it.isLive,
                     fromDate = it.fromDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) },
-                    toDate = it.toDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) }
+                    toDate = it.toDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) },
+                    order = it.order
                 )
             }
         )
@@ -50,7 +51,7 @@ class SearchMapper constructor(
 
     private fun searchTypeText(type: SearchContract.SearchType) = when (type) {
         LOCAL -> res.getString(R.string.search_local)
-        REMOTE -> res.getString(R.string.search_remote)
+        REMOTE -> res.getString(R.string.search_youtube)
     }
 
 }

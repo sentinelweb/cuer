@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SE
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 
 @Composable
 fun SearchView(viewModel: SearchViewModel) {
@@ -42,6 +43,7 @@ fun SearchView(viewModel: SearchViewModel) {
         clearRelatedClick = viewModel::onClearRelated,
         clearDatesClick = viewModel::onClearDates,
         selectDatesClick = viewModel::onSelectDates,
+        selectOrderClick = viewModel::onSelectOrder,
         playlistSelect = viewModel::onPlaylistSelect
     )
 }
@@ -58,6 +60,7 @@ fun SearchParametersUi(
     clearRelatedClick: () -> Unit,
     clearDatesClick: () -> Unit,
     selectDatesClick: () -> Unit,
+    selectOrderClick: () -> Unit,
     submit: () -> Unit
 ) {
 
@@ -94,9 +97,17 @@ fun SearchParametersUi(
                 )
                 val modifier = Modifier.weight(1f)
                 if (model.isLocal) {
-                    SearchLocal(model.localParams, modifier, playlistSelect)
+                    SearchLocal(model.localParams, playlistSelect, modifier)
                 } else {
-                    SearchRemote(model.remoteParams, liveClick, clearRelatedClick, clearDatesClick, selectDatesClick, modifier)
+                    SearchRemote(
+                        model.remoteParams,
+                        liveClick,
+                        clearRelatedClick,
+                        clearDatesClick,
+                        selectDatesClick,
+                        selectOrderClick,
+                        modifier
+                    )
                 }
                 Button(
                     onClick = submit,
@@ -122,19 +133,19 @@ fun SearchRemote(
     clearRelatedClick: () -> Unit,
     clearDateRangeClick: () -> Unit,
     selectDatesClick: () -> Unit,
+    selectOrderClick: () -> Unit,
     modifier: Modifier
 ) {
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
-        Row(modifier = Modifier.padding(8.dp)) {
-            val spacing = Modifier.padding(horizontal = 4.dp)
-            val text = spacing.align(Alignment.CenterVertically)
-            var dateSelectionText = stringResource(id = R.string.search_select_dates)
-            if (model.fromDate != null || model.toDate != null) {
-                dateSelectionText = "${model.fromDate} - ${model.toDate}"
+        if (model.relatedTo != null) {
+            Row(modifier = Modifier.padding(8.dp)) {
+                val spacing = Modifier.padding(horizontal = 4.dp)
+                val text = spacing.align(Alignment.CenterVertically)
                 Icon(
                     imageVector = Icons.Default.Clear,
                     tint = MaterialTheme.colors.onSurface,
@@ -142,61 +153,78 @@ fun SearchRemote(
                     modifier = Modifier
                         .width(24.dp)
                         .height(24.dp)
-                        .clickable { clearDateRangeClick() }
+                        .clickable { clearRelatedClick() }
                         .align(Alignment.CenterVertically)
                 )
-            }
-            Button(
-                onClick = { selectDatesClick() },
-                modifier = Modifier
-                    .padding(2.dp)
-                    .clip(shape = MaterialTheme.shapes.small)
-            ) {
                 Text(
-                    text = dateSelectionText,
+                    text = "Like ${model.relatedTo}",
+                    style = MaterialTheme.typography.body2,
+                    modifier = text
+                )
+            }
+        } else {
+            Row(modifier = Modifier.padding(8.dp)) {
+                val spacing = Modifier.padding(horizontal = 4.dp)
+                val text = spacing.align(Alignment.CenterVertically)
+                var dateSelectionText = stringResource(id = R.string.search_select_dates)
+                if (model.fromDate != null || model.toDate != null) {
+                    dateSelectionText = "${model.fromDate} - ${model.toDate}"
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        tint = MaterialTheme.colors.onSurface,
+                        contentDescription = stringResource(id = R.string.clear),
+                        modifier = Modifier
+                            .width(24.dp)
+                            .height(24.dp)
+                            .clickable { clearDateRangeClick() }
+                            .align(Alignment.CenterVertically)
+                    )
+                }
+                Button(
+                    onClick = { selectOrderClick() },
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clip(shape = MaterialTheme.shapes.small)
+                ) {
+                    Text(
+                        text = dateSelectionText,
+                        style = MaterialTheme.typography.body2,
+                        modifier = text
+                    )
+                }
+            }
+
+            Row(modifier = Modifier.padding(8.dp)) {
+                val spacing = Modifier.padding(horizontal = 4.dp)
+                val text = spacing.align(Alignment.CenterVertically)
+                Checkbox(
+                    checked = model.isLive,
+                    onCheckedChange = liveClick,
+                    modifier = spacing
+                )
+                Text(
+                    text = "Live",
                     style = MaterialTheme.typography.body2,
                     modifier = text
                 )
             }
         }
-//
-//        if (model.relatedToPlatformId != null) {
-//            Row(modifier = Modifier.padding(8.dp)) {
-//                val spacing = Modifier.padding(horizontal = 4.dp)
-//                val text = spacing.align(Alignment.CenterVertically)
-//                Icon(
-//                    imageVector = Icons.Default.Clear,
-//                    tint = MaterialTheme.colors.onSurface,
-//                    contentDescription = stringResource(id = R.string.clear),
-//                    modifier = Modifier
-//                        .width(24.dp)
-//                        .height(24.dp)
-//                        .clickable { clearRelatedClick() }
-//                        .align(Alignment.CenterVertically)
-//                )
-//                Text(
-//                    text = model.relatedToPlatformId,
-//                    style = MaterialTheme.typography.body2,
-//                    modifier = text
-//                )
-//            }
-//        }
-
         Row(modifier = Modifier.padding(8.dp)) {
-            val spacing = Modifier.padding(horizontal = 4.dp)
-            val text = spacing.align(Alignment.CenterVertically)
-            Checkbox(
-                checked = model.isLive,
-                onCheckedChange = liveClick,
-                modifier = spacing
-            )
-            Text(
-                text = "Live",
-                style = MaterialTheme.typography.body2,
-                modifier = text
-            )
+            Button(
+                onClick = { selectOrderClick() },
+                modifier = Modifier
+                    .padding(2.dp)
+                    .clip(shape = MaterialTheme.shapes.small)
+            ) {
+                Text(
+                    text = "Order: ${model.order.name}",
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .align(Alignment.CenterVertically)
+                )
+            }
         }
-
     }
 }
 
@@ -204,8 +232,8 @@ fun SearchRemote(
 @Composable
 private fun SearchLocal(
     model: SearchContract.LocalModel,
-    modifier: Modifier,
-    playlistSelect: (ChipModel) -> Unit
+    playlistSelect: (ChipModel) -> Unit,
+    modifier: Modifier
 ) {
     Column(modifier = modifier) {
 //                    Row(modifier = Modifier.padding(8.dp)) {
@@ -261,7 +289,6 @@ fun Chip(model: ChipModel, onClick: (ChipModel) -> Unit) {
         modifier = Modifier
             .padding(2.dp)
             .clip(shape = MaterialTheme.shapes.small)
-//            .background(colorResource(id = R.color.grey_400))
     ) {
         if (model.type != ChipModel.Type.PLAYLIST_SELECT) {
             Icon(
@@ -278,53 +305,26 @@ fun Chip(model: ChipModel, onClick: (ChipModel) -> Unit) {
     }
 }
 
-@Preview
-@Composable
-fun PreviewChipSelect() {
-    CuerTheme {
-        Chip(PLAYLIST_SELECT_MODEL, { m -> })
-    }
-}
-
-@Preview
-@Composable
-fun PreviewChipSelected() {
-    CuerTheme {
-        Chip(ChipModel(PLAYLIST, "philosophy"), { m -> })
-    }
-}
-
 @Composable
 fun SearchTextEntryInput(
-    text: String,
+    text: String?,
     textChange: (String) -> Unit,
-    submit: () -> Unit
-//    iconsVisible: Boolean,
-//    icon: TodoIcon,
-//    onIconChange: (TodoIcon) -> Unit,
-//    buttonSlot: @Composable () -> Unit
+    submit: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column {
         Row(
-            Modifier
+            modifier
                 .padding(top = 16.dp)
         ) {
-            TodoInputText(
+            SearchInputText(
                 text = text,
                 onTextChange = textChange,
                 onImeAction = submit
             )
 
             Spacer(modifier = Modifier.width(8.dp))
-            //Box(Modifier.align(Alignment.CenterVertically)) { buttonSlot() }
         }
-
-//        if (iconsVisible) {
-//            AnimatedIconRow(icon, onIconChange, Modifier.padding(top = 8.dp))
-//        } else {
-//            Spacer(modifier = Modifier.height(16.dp))
-//        }
-
     }
 }
 
@@ -339,15 +339,15 @@ fun SearchTextEntryInput(
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun TodoInputText(
-    text: String,
+fun SearchInputText(
+    text: String?,
     onTextChange: (String) -> Unit,
     onImeAction: () -> Unit = {}
 ) {
     Box() {
         val keyboardController = LocalSoftwareKeyboardController.current
         TextField(
-            value = text,
+            value = text ?: "",
             onValueChange = onTextChange,
             colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
             maxLines = 1,
@@ -359,46 +359,92 @@ fun TodoInputText(
             textStyle = MaterialTheme.typography.body1,
             modifier = Modifier.fillMaxWidth()
         )
-        Icon(
-            imageVector = Icons.Default.Clear,
-            tint = MaterialTheme.colors.onSurface,
-            contentDescription = stringResource(id = R.string.clear),
-            modifier = Modifier
-                .width(48.dp)
-                .height(48.dp)
-                .padding(12.dp)
-                .clickable { onTextChange("") }
-                .align(Alignment.CenterEnd)
+        if (text.isNullOrEmpty().not()) {
+            Icon(
+                imageVector = Icons.Default.Clear,
+                tint = MaterialTheme.colors.onSurface,
+                contentDescription = stringResource(id = R.string.clear),
+                modifier = Modifier
+                    .width(48.dp)
+                    .height(48.dp)
+                    .padding(12.dp)
+                    .clickable { onTextChange("") }
+                    .align(Alignment.CenterEnd)
+            )
+        }
+    }
+}
+
+val searchParams = SearchContract.Model(
+    type = "Local",
+    otherType = "YouTube",
+    text = "philosophy",
+    isLocal = true,
+    localParams = SearchContract.LocalModel(
+        isWatched = false,
+        isLive = false,
+        isNew = false,
+        playlists = listOf(
+            PLAYLIST_SELECT_MODEL,
+            ChipModel(PLAYLIST, "philosophy"),
+            ChipModel(PLAYLIST, "music"),
+            ChipModel(PLAYLIST, "doco"),
         )
+    ),
+    remoteParams = SearchContract.RemoteModel(
+        platform = PlatformDomain.YOUTUBE,
+        isLive = false,
+        channelPlatformId = null,
+        relatedTo = null,
+        fromDate = null,
+        toDate = null,
+        order = SearchRemoteDomain.Order.RELEVANCE
+    )
+)
+
+@Preview
+@Composable
+fun PreviewLocalUi() {
+    SearchParametersUi(searchParams, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+}
+
+@Preview
+@Composable
+fun PreviewRemoteUi() {
+    SearchParametersUi(searchParams.copy(
+        type = "YouTube",
+        otherType = "Local",
+        isLocal = false
+    ), {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+}
+
+@Preview
+@Composable
+fun PreviewRemoteRelatedlUi() {
+    SearchParametersUi(
+        searchParams.copy(
+            type = "YouTube",
+            otherType = "Local",
+            text = null,
+            isLocal = false,
+            remoteParams = searchParams.remoteParams.copy(
+                relatedTo = "Is Baurillard the god? [trgkdk34&]"
+            )
+        ), {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+}
+
+@Preview
+@Composable
+fun PreviewChipSelect() {
+    CuerTheme {
+        Chip(PLAYLIST_SELECT_MODEL, { m -> })
     }
 }
 
 @Preview
 @Composable
-fun PreviewSearchParametersUi() {
-    SearchParametersUi(SearchContract.Model(
-        type = "Local",
-        otherType = "Remote",
-        text = "philosophy",
-        isLocal = false,
-        localParams = SearchContract.LocalModel(
-            isWatched = false,
-            isLive = false,
-            isNew = false,
-            playlists = listOf(
-                PLAYLIST_SELECT_MODEL,
-                ChipModel(PLAYLIST, "philosophy"),
-                ChipModel(PLAYLIST, "music"),
-                ChipModel(PLAYLIST, "doco"),
-            )
-        ),
-        remoteParams = SearchContract.RemoteModel(
-            platform = PlatformDomain.YOUTUBE,
-            isLive = false,
-            channelPlatformId = null,
-            relatedToPlatformId = "dfddffdfasdf",
-            fromDate = null,
-            toDate = null,
-        )
-    ), {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+fun PreviewChipSelected() {
+    CuerTheme {
+        Chip(ChipModel(PLAYLIST, "philosophy"), { m -> })
+    }
 }

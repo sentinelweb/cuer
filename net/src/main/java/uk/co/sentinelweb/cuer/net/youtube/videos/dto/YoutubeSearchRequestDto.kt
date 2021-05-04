@@ -14,4 +14,14 @@ internal data class YoutubeSearchRequestDto(
     val maxResults: Int = YoutubeService.MAX_RESULTS,
     val pageToken: String? = null,
     val relevanceLanguage: String? = "en"
-)
+) {
+    internal enum class Order(val param: String) {
+        DATE("date"),
+        RATING("rating"),
+        RELEVANCE("relevance"),
+        VIDEOCOUNT("videoCount"),// channels only
+        VIEWCOUNT("viewCount"),
+        TITLE("title"),
+    }
+
+}

@@ -6,6 +6,7 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
@@ -23,7 +24,7 @@ interface SearchContract {
     data class Model(
         val type: String,
         val otherType: String,
-        val text: String,
+        val text: String?,
         val isLocal: Boolean,
         val localParams: LocalModel,
         val remoteParams: RemoteModel
@@ -38,11 +39,12 @@ interface SearchContract {
 
     data class RemoteModel(
         val platform: PlatformDomain,
-        val relatedToPlatformId: String?,
+        val relatedTo: String?,
         val channelPlatformId: String?,
         val isLive: Boolean,
         val fromDate: String?,
-        val toDate: String?
+        val toDate: String?,
+        val order: SearchRemoteDomain.Order
     )
 
     enum class SearchType {
@@ -64,6 +66,7 @@ interface SearchContract {
                 }
                 scoped { State() }
                 scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
+                scoped { EnumValuesDialogCreator(getSource<Fragment>().requireContext()) }
             }
             factory { SearchMapper(get(), get()) }
         }

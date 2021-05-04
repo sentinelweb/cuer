@@ -10,7 +10,6 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeSearchDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeSearchDto.Companion.EVENT_TYPE_MAP
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeSearchDto.EventType.*
-import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeSearchDto.Order.RATING
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeSearchDto.Type.VIDEO
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeSearchRequestDto
 
@@ -25,7 +24,7 @@ internal class YoutubeSearchMapper(
         YoutubeSearchRequestDto(
             relatedToVideoId = domain.relatedToMediaPlatformId,
             type = VIDEO.param,
-            order = RATING.param,
+            order = mapOrder(domain.order).param,
             maxResults = 50,
             channelId = null,
             eventType = null,
@@ -41,7 +40,7 @@ internal class YoutubeSearchMapper(
             channelId = domain.channelPlatformId,
             publishedBefore = domain.toDate?.let { timeStampMapper.mapTimestamp(it) },
             publishedAfter = domain.fromDate?.let { timeStampMapper.mapTimestamp(it) },
-            order = RATING.param,
+            order = mapOrder(domain.order).param,
             eventType = domain.isLive.let {
                 if (it) LIVE.param else null
             },
@@ -83,7 +82,7 @@ internal class YoutubeSearchMapper(
         MediaDomain(
             id = null,
             url = it.id.videoId?.let { "https://youtu.be/$it" } ?: throw BadDataException("No video ID"),
-            title = it.snippet.title,
+            title = it.snippet?.title ?: throw Exception("Snippet is null - should be fitlered out"),
             description = it.snippet.description,
             mediaType = MediaDomain.MediaTypeDomain.VIDEO,
             platform = PlatformDomain.YOUTUBE,
@@ -96,5 +95,13 @@ internal class YoutubeSearchMapper(
             isLiveBroadcast = !(listOf(COMPLETED, NONE).contains(EVENT_TYPE_MAP[it.snippet.liveBroadcastContent])),
             isLiveBroadcastUpcoming = (EVENT_TYPE_MAP[it.snippet.liveBroadcastContent] == UPCOMING)
         )
+    }
+
+    private fun mapOrder(domain: SearchRemoteDomain.Order): YoutubeSearchRequestDto.Order = when (domain) {
+        SearchRemoteDomain.Order.RELEVANCE -> YoutubeSearchRequestDto.Order.RELEVANCE
+        SearchRemoteDomain.Order.RATING -> YoutubeSearchRequestDto.Order.RATING
+        SearchRemoteDomain.Order.VIEWCOUNT -> YoutubeSearchRequestDto.Order.VIEWCOUNT
+        SearchRemoteDomain.Order.DATE -> YoutubeSearchRequestDto.Order.DATE
+        SearchRemoteDomain.Order.TITLE -> YoutubeSearchRequestDto.Order.TITLE
     }
 }

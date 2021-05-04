@@ -14,7 +14,7 @@ internal data class YoutubeSearchDto constructor(
     internal data class SearchResultDto constructor(
         val kind: String,
         val id: IdDto,
-        val snippet: SnippetDto,
+        val snippet: SnippetDto?,
     ) {
         @Serializable
         internal data class IdDto constructor(
@@ -48,15 +48,6 @@ internal data class YoutubeSearchDto constructor(
         VIDEO("video", "youtube#video", ObjectTypeDomain.MEDIA),
         CHANNEL("channel", "youtube#channel", ObjectTypeDomain.CHANNEL),
         PLAYLIST("playlist", "youtube#playlist", ObjectTypeDomain.PLAYLIST),
-    }
-
-    internal enum class Order(val param: String) {
-        DATE("date"),
-        RATING("rating"),
-        RELEVANCE("relevance"),
-        VIDEOCOUNT("videoCount"),// channels only
-        VIEWCOUNT("viewCount"),
-        TITLE("title"),
     }
 
     internal enum class EventType(val param: String) {

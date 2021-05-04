@@ -7,26 +7,32 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.datepicker.MaterialDatePicker
+import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentSearchBinding
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.DateRangePickerDialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
-import java.time.ZoneOffset
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class SearchBottomSheetFragment : BottomSheetDialogFragment() {
 
     private val viewModel: SearchViewModel by currentScope.inject()
     private val navMapper: NavigationMapper by currentScope.inject()
+    private val datePickerCreator: DatePickerCreator by currentScope.inject()
+    private val enumPickerCreator: EnumValuesDialogCreator by currentScope.inject()
+    private val log: LogWrapper by inject()
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
     private var dialogFragment: DialogFragment? = null
+
+    init {
+        log.tag(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,26 +64,19 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
                     hideDialogFragment()
                     when (model) {
                         is PlaylistsDialogContract.Config -> {
-                            dialogFragment =
-                                PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
-                            dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
+                            dialogFragment = PlaylistsDialogFragment.newInstance(model)
+                                .also { it.show(childFragmentManager, SELECT_PLAYLIST_TAG) }
                         }
                         is DateRangePickerDialogModel -> {
-                            val picker = MaterialDatePicker.Builder.dateRangePicker()
-                                .setTitleText(model.title)
-                                .setSelection(
-                                    androidx.core.util.Pair(
-                                        model.fromDate?.toInstant(ZoneOffset.UTC)?.toEpochMilli(),
-                                        model.toDate?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
-                                    )
-                                )
-                                .build()
-                            picker.addOnPositiveButtonClickListener {
-                                model.confirm(it.first, it.second)
-                            }
-                            picker.addOnDismissListener { dialogFragment = null }
-                            dialogFragment = picker
-                            dialogFragment?.show(childFragmentManager, SELECT_DATES_TAG);
+                            dialogFragment = datePickerCreator.createDateRangePicker(model)
+                                .also { it.show(childFragmentManager, SELECT_DATES_TAG) }
+                        }
+                        is EnumValuesDialogModel<*> -> {
+                            log.d("Show order")
+                            enumPickerCreator.create(model).show()
+                        }
+                        is DialogModel.DismissDialogModel -> {
+                            hideDialogFragment()
                         }
                         else -> Unit
                     }
