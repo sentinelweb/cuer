@@ -153,6 +153,12 @@ class PlaylistPresenter(
                         ?.takeIf { it != state.playlist }
                         ?.also { state.playlist = it }
                         ?.also { updateView() }
+                } else if (state.playlist?.type == APP) {// check to replace item in an app playlist
+                    state.playlist
+                        ?.items
+                        ?.find { it.media.platformId == plistItem.media.platformId }
+                        ?.also { updatePlaylistItemByMediaId(plistItem) }
+                        ?.let { state.playlist }
                 } else {
                     state.playlist
                         ?.let { playlistMutator.remove(it, plistItem) }
@@ -532,7 +538,7 @@ class PlaylistPresenter(
                 }
                 ?.apply {
                     if (playNow) {
-                         queue.playNow(state.playlistIdentifier, plItemId)
+                        queue.playNow(state.playlistIdentifier, plItemId)
                     }
                 }
                 ?: run {
@@ -660,31 +666,57 @@ class PlaylistPresenter(
                     ?.let { index ->
                         state.model?.let { model ->
                             val originalItem = get(index)
+                            val changedItem = originalItem.copy(media = m)
                             val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
                                 ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
-                            val changedItem = originalItem.copy(media = m)
-                            state.playlist = state.playlist
-                                ?.copy(items = toMutableList().apply { set(index, changedItem) })
-                            val mappedItem =
-                                modelMapper.map(
-                                    modelId,
-                                    changedItem,
-                                    index,
-                                    state.playlist?.config?.editableItems ?: false,
-                                    state.playlist?.config?.deletableItems ?: false,
-                                    state.playlist?.config?.editable ?: false,
-                                    playlists = state.playlistsMap,
-                                )
-                            state.model = model.let {
-                                it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
-                            }
-                            model.itemsIdMap[modelId] = changedItem
-                            mappedItem
-                                .takeIf { coroutines.mainScopeActive }
-                                ?.apply { view.updateItemModel(this) }
+                            updateItem(index, modelId, changedItem)
                         }
                     }
             }
+    }
+
+    private fun updatePlaylistItemByMediaId(plistItem: PlaylistItemDomain) {
+        state.playlist
+            ?.items
+            ?.apply {
+                indexOfFirst { it.media.platformId == plistItem.media.platformId }
+                    .takeIf { it > -1 }
+                    ?.let { index ->
+                        state.model?.let { model ->
+                            val originalItem = get(index)
+                            val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
+                                ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
+                            updateItem(index, modelId, plistItem)
+                        }
+                    }
+            }
+    }
+
+    private fun updateItem(
+        index: Int,
+        modelId: Long,
+        changedItem: PlaylistItemDomain
+    ) {
+        state.playlist = state.playlist?.let {
+            it.copy(items = it.items.toMutableList().apply { set(index, changedItem) })
+        }
+        val mappedItem =
+            modelMapper.map(
+                modelId,
+                changedItem,
+                index,
+                state.playlist?.config?.editableItems ?: false,
+                state.playlist?.config?.deletableItems ?: false,
+                state.playlist?.config?.editable ?: false,
+                playlists = state.playlistsMap,
+            )
+        state.model = state.model?.let {
+            it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
+        }?.also { it.itemsIdMap[modelId] = changedItem }
+
+        mappedItem
+            .takeIf { coroutines.mainScopeActive }
+            ?.apply { view.updateItemModel(this) }
     }
 
 }

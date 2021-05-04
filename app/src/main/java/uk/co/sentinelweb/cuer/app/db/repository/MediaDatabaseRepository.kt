@@ -176,7 +176,6 @@ class MediaDatabaseRepository constructor(
                     is MediaPositionUpdate ->
                         (update as MediaPositionUpdate)
                             // .apply { database.beginTransaction() }
-
                             .let { it to mediaDao.getFlags(it.id) }
                             .let { mediaUpdateMapper.map(it.first, it.second) }
                             .also { mediaDao.updatePosition(it.id, it.dateLastPlayed, it.positon, it.duration, it.flags) }

@@ -533,24 +533,4 @@ class PlaylistFragment :
 
     }
 
-    // old code
-//    private var onResumeGotArguments = false
-
-
-//    override fun onAttach(context: Context) {
-//        super.onAttach(context)
-//        // crappy hack - sometime onResume is called before activity onStart so the fragment doesn't get the arguments
-//        val plId = PLAYLIST_ID.getLong(arguments)
-//        val hasArguments = plId?.let{ it>0L } ?:false
-//        log.d("onAttach")
-//        if (isResumed && hasArguments && !onResumeGotArguments) {
-//            log.d("onAttach: got nav on args model = plid = $plId plitemId = ${PLAYLIST_ITEM_ID.getLong(arguments)} playNow = ${PLAY_NOW.getBoolean(arguments)}")
-//            presenter.setPlaylistData(
-//                plId,
-//                PLAYLIST_ITEM_ID.getLong(arguments),
-//                PLAY_NOW.getBoolean(arguments) ?: false
-//            )
-//        }
-//    }
-
 }
