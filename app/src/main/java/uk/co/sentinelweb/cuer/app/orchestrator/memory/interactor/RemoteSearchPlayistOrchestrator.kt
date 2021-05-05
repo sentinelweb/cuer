@@ -66,8 +66,13 @@ class RemoteSearchPlayistOrchestrator constructor(
         config = PlaylistDomain.PlaylistConfigDomain(playable = false, editable = false, deletableItems = false)
     )
 
-    private fun mapTitle() =
-        "Remote Search: " + searchPref()?.let { it.text ?: "like -> ${it.relatedToMediaTitle}" }
+    private fun mapTitle() = searchPref()?.let {
+        if (it.relatedToMediaPlatformId != null) {
+            "Related: ${it.relatedToMediaTitle}"
+        } else {
+            "Youtube Search: " + it.text
+        }
+    } ?: "No Remote - shouldn't see this"
 
     fun makeSearchItemsStats(): PlaylistStatDomain = PlaylistStatDomain(
         playlistId = REMOTE_SEARCH_PLAYLIST,
