@@ -101,6 +101,7 @@ class SearchViewModel(
 
     fun onClearRelated() {
         state.remote.relatedToMediaPlatformId = null
+        state.remote.relatedToMediaTitle = null
         model = mapper.map(state)
     }
 

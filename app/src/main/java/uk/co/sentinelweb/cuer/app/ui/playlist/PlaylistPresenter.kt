@@ -157,7 +157,7 @@ class PlaylistPresenter(
                     state.playlist
                         ?.items
                         ?.find { it.media.platformId == plistItem.media.platformId }
-                        ?.also { updatePlaylistItemByMediaId(plistItem) }
+                        ?.also { updatePlaylistItemByMediaId(plistItem, plistItem.media) }
                         ?.let { state.playlist }
                 } else {
                     state.playlist
@@ -185,7 +185,7 @@ class PlaylistPresenter(
                 FULL -> {
                     val containsMedia = state.playlist?.items?.find { it.media.platformId == media.platformId } != null
                     if (containsMedia) {
-                        updateMediaItem(media)
+                        updatePlaylistItemByMediaId(null, media)
                     }
                 }
                 DELETE -> Unit
@@ -643,36 +643,37 @@ class PlaylistPresenter(
             }
     }
 
-    private fun updateMediaItem(m: MediaDomain) {
+//    private fun updateMediaItem(m: MediaDomain) {
+//        state.playlist
+//            ?.items
+//            ?.apply {
+//                indexOfFirst { it.media.id == m.id }
+//                    .takeIf { it > -1 }
+//                    ?.let { index ->
+//                        state.model?.let { model ->
+//                            val originalItem = get(index)
+//
+//                            val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
+//                                ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
+//                            updateItem(index, modelId, changedItem)
+//                        }
+//                    }
+//            }
+//    }
+
+    private fun updatePlaylistItemByMediaId(plistItem: PlaylistItemDomain?, media: MediaDomain) {
         state.playlist
             ?.items
             ?.apply {
-                indexOfFirst { it.media.id == m.id }
+                indexOfFirst { it.media.platformId == media.platformId }
                     .takeIf { it > -1 }
                     ?.let { index ->
                         state.model?.let { model ->
                             val originalItem = get(index)
-                            val changedItem = originalItem.copy(media = m)
+                            val changedItem = plistItem ?: originalItem.copy(media = media)
                             val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
                                 ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
                             updateItem(index, modelId, changedItem)
-                        }
-                    }
-            }
-    }
-
-    private fun updatePlaylistItemByMediaId(plistItem: PlaylistItemDomain) {
-        state.playlist
-            ?.items
-            ?.apply {
-                indexOfFirst { it.media.platformId == plistItem.media.platformId }
-                    .takeIf { it > -1 }
-                    ?.let { index ->
-                        state.model?.let { model ->
-                            val originalItem = get(index)
-                            val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
-                                ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
-                            updateItem(index, modelId, plistItem)
                         }
                     }
             }

@@ -33,15 +33,15 @@ class SearchMapper constructor(
                         )
                 )
             },
-            state.remote.let {
+            state.remote.let { remote ->
                 SearchContract.RemoteModel(
-                    platform = it.platform,
-                    relatedTo = it.run { "$relatedToMediaTitle [$relatedToMediaPlatformId]" },
-                    channelPlatformId = it.channelPlatformId,
-                    isLive = it.isLive,
-                    fromDate = it.fromDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) },
-                    toDate = it.toDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) },
-                    order = it.order
+                    platform = remote.platform,
+                    relatedTo = remote.relatedToMediaPlatformId?.let { "${remote.relatedToMediaTitle} [$it]" },
+                    channelPlatformId = remote.channelPlatformId,
+                    isLive = remote.isLive,
+                    fromDate = remote.fromDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) },
+                    toDate = remote.toDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) },
+                    order = remote.order
                 )
             }
         )
