@@ -203,9 +203,7 @@ class PlaylistPresenter(
     // move item to playlist
     override fun onItemSwipeRight(itemModel: ItemContract.Model) { // move
         state.viewModelScope.launch {
-            state.model
-                ?.itemsIdMap
-                ?.get(itemModel.id)
+            playlistItemDomain(itemModel)
                 ?.also { itemDomain ->
                     state.playlist?.apply {
                         if (config.editableItems.not()) {
@@ -304,9 +302,7 @@ class PlaylistPresenter(
         state.viewModelScope.launch {
             delay(400)
 
-            state.model
-                ?.itemsIdMap
-                ?.get(itemModel.id)
+            playlistItemDomain(itemModel)
                 ?.takeIf { it.id != null }
                 ?.also { log.d("found item ${it.id}") }
                 ?.let { deleteItem ->
@@ -318,9 +314,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemViewClick(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.apply {
                 val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
                 view.showItemDescription(itemModel.id, this, source)
@@ -328,9 +322,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemClicked(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 if (!(ytContextHolder.isConnected())) {
                     val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
@@ -347,9 +339,7 @@ class PlaylistPresenter(
     }
 
     override fun onPlayStartClick(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 if (!(ytContextHolder.isConnected())) {
                     //view.showItemDescription(item.id, itemDomain)
@@ -383,9 +373,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemShowChannel(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.takeUnless { ytJavaApi.launchChannel(it.media) }
             ?.also { toastWrapper.show("can't launch channel") }
             ?: toastWrapper.show("can't find video")
@@ -396,9 +384,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemRelated(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.also { item ->
                 prefsWrapper.putString(
                     LAST_REMOTE_SEARCH, SearchRemoteDomain(
@@ -423,9 +409,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemShare(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 shareWrapper.share(itemDomain.media)
             }
@@ -466,9 +450,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemPlay(itemModel: ItemContract.Model, external: Boolean) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.also {
                 if (external) {
                     if (!ytJavaApi.launchVideo(it.media)) {
@@ -480,6 +462,10 @@ class PlaylistPresenter(
             }
             ?: toastWrapper.show("can't find video")
     }
+
+    private fun playlistItemDomain(itemModel: ItemContract.Model) = state.model
+        ?.itemsIdMap
+        ?.get(itemModel.id)
 
     override fun moveItem(fromPosition: Int, toPosition: Int) {
         if (state.dragFrom == null) {
