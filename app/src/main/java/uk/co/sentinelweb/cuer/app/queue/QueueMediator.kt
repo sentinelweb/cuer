@@ -174,7 +174,7 @@ class QueueMediator constructor(
     private suspend fun updateCurrentItem(resetPosition: Boolean) {
         state.currentItem = state.playlist
             ?.let { playlist ->
-                playlistOrchestrator.updateCurrentIndex(playlist, state.playlistIdentifier.toFlatOptions(true))
+                playlistOrchestrator.updateCurrentIndex(playlist, state.playlistIdentifier.flatOptions(true))
                 playlist.currentIndex.let { playlist.items[it] }
             }
             ?: throw NullPointerException("playlist should not be null")
@@ -215,7 +215,7 @@ class QueueMediator constructor(
                 }.let {
                     //log.d("updateCurrentMediaItem b4 sv: position=${state.currentItem?.media?.positon} target=${it.positon}")
 
-                    playlistOrchestrator.updateMedia(playlist!!, it, state.playlistIdentifier.toFlatOptions(true))
+                    playlistOrchestrator.updateMedia(playlist!!, it, state.playlistIdentifier.flatOptions(true))
                         ?.let { copy(media = it) }
                 }
             }

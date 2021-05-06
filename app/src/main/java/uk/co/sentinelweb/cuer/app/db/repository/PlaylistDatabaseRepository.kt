@@ -300,12 +300,12 @@ class PlaylistDatabaseRepository constructor(
     // endregion PlaylistStatDomain
 
     // region PlaylistItemDomain
-    suspend fun savePlaylistItem(item: PlaylistItemDomain, emit: Boolean = true): RepoResult<PlaylistItemDomain> =
+    suspend fun savePlaylistItem(item: PlaylistItemDomain, emit: Boolean = true, flat: Boolean = true): RepoResult<PlaylistItemDomain> =
         withContext(coProvider.IO) {
             try {
                 item
                     .let { item ->
-                        if (item.media.id == null) {
+                        if (item.media.id == null || !flat) {
                             log.d("Save media check: ${item.media.platformId}")
                             val saved = mediaRepository.save(item.media)
                                 .takeIf { it.isSuccessful }
@@ -338,7 +338,11 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
-    suspend fun savePlaylistItems(items: List<PlaylistItemDomain>, emit: Boolean = true): RepoResult<List<PlaylistItemDomain>> =
+    suspend fun savePlaylistItems(
+        items: List<PlaylistItemDomain>,
+        emit: Boolean = true,
+        flat: Boolean = true
+    ): RepoResult<List<PlaylistItemDomain>> =
         withContext(coProvider.IO) {
             try {
                 val checkOrderAndPlaylist: MutableSet<String> = mutableSetOf()
@@ -351,7 +355,7 @@ class PlaylistDatabaseRepository constructor(
                         }
                     }
                     .let { itemDomains ->
-                        itemDomains.filter { it.media.id == null }
+                        itemDomains.filter { it.media.id == null || !flat }
                             .takeIf { it.size > 0 }
                             ?.let {
                                 mediaRepository.save(it.map { it.media }).data!!.associateBy { it.platformId }

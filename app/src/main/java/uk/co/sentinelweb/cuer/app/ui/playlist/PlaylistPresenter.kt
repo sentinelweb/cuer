@@ -174,7 +174,7 @@ class PlaylistPresenter(
                         ?.also { updateView() }
             }.takeIf { !isQueuedPlaylist && currentIndexBefore != state.playlist?.currentIndex }
                 ?.apply {
-                    state.playlist?.apply { playlistOrchestrator.updateCurrentIndex(this, state.playlistIdentifier.toFlatOptions()) }
+                    state.playlist?.apply { playlistOrchestrator.updateCurrentIndex(this, state.playlistIdentifier.flatOptions()) }
                 }
         }.launchIn(coroutines.mainScope)
 
@@ -281,7 +281,7 @@ class PlaylistPresenter(
                         .copy(playlistId = playlist.id!!)
                         .apply { state.movedPlaylistItem = this }
                         .copy(order = timeProvider.currentTimeMillis())
-                        .apply { playlistItemOrchestrator.save(this, LOCAL.toFlatOptions()) }
+                        .apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
                         .apply { view.showUndo("Moved to : ${playlist.title}", ::undoMoveItem) }
                         .also { state.selectedPlaylistItem = null }
                 }
@@ -292,7 +292,7 @@ class PlaylistPresenter(
         state.viewModelScope.launch {
             state.movedPlaylistItem
                 ?.copy(playlistId = state.playlistIdentifier.id!! as Long)
-                ?.apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.toFlatOptions()) }
+                ?.apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.flatOptions()) }
                 ?.apply { state.movedPlaylistItem = null }
         }
     }
@@ -307,7 +307,7 @@ class PlaylistPresenter(
                 ?.also { log.d("found item ${it.id}") }
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
-                    playlistItemOrchestrator.delete(deleteItem, LOCAL.toFlatOptions())
+                    playlistItemOrchestrator.delete(deleteItem, LOCAL.flatOptions())
                     view.showUndo("Deleted: ${deleteItem.media.title}", ::undoDelete) // todo extract
                 }
         }
@@ -352,7 +352,6 @@ class PlaylistPresenter(
     override fun onStarPlaylist(): Boolean {
         state.playlist
             ?.let { commitHeaderChange(it.copy(starred = !it.starred)) }
-
         return true
     }
 
@@ -380,7 +379,12 @@ class PlaylistPresenter(
     }
 
     override fun onItemStar(itemModel: ItemContract.Model) {
-        toastWrapper.show("todo: star ${itemModel.id}")
+        state.viewModelScope.launch {
+            playlistItemDomain(itemModel)
+                ?.takeIf { it.id != null }
+                ?.let { it.copy(media = it.media.copy(starred = !it.media.starred)) }
+                ?.also { playlistItemOrchestrator.save(it, LOCAL.deepOptions()) }
+        }
     }
 
     override fun onItemRelated(itemModel: ItemContract.Model) {
@@ -441,7 +445,7 @@ class PlaylistPresenter(
 
     private fun commitHeaderChange(plist: PlaylistDomain) {
         state.viewModelScope.launch {
-            playlistOrchestrator.save(plist, state.playlistIdentifier.toFlatOptions())
+            playlistOrchestrator.save(plist, state.playlistIdentifier.flatOptions())
         }
     }
 
@@ -491,7 +495,7 @@ class PlaylistPresenter(
                             ?.let { item ->
                                 item to (item.id ?: throw java.lang.IllegalStateException("Moved item has no ID"))
                                     .toIdentifier(state.playlistIdentifier.source)
-                                    .toFlatOptions()
+                                    .flatOptions()
                             }
                             ?.let {
                                 playlistItemOrchestrator.save(it.first, it.second)
@@ -537,7 +541,7 @@ class PlaylistPresenter(
     override fun undoDelete() {
         state.deletedPlaylistItem?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistItemOrchestrator.save(itemDomain, LOCAL.toFlatOptions())
+                playlistItemOrchestrator.save(itemDomain, LOCAL.flatOptions())
                 state.deletedPlaylistItem = null
                 executeRefresh()
             }

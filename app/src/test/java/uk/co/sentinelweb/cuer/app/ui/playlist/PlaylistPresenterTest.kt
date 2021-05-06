@@ -636,7 +636,7 @@ class PlaylistPresenterTest {
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
-                mockPlaylistItemOrchestrator.delete(deletedItem, Source.LOCAL.toFlatOptions())
+                mockPlaylistItemOrchestrator.delete(deletedItem, Source.LOCAL.flatOptions())
             }
             verify { mockView.setModel(fixtExpectedMapped) }
             assertThat(fixtState!!.deletedPlaylistItem).isEqualTo(deletedItem)
@@ -669,7 +669,7 @@ class PlaylistPresenterTest {
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
-                mockPlaylistItemOrchestrator.save(fixtExpectedChangedItem, fixtCurrentSource.toFlatOptions())
+                mockPlaylistItemOrchestrator.save(fixtExpectedChangedItem, fixtCurrentSource.flatOptions())
             }
             verify { mockView.setModel(fixtExpectedMapped, false) }
             assertThat(fixtState!!.dragFrom).isNull()
@@ -795,7 +795,7 @@ class PlaylistPresenterTest {
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
-                mockPlaylistItemOrchestrator.save(deletedItem, Source.LOCAL.toFlatOptions())
+                mockPlaylistItemOrchestrator.save(deletedItem, Source.LOCAL.flatOptions())
             }
             verify { mockView.setModel(fixtExpectedMapped) }
             assertThat(fixtState!!.deletedPlaylistItem).isNull()

@@ -64,7 +64,7 @@ class PlaylistItemOrchestrator constructor(
     suspend override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.save(domain, options)
-            LOCAL -> playlistDatabaseRepository.savePlaylistItem(domain, options.emit)
+            LOCAL -> playlistDatabaseRepository.savePlaylistItem(domain, options.emit, options.flat)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
