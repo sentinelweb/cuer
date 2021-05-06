@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.app.queue
 
-//import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract.ConsumerListener
-//import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract.ProducerListener
-//import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options.Companion.LOCAL_FLAT
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.*
@@ -174,33 +171,61 @@ class QueueMediator constructor(
         }
     }
 
+    private suspend fun updateCurrentItem(resetPosition: Boolean) {
+        state.currentItem = state.playlist
+            ?.let { playlist ->
+                playlistOrchestrator.updateCurrentIndex(playlist, state.playlistIdentifier.toFlatOptions(true))
+                playlist.currentIndex.let { playlist.items[it] }
+            }
+            ?: throw NullPointerException("playlist should not be null")
+        //log.d("updateCurrentItem: ${state.currentItem?.media?.playFromStart}")
+        state.currentItem?.let {
+            if (resetPosition || it.media.playFromStart || state.playlist?.playFromStart ?: false) {
+                //log.d("updateCurrentItem:resetMediaPosition")
+                updateCurrentItemFromMedia(it.media.copy(positon = 0))
+            }
+        }
+        state.currentItem?.also {
+            mediaSessionManager.setMedia(it.media)
+        }
+        //log.d("updateCurrentItem: currentItemId=${state.currentItem?.id} currentMediaId=${state.currentItem?.media?.id} currentIndex=${state.playlist?.currentIndex} position=${state.currentItem?.media?.positon} ")
+        _currentItemFlow.emit(state.currentItem)
+    }
+
     override fun updateCurrentMediaItem(updatedMedia: MediaDomain) {
         val currentItemIsInPlaylist = currentItemIndex ?: -1 > -1
         if (currentItemIsInPlaylist) {
             coroutines.computationScope.launch {
-                state.currentItem = state.currentItem
-                    ?.run {
-                        media.let {
-                            MediaPositionUpdate(
-                                id = it.id!!,
-                                positon = updatedMedia.positon,
-                                duration = updatedMedia.duration,
-                                dateLastPlayed = updatedMedia.dateLastPlayed,
-                                watched = true
-                            )
-                        }.let {
-                            playlistOrchestrator.updateMedia(playlist!!, it, state.playlistIdentifier.toFlatOptions(true))
-                                ?.let { copy(media = it) }
-                        }
-                    }
-                state.playlist = state.playlist
-                    ?.let {
-                        it.copy(items = it.items.toMutableList().apply {
-                            set(currentItemIndex ?: throw IllegalStateException(), state.currentItem ?: throw IllegalStateException())
-                        })
-                    }
+                updateCurrentItemFromMedia(updatedMedia)
             }
         }
+    }
+
+    private suspend fun updateCurrentItemFromMedia(updatedMedia: MediaDomain) {
+        state.currentItem = state.currentItem
+            ?.run {
+                media.let {
+                    MediaPositionUpdate(
+                        id = it.id!!,
+                        positon = updatedMedia.positon,
+                        duration = updatedMedia.duration,
+                        dateLastPlayed = updatedMedia.dateLastPlayed,
+                        watched = true
+                    )
+                }.let {
+                    //log.d("updateCurrentMediaItem b4 sv: position=${state.currentItem?.media?.positon} target=${it.positon}")
+
+                    playlistOrchestrator.updateMedia(playlist!!, it, state.playlistIdentifier.toFlatOptions(true))
+                        ?.let { copy(media = it) }
+                }
+            }
+        //log.d("updateCurrentMediaItem: position=${state.currentItem?.media?.positon} ")
+        state.playlist = state.playlist
+            ?.let {
+                it.copy(items = it.items.toMutableList().apply {
+                    set(currentItemIndex ?: throw IllegalStateException(), state.currentItem ?: throw IllegalStateException())
+                })
+            }
     }
 
     override fun destroy() {
@@ -227,23 +252,6 @@ class QueueMediator constructor(
                 updateCurrentItem(false)
             }
         }
-    }
-
-    private suspend fun updateCurrentItem(resetPosition: Boolean) {
-        state.currentItem = state.playlist
-            ?.let { playlist ->
-                playlistOrchestrator.updateCurrentIndex(playlist, state.playlistIdentifier.toFlatOptions(true))
-                playlist.currentIndex.let { playlist.items[it] }
-            }
-            ?: throw NullPointerException("playlist should not be null")
-        log.d("updateCurrentItem: currentItemId=${state.currentItem?.id} currentMediaId=${state.currentItem?.media?.id} currentIndex=${state.playlist?.currentIndex} items.size=${state.playlist?.items?.size} ")
-        if (resetPosition) {
-            state.currentItem?.apply { updateCurrentMediaItem(media.copy(positon = 0)) }
-        }
-        state.currentItem?.apply {
-            mediaSessionManager.setMedia(media)
-        }
-        _currentItemFlow.emit(state.currentItem)
     }
 
     override fun onTrackEnded(media: MediaDomain?) {

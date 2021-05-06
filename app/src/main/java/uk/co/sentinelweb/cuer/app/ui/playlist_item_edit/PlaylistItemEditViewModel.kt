@@ -57,6 +57,9 @@ class PlaylistItemEditViewModel constructor(
     private val mediaOrchestrator: MediaOrchestrator,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
 ) : ViewModel() {
+    init {
+        log.tag(this)
+    }
 
     data class UiEvent(
         val type: Type,
@@ -252,6 +255,30 @@ class PlaylistItemEditViewModel constructor(
         update()
     }
 
+    fun onEditClick() {
+        state.media?.let { originalMedia ->
+            state.editSettings.watched = null
+            state.editSettings.playFromStart = null
+            _dialogModelLiveData.value = modelMapper.mapItemSettings(
+                originalMedia,
+                { i, selected ->
+                    when (i) {
+                        0 -> state.editSettings.watched = selected
+                        1 -> state.editSettings.playFromStart = selected
+                    }
+                },
+                {
+                    state.media = state.media?.copy(
+                        watched = state.editSettings.watched ?: originalMedia.watched,
+                        positon = state.editSettings.watched?.takeIf { it.not() }?.let { 0 } ?: originalMedia.positon,
+                        playFromStart = state.editSettings.playFromStart ?: originalMedia.playFromStart
+                    )
+                    state.isMediaChanged = true
+                }
+            )
+        }
+    }
+
     fun onRemovePlaylist(chipModel: ChipModel) {
         state.isPlaylistsChanged = true
         state.selectedPlaylists.removeIf { it.id == chipModel.value?.toLong() }
@@ -313,10 +340,12 @@ class PlaylistItemEditViewModel constructor(
                         ?: playlistItemOrchestrator.delete(item, Options(state.source))
                 }
             }
+            log.d("commit items: ${state.isMediaChanged}")
             state.committedItems = (
                     state.media
                         ?.let {
                             if (state.isMediaChanged) {
+                                log.d("saving media: ${it.playFromStart}")
                                 mediaOrchestrator.save(it, Options(saveSource, flat = false))
                             } else it
                         }

@@ -5,6 +5,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
@@ -79,6 +81,19 @@ class PlaylistItemEditModelMapper(
         R.string.dialog_message_save_check,
         AlertDialogModel.Button(R.string.dialog_button_save, confirm),
         cancel = AlertDialogModel.Button(R.string.dialog_button_dont_save, cancel),
+    )
+
+    fun mapItemSettings(item: MediaDomain, itemClick: (Int, Boolean) -> Unit, confirm: () -> Unit): SelectDialogModel = SelectDialogModel(
+        DialogModel.Type.PLAYLIST_ITEM_SETTNGS,
+        R.string.menu_settings,
+        true,
+        listOf(
+            SelectDialogModel.Item("Watched", item.watched, true),
+            SelectDialogModel.Item("Always play from start", item.playFromStart, true)
+        ),
+        itemClick,
+        confirm,
+        {}
     )
 
     companion object {

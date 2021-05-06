@@ -49,6 +49,9 @@ class QueueMediatorTest {
     lateinit var mockPlaylistItemOrchestrator: PlaylistItemOrchestrator
 
     @MockK
+    lateinit var mockMediaOrchestrator: MediaOrchestrator
+
+    @MockK
     lateinit var mockMediaSessionManager: MediaSessionManager
 
     @MockK
