@@ -41,6 +41,14 @@
                 app:layout_collapseParallaxMultiplier="0.7"
                 />
 
+            <View
+                android:id="@+id/playlist_action_bg"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="top"
+                android:background="@drawable/actionbar_gradient"
+                />
+
             <TextView
                 android:id="@+id/playlist_items"
                 style="@style/Header.InfoText"
@@ -51,28 +59,8 @@
                 tools:text="800"
                 />
 
-            <!--            <TextView-->
-            <!--                android:id="@+id/playlist_flags"-->
-            <!--                style="@style/Header.InfoText"-->
-            <!--                android:layout_marginTop="118dp"-->
-            <!--                android:text="@string/default_playlist"-->
-            <!--                android:visibility="gone"-->
-            <!--                app:layout_constraintTop_toTopOf="parent"-->
-            <!--                tools:text="Default"-->
-            <!--                />-->
-
-            <!--            <View-->
-            <!--                android:id="@+id/ple_action_bg"-->
-            <!--                android:layout_width="140dp"-->
-            <!--                android:layout_height="?attr/actionBarSize"-->
-            <!--                android:layout_gravity="top|end"-->
-            <!--                android:layout_marginTop="24dp"-->
-            <!--                android:background="@color/black_transparent_background"-->
-            <!--                android:fitsSystemWindows="true"-->
-            <!--                />-->
-
             <View
-                android:id="@+id/ple_title_bg"
+                android:id="@+id/playlist_title_bg"
                 android:layout_width="match_parent"
                 android:layout_height="64sp"
                 android:layout_gravity="bottom"
