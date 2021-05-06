@@ -182,7 +182,7 @@ class MediaDatabaseRepository constructor(
 //                                    .also { database.setTransactionSuccessful() }
 //                                    .also { database.endTransaction() }
                             .let { Data(load(id = it.id, flat).data) }
-                            .also { log.d("media: ${it.data?.dateLastPlayed}") }
+//                            .also { log.d("media: ${it.data?.dateLastPlayed}") }
                             .also { if (emit) it.data?.also { _mediaFlow.emit((if (flat) FLAT else FULL) to it) } }
                     else -> throw InvalidClassException("update object not valid: ${update::class.simpleName}")
                 }

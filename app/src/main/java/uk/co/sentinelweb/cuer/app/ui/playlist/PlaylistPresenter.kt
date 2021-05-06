@@ -616,7 +616,6 @@ class PlaylistPresenter(
     private suspend fun updateView(animate: Boolean = true) = withContext(coroutines.Main) {
         state.playlist
             .takeIf { coroutines.mainScopeActive }
-            .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
             ?.let { modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap) }
             ?.also { state.model = it }
             ?.also { view.setModel(it, animate) }
@@ -647,24 +646,6 @@ class PlaylistPresenter(
             }
     }
 
-//    private fun updateMediaItem(m: MediaDomain) {
-//        state.playlist
-//            ?.items
-//            ?.apply {
-//                indexOfFirst { it.media.id == m.id }
-//                    .takeIf { it > -1 }
-//                    ?.let { index ->
-//                        state.model?.let { model ->
-//                            val originalItem = get(index)
-//
-//                            val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
-//                                ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
-//                            updateItem(index, modelId, changedItem)
-//                        }
-//                    }
-//            }
-//    }
-
     private fun updatePlaylistItemByMediaId(plistItem: PlaylistItemDomain?, media: MediaDomain) {
         state.playlist
             ?.items
@@ -673,11 +654,18 @@ class PlaylistPresenter(
                     .takeIf { it > -1 }
                     ?.let { index ->
                         state.model?.let { model ->
-                            val originalItem = get(index)
-                            val changedItem = plistItem ?: originalItem.copy(media = media)
-                            val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
-                                ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
-                            updateItem(index, modelId, changedItem)
+                            val originalItemDomain = get(index)
+                            val changedItemDomain = plistItem ?: originalItemDomain.copy(media = media)
+                            //model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
+                            model.itemsIdMap.entries.firstOrNull {
+                                if (originalItemDomain.id != null) {
+                                    it.value.id == originalItemDomain.id
+                                } else {
+                                    it.value == originalItemDomain
+                                }
+                            }?.key
+                                ?.also { updateItem(index, it, changedItemDomain) }
+                                ?: throw Exception("Couldn't lookup model ID for $originalItemDomain keys=${model.itemsIdMap.keys}")
                         }
                     }
             }
