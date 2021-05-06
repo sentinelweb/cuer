@@ -8,9 +8,11 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.PINNED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -26,9 +28,18 @@ class PlaylistEditViewModel constructor(
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
 ) : ViewModel() {
 
+    data class UiEvent(
+        val type: Type,
+        val data: Any?
+    ) {
+        enum class Type { MESSAGE, ERROR }
+    }
+
+    private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
     private val _modelLiveData: MutableLiveData<PlaylistEditContract.Model> = MutableLiveData()
     private val _domainLiveData: MutableLiveData<PlaylistDomain> = MutableLiveData()
 
+    fun getUiObservable(): LiveData<PlaylistEditViewModel.UiEvent> = _uiLiveData
     fun getModelObservable(): LiveData<PlaylistEditContract.Model> = _modelLiveData
     fun getDomainObservable(): LiveData<PlaylistDomain> = _domainLiveData
 
@@ -103,8 +114,32 @@ class PlaylistEditViewModel constructor(
     }
 
     private fun update() {
-        state.model = mapper.mapModel(state.playlist)
-        _modelLiveData.value = mapper.mapModel(state.playlist)
+        val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlist.id
+        _modelLiveData.value = mapper.mapModel(state.playlist, pinned).apply {
+            state.model = this
+        }
+    }
+
+    fun onSelectParent() {
+
+    }
+
+    fun onRemoveParent() {
+
+    }
+
+    fun onPinClick() {
+        state.playlist.id?.apply {
+            val pinnedId = prefsWrapper.getLong(PINNED_PLAYLIST, 0)
+            if (pinnedId != state.playlist.id) {
+                prefsWrapper.putLong(PINNED_PLAYLIST, this)
+            } else {
+                prefsWrapper.remove(PINNED_PLAYLIST)
+            }
+            update()
+        } ?: run {
+            _uiLiveData.value = UiEvent(MESSAGE, "Please save the playlist first")
+        }
     }
 
 }

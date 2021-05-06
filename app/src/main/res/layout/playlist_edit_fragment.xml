@@ -117,10 +117,44 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/pe_default"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/default_playlist"
+                app:layout_constraintTop_toBottomOf="@id/pe_title"
+                />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/pe_play_start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pe_play_from_start"
+                app:layout_constraintTop_toBottomOf="@id/pe_default"
+                />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pe_parent_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pe_parent"
+                app:layout_constraintBottom_toBottomOf="@id/pe_parent_chip"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/pe_parent_chip"
+                />
+
+            <FrameLayout
+                android:id="@+id/pe_parent_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/pe_parent_label"
+                app:layout_constraintTop_toBottomOf="@id/pe_play_start"
+                />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/pe_commit_button"
                 style="@style/Widget.MaterialComponents.Button.Icon"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="4dp"
                 android:layout_marginVertical="16dp"
@@ -131,12 +165,13 @@
                 app:icon="@drawable/ic_button_tick_24_white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_title"
+                app:layout_constraintTop_toBottomOf="@id/pe_parent_chip"
                 tools:text="Commit"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -149,6 +184,22 @@
         app:layout_anchor="@id/pe_appbar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_button_unstarred_white"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/pe_pin_fab"
+        style="@style/FabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="80dp"
+        android:contentDescription="@null"
+        android:tint="@color/white"
+        android:visibility="visible"
+        app:fabSize="mini"
+        app:layout_anchor="@id/pe_appbar"
+        app:layout_anchorGravity="bottom|end"
+        app:srcCompat="@drawable/ic_push_pin_off_24"
+        tools:ignore="RtlSymmetry"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

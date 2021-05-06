@@ -20,6 +20,7 @@
     <string name="menu_play_yt">Launch</string>
     <string name="menu_channel_yt">Go to channel</string>
     <string name="menu_star">Star</string>
+    <string name="menu_pin">Pin</string>
     <string name="menu_share">Share</string>
     <string name="menu_paste">Paste &amp; add</string>
     <string name="menu_restart">Restart</string>
@@ -134,6 +135,8 @@
     <string name="new_items_below">New Items v</string>
     <string name="dialog_button_dont_save">Don\'t save</string>
     <string name="playlist_msg_deleted">This playlist was deleted</string>
+    <string name="pe_play_from_start">Play from start</string>
+    <string name="pe_parent">Parent</string>
 
 
 </resources>

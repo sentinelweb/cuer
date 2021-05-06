@@ -288,7 +288,7 @@ class PlaylistItemEditFragment
 
                     ple_chips.removeAllViews()
                     model.chips.forEach { chipModel ->
-                        chipCreator.create(chipModel, ple_chips)?.apply {
+                        chipCreator.create(chipModel, ple_chips).apply {
                             ple_chips.addView(this)
                             when (chipModel.type) {
                                 PLAYLIST_SELECT -> {
