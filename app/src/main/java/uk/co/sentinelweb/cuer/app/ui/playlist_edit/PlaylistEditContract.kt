@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_edit
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -14,7 +16,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 interface PlaylistEditContract {
 
-    data class Model constructor(
+    data class Model(
         val titleDisplay: CharSequence,
         val titleEdit: CharSequence,
         val imageUrl: String?,
@@ -25,15 +27,20 @@ interface PlaylistEditContract {
         val playFromStart: Boolean,
         val default: Boolean,
         val chip: ChipModel = ChipModel.PLAYLIST_SELECT_MODEL,
-        val validation: ValidatorModel?
+        val validation: ValidatorModel?,
+        @StringRes val watchAllText: Int,
+        @DrawableRes val watchAllIIcon: Int
     )
 
     data class State constructor(
         var isCreate: Boolean = false,
-        var model: Model? = null
+        var model: Model? = null,
+        var isAllWatched: Boolean? = null
     ) {
         lateinit var source: OrchestratorContract.Source
-        lateinit var playlist: PlaylistDomain
+
+        //lateinit var playlist: PlaylistDomain
+        lateinit var playlistEdit: PlaylistDomain
     }
 
     companion object {
@@ -45,7 +52,8 @@ interface PlaylistEditContract {
                     PlaylistEditViewModel(
                         state = get(),
                         mapper = get(),
-                        playlistRepo = get(),
+                        playlistOrchestrator = get(),
+                        mediaOrchestrator = get(),
                         log = get(),
                         imageProvider = get(),
                         prefsWrapper = get(named<GeneralPreferences>())

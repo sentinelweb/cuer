@@ -66,6 +66,7 @@
     <string name="playlist_item_menu_star">Star</string>
     <string name="playlist_item_menu_share">Share</string>
     <string name="playlist_item_menu_related">Related</string>
+    <string name="playlist_msg_deleted">This playlist was deleted</string>
 
     <!-- playlist edit fragemnt -->
     <string name="pe_fragment_title">Edit playlist</string>
@@ -73,6 +74,10 @@
     <string name="pe_title">Title</string>
     <string name="pe_create">Create</string>
     <string name="pe_save">Save</string>
+    <string name="pe_play_from_start">Play from start</string>
+    <string name="pe_parent">Parent</string>
+    <string name="pe_mark_all_watched">Mark all watched</string>
+    <string name="pe_mark_all_unwatched">Mark all unwatched</string>
 
     <!-- local player -->
     <string name="title_activity_fullscreen">Video Player</string>
@@ -111,6 +116,7 @@
     <string name="dialog_title_save_check">Save check</string>
     <string name="dialog_message_save_check">Do you want to save the item?</string>
     <string name="dialog_button_save">Save</string>
+    <string name="dialog_button_dont_save">Don\'t save</string>
 
     <!-- search -->
     <string name="search_title">Search</string>
@@ -132,11 +138,6 @@
     <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
 
-    <string name="new_items_below">New Items v</string>
-    <string name="dialog_button_dont_save">Don\'t save</string>
-    <string name="playlist_msg_deleted">This playlist was deleted</string>
-    <string name="pe_play_from_start">Play from start</string>
-    <string name="pe_parent">Parent</string>
 
 
 </resources>

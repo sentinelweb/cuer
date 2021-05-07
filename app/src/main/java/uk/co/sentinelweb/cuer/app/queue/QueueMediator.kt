@@ -180,7 +180,7 @@ class QueueMediator constructor(
             ?: throw NullPointerException("playlist should not be null")
         //log.d("updateCurrentItem: ${state.currentItem?.media?.playFromStart}")
         state.currentItem?.let {
-            if (resetPosition || it.media.playFromStart || state.playlist?.playFromStart ?: false) {
+            if (resetPosition || it.media.playFromStart || state.playlist?.playItemsFromStart ?: false) {
                 //log.d("updateCurrentItem:resetMediaPosition")
                 updateCurrentItemFromMedia(it.media.copy(positon = 0))
             }

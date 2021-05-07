@@ -5,9 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -17,12 +19,14 @@ import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.ext.isAllWatched
 
 
 class PlaylistEditViewModel constructor(
     private val state: PlaylistEditContract.State,
     private val mapper: PlaylistEditModelMapper,
-    private val playlistRepo: PlaylistOrchestrator,
+    private val playlistOrchestrator: PlaylistOrchestrator,
+    private val mediaOrchestrator: MediaOrchestrator,
     private val log: LogWrapper,
     private val imageProvider: FirebaseDefaultImageProvider,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
@@ -54,9 +58,11 @@ class PlaylistEditViewModel constructor(
         viewModelScope.launch {
             state.source = source
             playlistId?.let {
-                playlistRepo.load(it, Options(source))
+                playlistOrchestrator.load(it, source.deepOptions())
                     ?.let {
-                        state.playlist = it
+                        // state.playlist = it
+                        state.isAllWatched = it.isAllWatched()
+                        state.playlistEdit = it.copy(items = listOf())
                     } ?: makeCreateModel()
             } ?: makeCreateModel()
             update()
@@ -64,13 +70,13 @@ class PlaylistEditViewModel constructor(
     }
 
     fun onStarClick() {
-        state.playlist = state.playlist.copy(starred = !state.playlist.starred)
+        state.playlistEdit = state.playlistEdit.copy(starred = !state.playlistEdit.starred)
         update()
     }
 
     private fun makeCreateModel() {
         state.isCreate = true
-        state.playlist = PlaylistDomain(
+        state.playlistEdit = PlaylistDomain(
             title = "",
             image = ImageDomain(
                 url = "gs://cuer-275020.appspot.com/playlist_header/pexels-freestocksorg-34407-600.jpg",
@@ -82,9 +88,9 @@ class PlaylistEditViewModel constructor(
     }
 
     fun onImageClick(forward: Boolean) {
-        imageProvider.getNextImage(state.playlist.image, forward) { next ->
+        imageProvider.getNextImage(state.playlistEdit.image, forward) { next ->
             if (next != null) {
-                state.playlist = state.playlist.copy(image = next)
+                state.playlistEdit = state.playlistEdit.copy(image = next, thumb = next)
                 update()
             }
         }
@@ -92,8 +98,8 @@ class PlaylistEditViewModel constructor(
 
     fun onTitleChanged(text: String) {
         log.d("onTitleChanged($text)")
-        if (state.playlist.title != text) {
-            state.playlist = state.playlist.copy(title = text)
+        if (state.playlistEdit.title != text) {
+            state.playlistEdit = state.playlistEdit.copy(title = text)
             update()
         }
     }
@@ -101,9 +107,9 @@ class PlaylistEditViewModel constructor(
     fun onCommitClick() {
         if (state.model?.validation?.valid ?: false) {
             viewModelScope.launch {
-                playlistRepo.save(state.playlist, Options(state.source))
+                playlistOrchestrator.save(state.playlistEdit, Options(state.source))
                     .also {
-                        it.apply { state.playlist = this }
+                        it.apply { state.playlistEdit = this }
                         _domainLiveData.value = it
                     }.takeIf { state.isCreate }
                     ?.also {
@@ -114,24 +120,15 @@ class PlaylistEditViewModel constructor(
     }
 
     private fun update() {
-        val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlist.id
-        _modelLiveData.value = mapper.mapModel(state.playlist, pinned).apply {
-            state.model = this
-        }
-    }
-
-    fun onSelectParent() {
-
-    }
-
-    fun onRemoveParent() {
-
+        val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlistEdit.id
+        _modelLiveData.value = mapper.mapModel(state.playlistEdit, pinned, showAllWatched = state.isAllWatched == true)
+            .apply { state.model = this }
     }
 
     fun onPinClick() {
-        state.playlist.id?.apply {
+        state.playlistEdit.id?.apply {
             val pinnedId = prefsWrapper.getLong(PINNED_PLAYLIST, 0)
-            if (pinnedId != state.playlist.id) {
+            if (pinnedId != state.playlistEdit.id) {
                 prefsWrapper.putLong(PINNED_PLAYLIST, this)
             } else {
                 prefsWrapper.remove(PINNED_PLAYLIST)
@@ -141,5 +138,34 @@ class PlaylistEditViewModel constructor(
             _uiLiveData.value = UiEvent(MESSAGE, "Please save the playlist first")
         }
     }
+
+    fun onWatchAllClick() {
+        viewModelScope.launch {
+            playlistOrchestrator.load(state.playlistEdit.id!!, state.source.deepOptions())
+                ?.apply {
+                    val watched = state.isAllWatched == true
+                    mediaOrchestrator.save(items.map { it.media.copy(watched = !watched) }, state.source.deepOptions())
+                    state.isAllWatched = !watched
+                    update()
+                }
+        }
+    }
+
+    fun onPlayStartChanged(b: Boolean) {
+        log.d("onPlayStartChanged:$b")
+    }
+
+    fun onDefaultChanged(b: Boolean) {
+        log.d("onDefaultChanged: $b")
+    }
+
+    fun onSelectParent() {
+        log.d("onSelectParent")
+    }
+
+    fun onRemoveParent() {
+        log.d("onRemoveParent")
+    }
+
 
 }

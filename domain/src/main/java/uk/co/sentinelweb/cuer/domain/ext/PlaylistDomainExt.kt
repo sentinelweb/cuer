@@ -82,3 +82,9 @@ fun PlaylistDomain.scanOrder(): StringBuilder {
     return orderString
 }
 
+fun PlaylistDomain.isAllWatched() = this.items
+    .fold(Pair(/*all unwatched*/true,/*all watched*/ true)) { acc, item ->
+        (!item.media.watched && acc.first) to (item.media.watched && acc.second)
+    }
+    .let { if (it.first && !it.second) false else if (!it.first && it.second) true else null }
+

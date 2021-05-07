@@ -101,6 +101,9 @@ class PlaylistEditFragment : DialogFragment() {
             }
         }
         binding.peCommitButton.setOnClickListener { viewModel.onCommitClick() }
+        binding.peWatchAll.setOnClickListener { viewModel.onWatchAllClick() }
+        binding.pePlayStart.setOnCheckedChangeListener { v, b -> viewModel.onPlayStartChanged(b) }
+        binding.peDefault.setOnCheckedChangeListener { v, b -> viewModel.onDefaultChanged(b) }
         binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
         binding.peAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
@@ -186,6 +189,8 @@ class PlaylistEditFragment : DialogFragment() {
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .into(binding.peImage)
                     }
+                    binding.peWatchAll.setText(model.watchAllText)
+                    binding.peWatchAll.setIconResource(model.watchAllIIcon)
 
                     binding.peParentChip.removeAllViews()
                     chipCreator.create(model.chip, binding.peParentChip).apply {
