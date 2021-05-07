@@ -22,6 +22,7 @@ class PlaylistsDialogPresenter(
     private val playlistRepository: PlaylistDatabaseRepository,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val modelMapper: PlaylistsModelMapper,
+    private val dialogModelMapper: PlaylistsDialogModelMapper,
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
@@ -41,6 +42,11 @@ class PlaylistsDialogPresenter(
 
     override fun onItemClicked(item: ItemContract.Model) {
         state.playlists.find { it.id == item.id }
+            ?.apply {
+                if (state.pinSelected) {
+                    prefsWrapper.putLong(GeneralPreferences.PINNED_PLAYLIST, id!!)
+                }
+            }
             ?.apply { state.config.itemClick(this, true) }
             ?.also { view.dismiss() }
     }
@@ -64,12 +70,27 @@ class PlaylistsDialogPresenter(
         state.playlistStats = playlistRepository
             .loadPlaylistStatList(state.playlists.mapNotNull { it.id }).data
             ?: listOf()
+
         val pinnedId = prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
-            .let { modelMapper.map(it, null, false, state.config.showAdd, pinnedId) }
+            .let {
+                state.playlistsModel = modelMapper.map(it, null, false, pinnedId)
+                dialogModelMapper.map(state.playlistsModel, state.config.showAdd, state.pinSelected)
+            }
             .takeIf { coroutines.mainScopeActive }
             ?.also { view.setList(it, animate) }
+    }
+
+    private fun updateDialogModel() {
+        dialogModelMapper.map(state.playlistsModel, state.config.showAdd, state.pinSelected)
+            .takeIf { coroutines.mainScopeActive }
+            ?.also { view.updateDialogModel(it) }
+    }
+
+    override fun onPinSelectedPlaylist(b: Boolean) {
+        state.pinSelected = b
+        updateDialogModel()
     }
 
     override fun onDismiss() {

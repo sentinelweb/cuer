@@ -205,7 +205,7 @@ class PlaylistsPresenter(
 
             state.playlists
                 .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
-                .let { modelMapper.map(it, queue.playlistId, true, false, pinnedId) }
+                .let { modelMapper.map(it, queue.playlistId, true, pinnedId) }
                 .takeIf { coroutines.mainScopeActive }
                 ?.also { view.setList(it, animate) }
                 ?.takeIf { focusCurrent }

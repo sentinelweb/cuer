@@ -9,12 +9,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
-import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -22,8 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.ERROR
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -65,7 +61,7 @@ class PlaylistItemEditViewModel constructor(
         val type: Type,
         val data: Any?
     ) {
-        enum class Type { REFRESHING, ERROR }
+        enum class Type { REFRESHING, ERROR, UNPIN }
     }
 
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
@@ -108,7 +104,6 @@ class PlaylistItemEditViewModel constructor(
             state.isMediaChanged = media?.id == null
             media?.let { originalMedia ->
                 state.media = originalMedia
-                //playlistDialogModelCreator.loadPlaylists { state.allPlaylists = it }
                 originalMedia.id?.let {
                     playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it)), Options(state.source))
                         .takeIf { it.size > 0 }
@@ -123,6 +118,12 @@ class PlaylistItemEditViewModel constructor(
                                 }
                         }
                 }
+
+                prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
+                    ?.takeIf { state.selectedPlaylists.size == 0 }
+                    ?.let { playlistOrchestrator.load(it, LOCAL.flatOptions()) }
+                    ?.also { state.selectedPlaylists.add(it) }
+
                 if (originalMedia.channelData.thumbNail == null
                     || (originalMedia.duration?.let { it > 1000 * 60 * 60 * 24 } ?: true)
                     || originalMedia.isLiveBroadcast
@@ -243,6 +244,10 @@ class PlaylistItemEditViewModel constructor(
             }
     }
 
+    fun onUnPin() {
+        prefsWrapper.remove(GeneralPreferences.PINNED_PLAYLIST)
+    }
+
     fun onPlaylistCreated(domain: PlaylistDomain) {
         viewModelScope.launch {
             state.isPlaylistsChanged = true
@@ -281,7 +286,13 @@ class PlaylistItemEditViewModel constructor(
 
     fun onRemovePlaylist(chipModel: ChipModel) {
         state.isPlaylistsChanged = true
-        state.selectedPlaylists.removeIf { it.id == chipModel.value?.toLong() }
+        val plId = chipModel.value?.toLong()
+        state.selectedPlaylists.removeIf { it.id == plId }
+        prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
+            ?.takeIf { it == plId }
+            ?.apply {
+                _uiLiveData.value = UiEvent(UNPIN, null)
+            }
         update()
     }
 
@@ -352,7 +363,7 @@ class PlaylistItemEditViewModel constructor(
                         ?.let { savedMedia ->
                             state.media = savedMedia
                             selectedPlaylists
-                                .filter { it.id != state.editingPlaylistItem?.playlistId }// todo need original playlists (not editingPlaylistItem)
+                                .filter { it.id != state.editingPlaylistItem?.playlistId } // todo need original playlists (not editingPlaylistItem)
                                 .mapNotNull { playlist ->
                                     playlistItemOrchestrator.save(
                                         itemCreator.buildPlayListItem(savedMedia, playlist), Options(saveSource)

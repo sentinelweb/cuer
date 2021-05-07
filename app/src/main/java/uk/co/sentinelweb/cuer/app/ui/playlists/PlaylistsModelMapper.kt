@@ -15,22 +15,19 @@ class PlaylistsModelMapper constructor() {
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         current: OrchestratorContract.Identifier<*>?,
         showOverflow: Boolean,
-        showAdd: Boolean,
         pinnedId: Long?
-    ): PlaylistsContract.Model =
-        PlaylistsContract.Model(
-            DEFAULT_HEADER_IMAGE,
-            current,
-            showAdd,
-            domains.keys.mapIndexed { index, pl ->
-                ItemContract.Model(
-                    pl.id!!,
-                    index,
-                    pl.title,
-                    false,
-                    (pl.thumb ?: pl.image)?.url,
-                    count = domains[pl]?.itemCount ?: -1,
-                    newItems = domains[pl]?.let { it.itemCount - it.watchedItemCount } ?: -1,
+    ): PlaylistsContract.Model = PlaylistsContract.Model(
+        PLAYLISTS_HEADER_IMAGE,
+        current,
+        domains.keys.mapIndexed { index, pl ->
+            ItemContract.Model(
+                pl.id!!,
+                index,
+                pl.title,
+                false,
+                (pl.thumb ?: pl.image)?.url,
+                count = domains[pl]?.itemCount ?: -1,
+                newItems = domains[pl]?.let { it.itemCount - it.watchedItemCount } ?: -1,
                     starred = pl.starred,
                     loopMode = pl.mode,
                     type = pl.type,
@@ -50,7 +47,7 @@ class PlaylistsModelMapper constructor() {
         )
 
     companion object {
-        const val DEFAULT_HEADER_IMAGE = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg"
+        const val PLAYLISTS_HEADER_IMAGE = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg"
     }
 
 }

@@ -34,8 +34,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.ERROR
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
@@ -226,6 +225,9 @@ class PlaylistItemEditFragment
                     when (model.type) {
                         REFRESHING -> ple_swipe.isRefreshing = model.data as Boolean
                         ERROR -> snackbarWrapper.makeError(model.data as String).show()
+                        UNPIN -> snackbarWrapper
+                            .make("Unpin playlist?", actionText = "UNPIN", action = { viewModel.onUnPin() })
+                            .show()
                     }
                 }
             })

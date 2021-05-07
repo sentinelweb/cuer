@@ -33,11 +33,13 @@ interface PlaylistsDialogContract {
         fun setConfig(config: Config)
         fun onAddPlaylist()
         fun onDismiss()
+        fun onPinSelectedPlaylist(b: Boolean)
     }
 
     interface View {
-        fun setList(model: PlaylistsContract.Model, animate: Boolean = true)
+        fun setList(model: Model, animate: Boolean = true)
         fun dismiss()
+        fun updateDialogModel(model: Model)
     }
 
     data class Config(
@@ -56,10 +58,18 @@ interface PlaylistsDialogContract {
         var dragTo: Int? = null,
         var playlistStats: List<PlaylistStatDomain> = listOf(),
         var priorityPlaylistIds: MutableList<Long> = mutableListOf(),
-        var channelSearchApplied: Boolean = false
+        var channelSearchApplied: Boolean = false,
+        var pinSelected: Boolean = false
     ) : ViewModel() {
         lateinit var config: Config
+        lateinit var playlistsModel: PlaylistsContract.Model
     }
+
+    data class Model(
+        val playistsModel: PlaylistsContract.Model,
+        val showAdd: Boolean,
+        val pinNext: Boolean
+    )
 
     companion object {
 
@@ -77,10 +87,12 @@ interface PlaylistsDialogContract {
                         log = get(),
                         toastWrapper = get(),
                         prefsWrapper = get(named<GeneralPreferences>()),
-                        coroutines = get()
+                        coroutines = get(),
+                        dialogModelMapper = get()
                     )
                 }
                 scoped { PlaylistsModelMapper() }
+                scoped { PlaylistsDialogModelMapper() }
                 scoped { PlaylistsAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }

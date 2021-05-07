@@ -69,7 +69,6 @@ interface PlaylistsContract {
     data class Model(
         val imageUrl: String = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         val currentPlaylistId: Identifier<*>?, // todo non null?
-        val showAdd: Boolean = true,
         val items: List<ItemContract.Model>
     )
 
