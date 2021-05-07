@@ -15,7 +15,8 @@ class PlaylistsModelMapper constructor() {
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         current: OrchestratorContract.Identifier<*>?,
         showOverflow: Boolean,
-        showAdd: Boolean
+        showAdd: Boolean,
+        pinnedId: Long?
     ): PlaylistsContract.Model =
         PlaylistsContract.Model(
             DEFAULT_HEADER_IMAGE,
@@ -41,7 +42,9 @@ class PlaylistsModelMapper constructor() {
                     canDelete = pl.config.deletable,
                     canLaunch = pl.type == PLATFORM,
                     canShare = pl.type == PLATFORM,
-                    watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false
+                    watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false,
+                    pinned = pl.id == pinnedId,
+                    default = pl.default
                 )
             }
         )

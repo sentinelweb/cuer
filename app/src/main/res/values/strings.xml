@@ -67,6 +67,7 @@
     <string name="playlist_item_menu_share">Share</string>
     <string name="playlist_item_menu_related">Related</string>
     <string name="playlist_msg_deleted">This playlist was deleted</string>
+    <string name="playlist_play_items_from_start">Play items from start</string>
 
     <!-- playlist edit fragemnt -->
     <string name="pe_fragment_title">Edit playlist</string>
@@ -137,7 +138,7 @@
     <string name="live">LIVE</string>
     <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
-
+    <string name="pe_other_actions">Other actions</string>
 
 
 </resources>

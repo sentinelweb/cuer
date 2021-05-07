@@ -5,11 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -107,7 +104,15 @@ class PlaylistEditViewModel constructor(
     fun onCommitClick() {
         if (state.model?.validation?.valid ?: false) {
             viewModelScope.launch {
-                playlistOrchestrator.save(state.playlistEdit, Options(state.source))
+                if (state.playlistEdit.default && state.source == Source.LOCAL) {
+                    playlistOrchestrator.loadList(OrchestratorContract.DefaultFilter(), state.source.flatOptions())
+                        .takeIf { it.size > 0 }
+                        ?.map { it.copy(default = false) }
+                        ?.apply {
+                            playlistOrchestrator.save(this, state.source.flatOptions())
+                        }
+                }
+                playlistOrchestrator.save(state.playlistEdit, state.source.flatOptions())
                     .also {
                         it.apply { state.playlistEdit = this }
                         _domainLiveData.value = it
@@ -152,11 +157,13 @@ class PlaylistEditViewModel constructor(
     }
 
     fun onPlayStartChanged(b: Boolean) {
-        log.d("onPlayStartChanged:$b")
+        state.playlistEdit = state.playlistEdit.copy(playItemsFromStart = b)
+        update()
     }
 
     fun onDefaultChanged(b: Boolean) {
-        log.d("onDefaultChanged: $b")
+        state.playlistEdit = state.playlistEdit.copy(default = b)
+        update()
     }
 
     fun onSelectParent() {

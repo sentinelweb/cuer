@@ -32,6 +32,14 @@ class ItemModelMapper constructor(
         res.getDrawable(R.drawable.ic_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
+    private val pinDrawable: Drawable by lazy {
+        res.getDrawable(R.drawable.ic_push_pin_on_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+    }
+
+    private val defaultDrawable: Drawable by lazy {
+        res.getDrawable(R.drawable.ic_playlist_default_black, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+    }
+
     private val _bottomDrawables: MutableMap<Int, Drawable> = mutableMapOf()
 
     private fun bottomDrawable(@DrawableRes id: Int): Drawable {
@@ -59,7 +67,7 @@ class ItemModelMapper constructor(
     }
 
     fun mapBottomText(model: ItemContract.Model): SpannableString {
-        val countText = if (model.count > 0) model.run { "$newItems / $count" } else ""
+        val countText = if (model.count > 0) model.run { "$newItems / $count    " } else ""
         return SpannableString("          $countText").apply {
             res.replaceSpannableIcon(
                 this,
@@ -84,6 +92,22 @@ class ItemModelMapper constructor(
                 if (model.watched) watchDrawable else unwatchDrawable,
                 8, 9
             )
+
+            if (model.pinned) {
+                res.replaceSpannableIcon(
+                    this,
+                    pinDrawable,
+                    this.length - 3, this.length - 2
+                )
+            }
+
+            if (model.default) {
+                res.replaceSpannableIcon(
+                    this,
+                    defaultDrawable,
+                    this.length - 1, this.length
+                )
+            }
         }
     }
 

@@ -257,7 +257,7 @@
 
     <style name="Chip.SelectPlaylist" parent="Widget.MaterialComponents.Chip.Action">
         <item name="android:layout_marginHorizontal">4dp</item>
-        <item name="chipIcon">@drawable/ic_chip_playlist_black</item>
+        <item name="chipIcon">@drawable/ic_playlist_black</item>
         <item name="chipIconSize">20dp</item>
         <item name="chipIconTint">@color/chip_icon_tint</item>
     </style>

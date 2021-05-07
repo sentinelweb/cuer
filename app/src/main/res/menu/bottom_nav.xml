@@ -10,13 +10,13 @@
 
     <item
         android:id="@id/navigation_playlists"
-        android:icon="@drawable/ic_nav_playlists_black"
+        android:icon="@drawable/ic_playlists_black"
         android:title="@string/bottomnav_title_playlists"
         />
 
     <item
         android:id="@id/navigation_playlist"
-        android:icon="@drawable/ic_nav_playlist_black"
+        android:icon="@drawable/ic_playlist_black"
         android:title="@string/bottomnav_title_playlist"
         />
 

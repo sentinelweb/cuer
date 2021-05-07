@@ -67,7 +67,9 @@ interface ItemContract {
         val canDelete: Boolean,
         val canLaunch: Boolean,
         val canShare: Boolean,
-        val watched: Boolean
+        val watched: Boolean,
+        val pinned: Boolean,
+        val default: Boolean
     ) : ItemBaseModel(id)
 
 }

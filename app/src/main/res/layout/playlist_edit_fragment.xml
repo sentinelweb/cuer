@@ -40,7 +40,6 @@
                 tools:src="@drawable/im_test_nietzche"
                 />
 
-
             <View
                 android:id="@+id/pe_action_bg"
                 android:layout_width="match_parent"
@@ -166,7 +165,6 @@
                 android:textAppearance="?attr/textAppearanceButton"
                 app:icon="@drawable/ic_button_tick_24_white"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_parent_chip"
                 tools:text="Commit"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
@@ -182,20 +180,32 @@
                 app:layout_constraintTop_toBottomOf="@id/pe_commit_button"
                 />
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pe_other_actions_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/pe_other_actions"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_divider"
+                />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/pe_watch_all"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="4dp"
-                android:layout_marginVertical="16dp"
+                android:layout_marginVertical="8dp"
                 android:drawableTint="@color/button_fg_tint"
                 android:elevation="@dimen/button_elevation"
                 android:text="@string/pe_mark_all_watched"
                 android:textAppearance="?attr/textAppearanceButton"
                 app:icon="@drawable/ic_visibility_24"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_divider"
+                app:layout_constraintTop_toBottomOf="@id/pe_other_actions_title"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
                 />
 

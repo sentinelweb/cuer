@@ -191,7 +191,10 @@ class PlaylistEditFragment : DialogFragment() {
                     }
                     binding.peWatchAll.setText(model.watchAllText)
                     binding.peWatchAll.setIconResource(model.watchAllIIcon)
+                    binding.peDefault.isChecked = model.default
+                    binding.peDefault.isVisible = !model.default
 
+                    binding.pePlayStart.isChecked = model.playFromStart
                     binding.peParentChip.removeAllViews()
                     chipCreator.create(model.chip, binding.peParentChip).apply {
                         binding.peParentChip.addView(this)

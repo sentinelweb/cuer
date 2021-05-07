@@ -164,6 +164,7 @@ class PlaylistsPresenter(
 
     private suspend fun executeRefresh(focusCurrent: Boolean, animate: Boolean = true) {
         try {
+            val pinnedId = prefsWrapper.getLong(PINNED_PLAYLIST)
             state.playlists = playlistRepository.loadList(null)
                 .takeIf { it.isSuccessful }
                 ?.data
@@ -204,7 +205,7 @@ class PlaylistsPresenter(
 
             state.playlists
                 .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
-                .let { modelMapper.map(it, queue.playlistId, true, false) }
+                .let { modelMapper.map(it, queue.playlistId, true, false, pinnedId) }
                 .takeIf { coroutines.mainScopeActive }
                 ?.also { view.setList(it, animate) }
                 ?.takeIf { focusCurrent }

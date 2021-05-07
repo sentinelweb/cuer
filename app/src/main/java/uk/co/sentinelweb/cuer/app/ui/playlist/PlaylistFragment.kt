@@ -130,9 +130,6 @@ class PlaylistFragment :
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
         presenter.initialise()
-//        edgeToEdgeWrapper.doOnApplyWindowInsets(binding.playlistToolbar) { view, insets, padding ->
-//            view.updatePadding( top = insets.)
-//        }
         binding.playlistList.layoutManager = LinearLayoutManager(context)
         binding.playlistList.adapter = adapter
         itemTouchHelper.attachToRecyclerView(binding.playlistList)
@@ -159,7 +156,6 @@ class PlaylistFragment :
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (menuState.isShow) {
                     menuState.isShow = false
-                    //modeMenuItems.forEach { it.isVisible = false }
                     updatePlayModeMenuItems()
                     playMenuItem?.isVisible = false
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
@@ -311,15 +307,14 @@ class PlaylistFragment :
         starMenuItem?.setIcon(model.starredIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
         editMenuItem?.isVisible = model.canEdit
         starMenuItem?.isVisible = model.canEdit
-        //playlist_items.setText("${model.items.size}")
-        //binding.playlistFlags.isVisible = model.isDefault
+        binding.playlistFlags.isVisible = model.isDefault || model.isPlayFromStart || model.isPinned
+        binding.playlistFlagDefault.isVisible = model.isDefault
+        binding.playlistFlagPlayStart.isVisible = model.isPlayFromStart
+        binding.playlistFlagPinned.isVisible = model.isPinned
         binding.playlistFabPlaymode.setImageResource(model.loopModeIcon)
         menuState.lastPlayModeIndex = model.loopModeIndex
         menuState.isPlayable = model.canPlay
         updatePlayModeMenuItems()
-//        if (!binding.playlistFabPlaymode.isVisible && model.canPlay) {
-//            modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == menuState.lastPlayModeIndex }
-//        }
     }
 
     override fun showUndo(msg: String, undoFunction: () -> Unit) {

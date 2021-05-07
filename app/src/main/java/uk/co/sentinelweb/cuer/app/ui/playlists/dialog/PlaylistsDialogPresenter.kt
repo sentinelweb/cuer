@@ -64,13 +64,12 @@ class PlaylistsDialogPresenter(
         state.playlistStats = playlistRepository
             .loadPlaylistStatList(state.playlists.mapNotNull { it.id }).data
             ?: listOf()
-
+        val pinnedId = prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
-            .let { modelMapper.map(it, null, false, state.config.showAdd) }
+            .let { modelMapper.map(it, null, false, state.config.showAdd, pinnedId) }
             .takeIf { coroutines.mainScopeActive }
             ?.also { view.setList(it, animate) }
-
     }
 
     override fun onDismiss() {

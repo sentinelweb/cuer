@@ -76,6 +76,7 @@ class PlaylistPresenter(
     }
 
     private fun isPlaylistPlaying() = isQueuedPlaylist && ytContextHolder.isConnected()
+    private fun isPlaylistPinned() = state.playlist?.let { prefsWrapper.getLong(PINNED_PLAYLIST, 0) == it.id } ?: false
 
     private val isQueuedPlaylist: Boolean
         get() = state.playlistIdentifier == queue.playlistId
@@ -484,7 +485,10 @@ class PlaylistPresenter(
                 ?.let { playlist -> playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!) }
                 ?.also { state.playlist = it }
                 ?.also {
-                    modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap)
+                    modelMapper.map(
+                        it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap,
+                        pinned = isPlaylistPinned()
+                    )
                         .also { view.setModel(it, false) }
                     view.highlightPlayingItem(it.currentIndex)
                 }
@@ -616,7 +620,12 @@ class PlaylistPresenter(
     private suspend fun updateView(animate: Boolean = true) = withContext(coroutines.Main) {
         state.playlist
             .takeIf { coroutines.mainScopeActive }
-            ?.let { modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap) }
+            ?.let {
+                modelMapper.map(
+                    it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap,
+                    pinned = isPlaylistPinned()
+                )
+            }
             ?.also { state.model = it }
             ?.also { view.setModel(it, animate) }
             .also {
@@ -638,7 +647,10 @@ class PlaylistPresenter(
             .takeIf { coroutines.mainScopeActive }
             ?.apply {
                 view.setHeaderModel(
-                    modelMapper.map(this, isPlaylistPlaying(), false, id = state.playlistIdentifier, playlists = state.playlistsMap)
+                    modelMapper.map(
+                        this, isPlaylistPlaying(), false, id = state.playlistIdentifier, playlists = state.playlistsMap,
+                        pinned = isPlaylistPinned()
+                    )
                 )
                 state.playlist?.currentIndex?.also {
                     view.highlightPlayingItem(it)
@@ -679,16 +691,13 @@ class PlaylistPresenter(
         state.playlist = state.playlist?.let {
             it.copy(items = it.items.toMutableList().apply { set(index, changedItem) })
         }
-        val mappedItem =
-            modelMapper.map(
-                modelId,
-                changedItem,
-                index,
-                state.playlist?.config?.editableItems ?: false,
-                state.playlist?.config?.deletableItems ?: false,
-                state.playlist?.config?.editable ?: false,
-                playlists = state.playlistsMap,
-            )
+        val mappedItem = modelMapper.map(
+            modelId, changedItem, index,
+            state.playlist?.config?.editableItems ?: false,
+            state.playlist?.config?.deletableItems ?: false,
+            state.playlist?.config?.editable ?: false,
+            playlists = state.playlistsMap,
+        )
         state.model = state.model?.let {
             it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
         }?.also { it.itemsIdMap[modelId] = changedItem }

@@ -19,7 +19,7 @@
         />
     <item
         android:id="@+id/playlist_context_play_start"
-        android:icon="@drawable/ic_menu_play_start_black"
+        android:icon="@drawable/ic_play_start_black"
         android:title="@string/playlist_item_menu_play_start"
         app:iconTint="?contextMenuItemColor"
         />

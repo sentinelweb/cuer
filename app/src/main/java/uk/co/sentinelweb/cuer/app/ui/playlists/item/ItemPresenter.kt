@@ -15,7 +15,7 @@ class ItemPresenter(
         view.setCheckedVisible(item.checkIcon)
         item.thumbNailUrl
             ?.apply { view.setIconUrl(this) }
-            ?: R.drawable.ic_chip_playlist_black
+            ?: R.drawable.ic_playlist_black
                 .apply { view.setIconResource(this) }
         state.item = item
         view.showOverflow(item.showOverflow && (canPlay() || canLaunch() || canEdit() || canShare()))
