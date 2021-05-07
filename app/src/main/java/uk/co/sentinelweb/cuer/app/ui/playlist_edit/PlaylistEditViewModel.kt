@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
@@ -39,10 +41,12 @@ class PlaylistEditViewModel constructor(
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
     private val _modelLiveData: MutableLiveData<PlaylistEditContract.Model> = MutableLiveData()
     private val _domainLiveData: MutableLiveData<PlaylistDomain> = MutableLiveData()
+    private val _dialogModelLiveData: MutableLiveData<DialogModel> = MutableLiveData()
 
     fun getUiObservable(): LiveData<PlaylistEditViewModel.UiEvent> = _uiLiveData
     fun getModelObservable(): LiveData<PlaylistEditContract.Model> = _modelLiveData
     fun getDomainObservable(): LiveData<PlaylistDomain> = _domainLiveData
+    fun getDialogObservable(): LiveData<DialogModel> = _dialogModelLiveData
 
     @Suppress("RedundantOverride") // for note
     override fun onCleared() {
@@ -126,8 +130,9 @@ class PlaylistEditViewModel constructor(
 
     private fun update() {
         val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlistEdit.id
-        _modelLiveData.value = mapper.mapModel(state.playlistEdit, pinned, showAllWatched = state.isAllWatched == true)
-            .apply { state.model = this }
+        _modelLiveData.value = mapper.mapModel(
+            state.playlistEdit, pinned, parent = state.playlistParent, showAllWatched = state.isAllWatched == true
+        ).apply { state.model = this }
     }
 
     fun onPinClick() {
@@ -167,11 +172,34 @@ class PlaylistEditViewModel constructor(
     }
 
     fun onSelectParent() {
-        log.d("onSelectParent")
+        _dialogModelLiveData.value =
+            PlaylistsDialogContract.Config(
+                setOf(),
+                true,
+                this::onParentSelected,
+                { },
+                this::onPlaylistDialogClose,
+                null,
+                showAdd = false,
+                showPin = false
+            )
+    }
+
+    fun onParentSelected(playlist: PlaylistDomain?, checked: Boolean) {
+        // todo check for circular refs!! while parent.parent.id != -1 ..
+        state.playlistParent = playlist
+        state.playlistEdit = state.playlistEdit.copy(parentId = playlist?.id)
+        update()
+    }
+
+    fun onPlaylistDialogClose() {
+        update()
     }
 
     fun onRemoveParent() {
-        log.d("onRemoveParent")
+        state.playlistParent = null
+        state.playlistEdit = state.playlistEdit.copy(parentId = null)
+        update()
     }
 
 

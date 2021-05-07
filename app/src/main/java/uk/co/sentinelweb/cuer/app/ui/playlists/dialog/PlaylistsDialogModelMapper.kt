@@ -5,12 +5,13 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 class PlaylistsDialogModelMapper() {
 
     fun map(
-        playlistsModel: PlaylistsContract.Model,
-        showAdd: Boolean,
-        pinNext: Boolean
+        playlistsModel: PlaylistsContract.Model?,
+        config: PlaylistsDialogContract.Config,
+        pinOn: Boolean
     ) = PlaylistsDialogContract.Model(
         playlistsModel,
-        showAdd,
-        pinNext
+        config.showAdd,
+        config.showPin && pinOn,
+        config.showPin && !pinOn
     )
 }

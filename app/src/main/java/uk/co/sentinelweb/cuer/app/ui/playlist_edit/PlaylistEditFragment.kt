@@ -19,10 +19,14 @@ import uk.co.sentinelweb.cuer.app.databinding.PlaylistEditFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -52,6 +56,8 @@ class PlaylistEditFragment : DialogFragment() {
 
     private var _binding: PlaylistEditFragmentBinding? = null
     private val binding get() = _binding!!
+
+    private var dialogFragment: DialogFragment? = null
 
     interface Listener {
         fun onPlaylistCommit(domain: PlaylistDomain?)
@@ -131,6 +137,7 @@ class PlaylistEditFragment : DialogFragment() {
         observeUi()
         observeModel()
         observeDomain()
+        observeDialog()
     }
 
     private fun observeUi() {
@@ -223,6 +230,33 @@ class PlaylistEditFragment : DialogFragment() {
                     }
                 }
             })
+    }
+
+    private fun observeDialog() =
+        viewModel.getDialogObservable().observe(this.viewLifecycleOwner,
+            object : Observer<DialogModel> {
+                override fun onChanged(model: DialogModel) {
+                    dialog?.dismiss()
+                    hideDialogFragment()
+                    when (model.type) {
+                        PLAYLIST_FULL -> {
+                            dialogFragment =
+                                PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+                            dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())
+                        }
+                        else -> Unit
+                    }
+                }
+            }
+        )
+
+    private fun hideDialogFragment() {
+        dialogFragment?.let {
+            val ft = childFragmentManager.beginTransaction()
+            ft.hide(it)
+            ft.commit()
+        }
+        dialogFragment = null
     }
 
     private fun observeDomain() {

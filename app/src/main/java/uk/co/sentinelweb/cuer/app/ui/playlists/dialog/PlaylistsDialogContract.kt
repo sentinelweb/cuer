@@ -49,7 +49,8 @@ interface PlaylistsDialogContract {
         val confirm: (() -> Unit)?,
         val dismiss: () -> Unit,
         val suggestionsMedia: MediaDomain? = null,
-        val showAdd: Boolean = true
+        val showAdd: Boolean = true,
+        val showPin: Boolean = true
     ) : DialogModel(Type.PLAYLIST_FULL, R.string.playlist_dialog_title)
 
     data class State(
@@ -59,16 +60,17 @@ interface PlaylistsDialogContract {
         var playlistStats: List<PlaylistStatDomain> = listOf(),
         var priorityPlaylistIds: MutableList<Long> = mutableListOf(),
         var channelSearchApplied: Boolean = false,
-        var pinSelected: Boolean = false
+        var pinWhenSelected: Boolean = false,
+        var playlistsModel: PlaylistsContract.Model? = null
     ) : ViewModel() {
         lateinit var config: Config
-        lateinit var playlistsModel: PlaylistsContract.Model
     }
 
     data class Model(
-        val playistsModel: PlaylistsContract.Model,
+        val playistsModel: PlaylistsContract.Model?,
         val showAdd: Boolean,
-        val pinNext: Boolean
+        val showPin: Boolean,
+        val showUnPin: Boolean
     )
 
     companion object {

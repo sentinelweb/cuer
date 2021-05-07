@@ -89,15 +89,15 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     // region PlaylistContract.View
     override fun setList(model: PlaylistsDialogContract.Model, animate: Boolean) {
         updateDialogNoList(model)
-        adapter.setData(model.playistsModel.items, animate)
+        model.playistsModel?.items?.apply { adapter.setData(this, animate) }
     }
 
     private fun updateDialogNoList(model: PlaylistsDialogContract.Model) {
         binding.pdfSwipe.isRefreshing = false
-        adapter.currentPlaylistId = model.playistsModel.currentPlaylistId
+        adapter.currentPlaylistId = model.playistsModel?.currentPlaylistId
         binding.pdfAddButton.isVisible = model.showAdd
-        binding.pdfPinSelectedButton.isVisible = model.pinNext
-        binding.pdfPinUnselectedButton.isVisible = !model.pinNext
+        binding.pdfPinSelectedButton.isVisible = model.showPin
+        binding.pdfPinUnselectedButton.isVisible = model.showUnPin
     }
     //endregion
 

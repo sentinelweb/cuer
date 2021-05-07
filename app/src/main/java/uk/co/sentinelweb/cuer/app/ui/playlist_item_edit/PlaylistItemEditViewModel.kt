@@ -223,7 +223,8 @@ class PlaylistItemEditViewModel constructor(
                 { },
                 this@PlaylistItemEditViewModel::onPlaylistDialogClose,
                 state.media,
-                showAdd = true
+                showAdd = true,
+                showPin = false
             )
     }
 

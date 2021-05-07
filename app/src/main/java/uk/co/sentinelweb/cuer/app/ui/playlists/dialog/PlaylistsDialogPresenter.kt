@@ -43,7 +43,7 @@ class PlaylistsDialogPresenter(
     override fun onItemClicked(item: ItemContract.Model) {
         state.playlists.find { it.id == item.id }
             ?.apply {
-                if (state.pinSelected) {
+                if (state.pinWhenSelected) {
                     prefsWrapper.putLong(GeneralPreferences.PINNED_PLAYLIST, id!!)
                 }
             }
@@ -56,6 +56,7 @@ class PlaylistsDialogPresenter(
     }
 
     private suspend fun executeRefresh(animate: Boolean = false) {
+        dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
         if (!state.channelSearchApplied) {
             state.config.suggestionsMedia?.apply {
                 playlistOrchestrator.loadList(ChannelPlatformIdFilter(this.channelData.platformId!!), Options(LOCAL))
@@ -76,20 +77,20 @@ class PlaylistsDialogPresenter(
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
             .let {
                 state.playlistsModel = modelMapper.map(it, null, false, pinnedId)
-                dialogModelMapper.map(state.playlistsModel, state.config.showAdd, state.pinSelected)
+                dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
             }
             .takeIf { coroutines.mainScopeActive }
             ?.also { view.setList(it, animate) }
     }
 
     private fun updateDialogModel() {
-        dialogModelMapper.map(state.playlistsModel, state.config.showAdd, state.pinSelected)
+        dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
             .takeIf { coroutines.mainScopeActive }
             ?.also { view.updateDialogModel(it) }
     }
 
     override fun onPinSelectedPlaylist(b: Boolean) {
-        state.pinSelected = b
+        state.pinWhenSelected = b
         updateDialogModel()
     }
 

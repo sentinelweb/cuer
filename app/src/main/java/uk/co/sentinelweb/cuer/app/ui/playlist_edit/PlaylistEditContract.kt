@@ -35,7 +35,8 @@ interface PlaylistEditContract {
     data class State constructor(
         var isCreate: Boolean = false,
         var model: Model? = null,
-        var isAllWatched: Boolean? = null
+        var isAllWatched: Boolean? = null,
+        var playlistParent: PlaylistDomain? = null
     ) {
         lateinit var source: OrchestratorContract.Source
 
