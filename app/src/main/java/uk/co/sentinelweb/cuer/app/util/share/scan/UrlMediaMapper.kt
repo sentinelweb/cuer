@@ -5,8 +5,7 @@ import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.PLAYLIST
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
@@ -16,6 +15,7 @@ val urlMediaMappers = listOf(
     YoutubeShortUrlMediaMapper(),
     YoutubeUrlMediaMapper(),
     YoutubeUrlPlaylistMapper(),
+    YoutubeUrlChannelUserMapper(),
     YoutubeUrlChannelMapper()
 )
 
@@ -97,32 +97,37 @@ private class YoutubeUrlPlaylistMapper : UrlMediaMapper {
         )
 }
 
-// https://youtube.com/channel/<channel ID>.
+// https://youtube.com/c/<userName>.
+// todo need to exec https://developers.google.com/youtube/v3/docs/channels/list#forUsername to get platformID
+private class YoutubeUrlChannelUserMapper : UrlMediaMapper {
+
+    override fun check(uri: Uri): Boolean =
+        uri.host?.contains("youtube.") ?: false
+                && uri.path?.let { it.indexOf("c") > 0 } ?: false
+
+    override fun map(uri: Uri): Pair<ObjectTypeDomain, ChannelDomain> =
+        CHANNEL to ChannelDomain(
+            id = null,
+            platform = YOUTUBE,
+            platformId = NO_PLATFORM_ID,
+            customUrl = uri.path?.let { it.substring(it.lastIndexOf('/')) }
+        )
+}
+
+// https://youtube.com/channel/<platformId>.
+// todo need to exec https://developers.google.com/youtube/v3/docs/channels/list#forUsername to get platformID
 private class YoutubeUrlChannelMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
         uri.host?.contains("youtube.") ?: false
-                && uri.path?.let { it.indexOf("playlist") > 0 } ?: false
-                && uri.getQueryParameters("list").isNotEmpty()
+                && uri.path?.let { it.indexOf("c") > 0 } ?: false
 
-    override fun map(uri: Uri): Pair<ObjectTypeDomain, PlaylistDomain> =
-        PLAYLIST to PlaylistDomain(
+    override fun map(uri: Uri): Pair<ObjectTypeDomain, ChannelDomain> =
+        CHANNEL to ChannelDomain(
             id = null,
-            config = PlaylistDomain.PlaylistConfigDomain(
-                platformUrl = uri.toString()
-            ),
-            type = PLATFORM,
             platform = YOUTUBE,
-            platformId = uri.getQueryParameters("list")[0],
-            starred = false,
-            items = listOf(),
-            currentIndex = -1,
-            title = "",
-            mode = SINGLE,
-            parentId = null,
-            default = false,
-            archived = false,
-            image = null,
-            thumb = null
+            platformId = uri.path?.let { it.substring(it.lastIndexOf('/')) }
         )
 }
+
+const val NO_PLATFORM_ID = "NoPlatformId"
