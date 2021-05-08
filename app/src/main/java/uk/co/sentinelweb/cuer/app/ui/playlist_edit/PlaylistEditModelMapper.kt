@@ -27,7 +27,8 @@ class PlaylistEditModelMapper constructor(
             validation = validator.validate(domain),
             watchAllText = if (!showAllWatched) R.string.pe_mark_all_watched else R.string.pe_mark_all_unwatched,
             watchAllIIcon = if (!showAllWatched) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24,
-            info = buildInfo(domain)
+            info = buildInfo(domain),
+            config = domain.config
         )
 
     private fun buildInfo(domain: PlaylistDomain): String = "<b>Type</b>: ${domain.type}" +

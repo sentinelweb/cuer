@@ -161,13 +161,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/pe_editable_items"
-                app:layout_constraintEnd_toStartOf="@id/pe_play_start"
+                app:layout_constraintEnd_toStartOf="@id/pe_deletable_items"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_playable"
                 />
 
             <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/pe_play_deletable_items"
+                android:id="@+id/pe_deletable_items"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/pe_deletable_items"
@@ -215,13 +215,47 @@
                 />
 
             <View
-                android:id="@+id/pe_divider"
+                android:id="@+id/pe_divider1"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:background="@color/divider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_commit_button"
+                />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pe_info_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/pe_info"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_divider1"
+                />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pe_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:autoLink="web|email"
+                android:linksClickable="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_info_title"
+                tools:text="@string/pe_info"
+                />
+
+            <View
+                android:id="@+id/pe_divider"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_info"
                 />
 
             <com.google.android.material.textview.MaterialTextView
@@ -252,42 +286,6 @@
                 app:layout_constraintTop_toBottomOf="@id/pe_other_actions_title"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
                 />
-
-            <View
-                android:id="@+id/pe_divider1"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/divider"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_watch_all"
-                />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/pe_info_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:text="@string/pe_info"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_divider1"
-                />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/pe_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:autoLink="web|email"
-                android:linksClickable="true"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_info_title"
-                tools:text="@string/pe_info"
-                />
-
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>

@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.PLAY_START
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
@@ -64,7 +65,6 @@ class PlaylistEditViewModel constructor(
             playlistId?.let {
                 playlistOrchestrator.load(it, source.deepOptions())
                     ?.let {
-                        // state.playlist = it
                         state.isAllWatched = it.isAllWatched()
                         state.playlistEdit = it.copy(items = listOf())
                     } ?: makeCreateModel()
@@ -164,13 +164,18 @@ class PlaylistEditViewModel constructor(
         }
     }
 
-    fun onPlayStartChanged(b: Boolean) {
-        state.playlistEdit = state.playlistEdit.copy(playItemsFromStart = b)
-        update()
-    }
+    enum class Flag { DEFAULT, PLAY_START, DELETABLE, EDITABLE, PLAYABLE, DELETE_ITEMS, EDIT_ITEMS }
 
-    fun onDefaultChanged(b: Boolean) {
-        state.playlistEdit = state.playlistEdit.copy(default = b)
+    fun onFlagChanged(b: Boolean, f: Flag) {
+        state.playlistEdit = when (f) {
+            PLAY_START -> state.playlistEdit.copy(playItemsFromStart = b)
+            Flag.DEFAULT -> state.playlistEdit.copy(default = b)
+            Flag.DELETABLE -> state.playlistEdit.copy(config = state.playlistEdit.config.copy(deletable = b))
+            Flag.EDITABLE -> state.playlistEdit.copy(config = state.playlistEdit.config.copy(editable = b))
+            Flag.PLAYABLE -> state.playlistEdit.copy(config = state.playlistEdit.config.copy(playable = b))
+            Flag.DELETE_ITEMS -> state.playlistEdit.copy(config = state.playlistEdit.config.copy(deletableItems = b))
+            Flag.EDIT_ITEMS -> state.playlistEdit.copy(config = state.playlistEdit.config.copy(editableItems = b))
+        }
         update()
     }
 

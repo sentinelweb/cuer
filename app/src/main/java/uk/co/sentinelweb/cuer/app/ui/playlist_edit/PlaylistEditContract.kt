@@ -32,7 +32,8 @@ interface PlaylistEditContract {
         val validation: ValidatorModel?,
         @StringRes val watchAllText: Int,
         @DrawableRes val watchAllIIcon: Int,
-        val info: String
+        val info: String,
+        val config: PlaylistDomain.PlaylistConfigDomain
     )
 
     data class State constructor(

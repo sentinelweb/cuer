@@ -29,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -115,8 +116,12 @@ class PlaylistEditFragment : DialogFragment() {
         }
         binding.peCommitButton.setOnClickListener { viewModel.onCommitClick() }
         binding.peWatchAll.setOnClickListener { viewModel.onWatchAllClick() }
-        binding.pePlayStart.setOnCheckedChangeListener { v, b -> viewModel.onPlayStartChanged(b) }
-        binding.peDefault.setOnCheckedChangeListener { v, b -> viewModel.onDefaultChanged(b) }
+        binding.pePlayStart.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, PLAY_START) }
+        binding.peDefault.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, DEFAULT) }
+        binding.pePlayable.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, PLAYABLE) }
+        binding.peDeletable.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, DELETABLE) }
+        binding.peEditableItems.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, EDIT_ITEMS) }
+        binding.peDeletableItems.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, DELETE_ITEMS) }
         binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
         binding.peAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
@@ -227,6 +232,10 @@ class PlaylistEditFragment : DialogFragment() {
                     binding.peDefault.isVisible = !model.default
                     binding.peInfo.text = Html.fromHtml(model.info, Html.FROM_HTML_MODE_LEGACY)
                     binding.pePlayStart.isChecked = model.playFromStart
+                    binding.pePlayable.isChecked = model.config.playable
+                    binding.peDeletable.isChecked = model.config.deletable
+                    binding.peDeletableItems.isChecked = model.config.deletableItems
+                    binding.peEditableItems.isChecked = model.config.editableItems
                     binding.peParentChip.removeAllViews()
                     chipCreator.create(model.chip, binding.peParentChip).apply {
                         binding.peParentChip.addView(this)

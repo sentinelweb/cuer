@@ -163,7 +163,7 @@ class SharePresenter constructor(
                 playId
                     .takeIf { play }
                     ?.takeIf { isConnected }
-                    ?.let { pli ->
+                    ?.let { _ ->
                         playId.first.let { itemPlaylistId ->
                             queue.playNow(itemPlaylistId.toIdentifier(LOCAL), playId.second)
                         }
