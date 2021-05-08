@@ -88,15 +88,9 @@ interface PlaylistItemEditContract {
                 scoped { PlaylistItemEditModelMapper(get(), get(), get(), get()) }
                 scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
                 //scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped {
-                    ChipCreator((getSource() as Fragment).requireActivity(), get(), get())
-                }
-                scoped {
-                    SelectDialogCreator((getSource() as Fragment).requireActivity())
-                }
-                scoped {
-                    getSource<Fragment>().requireActivity()
-                }
+                scoped { ChipCreator((getSource() as Fragment).requireActivity(), get(), get()) }
+                scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
+                scoped { getSource<Fragment>().requireActivity() }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
                 scoped { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
             }

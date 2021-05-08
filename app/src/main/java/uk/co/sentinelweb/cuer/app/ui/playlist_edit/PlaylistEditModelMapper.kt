@@ -3,7 +3,9 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_edit
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 
 class PlaylistEditModelMapper constructor(
     private val res: ResourceWrapper,
@@ -16,7 +18,7 @@ class PlaylistEditModelMapper constructor(
             imageUrl = domain.image?.url,
             thumbUrl = domain.thumb?.url,
             starred = domain.starred,
-            button = res.getString(domain.id?.let { R.string.pe_save } ?: R.string.pe_create),
+            buttonText = res.getString(domain.id?.let { R.string.pe_save } ?: R.string.pe_create),
             pinned = pinned,
             playFromStart = domain.playItemsFromStart,
             default = domain.default,
@@ -24,7 +26,21 @@ class PlaylistEditModelMapper constructor(
                 ?: ChipModel.PLAYLIST_SELECT_MODEL,
             validation = validator.validate(domain),
             watchAllText = if (!showAllWatched) R.string.pe_mark_all_watched else R.string.pe_mark_all_unwatched,
-            watchAllIIcon = if (!showAllWatched) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24
+            watchAllIIcon = if (!showAllWatched) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24,
+            info = buildInfo(domain)
         )
+
+    private fun buildInfo(domain: PlaylistDomain): String = "<b>Type</b>: ${domain.type}" +
+            (if (domain.type == PLATFORM) "<br/><b>Platform</b>: ${domain.platform}" +
+                    (domain.config.platformUrl?.let { "<br/><b>Platform URL</b>: ${domain.config.platformUrl}" }
+                        ?: YoutubeJavaApiWrapper.playlistUrl(domain))
+            else "") +
+            (domain.config.updateUrl?.let { "<br/><b>Update URL</b>: ${domain.config.updateUrl}" } ?: "") +
+            (domain.config.description?.let { "<br/><br/><b>Description</b>:<br/> ${domain.config.description}" } ?: "") +
+            (domain.channelData?.let {
+                ("<br/><br/><b>Channel</b>: ${it.title}") +
+                        ("<br/><b>Channel URL</b>: " + (it.customUrl ?: YoutubeJavaApiWrapper.channelUrl(it))) +
+                        (it.description?.let { "<br/><br/><b>Description</b>:<br/> ${it}" } ?: "")
+            } ?: "")
 
 }

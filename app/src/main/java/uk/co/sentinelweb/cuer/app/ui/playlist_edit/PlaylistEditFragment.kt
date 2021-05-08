@@ -2,7 +2,11 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_edit
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.Html
+import android.text.Spannable
+import android.text.method.LinkMovementMethod
 import android.view.*
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
@@ -21,6 +25,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.ERROR
@@ -46,6 +52,7 @@ class PlaylistEditFragment : DialogFragment() {
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
     private val toastWrapper: ToastWrapper by inject()
+    private val navMapper: NavigationMapper by currentScope.inject()
 
     private val starMenuItem: MenuItem
         get() = binding.peToolbar.menu.findItem(R.id.pe_star)
@@ -134,10 +141,41 @@ class PlaylistEditFragment : DialogFragment() {
                 }
             }
         })
+        binding.peInfo.setMovementMethod(object : LinkMovementMethod() {
+            override fun handleMovementKey(
+                widget: TextView?,
+                buffer: Spannable?,
+                keyCode: Int,
+                movementMetaState: Int,
+                event: KeyEvent?
+            ): Boolean {
+                buffer?.run { viewModel.onLinkClick(this.toString()) }
+                return true
+            }
+        })
         observeUi()
         observeModel()
         observeDomain()
         observeDialog()
+        observeNavigation()
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        /* init */ viewModel
+    }
+
+    override fun onResume() {
+        super.onResume()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+        (PLAYLIST_ID.getLong(arguments) to (SOURCE.getEnum(arguments) ?: Source.LOCAL)).apply {
+            viewModel.setData(first, second)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        dialogFragment?.dismissAllowingStateLoss()
     }
 
     private fun observeUi() {
@@ -151,19 +189,6 @@ class PlaylistEditFragment : DialogFragment() {
                     }
                 }
             })
-    }
-
-    override fun onResume() {
-        super.onResume()
-        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-        (PLAYLIST_ID.getLong(arguments) to (SOURCE.getEnum(arguments) ?: Source.LOCAL)).apply {
-            viewModel.setData(first, second)
-        }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        /* init */ viewModel
     }
 
     private fun observeModel() {
@@ -189,7 +214,7 @@ class PlaylistEditFragment : DialogFragment() {
                     pinMenuItem.setIcon(pinIconResource)
                     binding.pePinFab.setImageResource(pinIconResource)
 
-                    model.button?.apply { binding.peCommitButton.text = this }
+                    model.buttonText?.apply { binding.peCommitButton.text = this }
                     model.imageUrl?.let {
                         Glide.with(binding.peImage.context)
                             .loadFirebaseOrOtherUrl(it, imageProvider)
@@ -200,7 +225,7 @@ class PlaylistEditFragment : DialogFragment() {
                     binding.peWatchAll.setIconResource(model.watchAllIIcon)
                     binding.peDefault.isChecked = model.default
                     binding.peDefault.isVisible = !model.default
-
+                    binding.peInfo.text = Html.fromHtml(model.info, Html.FROM_HTML_MODE_LEGACY)
                     binding.pePlayStart.isChecked = model.playFromStart
                     binding.peParentChip.removeAllViews()
                     chipCreator.create(model.chip, binding.peParentChip).apply {
@@ -233,7 +258,8 @@ class PlaylistEditFragment : DialogFragment() {
     }
 
     private fun observeDialog() =
-        viewModel.getDialogObservable().observe(this.viewLifecycleOwner,
+        viewModel.getDialogObservable().observe(
+            this.viewLifecycleOwner,
             object : Observer<DialogModel> {
                 override fun onChanged(model: DialogModel) {
                     dialog?.dismiss()
@@ -250,13 +276,15 @@ class PlaylistEditFragment : DialogFragment() {
             }
         )
 
-    private fun hideDialogFragment() {
-        dialogFragment?.let {
-            val ft = childFragmentManager.beginTransaction()
-            ft.hide(it)
-            ft.commit()
-        }
-        dialogFragment = null
+    private fun observeNavigation() {
+        viewModel.getNavigationObservable().observe(
+            this.viewLifecycleOwner,
+            object : Observer<NavigationModel> {
+                override fun onChanged(nav: NavigationModel) {
+                    navMapper.navigate(nav)
+                }
+            }
+        )
     }
 
     private fun observeDomain() {
@@ -269,6 +297,15 @@ class PlaylistEditFragment : DialogFragment() {
                         ?: findNavController().popBackStack()
                 }
             })
+    }
+
+    private fun hideDialogFragment() {
+        dialogFragment?.let {
+            val ft = childFragmentManager.beginTransaction()
+            ft.hide(it)
+            ft.commit()
+        }
+        dialogFragment = null
     }
 
     companion object {

@@ -21,6 +21,11 @@ class ItemPresenter(
         view.showOverflow(item.showOverflow && (canPlay() || canLaunch() || canEdit() || canShare()))
     }
 
+    override fun doMerge(): Boolean {
+        interactions.onMerge(state.item!!)
+        return true
+    }
+
     override fun doClick() {
         interactions.onClick(state.item!!)
     }

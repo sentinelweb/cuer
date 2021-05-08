@@ -31,6 +31,7 @@
     <string name="menu_show_unlistened">Show unlistened</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_filter">Play</string>
+    <string name="menu_merge">Merge with &#8230;</string>
 
     <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>
@@ -79,6 +80,12 @@
     <string name="pe_parent">Parent</string>
     <string name="pe_mark_all_watched">Mark all watched</string>
     <string name="pe_mark_all_unwatched">Mark all unwatched</string>
+    <string name="pe_info">Information</string>
+    <string name="pe_playable">Playable</string>
+    <string name="pe_deletable">Deletable</string>
+    <string name="pe_editable_items">Editable items</string>
+    <string name="pe_deletable_items">Deletable items</string>
+    <string name="pe_other_actions">Other actions</string>
 
     <!-- local player -->
     <string name="title_activity_fullscreen">Video Player</string>
@@ -138,7 +145,6 @@
     <string name="live">LIVE</string>
     <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
-    <string name="pe_other_actions">Other actions</string>
 
 
 </resources>

@@ -99,7 +99,8 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
         binding.pdfPinSelectedButton.isVisible = model.showPin
         binding.pdfPinUnselectedButton.isVisible = model.showUnPin
     }
-    //endregion
+
+//endregion
 
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
@@ -138,6 +139,10 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     override fun onShare(item: ItemContract.Model) {
         //presenter.onItemShare(item)
+    }
+
+    override fun onMerge(item: ItemContract.Model) {
+
     }
     //endregion
 

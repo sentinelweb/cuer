@@ -15,7 +15,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 val urlMediaMappers = listOf(
     YoutubeShortUrlMediaMapper(),
     YoutubeUrlMediaMapper(),
-    YoutubeUrlPlaylistMapper()
+    YoutubeUrlPlaylistMapper(),
+    YoutubeUrlChannelMapper()
 )
 
 interface UrlMediaMapper {
@@ -68,6 +69,36 @@ private class YoutubeUrlMediaMapper : UrlMediaMapper {
 
 // https://www.youtube.com/playlist?list=<playlist ID>.
 private class YoutubeUrlPlaylistMapper : UrlMediaMapper {
+
+    override fun check(uri: Uri): Boolean =
+        uri.host?.contains("youtube.") ?: false
+                && uri.path?.let { it.indexOf("playlist") > 0 } ?: false
+                && uri.getQueryParameters("list").isNotEmpty()
+
+    override fun map(uri: Uri): Pair<ObjectTypeDomain, PlaylistDomain> =
+        PLAYLIST to PlaylistDomain(
+            id = null,
+            config = PlaylistDomain.PlaylistConfigDomain(
+                platformUrl = uri.toString()
+            ),
+            type = PLATFORM,
+            platform = YOUTUBE,
+            platformId = uri.getQueryParameters("list")[0],
+            starred = false,
+            items = listOf(),
+            currentIndex = -1,
+            title = "",
+            mode = SINGLE,
+            parentId = null,
+            default = false,
+            archived = false,
+            image = null,
+            thumb = null
+        )
+}
+
+// https://youtube.com/channel/<channel ID>.
+private class YoutubeUrlChannelMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
         uri.host?.contains("youtube.") ?: false

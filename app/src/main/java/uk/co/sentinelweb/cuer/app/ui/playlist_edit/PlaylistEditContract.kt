@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_edit
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -9,6 +10,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.validator.ValidatorModel
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -22,14 +24,15 @@ interface PlaylistEditContract {
         val imageUrl: String?,
         val thumbUrl: String?,
         val starred: Boolean,
-        val button: String?,
+        val buttonText: String?,
         val pinned: Boolean,
         val playFromStart: Boolean,
         val default: Boolean,
         val chip: ChipModel = ChipModel.PLAYLIST_SELECT_MODEL,
         val validation: ValidatorModel?,
         @StringRes val watchAllText: Int,
-        @DrawableRes val watchAllIIcon: Int
+        @DrawableRes val watchAllIIcon: Int,
+        val info: String
     )
 
     data class State constructor(
@@ -65,6 +68,7 @@ interface PlaylistEditContract {
                 scoped { ChipCreator((getSource() as Fragment).requireActivity(), get(), get()) }
                 factory { PlaylistValidator(get()) }
                 scoped { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
+                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
             }
         }
     }

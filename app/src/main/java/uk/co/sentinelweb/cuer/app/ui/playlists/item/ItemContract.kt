@@ -29,6 +29,8 @@ interface ItemContract {
         fun canShare(): Boolean
         fun canPlay(): Boolean
         fun canLaunch(): Boolean
+        fun doMerge(): Boolean
+
     }
 
     interface External : ItemBaseContract.ItemPresenterBase {
@@ -44,6 +46,7 @@ interface ItemContract {
         fun onPlay(item: Model, external: Boolean)
         fun onStar(item: Model)
         fun onShare(item: Model)
+        fun onMerge(item: Model)
     }
 
     data class State constructor(var item: Model? = null)

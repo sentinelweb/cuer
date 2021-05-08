@@ -572,7 +572,14 @@ class PlaylistPresenter(
         if (state.playlistIdentifier.source == MEMORY) {
             state.playlist
                 ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it, LOCAL) }
-                ?.let { it.copy(items = it.items.map { it.copy(id = null) }, config = it.config.copy(playable = true)) }
+                ?.let {
+                    it.copy(
+                        items = it.items.map { it.copy(id = null) },
+                        config = it.config.copy(
+                            playable = true, editable = true, deletable = true, deletableItems = true, editableItems = true
+                        )
+                    )
+                }
                 ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
                 ?.also { state.playlistIdentifier = it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure") }
                 ?.also { state.playlist = it }

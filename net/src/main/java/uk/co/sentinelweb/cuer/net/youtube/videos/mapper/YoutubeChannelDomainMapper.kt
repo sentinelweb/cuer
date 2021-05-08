@@ -23,6 +23,7 @@ internal class YoutubeChannelDomainMapper(
         thumbNail = imageMapper.mapThumb(it.snippet.thumbnails),
         image = imageMapper.mapImage(it.snippet.thumbnails),
         starred = false,
+        customUrl = it.snippet.customUrl?.let { "https://youtube.com/channel/$it" },
         published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) }
     )
 }

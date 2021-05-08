@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
@@ -42,11 +43,13 @@ class PlaylistEditViewModel constructor(
     private val _modelLiveData: MutableLiveData<PlaylistEditContract.Model> = MutableLiveData()
     private val _domainLiveData: MutableLiveData<PlaylistDomain> = MutableLiveData()
     private val _dialogModelLiveData: MutableLiveData<DialogModel> = MutableLiveData()
+    private val _navigateLiveData: MutableLiveData<NavigationModel> = MutableLiveData()
 
-    fun getUiObservable(): LiveData<PlaylistEditViewModel.UiEvent> = _uiLiveData
+    fun getUiObservable(): LiveData<UiEvent> = _uiLiveData
     fun getModelObservable(): LiveData<PlaylistEditContract.Model> = _modelLiveData
     fun getDomainObservable(): LiveData<PlaylistDomain> = _domainLiveData
     fun getDialogObservable(): LiveData<DialogModel> = _dialogModelLiveData
+    fun getNavigationObservable(): LiveData<NavigationModel> = _navigateLiveData
 
     @Suppress("RedundantOverride") // for note
     override fun onCleared() {
@@ -200,6 +203,14 @@ class PlaylistEditViewModel constructor(
         state.playlistParent = null
         state.playlistEdit = state.playlistEdit.copy(parentId = null)
         update()
+    }
+
+    fun onLinkClick(urlString: String) {
+        _navigateLiveData.value =
+            NavigationModel(
+                NavigationModel.Target.WEB_LINK,
+                mapOf(NavigationModel.Param.LINK to urlString)
+            )
     }
 
 

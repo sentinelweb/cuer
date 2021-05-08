@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayist
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
@@ -99,6 +100,7 @@ object Modules {
         single { PlaylistMemoryRepository(get(), get(), get(), get(), get()) }
         single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get()) }
+        factory { PlaylistMergeOrchestrator(get(), get()) }
         factory { PlaylistMediaLookupOrchestrator(get(), get()) }
         factory { NewMediaPlayistInteractor(get()) }
         factory { RecentItemsPlayistInteractor(get()) }

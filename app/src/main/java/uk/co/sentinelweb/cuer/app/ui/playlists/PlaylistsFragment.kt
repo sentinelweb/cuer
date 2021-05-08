@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -16,6 +17,8 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistsFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
@@ -47,6 +50,7 @@ class PlaylistsFragment :
         get() = binding.playlistsToolbar.menu.findItem(R.id.playlists_search)
 
     private var snackbar: Snackbar? = null
+    private var dialogFragment: DialogFragment? = null
 
     init {
         log.tag(this)
@@ -105,6 +109,11 @@ class PlaylistsFragment :
         super.onPause()
         presenter.onPause()
     }
+
+    override fun onStop() {
+        super.onStop()
+        dialogFragment?.dismissAllowingStateLoss()
+    }
     // endregion
 
     // region PlaylistContract.View
@@ -160,6 +169,12 @@ class PlaylistsFragment :
     override fun hideRefresh() {
         binding.playlistsSwipe.isRefreshing = false
     }
+
+    override fun showPlaylistSelector(model: PlaylistsDialogContract.Config) {
+        dialogFragment?.dismissAllowingStateLoss()
+        dialogFragment = PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+        dialogFragment?.show(childFragmentManager, "PlaylistsSelector")
+    }
     //endregion
 
     // region ItemContract.ItemMoveInteractions
@@ -201,29 +216,9 @@ class PlaylistsFragment :
     override fun onShare(item: ItemContract.Model) {
         presenter.onItemShare(item)
     }
+
+    override fun onMerge(item: ItemContract.Model) {
+        presenter.onMerge(item)
+    }
     //endregion
-
-//    override fun scrollTo(direction: PlaylistsContract.ScrollDirection) {
-//        (playlist_list.layoutManager as LinearLayoutManager).run {
-//            val itemsOnScreen =
-//                this.findLastCompletelyVisibleItemPosition() - this.findFirstCompletelyVisibleItemPosition()
-//
-//            val useIndex = when (direction) {
-//                Up -> max(this.findFirstCompletelyVisibleItemPosition() - itemsOnScreen, 0)
-//                Down ->
-//                    min(
-//                        this.findLastCompletelyVisibleItemPosition() + itemsOnScreen,
-//                        adapter.data.size - 1
-//                    )
-//                Top -> 0
-//                Bottom -> adapter.data.size - 1
-//            }
-//            if (abs(this.findLastCompletelyVisibleItemPosition() - useIndex) > 20)
-//                playlist_list.scrollToPosition(useIndex)
-//            else {
-//                playlist_list.smoothScrollToPosition(useIndex)
-//            }
-//        }
-//    }
-
 }

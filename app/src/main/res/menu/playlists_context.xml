@@ -31,4 +31,10 @@
         android:title="@string/menu_share"
         app:iconTint="?contextMenuItemColor"
         />
+    <item
+        android:id="@+id/playlists_context_merge"
+        android:icon="@drawable/ic_playlist_merge_24"
+        android:title="@string/menu_merge"
+        app:iconTint="?contextMenuItemColor"
+        />
 </menu>

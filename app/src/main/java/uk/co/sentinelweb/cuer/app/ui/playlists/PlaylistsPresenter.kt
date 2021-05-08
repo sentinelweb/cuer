@@ -15,7 +15,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlay
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPair
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -26,8 +28,8 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.*
 
 class PlaylistsPresenter(
     private val view: PlaylistsContract.View,
@@ -44,7 +46,8 @@ class PlaylistsPresenter(
     private val localSearch: LocalSearchPlayistInteractor,
     private val remoteSearch: RemoteSearchPlayistOrchestrator,
     private val ytJavaApi: YoutubeJavaApiWrapper,
-    private val searchMapper: SearchMapper
+    private val searchMapper: SearchMapper,
+    private val merge: PlaylistMergeOrchestrator
 ) : PlaylistsContract.Presenter {
 
     override fun initialise() {
@@ -69,8 +72,7 @@ class PlaylistsPresenter(
     override fun onItemSwipeLeft(item: ItemContract.Model) {
         state.viewModelScope.launch {
             delay(400)
-            state.playlists.apply {
-                find { it.id == item.id }
+            findPlaylist(item)
                     ?.let { playlist ->
                         if (playlist.type != APP) {
                             state.deletedPlaylist = playlist.id
@@ -102,7 +104,7 @@ class PlaylistsPresenter(
                             executeRefresh(false, false)
                         }
                     } ?: let { view.showMessage("Cannot delete playlist") }
-            }
+
         }
     }
 
@@ -114,13 +116,14 @@ class PlaylistsPresenter(
         if (!external) {
             view.gotoPlaylist(item.id, true, item.source)
         } else {
-            state.playlists
-                .find { it.id == item.id }
+            findPlaylist(item)
                 ?.takeIf { it.type == PLATFORM }
                 ?.apply { ytJavaApi.launchPlaylist(platformId!!) }
                 ?: let { view.showMessage("Cannot launch playlist") }
         }
     }
+
+    private fun findPlaylist(item: ItemContract.Model) = state.playlists.find { it.id == item.id }
 
     override fun onItemStar(item: ItemContract.Model) {
         toastWrapper.show("todo: star ${item.id}")
@@ -128,6 +131,38 @@ class PlaylistsPresenter(
 
     override fun onItemShare(item: ItemContract.Model) {
         toastWrapper.show("share: ${item.title}")
+    }
+
+    override fun onMerge(item: ItemContract.Model) {
+        findPlaylist(item)
+            ?.takeIf { it.type != APP }
+            ?.apply {
+                findPlaylist(item)?.also { delPlaylist ->
+                    view.showPlaylistSelector(
+                        PlaylistsDialogContract.Config(
+                            selectedPlaylists = setOf(),
+                            multi = true,
+                            itemClick = { p, b -> merge(p!!, delPlaylist) },
+                            confirm = { },
+                            dismiss = { },
+                            suggestionsMedia = null,
+                            showPin = false,
+                        )
+                    )
+                }
+            }
+    }
+
+    private fun merge(thisPlaylist: PlaylistDomain, delPlaylist: PlaylistDomain) {
+        coroutines.mainScope.launch {
+            if (merge.checkMerge(thisPlaylist, delPlaylist)) {
+                merge.merge(thisPlaylist, delPlaylist).also {
+                    executeRefresh(true, false)
+                }
+            } else {
+                view.showMessage("Cannot merge this playlist")
+            }
+        }
     }
 
     override fun moveItem(fromPosition: Int, toPosition: Int) {

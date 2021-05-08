@@ -10,6 +10,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
@@ -35,6 +36,8 @@ interface PlaylistsContract {
         fun onItemPlay(item: ItemContract.Model, external: Boolean)
         fun onItemStar(item: ItemContract.Model)
         fun onItemShare(item: ItemContract.Model)
+        fun onMerge(item: ItemContract.Model)
+
         fun moveItem(fromPosition: Int, toPosition: Int)
 
         //fun scroll(direction: ScrollDirection)
@@ -54,6 +57,7 @@ interface PlaylistsContract {
         fun gotoPlaylist(id: Long, play: Boolean, source: Source)
         fun gotoEdit(id: Long, source: Source)
         fun showMessage(msg: String)
+        fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
@@ -94,7 +98,8 @@ interface PlaylistsContract {
                         localSearch = get(),
                         remoteSearch = get(),
                         ytJavaApi = get(),
-                        searchMapper = get()
+                        searchMapper = get(),
+                        merge = get()
                     )
                 }
                 scoped { PlaylistsModelMapper() }

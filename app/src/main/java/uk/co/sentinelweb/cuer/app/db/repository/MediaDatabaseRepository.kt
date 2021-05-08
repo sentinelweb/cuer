@@ -50,7 +50,7 @@ class MediaDatabaseRepository constructor(
         withContext(coProvider.IO) {
             try {
                 domain
-                    .let { if (!flat) checkToSaveChannel(it) else it }
+                    .let { if (!flat) it.copy(channelData = checkToSaveChannel(it.channelData)) else it }
                     .let { mediaMapper.map(it) }
                     .let { mediaDao.insert(it) }
                     .let { Data(load(id = it, flat).data) }
@@ -68,7 +68,7 @@ class MediaDatabaseRepository constructor(
             try { // todo better transactions
                 domains
                     .also { database.beginTransaction() }
-                    .map { if (!flat) checkToSaveChannel(it) else it }
+                    .map { if (!flat) it.copy(channelData = checkToSaveChannel(it.channelData)) else it }
                     .map { mediaMapper.map(it) }
                     .let { mediaDao.insertAll(it) }
                     .also { database.setTransactionSuccessful() }
@@ -207,10 +207,10 @@ class MediaDatabaseRepository constructor(
             }
         }
 
-    private suspend fun checkToSaveChannel(media: MediaDomain): MediaDomain {
-        if (media.channelData.platformId.isNullOrEmpty())
+    suspend fun checkToSaveChannel(channel: ChannelDomain): ChannelDomain {
+        if (channel.platformId.isNullOrEmpty())
             throw InvalidObjectException("Channel data is missing remoteID")
-        return media.channelData
+        return channel
             .let { channelMapper.map(it) }
             .let { toCheck ->
                 channelDao.findByChannelId(toCheck.remoteId)?.let { saved ->
@@ -225,7 +225,7 @@ class MediaDatabaseRepository constructor(
                     saved.id
                 } ?: channelDao.insert(toCheck)
             }
-            .let { media.copy(channelData = media.channelData.copy(id = it)) }
+            .let { channel.copy(id = it) }
     }
 
     suspend fun deleteAllChannels(): RepoResult<Boolean> =
