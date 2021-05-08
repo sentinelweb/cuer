@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -25,7 +26,6 @@ import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class PlaylistsFragment :
@@ -37,7 +37,6 @@ class PlaylistsFragment :
     private val presenter: PlaylistsContract.Presenter by currentScope.inject()
     private val adapter: PlaylistsAdapter by currentScope.inject()
     private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
-    private val toastWrapper: ToastWrapper by inject()
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val log: LogWrapper by inject()
@@ -61,7 +60,7 @@ class PlaylistsFragment :
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = PlaylistsFragmentBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -73,20 +72,11 @@ class PlaylistsFragment :
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
 
-        //presenter.initialise()
         binding.playlistsList.layoutManager = LinearLayoutManager(context)
         binding.playlistsList.adapter = adapter
         itemTouchHelper.attachToRecyclerView(binding.playlistsList)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
-//        playlist_fab_up.setOnClickListener { presenter.scroll(Up) }
-//        playlist_fab_up.setOnLongClickListener { presenter.scroll(Top);true }
-//        playlist_fab_down.setOnClickListener { presenter.scroll(Down) }
-//        playlist_fab_down.setOnLongClickListener { presenter.scroll(Bottom);true }
-    }
-
-    override fun onDestroyView() {
-        presenter.destroy()
-        super.onDestroyView()
+        binding.playlistsUp.setOnClickListener { presenter.onUpClicked() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -124,6 +114,7 @@ class PlaylistsFragment :
             .into(binding.playlistsHeaderImage)
         binding.playlistsSwipe.isRefreshing = false
         binding.playlistsItems.text = "${model.items.size}"
+        binding.playlistsUp.isVisible = model.showUp
         adapter.currentPlaylistId = model.currentPlaylistId
         adapter.setData(model.items, animate)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
@@ -172,7 +163,7 @@ class PlaylistsFragment :
 
     override fun showPlaylistSelector(model: PlaylistsDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()
-        dialogFragment = PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+        dialogFragment = PlaylistsDialogFragment.newInstance(model)
         dialogFragment?.show(childFragmentManager, "PlaylistsSelector")
     }
     //endregion
@@ -200,9 +191,8 @@ class PlaylistsFragment :
     }
 
     override fun onLeftSwipe(item: ItemContract.Model) {
-        val playlistItemModel = item
-        adapter.notifyItemRemoved(playlistItemModel.index)
-        presenter.onItemSwipeLeft(playlistItemModel) // delays for animation
+        adapter.notifyItemRemoved(item.index)
+        presenter.onItemSwipeLeft(item) // delays for animation
     }
 
     override fun onPlay(item: ItemContract.Model, external: Boolean) {
@@ -220,5 +210,14 @@ class PlaylistsFragment :
     override fun onMerge(item: ItemContract.Model) {
         presenter.onMerge(item)
     }
+
+    override fun onImageClick(item: ItemContract.Model) {
+        presenter.onItemImageClicked(item)
+    }
+
+    override fun onEdit(item: ItemContract.Model) {
+        presenter.onEdit(item)
+    }
+
     //endregion
 }

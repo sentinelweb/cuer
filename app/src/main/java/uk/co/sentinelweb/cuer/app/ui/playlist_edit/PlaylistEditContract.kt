@@ -33,18 +33,18 @@ interface PlaylistEditContract {
         @StringRes val watchAllText: Int,
         @DrawableRes val watchAllIIcon: Int,
         val info: String,
-        val config: PlaylistDomain.PlaylistConfigDomain
+        val config: PlaylistDomain.PlaylistConfigDomain,
+        val showDefault: Boolean
     )
 
     data class State constructor(
         var isCreate: Boolean = false,
         var model: Model? = null,
         var isAllWatched: Boolean? = null,
-        var playlistParent: PlaylistDomain? = null
+        var playlistParent: PlaylistDomain? = null,
+        var defaultInitial: Boolean = false
     ) {
         lateinit var source: OrchestratorContract.Source
-
-        //lateinit var playlist: PlaylistDomain
         lateinit var playlistEdit: PlaylistDomain
     }
 

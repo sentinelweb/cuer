@@ -145,6 +145,7 @@
     <string name="live">LIVE</string>
     <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
+    <string name="playlists_up_contentdesc">Up</string>
 
 
 </resources>

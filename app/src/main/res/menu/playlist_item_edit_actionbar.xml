@@ -5,7 +5,7 @@
     >
     <item
         android:id="@+id/plie_edit"
-        android:icon="@drawable/ic_button_edit_24"
+        android:icon="@drawable/ic_edit_24"
         android:orderInCategory="50"
         android:title="@string/menu_edit"
         app:iconTint="@color/white"
@@ -14,7 +14,7 @@
 
     <item
         android:id="@+id/plie_play"
-        android:icon="@drawable/ic_menu_play_black"
+        android:icon="@drawable/ic_play_black"
         android:title="@string/menu_play"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="ifRoom"

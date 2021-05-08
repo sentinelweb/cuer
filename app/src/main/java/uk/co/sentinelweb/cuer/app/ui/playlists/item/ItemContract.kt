@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
-import android.text.SpannableString
+import android.text.Spannable
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
@@ -11,8 +11,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 interface ItemContract {
 
     interface View {
-        fun setTopText(text: SpannableString)
-        fun setBottomText(text: SpannableString)
+        fun setTopText(text: Spannable)
+        fun setBottomText(text: Spannable)
         fun setIconResource(@DrawableRes iconRes: Int)
         fun setCheckedVisible(checked: Boolean)
         fun setPresenter(itemPresenter: Presenter)
@@ -29,7 +29,9 @@ interface ItemContract {
         fun canShare(): Boolean
         fun canPlay(): Boolean
         fun canLaunch(): Boolean
-        fun doMerge(): Boolean
+        fun doMerge()
+        fun doImageClick()
+        fun doEdit()
 
     }
 
@@ -47,6 +49,8 @@ interface ItemContract {
         fun onStar(item: Model)
         fun onShare(item: Model)
         fun onMerge(item: Model)
+        fun onImageClick(item: Model)
+        fun onEdit(item: Model)
     }
 
     data class State constructor(var item: Model? = null)
@@ -72,7 +76,8 @@ interface ItemContract {
         val canShare: Boolean,
         val watched: Boolean,
         val pinned: Boolean,
-        val default: Boolean
+        val default: Boolean,
+        val descendents: Int
     ) : ItemBaseModel(id)
 
 }

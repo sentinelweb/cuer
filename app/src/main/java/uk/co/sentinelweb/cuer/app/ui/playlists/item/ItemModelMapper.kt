@@ -1,8 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import android.graphics.drawable.Drawable
+import android.text.Spannable
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import androidx.annotation.DrawableRes
+import androidx.core.text.toSpannable
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -40,6 +43,10 @@ class ItemModelMapper constructor(
         res.getDrawable(R.drawable.ic_playlist_default_black, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
+    private val tree: Drawable by lazy {
+        res.getDrawable(R.drawable.ic_tree_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+    }
+
     private val _bottomDrawables: MutableMap<Int, Drawable> = mutableMapOf()
 
     private fun bottomDrawable(@DrawableRes id: Int): Drawable {
@@ -66,49 +73,65 @@ class ItemModelMapper constructor(
         }
     }
 
-    fun mapBottomText(model: ItemContract.Model): SpannableString {
-        val countText = if (model.count > 0) model.run { "$newItems / $count    " } else ""
-        return SpannableString("          $countText").apply {
+    fun mapBottomText(model: ItemContract.Model): Spannable {
+        val countText = if (model.count > 0) model.run { "$newItems / $count " } else ""
+        val base = SpannableString("          $countText").let {
             res.replaceSpannableIcon(
-                this,
+                it,
                 bottomDrawable(iconMapper.map(model.type, model.platform)),
                 0, 1
             )
 
             res.replaceSpannableIcon(
-                this,
+                it,
                 if (model.starred) starDrawable else unstarDrawable,
                 2, 3
             )
 
             res.replaceSpannableIcon(
-                this,
+                it,
                 bottomDrawable(iconMapper.map(model.loopMode)),
                 5, 6
             )
 
             res.replaceSpannableIcon(
-                this,
+                it,
                 if (model.watched) watchDrawable else unwatchDrawable,
                 8, 9
             )
-
-            if (model.pinned) {
-                res.replaceSpannableIcon(
-                    this,
-                    pinDrawable,
-                    this.length - 3, this.length - 2
-                )
-            }
-
-            if (model.default) {
-                res.replaceSpannableIcon(
-                    this,
-                    defaultDrawable,
-                    this.length - 1, this.length
-                )
-            }
+            it
         }
+        val builder = SpannableStringBuilder()
+        builder.append(base)
+        if (model.pinned) {
+            val str = SpannableString("  ")
+            res.replaceSpannableIcon(
+                str,
+                pinDrawable,
+                0, 1
+            )
+            builder.append(str)
+        }
+
+        if (model.default) {
+            val str = SpannableString("  ")
+            res.replaceSpannableIcon(
+                str,
+                defaultDrawable,
+                0, 1
+            )
+            builder.append(str)
+        }
+        if (model.descendents > 0) {
+            val str = SpannableString("  ${model.descendents}")
+            res.replaceSpannableIcon(
+                str,
+                tree,
+                0, 1
+            )
+            builder.append(str)
+        }
+        return builder.toSpannable()
     }
 
     companion object {

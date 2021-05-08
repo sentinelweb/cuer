@@ -1,11 +1,13 @@
 package uk.co.sentinelweb.cuer.domain
 
-// todo make assembler/creator
 data class PlaylistTreeDomain constructor(
-    val nodes: List<Node>
-) {
-    data class Node constructor(
-        val parent: PlaylistDomain,
-        val children: List<Node>
-    )
-}
+    val node: PlaylistDomain? = null,
+    var parent: PlaylistTreeDomain? = null,
+    val chidren: List<PlaylistTreeDomain> = listOf()
+)
+
+data class MutablePlaylistTreeDomain constructor(
+    var node: PlaylistDomain?,
+    var parent: MutablePlaylistTreeDomain?,
+    val chidren: MutableList<MutablePlaylistTreeDomain> = mutableListOf()
+)

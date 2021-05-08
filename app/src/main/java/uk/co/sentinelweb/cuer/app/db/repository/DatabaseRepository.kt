@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.domain.update.UpdateObject
 interface DatabaseRepository<Domain> {
 
     val updates: Flow<Pair<OrchestratorContract.Operation, Domain>>
-
+    // todo flat: Boolean = true, emit: Boolean = true - for all and check - to match orchestrator
     suspend fun save(domain: Domain, flat: Boolean = false, emit: Boolean = false): RepoResult<Domain>
 
     suspend fun save(domains: List<Domain>, flat: Boolean = false, emit: Boolean = false): RepoResult<List<Domain>>

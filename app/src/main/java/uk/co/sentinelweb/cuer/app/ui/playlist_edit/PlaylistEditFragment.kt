@@ -229,7 +229,7 @@ class PlaylistEditFragment : DialogFragment() {
                     binding.peWatchAll.setText(model.watchAllText)
                     binding.peWatchAll.setIconResource(model.watchAllIIcon)
                     binding.peDefault.isChecked = model.default
-                    binding.peDefault.isVisible = !model.default
+                    binding.peDefault.isVisible = model.showDefault
                     binding.peInfo.text = Html.fromHtml(model.info, Html.FROM_HTML_MODE_LEGACY)
                     binding.pePlayStart.isChecked = model.playFromStart
                     binding.pePlayable.isChecked = model.config.playable

@@ -4,8 +4,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
@@ -13,8 +14,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlay
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
-import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -30,11 +29,17 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.ext.buildLookup
+import uk.co.sentinelweb.cuer.domain.ext.buildTree
+import java.util.*
+import java.util.Locale.getDefault
 
 class PlaylistsPresenter(
     private val view: PlaylistsContract.View,
     private val state: PlaylistsContract.State,
-    private val playlistRepository: PlaylistDatabaseRepository,
+    private val playlistOrchestrator: PlaylistOrchestrator,
+    private val playlistStatsOrchestrator: PlaylistStatsOrchestrator,
     private val queue: QueueMediatorContract.Producer,
     private val modelMapper: PlaylistsModelMapper,
     private val log: LogWrapper,
@@ -50,10 +55,6 @@ class PlaylistsPresenter(
     private val merge: PlaylistMergeOrchestrator
 ) : PlaylistsContract.Presenter {
 
-    override fun initialise() {
-
-    }
-
     override fun refreshList() {
         refreshPlaylists()
     }
@@ -62,54 +63,102 @@ class PlaylistsPresenter(
         //state.addedMedia = mediaDomain
     }
 
-    override fun destroy() {
+    override fun onResume() {
+        state.viewModelScope.launch { executeRefresh(true) }
+        // todo a better job - might refresh too much
+        // todo listen for stat changes
+        playlistOrchestrator.updates
+            .onEach { refreshPlaylists() }
+            .let { coroutines.mainScope }
+    }
+
+    override fun onPause() {
+        coroutines.cancel()
     }
 
     override fun onItemSwipeRight(item: ItemContract.Model) {
-        view.gotoEdit(item.id, LOCAL)
+        findPlaylist(item)
+            ?.takeIf { it.type != APP }
+            ?.apply {
+                findPlaylist(item)
+                    ?.also { delPlaylist ->
+                        view.showPlaylistSelector(
+                            PlaylistsDialogContract.Config(
+                                selectedPlaylists = setOf(),
+                                multi = true,
+                                itemClick = { p, _ -> setParent(p!!, delPlaylist) },
+                                confirm = { },
+                                dismiss = { showChildNode() },
+                                suggestionsMedia = null,
+                                showPin = false,
+                            )
+                        )
+                    }
+            }
+    }
+
+    private fun setParent(parent: PlaylistDomain, child: PlaylistDomain) {
+        state.viewModelScope.launch {
+            playlistOrchestrator.save(child.copy(parentId = parent.id), LOCAL.flatOptions())
+            executeRefresh(false)
+        }
     }
 
     override fun onItemSwipeLeft(item: ItemContract.Model) {
         state.viewModelScope.launch {
             delay(400)
             findPlaylist(item)
-                    ?.let { playlist ->
-                        if (playlist.type != APP) {
-                            state.deletedPlaylist = playlist.id
-                                ?.let { playlistRepository.load(it, flat = false) }
-                                ?.takeIf { it.isSuccessful }
-                                ?.data
-                                ?.apply {
-                                    playlistRepository.delete(playlist, emit = true)
-                                    view.showUndo("Deleted playlist: ${playlist.title}", this@PlaylistsPresenter::undoDelete)
-                                    executeRefresh(false, false)
-                                }
-                                ?: let {
-                                    view.showMessage("Cannot load playlist backup")
-                                    null
-                                }
-                        } else if (playlist.id == LOCAL_SEARCH_PLAYLIST || playlist.id == REMOTE_SEARCH_PLAYLIST) {
-                            val isLocal = playlist.id == LOCAL_SEARCH_PLAYLIST
-                            val type = searchMapper.searchTypeText(isLocal)
-                            val key = if (isLocal) LAST_LOCAL_SEARCH else LAST_REMOTE_SEARCH
-                            val lastSearch = prefsWrapper.getString(key, null)
-                            prefsWrapper.remove(key)
-                            if (!isLocal) remoteSearch.clearCached();
-                            view.showUndo("Deleted $type search", {
-                                prefsWrapper.putString(key, lastSearch!!)
-                                state.viewModelScope.launch {
-                                    executeRefresh(false, false)
-                                }
-                            })
-                            executeRefresh(false, false)
+                ?.let { playlist ->
+                    if (playlist.type != APP) {
+                        state.deletedPlaylist = playlist.id
+                            ?.let { playlistOrchestrator.load(it, LOCAL.deepOptions()) }
+                            ?.apply {
+                                playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
+                                view.showUndo("Deleted playlist: ${playlist.title}", this@PlaylistsPresenter::undoDelete)
+                                executeRefresh(false)
+                            }
+                            ?: let {
+                                view.showMessage("Cannot load playlist backup")
+                                null
+                            }
+                    } else if (playlist.id == LOCAL_SEARCH_PLAYLIST || playlist.id == REMOTE_SEARCH_PLAYLIST) {
+                        val isLocal = playlist.id == LOCAL_SEARCH_PLAYLIST
+                        val type = searchMapper.searchTypeText(isLocal)
+                        val key = if (isLocal) LAST_LOCAL_SEARCH else LAST_REMOTE_SEARCH
+                        val lastSearch = prefsWrapper.getString(key, null)
+                        prefsWrapper.remove(key)
+                        if (!isLocal) remoteSearch.clearCached()
+                        view.showUndo("Deleted $type search") {
+                            prefsWrapper.putString(key, lastSearch!!)
+                            state.viewModelScope.launch {
+                                executeRefresh(false)
+                            }
                         }
-                    } ?: let { view.showMessage("Cannot delete playlist") }
+                        executeRefresh(false)
+                    }
+                } ?: let { view.showMessage("Cannot delete playlist") }
 
         }
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        view.gotoPlaylist(item.id, false, item.source)// todo map to list (add to model)
+        view.gotoPlaylist(item.id, false, item.source)
+    }
+
+    override fun onItemImageClicked(item: ItemContract.Model) {
+        findPlaylist(item)
+            ?.takeIf { state.treeLookup[it.id]?.chidren?.size ?: 0 > 0 }
+            ?.also {
+                state.treeCurrentNode = state.treeLookup[it.id]!!
+                showChildNode()
+            }
+    }
+
+    override fun onUpClicked() {
+        if (state.treeCurrentNode !== state.treeRoot) {
+            state.treeCurrentNode = state.treeCurrentNode.parent!!
+            showChildNode()
+        }
     }
 
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
@@ -123,14 +172,16 @@ class PlaylistsPresenter(
         }
     }
 
-    private fun findPlaylist(item: ItemContract.Model) = state.playlists.find { it.id == item.id }
-
     override fun onItemStar(item: ItemContract.Model) {
         toastWrapper.show("todo: star ${item.id}")
     }
 
     override fun onItemShare(item: ItemContract.Model) {
         toastWrapper.show("share: ${item.title}")
+    }
+
+    override fun onEdit(item: ItemContract.Model) {
+        view.gotoEdit(item.id, LOCAL)
     }
 
     override fun onMerge(item: ItemContract.Model) {
@@ -142,7 +193,7 @@ class PlaylistsPresenter(
                         PlaylistsDialogContract.Config(
                             selectedPlaylists = setOf(),
                             multi = true,
-                            itemClick = { p, b -> merge(p!!, delPlaylist) },
+                            itemClick = { p, _ -> merge(p!!, delPlaylist) },
                             confirm = { },
                             dismiss = { },
                             suggestionsMedia = null,
@@ -157,7 +208,7 @@ class PlaylistsPresenter(
         coroutines.mainScope.launch {
             if (merge.checkMerge(thisPlaylist, delPlaylist)) {
                 merge.merge(thisPlaylist, delPlaylist).also {
-                    executeRefresh(true, false)
+                    executeRefresh(true)
                 }
             } else {
                 view.showMessage("Cannot merge this playlist")
@@ -186,7 +237,7 @@ class PlaylistsPresenter(
     override fun undoDelete() {
         state.deletedPlaylist?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistRepository.save(itemDomain)
+                playlistOrchestrator.save(itemDomain, LOCAL.flatOptions())
                 state.deletedPlaylist = null
                 executeRefresh(false)
             }
@@ -197,53 +248,49 @@ class PlaylistsPresenter(
         state.viewModelScope.launch { executeRefresh(false) }
     }
 
-    private suspend fun executeRefresh(focusCurrent: Boolean, animate: Boolean = true) {
+    private suspend fun executeRefresh(focusCurrent: Boolean) {
         try {
-            val pinnedId = prefsWrapper.getLong(PINNED_PLAYLIST)
-            state.playlists = playlistRepository.loadList(null)
-                .takeIf { it.isSuccessful }
-                ?.data
-                ?.sortedWith(compareBy({ !it.starred }, { it.title.toLowerCase() }))
-                ?.toMutableList()
-                ?.apply { add(0, newMedia.makeNewItemsHeader()) }
-                ?.apply { add(1, recentItems.makeRecentItemsHeader()) }
-                ?.apply {
+            state.playlists = playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
+                .also {
+                    state.treeRoot = it.buildTree()
+                    state.treeCurrentNode = state.treeRoot
+                    state.treeLookup = state.treeRoot.buildLookup()
+                }
+                .sortedWith(compareBy({ !it.starred }, { it.title.toLowerCase(getDefault()) }))
+                .toMutableList()
+                .apply { add(0, newMedia.makeNewItemsHeader()) }
+                .apply { add(1, recentItems.makeRecentItemsHeader()) }
+                .apply {
                     if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
                         add(2, localSearch.makeSearchHeader())
                     }
                 }
-                ?.apply {
+                .apply {
                     if (prefsWrapper.has(LAST_REMOTE_SEARCH)) {
                         add(2, remoteSearch.makeSearchHeader())
                     }
                 }
-                ?: listOf()
 
-
-            state.playlistStats = playlistRepository
-                .loadPlaylistStatList(state.playlists.mapNotNull { if (it.type != APP) it.id else null })
-                .data
-                ?.toMutableList()
-                ?.apply { add(newMedia.makeNewItemsStats()) }
-                ?.apply { add(recentItems.makeRecentItemsStats()) }
-                ?.apply {
+            state.playlistStats = playlistStatsOrchestrator
+                .loadList(IdListFilter(state.playlists.mapNotNull { if (it.type != APP) it.id else null }), LOCAL.flatOptions())
+                .toMutableList()
+                .apply { add(newMedia.makeNewItemsStats()) }
+                .apply { add(recentItems.makeRecentItemsStats()) }
+                .apply {
                     if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
                         add(2, localSearch.makeSearchItemsStats())
                     }
                 }
-                ?.apply {
+                .apply {
                     if (prefsWrapper.has(LAST_REMOTE_SEARCH)) {
                         add(3, remoteSearch.makeSearchItemsStats())
                     }
                 }
-                ?: listOf()
 
-            state.playlists
-                .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
-                .let { modelMapper.map(it, queue.playlistId, true, pinnedId) }
-                .takeIf { coroutines.mainScopeActive }
-                ?.also { view.setList(it, animate) }
-                ?.takeIf { focusCurrent }
+            state.playlistsDisplay = buildDisplayList()
+
+            showChildNode()
+                .takeIf { focusCurrent }
                 ?.let {
                     state.playlists.apply {
                         prefsWrapper.getPairNonNull(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair())
@@ -258,17 +305,48 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onResume() {
-        state.viewModelScope.launch { executeRefresh(true) }
-        // todo a better job - might refresh too much
-        // todo listen for stat changes
-        playlistRepository.updates
-            .onEach { refreshPlaylists() }
-            .let { coroutines.mainScope }
+    private fun mapModel(
+        it: Map<PlaylistDomain, PlaylistStatDomain?>
+    ) = modelMapper.map(
+        it,
+        queue.playlistId,
+        true,
+        prefsWrapper.getLong(PINNED_PLAYLIST),
+        state.treeCurrentNode,
+        state.treeCurrentNode !== state.treeRoot
+    )
 
+    private fun buildDisplayList(): List<PlaylistDomain> =
+        if (state.treeCurrentNode == state.treeRoot) {
+            state.playlists
+                .filter { it.type == APP || it.starred }
+                .toMutableList()
+                .let { list -> list to (list.map { it.id }.toSet()) }
+                .let { (list, idset) ->
+                    list.addAll(
+                        state.treeCurrentNode.chidren
+                            .filter { !idset.contains(it.node!!.id) }
+                            .map { it.node!! }
+                            .sortedBy { it.title.toLowerCase(getDefault()) }
+                    )
+                    list
+                }
+        } else {
+            state.treeCurrentNode.chidren
+                .map { it.node!! }
+                .sortedBy { it.title.toLowerCase(getDefault()) }
+        }
+
+    private fun showChildNode() {
+        state.playlistsDisplay = buildDisplayList()
+        state.playlistsDisplay
+            .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
+            .let { mapModel(it) }
+            .takeIf { coroutines.mainScopeActive }
+            ?.also { view.setList(it, false) }
     }
 
-    override fun onPause() {
-        coroutines.cancel()
-    }
+    private fun findPlaylist(item: ItemContract.Model) = state.playlists.find { it.id == item.id }
+
+
 }

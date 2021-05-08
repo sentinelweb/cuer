@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item
 // todo view binding
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.SpannableString
+import android.text.Spannable
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.view.View
@@ -43,6 +43,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         super.onFinishInflate()
         listitem.setOnClickListener { presenter.doClick() }
         listitem_overflow_click.setOnClickListener { showContextualMenu() }
+        listitem_icon.setOnClickListener { presenter.doImageClick() }
     }
 
     @SuppressLint("RestrictedApi")
@@ -55,6 +56,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
             override fun onMenuItemClick(item: MenuItem): Boolean {
                 when (item.itemId) {
                     R.id.playlists_context_play -> presenter.doPlay(false)
+                    R.id.playlists_edit -> presenter.doEdit()
                     R.id.playlists_context_play_external -> presenter.doPlay(true)
                     R.id.playlists_context_star -> presenter.doStar()
                     R.id.playlists_context_share -> presenter.doShare()
@@ -89,11 +91,11 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         listitem_icon_check.visibility = if (checked) View.VISIBLE else View.GONE
     }
 
-    override fun setTopText(text: SpannableString) {
+    override fun setTopText(text: Spannable) {
         listitem_top.setText(text)
     }
 
-    override fun setBottomText(text: SpannableString) {
+    override fun setBottomText(text: Spannable) {
         listitem_bottom.setText(text)
     }
 

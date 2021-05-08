@@ -66,6 +66,7 @@ class PlaylistEditViewModel constructor(
                 playlistOrchestrator.load(it, source.deepOptions())
                     ?.let {
                         state.isAllWatched = it.isAllWatched()
+                        state.defaultInitial = it.default
                         state.playlistEdit = it.copy(items = listOf())
                     } ?: makeCreateModel()
             } ?: makeCreateModel()
@@ -134,7 +135,8 @@ class PlaylistEditViewModel constructor(
     private fun update() {
         val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlistEdit.id
         _modelLiveData.value = mapper.mapModel(
-            state.playlistEdit, pinned, parent = state.playlistParent, showAllWatched = state.isAllWatched == true
+            state.playlistEdit, pinned, parent = state.playlistParent,
+            showAllWatched = state.isAllWatched == true, showDefault = !state.defaultInitial
         ).apply { state.model = this }
     }
 

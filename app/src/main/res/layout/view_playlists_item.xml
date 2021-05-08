@@ -10,9 +10,9 @@
     <TextView
         android:id="@+id/swipe_label_right"
         style="@style/ItemView.Background.Right"
-        android:background="?colorEdit"
-        android:text="@string/pls_item_edit"
-        app:drawableLeftCompat="@drawable/ic_button_edit_24"
+        android:background="?colorMove"
+        android:text="@string/pl_item_move"
+        app:drawableLeftCompat="@drawable/ic_item_playlist_move_white"
         tools:ignore="RtlHardcoded,RtlSymmetry"
         />
 

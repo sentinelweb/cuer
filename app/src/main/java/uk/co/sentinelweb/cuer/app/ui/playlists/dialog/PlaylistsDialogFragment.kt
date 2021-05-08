@@ -58,6 +58,14 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
         presenter.setConfig(config)
     }
 
+    override fun onImageClick(item: ItemContract.Model) {
+
+    }
+
+    override fun onEdit(item: ItemContract.Model) {
+
+    }
+
     override fun updateDialogModel(model: PlaylistsDialogContract.Model) {
         updateDialogNoList(model)
     }

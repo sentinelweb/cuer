@@ -8,6 +8,9 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
+import uk.co.sentinelweb.cuer.domain.ext.buildLookup
+import uk.co.sentinelweb.cuer.domain.ext.descendents
 
 class PlaylistsModelMapper constructor() {
 
@@ -15,19 +18,24 @@ class PlaylistsModelMapper constructor() {
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         current: OrchestratorContract.Identifier<*>?,
         showOverflow: Boolean,
-        pinnedId: Long?
-    ): PlaylistsContract.Model = PlaylistsContract.Model(
-        PLAYLISTS_HEADER_IMAGE,
-        current,
-        domains.keys.mapIndexed { index, pl ->
-            ItemContract.Model(
-                pl.id!!,
-                index,
-                pl.title,
-                false,
-                (pl.thumb ?: pl.image)?.url,
-                count = domains[pl]?.itemCount ?: -1,
-                newItems = domains[pl]?.let { it.itemCount - it.watchedItemCount } ?: -1,
+        pinnedId: Long?,
+        node: PlaylistTreeDomain?,
+        showUp: Boolean
+    ): PlaylistsContract.Model {
+        val treeLookup = node?.buildLookup()
+        return PlaylistsContract.Model(
+            PLAYLISTS_HEADER_IMAGE,
+            current,
+            showUp,
+            domains.keys.mapIndexed { index, pl ->
+                ItemContract.Model(
+                    pl.id ?: throw Exception("Playlist must have an id"),
+                    index,
+                    pl.title,
+                    false,
+                    (pl.thumb ?: pl.image)?.url,
+                    count = domains[pl]?.itemCount ?: -1,
+                    newItems = domains[pl]?.let { it.itemCount - it.watchedItemCount } ?: -1,
                     starred = pl.starred,
                     loopMode = pl.mode,
                     type = pl.type,
@@ -41,10 +49,12 @@ class PlaylistsModelMapper constructor() {
                     canShare = pl.type == PLATFORM,
                     watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false,
                     pinned = pl.id == pinnedId,
-                    default = pl.default
+                    default = pl.default,
+                    descendents = treeLookup?.get(pl.id)?.descendents() ?: 0
                 )
             }
         )
+    }
 
     companion object {
         const val PLAYLISTS_HEADER_IMAGE = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg"

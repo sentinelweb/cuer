@@ -293,19 +293,22 @@ class PlaylistDatabaseRepository constructor(
         }
 
     // region PlaylistStatDomain
-    suspend fun loadPlaylistStatList(playlistIds: List<Long>, emit: Boolean = false): RepoResult<List<PlaylistStatDomain>> =
+    suspend fun loadPlaylistStatList(filter: Filter): RepoResult<List<PlaylistStatDomain>> =
         withContext(coProvider.IO) {
             try {
                 database.beginTransaction()
-                RepoResult.Data(
-                    playlistIds.map {
-                        PlaylistStatDomain(
-                            playlistId = it,
-                            itemCount = playlistItemDao.countItems(it),
-                            watchedItemCount = playlistItemDao.countMediaFlags(it, MediaEntity.FLAG_WATCHED)
-                        )
-                    }).also { database.setTransactionSuccessful() }
-                    .also { if (emit) it.data?.forEach { _playlistStatFlow.emit(FLAT to it) } }
+                when (filter) {
+                    is IdListFilter ->
+                        RepoResult.Data(
+                            filter.ids.map {
+                                PlaylistStatDomain(
+                                    playlistId = it,
+                                    itemCount = playlistItemDao.countItems(it),
+                                    watchedItemCount = playlistItemDao.countMediaFlags(it, MediaEntity.FLAG_WATCHED)
+                                )
+                            }).also { database.setTransactionSuccessful() }
+                    else -> throw UnsupportedOperationException("$filter not supported")
+                }
             } catch (e: Throwable) {
                 val msg = "couldn't delete all media"
                 log.e(msg, e)

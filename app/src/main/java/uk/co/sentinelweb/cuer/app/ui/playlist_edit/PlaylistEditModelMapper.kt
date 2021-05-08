@@ -11,7 +11,10 @@ class PlaylistEditModelMapper constructor(
     private val res: ResourceWrapper,
     private val validator: PlaylistValidator
 ) {
-    fun mapModel(domain: PlaylistDomain, pinned: Boolean = false, parent: PlaylistDomain? = null, showAllWatched: Boolean) =
+    fun mapModel(
+        domain: PlaylistDomain, pinned: Boolean = false, parent: PlaylistDomain? = null,
+        showAllWatched: Boolean, showDefault: Boolean
+    ) =
         PlaylistEditContract.Model(
             titleDisplay = if (domain.title.isBlank()) res.getString(R.string.pe_default_display_title) else domain.title,
             titleEdit = domain.title,
@@ -28,7 +31,8 @@ class PlaylistEditModelMapper constructor(
             watchAllText = if (!showAllWatched) R.string.pe_mark_all_watched else R.string.pe_mark_all_unwatched,
             watchAllIIcon = if (!showAllWatched) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24,
             info = buildInfo(domain),
-            config = domain.config
+            config = domain.config,
+            showDefault = showDefault
         )
 
     private fun buildInfo(domain: PlaylistDomain): String = "<b>Type</b>: ${domain.type}" +

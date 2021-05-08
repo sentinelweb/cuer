@@ -7,7 +7,7 @@
 
     <item
         android:id="@+id/playlist_edit"
-        android:icon="@drawable/ic_button_edit_24"
+        android:icon="@drawable/ic_edit_24"
         android:orderInCategory="275"
         android:title="@string/menu_edit"
         app:iconTint="@color/white"
@@ -45,7 +45,7 @@
 
     <item
         android:id="@+id/playlist_play"
-        android:icon="@drawable/ic_menu_play_black"
+        android:icon="@drawable/ic_play_black"
         android:orderInCategory="250"
         android:title="@string/menu_play"
         android:visible="false"

@@ -2,10 +2,11 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -19,8 +20,8 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 class PlaylistsDialogPresenter(
     private val view: PlaylistsDialogContract.View,
     private val state: PlaylistsDialogContract.State,
-    private val playlistRepository: PlaylistDatabaseRepository,
     private val playlistOrchestrator: PlaylistOrchestrator,
+    private val playlistStatsOrchestrator: PlaylistStatsOrchestrator,
     private val modelMapper: PlaylistsModelMapper,
     private val dialogModelMapper: PlaylistsDialogModelMapper,
     private val log: LogWrapper,
@@ -59,24 +60,23 @@ class PlaylistsDialogPresenter(
         dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
         if (!state.channelSearchApplied) {
             state.config.suggestionsMedia?.apply {
-                playlistOrchestrator.loadList(ChannelPlatformIdFilter(this.channelData.platformId!!), Options(LOCAL))
+                playlistOrchestrator.loadList(ChannelPlatformIdFilter(this.channelData.platformId!!), LOCAL.flatOptions())
                     .apply { state.priorityPlaylistIds.addAll(this.map { it.id!! }) }
             }
             state.channelSearchApplied = true
         }
 
-        state.playlists = playlistOrchestrator.loadList(AllFilter(), Options(LOCAL))
+        state.playlists = playlistOrchestrator.loadList(AllFilter(), LOCAL.flatOptions())
             .sortedWith(compareBy({ !state.priorityPlaylistIds.contains(it.id) }, { !it.starred }, { it.title.toLowerCase() }))
 
-        state.playlistStats = playlistRepository
-            .loadPlaylistStatList(state.playlists.mapNotNull { it.id }).data
-            ?: listOf()
+        state.playlistStats = playlistStatsOrchestrator
+            .loadList(IdListFilter(state.playlists.mapNotNull { it.id }), LOCAL.flatOptions())
 
         val pinnedId = prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
             .let {
-                state.playlistsModel = modelMapper.map(it, null, false, pinnedId)
+                state.playlistsModel = modelMapper.map(it, null, false, pinnedId, null, false)
                 dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
             }
             .takeIf { coroutines.mainScopeActive }
@@ -116,7 +116,7 @@ class PlaylistsDialogPresenter(
 
     override fun onResume() {
         coroutines.mainScope.launch { executeRefresh() }
-        playlistRepository.updates
+        playlistOrchestrator.updates
             .onEach { refreshPlaylists() }
             .let { coroutines.mainScope }
     }

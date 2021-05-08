@@ -84,7 +84,7 @@ interface PlaylistsDialogContract {
                         view = get(),
                         state = get(),
                         playlistOrchestrator = get(),
-                        playlistRepository = get(),
+                        playlistStatsOrchestrator = get(),
                         modelMapper = get(),
                         log = get(),
                         toastWrapper = get(),

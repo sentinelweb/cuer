@@ -1,7 +1,9 @@
 package uk.co.sentinelweb.cuer.domain.ext
 
+import uk.co.sentinelweb.cuer.domain.MutablePlaylistTreeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
 fun PlaylistDomain.currentItem() = if (currentIndex > -1 && items.size > 0 && currentIndex < items.size) {
     items[currentIndex]
@@ -88,3 +90,48 @@ fun PlaylistDomain.isAllWatched() = this.items
     }
     .let { if (it.first && !it.second) false else if (!it.first && it.second) true else null }
 
+fun List<PlaylistDomain>.buildTree(): PlaylistTreeDomain {
+    val treeLookup = mutableMapOf<Long?, MutablePlaylistTreeDomain>()
+    val root = MutablePlaylistTreeDomain(null, null)
+    forEach { pl ->
+        val node = MutablePlaylistTreeDomain(pl, null)
+        treeLookup.put(pl.id, node)
+    }
+    forEach { pl ->
+        val node = treeLookup[pl.id]!!
+        pl.parentId?.let { parentId ->
+            treeLookup[parentId]
+                ?.apply { chidren.add(node) }
+                ?.apply { node.parent = this }
+                ?: also {
+                    root.chidren.add(node)
+                    node.parent = root
+                }
+        } ?: also {
+            root.chidren.add(node)
+            node.parent = root
+        }
+    }
+    return root.toImmutableTree()
+}
+
+fun MutablePlaylistTreeDomain.toImmutableTree(): PlaylistTreeDomain =
+    PlaylistTreeDomain(this.node, null, this.chidren.map { it.toImmutableTree() })
+        .also { t -> t.chidren.forEach { it.parent = t } }
+
+fun PlaylistTreeDomain.toMutableTree(): MutablePlaylistTreeDomain =
+    MutablePlaylistTreeDomain(this.node, null, this.chidren.map { it.toMutableTree() }.toMutableList())
+        .also { t -> t.chidren.forEach { it.parent = t } }
+
+fun PlaylistTreeDomain.depth(): Int = (this.parent?.depth()?.inc() ?: 0)
+
+fun PlaylistTreeDomain.descendents(): Int = this.chidren.size + this.chidren.sumOf { it.descendents() }
+
+fun PlaylistTreeDomain.buildLookup(): Map<Long, PlaylistTreeDomain> =
+    this.chidren.associateBy { it.node?.id!! }.toMutableMap()
+        .also { map -> this.chidren.forEach { map.putAll(it.buildLookup()) } }
+
+fun PlaylistTreeDomain.dumpTree(pfx: String = "") {
+    println(pfx + ":" + node?.title)
+    chidren.forEach { it.dumpTree("-$pfx") }
+}
