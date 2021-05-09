@@ -78,7 +78,7 @@ class ShareWrapper(
             sb.append(this).append("\n\n")
         }
         if (playlist.items.size > 0) {
-            sb.append("Videos:\n\n")
+            sb.append(Character.toChars(0x1F4FA)).append(" Videos:\n\n")
             playlist.items.forEach {
                 it.media.apply {
                     if (starred) {
@@ -92,6 +92,8 @@ class ShareWrapper(
                 }
             }
         }
+
+        sb.append("Sent via Cuer @cuerapp (https://twitter.com/cuerapp)").append("\n\n")
         return sb.toString()
     }
 
