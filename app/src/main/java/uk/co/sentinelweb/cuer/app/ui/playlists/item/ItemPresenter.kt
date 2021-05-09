@@ -29,6 +29,8 @@ class ItemPresenter(
         interactions.onEdit(state.item!!)
     }
 
+    override fun isStarred(): Boolean = state.item!!.starred
+
     override fun doMerge() {
         interactions.onMerge(state.item!!)
     }

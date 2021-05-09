@@ -38,7 +38,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     private lateinit var presenter: ItemContract.Presenter
     private val log: LogWrapper by inject()
     private val res: ResourceWrapper by inject()
-    private var menu: PopupMenu? = null
+    private var popupMenu: PopupMenu? = null
 
     private var _binding: ViewPlaylistItemBinding? = null
     private val binding get() = _binding!!
@@ -70,7 +70,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        menu?.dismiss()
+        popupMenu?.dismiss()
     }
 
     override fun onCreateContextMenu(menu: ContextMenu?) {
@@ -82,10 +82,10 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     private fun showContextualMenu() {
         log.d("showContextualMenu")
         val wrapper = ContextThemeWrapper(context, R.style.ContextMenu)
-        menu?.dismiss()
-        menu = PopupMenu(wrapper, binding.listitemOverflowClick)
-        menu?.inflate(R.menu.playlist_context)
-        menu?.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
+        popupMenu?.dismiss()
+        val popup = PopupMenu(wrapper, binding.listitemOverflowClick)
+        popup.inflate(R.menu.playlist_context)
+        popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem): Boolean {
                 when (item.itemId) {
                     R.id.playlist_context_view -> presenter.doView()
@@ -100,15 +100,22 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
                 return true
             }
         })
-        menu?.setOnDismissListener { menu = null }
-        MenuPopupHelper(wrapper, menu?.menu as MenuBuilder, binding.listitemOverflowClick).apply {
+        popup.menu.findItem(R.id.playlist_context_star).setIcon(
+            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred_black
+        )
+        popup.menu.findItem(R.id.playlist_context_star).setTitle(
+            if (presenter.isStarred()) R.string.menu_unstar else R.string.menu_star
+        )
+        popup.setOnDismissListener { popupMenu = null }
+        MenuPopupHelper(wrapper, popup.menu as MenuBuilder, binding.listitemOverflowClick).apply {
             setForceShowIcon(true)
             show()
         }
+        popupMenu = popup
     }
 
     override fun dismissMenu() {
-        menu?.dismiss()
+        popupMenu?.dismiss()
     }
 
     fun resetBackground() {

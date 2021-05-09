@@ -53,6 +53,7 @@ class PlaylistDatabaseRepository constructor(
     private val playlistStats: List<PlaylistStatDomain> = _playlistStats
 
     init {
+        log.tag(this)
 //        coProvider.computationScope.launch {
 //            // todo error check
 //            loadList(null).data?.map { it.id!! }
@@ -76,7 +77,7 @@ class PlaylistDatabaseRepository constructor(
                         } ?: p
                     }
                     .let { playlistMapper.map(it) }
-                    .let { playlistDao.insert(it) }/* todo channels */
+                    .let { playlistDao.insert(it) }
                     .also { insertId = it }
                     .takeIf { !flat }
                     ?.let { playlistId -> domain.items.map { it.copy(playlistId = playlistId) } }
@@ -86,7 +87,7 @@ class PlaylistDatabaseRepository constructor(
                     .also { database.endTransaction() }
                 load(insertId, flat)
                     .takeIf { it.isSuccessful }
-                    ?.also { if (emit) it.data?.apply { _playlistFlow.emit((if (flat) FLAT else FULL) to this) } }
+                    ?.also { if (emit) it.data?.apply { _playlistFlow.emit((if (flat) FLAT else FULL) to this); log.d("emitted save") } }
                     ?: throw IllegalStateException("Couldn't load saved data")
             } catch (e: Throwable) {
                 val msg = "couldn't save playlist ${domain.title}"
@@ -110,7 +111,7 @@ class PlaylistDatabaseRepository constructor(
                         } ?: p
                     }
                     .map { playlistMapper.map(it) }
-                    .let { playlistDao.insertAll(it) }/* todo channels */
+                    .let { playlistDao.insertAll(it) }
                     .also { insertIds = it }
                     .takeIf { !flat }
                     ?.mapIndexed { index, playlistId -> domains[index] to playlistId }

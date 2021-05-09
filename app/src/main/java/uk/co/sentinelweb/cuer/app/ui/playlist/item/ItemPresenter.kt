@@ -41,6 +41,8 @@ class ItemPresenter(
         interactions.onRightSwipe(state.item!!)
     }
 
+    override fun isStarred(): Boolean = state.item!!.starred
+
     override fun canDragLeft(): Boolean = state.item?.canDelete ?: false
 
     override fun canDragRight(): Boolean = state.item?.canEdit ?: false

@@ -38,6 +38,7 @@ interface ItemContract {
         fun doPlayStartClick()
         fun updateProgress()
         fun isViewForId(id: Long): Boolean
+        fun isStarred(): Boolean
     }
 
     interface External : ItemBaseContract.ItemPresenterBase {

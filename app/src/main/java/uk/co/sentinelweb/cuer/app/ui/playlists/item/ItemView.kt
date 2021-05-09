@@ -68,6 +68,12 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         popup.menu.findItem(R.id.playlists_context_play).isVisible = presenter.canPlay()
         popup.menu.findItem(R.id.playlists_context_play_external).isVisible = presenter.canLaunch()
         popup.menu.findItem(R.id.playlists_context_star).isVisible = presenter.canEdit()
+        popup.menu.findItem(R.id.playlists_context_star).setIcon(
+            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred_black
+        )
+        popup.menu.findItem(R.id.playlists_context_star).setTitle(
+            if (presenter.isStarred()) R.string.menu_unstar else R.string.menu_star
+        )
         popup.menu.findItem(R.id.playlists_context_share).isVisible = presenter.canShare()
         popup.menu.findItem(R.id.playlists_context_merge).isVisible = presenter.canEdit()
         MenuPopupHelper(wrapper, popup.menu as MenuBuilder, listitem_overflow_click).apply {

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.*
@@ -55,6 +56,10 @@ class PlaylistsPresenter(
     private val merge: PlaylistMergeOrchestrator
 ) : PlaylistsContract.Presenter {
 
+    init {
+        log.tag(this)
+    }
+
     override fun refreshList() {
         refreshPlaylists()
     }
@@ -68,8 +73,11 @@ class PlaylistsPresenter(
         // todo a better job - might refresh too much
         // todo listen for stat changes
         playlistOrchestrator.updates
-            .onEach { refreshPlaylists() }
-            .let { coroutines.mainScope }
+            .onEach { (op, source, plist) ->
+                log.d("playlist changed: $op, $source, id=${plist.id} items=${plist.items.size}")
+                refreshPlaylists()
+            }
+            .launchIn(coroutines.mainScope)
     }
 
     override fun onPause() {
@@ -100,7 +108,6 @@ class PlaylistsPresenter(
     private fun setParent(parent: PlaylistDomain, child: PlaylistDomain) {
         state.viewModelScope.launch {
             playlistOrchestrator.save(child.copy(parentId = parent.id), LOCAL.flatOptions())
-            executeRefresh(false)
         }
     }
 
@@ -115,7 +122,6 @@ class PlaylistsPresenter(
                             ?.apply {
                                 playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
                                 view.showUndo("Deleted playlist: ${playlist.title}", this@PlaylistsPresenter::undoDelete)
-                                executeRefresh(false)
                             }
                             ?: let {
                                 view.showMessage("Cannot load playlist backup")
@@ -173,7 +179,12 @@ class PlaylistsPresenter(
     }
 
     override fun onItemStar(item: ItemContract.Model) {
-        toastWrapper.show("todo: star ${item.id}")
+        state.viewModelScope.launch {
+            findPlaylist(item)
+                ?.takeIf { it.id != null && it.id ?: 0 > 0 }
+                ?.let { it.copy(starred = !it.starred) }
+                ?.also { playlistOrchestrator.save(it, LOCAL.flatOptions()) }
+        }
     }
 
     override fun onItemShare(item: ItemContract.Model) {
@@ -207,9 +218,7 @@ class PlaylistsPresenter(
     private fun merge(thisPlaylist: PlaylistDomain, delPlaylist: PlaylistDomain) {
         coroutines.mainScope.launch {
             if (merge.checkMerge(thisPlaylist, delPlaylist)) {
-                merge.merge(thisPlaylist, delPlaylist).also {
-                    executeRefresh(true)
-                }
+                merge.merge(thisPlaylist, delPlaylist)
             } else {
                 view.showMessage("Cannot merge this playlist")
             }

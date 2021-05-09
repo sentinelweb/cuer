@@ -20,6 +20,7 @@
     <string name="menu_play_yt">Launch</string>
     <string name="menu_channel_yt">Go to channel</string>
     <string name="menu_star">Star</string>
+    <string name="menu_unstar">UnStar</string>
     <string name="menu_pin">Pin</string>
     <string name="menu_share">Share</string>
     <string name="menu_paste">Paste &amp; add</string>

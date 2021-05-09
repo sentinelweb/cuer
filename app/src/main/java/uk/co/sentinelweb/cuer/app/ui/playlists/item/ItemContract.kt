@@ -32,6 +32,7 @@ interface ItemContract {
         fun doMerge()
         fun doImageClick()
         fun doEdit()
+        fun isStarred(): Boolean
 
     }
 
