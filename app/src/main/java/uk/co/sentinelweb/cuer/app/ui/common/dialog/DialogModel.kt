@@ -9,7 +9,8 @@ open class DialogModel constructor(
     enum class Type {
         PLAYLIST, PLAYLIST_ADD, PLAYLIST_FULL, CONFIRM,
         SELECT_ROUTE, SKIP_TIME, DATE_RANGE_PICKER,
-        DATE_PICKER, DISMISS, ENUM_VALUES, PLAYLIST_ITEM_SETTNGS
+        DATE_PICKER, DISMISS, ENUM_VALUES, PLAYLIST_ITEM_SETTNGS,
+        IMAGE_SEARCH
     }
 
     class DismissDialogModel() : DialogModel(Type.DISMISS, 0)

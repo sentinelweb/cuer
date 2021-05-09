@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
-import uk.co.sentinelweb.cuer.net.pixabay.mapper.ImageMapper
+import uk.co.sentinelweb.cuer.net.pixabay.mapper.PixabayImageMapper
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
 import uk.co.sentinelweb.cuer.net.retrofit.RetrofitBuilder
 
@@ -46,14 +46,14 @@ class PixabayRetrofitInteractorApiTest : KoinComponent {
         sut = PixabayRetrofitInteractor(
             keyProvider = keyProvider,
             service = service,
-            imageMapper = ImageMapper(),
+            imageMapper = PixabayImageMapper(),
             errorMapper = ErrorMapper(SystemLogWrapper()),
             connectivity = connectivityWrapper,
             coContext = CoroutineContextProvider()
         )
     }
 
-    //@Ignore("Real api test .. run manually only")
+    @Ignore("Real api test .. run manually only")
     @Test
     fun images() {
         runBlocking {

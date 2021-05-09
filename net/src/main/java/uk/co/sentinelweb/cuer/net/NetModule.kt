@@ -4,6 +4,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayInteractor
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayRetrofitInteractor
+import uk.co.sentinelweb.cuer.net.pixabay.mapper.PixabayImageMapper
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
 import uk.co.sentinelweb.cuer.net.retrofit.RetrofitBuilder
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
@@ -49,6 +50,7 @@ object NetModule {
                 errorMapper = get()
             )
         }
+        factory { PixabayImageMapper() }
 
         factory { ErrorMapper(log = get()) }
     }

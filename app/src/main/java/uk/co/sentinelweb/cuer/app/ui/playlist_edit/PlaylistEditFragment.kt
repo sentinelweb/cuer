@@ -34,6 +34,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
+import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageDialogFragment
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -273,12 +275,18 @@ class PlaylistEditFragment : DialogFragment() {
                 override fun onChanged(model: DialogModel) {
                     dialog?.dismiss()
                     hideDialogFragment()
-                    when (model.type) {
-                        PLAYLIST_FULL -> {
+                    when (model) {
+                        is PlaylistsDialogContract.Config -> {
                             dialogFragment =
-                                PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+                                PlaylistsDialogFragment.newInstance(model)
                             dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())
                         }
+                        is SearchImageContract.Config -> {
+                            dialogFragment =
+                                SearchImageDialogFragment.newInstance(model)
+                            dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())
+                        }
+                        is DialogModel.DismissDialogModel -> dialogFragment?.dismiss()
                         else -> Unit
                     }
                 }

@@ -104,7 +104,6 @@ fun SearchParametersUi(
                         liveClick,
                         clearRelatedClick,
                         clearDatesClick,
-                        selectDatesClick,
                         selectOrderClick,
                         modifier
                     )
@@ -132,7 +131,6 @@ fun SearchRemote(
     liveClick: (Boolean) -> Unit,
     clearRelatedClick: () -> Unit,
     clearDateRangeClick: () -> Unit,
-    selectDatesClick: () -> Unit,
     selectOrderClick: () -> Unit,
     modifier: Modifier
 ) {

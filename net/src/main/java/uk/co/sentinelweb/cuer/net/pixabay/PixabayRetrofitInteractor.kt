@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.pixabay.dto.PixabayImageListDto.Orientation.HORIZONTAL
 import uk.co.sentinelweb.cuer.net.pixabay.dto.PixabayImageListDto.Type.PHOTO
-import uk.co.sentinelweb.cuer.net.pixabay.mapper.ImageMapper
+import uk.co.sentinelweb.cuer.net.pixabay.mapper.PixabayImageMapper
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
 
 /**
@@ -18,7 +18,7 @@ import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
 internal class PixabayRetrofitInteractor constructor(
     private val keyProvider: ApiKeyProvider,
     private val service: PixabayService,
-    private val imageMapper: ImageMapper,
+    private val imageMapper: PixabayImageMapper,
     private val coContext: CoroutineContextProvider,
     private val errorMapper: ErrorMapper,
     private val connectivity: ConnectivityWrapper

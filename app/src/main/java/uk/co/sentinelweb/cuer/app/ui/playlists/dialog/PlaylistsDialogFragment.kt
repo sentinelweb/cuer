@@ -33,11 +33,6 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
         log.tag(this)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = PlaylistsDialogFragmentBinding.inflate(layoutInflater)
         return binding.root

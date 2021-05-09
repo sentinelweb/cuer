@@ -148,6 +148,7 @@
     <string name="live">LIVE</string>
     <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
+    <string name="imagesearch_dialog_title">Image Search</string>
 
 
 </resources>

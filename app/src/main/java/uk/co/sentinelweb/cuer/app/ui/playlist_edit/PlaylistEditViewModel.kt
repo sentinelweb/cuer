@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.PLAY_START
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
@@ -93,12 +94,22 @@ class PlaylistEditViewModel constructor(
     }
 
     fun onImageClick(forward: Boolean) {
-        imageProvider.getNextImage(state.playlistEdit.image, forward) { next ->
-            if (next != null) {
-                state.playlistEdit = state.playlistEdit.copy(image = next, thumb = next)
-                update()
-            }
-        }
+//        imageProvider.getNextImage(state.playlistEdit.image, forward) { next ->
+//            if (next != null) {
+//                state.playlistEdit = state.playlistEdit.copy(image = next, thumb = next)
+//                update()
+//            }
+//        }
+        _dialogModelLiveData.value = SearchImageContract.Config(
+            state.playlistEdit.title,
+            this::onImageSelected
+        )
+    }
+
+    fun onImageSelected(image: ImageDomain) {
+        state.playlistEdit = state.playlistEdit.copy(image = image, thumb = image)
+        update()
+        _dialogModelLiveData.value = DialogModel.DismissDialogModel()
     }
 
     fun onTitleChanged(text: String) {

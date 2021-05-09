@@ -38,6 +38,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
+import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
@@ -84,7 +85,8 @@ object Modules {
         YoutubeCastServiceModule.serviceModule,
         PrefBackupContract.fragmentModule,
         PrefRootContract.fragmentModule,
-        SearchContract.fragmentModule
+        SearchContract.fragmentModule,
+        SearchImageContract.fragmentModule
     )
 
     private val uiModule = module {
@@ -162,7 +164,6 @@ object Modules {
     private val appNetModule = module {
         factory<ApiKeyProvider>(named(YOUTUBE)) { CuerYoutubeApiKeyProvider() }
         factory<ApiKeyProvider>(named(PIXABAY)) { CuerPixabayApiKeyProvider() }
-        factory<ApiKeyProvider> { CuerYoutubeApiKeyProvider() }
         single { NetModuleConfig(debug = BuildConfig.DEBUG) }
     }
 

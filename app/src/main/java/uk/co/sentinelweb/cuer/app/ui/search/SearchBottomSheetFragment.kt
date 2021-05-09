@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import uk.co.sentinelweb.cuer.app.databinding.FragmentSearchBinding
+import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -25,7 +25,7 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
     private val enumPickerCreator: EnumValuesDialogCreator by currentScope.inject()
     private val log: LogWrapper by inject()
 
-    private var _binding: FragmentSearchBinding? = null
+    private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
 
     private var dialogFragment: DialogFragment? = null
@@ -34,13 +34,9 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
         log.tag(this)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentSearchBinding.inflate(layoutInflater)
-        binding.searchBottomSheet.setContent {
+        _binding = FragmentComposeBinding.inflate(layoutInflater)
+        binding.composeView.setContent {
             SearchView(viewModel = viewModel)
         }
         return binding.root
