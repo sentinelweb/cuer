@@ -14,5 +14,6 @@ enum class GeneralPreferences constructor(
     LIVE_DURATION_ID("liveDurationId"),
     LAST_LOCAL_SEARCH("lastLocalSearch"),
     LAST_REMOTE_SEARCH("lastRemoteSearch"),
-    LAST_SEARCH_TYPE("lastSearchType")
+    LAST_SEARCH_TYPE("lastSearchType"),
+    PINNED_PLAYLIST("pinnedPlaylist")
 }

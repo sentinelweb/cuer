@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
 interface PlaylistsDialogContract {
 
@@ -33,11 +34,13 @@ interface PlaylistsDialogContract {
         fun setConfig(config: Config)
         fun onAddPlaylist()
         fun onDismiss()
+        fun onPinSelectedPlaylist(b: Boolean)
     }
 
     interface View {
-        fun setList(model: PlaylistsContract.Model, animate: Boolean = true)
+        fun setList(model: Model, animate: Boolean = true)
         fun dismiss()
+        fun updateDialogModel(model: Model)
     }
 
     data class Config(
@@ -47,7 +50,8 @@ interface PlaylistsDialogContract {
         val confirm: (() -> Unit)?,
         val dismiss: () -> Unit,
         val suggestionsMedia: MediaDomain? = null,
-        val showAdd: Boolean = true
+        val showAdd: Boolean = true,
+        val showPin: Boolean = true
     ) : DialogModel(Type.PLAYLIST_FULL, R.string.playlist_dialog_title)
 
     data class State(
@@ -56,10 +60,21 @@ interface PlaylistsDialogContract {
         var dragTo: Int? = null,
         var playlistStats: List<PlaylistStatDomain> = listOf(),
         var priorityPlaylistIds: MutableList<Long> = mutableListOf(),
-        var channelSearchApplied: Boolean = false
+        var channelSearchApplied: Boolean = false,
+        var pinWhenSelected: Boolean = false,
+        var playlistsModel: PlaylistsContract.Model? = null
     ) : ViewModel() {
         lateinit var config: Config
+        lateinit var treeRoot: PlaylistTreeDomain
+        lateinit var treeLookup: Map<Long, PlaylistTreeDomain>
     }
+
+    data class Model(
+        val playistsModel: PlaylistsContract.Model?,
+        val showAdd: Boolean,
+        val showPin: Boolean,
+        val showUnPin: Boolean
+    )
 
     companion object {
 
@@ -72,15 +87,17 @@ interface PlaylistsDialogContract {
                         view = get(),
                         state = get(),
                         playlistOrchestrator = get(),
-                        playlistRepository = get(),
+                        playlistStatsOrchestrator = get(),
                         modelMapper = get(),
                         log = get(),
                         toastWrapper = get(),
                         prefsWrapper = get(named<GeneralPreferences>()),
-                        coroutines = get()
+                        coroutines = get(),
+                        dialogModelMapper = get()
                     )
                 }
-                scoped { PlaylistsModelMapper() }
+                scoped { PlaylistsModelMapper(get()) }
+                scoped { PlaylistsDialogModelMapper() }
                 scoped { PlaylistsAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }

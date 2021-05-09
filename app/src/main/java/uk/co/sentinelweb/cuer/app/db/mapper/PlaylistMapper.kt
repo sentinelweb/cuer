@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_ARCHIVED
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_DEFAULT
+import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_PLAY_ITEMS_FROM_START
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -26,9 +27,10 @@ class PlaylistMapper(
         id = domain.id ?: INITIAL_ID,
         currentIndex = domain.currentIndex, // todo enforce consistency better
         config = domain.config,
-        flags = if (domain.archived) FLAG_ARCHIVED else 0 +
-                if (domain.starred) FLAG_STARRED else 0 +
-                        if (domain.default) FLAG_DEFAULT else 0,
+        flags = (if (domain.archived) FLAG_ARCHIVED else 0) +
+                (if (domain.starred) FLAG_STARRED else 0) +
+                (if (domain.default) FLAG_DEFAULT else 0) +
+                (if (domain.playItemsFromStart) FLAG_PLAY_ITEMS_FROM_START else 0),
         image = imageMapper.mapImage(domain.image),
         thumb = imageMapper.mapImage(domain.thumb),
         mode = domain.mode,
@@ -50,6 +52,7 @@ class PlaylistMapper(
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
         starred = entity.flags and FLAG_STARRED == FLAG_STARRED,
         default = entity.flags and FLAG_DEFAULT == FLAG_DEFAULT,
+        playItemsFromStart = entity.flags and FLAG_PLAY_ITEMS_FROM_START == FLAG_PLAY_ITEMS_FROM_START,
         items = items
             ?.mapNotNull { item ->
                 medias?.get(item.mediaId)
@@ -81,6 +84,7 @@ class PlaylistMapper(
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
         starred = entity.flags and FLAG_STARRED == FLAG_STARRED,
         default = entity.flags and FLAG_DEFAULT == FLAG_DEFAULT,
+        playItemsFromStart = entity.flags and FLAG_PLAY_ITEMS_FROM_START == FLAG_PLAY_ITEMS_FROM_START,
         items = items
             ?.mapNotNull { item ->
                 medias.get(item.mediaId)

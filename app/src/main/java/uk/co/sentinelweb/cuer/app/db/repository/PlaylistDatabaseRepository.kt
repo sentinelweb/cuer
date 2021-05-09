@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
+import uk.co.sentinelweb.cuer.app.db.dao.ChannelDao
 import uk.co.sentinelweb.cuer.app.db.dao.PlaylistDao
 import uk.co.sentinelweb.cuer.app.db.dao.PlaylistItemDao
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
@@ -28,7 +29,7 @@ class PlaylistDatabaseRepository constructor(
     private val playlistMapper: PlaylistMapper,
     private val playlistItemDao: PlaylistItemDao,
     private val playlistItemMapper: PlaylistItemMapper,
-    //private val mediaDao: MediaDao,
+    private val channelDao: ChannelDao,
     private val mediaRepository: MediaDatabaseRepository,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
@@ -52,6 +53,7 @@ class PlaylistDatabaseRepository constructor(
     private val playlistStats: List<PlaylistStatDomain> = _playlistStats
 
     init {
+        log.tag(this)
 //        coProvider.computationScope.launch {
 //            // todo error check
 //            loadList(null).data?.map { it.id!! }
@@ -69,8 +71,13 @@ class PlaylistDatabaseRepository constructor(
                 var insertId = -1L
                 domain
                     .also { database.beginTransaction() }
+                    .let { p ->
+                        p.channelData?.let {
+                            p.copy(channelData = mediaRepository.checkToSaveChannel(it))
+                        } ?: p
+                    }
                     .let { playlistMapper.map(it) }
-                    .let { playlistDao.insert(it) }/* todo channels */
+                    .let { playlistDao.insert(it) }
                     .also { insertId = it }
                     .takeIf { !flat }
                     ?.let { playlistId -> domain.items.map { it.copy(playlistId = playlistId) } }
@@ -80,7 +87,7 @@ class PlaylistDatabaseRepository constructor(
                     .also { database.endTransaction() }
                 load(insertId, flat)
                     .takeIf { it.isSuccessful }
-                    ?.also { if (emit) it.data?.apply { _playlistFlow.emit((if (flat) FLAT else FULL) to this) } }
+                    ?.also { if (emit) it.data?.apply { _playlistFlow.emit((if (flat) FLAT else FULL) to this); log.d("emitted save") } }
                     ?: throw IllegalStateException("Couldn't load saved data")
             } catch (e: Throwable) {
                 val msg = "couldn't save playlist ${domain.title}"
@@ -98,8 +105,13 @@ class PlaylistDatabaseRepository constructor(
                 var insertIds = listOf<Long>()
                 domains
                     .also { database.beginTransaction() }
+                    .map { p ->
+                        p.channelData?.let {
+                            p.copy(channelData = mediaRepository.checkToSaveChannel(it))
+                        } ?: p
+                    }
                     .map { playlistMapper.map(it) }
-                    .let { playlistDao.insertAll(it) }/* todo channels */
+                    .let { playlistDao.insertAll(it) }
                     .also { insertIds = it }
                     .takeIf { !flat }
                     ?.mapIndexed { index, playlistId -> domains[index] to playlistId }
@@ -127,10 +139,9 @@ class PlaylistDatabaseRepository constructor(
             try {
                 database.beginTransaction()
                 if (flat) {
-                    playlistDao.load(id)!!
-                        .let { playlistMapper.mapWithMediaEntities(it, null, null, null) }/* todo channels */
+                    playlistDao.load(id)?.mapFlat() ?: throw Exception("ID not found")
                 } else {
-                    mapDeep(playlistDao.loadWithItems(id)!!)
+                    playlistDao.loadWithItems(id)?.mapDeep() ?: throw Exception("ID not found")
                 }
                     .let { domain -> RepoResult.Data(domain) }
                     .also { database.setTransactionSuccessful() }
@@ -141,12 +152,9 @@ class PlaylistDatabaseRepository constructor(
             }.also { database.endTransaction() }
         }
 
-    private suspend fun mapDeep(loadWithItems: PlaylistAndItems): PlaylistDomain =
-        loadWithItems
+    private suspend fun PlaylistAndItems.mapDeep(): PlaylistDomain =
+        this
             .let {
-//                val medias = mediaDao
-//                    .loadAllByIds(it.items.map { it.mediaId }.toLongArray())
-//                    .associateBy { it.media.id }
                 val medias = mediaRepository.loadList(IdListFilter(it.items.map { it.mediaId }), flat = false)
                     .data!!
                     .associateBy { it.id!! }
@@ -154,9 +162,18 @@ class PlaylistDatabaseRepository constructor(
                     it.playlist,
                     it.items,
                     medias,
-                    null/* todo channels */
+                    it.playlist.channelId?.let { channelDao.load(it) }
                 )
             }
+
+    private suspend fun List<PlaylistAndItems>.mapDeep() = this.map { it.mapDeep() }
+
+    private suspend fun PlaylistEntity.mapFlat() = this.let {
+        playlistMapper.mapWithMediaEntities(
+            it, null, null, it.channelId?.let { channelDao.load(it) })
+    }
+
+    private suspend fun List<PlaylistEntity>.mapFlat() = this.map { it.mapFlat() }
 
     override suspend fun loadList(filter: Filter?, flat: Boolean): RepoResult<List<PlaylistDomain>> =
         withContext(coProvider.IO) {
@@ -167,41 +184,40 @@ class PlaylistDatabaseRepository constructor(
                         when (filter) {
                             is IdListFilter ->
                                 if (flat)
-                                    playlistDao.loadAllByIds(filter.ids.toLongArray())
-                                        .map { playlistMapper.mapWithMediaEntities(it, null, null, null) }
+                                    playlistDao.loadAllByIds(filter.ids.toLongArray()).mapFlat()
                                 else playlistDao
                                     .loadAllByIdsWithItems(filter.ids.toLongArray())
-                                    .map { mapDeep(it) }/* todo channels */
+                                    .mapDeep()
                             is DefaultFilter ->
                                 if (flat) playlistDao
                                     .loadAllByFlags(PlaylistEntity.FLAG_DEFAULT)
-                                    .map { playlistMapper.mapWithMediaEntities(it, null, null, null) }
+                                    .mapFlat()
                                 else playlistDao
                                     .loadAllByFlagsWithItems(PlaylistEntity.FLAG_DEFAULT)
-                                    .map { mapDeep(it) }/* todo channels */
+                                    .mapDeep()
                             is AllFilter ->
                                 if (flat) playlistDao
                                     .getAllPlaylists()
-                                    .map { playlistMapper.mapWithMediaEntities(it, null, null, null) }
+                                    .mapFlat()
                                 else playlistDao
                                     .getAllPlaylistsWithItems()
-                                    .map { mapDeep(it) }/* todo channels */
+                                    .mapDeep()
                             is PlatformIdListFilter ->
                                 if (flat) playlistDao
                                     .loadAllByPlatformIds(filter.ids)
-                                    .map { playlistMapper.mapWithMediaEntities(it, null, null, null) }
+                                    .mapFlat()
                                 else playlistDao
                                     .loadAllByPlatformIdsWithItems(filter.ids)
-                                    .map { mapDeep(it) }/* todo channels */
+                                    .mapDeep()
                             is ChannelPlatformIdFilter ->
                                 if (flat) playlistDao
                                     .findPlaylistsForChannePlatformlId(filter.platformId)
-                                    .map { playlistMapper.mapWithMediaEntities(it, null, null, null) }
+                                    .mapFlat()
                                 else throw IllegalArgumentException("Only flat supported for ChannelPlatformIdFilter")
                             else ->// todo return empty for else
                                 playlistDao
                                     .getAllPlaylists()
-                                    .map { playlistMapper.mapWithMediaEntities(it, null, null, null) }
+                                    .mapFlat()
                         }
                     }.let { RepoResult.Data(it) }
                     .also { database.setTransactionSuccessful() }
@@ -278,19 +294,22 @@ class PlaylistDatabaseRepository constructor(
         }
 
     // region PlaylistStatDomain
-    suspend fun loadPlaylistStatList(playlistIds: List<Long>, emit: Boolean = false): RepoResult<List<PlaylistStatDomain>> =
+    suspend fun loadPlaylistStatList(filter: Filter): RepoResult<List<PlaylistStatDomain>> =
         withContext(coProvider.IO) {
             try {
                 database.beginTransaction()
-                RepoResult.Data(
-                    playlistIds.map {
-                        PlaylistStatDomain(
-                            playlistId = it,
-                            itemCount = playlistItemDao.countItems(it),
-                            watchedItemCount = playlistItemDao.countMediaFlags(it, MediaEntity.FLAG_WATCHED)
-                        )
-                    }).also { database.setTransactionSuccessful() }
-                    .also { if (emit) it.data?.forEach { _playlistStatFlow.emit(FLAT to it) } }
+                when (filter) {
+                    is IdListFilter ->
+                        RepoResult.Data(
+                            filter.ids.map {
+                                PlaylistStatDomain(
+                                    playlistId = it,
+                                    itemCount = playlistItemDao.countItems(it),
+                                    watchedItemCount = playlistItemDao.countMediaFlags(it, MediaEntity.FLAG_WATCHED)
+                                )
+                            }).also { database.setTransactionSuccessful() }
+                    else -> throw UnsupportedOperationException("$filter not supported")
+                }
             } catch (e: Throwable) {
                 val msg = "couldn't delete all media"
                 log.e(msg, e)
@@ -300,12 +319,12 @@ class PlaylistDatabaseRepository constructor(
     // endregion PlaylistStatDomain
 
     // region PlaylistItemDomain
-    suspend fun savePlaylistItem(item: PlaylistItemDomain, emit: Boolean = true): RepoResult<PlaylistItemDomain> =
+    suspend fun savePlaylistItem(item: PlaylistItemDomain, emit: Boolean = true, flat: Boolean = true): RepoResult<PlaylistItemDomain> =
         withContext(coProvider.IO) {
             try {
                 item
                     .let { item ->
-                        if (item.media.id == null) {
+                        if (item.media.id == null || !flat) {
                             log.d("Save media check: ${item.media.platformId}")
                             val saved = mediaRepository.save(item.media)
                                 .takeIf { it.isSuccessful }
@@ -338,7 +357,11 @@ class PlaylistDatabaseRepository constructor(
             }
         }
 
-    suspend fun savePlaylistItems(items: List<PlaylistItemDomain>, emit: Boolean = true): RepoResult<List<PlaylistItemDomain>> =
+    suspend fun savePlaylistItems(
+        items: List<PlaylistItemDomain>,
+        emit: Boolean = true,
+        flat: Boolean = true
+    ): RepoResult<List<PlaylistItemDomain>> =
         withContext(coProvider.IO) {
             try {
                 val checkOrderAndPlaylist: MutableSet<String> = mutableSetOf()
@@ -351,7 +374,7 @@ class PlaylistDatabaseRepository constructor(
                         }
                     }
                     .let { itemDomains ->
-                        itemDomains.filter { it.media.id == null }
+                        itemDomains.filter { it.media.id == null || !flat }
                             .takeIf { it.size > 0 }
                             ?.let {
                                 mediaRepository.save(it.map { it.media }).data!!.associateBy { it.platformId }

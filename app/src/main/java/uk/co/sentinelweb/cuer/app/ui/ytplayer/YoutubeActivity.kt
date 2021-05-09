@@ -16,7 +16,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA_ID
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
+import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 
 /**
  * TODO clean up (a lot)
@@ -26,7 +26,7 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener {
 
     private val toastWrapper: ToastWrapper by inject()
-    private val apiKeyProvider: YoutubeApiKeyProvider by inject()
+    private val apiKeyProvider: ApiKeyProvider by inject()
 
     // jesus fin christ ..
     private val mHideHandler = Handler()

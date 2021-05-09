@@ -24,11 +24,12 @@ jobs:
         env:
           GS: "${{ secrets.GOOGLESERVICES_JSON }}"
       - name: Build
-        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY clean assembleDebug
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY clean assembleDebug
         env:
           YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
+          PIXABAY_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"
       - name: Test
-        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY core:test domain:test net:test app:testDebugUnitTest
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY core:test domain:test net:test app:testDebugUnitTest
         env:
           YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
       - name: Android Test Report

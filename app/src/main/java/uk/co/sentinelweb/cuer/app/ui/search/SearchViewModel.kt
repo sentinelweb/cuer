@@ -101,6 +101,7 @@ class SearchViewModel(
 
     fun onClearRelated() {
         state.remote.relatedToMediaPlatformId = null
+        state.remote.relatedToMediaTitle = null
         model = mapper.map(state)
     }
 
@@ -176,7 +177,8 @@ class SearchViewModel(
                     this@SearchViewModel::onPlaylistSelected,
                     { },
                     this@SearchViewModel::onPlaylistDialogClose,
-                    showAdd = false
+                    showAdd = false,
+                    showPin = false
                 )
         } else if (chipModel.type == PLAYLIST) {
             state.local.playlists

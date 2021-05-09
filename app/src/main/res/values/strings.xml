@@ -20,6 +20,8 @@
     <string name="menu_play_yt">Launch</string>
     <string name="menu_channel_yt">Go to channel</string>
     <string name="menu_star">Star</string>
+    <string name="menu_unstar">UnStar</string>
+    <string name="menu_pin">Pin</string>
     <string name="menu_share">Share</string>
     <string name="menu_paste">Paste &amp; add</string>
     <string name="menu_restart">Restart</string>
@@ -29,7 +31,8 @@
     <string name="menu_playlist_mode_single">Single</string>
     <string name="menu_show_unlistened">Show unlistened</string>
     <string name="menu_edit">Edit</string>
-    <string name="menu_filter">Play</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_merge">Merge with &#8230;</string>
 
     <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>
@@ -65,6 +68,8 @@
     <string name="playlist_item_menu_star">Star</string>
     <string name="playlist_item_menu_share">Share</string>
     <string name="playlist_item_menu_related">Related</string>
+    <string name="playlist_msg_deleted">This playlist was deleted</string>
+    <string name="playlist_play_items_from_start">Play items from start</string>
 
     <!-- playlist edit fragemnt -->
     <string name="pe_fragment_title">Edit playlist</string>
@@ -72,6 +77,16 @@
     <string name="pe_title">Title</string>
     <string name="pe_create">Create</string>
     <string name="pe_save">Save</string>
+    <string name="pe_play_from_start">Play from start</string>
+    <string name="pe_parent">Parent</string>
+    <string name="pe_mark_all_watched">Mark all watched</string>
+    <string name="pe_mark_all_unwatched">Mark all unwatched</string>
+    <string name="pe_info">Information</string>
+    <string name="pe_playable">Playable</string>
+    <string name="pe_deletable">Deletable</string>
+    <string name="pe_editable_items">Editable items</string>
+    <string name="pe_deletable_items">Deletable items</string>
+    <string name="pe_other_actions">Other actions</string>
 
     <!-- local player -->
     <string name="title_activity_fullscreen">Video Player</string>
@@ -99,6 +114,8 @@
     <!-- playlists & item -->
     <string name="pls_item_edit">Edit</string>
     <string name="pls_item_delete">Delete</string>
+    <string name="playlists_up_contentdesc">Up</string>
+    <string name="playlists_title">Playlists</string>
 
     <!-- dialogs -->
     <string name="playlist_dialog_add_playlist">Add playlist …</string>
@@ -110,6 +127,7 @@
     <string name="dialog_title_save_check">Save check</string>
     <string name="dialog_message_save_check">Do you want to save the item?</string>
     <string name="dialog_button_save">Save</string>
+    <string name="dialog_button_dont_save">Don\'t save</string>
 
     <!-- search -->
     <string name="search_title">Search</string>
@@ -130,10 +148,8 @@
     <string name="live">LIVE</string>
     <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
-
-    <string name="new_items_below">New Items v</string>
-    <string name="dialog_button_dont_save">Don\'t save</string>
-    <string name="playlist_msg_deleted">This playlist was deleted</string>
+    <string name="imagesearch_dialog_title">Image Search</string>
+    <string name="searchimage_term">Search Term</string>
 
 
 </resources>

@@ -10,6 +10,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
@@ -21,12 +22,11 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
 interface PlaylistsContract {
 
     interface Presenter {
-        fun initialise()
-        fun destroy()
         fun refreshList()
         fun setFocusMedia(mediaDomain: MediaDomain)
         fun onItemSwipeRight(item: ItemContract.Model)
@@ -35,41 +35,45 @@ interface PlaylistsContract {
         fun onItemPlay(item: ItemContract.Model, external: Boolean)
         fun onItemStar(item: ItemContract.Model)
         fun onItemShare(item: ItemContract.Model)
+        fun onMerge(item: ItemContract.Model)
         fun moveItem(fromPosition: Int, toPosition: Int)
-
-        //fun scroll(direction: ScrollDirection)
         fun undoDelete()
         fun commitMove()
         fun onResume()
         fun onPause()
+        fun onItemImageClicked(item: ItemContract.Model)
+        fun onUpClicked()
+        fun onEdit(item: ItemContract.Model)
     }
 
     interface View {
         fun setList(model: Model, animate: Boolean = true)
         fun scrollToItem(index: Int)
         fun hideRefresh()
-
-        //fun scrollTo(direction: ScrollDirection)
         fun showUndo(msg: String, undo: () -> Unit)
         fun gotoPlaylist(id: Long, play: Boolean, source: Source)
         fun gotoEdit(id: Long, source: Source)
         fun showMessage(msg: String)
+        fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
     }
-
-    enum class ScrollDirection { Up, Down, Top, Bottom }
 
     data class State constructor(
         var playlists: List<PlaylistDomain> = listOf(),
         var deletedPlaylist: PlaylistDomain? = null,
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
-        var playlistStats: List<PlaylistStatDomain> = listOf()
+        var playlistStats: List<PlaylistStatDomain> = listOf(),
+        var treeRoot: PlaylistTreeDomain = PlaylistTreeDomain(),
+        var treeCurrentNodeId: Long? = null,
+        var playlistsDisplay: List<PlaylistDomain> = listOf(),
+        var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf()
     ) : ViewModel()
 
     data class Model(
+        val title: String,
         val imageUrl: String = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         val currentPlaylistId: Identifier<*>?, // todo non null?
-        val showAdd: Boolean = true,
+        val showUp: Boolean,
         val items: List<ItemContract.Model>
     )
 
@@ -83,7 +87,8 @@ interface PlaylistsContract {
                     PlaylistsPresenter(
                         view = get(),
                         state = get(),
-                        playlistRepository = get(),
+                        playlistOrchestrator = get(),
+                        playlistStatsOrchestrator = get(),
                         modelMapper = get(),
                         queue = get(),
                         log = get(),
@@ -95,10 +100,12 @@ interface PlaylistsContract {
                         localSearch = get(),
                         remoteSearch = get(),
                         ytJavaApi = get(),
-                        searchMapper = get()
+                        searchMapper = get(),
+                        merge = get(),
+                        shareWrapper = get()
                     )
                 }
-                scoped { PlaylistsModelMapper() }
+                scoped { PlaylistsModelMapper(get()) }
                 scoped { PlaylistsAdapter(get(), getSource()) }
                 scoped {
                     ItemTouchHelperCallback(

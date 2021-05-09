@@ -38,21 +38,24 @@ class PlaylistModelMapper constructor(
         isPlaying: Boolean,
         mapItems: Boolean = true,
         id: OrchestratorContract.Identifier<*>,
+        pinned: Boolean,
         playlists: Map<Long, PlaylistDomain>?
     ): PlaylistContract.Model {
         modelIdGenerator = 0
         val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
         return PlaylistContract.Model(
-            domain.title,
-            domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
-            domain.mode.ordinal,
-            iconMapper.map(domain.mode),
-            if (isPlaying) R.drawable.ic_baseline_playlist_close_24 else R.drawable.ic_baseline_playlist_play_24,
-            if (domain.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_unstarred_white,
-            domain.default,
-            id.source == LOCAL,
-            domain.config.playable,
-            domain.config.editable,
+            title = domain.title,
+            imageUrl = domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
+            loopModeIndex = domain.mode.ordinal,
+            loopModeIcon = iconMapper.map(domain.mode),
+            playIcon = if (isPlaying) R.drawable.ic_baseline_playlist_close_24 else R.drawable.ic_baseline_playlist_play_24,
+            starredIcon = if (domain.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_unstarred_white,
+            isDefault = domain.default,
+            isSaved = id.source == LOCAL,
+            isPlayFromStart = domain.playItemsFromStart,
+            isPinned = pinned,
+            canPlay = domain.config.playable,
+            canEdit = domain.config.editable,
             items = if (mapItems) {
                 domain.items.mapIndexed { index, item ->
                     val modelId = item.id ?: modelIdGenerator

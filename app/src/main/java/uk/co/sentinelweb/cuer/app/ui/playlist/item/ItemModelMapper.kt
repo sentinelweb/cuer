@@ -25,11 +25,11 @@ class ItemModelMapper constructor(
     }
 
     private val unwatchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_baseline_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+        res.getDrawable(R.drawable.ic_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
     private val watchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_baseline_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+        res.getDrawable(R.drawable.ic_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
     private val _bottomDrawables: MutableMap<Int, Drawable> = mutableMapOf()

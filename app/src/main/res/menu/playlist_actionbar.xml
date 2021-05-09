@@ -7,17 +7,17 @@
 
     <item
         android:id="@+id/playlist_edit"
-        android:icon="@drawable/ic_button_edit_24"
-        android:orderInCategory="275"
+        android:icon="@drawable/ic_edit_24"
+        android:orderInCategory="150"
         android:title="@string/menu_edit"
         app:iconTint="@color/white"
-        app:showAsAction="never"
+        app:showAsAction="always"
         />
 
     <item
         android:id="@+id/playlist_star"
         android:icon="@drawable/ic_button_unstarred_white"
-        android:orderInCategory="300"
+        android:orderInCategory="100"
         android:title="@string/menu_star"
         android:visible="false"
         app:iconTint="@color/white"
@@ -41,11 +41,12 @@
         android:title="@string/menu_show_unlistened"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="never"
+        android:visible="false"
         />
 
     <item
         android:id="@+id/playlist_play"
-        android:icon="@drawable/ic_menu_play_black"
+        android:icon="@drawable/ic_play_black"
         android:orderInCategory="250"
         android:title="@string/menu_play"
         android:visible="false"
@@ -56,7 +57,7 @@
     <item
         android:id="@+id/playlist_mode_shuffle"
         android:icon="@drawable/ic_button_shuffle_24"
-        android:orderInCategory="50"
+        android:orderInCategory="200"
         android:title="@string/menu_playlist_mode_shuffle"
         android:visible="false"
         app:iconTint="@color/menu_button_icon_tint"
@@ -66,7 +67,7 @@
     <item
         android:id="@+id/playlist_mode_single"
         android:icon="@drawable/ic_button_shuffle_disabled_24"
-        android:orderInCategory="50"
+        android:orderInCategory="200"
         android:title="@string/menu_playlist_mode_single"
         android:visible="false"
         app:iconTint="@color/menu_button_icon_tint"
@@ -76,7 +77,7 @@
     <item
         android:id="@+id/playlist_mode_loop"
         android:icon="@drawable/ic_button_repeat_24"
-        android:orderInCategory="50"
+        android:orderInCategory="200"
         android:title="@string/menu_playlist_mode_loop"
         android:visible="false"
         app:iconTint="@color/menu_button_icon_tint"
@@ -86,7 +87,7 @@
     <item
         android:id="@+id/playlist_search"
         android:icon="@drawable/ic_baseline_search_24"
-        android:orderInCategory="50"
+        android:orderInCategory="170"
         android:title="@string/menu_playlist_mode_loop"
         android:visible="true"
         app:iconTint="@color/menu_button_icon_tint"

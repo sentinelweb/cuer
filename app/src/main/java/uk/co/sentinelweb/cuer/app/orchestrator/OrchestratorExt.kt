@@ -21,7 +21,6 @@ inline fun <reified T> NetResult<List<T>>.forceNetListResultNotEmpty(msg: String
         ?: throw OrchestratorContract.DoesNotExistException(msg)
 }
 
-
 inline fun <reified T> RepoResult<List<T>>.allowDatabaseListResultEmpty(): List<T> = this.let {
     (it.takeIf { it.isSuccessful }
         ?: throw OrchestratorContract.DatabaseException(it))
@@ -56,7 +55,7 @@ inline fun <reified T> RepoResult<T>.forceDatabaseSuccess(): T? = this.let {
         .data
 }
 
-inline fun <reified T> NetResult<T>.forceNetSuccess(msg: String): T? = this.let {
+inline fun <reified T> NetResult<T>.forceNetSuccess(): T? = this.let {
     (it.takeIf { it.isSuccessful }
         ?: throw OrchestratorContract.NetException(it)
             ).data
@@ -68,7 +67,7 @@ fun Long.toIdentifier(source: Source) = Identifier(this, source)
 
 inline fun <reified Id> Identifier<Id>.toPair() = Pair(id, source)
 inline fun <reified Id> Identifier<*>.toPairType() = Pair(id, source)
-inline fun Identifier<*>.toFlatOptions(emit: Boolean = true) = OrchestratorContract.Options(source, flat = true, emit = emit)
-inline fun Identifier<*>.toDeep(emit: Boolean = false) = OrchestratorContract.Options(source, flat = false, emit = emit)
-inline fun Source.toFlatOptions(emit: Boolean = true) = OrchestratorContract.Options(this, flat = true, emit = emit)
-inline fun Source.toDeep(emit: Boolean = false) = OrchestratorContract.Options(this, flat = false, emit = emit)
+fun Identifier<*>.flatOptions(emit: Boolean = true) = OrchestratorContract.Options(source, flat = true, emit = emit)
+fun Identifier<*>.deepOptions(emit: Boolean = true) = OrchestratorContract.Options(source, flat = false, emit = emit)
+fun Source.flatOptions(emit: Boolean = true) = OrchestratorContract.Options(this, flat = true, emit = emit)
+fun Source.deepOptions(emit: Boolean = true) = OrchestratorContract.Options(this, flat = false, emit = emit)

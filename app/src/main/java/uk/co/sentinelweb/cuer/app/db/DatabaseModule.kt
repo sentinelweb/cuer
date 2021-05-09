@@ -33,7 +33,7 @@ object DatabaseModule {
                 playlistItemDao = get<AppDatabase>().playlistItemDao(),
                 playlistItemMapper = get(),
                 mediaRepository = get(),
-//                mediaDao = get<AppDatabase>().mediaDao(),
+                channelDao = get<AppDatabase>().channelDao(),
                 coProvider = get(),
                 log = get(),
                 database = get()

@@ -15,10 +15,24 @@ class ItemPresenter(
         view.setCheckedVisible(item.checkIcon)
         item.thumbNailUrl
             ?.apply { view.setIconUrl(this) }
-            ?: R.drawable.ic_chip_playlist_black
+            ?: R.drawable.ic_playlist_black
                 .apply { view.setIconResource(this) }
         state.item = item
         view.showOverflow(item.showOverflow && (canPlay() || canLaunch() || canEdit() || canShare()))
+    }
+
+    override fun doImageClick() {
+        interactions.onImageClick(state.item!!)
+    }
+
+    override fun doEdit() {
+        interactions.onEdit(state.item!!)
+    }
+
+    override fun isStarred(): Boolean = state.item!!.starred
+
+    override fun doMerge() {
+        interactions.onMerge(state.item!!)
     }
 
     override fun doClick() {

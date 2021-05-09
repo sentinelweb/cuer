@@ -13,10 +13,10 @@ import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
+import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
 import uk.co.sentinelweb.cuer.net.retrofit.RetrofitBuilder
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
@@ -34,7 +34,7 @@ class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
 
     private lateinit var service: YoutubeService
 
-    private var keyProvider = object : YoutubeApiKeyProvider {
+    private var keyProvider = object : ApiKeyProvider {
         override val key: String = System.getProperty("CUER_YOUTUBE_API_KEY")
     }
 

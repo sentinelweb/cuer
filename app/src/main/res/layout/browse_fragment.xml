@@ -43,7 +43,15 @@
                 />
 
             <View
-                android:id="@+id/ple_title_bg"
+                android:id="@+id/browse_action_bg"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="top"
+                android:background="@drawable/actionbar_gradient"
+                />
+
+            <View
+                android:id="@+id/browse_title_bg"
                 android:layout_width="match_parent"
                 android:layout_height="64sp"
                 android:layout_gravity="bottom"

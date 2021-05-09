@@ -5,6 +5,8 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 
 class ShareWrapper(
     private val activity: AppCompatActivity
@@ -22,6 +24,24 @@ class ShareWrapper(
         }.let {
             Intent.createChooser(it, "Share Video: ${media.title}")
             //it // gives a different share sheet - a bit easier
+        }.run {
+            activity.startActivity(this)
+        }
+    }
+
+    fun share(playlist: PlaylistDomain) {
+        Intent().apply {
+            action = Intent.ACTION_SEND
+            data = Uri.parse(YoutubeJavaApiWrapper.playlistUrl(playlist))
+            putExtra(
+                Intent.EXTRA_TEXT,
+                playlistMessage(playlist).trimMargin()
+            )
+            val subject = "Shared playlist: '${playlist.title}'" + (playlist.channelData?.let { " by '${it.title}'" } ?: "")
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+            type = "text/plain"
+        }.let {
+            Intent.createChooser(it, "Share Playlist: ${playlist.title}")
         }.run {
             activity.startActivity(this)
         }
@@ -46,6 +66,35 @@ class ShareWrapper(
                     |
                     |by "${media.channelData.title}" (${YoutubeJavaApiWrapper.channelUrl(media)})
                     """
+    }
+
+    private fun playlistMessage(playlist: PlaylistDomain): String {
+        val sb = StringBuilder()
+        sb.append("Playlist: ").append(playlist.title).append("\n\n")
+        if (playlist.type == PLATFORM) {
+            sb.append("URL:").append(YoutubeJavaApiWrapper.playlistUrl(playlist)).append("\n\n")
+        }
+        playlist.config.description?.apply {
+            sb.append(this).append("\n\n")
+        }
+        if (playlist.items.size > 0) {
+            sb.append(Character.toChars(0x1F4FA)).append(" Videos:\n\n")
+            playlist.items.forEach {
+                it.media.apply {
+                    if (starred) {
+                        sb.append(Character.toChars(0x2B50)).append(" ")
+                    }
+                    sb.append(title).append("\n")
+                    sb.append(YoutubeJavaApiWrapper.videoShortUrl(this)).append("\n")
+                    sb.append("   by: ").append(channelData.title).append(" - ")
+                        .append(channelData.customUrl ?: YoutubeJavaApiWrapper.channelUrl(channelData))
+                        .append("\n\n")
+                }
+            }
+        }
+
+        sb.append("Sent via Cuer @cuerapp (https://twitter.com/cuerapp)").append("\n\n")
+        return sb.toString()
     }
 
     fun getLinkFromIntent(intent: Intent): String? =

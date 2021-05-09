@@ -41,7 +41,15 @@
                 />
 
             <View
-                android:id="@+id/ple_title_bg"
+                android:id="@+id/pe_action_bg"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="top"
+                android:background="@drawable/actionbar_gradient"
+                />
+
+            <View
+                android:id="@+id/pe_title_bg"
                 android:layout_width="match_parent"
                 android:layout_height="64sp"
                 android:layout_gravity="bottom"
@@ -108,12 +116,92 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/pe_default"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/default_playlist"
+                app:layout_constraintEnd_toStartOf="@id/pe_play_start"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_title"
+                />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/pe_play_start"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/pe_play_from_start"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/pe_default"
+                app:layout_constraintTop_toBottomOf="@id/pe_title"
+                />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/pe_playable"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/pe_playable"
+                app:layout_constraintEnd_toStartOf="@id/pe_deletable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_play_start"
+                />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/pe_deletable"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/pe_deletable"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/pe_playable"
+                app:layout_constraintTop_toBottomOf="@id/pe_play_start"
+                />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/pe_editable_items"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/pe_editable_items"
+                app:layout_constraintEnd_toStartOf="@id/pe_deletable_items"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_playable"
+                />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/pe_deletable_items"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/pe_deletable_items"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/pe_editable_items"
+                app:layout_constraintTop_toBottomOf="@id/pe_playable"
+                />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pe_parent_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pe_parent"
+                app:layout_constraintBottom_toBottomOf="@id/pe_parent_chip"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/pe_parent_chip"
+                />
+
+            <FrameLayout
+                android:id="@+id/pe_parent_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:layout_constraintStart_toEndOf="@id/pe_parent_label"
+                app:layout_constraintTop_toBottomOf="@id/pe_editable_items"
+                />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/pe_commit_button"
                 style="@style/Widget.MaterialComponents.Button.Icon"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="4dp"
+                android:paddingHorizontal="16dp"
                 android:layout_marginVertical="16dp"
                 android:drawableTint="@color/button_fg_tint"
                 android:elevation="@dimen/button_elevation"
@@ -121,13 +209,85 @@
                 android:textAppearance="?attr/textAppearanceButton"
                 app:icon="@drawable/ic_button_tick_24_white"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_title"
+                app:layout_constraintTop_toBottomOf="@id/pe_parent_chip"
                 tools:text="Commit"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
                 />
 
+            <View
+                android:id="@+id/pe_divider1"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_commit_button"
+                />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pe_info_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/pe_info"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_divider1"
+                />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pe_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:autoLink="web|email"
+                android:linksClickable="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_info_title"
+                tools:text="@string/pe_info"
+                />
+
+            <View
+                android:id="@+id/pe_divider"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_info"
+                />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pe_other_actions_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/pe_other_actions"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_divider"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/pe_watch_all"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginVertical="8dp"
+                android:drawableTint="@color/button_fg_tint"
+                android:elevation="@dimen/button_elevation"
+                android:text="@string/pe_mark_all_watched"
+                android:textAppearance="?attr/textAppearanceButton"
+                app:icon="@drawable/ic_visibility_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_other_actions_title"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -140,6 +300,22 @@
         app:layout_anchor="@id/pe_appbar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_button_unstarred_white"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/pe_pin_fab"
+        style="@style/FabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="80dp"
+        android:contentDescription="@null"
+        android:tint="@color/white"
+        android:visibility="visible"
+        app:fabSize="mini"
+        app:layout_anchor="@id/pe_appbar"
+        app:layout_anchorGravity="bottom|end"
+        app:srcCompat="@drawable/ic_push_pin_off_24"
+        tools:ignore="RtlSymmetry"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

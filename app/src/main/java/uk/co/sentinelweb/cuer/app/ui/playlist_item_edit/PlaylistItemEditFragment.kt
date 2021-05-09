@@ -34,8 +34,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.ERROR
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.REFRESHING
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
@@ -68,6 +67,8 @@ class PlaylistItemEditFragment
     private val starMenuItem: MenuItem
         get() = ple_toolbar.menu.findItem(R.id.plie_star)
     private val playMenuItem: MenuItem
+        get() = ple_toolbar.menu.findItem(R.id.plie_play)
+    private val ediitMenuItem: MenuItem
         get() = ple_toolbar.menu.findItem(R.id.plie_play)
 
     private var dialog: AppCompatDialog? = null
@@ -139,6 +140,10 @@ class PlaylistItemEditFragment
             when (menuItem.itemId) {
                 R.id.plie_star -> {
                     viewModel.onStarClick()
+                    true
+                }
+                R.id.plie_edit -> {
+                    viewModel.onEditClick()
                     true
                 }
                 R.id.plie_play -> {
@@ -220,6 +225,9 @@ class PlaylistItemEditFragment
                     when (model.type) {
                         REFRESHING -> ple_swipe.isRefreshing = model.data as Boolean
                         ERROR -> snackbarWrapper.makeError(model.data as String).show()
+                        UNPIN -> snackbarWrapper
+                            .make("Unpin playlist?", actionText = "UNPIN", action = { viewModel.onUnPin() })
+                            .show()
                     }
                 }
             })
@@ -275,16 +283,14 @@ class PlaylistItemEditFragment
                     model.channelThumbUrl?.also { url ->
                         Glide.with(requireContext())
                             .load(url)
-                            //.circleCrop()
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .addListener(GlideFallbackLoadListener(ple_author_image, url, ytDrawable, log))
                             .into(ple_author_image)
-                        //.onLoadFailed(ytDrawable)
                     } ?: run { ple_author_image.setImageDrawable(ytDrawable) }
 
                     ple_chips.removeAllViews()
                     model.chips.forEach { chipModel ->
-                        chipCreator.create(chipModel, ple_chips)?.apply {
+                        chipCreator.create(chipModel, ple_chips).apply {
                             ple_chips.addView(this)
                             when (chipModel.type) {
                                 PLAYLIST_SELECT -> {
@@ -353,17 +359,23 @@ class PlaylistItemEditFragment
                                 }
                             dialogFragment?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
                         }
-                        DialogModel.Type.PLAYLIST -> {
-                            selectDialogCreator
-                                .createMulti(model as SelectDialogModel)
-                                .apply { show() }
-                        }
                         DialogModel.Type.SELECT_ROUTE -> {
                             castDialogWrapper.showRouteSelector(childFragmentManager)
                         }
                         DialogModel.Type.CONFIRM -> {
                             alertDialogCreator.create(model as AlertDialogModel).show()
                         }
+                        DialogModel.Type.PLAYLIST -> {
+                            selectDialogCreator
+                                .createMulti(model as SelectDialogModel)
+                                .apply { show() }
+                        }
+                        DialogModel.Type.PLAYLIST_ITEM_SETTNGS -> {
+                            selectDialogCreator
+                                .createMulti(model as SelectDialogModel)
+                                .apply { show() }
+                        }
+
                         else -> Unit
                     }
                 }

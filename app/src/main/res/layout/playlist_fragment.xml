@@ -41,38 +41,72 @@
                 app:layout_collapseParallaxMultiplier="0.7"
                 />
 
+            <View
+                android:id="@+id/playlist_action_bg"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="top"
+                android:background="@drawable/actionbar_gradient"
+                />
+
             <TextView
                 android:id="@+id/playlist_items"
                 style="@style/Header.InfoText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/dash"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:text="800"
                 />
 
-            <!--            <TextView-->
-            <!--                android:id="@+id/playlist_flags"-->
-            <!--                style="@style/Header.InfoText"-->
-            <!--                android:layout_marginTop="118dp"-->
-            <!--                android:text="@string/default_playlist"-->
-            <!--                android:visibility="gone"-->
-            <!--                app:layout_constraintTop_toTopOf="parent"-->
-            <!--                tools:text="Default"-->
-            <!--                />-->
+            <LinearLayout
+                android:id="@+id/playlist_flags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="84dp"
+                android:background="@color/info_text_overlay_background"
+                android:orientation="horizontal"
+                android:padding="2dp"
+                android:visibility="gone"
+                tools:text="800"
+                >
 
-            <!--            <View-->
-            <!--                android:id="@+id/ple_action_bg"-->
-            <!--                android:layout_width="140dp"-->
-            <!--                android:layout_height="?attr/actionBarSize"-->
-            <!--                android:layout_gravity="top|end"-->
-            <!--                android:layout_marginTop="24dp"-->
-            <!--                android:background="@color/black_transparent_background"-->
-            <!--                android:fitsSystemWindows="true"-->
-            <!--                />-->
+                <ImageView
+                    android:id="@+id/playlist_flag_default"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@string/default_playlist"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_playlist_default_black"
+                    android:visibility="gone"
+                    app:tint="@color/white"
+                    />
+
+                <ImageView
+                    android:id="@+id/playlist_flag_play_start"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@string/playlist_play_items_from_start"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_play_start_black"
+                    android:visibility="gone"
+                    app:tint="@color/white"
+                    />
+
+                <ImageView
+                    android:id="@+id/playlist_flag_pinned"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@string/menu_pin"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_push_pin_on_24"
+                    android:visibility="gone"
+                    app:tint="@color/white"
+                    />
+            </LinearLayout>
 
             <View
-                android:id="@+id/ple_title_bg"
+                android:id="@+id/playlist_title_bg"
                 android:layout_width="match_parent"
                 android:layout_height="64sp"
                 android:layout_gravity="bottom"
@@ -203,5 +237,6 @@
         tools:ignore="RtlSymmetry"
         android:visibility="gone"
         />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

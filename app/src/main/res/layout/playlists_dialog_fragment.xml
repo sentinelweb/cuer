@@ -36,15 +36,49 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="8dp"
+        android:layout_marginStart="8dp"
+        app:iconGravity="textStart"
         android:drawableTint="@color/button_fg_tint"
         android:elevation="@dimen/button_elevation"
         android:text="@string/playlist_dialog_add_playlist"
         android:textAppearance="?attr/textAppearanceButton"
         app:icon="@drawable/ic_button_add_black"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:visibility="gone"
         tools:text="Add"
         />
+
+    <Button
+        android:id="@+id/pdf_pin_selected_button"
+        style="@style/Button.IconOnly"
+        android:layout_width="48dp"
+        android:layout_height="36dp"
+        android:layout_marginVertical="8dp"
+        android:layout_marginEnd="8dp"
+        android:elevation="4dp"
+        android:visibility="visible"
+        app:icon="@drawable/ic_push_pin_on_24"
+        app:layout_constraintBaseline_toBaselineOf="@id/pdf_add_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="?colorPrimary"
+        tools:text="Add"
+        />
+
+    <Button
+        android:id="@+id/pdf_pin_unselected_button"
+        style="@style/Button.IconOnly"
+        android:layout_width="48dp"
+        android:layout_height="36dp"
+        android:layout_marginVertical="8dp"
+        android:layout_marginEnd="8dp"
+        android:elevation="4dp"
+        android:visibility="gone"
+        app:icon="@drawable/ic_push_pin_off_24"
+        app:layout_constraintBaseline_toBaselineOf="@id/pdf_add_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="?colorPrimary"
+        tools:text="Add"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

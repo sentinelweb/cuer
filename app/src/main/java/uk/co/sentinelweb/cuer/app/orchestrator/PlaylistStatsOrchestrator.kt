@@ -27,9 +27,15 @@ class PlaylistStatsOrchestrator constructor(
         throw NotImplementedException()
     }
 
-    suspend override fun loadList(filter: Filter, options: Options): List<PlaylistStatDomain> {
-        throw NotImplementedException()
-    }
+    suspend override fun loadList(filter: Filter, options: Options): List<PlaylistStatDomain> =
+        when (options.source) {
+            Source.MEMORY -> throw NotImplementedException()
+            Source.LOCAL -> playlistDatabaseRepository.loadPlaylistStatList(filter)
+                .allowDatabaseListResultEmpty()
+            Source.LOCAL_NETWORK -> throw NotImplementedException()
+            Source.REMOTE -> throw NotImplementedException()
+            Source.PLATFORM -> throw InvalidOperationException(this::class, filter, options)
+        }
 
     suspend override fun save(domain: PlaylistStatDomain, options: Options): PlaylistStatDomain {
         throw NotImplementedException()

@@ -1,29 +1,39 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
+import uk.co.sentinelweb.cuer.domain.ext.descendents
 
-class PlaylistsModelMapper constructor() {
+class PlaylistsModelMapper constructor(
+    private val res: ResourceWrapper
+) {
 
     fun map(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         current: OrchestratorContract.Identifier<*>?,
         showOverflow: Boolean,
-        showAdd: Boolean
-    ): PlaylistsContract.Model =
-        PlaylistsContract.Model(
-            DEFAULT_HEADER_IMAGE,
+        pinnedId: Long?,
+        nodeId: Long?,
+        treeLookup: Map<Long, PlaylistTreeDomain>
+    ): PlaylistsContract.Model {
+        return PlaylistsContract.Model(
+            treeLookup[nodeId]?.node?.title?.let { it + ": " + res.getString(R.string.playlists_title) }
+                ?: res.getString(R.string.playlists_title),
+            treeLookup[nodeId]?.node?.image?.url ?: PLAYLISTS_HEADER_IMAGE,
             current,
-            showAdd,
+            nodeId != null,
             domains.keys.mapIndexed { index, pl ->
                 ItemContract.Model(
-                    pl.id!!,
+                    pl.id ?: throw Exception("Playlist must have an id"),
                     index,
                     pl.title,
                     false,
@@ -40,14 +50,18 @@ class PlaylistsModelMapper constructor() {
                     canPlay = pl.config.playable,
                     canDelete = pl.config.deletable,
                     canLaunch = pl.type == PLATFORM,
-                    canShare = pl.type == PLATFORM,
-                    watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false
+                    canShare = pl.type != APP,
+                    watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false,
+                    pinned = pl.id == pinnedId,
+                    default = pl.default,
+                    descendents = treeLookup.get(pl.id)?.descendents() ?: 0
                 )
             }
         )
+    }
 
     companion object {
-        const val DEFAULT_HEADER_IMAGE = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg"
+        const val PLAYLISTS_HEADER_IMAGE = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg"
     }
 
 }

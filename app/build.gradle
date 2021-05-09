@@ -25,6 +25,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "youtubeApiKey", "\"$CUER_YOUTUBE_API_KEY\""
+        buildConfigField "String", "pixabayApiKey", "\"$CUER_PIXABAY_API_KEY\""
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -145,10 +146,11 @@ dependencies {
 
     implementation "com.firebaseui:firebase-ui-storage:$ver_firebase_ui"
 
-    // only use glide to load firebase images (its shit)
     implementation "com.github.bumptech.glide:glide:$ver_glide"
     annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
     kapt "com.github.bumptech.glide:compiler:$ver_glide"
+    // this is causing some weird compose crashes
+    // implementation "com.google.accompanist:accompanist-glide:$ver_glide_accompanist"
 
     debugImplementation ("androidx.fragment:fragment-testing:$ver_androidx_fragment_test"){// hack
         exclude group:"androidx.test"

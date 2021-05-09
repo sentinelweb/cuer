@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
+import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
@@ -18,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayist
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
@@ -36,6 +38,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
+import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
@@ -59,9 +62,11 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.di.DomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
+import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
+import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
+import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
 
 object Modules {
 
@@ -80,7 +85,8 @@ object Modules {
         YoutubeCastServiceModule.serviceModule,
         PrefBackupContract.fragmentModule,
         PrefRootContract.fragmentModule,
-        SearchContract.fragmentModule
+        SearchContract.fragmentModule,
+        SearchImageContract.fragmentModule
     )
 
     private val uiModule = module {
@@ -99,6 +105,7 @@ object Modules {
         single { PlaylistMemoryRepository(get(), get(), get(), get(), get()) }
         single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get()) }
+        factory { PlaylistMergeOrchestrator(get(), get()) }
         factory { PlaylistMediaLookupOrchestrator(get(), get()) }
         factory { NewMediaPlayistInteractor(get()) }
         factory { RecentItemsPlayistInteractor(get()) }
@@ -155,7 +162,8 @@ object Modules {
     }
 
     private val appNetModule = module {
-        factory<YoutubeApiKeyProvider> { CuerYoutubeApiKeyProvider() }
+        factory<ApiKeyProvider>(named(YOUTUBE)) { CuerYoutubeApiKeyProvider() }
+        factory<ApiKeyProvider>(named(PIXABAY)) { CuerPixabayApiKeyProvider() }
         single { NetModuleConfig(debug = BuildConfig.DEBUG) }
     }
 

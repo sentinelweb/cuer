@@ -7,13 +7,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.playlists_dialog_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.currentScope
-import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.databinding.PlaylistsDialogFragmentBinding
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsAdapter
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -28,30 +26,43 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
     private val log: LogWrapper by inject()
 
+    private var _binding: PlaylistsDialogFragmentBinding? = null
+    private val binding get() = _binding!!
+
     init {
         log.tag(this)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.playlists_dialog_fragment, parent, false)
+        _binding = PlaylistsDialogFragmentBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        pdf_list.layoutManager = LinearLayoutManager(context)
-        pdf_list.adapter = adapter
-        pdf_swipe.setOnRefreshListener { presenter.refreshList() }
-        pdf_add_button.setOnClickListener { presenter.onAddPlaylist() }
+        binding.pdfList.layoutManager = LinearLayoutManager(context)
+        binding.pdfList.adapter = adapter
+        binding.pdfSwipe.setOnRefreshListener { presenter.refreshList() }
+        binding.pdfAddButton.setOnClickListener { presenter.onAddPlaylist() }
+        binding.pdfPinSelectedButton.setOnClickListener { presenter.onPinSelectedPlaylist(false) }
+        binding.pdfPinUnselectedButton.setOnClickListener { presenter.onPinSelectedPlaylist(true) }
         //itemTouchHelper.attachToRecyclerView(pdf_list)
 
         presenter.setConfig(config)
+    }
+
+    override fun onImageClick(item: ItemContract.Model) {
+
+    }
+
+    override fun onEdit(item: ItemContract.Model) {
+
+    }
+
+    override fun updateDialogModel(model: PlaylistsDialogContract.Model) {
+        updateDialogNoList(model)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -79,13 +90,20 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     // endregion
 
     // region PlaylistContract.View
-    override fun setList(model: PlaylistsContract.Model, animate: Boolean) {
-        pdf_swipe.isRefreshing = false
-        adapter.currentPlaylistId = model.currentPlaylistId
-        pdf_add_button.isVisible = model.showAdd
-        adapter.setData(model.items, animate)
+    override fun setList(model: PlaylistsDialogContract.Model, animate: Boolean) {
+        updateDialogNoList(model)
+        model.playistsModel?.items?.apply { adapter.setData(this, animate) }
     }
-    //endregion
+
+    private fun updateDialogNoList(model: PlaylistsDialogContract.Model) {
+        binding.pdfSwipe.isRefreshing = false
+        adapter.currentPlaylistId = model.playistsModel?.currentPlaylistId
+        binding.pdfAddButton.isVisible = model.showAdd
+        binding.pdfPinSelectedButton.isVisible = model.showPin
+        binding.pdfPinUnselectedButton.isVisible = model.showUnPin
+    }
+
+//endregion
 
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
@@ -124,6 +142,10 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     override fun onShare(item: ItemContract.Model) {
         //presenter.onItemShare(item)
+    }
+
+    override fun onMerge(item: ItemContract.Model) {
+
     }
     //endregion
 

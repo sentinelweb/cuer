@@ -10,9 +10,9 @@
     <TextView
         android:id="@+id/swipe_label_right"
         style="@style/ItemView.Background.Right"
-        android:background="?colorEdit"
-        android:text="@string/pls_item_edit"
-        app:drawableLeftCompat="@drawable/ic_button_edit_24"
+        android:background="?colorMove"
+        android:text="@string/pl_item_move"
+        app:drawableLeftCompat="@drawable/ic_item_playlist_move_white"
         tools:ignore="RtlHardcoded,RtlSymmetry"
         />
 
@@ -39,7 +39,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_nav_playlist_black"
+            tools:src="@drawable/ic_playlist_default_black"
 
             />
 

@@ -76,6 +76,7 @@ class PlaylistPresenter(
     }
 
     private fun isPlaylistPlaying() = isQueuedPlaylist && ytContextHolder.isConnected()
+    private fun isPlaylistPinned() = state.playlist?.let { prefsWrapper.getLong(PINNED_PLAYLIST, 0) == it.id } ?: false
 
     private val isQueuedPlaylist: Boolean
         get() = state.playlistIdentifier == queue.playlistId
@@ -157,7 +158,7 @@ class PlaylistPresenter(
                     state.playlist
                         ?.items
                         ?.find { it.media.platformId == plistItem.media.platformId }
-                        ?.also { updatePlaylistItemByMediaId(plistItem) }
+                        ?.also { updatePlaylistItemByMediaId(plistItem, plistItem.media) }
                         ?.let { state.playlist }
                 } else {
                     state.playlist
@@ -174,7 +175,7 @@ class PlaylistPresenter(
                         ?.also { updateView() }
             }.takeIf { !isQueuedPlaylist && currentIndexBefore != state.playlist?.currentIndex }
                 ?.apply {
-                    state.playlist?.apply { playlistOrchestrator.updateCurrentIndex(this, state.playlistIdentifier.toFlatOptions()) }
+                    state.playlist?.apply { playlistOrchestrator.updateCurrentIndex(this, state.playlistIdentifier.flatOptions()) }
                 }
         }.launchIn(coroutines.mainScope)
 
@@ -185,7 +186,7 @@ class PlaylistPresenter(
                 FULL -> {
                     val containsMedia = state.playlist?.items?.find { it.media.platformId == media.platformId } != null
                     if (containsMedia) {
-                        updateMediaItem(media)
+                        updatePlaylistItemByMediaId(null, media)
                     }
                 }
                 DELETE -> Unit
@@ -203,9 +204,7 @@ class PlaylistPresenter(
     // move item to playlist
     override fun onItemSwipeRight(itemModel: ItemContract.Model) { // move
         state.viewModelScope.launch {
-            state.model
-                ?.itemsIdMap
-                ?.get(itemModel.id)
+            playlistItemDomain(itemModel)
                 ?.also { itemDomain ->
                     state.playlist?.apply {
                         if (config.editableItems.not()) {
@@ -233,6 +232,7 @@ class PlaylistPresenter(
                 confirm = { },
                 dismiss = { view.resetItemsState() },
                 suggestionsMedia = state.selectedPlaylistItem?.media,
+                showPin = false,
             )
         )
     }
@@ -283,7 +283,7 @@ class PlaylistPresenter(
                         .copy(playlistId = playlist.id!!)
                         .apply { state.movedPlaylistItem = this }
                         .copy(order = timeProvider.currentTimeMillis())
-                        .apply { playlistItemOrchestrator.save(this, LOCAL.toFlatOptions()) }
+                        .apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
                         .apply { view.showUndo("Moved to : ${playlist.title}", ::undoMoveItem) }
                         .also { state.selectedPlaylistItem = null }
                 }
@@ -294,7 +294,7 @@ class PlaylistPresenter(
         state.viewModelScope.launch {
             state.movedPlaylistItem
                 ?.copy(playlistId = state.playlistIdentifier.id!! as Long)
-                ?.apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.toFlatOptions()) }
+                ?.apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.flatOptions()) }
                 ?.apply { state.movedPlaylistItem = null }
         }
     }
@@ -304,23 +304,19 @@ class PlaylistPresenter(
         state.viewModelScope.launch {
             delay(400)
 
-            state.model
-                ?.itemsIdMap
-                ?.get(itemModel.id)
+            playlistItemDomain(itemModel)
                 ?.takeIf { it.id != null }
                 ?.also { log.d("found item ${it.id}") }
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
-                    playlistItemOrchestrator.delete(deleteItem, LOCAL.toFlatOptions())
+                    playlistItemOrchestrator.delete(deleteItem, LOCAL.flatOptions())
                     view.showUndo("Deleted: ${deleteItem.media.title}", ::undoDelete) // todo extract
                 }
         }
     }
 
     override fun onItemViewClick(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.apply {
                 val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
                 view.showItemDescription(itemModel.id, this, source)
@@ -328,9 +324,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemClicked(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 if (!(ytContextHolder.isConnected())) {
                     val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
@@ -347,9 +341,7 @@ class PlaylistPresenter(
     }
 
     override fun onPlayStartClick(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 if (!(ytContextHolder.isConnected())) {
                     //view.showItemDescription(item.id, itemDomain)
@@ -362,7 +354,6 @@ class PlaylistPresenter(
     override fun onStarPlaylist(): Boolean {
         state.playlist
             ?.let { commitHeaderChange(it.copy(starred = !it.starred)) }
-
         return true
     }
 
@@ -383,22 +374,23 @@ class PlaylistPresenter(
     }
 
     override fun onItemShowChannel(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.takeUnless { ytJavaApi.launchChannel(it.media) }
             ?.also { toastWrapper.show("can't launch channel") }
             ?: toastWrapper.show("can't find video")
     }
 
     override fun onItemStar(itemModel: ItemContract.Model) {
-        toastWrapper.show("todo: star ${itemModel.id}")
+        state.viewModelScope.launch {
+            playlistItemDomain(itemModel)
+                ?.takeIf { it.id != null }
+                ?.let { it.copy(media = it.media.copy(starred = !it.media.starred)) }
+                ?.also { playlistItemOrchestrator.save(it, LOCAL.deepOptions()) }
+        }
     }
 
     override fun onItemRelated(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.also { item ->
                 prefsWrapper.putString(
                     LAST_REMOTE_SEARCH, SearchRemoteDomain(
@@ -423,9 +415,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemShare(itemModel: ItemContract.Model) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 shareWrapper.share(itemDomain.media)
             }
@@ -457,7 +447,7 @@ class PlaylistPresenter(
 
     private fun commitHeaderChange(plist: PlaylistDomain) {
         state.viewModelScope.launch {
-            playlistOrchestrator.save(plist, state.playlistIdentifier.toFlatOptions())
+            playlistOrchestrator.save(plist, state.playlistIdentifier.flatOptions())
         }
     }
 
@@ -466,9 +456,7 @@ class PlaylistPresenter(
     }
 
     override fun onItemPlay(itemModel: ItemContract.Model, external: Boolean) {
-        state.model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        playlistItemDomain(itemModel)
             ?.also {
                 if (external) {
                     if (!ytJavaApi.launchVideo(it.media)) {
@@ -480,6 +468,10 @@ class PlaylistPresenter(
             }
             ?: toastWrapper.show("can't find video")
     }
+
+    private fun playlistItemDomain(itemModel: ItemContract.Model) = state.model
+        ?.itemsIdMap
+        ?.get(itemModel.id)
 
     override fun moveItem(fromPosition: Int, toPosition: Int) {
         if (state.dragFrom == null) {
@@ -494,7 +486,10 @@ class PlaylistPresenter(
                 ?.let { playlist -> playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!) }
                 ?.also { state.playlist = it }
                 ?.also {
-                    modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap)
+                    modelMapper.map(
+                        it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap,
+                        pinned = isPlaylistPinned()
+                    )
                         .also { view.setModel(it, false) }
                     view.highlightPlayingItem(it.currentIndex)
                 }
@@ -505,7 +500,7 @@ class PlaylistPresenter(
                             ?.let { item ->
                                 item to (item.id ?: throw java.lang.IllegalStateException("Moved item has no ID"))
                                     .toIdentifier(state.playlistIdentifier.source)
-                                    .toFlatOptions()
+                                    .flatOptions()
                             }
                             ?.let {
                                 playlistItemOrchestrator.save(it.first, it.second)
@@ -551,7 +546,7 @@ class PlaylistPresenter(
     override fun undoDelete() {
         state.deletedPlaylistItem?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistItemOrchestrator.save(itemDomain, LOCAL.toFlatOptions())
+                playlistItemOrchestrator.save(itemDomain, LOCAL.flatOptions())
                 state.deletedPlaylistItem = null
                 executeRefresh()
             }
@@ -577,7 +572,14 @@ class PlaylistPresenter(
         if (state.playlistIdentifier.source == MEMORY) {
             state.playlist
                 ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it, LOCAL) }
-                ?.let { it.copy(items = it.items.map { it.copy(id = null) }, config = it.config.copy(playable = true)) }
+                ?.let {
+                    it.copy(
+                        items = it.items.map { it.copy(id = null) },
+                        config = it.config.copy(
+                            playable = true, editable = true, deletable = true, deletableItems = true, editableItems = true
+                        )
+                    )
+                }
                 ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
                 ?.also { state.playlistIdentifier = it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure") }
                 ?.also { state.playlist = it }
@@ -626,8 +628,12 @@ class PlaylistPresenter(
     private suspend fun updateView(animate: Boolean = true) = withContext(coroutines.Main) {
         state.playlist
             .takeIf { coroutines.mainScopeActive }
-            .also { view.setSubTitle(state.playlist?.title ?: "No playlist" + (if (isQueuedPlaylist) " - playing" else "")) }
-            ?.let { modelMapper.map(it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap) }
+            ?.let {
+                modelMapper.map(
+                    it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap,
+                    pinned = isPlaylistPinned()
+                )
+            }
             ?.also { state.model = it }
             ?.also { view.setModel(it, animate) }
             .also {
@@ -649,7 +655,10 @@ class PlaylistPresenter(
             .takeIf { coroutines.mainScopeActive }
             ?.apply {
                 view.setHeaderModel(
-                    modelMapper.map(this, isPlaylistPlaying(), false, id = state.playlistIdentifier, playlists = state.playlistsMap)
+                    modelMapper.map(
+                        this, isPlaylistPlaying(), false, id = state.playlistIdentifier, playlists = state.playlistsMap,
+                        pinned = isPlaylistPinned()
+                    )
                 )
                 state.playlist?.currentIndex?.also {
                     view.highlightPlayingItem(it)
@@ -657,36 +666,26 @@ class PlaylistPresenter(
             }
     }
 
-    private fun updateMediaItem(m: MediaDomain) {
+    private fun updatePlaylistItemByMediaId(plistItem: PlaylistItemDomain?, media: MediaDomain) {
         state.playlist
             ?.items
             ?.apply {
-                indexOfFirst { it.media.id == m.id }
+                indexOfFirst { it.media.platformId == media.platformId }
                     .takeIf { it > -1 }
                     ?.let { index ->
                         state.model?.let { model ->
-                            val originalItem = get(index)
-                            val changedItem = originalItem.copy(media = m)
-                            val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
-                                ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
-                            updateItem(index, modelId, changedItem)
-                        }
-                    }
-            }
-    }
-
-    private fun updatePlaylistItemByMediaId(plistItem: PlaylistItemDomain) {
-        state.playlist
-            ?.items
-            ?.apply {
-                indexOfFirst { it.media.platformId == plistItem.media.platformId }
-                    .takeIf { it > -1 }
-                    ?.let { index ->
-                        state.model?.let { model ->
-                            val originalItem = get(index)
-                            val modelId = model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
-                                ?: throw IllegalStateException("Couldn't lookup model ID for $originalItem")
-                            updateItem(index, modelId, plistItem)
+                            val originalItemDomain = get(index)
+                            val changedItemDomain = plistItem ?: originalItemDomain.copy(media = media)
+                            //model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
+                            model.itemsIdMap.entries.firstOrNull {
+                                if (originalItemDomain.id != null) {
+                                    it.value.id == originalItemDomain.id
+                                } else {
+                                    it.value == originalItemDomain
+                                }
+                            }?.key
+                                ?.also { updateItem(index, it, changedItemDomain) }
+                                ?: throw Exception("Couldn't lookup model ID for $originalItemDomain keys=${model.itemsIdMap.keys}")
                         }
                     }
             }
@@ -700,16 +699,13 @@ class PlaylistPresenter(
         state.playlist = state.playlist?.let {
             it.copy(items = it.items.toMutableList().apply { set(index, changedItem) })
         }
-        val mappedItem =
-            modelMapper.map(
-                modelId,
-                changedItem,
-                index,
-                state.playlist?.config?.editableItems ?: false,
-                state.playlist?.config?.deletableItems ?: false,
-                state.playlist?.config?.editable ?: false,
-                playlists = state.playlistsMap,
-            )
+        val mappedItem = modelMapper.map(
+            modelId, changedItem, index,
+            state.playlist?.config?.editableItems ?: false,
+            state.playlist?.config?.deletableItems ?: false,
+            state.playlist?.config?.editable ?: false,
+            playlists = state.playlistsMap,
+        )
         state.model = state.model?.let {
             it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
         }?.also { it.itemsIdMap[modelId] = changedItem }

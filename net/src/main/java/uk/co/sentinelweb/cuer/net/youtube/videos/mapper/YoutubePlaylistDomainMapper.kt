@@ -32,9 +32,9 @@ internal class YoutubePlaylistDomainMapper(
                 platformId = it.id,
                 thumb = imageMapper.mapThumb(it.snippet.thumbnails),
                 image = imageMapper.mapImage(it.snippet.thumbnails),
-                channelData = channelLookup[it.snippet.channelId],
+                channelData = channelLookup[it.snippet.channelId] ?: throw IllegalStateException("Channel data not found"),
                 config = PlaylistDomain.PlaylistConfigDomain(
-                    updateUrl = "https://www.youtube.com/playlist?list=${it.id}",
+                    platformUrl = "https://youtube.com/playlist?list=${it.id}",
                     description = it.snippet.description,
                     published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) }
                 ),

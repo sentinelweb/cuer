@@ -41,6 +41,14 @@
                 tools:src="@drawable/im_test_nietzche"
                 />
 
+            <View
+                android:id="@+id/playlists_action_bg"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="top"
+                android:background="@drawable/actionbar_gradient"
+                />
+
             <TextView
                 android:id="@+id/playlists_items"
                 style="@style/Header.InfoText"
@@ -65,7 +73,7 @@
                 android:background="@android:color/transparent"
                 android:elevation="0dp"
                 app:layout_collapseMode="pin"
-                app:title="@string/bottomnav_title_playlists"
+                app:title="@string/playlists_title"
                 app:menu="@menu/playlists_actionbar"
                 />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -91,4 +99,18 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/playlists_up"
+        style="@style/FabButton.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/playlists_up_contentdesc"
+        android:visibility="gone"
+        app:fabSize="mini"
+        app:layout_anchor="@+id/playlists_swipe"
+        app:layout_anchorGravity="bottom|right"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        app:srcCompat="@drawable/ic_parent_folder_24"
+        />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

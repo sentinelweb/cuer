@@ -23,12 +23,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
             android:elevation="0dp"
-
             />
-        <!--        app:menu="@menu/main_actionbar"-->
-        <!--        app:layout_collapseMode="pin"-->
-        <!--        app:layout_scrollFlags="scroll|enterAlways|snap"-->
-
 
     </com.google.android.material.appbar.AppBarLayout>
 
