@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -53,7 +54,8 @@ class PlaylistsPresenter(
     private val remoteSearch: RemoteSearchPlayistOrchestrator,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val searchMapper: SearchMapper,
-    private val merge: PlaylistMergeOrchestrator
+    private val merge: PlaylistMergeOrchestrator,
+    private val shareWrapper: ShareWrapper
 ) : PlaylistsContract.Presenter {
 
     init {
@@ -188,7 +190,15 @@ class PlaylistsPresenter(
     }
 
     override fun onItemShare(item: ItemContract.Model) {
-        toastWrapper.show("share: ${item.title}")
+        findPlaylist(item)
+            ?.takeIf { it.id != null && it.id ?: 0 > 0 && it.type != APP }
+            ?.let { itemDomain ->
+                coroutines.mainScope.launch {
+                    playlistOrchestrator.load(itemDomain.id!!, LOCAL.deepOptions())
+                        ?.also { shareWrapper.share(it) }
+                        ?: view.showMessage("Couldn't load playlist ...")
+                }
+            }
     }
 
     override fun onEdit(item: ItemContract.Model) {

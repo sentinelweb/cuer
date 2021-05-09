@@ -50,7 +50,7 @@ class PlaylistsModelMapper constructor(
                     canPlay = pl.config.playable,
                     canDelete = pl.config.deletable,
                     canLaunch = pl.type == PLATFORM,
-                    canShare = pl.type == PLATFORM,
+                    canShare = pl.type != APP,
                     watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false,
                     pinned = pl.id == pinnedId,
                     default = pl.default,

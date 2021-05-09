@@ -101,7 +101,8 @@ interface PlaylistsContract {
                         remoteSearch = get(),
                         ytJavaApi = get(),
                         searchMapper = get(),
-                        merge = get()
+                        merge = get(),
+                        shareWrapper = get()
                     )
                 }
                 scoped { PlaylistsModelMapper(get()) }
