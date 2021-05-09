@@ -15,15 +15,13 @@ interface SearchImageContract {
 
     data class Model constructor(
         val term: String?,
-        val images: List<ImageDomain>,
-        val message: String?
+        val images: List<ImageDomain>
     )
 
     data class State constructor(
         var term: String? = null,
         var images: List<ImageDomain>? = null,
-        var config: Config? = null,
-        var message: String? = null
+        var config: Config? = null
     )
 
     data class Config(
@@ -34,8 +32,7 @@ interface SearchImageContract {
     class Mapper {
         fun map(state: State) = Model(
             term = state.term,
-            images = state.images ?: listOf(),
-            message = state.message
+            images = state.images ?: listOf()
         )
     }
 

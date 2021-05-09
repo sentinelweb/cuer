@@ -1,13 +1,13 @@
 package uk.co.sentinelweb.cuer.app.ui.search.image
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract.Model
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayInteractor
 
 class SearchImageViewModel(
@@ -21,24 +21,38 @@ class SearchImageViewModel(
         log.tag(this)
     }
 
-    var model: Model by mutableStateOf(mapper.map(state))
-        private set
+    data class UiEvent(
+        val type: Type,
+        val data: Any?
+    ) {
+        enum class Type { ERROR, LOADING }
+    }
+
+    private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
+    private val _modelLiveData: MutableLiveData<Model> = MutableLiveData()
+
+    fun getUiObservable(): LiveData<UiEvent> = _uiLiveData
+    fun getModelObservable(): LiveData<Model> = _modelLiveData
+
 
     fun onSearchTextChange(text: String) {
         state.term = text
-        model = mapper.map(state)
+        //_modelLiveData.value = mapper.map(state)
     }
 
     fun onSearch() {
         viewModelScope.launch {
+            _uiLiveData.value = UiEvent(UiEvent.Type.LOADING, true)
             state.term?.let {
                 pixabayInteractor.images(it)
                     .takeIf { it.isSuccessful }
                     ?.data
                     ?.also { state.images = it }
-                    ?.also { model = mapper.map(state) }
+                    ?.also { _modelLiveData.value = mapper.map(state) }
+                    .also { _uiLiveData.value = UiEvent(UiEvent.Type.LOADING, false) }
                     ?: let {
                         showError("Search Failed")
+                        _uiLiveData.value = UiEvent(UiEvent.Type.LOADING, false)
                         null
                     }
             } ?: let {
@@ -49,23 +63,17 @@ class SearchImageViewModel(
     }
 
     private fun showError(msg: String) {
-        state.message = msg
         log.e(msg)
-        model = mapper.map(state)
+        _uiLiveData.value = UiEvent(UiEvent.Type.ERROR, msg)
     }
 
-    fun onImageSelected(index: Int) {
-        state.images
-            ?.takeIf { index < (state.images?.size ?: 0) }
-            ?.get(index)
-            ?.apply {
-                state.config?.let { it.itemClick(this) }
-            }
-            ?: showError("Could get iamge")
+    fun onImageSelected(image: ImageDomain) {
+        state.config?.let { it.itemClick(image) }
     }
 
     fun setConfig(config: SearchImageContract.Config) {
         state.config = config
+        state.term = config.initialTerm
         onSearch()
     }
 
