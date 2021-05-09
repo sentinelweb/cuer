@@ -64,12 +64,13 @@ interface PlaylistsContract {
         var dragTo: Int? = null,
         var playlistStats: List<PlaylistStatDomain> = listOf(),
         var treeRoot: PlaylistTreeDomain = PlaylistTreeDomain(),
-        var treeCurrentNode: PlaylistTreeDomain = treeRoot,
+        var treeCurrentNodeId: Long? = null,
         var playlistsDisplay: List<PlaylistDomain> = listOf(),
         var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf()
     ) : ViewModel()
 
     data class Model(
+        val title: String,
         val imageUrl: String = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         val currentPlaylistId: Identifier<*>?, // todo non null?
         val showUp: Boolean,
@@ -103,7 +104,7 @@ interface PlaylistsContract {
                         merge = get()
                     )
                 }
-                scoped { PlaylistsModelMapper() }
+                scoped { PlaylistsModelMapper(get()) }
                 scoped { PlaylistsAdapter(get(), getSource()) }
                 scoped {
                     ItemTouchHelperCallback(

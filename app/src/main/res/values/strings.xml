@@ -30,7 +30,7 @@
     <string name="menu_playlist_mode_single">Single</string>
     <string name="menu_show_unlistened">Show unlistened</string>
     <string name="menu_edit">Edit</string>
-    <string name="menu_filter">Play</string>
+    <string name="menu_filter">Filter</string>
     <string name="menu_merge">Merge with &#8230;</string>
 
     <!-- share activity -->
@@ -113,6 +113,8 @@
     <!-- playlists & item -->
     <string name="pls_item_edit">Edit</string>
     <string name="pls_item_delete">Delete</string>
+    <string name="playlists_up_contentdesc">Up</string>
+    <string name="playlists_title">Playlists</string>
 
     <!-- dialogs -->
     <string name="playlist_dialog_add_playlist">Add playlist …</string>
@@ -145,7 +147,6 @@
     <string name="live">LIVE</string>
     <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
-    <string name="playlists_up_contentdesc">Up</string>
 
 
 </resources>

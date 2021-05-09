@@ -1,32 +1,36 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
-import uk.co.sentinelweb.cuer.domain.ext.buildLookup
 import uk.co.sentinelweb.cuer.domain.ext.descendents
 
-class PlaylistsModelMapper constructor() {
+class PlaylistsModelMapper constructor(
+    private val res: ResourceWrapper
+) {
 
     fun map(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         current: OrchestratorContract.Identifier<*>?,
         showOverflow: Boolean,
         pinnedId: Long?,
-        node: PlaylistTreeDomain?,
-        showUp: Boolean
+        nodeId: Long?,
+        treeLookup: Map<Long, PlaylistTreeDomain>
     ): PlaylistsContract.Model {
-        val treeLookup = node?.buildLookup()
         return PlaylistsContract.Model(
-            PLAYLISTS_HEADER_IMAGE,
+            treeLookup[nodeId]?.node?.title?.let { it + ": " + res.getString(R.string.playlists_title) }
+                ?: res.getString(R.string.playlists_title),
+            treeLookup[nodeId]?.node?.image?.url ?: PLAYLISTS_HEADER_IMAGE,
             current,
-            showUp,
+            nodeId != null,
             domains.keys.mapIndexed { index, pl ->
                 ItemContract.Model(
                     pl.id ?: throw Exception("Playlist must have an id"),
@@ -50,7 +54,7 @@ class PlaylistsModelMapper constructor() {
                     watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false,
                     pinned = pl.id == pinnedId,
                     default = pl.default,
-                    descendents = treeLookup?.get(pl.id)?.descendents() ?: 0
+                    descendents = treeLookup.get(pl.id)?.descendents() ?: 0
                 )
             }
         )

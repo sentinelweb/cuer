@@ -118,6 +118,7 @@ class PlaylistsFragment :
         adapter.currentPlaylistId = model.currentPlaylistId
         adapter.setData(model.items, animate)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
+        binding.playlistsCollapsingToolbar.title = model.title
     }
 
     override fun showUndo(msg: String, undo: () -> Unit) {

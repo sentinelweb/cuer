@@ -16,6 +16,9 @@ import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ext.buildLookup
+import uk.co.sentinelweb.cuer.domain.ext.buildTree
+import java.util.Locale.getDefault
 
 class PlaylistsDialogPresenter(
     private val view: PlaylistsDialogContract.View,
@@ -66,17 +69,25 @@ class PlaylistsDialogPresenter(
             state.channelSearchApplied = true
         }
 
+        val pinnedId = prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
         state.playlists = playlistOrchestrator.loadList(AllFilter(), LOCAL.flatOptions())
-            .sortedWith(compareBy({ !state.priorityPlaylistIds.contains(it.id) }, { !it.starred }, { it.title.toLowerCase() }))
+            .filter { it.config.editableItems }
+            .sortedWith(compareBy(
+                { it.id != pinnedId },
+                { !state.priorityPlaylistIds.contains(it.id) },
+                { !it.starred },
+                { it.title.toLowerCase(getDefault()) })
+            )
+            .apply { state.treeRoot = buildTree() }
+            .apply { state.treeLookup = state.treeRoot.buildLookup() }
 
         state.playlistStats = playlistStatsOrchestrator
             .loadList(IdListFilter(state.playlists.mapNotNull { it.id }), LOCAL.flatOptions())
 
-        val pinnedId = prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
             .let {
-                state.playlistsModel = modelMapper.map(it, null, false, pinnedId, null, false)
+                state.playlistsModel = modelMapper.map(it, null, false, pinnedId, null, state.treeLookup)
                 dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
             }
             .takeIf { coroutines.mainScopeActive }

@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
 interface PlaylistsDialogContract {
 
@@ -64,6 +65,8 @@ interface PlaylistsDialogContract {
         var playlistsModel: PlaylistsContract.Model? = null
     ) : ViewModel() {
         lateinit var config: Config
+        lateinit var treeRoot: PlaylistTreeDomain
+        lateinit var treeLookup: Map<Long, PlaylistTreeDomain>
     }
 
     data class Model(
@@ -93,7 +96,7 @@ interface PlaylistsDialogContract {
                         dialogModelMapper = get()
                     )
                 }
-                scoped { PlaylistsModelMapper() }
+                scoped { PlaylistsModelMapper(get()) }
                 scoped { PlaylistsDialogModelMapper() }
                 scoped { PlaylistsAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }

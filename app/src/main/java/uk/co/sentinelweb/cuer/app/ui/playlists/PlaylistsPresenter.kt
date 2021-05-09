@@ -88,7 +88,7 @@ class PlaylistsPresenter(
                                 multi = true,
                                 itemClick = { p, _ -> setParent(p!!, delPlaylist) },
                                 confirm = { },
-                                dismiss = { showChildNode() },
+                                dismiss = { showCurrentNode() },
                                 suggestionsMedia = null,
                                 showPin = false,
                             )
@@ -149,15 +149,15 @@ class PlaylistsPresenter(
         findPlaylist(item)
             ?.takeIf { state.treeLookup[it.id]?.chidren?.size ?: 0 > 0 }
             ?.also {
-                state.treeCurrentNode = state.treeLookup[it.id]!!
-                showChildNode()
+                state.treeCurrentNodeId = it.id
+                showCurrentNode()
             }
     }
 
     override fun onUpClicked() {
-        if (state.treeCurrentNode !== state.treeRoot) {
-            state.treeCurrentNode = state.treeCurrentNode.parent!!
-            showChildNode()
+        if (state.treeCurrentNodeId != null) {
+            state.treeCurrentNodeId = state.treeLookup[state.treeCurrentNodeId]?.let { it.parent?.node?.id }
+            showCurrentNode()
         }
     }
 
@@ -253,10 +253,8 @@ class PlaylistsPresenter(
             state.playlists = playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
                 .also {
                     state.treeRoot = it.buildTree()
-                    state.treeCurrentNode = state.treeRoot
                     state.treeLookup = state.treeRoot.buildLookup()
                 }
-                .sortedWith(compareBy({ !it.starred }, { it.title.toLowerCase(getDefault()) }))
                 .toMutableList()
                 .apply { add(0, newMedia.makeNewItemsHeader()) }
                 .apply { add(1, recentItems.makeRecentItemsHeader()) }
@@ -289,7 +287,7 @@ class PlaylistsPresenter(
 
             state.playlistsDisplay = buildDisplayList()
 
-            showChildNode()
+            showCurrentNode()
                 .takeIf { focusCurrent }
                 ?.let {
                     state.playlists.apply {
@@ -312,19 +310,21 @@ class PlaylistsPresenter(
         queue.playlistId,
         true,
         prefsWrapper.getLong(PINNED_PLAYLIST),
-        state.treeCurrentNode,
-        state.treeCurrentNode !== state.treeRoot
+        state.treeCurrentNodeId,
+        state.treeLookup
     )
 
     private fun buildDisplayList(): List<PlaylistDomain> =
-        if (state.treeCurrentNode == state.treeRoot) {
+        if (state.treeCurrentNodeId == null) {
+            val pinnedId = prefsWrapper.getLong(PINNED_PLAYLIST)
             state.playlists
-                .filter { it.type == APP || it.starred }
+                .filter { it.type == APP || it.starred || it.id == pinnedId }
+                .sortedWith(compareBy({ it.id != pinnedId }, { it.type != APP }, { !it.starred }, { it.title.toLowerCase(getDefault()) }))
                 .toMutableList()
                 .let { list -> list to (list.map { it.id }.toSet()) }
                 .let { (list, idset) ->
                     list.addAll(
-                        state.treeCurrentNode.chidren
+                        state.treeRoot.chidren
                             .filter { !idset.contains(it.node!!.id) }
                             .map { it.node!! }
                             .sortedBy { it.title.toLowerCase(getDefault()) }
@@ -332,12 +332,13 @@ class PlaylistsPresenter(
                     list
                 }
         } else {
-            state.treeCurrentNode.chidren
-                .map { it.node!! }
-                .sortedBy { it.title.toLowerCase(getDefault()) }
+            state.treeLookup[state.treeCurrentNodeId]?.chidren
+                ?.map { it.node!! }
+                ?.sortedBy { it.title.toLowerCase(getDefault()) }
+                ?: listOf()
         }
 
-    private fun showChildNode() {
+    private fun showCurrentNode() {
         state.playlistsDisplay = buildDisplayList()
         state.playlistsDisplay
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }

@@ -73,7 +73,7 @@
                 android:background="@android:color/transparent"
                 android:elevation="0dp"
                 app:layout_collapseMode="pin"
-                app:title="@string/bottomnav_title_playlists"
+                app:title="@string/playlists_title"
                 app:menu="@menu/playlists_actionbar"
                 />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
