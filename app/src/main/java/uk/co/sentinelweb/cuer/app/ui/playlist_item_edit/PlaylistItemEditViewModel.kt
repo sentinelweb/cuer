@@ -224,7 +224,7 @@ class PlaylistItemEditViewModel constructor(
                 this@PlaylistItemEditViewModel::onPlaylistDialogClose,
                 state.media,
                 showAdd = true,
-                showPin = false
+                showPin = true
             )
     }
 

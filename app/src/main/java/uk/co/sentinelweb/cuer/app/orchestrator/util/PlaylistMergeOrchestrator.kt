@@ -5,7 +5,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 
 class PlaylistMergeOrchestrator constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
@@ -18,9 +19,10 @@ class PlaylistMergeOrchestrator constructor(
     fun checkMerge(toDelete: PlaylistDomain, toReceive: PlaylistDomain): Boolean =
         (toDelete.config.updateUrl == null || toReceive.config.updateUrl == null)
                 && toDelete.id != null && toReceive.id != null
-                && toDelete.type != APP && toReceive.type != APP
                 && toDelete.id != toReceive.id
-                && ((toDelete.type == PLATFORM && toReceive.type == USER) || (toDelete.type == USER && toReceive.type == PLATFORM))
+                && ((toDelete.type == PLATFORM && toReceive.type == USER && toDelete.platformId != null) ||
+                (toDelete.type == USER && toReceive.type == PLATFORM && toReceive.platformId != null) ||
+                (toDelete.type == USER && toReceive.type == USER))
 
     suspend fun merge(toDelete: PlaylistDomain, toReceive: PlaylistDomain): PlaylistDomain {
         if (!checkMerge(toDelete, toReceive)) throw IllegalArgumentException("Cannot merge these playlists")
