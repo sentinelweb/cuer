@@ -20,7 +20,7 @@ import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
+import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
@@ -38,7 +38,7 @@ class YoutubeVideosRetrofitInteractorTest : KoinComponent {
     private lateinit var mockService: YoutubeService
 
     @MockK
-    private lateinit var mockKeyProvider: YoutubeApiKeyProvider
+    private lateinit var mockKeyProvider: ApiKeyProvider
 
     @MockK
     private lateinit var mockVideoMapper: YoutubeVideoMediaDomainMapper

@@ -8,10 +8,10 @@ import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
+import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.exception.InvalidPartsException
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService.Companion.MAX_RESULTS
@@ -31,7 +31,7 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainM
  * todo categories : https://www.googleapis.com/youtube/v3/videoCategories?regionCode=uk&key=
  */
 internal class YoutubeRetrofitInteractor constructor(
-    private val keyProvider: YoutubeApiKeyProvider,
+    private val keyProvider: ApiKeyProvider,
     private val service: YoutubeService,
     private val videoMapper: YoutubeVideoMediaDomainMapper,
     private val channelMapper: YoutubeChannelDomainMapper,

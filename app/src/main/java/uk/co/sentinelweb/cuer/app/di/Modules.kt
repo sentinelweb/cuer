@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
+import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
@@ -60,9 +61,11 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.di.DomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
+import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
-import uk.co.sentinelweb.cuer.net.youtube.YoutubeApiKeyProvider
+import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
+import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
 
 object Modules {
 
@@ -157,7 +160,9 @@ object Modules {
     }
 
     private val appNetModule = module {
-        factory<YoutubeApiKeyProvider> { CuerYoutubeApiKeyProvider() }
+        factory<ApiKeyProvider>(named(YOUTUBE)) { CuerYoutubeApiKeyProvider() }
+        factory<ApiKeyProvider>(named(PIXABAY)) { CuerPixabayApiKeyProvider() }
+        factory<ApiKeyProvider> { CuerYoutubeApiKeyProvider() }
         single { NetModuleConfig(debug = BuildConfig.DEBUG) }
     }
 

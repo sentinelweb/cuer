@@ -10,6 +10,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
+import uk.co.sentinelweb.cuer.net.pixabay.PixabayService
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import java.util.concurrent.TimeUnit
 
@@ -48,8 +49,24 @@ internal class RetrofitBuilder constructor(
     internal fun buildYoutubeService(retrofit: Retrofit): YoutubeService =
         retrofit.create(YoutubeService::class.java)
 
+    internal fun buildPixabayClient() = Retrofit.Builder()
+        .baseUrl(PIXABAY_BASE)
+        .addConverterFactory(GsonConverterFactory.create())
+        // todo try this
+//        .addConverterFactory(
+//            Json{ignoreUnknownKeys = true; isLenient = true}.asConverterFactory(
+//                CONTENT_TYPE
+//            )
+//        )
+        .client(buildOkHttpClient())
+        .build()
+
+    internal fun buildPixabayService(retrofit: Retrofit): PixabayService =
+        retrofit.create(PixabayService::class.java)
+
     internal companion object {
         private const val YOUTUBE_BASE = "https://www.googleapis.com/youtube/v3/"
+        private const val PIXABAY_BASE = "https://pixabay.com/api/"
         private val CONTENT_TYPE = "application/json".toMediaType()
 
         val PRINT_URL_INTERCEPTOR = object : Interceptor {

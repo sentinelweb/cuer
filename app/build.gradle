@@ -25,6 +25,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "youtubeApiKey", "\"$CUER_YOUTUBE_API_KEY\""
+        buildConfigField "String", "pixabayApiKey", "\"$CUER_PIXABAY_API_KEY\""
 
         javaCompileOptions {
             annotationProcessorOptions {

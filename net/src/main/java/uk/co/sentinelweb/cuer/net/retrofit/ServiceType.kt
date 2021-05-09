@@ -1,5 +1,5 @@
 package uk.co.sentinelweb.cuer.net.retrofit
 
-internal enum class ServiceType {
-    YOUTUBE
+enum class ServiceType {
+    YOUTUBE, PIXABAY
 }
