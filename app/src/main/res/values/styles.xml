@@ -142,6 +142,8 @@
         <item name="android:layout_margin">@dimen/list_item_margin</item>
         <item name="android:background">@drawable/ic_ripple_item_background</item>
         <item name="android:elevation">@dimen/list_item_elevation</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/itemview_icon_height</item>
     </style>
 
     <style name="ItemView.Background">
@@ -171,8 +173,8 @@
     </style>
 
     <style name="ItemView.Thumb.Row">
-        <item name="android:layout_width">100dp</item>
-        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_width">@dimen/itemview_icon_width</item>
+        <item name="android:layout_height">@dimen/itemview_icon_height</item>
         <item name="android:background">@color/surface</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
     </style>
@@ -191,10 +193,10 @@
         <item name="android:paddingBottom">2dp</item>
         <item name="android:paddingEnd">4dp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:lineSpacingExtra">-2dp</item>
+        <item name="android:lineSpacingExtra">-4dp</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:ellipsize">end</item>
-        <item name="android:maxLines">2</item>
+        <item name="android:maxLines">3</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
         <item name="android:textScaleX">?headlineFontXScaling</item>
@@ -320,4 +322,7 @@
         <item name="android:minWidth">48dp</item>
         <item name="android:minHeight">48dp</item>
     </style>
+
+    <dimen name="itemview_icon_height">72dp</dimen>
+    <dimen name="itemview_icon_width">128dp</dimen>
 </resources>

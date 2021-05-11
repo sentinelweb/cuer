@@ -29,7 +29,6 @@
         android:id="@+id/listitem"
         style="@style/ItemView.Container"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
         >
 
         <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView

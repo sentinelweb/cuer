@@ -13,13 +13,13 @@
     <dimen name="chip_icon_size">16dp</dimen>
 
     <dimen name="list_item_padding">4dp</dimen>
-    <dimen name="list_item_margin">8dp</dimen>
+    <dimen name="list_item_margin">0dp</dimen>
     <dimen name="list_item_swipe_margin">8dp</dimen>
     <dimen name="list_item_elevation">2dp</dimen>
     <dimen name="list_item_swipe_dismiss_dist">100dp</dimen>
     <dimen name="list_item_swipe_dismiss_tolerance">4dp</dimen>
     <dimen name="list_item_height">76dp</dimen>
-    <dimen name="list_item_top_text_size">14sp</dimen>
+    <dimen name="list_item_top_text_size">15sp</dimen>
     <dimen name="list_item_bottom_text_size">13sp</dimen>
     <dimen name="list_item_progress_height">4dp</dimen>
     <dimen name="item_swipe_icon_size">28dp</dimen>
