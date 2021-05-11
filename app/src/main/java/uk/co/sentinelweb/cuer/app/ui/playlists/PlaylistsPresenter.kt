@@ -160,6 +160,7 @@ class PlaylistsPresenter(
                 state.treeCurrentNodeId = it.id
                 showCurrentNode()
             }
+            ?: findPlaylist(item)?.apply { view.gotoPlaylist(id!!, false, item.source) }
     }
 
     override fun onUpClicked() {

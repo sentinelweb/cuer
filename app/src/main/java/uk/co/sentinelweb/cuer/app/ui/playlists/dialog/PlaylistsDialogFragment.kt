@@ -53,14 +53,6 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
         presenter.setConfig(config)
     }
 
-    override fun onImageClick(item: ItemContract.Model) {
-
-    }
-
-    override fun onEdit(item: ItemContract.Model) {
-
-    }
-
     override fun updateDialogModel(model: PlaylistsDialogContract.Model) {
         updateDialogNoList(model)
     }
@@ -147,6 +139,15 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     override fun onMerge(item: ItemContract.Model) {
 
     }
+
+    override fun onImageClick(item: ItemContract.Model) {
+        presenter.onItemClicked(item)
+    }
+
+    override fun onEdit(item: ItemContract.Model) {
+
+    }
+
     //endregion
 
     companion object {
