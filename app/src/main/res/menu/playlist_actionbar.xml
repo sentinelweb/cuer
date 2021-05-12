@@ -93,4 +93,14 @@
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="always"
         />
+
+    <item
+        android:id="@+id/playlist_children"
+        android:icon="@drawable/ic_tree_24"
+        android:orderInCategory="170"
+        android:title="@string/menu_show_children"
+        android:visible="true"
+        app:iconTint="@color/menu_button_icon_tint"
+        app:showAsAction="ifRoom"
+        />
 </menu>

@@ -89,6 +89,8 @@ class PlaylistFragment :
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_filter)
     private val searchMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_search)
+    private val childrenMenuItem: MenuItem
+        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_children)
     private val modeMenuItems: List<MenuItem>
         get() = listOf( // same order as the enum in PlaylistDomain
             binding.playlistToolbar.menu.findItem(R.id.playlist_mode_single),
@@ -189,6 +191,7 @@ class PlaylistFragment :
         newMenuItem.setOnMenuItemClickListener { presenter.onFilterNewItems() }
         editMenuItem?.setOnMenuItemClickListener { presenter.onEdit() }
         filterMenuItem.setOnMenuItemClickListener { presenter.onFilterPlaylistItems() }
+        childrenMenuItem.setOnMenuItemClickListener { presenter.onShowChildren() }
         if (menuState.reloadHeaderAfterMenuInit) {
             presenter.reloadHeader()
             menuState.reloadHeaderAfterMenuInit = false
@@ -307,11 +310,14 @@ class PlaylistFragment :
         starMenuItem?.setIcon(model.starredIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
         editMenuItem?.isVisible = model.canEdit
         starMenuItem?.isVisible = model.canEdit
-        binding.playlistFlags.isVisible = model.isDefault || model.isPlayFromStart || model.isPinned
+        childrenMenuItem?.isVisible = model.hasChildren > 0
+        binding.playlistFlags.isVisible = model.isDefault || model.isPlayFromStart || model.isPinned || model.hasChildren > 0
         binding.playlistFlagDefault.isVisible = model.isDefault
         binding.playlistFlagPlayStart.isVisible = model.isPlayFromStart
         binding.playlistFlagPinned.isVisible = model.isPinned
         binding.playlistFabPlaymode.setImageResource(model.loopModeIcon)
+        binding.playlistFlagChildren.isVisible = model.hasChildren > 0
+        binding.playlistFlagChildren.text = model.hasChildren.toString()
         menuState.lastPlayModeIndex = model.loopModeIndex
         menuState.isPlayable = model.canPlay
         updatePlayModeMenuItems()

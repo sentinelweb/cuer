@@ -70,8 +70,10 @@ class PlaylistsPresenter(
         //state.addedMedia = mediaDomain
     }
 
-    override fun onResume() {
+    override fun onResume(parentId: Long?) {
+        state.treeCurrentNodeId = parentId
         state.viewModelScope.launch { executeRefresh(true) }
+
         // todo a better job - might refresh too much
         // todo listen for stat changes
         playlistOrchestrator.updates

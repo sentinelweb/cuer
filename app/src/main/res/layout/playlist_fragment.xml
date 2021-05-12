@@ -73,8 +73,8 @@
 
                 <ImageView
                     android:id="@+id/playlist_flag_default"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="@dimen/flag_size"
+                    android:layout_height="@dimen/flag_size"
                     android:contentDescription="@string/default_playlist"
                     android:padding="2dp"
                     android:src="@drawable/ic_playlist_default_black"
@@ -84,8 +84,8 @@
 
                 <ImageView
                     android:id="@+id/playlist_flag_play_start"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="@dimen/flag_size"
+                    android:layout_height="@dimen/flag_size"
                     android:contentDescription="@string/playlist_play_items_from_start"
                     android:padding="2dp"
                     android:src="@drawable/ic_play_start_black"
@@ -95,14 +95,30 @@
 
                 <ImageView
                     android:id="@+id/playlist_flag_pinned"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="@dimen/flag_size"
+                    android:layout_height="@dimen/flag_size"
                     android:contentDescription="@string/menu_pin"
                     android:padding="2dp"
                     android:src="@drawable/ic_push_pin_on_24"
                     android:visibility="gone"
                     app:tint="@color/white"
                     />
+
+                <TextView
+                    android:id="@+id/playlist_flag_children"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/flag_size"
+                    android:drawablePadding="2dp"
+                    android:gravity="top"
+                    android:padding="2dp"
+                    android:textAppearance="@style/TextAppearance.App.Caption"
+                    android:textColor="@color/white"
+                    android:visibility="gone"
+                    app:drawableStartCompat="@drawable/ic_tree_flag_20"
+                    app:drawableTint="@color/white"
+                    tools:text="3"
+                    />
+
             </LinearLayout>
 
             <View

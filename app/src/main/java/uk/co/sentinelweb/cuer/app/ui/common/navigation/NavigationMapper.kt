@@ -61,16 +61,24 @@ class NavigationMapper constructor(
                     PLAY_NOW.name to nav.params[PLAY_NOW],
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                navOptions(optionsBuilder = {
+                nav.navOpts ?: navOptions(optionsBuilder = {// todo remove
                     launchSingleTop = true
                     popUpTo(R.id.navigation_playlist, { inclusive = true })
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+            PLAYLISTS_FRAGMENT -> navController.navigate(
+                R.id.navigation_playlists,
+                bundleOf(
+                    PLAYLIST_ID.name to nav.params[PLAYLIST_ID]
+                ),
+                nav.navOpts,
+                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
+            )
             PLAYLIST_ITEM_FRAGMENT -> navController.navigate(
                 R.id.navigation_playlist_item_edit,
                 bundleOf(PLAYLIST_ITEM.name to (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain).serialise()),
-                navOptions(optionsBuilder = {
+                nav.navOpts ?: navOptions(optionsBuilder = {// todo remove
                     launchSingleTop = true
                     popUpTo(R.id.navigation_playlist_edit, { inclusive = true })
                 }),
