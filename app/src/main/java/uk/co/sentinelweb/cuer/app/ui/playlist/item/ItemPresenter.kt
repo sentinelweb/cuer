@@ -41,6 +41,8 @@ class ItemPresenter(
         interactions.onRightSwipe(state.item!!)
     }
 
+    override fun isCompositePlaylist(): Boolean = state.item!!.playlistName != null
+
     override fun isStarred(): Boolean = state.item!!.starred
 
     override fun canDragLeft(): Boolean = state.item?.canDelete ?: false
@@ -57,6 +59,10 @@ class ItemPresenter(
 
     override fun doPlay(external: Boolean) {
         interactions.onPlay(state.item!!, external)
+    }
+
+    override fun doGotoPlaylist() {
+        interactions.onGotoPlaylist(state.item!!)
     }
 
     override fun doShowChannel() {

@@ -197,9 +197,8 @@
         <item name="android:lineSpacingExtra">-4dp</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">3</item>
-        <!--        <item name="fontFamily">?headlineFont</item>-->
-        <!--        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>-->
-        <!--        <item name="android:textScaleX">?headlineFontXScaling</item>-->
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
     </style>
 
     <style name="ItemView.BottomText" parent="@style/TextAppearance.AppCompat.Small">

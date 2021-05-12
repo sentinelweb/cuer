@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestra
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLISTS_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -379,7 +380,7 @@ class PlaylistPresenter(
         state.playlist?.id?.also {
             view.navigate(
                 NavigationModel(
-                    PLAYLISTS_FRAGMENT, mapOf(NavigationModel.Param.PLAYLIST_ID to it)
+                    PLAYLISTS_FRAGMENT, mapOf(PLAYLIST_ID to it)
                 )
             )
         }
@@ -416,11 +417,7 @@ class PlaylistPresenter(
                 view.navigate(
                     NavigationModel(
                         NavigationModel.Target.PLAYLIST_FRAGMENT,
-                        mapOf(
-                            NavigationModel.Param.PLAYLIST_ID to REMOTE_SEARCH_PLAYLIST,
-                            NavigationModel.Param.PLAY_NOW to false,
-                            NavigationModel.Param.SOURCE to MEMORY
-                        )
+                        mapOf(PLAYLIST_ID to REMOTE_SEARCH_PLAYLIST, PLAY_NOW to false, SOURCE to MEMORY)
                     )
                 )
 
@@ -431,6 +428,19 @@ class PlaylistPresenter(
         playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 shareWrapper.share(itemDomain.media)
+            }
+    }
+
+    override fun onItemGotoPlaylist(item: ItemContract.Model) {
+        playlistItemDomain(item)
+            ?.playlistId
+            ?.let {
+                view.navigate(
+                    NavigationModel(
+                        NavigationModel.Target.PLAYLIST_FRAGMENT,
+                        mapOf(PLAYLIST_ID to it, PLAY_NOW to false, SOURCE to LOCAL)
+                    )
+                )
             }
     }
 
@@ -714,12 +724,13 @@ class PlaylistPresenter(
         state.playlist = state.playlist?.let {
             it.copy(items = it.items.toMutableList().apply { set(index, changedItem) })
         }
-        val mappedItem = modelMapper.map(
+        val mappedItem = modelMapper.mapItem(
             modelId, changedItem, index,
             state.playlist?.config?.editableItems ?: false,
             state.playlist?.config?.deletableItems ?: false,
             state.playlist?.config?.editable ?: false,
             playlists = state.playlistsTreeLookup,
+            currentPlaylistId = state.playlist?.id
         )
         state.model = state.model?.let {
             it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })

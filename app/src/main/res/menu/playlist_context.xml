@@ -51,10 +51,18 @@
         android:title="@string/playlist_item_menu_share"
         app:iconTint="?contextMenuItemColor"
         />
+
     <item
         android:id="@+id/playlist_context_related"
         android:icon="@drawable/ic_baseline_search_24"
         android:title="@string/playlist_item_menu_related"
+        app:iconTint="?contextMenuItemColor"
+        />
+
+    <item
+        android:id="@+id/playlist_goto_playlist"
+        android:icon="@drawable/ic_playlist_black"
+        android:title="@string/playlist_item_menu_goto_playlist"
         app:iconTint="?contextMenuItemColor"
         />
 </menu>

@@ -506,6 +506,10 @@ class PlaylistFragment :
     override fun onShare(item: ItemContract.Model) {
         presenter.onItemShare(item)
     }
+
+    override fun onGotoPlaylist(item: ItemContract.Model) {
+        presenter.onItemGotoPlaylist(item)
+    }
     // endregion
 
     // region ItemContract.Interactions

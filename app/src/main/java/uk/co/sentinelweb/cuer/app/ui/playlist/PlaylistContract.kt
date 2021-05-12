@@ -47,6 +47,7 @@ interface PlaylistContract {
         fun onItemShare(itemModel: ItemContract.Model)
         fun onPlayStartClick(itemModel: ItemContract.Model)
         fun onItemViewClick(itemModel: ItemContract.Model)
+        fun onItemGotoPlaylist(item: ItemContract.Model)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun scroll(direction: ScrollDirection)
         fun undoDelete()

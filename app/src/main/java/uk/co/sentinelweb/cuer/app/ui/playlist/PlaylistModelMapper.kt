@@ -61,14 +61,15 @@ class PlaylistModelMapper constructor(
                 domain.items.mapIndexed { index, item ->
                     val modelId = item.id ?: modelIdGenerator
                     itemsIdMap[modelId] = item
-                    map(
+                    mapItem(
                         modelId,
                         item,
                         index,
                         domain.config.editableItems,
                         domain.config.deletableItems,
                         domain.config.editable,
-                        playlists
+                        playlists,
+                        domain.id
                     )
                 }
             } else {
@@ -79,14 +80,15 @@ class PlaylistModelMapper constructor(
         )
     }
 
-    fun map(
+    fun mapItem(
         modelId: Long,
         item: PlaylistItemDomain,
         index: Int,
         canEdit: Boolean,
         canDelete: Boolean,
         canReorder: Boolean,
-        playlists: Map<Long, PlaylistTreeDomain>?
+        playlists: Map<Long, PlaylistTreeDomain>?,
+        currentPlaylistId: Long?
     ): ItemContract.Model {
         val top = item.media.title ?: "No title"
         val pos = item.media.positon?.toFloat() ?: 0f
@@ -120,7 +122,9 @@ class PlaylistModelMapper constructor(
             infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media),
             canEdit = canEdit,
             canDelete = canDelete,
-            playlistName = playlists?.get(item.playlistId)?.node?.title,
+            playlistName = item.playlistId?.let {
+                if (it != currentPlaylistId) playlists?.get(it)?.node?.title else null
+            },
             canReorder = canReorder
         )
     }

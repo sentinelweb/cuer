@@ -36,9 +36,11 @@ interface ItemContract {
         fun doRelated()
         fun doView()
         fun doPlayStartClick()
+        fun doGotoPlaylist()
         fun updateProgress()
         fun isViewForId(id: Long): Boolean
         fun isStarred(): Boolean
+        fun isCompositePlaylist(): Boolean
     }
 
     interface External : ItemBaseContract.ItemPresenterBase {
@@ -58,6 +60,7 @@ interface ItemContract {
         fun onShare(item: Model)
         fun onView(item: Model)
         fun onPlayStartClick(item: Model)
+        fun onGotoPlaylist(item: Model)
     }
 
     data class Model(
