@@ -40,7 +40,7 @@ class ResourceWrapperTest {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         whenever(mockContext.resources).thenReturn(mockResources)
         whenever(mockResources.displayMetrics).thenReturn(displayMetrics)
 

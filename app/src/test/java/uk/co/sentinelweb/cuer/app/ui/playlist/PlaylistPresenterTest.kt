@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -114,7 +115,7 @@ class PlaylistPresenterTest {
 
     private lateinit var fixtNextPlaylist: PlaylistDomain
     private lateinit var fixtNextIdentifier: Identifier<Long>
-    private val fixtNextSource: Source = Source.LOCAL
+    private val fixtNextSource: Source = LOCAL
     private val fixtNextCurrentIndex: Int = 5
     private lateinit var fixtNextPlaylistMapped: PlaylistContract.Model
 
@@ -148,9 +149,10 @@ class PlaylistPresenterTest {
             .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(10))
         fixtCurrentIdentifier = Identifier(fixtCurrentPlaylist.id!!, fixtCurrentSource)
         coEvery {
-            mockPlaylistOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id, Options(fixtCurrentIdentifier.source, flat = false))
+            mockPlaylistOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id, fixtCurrentIdentifier.source.flatOptions())
         } returns (fixtCurrentPlaylist to fixtCurrentSource)
-        every { mockModelMapper.map(any(), any(), true, fixtCurrentIdentifier, any(), null) } returns fixtCurrentPlaylistMapped
+        log.d("cuurrent: id:${fixtCurrentIdentifier.id} opts:${fixtCurrentIdentifier.source.flatOptions()}")
+        every { mockModelMapper.map(any(), any(), true, fixtCurrentIdentifier, any(), any()) } returns fixtCurrentPlaylistMapped
 
 
         // next
@@ -164,12 +166,16 @@ class PlaylistPresenterTest {
         fixtNextPlaylistMapped = fixture.build<PlaylistContract.Model>()
             .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(12))
         coEvery {
-            mockPlaylistOrchestrator.getPlaylistOrDefault(fixtNextIdentifier.id, Options(fixtNextIdentifier.source, flat = false))
+            mockPlaylistOrchestrator.getPlaylistOrDefault(fixtNextIdentifier.id, fixtNextIdentifier.source.flatOptions())
         } returns (fixtNextPlaylist to fixtNextSource)
-        every { mockModelMapper.map(any(), any(), true, fixtNextIdentifier, any(), null) } returns fixtNextPlaylistMapped
+        every { mockModelMapper.map(any(), any(), true, fixtNextIdentifier, any(), any()) } returns fixtNextPlaylistMapped
 
         // fixme this *should* work for app playlists (executeRefresh.if (it.first.type == APP) {)
         //coEvery{mockPlaylistOrchestrator.loadList(AllFilter(), Options(Source.LOCAL))} returns listOf(fixtCurrentPlaylist)
+
+        coEvery {
+            mockPlaylistOrchestrator.loadList(any<AllFilter>(), LOCAL.flatOptions())
+        } returns listOf()// fixme: problems building the tree will need pt play with data
 
         // orchestrator
         fixtPlaylistOrchestratorFlow = MutableSharedFlow()
@@ -377,7 +383,7 @@ class PlaylistPresenterTest {
                 id = fixtCurrentPlaylist.items.get(replaceItemIndex).id,
                 playlistId = fixtCurrentPlaylist.id?.let { it + 100L }
             )
-            val nextItem = fixtCurrentPlaylist.items.get(replaceItemIndex + 1)
+            //val nextItem = fixtCurrentPlaylist.items.get(replaceItemIndex + 1)
 
             // test
             fixtPlaylistItemOrchestratorFlow
@@ -477,7 +483,7 @@ class PlaylistPresenterTest {
                 id = fixtCurrentPlaylist.items.get(deleteItemIndex).id,
                 playlistId = fixtCurrentPlaylist.id?.let { it + 100L }
             )
-            val expectedPlayingAfter = fixtCurrentPlaylist.items.get(deleteItemIndex + 1)
+            //val expectedPlayingAfter = fixtCurrentPlaylist.items.get(deleteItemIndex + 1)
             // test
             fixtPlaylistItemOrchestratorFlow
                 .emit((Operation.DELETE to fixtCurrentSource then fixtChanged))
@@ -646,7 +652,7 @@ class PlaylistPresenterTest {
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
-                mockPlaylistItemOrchestrator.delete(deletedItem, Source.LOCAL.flatOptions())
+                mockPlaylistItemOrchestrator.delete(deletedItem, LOCAL.flatOptions())
             }
             verify { mockView.setModel(fixtExpectedMapped) }
             assertThat(fixtState!!.deletedPlaylistItem).isEqualTo(deletedItem)
@@ -684,7 +690,7 @@ class PlaylistPresenterTest {
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtExpectedPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtCurrentIdentifier)
             assertThat(movedItem.id).isEqualTo(fixtExpectedChangedItem.id)
-            verify { mockModelMapper.map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify { mockModelMapper.map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), any()) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
@@ -709,7 +715,7 @@ class PlaylistPresenterTest {
             // verify
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtCurrentPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtCurrentIdentifier)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), any()) }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtCurrentPlaylist.currentIndex) }
@@ -731,7 +737,7 @@ class PlaylistPresenterTest {
             // verify
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtNextPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtNextIdentifier)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), null) }
+            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), any()) }
             verify { mockView.setModel(fixtNextPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtNextPlaylist.currentIndex) }
@@ -753,7 +759,7 @@ class PlaylistPresenterTest {
             // verify
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtNextPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtNextIdentifier)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), null) }
+            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), any()) }
             verify { mockView.setModel(fixtNextPlaylistMapped) }
             verify { mockView.scrollToItem(selectedItemIndex) }
             verify { mockView.highlightPlayingItem(fixtNextPlaylist.currentIndex) }
@@ -779,7 +785,7 @@ class PlaylistPresenterTest {
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtNextPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtNextIdentifier)
             coVerify { mockQueue.playNow(fixtNextIdentifier, plItem.id) }
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), null) }
+            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), any()) }
             verify { mockView.setModel(fixtNextPlaylistMapped) }
             verify { mockView.scrollToItem(selectedItemIndex) }
             verify { mockView.highlightPlayingItem(selectedItemIndex) } // comes from emitter
@@ -805,7 +811,7 @@ class PlaylistPresenterTest {
                     true,
                     fixtCurrentIdentifier,
                     any(),
-                    null
+                    any()
                 )
             } returns fixtExpectedMapped //
             log.d("before:${fixtCurrentPlaylist.scanOrder()}")
@@ -819,11 +825,11 @@ class PlaylistPresenterTest {
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtExpectedPlaylist)
             assertThat(fixtState!!.playlist!!.currentIndex).isEqualTo(fixtCurrentCurentIndex + 1)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtCurrentIdentifier)
-            verify { mockModelMapper.map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify { mockModelMapper.map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), any()) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
-                mockPlaylistItemOrchestrator.save(deletedItem, Source.LOCAL.flatOptions())
+                mockPlaylistItemOrchestrator.save(deletedItem, LOCAL.flatOptions())
             }
             verify { mockView.setModel(fixtExpectedMapped) }
             assertThat(fixtState!!.deletedPlaylistItem).isNull()
