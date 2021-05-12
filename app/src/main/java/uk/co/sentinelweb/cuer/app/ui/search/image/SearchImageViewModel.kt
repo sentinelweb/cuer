@@ -27,44 +27,41 @@ class SearchImageViewModel(
         val type: Type,
         val data: Any?
     ) {
-        enum class Type { ERROR, LOADING }
+        enum class Type { ERROR }
     }
 
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
-    //private val _modelLiveData: MutableLiveData<Model> = MutableLiveData()
 
     fun getUiObservable(): LiveData<UiEvent> = _uiLiveData
 
-    //fun getModelObservable(): LiveData<Model> = _modelLiveData
-    var modelState: SearchImageContract.Model by mutableStateOf(mapper.map(state))
+    var searchState: SearchImageContract.SearchModel by mutableStateOf(mapper.mapSearch(state))
         private set
-    var loadingState: Boolean by mutableStateOf(false)
+    var resultsState: SearchImageContract.ResultsModel by mutableStateOf(mapper.mapResults(state))
         private set
 
     fun onSearchTextChange(text: String) {
         state.term = text
-        //_modelLiveData.value = mapper.map(state)
+        searchState = mapper.mapSearch(state)
     }
 
     fun onSearch() {
         viewModelScope.launch {
-            //_uiLiveData.value = UiEvent(UiEvent.Type.LOADING, true)
-            loadingState = true
+            state.loading = true
+            searchState = mapper.mapSearch(state)
             state.term?.let {
                 pixabayInteractor.images(it)
                     .takeIf { it.isSuccessful }
                     ?.data
                     ?.also { state.images = it }
-                    //?.also { _modelLiveData.value = mapper.map(state) }
-                    ?.also { modelState = mapper.map(state) }
+                    ?.also { resultsState = mapper.mapResults(state) }
                     .also {
-//                        _uiLiveData.value = UiEvent(UiEvent.Type.LOADING, false)
-                        loadingState = false
+                        state.loading = false
+                        searchState = mapper.mapSearch(state)
                     }
                     ?: let {
                         showError("Search Failed")
-                        //_uiLiveData.value = UiEvent(UiEvent.Type.LOADING, false)
-                        loadingState = false
+                        state.loading = false
+                        searchState = mapper.mapSearch(state)
                         null
                     }
             } ?: let {

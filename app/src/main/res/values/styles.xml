@@ -188,18 +188,18 @@
 
     <style name="ItemView.TopText" parent="@style/TextAppearance.MaterialComponents.Body1">
         <item name="android:textSize">@dimen/list_item_top_text_size</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Subtitle2</item>
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingTop">0dp</item>
         <item name="android:paddingBottom">2dp</item>
         <item name="android:paddingEnd">4dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:lineSpacingExtra">-4dp</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">3</item>
-        <item name="fontFamily">?headlineFont</item>
-        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
-        <item name="android:textScaleX">?headlineFontXScaling</item>
+        <!--        <item name="fontFamily">?headlineFont</item>-->
+        <!--        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>-->
+        <!--        <item name="android:textScaleX">?headlineFontXScaling</item>-->
     </style>
 
     <style name="ItemView.BottomText" parent="@style/TextAppearance.AppCompat.Small">

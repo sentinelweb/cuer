@@ -149,7 +149,7 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$ver_glide"
     annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
     kapt "com.github.bumptech.glide:compiler:$ver_glide"
-    // this is causing some weird compose crashes
+
     implementation ("com.google.accompanist:accompanist-glide:$ver_glide_accompanist"){
         exclude group:"androidx.compose.runtime"
         exclude group:"androidx.compose.ui"

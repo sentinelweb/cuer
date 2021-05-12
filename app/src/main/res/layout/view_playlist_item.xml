@@ -13,6 +13,7 @@
         android:background="?colorMove"
         android:text="@string/pl_item_move"
         app:drawableLeftCompat="@drawable/ic_item_playlist_move_white"
+        android:layout_marginBottom="4dp"
         tools:ignore="RtlHardcoded,RtlSymmetry"
         />
 
@@ -22,6 +23,7 @@
         android:background="?colorDelete"
         android:text="@string/pl_item_delete"
         app:drawableRightCompat="@drawable/ic_item_delete_white"
+        android:layout_marginBottom="4dp"
         tools:ignore="RtlHardcoded,RtlSymmetry"
         />
 
