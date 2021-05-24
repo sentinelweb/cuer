@@ -2,6 +2,10 @@ apply plugin: 'java-library'
 apply plugin: 'kotlin'
 apply plugin: "org.jetbrains.kotlin.jvm"
 
+compileKotlin {
+    kotlinOptions.jvmTarget = ver_jvm
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"

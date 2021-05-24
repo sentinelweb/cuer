@@ -3,6 +3,10 @@ apply plugin: 'kotlin'
 apply plugin: "org.jetbrains.kotlin.jvm"
 apply plugin: 'kotlinx-serialization'
 
+compileKotlin {
+    kotlinOptions.jvmTarget = ver_jvm
+}
+
 dependencies {
     api project(":domain")
     api project(":core")

@@ -48,7 +48,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = ver_jvm
         useIR = true
         // byoass compose kotlin version compatability check
         // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
