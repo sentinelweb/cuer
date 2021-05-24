@@ -8,6 +8,7 @@ plugins {
 version = "1.0"
 
 kotlin {
+    jvm()
     js {
         //browser()// use in usage lib
     }
@@ -17,6 +18,7 @@ kotlin {
         val commonMain by getting
         val androidMain by getting
         val jsMain by getting
+        val jvmMain by getting
     }
 }
 
