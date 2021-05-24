@@ -96,6 +96,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
                     R.id.playlist_context_star -> presenter.doStar()
                     R.id.playlist_context_share -> presenter.doShare()
                     R.id.playlist_context_related -> presenter.doRelated()
+                    R.id.playlist_goto_playlist -> presenter.doGotoPlaylist()
                 }
                 return true
             }
@@ -106,6 +107,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         popup.menu.findItem(R.id.playlist_context_star).setTitle(
             if (presenter.isStarred()) R.string.menu_unstar else R.string.menu_star
         )
+        popup.menu.findItem(R.id.playlist_goto_playlist).isVisible = presenter.isCompositePlaylist()
         popup.setOnDismissListener { popupMenu = null }
         MenuPopupHelper(wrapper, popup.menu as MenuBuilder, binding.listitemOverflowClick).apply {
             setForceShowIcon(true)

@@ -98,6 +98,7 @@
             app:popUpTo="@id/navigation_playlist_edit"
             app:popUpToInclusive="true"
             />
+
     </fragment>
 
     <fragment

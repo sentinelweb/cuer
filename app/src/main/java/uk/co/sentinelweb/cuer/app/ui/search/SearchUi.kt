@@ -104,6 +104,7 @@ fun SearchParametersUi(
                         liveClick,
                         clearRelatedClick,
                         clearDatesClick,
+                        selectDatesClick,
                         selectOrderClick,
                         modifier
                     )
@@ -131,6 +132,7 @@ fun SearchRemote(
     liveClick: (Boolean) -> Unit,
     clearRelatedClick: () -> Unit,
     clearDateRangeClick: () -> Unit,
+    selectDatesClick: () -> Unit,
     selectOrderClick: () -> Unit,
     modifier: Modifier
 ) {
@@ -179,7 +181,7 @@ fun SearchRemote(
                     )
                 }
                 Button(
-                    onClick = { selectOrderClick() },
+                    onClick = selectDatesClick,
                     modifier = Modifier
                         .padding(2.dp)
                         .clip(shape = MaterialTheme.shapes.small)
@@ -209,7 +211,7 @@ fun SearchRemote(
         }
         Row(modifier = Modifier.padding(8.dp)) {
             Button(
-                onClick = { selectOrderClick() },
+                onClick = selectOrderClick,
                 modifier = Modifier
                     .padding(2.dp)
                     .clip(shape = MaterialTheme.shapes.small)

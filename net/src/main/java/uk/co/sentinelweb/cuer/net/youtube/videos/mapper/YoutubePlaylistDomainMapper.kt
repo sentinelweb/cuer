@@ -47,9 +47,11 @@ internal class YoutubePlaylistDomainMapper(
         items: List<YoutubePlaylistItemDto.PlaylistItemDto>,
         videoLookup: Map<String, YoutubeVideosDto.VideoDto>,
         channelLookup: Map<String, ChannelDomain>
-    ): List<PlaylistItemDomain> = items.map {
-        itemCreator.buildPlayListItem(mapMedia(it, videoLookup, channelLookup), null, order = it.snippet.position * 1000L)
-    }
+    ): List<PlaylistItemDomain> = items
+        .filter { videoLookup.keys.contains<String>(it.snippet.resourceId.videoId) } // some videos are deleted
+        .map {
+            itemCreator.buildPlayListItem(mapMedia(it, videoLookup, channelLookup), null, order = it.snippet.position * 1000L)
+        }
 
     private fun mapMedia(
         item: YoutubePlaylistItemDto.PlaylistItemDto,
@@ -69,7 +71,8 @@ internal class YoutubePlaylistDomainMapper(
                 ?: -1,
             thumbNail = imageMapper.mapThumb(it.thumbnails),
             image = imageMapper.mapImage(it.thumbnails),
-            channelData = channelLookup[it.videoOwnerChannelId] ?: throw BadDataException("Channel not found"),
+            channelData = it.videoOwnerChannelId?.let { channelLookup[it] }
+                ?: throw BadDataException("Channel not found: ownerId:${it.videoOwnerChannelId} videoId:${it.resourceId.videoId}"),
             published = it.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) },
             isLiveBroadcast = videoLookup[it.resourceId.videoId]
                 ?.snippet?.liveBroadcastContent

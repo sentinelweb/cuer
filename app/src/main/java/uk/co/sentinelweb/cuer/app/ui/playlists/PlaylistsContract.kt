@@ -39,7 +39,7 @@ interface PlaylistsContract {
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun undoDelete()
         fun commitMove()
-        fun onResume()
+        fun onResume(parentId: Long?)
         fun onPause()
         fun onItemImageClicked(item: ItemContract.Model)
         fun onUpClicked()

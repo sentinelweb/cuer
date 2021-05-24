@@ -32,7 +32,7 @@ class PlaylistMergeOrchestrator constructor(
             type = if (toDeleteFull.type == PLATFORM) PLATFORM else toReceiveFull.type,
             channelData = if (toDeleteFull.type == PLATFORM && toReceiveFull.type == USER) toDeleteFull.channelData else toReceiveFull.channelData,
             platformId = if (toDeleteFull.type == PLATFORM && toReceiveFull.type == USER) toDeleteFull.platformId else toReceiveFull.platformId,
-
+            platform = if (toDeleteFull.type == PLATFORM && toReceiveFull.type == USER) toDeleteFull.platform else toReceiveFull.platform,
             items = toReceiveFull.items.toMutableList()
                 .apply { addAll(toDeleteFull.items.map { it.copy(playlistId = toReceiveFull.id) }) },// copy also done in db
             config = toReceiveFull.config.copy(

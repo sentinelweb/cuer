@@ -49,6 +49,13 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        useIR = true
+        // byoass compose kotlin version compatability check
+        // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
+        freeCompilerArgs += [
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+        ]
     }
 
     buildFeatures {
@@ -149,8 +156,14 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$ver_glide"
     annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
     kapt "com.github.bumptech.glide:compiler:$ver_glide"
-    // this is causing some weird compose crashes
-    // implementation "com.google.accompanist:accompanist-glide:$ver_glide_accompanist"
+
+    implementation ("com.google.accompanist:accompanist-glide:$ver_glide_accompanist"){
+        exclude group:"androidx.compose.runtime"
+        exclude group:"androidx.compose.ui"
+        exclude group:"androidx.compose.foundation"
+        exclude group:"androidx.compose.material"
+        exclude group:"com.google.android.material"
+    }
 
     debugImplementation ("androidx.fragment:fragment-testing:$ver_androidx_fragment_test"){// hack
         exclude group:"androidx.test"

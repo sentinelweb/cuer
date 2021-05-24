@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter.Format.SECS
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 import java.time.OffsetDateTime
 
 
@@ -39,7 +40,7 @@ class PlaylistModelMapper constructor(
         mapItems: Boolean = true,
         id: OrchestratorContract.Identifier<*>,
         pinned: Boolean,
-        playlists: Map<Long, PlaylistDomain>?
+        playlists: Map<Long, PlaylistTreeDomain>?
     ): PlaylistContract.Model {
         modelIdGenerator = 0
         val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
@@ -60,31 +61,34 @@ class PlaylistModelMapper constructor(
                 domain.items.mapIndexed { index, item ->
                     val modelId = item.id ?: modelIdGenerator
                     itemsIdMap[modelId] = item
-                    map(
+                    mapItem(
                         modelId,
                         item,
                         index,
                         domain.config.editableItems,
                         domain.config.deletableItems,
                         domain.config.editable,
-                        playlists
+                        playlists,
+                        domain.id
                     )
                 }
             } else {
                 null
             },
+            hasChildren = playlists?.get(domain.id)?.chidren?.size ?: 0,
             itemsIdMap = itemsIdMap
         )
     }
 
-    fun map(
+    fun mapItem(
         modelId: Long,
         item: PlaylistItemDomain,
         index: Int,
         canEdit: Boolean,
         canDelete: Boolean,
         canReorder: Boolean,
-        playlists: Map<Long, PlaylistDomain>?
+        playlists: Map<Long, PlaylistTreeDomain>?,
+        currentPlaylistId: Long?
     ): ItemContract.Model {
         val top = item.media.title ?: "No title"
         val pos = item.media.positon?.toFloat() ?: 0f
@@ -118,7 +122,9 @@ class PlaylistModelMapper constructor(
             infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media),
             canEdit = canEdit,
             canDelete = canDelete,
-            playlistName = playlists?.get(item.playlistId)?.title,
+            playlistName = item.playlistId?.let {
+                if (it != currentPlaylistId) playlists?.get(it)?.node?.title else null
+            },
             canReorder = canReorder
         )
     }

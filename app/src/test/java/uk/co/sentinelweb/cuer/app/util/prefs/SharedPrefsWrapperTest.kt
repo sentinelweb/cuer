@@ -308,9 +308,7 @@ class SharedPrefsWrapperTest {
     @Test
     @Ignore("Some mocking problem there")
     fun getPairDefault() {
-        val fixtFirst: String = fixture.build()
         val fixtFirstDefault: String = fixture.build()
-        val fixtSecond: Source = fixture.build()
         val fixtSecondDefault: Source = fixture.build()
         every { mockPrefs.getString(X1_FIRST, fixtFirstDefault) } returns null
         every { mockPrefs.getString(X1_SECOND, null) } returns null

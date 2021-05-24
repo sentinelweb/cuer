@@ -13,15 +13,20 @@ import uk.co.sentinelweb.cuer.domain.ImageDomain
 
 interface SearchImageContract {
 
-    data class Model constructor(
+    data class SearchModel constructor(
         val term: String?,
+        val loading: Boolean
+    )
+
+    data class ResultsModel constructor(
         val images: List<ImageDomain>
     )
 
     data class State constructor(
         var term: String? = null,
         var images: List<ImageDomain>? = null,
-        var config: Config? = null
+        var config: Config? = null,
+        var loading: Boolean = false
     )
 
     data class Config(
@@ -30,8 +35,12 @@ interface SearchImageContract {
     ) : DialogModel(Type.IMAGE_SEARCH, R.string.imagesearch_dialog_title)
 
     class Mapper {
-        fun map(state: State) = Model(
+        fun mapSearch(state: State) = SearchModel(
             term = state.term,
+            loading = state.loading
+        )
+
+        fun mapResults(state: State) = ResultsModel(
             images = state.images ?: listOf()
         )
     }

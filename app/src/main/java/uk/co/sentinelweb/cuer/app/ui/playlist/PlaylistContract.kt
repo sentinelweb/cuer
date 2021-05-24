@@ -29,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
 interface PlaylistContract {
 
@@ -46,6 +47,7 @@ interface PlaylistContract {
         fun onItemShare(itemModel: ItemContract.Model)
         fun onPlayStartClick(itemModel: ItemContract.Model)
         fun onItemViewClick(itemModel: ItemContract.Model)
+        fun onItemGotoPlaylist(item: ItemContract.Model)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
@@ -58,6 +60,7 @@ interface PlaylistContract {
         fun onFilterNewItems(): Boolean
         fun onEdit(): Boolean
         fun onFilterPlaylistItems(): Boolean
+        fun onShowChildren(): Boolean
         fun onResume()
         fun onPause()
         suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit)
@@ -105,7 +108,8 @@ interface PlaylistContract {
         var dragTo: Int? = null,
         var selectedPlaylistItem: PlaylistItemDomain? = null,
         var model: Model? = null,
-        var playlistsMap: Map<Long, PlaylistDomain>? = null
+        var playlistsTree: PlaylistTreeDomain? = null,
+        var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null
     ) : ViewModel()
 
     data class Model constructor(
@@ -122,7 +126,8 @@ interface PlaylistContract {
         val canPlay: Boolean,
         val canEdit: Boolean,
         val items: List<ItemContract.Model>?,
-        val itemsIdMap: MutableMap<Long, PlaylistItemDomain>
+        val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
+        val hasChildren: Int
     )
 
     companion object {

@@ -2,11 +2,13 @@ package uk.co.sentinelweb.cuer.app.ui.common.navigation
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.navigation.NavOptions
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 
 data class NavigationModel constructor(
     val target: Target,
-    val params: Map<Param, Any> = mapOf()
+    val params: Map<Param, Any> = mapOf(),
+    val navOpts: NavOptions? = null
 ) {
     init {
         params.keys
@@ -30,7 +32,7 @@ data class NavigationModel constructor(
         PLAYLIST_CREATE(),
         PLAYLIST_FRAGMENT(listOf(PLAYLIST_ID, SOURCE), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
         PLAYLIST_ITEM_FRAGMENT(listOf(PLAYLIST_ITEM, SOURCE), listOf(FRAGMENT_NAV_EXTRAS)),
-        PLAYLISTS_FRAGMENT(),
+        PLAYLISTS_FRAGMENT(listOf(), listOf(PLAYLIST_ID)),
         BROWSE_FRAGMENT(),
         PLAYER_FRAGMENT(),
         NAV_BACK(), // use navigation to go back
@@ -55,7 +57,7 @@ data class NavigationModel constructor(
         PLAYLIST_ITEM_ID, /* Long */
         PLAYLIST_ITEM, /* PlaylistItemDomain */
         FRAGMENT_NAV_EXTRAS, /* FragmentNavigator.Extras */
-        SOURCE /* uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source */
+        SOURCE, /* uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source */
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)

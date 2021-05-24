@@ -19,8 +19,11 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLISTS_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
@@ -373,6 +376,17 @@ class PlaylistPresenter(
         return true
     }
 
+    override fun onShowChildren(): Boolean {
+        state.playlist?.id?.also {
+            view.navigate(
+                NavigationModel(
+                    PLAYLISTS_FRAGMENT, mapOf(PLAYLIST_ID to it)
+                )
+            )
+        }
+        return true
+    }
+
     override fun onItemShowChannel(itemModel: ItemContract.Model) {
         playlistItemDomain(itemModel)
             ?.takeUnless { ytJavaApi.launchChannel(it.media) }
@@ -403,11 +417,7 @@ class PlaylistPresenter(
                 view.navigate(
                     NavigationModel(
                         NavigationModel.Target.PLAYLIST_FRAGMENT,
-                        mapOf(
-                            NavigationModel.Param.PLAYLIST_ID to REMOTE_SEARCH_PLAYLIST,
-                            NavigationModel.Param.PLAY_NOW to false,
-                            NavigationModel.Param.SOURCE to MEMORY
-                        )
+                        mapOf(PLAYLIST_ID to REMOTE_SEARCH_PLAYLIST, PLAY_NOW to false, SOURCE to MEMORY)
                     )
                 )
 
@@ -418,6 +428,19 @@ class PlaylistPresenter(
         playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 shareWrapper.share(itemDomain.media)
+            }
+    }
+
+    override fun onItemGotoPlaylist(item: ItemContract.Model) {
+        playlistItemDomain(item)
+            ?.playlistId
+            ?.let {
+                view.navigate(
+                    NavigationModel(
+                        NavigationModel.Target.PLAYLIST_FRAGMENT,
+                        mapOf(PLAYLIST_ID to it, PLAY_NOW to false, SOURCE to LOCAL)
+                    )
+                )
             }
     }
 
@@ -487,7 +510,7 @@ class PlaylistPresenter(
                 ?.also { state.playlist = it }
                 ?.also {
                     modelMapper.map(
-                        it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap,
+                        it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsTreeLookup,
                         pinned = isPlaylistPinned()
                     )
                         .also { view.setModel(it, false) }
@@ -599,7 +622,7 @@ class PlaylistPresenter(
         view.showRefresh()
         try {
             playlistOrchestrator
-                .getPlaylistOrDefault(state.playlistIdentifier.id as Long, Options(state.playlistIdentifier.source, false))
+                .getPlaylistOrDefault(state.playlistIdentifier.id as Long, state.playlistIdentifier.source.flatOptions())
                 .also { state.playlist = it?.first }
                 ?.also { (playlist, source) ->
                     playlist.id
@@ -607,10 +630,12 @@ class PlaylistPresenter(
                         ?: throw IllegalStateException("Need an id")
                 }
                 ?.also {
-                    if (it.first.type == APP) {
-                        state.playlistsMap = playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), Options(LOCAL))
-                            .associateBy { it.id!! }
-                    }
+                    state.playlistsTree = playlistOrchestrator
+                        .loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
+                        .buildTree()
+                        .also {
+                            state.playlistsTreeLookup = it.buildLookup()
+                        }
                 }
                 ?.also {
                     if (it.second == LOCAL || it.first.type == APP) {
@@ -630,7 +655,7 @@ class PlaylistPresenter(
             .takeIf { coroutines.mainScopeActive }
             ?.let {
                 modelMapper.map(
-                    it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsMap,
+                    it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsTreeLookup,
                     pinned = isPlaylistPinned()
                 )
             }
@@ -656,8 +681,8 @@ class PlaylistPresenter(
             ?.apply {
                 view.setHeaderModel(
                     modelMapper.map(
-                        this, isPlaylistPlaying(), false, id = state.playlistIdentifier, playlists = state.playlistsMap,
-                        pinned = isPlaylistPinned()
+                        this, isPlaylistPlaying(), false, id = state.playlistIdentifier,
+                        playlists = state.playlistsTreeLookup, pinned = isPlaylistPinned()
                     )
                 )
                 state.playlist?.currentIndex?.also {
@@ -699,12 +724,13 @@ class PlaylistPresenter(
         state.playlist = state.playlist?.let {
             it.copy(items = it.items.toMutableList().apply { set(index, changedItem) })
         }
-        val mappedItem = modelMapper.map(
+        val mappedItem = modelMapper.mapItem(
             modelId, changedItem, index,
             state.playlist?.config?.editableItems ?: false,
             state.playlist?.config?.deletableItems ?: false,
             state.playlist?.config?.editable ?: false,
-            playlists = state.playlistsMap,
+            playlists = state.playlistsTreeLookup,
+            currentPlaylistId = state.playlist?.id
         )
         state.model = state.model?.let {
             it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
