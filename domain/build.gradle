@@ -11,11 +11,12 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$ver_kotlinx_serialization_runtime"
 
     // koin
-    implementation  "org.koin:koin-core:$ver_koin"
+    implementation  "io.insert-koin:koin-core:$ver_koin"
 
     // test
     testImplementation "junit:junit:$ver_junit"
-    testImplementation "org.koin:koin-test:$ver_koin"
+    testImplementation "io.insert-koin:koin-test:$ver_koin"
+    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     testImplementation "com.google.truth:truth:$ver_truth"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
