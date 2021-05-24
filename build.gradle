@@ -3,6 +3,7 @@
 buildscript {
 
     repositories {
+        gradlePluginPortal()
         google()
         jcenter()
         mavenCentral()
@@ -10,7 +11,7 @@ buildscript {
 
     dependencies {
         classpath "com.android.tools.build:gradle:$ver_build_tools_gradle"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$ver_kotlin"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0"
         classpath "org.jetbrains.kotlin:kotlin-serialization:$ver_kotlin"
         classpath "com.google.gms:google-services:$ver_google_services"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$ver_navigation"
