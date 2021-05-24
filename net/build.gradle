@@ -18,11 +18,13 @@ dependencies {
 //    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:$ver_retrofit2_kotlinx_serialization_converter"
 
     // koin
-    implementation  "org.koin:koin-core:$ver_koin"
+    implementation  "io.insert-koin:koin-core:$ver_koin"
 
     // test
     testImplementation "junit:junit:$ver_junit"
-    testImplementation "org.koin:koin-test:$ver_koin"
+    testImplementation "io.insert-koin:koin-test:$ver_koin"
+    // Koin for JUnit 4
+    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
 }

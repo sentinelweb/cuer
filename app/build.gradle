@@ -122,9 +122,9 @@ dependencies {
     implementation "androidx.navigation:navigation-ui:$ver_navigation"
 
     // koin
-    implementation "org.koin:koin-core:$ver_koin"
-    implementation "org.koin:koin-androidx-scope:$ver_koin"
-    implementation "org.koin:koin-android-viewmodel:$ver_koin"
+    implementation "io.insert-koin:koin-core:$ver_koin"
+    implementation "io.insert-koin:koin-android:$ver_koin"
+    //implementation "org.koin:koin-android-viewmodel:$ver_koin"
 
     // room
     implementation "androidx.room:room-runtime:$ver_room"
@@ -170,7 +170,9 @@ dependencies {
     }
 
     testImplementation "junit:junit:$ver_junit"
-    testImplementation "org.koin:koin-test:$ver_koin"
+    testImplementation "io.insert-koin:koin-test:$ver_koin"
+    // Koin for JUnit 4
+    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.google.truth:truth:$ver_truth"
     testImplementation "org.mockito:mockito-core:$ver_mockito"
@@ -190,7 +192,9 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
 //    testImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.16.0'
 
-    androidTestImplementation "org.koin:koin-test:$ver_koin"
+    androidTestImplementation "io.insert-koin:koin-test:$ver_koin"
+    // Koin for JUnit 4
+    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     androidTestImplementation "com.google.truth:truth:$ver_truth"
     androidTestImplementation "org.mockito:mockito-core:$ver_mockito"
     androidTestImplementation "org.mockito:mockito-android:$ver_mockito"
