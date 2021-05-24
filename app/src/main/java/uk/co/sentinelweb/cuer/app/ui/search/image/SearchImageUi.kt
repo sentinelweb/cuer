@@ -71,7 +71,6 @@ fun SearchImageParametersUi(
                                 .align(Alignment.CenterEnd)
                                 .width(36.dp)
                                 .height(36.dp)
-                            /**/
                         )
                     }
                 }
