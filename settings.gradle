@@ -1,7 +1,19 @@
-//include ':prototype'
+pluginManagement {
+    repositories {
+        maven { url "https://dl.bintray.com/kotlin/kotlin-eap" }
+
+        mavenCentral()
+
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+}
 rootProject.name='Cuer'
+
 include ':app'
 include ':net'
+include ':shared'
+include ':remote'
+
+//include ':prototype'
 //include ':domain'
 //include ':core'
-include ':shared'
