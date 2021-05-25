@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-class PlaylistItemCreator constructor(
+actual class PlaylistItemCreator constructor(
     private val timeProvider: TimeProvider
 ) {
     fun buildPlayListItem(savedMedia: MediaDomain, playlist: PlaylistDomain?, order: Long? = null) =

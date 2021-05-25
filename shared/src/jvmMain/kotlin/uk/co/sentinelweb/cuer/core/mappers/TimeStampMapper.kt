@@ -4,7 +4,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import java.time.*
 import java.time.format.DateTimeFormatter
 
-class TimeStampMapper constructor(
+actual class TimeStampMapper constructor(
     private val log: LogWrapper
 ) {
 

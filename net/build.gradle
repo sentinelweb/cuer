@@ -8,11 +8,12 @@ compileKotlin {
 }
 
 dependencies {
-    api project(":shared")
+    implementation project(":shared")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core"
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime"
 
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:$ver_retrofit"
@@ -26,7 +27,6 @@ dependencies {
     // test
     testImplementation "junit:junit:$ver_junit"
     testImplementation "io.insert-koin:koin-test:$ver_koin"
-    // Koin for JUnit 4
     testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"

@@ -9,7 +9,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 
 class TimeStampMapperTest {
     private val spyLog = spyk<LogWrapper>(SystemLogWrapper())
-    private val sut = TimeStampMapper(spyLog)
+    private val sut = uk.co.sentinelweb.cuer.core.TimeStampMapper(spyLog)
 
     @Before
     fun setUp() {
