@@ -1,14 +1,23 @@
 package uk.co.sentinelweb.cuer.core.providers
 
-import kotlinx.coroutines.*
-import java.util.concurrent.Executors
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 
-// this should be factory scopes should be shared between objects
+
+interface DispatcherProvider {
+    val IO: CoroutineDispatcher
+    val Computation: CoroutineDispatcher
+}
+
+expect object PlatformDispatcherProvider : DispatcherProvider
+
 open class CoroutineContextProvider constructor(
     val Main: CoroutineDispatcher = Dispatchers.Main,
-    val IO: CoroutineDispatcher = Dispatchers.IO,
+    val IO: CoroutineDispatcher = PlatformDispatcherProvider.IO,
     val Default: CoroutineDispatcher = Dispatchers.Default,
-    val Computation: CoroutineDispatcher = ComputationDispatcher
+    val Computation: CoroutineDispatcher = PlatformDispatcherProvider.Computation
 ) {
     inner class ScopeHolder(private val dispatcher: CoroutineDispatcher) {
         private var _scope: CoroutineScope? = null
@@ -49,9 +58,5 @@ open class CoroutineContextProvider constructor(
         _mainScope.cancel()
         _computationScope.cancel()
         _ioScope.cancel()
-    }
-
-    companion object {
-        val ComputationDispatcher: CoroutineDispatcher = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
     }
 }
