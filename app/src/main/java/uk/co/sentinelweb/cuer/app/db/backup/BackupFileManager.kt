@@ -1,9 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.backup
 
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.db.backup.version.BackupFileModel
 import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
-import uk.co.sentinelweb.cuer.app.db.backup.version.jsonBackupSerialzer
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
@@ -12,7 +10,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class BackupFileManager constructor(
     private val mediaRepository: MediaDatabaseRepository,
@@ -29,9 +29,7 @@ class BackupFileManager constructor(
             version = 3,
             medias = listOf(),
             playlists = playlistRepository.loadList(OrchestratorContract.AllFilter()).data!!
-        ).let {
-            jsonBackupSerialzer.encodeToString(BackupFileModel.serializer(), it)
-        }
+        ).serialise()
     }
 
     suspend fun restoreData(data: String): Boolean = withContext(contextProvider.IO) {

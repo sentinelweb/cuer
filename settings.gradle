@@ -2,6 +2,6 @@
 rootProject.name='Cuer'
 include ':app'
 include ':net'
-include ':domain'
-include ':core'
+//include ':domain'
+//include ':core'
 include ':shared'

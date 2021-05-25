@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.share
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
-import kotlinx.serialization.Transient
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -66,9 +65,8 @@ interface ShareContract {
         }
     }
 
-    // @Serializable
     data class State(
-        @Transient var model: Model? = null,
+        var model: Model? = null,
         var scanResult: ScanContract.Result? = null
     ) : ViewModel()
 

@@ -8,11 +8,14 @@ compileKotlin {
 }
 
 dependencies {
-    api project(":core")
+    //api project(":core")
+    api project(":shared")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$ver_kotlinx_serialization_runtime"
+    api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:$ver_kotlinx_serialization_runtime") {
+        exclude group:"org.jetbrains.kotlinx", module:"kotlinx-serialization-core"
+    }
 
     // koin
     implementation  "io.insert-koin:koin-core:$ver_koin"

@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.db.backup.version
+package uk.co.sentinelweb.cuer.domain.backup
 
 import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.domain.MediaDomain

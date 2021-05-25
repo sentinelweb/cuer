@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlinx-serialization'
+//apply plugin: 'kotlinx-serialization'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'com.google.firebase.crashlytics'
@@ -82,14 +82,14 @@ android {
 
 dependencies {
     // project
-    implementation project(":domain")
-    implementation project(":core")
+    //implementation project(":domain")
+    //implementation project(":core")
+    implementation project(":shared")
     implementation project(":net")
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // deps
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$ver_kotlinx_serialization_runtime"
     implementation "androidx.appcompat:appcompat:$ver_appcompat"
     implementation "androidx.fragment:fragment-ktx:$ver_fragment_ktx"
     implementation "androidx.core:core:$ver_androidx_core"
