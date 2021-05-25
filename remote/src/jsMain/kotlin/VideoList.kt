@@ -1,7 +1,9 @@
-import kotlinx.browser.window
+
 import kotlinx.html.js.onClickFunction
 import react.*
-import react.dom.*
+import react.dom.h3
+import react.dom.p
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 @JsExport
 class VideoList : RComponent<VideoListProps, RState>() {
@@ -20,7 +22,7 @@ class VideoList : RComponent<VideoListProps, RState>() {
                 if (video == props.selectedVideo) {
                     +"▶ "
                 }
-                +"${video.speaker}: ${video.title}"
+                +"${video.channelData.title}: ${video.title}"
             }
         }
     }
@@ -28,9 +30,9 @@ class VideoList : RComponent<VideoListProps, RState>() {
 
 external interface VideoListProps : RProps {
     var title: String
-    var videos: List<Video>
-    var selectedVideo: Video?
-    var onSelectVideo: (Video) -> Unit
+    var videos: List<MediaDomain>
+    var selectedVideo: MediaDomain?
+    var onSelectVideo: (MediaDomain) -> Unit
 }
 
 fun RBuilder.videoList(handler: VideoListProps.() -> Unit): ReactElement {

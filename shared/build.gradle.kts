@@ -39,7 +39,7 @@ android {
 kotlin {
     jvm()
     js {
-        //browser()// use in usage lib
+        browser()
     }
     android()
 

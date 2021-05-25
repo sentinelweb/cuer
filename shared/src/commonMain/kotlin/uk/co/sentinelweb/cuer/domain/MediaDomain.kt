@@ -1,9 +1,12 @@
 package uk.co.sentinelweb.cuer.domain
 
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import java.time.Instant
-import java.time.LocalDateTime
+
+//import java.time.Instant
+//import java.time.LocalDateTime
 
 @Serializable
 data class MediaDomain(
@@ -26,8 +29,8 @@ data class MediaDomain(
     val isLiveBroadcast: Boolean = false,
     val isLiveBroadcastUpcoming: Boolean = false,
     val playFromStart: Boolean = false,
-
     ) {
+
     enum class MediaTypeDomain {
         VIDEO, AUDIO, WEB
     }

@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.domain.mutator
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import kotlin.random.Random
 
 class PlaylistMutator {
     // do i have to change the current index? yes
@@ -82,7 +83,7 @@ class PlaylistMutator {
     private fun selectRandom(oldIndex: Int, playlist: PlaylistDomain): Int {
         var newIndex = oldIndex
         while (newIndex == oldIndex && newIndex < playlist.items.size) {
-            newIndex = (Math.random() * (playlist.items.size)).toInt()
+            newIndex = Random.Default.nextInt(playlist.items.size)
         }
         return newIndex
     }

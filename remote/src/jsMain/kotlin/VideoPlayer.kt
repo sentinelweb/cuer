@@ -5,10 +5,11 @@ import react.dom.h3
 import styled.css
 import styled.styledButton
 import styled.styledDiv
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 external interface VideoPlayerProps : RProps {
-    var video: Video
-    var onWatchedButtonPressed: (Video) -> Unit
+    var video: MediaDomain
+    var onWatchedButtonPressed: (MediaDomain) -> Unit
     var unwatchedVideo: Boolean
 }
 
@@ -22,10 +23,10 @@ class VideoPlayer : RComponent<VideoPlayerProps, RState>() {
                 right = 10.px
             }
             h3 {
-                +"${props.video.speaker}: ${props.video.title}"
+                +"${props.video.channelData.title}: ${props.video.title}"
             }
             reactPlayerLite {
-                attrs.url = props.video.videoUrl
+                attrs.url = props.video.url
             }
             styledDiv {
                 css {
@@ -33,56 +34,56 @@ class VideoPlayer : RComponent<VideoPlayerProps, RState>() {
                     marginBottom = 10.px
                 }
                 emailShareButton {
-                    attrs.url = props.video.videoUrl
+                    attrs.url = props.video.url
                     emailIcon {
                         attrs.size = 32
                         attrs.round = true
                     }
                 }
                 telegramShareButton {
-                    attrs.url = props.video.videoUrl
+                    attrs.url = props.video.url
                     telegramIcon {
                         attrs.size = 32
                         attrs.round = true
                     }
                 }
                 twitterShareButton {
-                    attrs.url = props.video.videoUrl
+                    attrs.url = props.video.url
                     twitterIcon {
                         attrs.size = 32
                         attrs.round = true
                     }
                 }
                 whatsappShareButton {
-                    attrs.url = props.video.videoUrl
+                    attrs.url = props.video.url
                     whatsappIcon {
                         attrs.size = 32
                         attrs.round = true
                     }
                 }
                 facebookShareButton {
-                    attrs.url = props.video.videoUrl
+                    attrs.url = props.video.url
                     facebookIcon {
                         attrs.size = 32
                         attrs.round = true
                     }
                 }
                 linkedinShareButton {
-                    attrs.url = props.video.videoUrl
+                    attrs.url = props.video.url
                     linkedinIcon {
                         attrs.size = 32
                         attrs.round = true
                     }
                 }
                 pinterestShareButton {
-                    attrs.url = props.video.videoUrl
+                    attrs.url = props.video.url
                     pinterestIcon {
                         attrs.size = 32
                         attrs.round = true
                     }
                 }
                 redditShareButton {
-                    attrs.url = props.video.videoUrl
+                    attrs.url = props.video.url
                     redditIcon {
                         attrs.size = 32
                         attrs.round = true
