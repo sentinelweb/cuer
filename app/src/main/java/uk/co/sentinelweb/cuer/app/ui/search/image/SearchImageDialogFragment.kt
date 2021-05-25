@@ -7,19 +7,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-
-
-
 class SearchImageDialogFragment(private val config: SearchImageContract.Config) : DialogFragment() {
 
-    private val viewModel: SearchImageViewModel by currentScope.inject()
+    private val viewModel: SearchImageViewModel by inject()
     private val log: LogWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()

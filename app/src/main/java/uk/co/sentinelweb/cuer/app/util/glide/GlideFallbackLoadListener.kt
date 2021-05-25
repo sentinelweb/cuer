@@ -6,7 +6,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 /**

@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.share
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import kotlinx.serialization.Transient
-import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract

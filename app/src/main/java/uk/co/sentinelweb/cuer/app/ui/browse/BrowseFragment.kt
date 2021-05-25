@@ -8,17 +8,22 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.android.synthetic.main.browse_fragment.*
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 
 // fixme : this is the app:startDestination fragment which causes a double instance and the menus not to work :/
 // when implementing here might need to make a dummy app:startDestination and  manually navigate in mainActivity
-class BrowseFragment : Fragment(R.layout.browse_fragment), BrowseContract.View {
+class BrowseFragment : Fragment(R.layout.browse_fragment),
+    BrowseContract.View,
+    AndroidScopeComponent {
 
-    private val presenter: BrowseContract.Presenter by currentScope.inject()
+    override val scope: Scope by fragmentScopeWithSource()
+    private val presenter: BrowseContract.Presenter by inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 

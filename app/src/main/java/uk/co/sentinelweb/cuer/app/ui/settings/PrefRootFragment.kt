@@ -10,15 +10,19 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import org.koin.android.scope.currentScope
+import org.koin.android.ext.android.inject
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
-class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContract.View {
+class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContract.View, AndroidScopeComponent {
 
-    private val presenter: PrefRootContract.Presenter by currentScope.inject()
-    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
+    override val scope: Scope by fragmentScopeWithSource()
+    private val presenter: PrefRootContract.Presenter by inject()
+    private val snackbarWrapper: SnackbarWrapper by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)

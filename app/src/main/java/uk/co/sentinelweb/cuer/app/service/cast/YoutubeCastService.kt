@@ -5,18 +5,18 @@ import android.content.Intent
 import android.os.IBinder
 import androidx.media.session.MediaButtonReceiver
 import org.koin.android.ext.android.inject
-import org.koin.core.KoinComponent
+import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
-import org.koin.ext.getOrCreateScope
 import uk.co.sentinelweb.cuer.app.CuerAppState
+import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, KoinComponent {
+class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, AndroidScopeComponent {
 
-    private lateinit var scope: Scope
-    private lateinit var controller: YoutubeCastServiceContract.Controller
+    override val scope: Scope by serviceScopeWithSource()
+    private val controller: YoutubeCastServiceContract.Controller by scope.inject()
     private val toastWrapper: ToastWrapper by inject()
     private val notificationWrapper: NotificationWrapper by inject()
     private val appState: CuerAppState by inject()
@@ -26,9 +26,6 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, KoinCo
         super.onCreate()
         log.tag(this)
         _instance = this
-        scope = this.getOrCreateScope().apply {
-            controller = get()
-        }
         log.d("Service created")
         appState.castNotificationChannelId = notificationWrapper.createChannelId()
         controller.initialise()
@@ -39,6 +36,7 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, KoinCo
         super.onDestroy()
         log.d("Service destroyed")
         controller.destroy()
+        scope.close()
         _instance = null
     }
 
