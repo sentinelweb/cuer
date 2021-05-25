@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.domain.PlatformDomain
 class App : RComponent<RProps, AppState>() {
     override fun RBuilder.render() {
         h1 {
-            +"KotlinConf Explorer"
+            +"Cuer playlists"
         }
         videoList {
             title = "Unwatched videos"
