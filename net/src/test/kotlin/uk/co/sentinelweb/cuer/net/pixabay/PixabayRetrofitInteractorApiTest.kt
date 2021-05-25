@@ -6,7 +6,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import org.koin.core.KoinComponent
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -24,7 +23,7 @@ import uk.co.sentinelweb.cuer.net.retrofit.RetrofitBuilder
  *
  * TO RUN FROM AS : set -DCUER_PIXABAY_API_KEY=api in configuration
  */
-class PixabayRetrofitInteractorApiTest : KoinComponent {
+class PixabayRetrofitInteractorApiTest {
 
     private lateinit var service: PixabayService
 

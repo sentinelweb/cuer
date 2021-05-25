@@ -5,7 +5,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import org.koin.core.KoinComponent
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
@@ -30,7 +29,7 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.*
  *
  * TO RUN FROM AS : set -DCUER_YOUTUBE_API_KEY=api in configuration
  */
-class YoutubeVideosRetrofitInteractorApiTest : KoinComponent {
+class YoutubeVideosRetrofitInteractorApiTest {
 
     private lateinit var service: YoutubeService
 
