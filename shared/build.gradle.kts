@@ -12,6 +12,9 @@ val ver_kotlinx_datetime: String by project
 val ver_koin: String by project
 val ver_mockk: String by project
 val ver_jvm: String by project
+val ver_jfixture: String by project
+val ver_junit: String by project
+val ver_truth: String by project
 
 version = "1.0"
 
@@ -62,6 +65,7 @@ kotlin {
             dependencies {
                 // Koin for JUnit 4
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
+                implementation("junit:junit:$ver_junit")
             }
         }
         val jsMain by getting
@@ -71,6 +75,9 @@ kotlin {
             dependencies {
                 // Koin for JUnit 4
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
+
+                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
+                implementation("com.google.truth:truth:$ver_truth")
             }
         }
     }
