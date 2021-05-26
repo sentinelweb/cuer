@@ -1,35 +1,23 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 // ./gradlew :remote:jsBrowserRun --continue
+
+//  ./gradlew :remote:runServer
+
 plugins {
     kotlin("multiplatform")
-    id("com.android.library")
+    //id("com.android.library")
+    application
     kotlin("plugin.serialization")
 }
 
 val ver_kotlinx_datetime: String by project
 val ver_kotlinx_serialization_core: String by project
+val ver_ktor: String by project
+val ver_jvm: String by project
 
 group = "uk.co.sentinelweb.cuer.remote"
 version = "1.0"
-
-android {
-    compileSdkVersion(30)
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdkVersion(16)
-        targetSdkVersion(30)
-    }
-    // remove when upgrading to kotlin 1.5
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
-    }
-}
 
 kotlin {
     js {
@@ -40,7 +28,9 @@ kotlin {
         }
         binaries.executable()
     }
-    android()
+    jvm {
+        //withJava()
+    }
     sourceSets {
 
         val commonMain by getting {
@@ -48,11 +38,19 @@ kotlin {
                 implementation(project(":shared"))
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
-
+                implementation("io.ktor:ktor-client-core:$ver_ktor")
             }
         }
 
-        val androidMain by getting
+        val jvmMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$ver_kotlinx_serialization_core")
+                implementation("io.ktor:ktor-serialization:$ver_ktor")
+                implementation("io.ktor:ktor-server-core:$ver_ktor")
+                implementation("io.ktor:ktor-server-netty:$ver_ktor")
+                implementation("ch.qos.logback:logback-classic:1.2.3")
+            }
+        }
 
         val jsMain by getting {
             dependencies {
@@ -97,6 +95,20 @@ kotlin {
     }
 }
 
+val runServer by tasks.creating(JavaExec::class) {
+    group = "application"
+    main = "uk.co.sentinelweb.cuer.remote.server.ServerKt"
+    kotlin {
+        val main = targets["jvm"].compilations["main"]
+        dependsOn(main.compileAllTaskName)
+        classpath(
+            { main.output.allOutputs.files },
+            { configurations["jvmRuntimeClasspath"] }
+        )
+    }
+    ///disable app icon on macOS
+    //systemProperty("java.awt.headless", "true")
+}
 
 tasks {
     withType<KotlinWebpack> {
@@ -105,10 +117,10 @@ tasks {
     }
 }
 
-//repositories {
-//    maven { setUrl("https://dl.bintray.com/kotlin/kotlin-eap") }
-//    maven("https://kotlin.bintray.com/kotlin-js-wrappers/")
-////    maven("https://dl.bintray.com/cfraser/muirwik")
-//    mavenCentral()
-//    jcenter()
-//}
+tasks {
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = ver_jvm
+        }
+    }
+}
