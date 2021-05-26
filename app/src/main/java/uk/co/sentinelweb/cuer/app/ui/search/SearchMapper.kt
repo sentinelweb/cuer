@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.search
 
+import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
@@ -39,8 +40,8 @@ class SearchMapper constructor(
                     relatedTo = remote.relatedToMediaPlatformId?.let { "${remote.relatedToMediaTitle} [$it]" },
                     channelPlatformId = remote.channelPlatformId,
                     isLive = remote.isLive,
-                    fromDate = remote.fromDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) },
-                    toDate = remote.toDate?.let { dateTimeFormatter.formatDate(it.toLocalDate()) },
+                    fromDate = remote.fromDate?.let { dateTimeFormatter.formatDate(it.toJavaLocalDateTime().toLocalDate()) },
+                    toDate = remote.toDate?.let { dateTimeFormatter.formatDate(it.toJavaLocalDateTime().toLocalDate()) },
                     order = remote.order
                 )
             }

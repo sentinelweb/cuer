@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.domain
 
 import com.flextrade.jfixture.FixtureAnnotations
 import com.flextrade.jfixture.annotations.Fixture
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
@@ -10,8 +12,6 @@ import org.junit.Before
 import org.junit.Test
 import uk.co.sentinelweb.cuer.domain.serialization.InstantSerializer
 import uk.co.sentinelweb.cuer.domain.serialization.LocalDateTimeSerializer
-import java.time.Instant
-import java.time.LocalDateTime
 
 class MediaDomainTest_Serialization {
 

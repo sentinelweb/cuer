@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.settings
 
+import kotlinx.datetime.toJavaInstant
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -19,6 +20,6 @@ class PrefRootPresenter constructor(
         } else {
             view.showMessage("No reports sent")
         }
-        state.lastDebugSent = timeProvider.instant()
+        state.lastDebugSent = timeProvider.instant().toJavaInstant()
     }
 }

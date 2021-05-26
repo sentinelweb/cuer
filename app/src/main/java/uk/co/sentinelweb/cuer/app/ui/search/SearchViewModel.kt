@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
@@ -24,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
@@ -31,14 +34,14 @@ import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
 import uk.co.sentinelweb.cuer.domain.ext.serialise
-import java.time.LocalDateTime
 
 class SearchViewModel(
     private val state: SearchContract.State,
     private val mapper: SearchMapper,
     private val log: LogWrapper,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
-    private val timeStampMapper: TimeStampMapper
+    private val timeStampMapper: TimeStampMapper,
+    private val timeProvider: TimeProvider
 ) : ViewModel() {
 
     init {
@@ -114,8 +117,8 @@ class SearchViewModel(
         _dialogModelLiveData.value =
             DateRangePickerDialogModel(
                 R.string.search_select_dates,
-                state.remote.fromDate,
-                state.remote.toDate ?: LocalDateTime.now(),
+                state.remote.fromDate?.toJavaLocalDateTime(),
+                (state.remote.toDate ?: timeProvider.localDateTime()).toJavaLocalDateTime(),
                 this::onDatesSelected,
                 { _dialogModelLiveData.value = DialogModel.DismissDialogModel() }
             )
@@ -123,8 +126,8 @@ class SearchViewModel(
 
     fun onDatesSelected(start: Long, end: Long) {
         state.remote = state.remote.copy(
-            fromDate = timeStampMapper.toLocalDateTimeNano(start),
-            toDate = timeStampMapper.toLocalDateTimeNano(end)
+            fromDate = timeStampMapper.toLocalDateTimeNano(start).toKotlinLocalDateTime(),
+            toDate = timeStampMapper.toLocalDateTimeNano(end).toKotlinLocalDateTime()
         )
         model = mapper.map(state)
     }

@@ -83,7 +83,7 @@ android {
 dependencies {
     // project
     //implementation project(":domain")
-    //implementation project(":core")
+    implementation project(":core")
     implementation project(":shared")
     implementation project(":net")
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -99,7 +99,7 @@ dependencies {
     implementation "com.google.android.material:material:$ver_material"
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
-
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime"
     implementation "androidx.recyclerview:recyclerview:$ver_recyclerview"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$ver_swipe_refresh"
 

@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.entity.update
 
+import kotlinx.datetime.toJavaInstant
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 import uk.co.sentinelweb.cuer.app.db.util.setFlag
@@ -11,7 +12,7 @@ class MediaUpdateMapper(val instantConverter: InstantTypeConverter) {
         updateObject.id,
         updateObject.duration,
         updateObject.positon,
-        instantConverter.toDb(updateObject.dateLastPlayed),
+        instantConverter.toDb(updateObject.dateLastPlayed?.toJavaInstant()),
         setFlag(flags, MediaEntity.FLAG_WATCHED, updateObject.watched)
     )
 

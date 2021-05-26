@@ -57,6 +57,7 @@ import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
+import uk.co.sentinelweb.cuer.core.di.CoreJvmModule
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -179,6 +180,7 @@ object Modules {
         .plus(NetModule.netModule)
         .plus(CoreModule.objectModule)
         .plus(DomainModule.objectModule)
+        .plus(CoreJvmModule.objectModule)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
 }

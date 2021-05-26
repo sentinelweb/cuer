@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 
+import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
@@ -36,7 +37,7 @@ internal class YoutubePlaylistDomainMapper(
                 config = PlaylistDomain.PlaylistConfigDomain(
                     platformUrl = "https://youtube.com/playlist?list=${it.id}",
                     description = it.snippet.description,
-                    published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) }
+                    published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts)?.toKotlinLocalDateTime() }
                 ),
                 items = mapItems(items, videoLookup, channelLookup)
             )
@@ -73,7 +74,7 @@ internal class YoutubePlaylistDomainMapper(
             image = imageMapper.mapImage(it.thumbnails),
             channelData = it.videoOwnerChannelId?.let { channelLookup[it] }
                 ?: throw BadDataException("Channel not found: ownerId:${it.videoOwnerChannelId} videoId:${it.resourceId.videoId}"),
-            published = it.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) },
+            published = it.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts)?.toKotlinLocalDateTime() },
             isLiveBroadcast = videoLookup[it.resourceId.videoId]
                 ?.snippet?.liveBroadcastContent
                 ?.let { it == YoutubeVideosDto.LIVE || it == YoutubeVideosDto.UPCOMING }
