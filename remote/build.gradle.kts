@@ -48,6 +48,7 @@ kotlin {
                 implementation("io.ktor:ktor-serialization:$ver_ktor")
                 implementation("io.ktor:ktor-server-core:$ver_ktor")
                 implementation("io.ktor:ktor-server-netty:$ver_ktor")
+                implementation("io.ktor:ktor-server-cio:$ver_ktor")
                 implementation("ch.qos.logback:logback-classic:1.2.3")
             }
         }
@@ -93,6 +94,10 @@ kotlin {
             }
         }
     }
+}
+
+application {
+    mainClassName = "uk.co.sentinelweb.cuer.remote.server.ServerKt"
 }
 
 val runServer by tasks.creating(JavaExec::class) {

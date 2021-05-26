@@ -8,13 +8,14 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
+import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.server.netty.*
 import org.slf4j.event.Level
 
 fun main() {
+    // todo test CIO with android
     val port = System.getenv("PORT")?.toInt() ?: 9090
-    embeddedServer(Netty, port) {
+    embeddedServer(/*Netty*/CIO, port) {
         install(ContentNegotiation) {
             json()
         }
@@ -42,16 +43,9 @@ fun main() {
                 call.respondText("Hello, API!")
                 System.out.println("/hello : " + call.request.uri)
             }
-//            get("/cuer.js") {
-//                call.respondBytes(
-//                    this::class.java.classLoader.getResource("cuer.js")!!.readBytes(),
-//                    ContentType.Application.JavaScript
-//                )
-//                System.out.println("/cuer.js : "+call.request.uri)
-//            }
             static("/") {
                 System.out.println("static : " + this.children.toString())
-                resources("")
+                resources()
             }
         }
     }.start(wait = true)
