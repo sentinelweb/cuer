@@ -7,8 +7,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.toJavaInstant
 import kotlinx.datetime.toJavaLocalDateTime
-import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
-import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager.Companion.VERSION
+import uk.co.sentinelweb.cuer.app.backujp.BackupFileManager
+import uk.co.sentinelweb.cuer.app.backujp.BackupFileManager.Companion.VERSION
 import uk.co.sentinelweb.cuer.app.util.wrapper.FileWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper

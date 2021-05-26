@@ -1,11 +1,7 @@
-package uk.co.sentinelweb.cuer.app.db.backup.version
+package uk.co.sentinelweb.cuer.app.backup.version
 
-import androidx.annotation.VisibleForTesting
-//import uk.co.sentinelweb.cuer.app.db.backup.version.v1.V1Mapper
-//import uk.co.sentinelweb.cuer.app.db.backup.version.v1.V1Parser
-import uk.co.sentinelweb.cuer.app.db.backup.version.v2.V2Parser
+import uk.co.sentinelweb.cuer.app.backup.version.v2.V2Parser
 import uk.co.sentinelweb.cuer.app.db.backup.version.v2.V3Parser
-import java.util.*
 
 class ParserFactory {
 
@@ -15,11 +11,10 @@ class ParserFactory {
             //1 -> V1Parser(V1Mapper())
             2 -> V2Parser()
             3 -> V3Parser()
-            else -> throw InvalidPropertiesFormatException("Can't get parser for version :(")
+            else -> throw UnsupportedOperationException("Can't get parser for version:$version")
         }
     }
 
-    @VisibleForTesting
     fun getVersion(data: String): Int {
         val pos = data.indexOf("version")
         if (pos in 0..100) {

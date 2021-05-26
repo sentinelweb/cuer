@@ -6,9 +6,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
+import uk.co.sentinelweb.cuer.app.backujp.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
-import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
-import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.orchestrator.*
@@ -144,7 +143,6 @@ object Modules {
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
         factory { BackupFileManager(get(), get(), get(), get(), get(), get(), get()) }
-        factory { ParserFactory() }
     }
 
     private val wrapperModule = module {
@@ -183,4 +181,5 @@ object Modules {
         .plus(CoreJvmModule.objectModule)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
+        .plus(AppSharedModule.objectModule)
 }
