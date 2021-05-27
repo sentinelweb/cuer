@@ -4,7 +4,11 @@ on:
   push:
     branches: [ develop ]
   pull_request:
-    //branches: [ * ]
+    branches:
+      - feature/**
+      - bugfix/**
+      - develop
+      - main
 
 jobs:
   build:
