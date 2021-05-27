@@ -96,23 +96,39 @@ kotlin {
     }
 }
 
-application {
-    mainClassName = "uk.co.sentinelweb.cuer.remote.server.ServerKt"
-}
-
 val runServer by tasks.creating(JavaExec::class) {
     group = "application"
     main = "uk.co.sentinelweb.cuer.remote.server.ServerKt"
     kotlin {
         val main = targets["jvm"].compilations["main"]
         dependsOn(main.compileAllTaskName)
+        dependsOn("jsBrowserDevelopmentWebpack")
+        val jarTaskName = "jvmJar"
+        dependsOn(jarTaskName)
+        val jvmJarTask = tasks.getByName<Jar>(jarTaskName)
         classpath(
-            { main.output.allOutputs.files },
+//            { main.output.allOutputs.files },
+            { jvmJarTask.outputs.files },
             { configurations["jvmRuntimeClasspath"] }
         )
+        println("runServer:" + main.output.allOutputs.files)
     }
     ///disable app icon on macOS
     //systemProperty("java.awt.headless", "true")
+}
+
+// include JS artifacts in any JAR we generate
+tasks.getByName<Jar>("jvmJar") {
+    val taskName = if (project.hasProperty("isProduction")) {
+        "jsBrowserProductionWebpack"
+    } else {
+        "jsBrowserDevelopmentWebpack"
+    }
+    val webpackTask = tasks.getByName<KotlinWebpack>(taskName)
+    dependsOn(webpackTask) // make sure JS gets compiled first
+//    from(File(webpackTask.destinationDirectory, webpackTask.outputFileName))// bring output file along into the JAR
+    from(File(webpackTask.destinationDirectory, "cuer.js"))
+//    from(File(webpackTask.destinationDirectory, "cuer.js.map"))
 }
 
 tasks {

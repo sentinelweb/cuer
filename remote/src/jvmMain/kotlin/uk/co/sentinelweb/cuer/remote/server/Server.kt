@@ -45,7 +45,7 @@ fun main() {
             }
             static("/") {
                 System.out.println("static : " + this.children.toString())
-                resources()
+                resources("")
             }
         }
     }.start(wait = true)
