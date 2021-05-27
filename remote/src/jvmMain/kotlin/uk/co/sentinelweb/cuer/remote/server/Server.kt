@@ -10,7 +10,7 @@ import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import org.slf4j.event.Level
+import java.io.File
 
 fun main() {
     // todo test CIO with android
@@ -29,7 +29,7 @@ fun main() {
             gzip()
         }
         install(CallLogging) {
-            level = Level.DEBUG
+            //level = Level.DEBUG
         }
         routing {
             get("/") {
@@ -39,9 +39,22 @@ fun main() {
                 )
                 System.out.println("/ : " + call.request.uri)
             }
-            get("/hello") {
-                call.respondText("Hello, API!")
-                System.out.println("/hello : " + call.request.uri)
+            get("/playlists") {
+                try {
+                    call.respondBytes(
+                        File(
+                            File(System.getProperty("user.dir")).parent,
+                            "media/data/v3-2021-05-26_13 28 23-short.json"
+                        ).readBytes(),
+                        ContentType.Application.Json
+                    )
+                } catch (e: Throwable) {
+                    System.err.println("error: /playlists : " + e.message)
+                    e.printStackTrace()
+                    call.response.status(HttpStatusCode.InternalServerError)
+                    call.respondText("Error loading file")
+                }
+                System.out.println("/playlists : " + call.request.uri)
             }
             static("/") {
                 System.out.println("static : " + this.children.toString())
