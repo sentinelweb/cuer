@@ -22,13 +22,18 @@ fun MediaDomain.serialise() = domainJsonSerializer.encodeToString(
     MediaDomain.serializer(), this
 )
 
-fun List<MediaDomain>.serialiseList() = domainJsonSerializer.encodeToString(
+fun List<MediaDomain>.serialiseMedias() = domainJsonSerializer.encodeToString(
     ListSerializer(MediaDomain.serializer()), this
 )
 
 fun PlaylistDomain.serialise() = domainJsonSerializer.encodeToString(
     PlaylistDomain.serializer(), this
 )
+
+fun List<PlaylistDomain>.serialisePlaylists() = domainJsonSerializer.encodeToString(
+    ListSerializer(PlaylistDomain.serializer()), this
+)
+
 
 fun PlaylistDomain.PlaylistConfigDomain.serialise() = domainJsonSerializer.encodeToString(
     PlaylistDomain.PlaylistConfigDomain.serializer(), this

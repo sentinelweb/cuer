@@ -15,6 +15,7 @@ val ver_kotlinx_datetime: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_ktor: String by project
 val ver_jvm: String by project
+val outputJsLibName = "cuer.js"
 
 group = "uk.co.sentinelweb.cuer.remote"
 version = "1.0"
@@ -118,6 +119,7 @@ val runServer by tasks.creating(JavaExec::class) {
 }
 
 // include JS artifacts in any JAR we generate
+
 tasks.getByName<Jar>("jvmJar") {
     val taskName = if (project.hasProperty("isProduction")) {
         "jsBrowserProductionWebpack"
@@ -127,13 +129,13 @@ tasks.getByName<Jar>("jvmJar") {
     val webpackTask = tasks.getByName<KotlinWebpack>(taskName)
     dependsOn(webpackTask) // make sure JS gets compiled first
 //    from(File(webpackTask.destinationDirectory, webpackTask.outputFileName))// bring output file along into the JAR
-    from(File(webpackTask.destinationDirectory, "cuer.js"))
+    from(File(webpackTask.destinationDirectory, outputJsLibName))
 //    from(File(webpackTask.destinationDirectory, "cuer.js.map"))
 }
 
 tasks {
     withType<KotlinWebpack> {
-        outputFileName = "cuer.js"
+        outputFileName = outputJsLibName
         //output.libraryTarget = "commonjs2"
     }
 }
