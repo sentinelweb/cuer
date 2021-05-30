@@ -16,6 +16,6 @@ data class SearchLocalDomain(
     var dateRangeType: DateRange = DateRange.PUBLISHED,
     @Contextual var fromDate: Instant? = null,
     @Contextual var toDate: Instant? = null
-) {
+) : Domain {
     enum class DateRange { PUBLISHED, ADDED, WATCHED }
 }

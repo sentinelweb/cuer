@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
-import uk.co.sentinelweb.cuer.domain.update.UpdateObject
+import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistStatsOrchestrator constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
@@ -53,7 +53,7 @@ class PlaylistStatsOrchestrator constructor(
         throw NotImplementedException()
     }
 
-    override suspend fun update(update: UpdateObject<PlaylistStatDomain>, options: Options): PlaylistStatDomain? {
+    override suspend fun update(update: UpdateDomain<PlaylistStatDomain>, options: Options): PlaylistStatDomain? {
         throw NotImplementedException()
     }
 }

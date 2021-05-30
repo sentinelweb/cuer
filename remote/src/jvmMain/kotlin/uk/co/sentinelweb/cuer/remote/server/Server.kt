@@ -10,20 +10,33 @@ import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseBackupFileModel
 import uk.co.sentinelweb.cuer.domain.ext.serialise
-import uk.co.sentinelweb.cuer.domain.ext.serialisePlaylists
+import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
+import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
+import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
+import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
 
-private lateinit var database: BackupFileModel
+data class TestDatabase constructor(
+    val data: BackupFileModel,
+    val items: Map<Long, PlaylistItemDomain> = data.playlists.map { it.items }.flatten().associateBy { it.id!! },
+    val media: Map<Long, MediaDomain> = data.playlists.map { it.items.map { it.media } }.flatten().associateBy { it.id!! },
+)
+
+private lateinit var database: TestDatabase
 
 fun main() {
     val backupFile = File(
         File(System.getProperty("user.dir")).parent,
         "media/data/v3-2021-05-26_13 28 23-cuer_backup-Pixel_3a.json"
     )
-    database = deserialiseBackupFileModel(backupFile.readText())
+    database = TestDatabase(deserialiseBackupFileModel(backupFile.readText()))
     System.out.println("database loaded")
     // todo test CIO with android
     val port = System.getenv("PORT")?.toInt() ?: 9090
@@ -52,30 +65,68 @@ fun main() {
                 System.out.println("/ : " + call.request.uri)
             }
             get("/playlists") {
-                call.respondText(
-                    database.playlists.map { it.copy(items = listOf()) }.serialisePlaylists(),
-                    ContentType.Application.Json
-                )
-                System.out.println("/playlists : " + call.request.uri)
-            }
-            get("/playlist/{id}") {
-                val id = call.parameters["id"]?.toLong() ?: error("Invalid playlist request")
-                database.playlists.find { it.id == id }
-                    ?.apply {
+                database.data.playlists.map { it.copy(items = listOf()) }
+                    .let { ResponseDomain(it) }
+                    .apply {
                         call.respondText(serialise(), ContentType.Application.Json)
                     }
-                    ?: apply {
-                        System.err.println("error: /playlist : $id")
-                        call.response.status(HttpStatusCode.NotFound)
-                        call.respondText("No playlist with ID: $id")
+                System.out.println("/playlists : " + call.request.uri)
+            }
+            get("/playlist/") {
+                call.error(HttpStatusCode.BadRequest, "No ID")
+            }
+            get("/playlist/{id}") {
+                (call.parameters["id"]?.toLong())
+                    ?.let { id ->
+                        database.data.playlists.find { it.id == id }
+                            ?.let { ResponseDomain(it) }
+                            ?.apply {
+                                call.respondText(serialise(), ContentType.Application.Json)
+                            }
+                            ?: apply {
+                                call.error(HttpStatusCode.NotFound, "No playlist with ID: $id")
+                            }
                     }
-                System.out.println("/playlist : " + call.request.uri)
+                System.out.println(call.request.uri)
+            }
+            get("/playlistItem/") {
+                call.error(HttpStatusCode.BadRequest, "No ID")
+            }
+            get("/playlistItem/{id}") {
+                (call.parameters["id"]?.toLong())
+                    ?.let { id ->
+                        database.items[id]
+                            ?.let { ResponseDomain(it) }
+                            ?.apply {
+                                call.respondText(serialise(), ContentType.Application.Json)
+                            }
+                            ?: apply {
+                                call.error(HttpStatusCode.NotFound, "No playlist with ID: $id")
+                            }
+                    }
+                System.out.println(call.request.uri)
             }
             static("/") {
-                System.out.println("static : " + this.children.toString())
                 resources("")
             }
         }
     }.start(wait = true)
 }
 
+suspend fun ApplicationCall.error(
+    status: HttpStatusCode = HttpStatusCode.InternalServerError,
+    message: String? = null,
+    error: Throwable? = null
+) {
+    val errorString = error?.let { e ->
+        StringWriter()
+            .apply { e.printStackTrace(PrintWriter(this)) }
+            .toString()
+    }
+    val messageFull = status.description + " : " + (message ?: error?.message ?: "")
+    response.status(status)
+    respondText(
+        ResponseDomain(ErrorDomain(ERROR, HTTP, status.value, messageFull, errorString)).serialise(),
+        ContentType.Application.Json
+    )
+}

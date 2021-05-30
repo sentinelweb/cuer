@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.update.UpdateObject
+import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
@@ -96,7 +96,7 @@ class MediaOrchestrator constructor(
         throw NotImplementedException()
     }
 
-    override suspend fun update(update: UpdateObject<MediaDomain>, options: Options): MediaDomain? =
+    override suspend fun update(update: UpdateDomain<MediaDomain>, options: Options): MediaDomain? =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
             LOCAL -> mediaDatabaseRepository

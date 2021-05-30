@@ -4,11 +4,11 @@ import kotlinx.datetime.toJavaInstant
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 import uk.co.sentinelweb.cuer.app.db.util.setFlag
-import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdate
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 
 class MediaUpdateMapper(val instantConverter: InstantTypeConverter) {
 
-    fun map(updateObject: MediaPositionUpdate, flags: Long) = MediaPositionUpdateEntity(
+    fun map(updateObject: MediaPositionUpdateDomain, flags: Long) = MediaPositionUpdateEntity(
         updateObject.id,
         updateObject.duration,
         updateObject.positon,

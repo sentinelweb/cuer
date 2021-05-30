@@ -3,18 +3,15 @@ package uk.co.sentinelweb.cuer.domain.update
 import kotlinx.datetime.Instant
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
-//import java.time.Instant
 
-abstract class UpdateObject<T>
+abstract class UpdateDomain<T>
 
-sealed class MediaUpdateObject : UpdateObject<MediaDomain>() {
+sealed class MediaUpdateDomain : UpdateDomain<MediaDomain>()
 
-}
-
-data class MediaPositionUpdate(
+data class MediaPositionUpdateDomain(
     val id: Long,
     val duration: Long?,
     val positon: Long?,
     val dateLastPlayed: Instant?,
     val watched: Boolean
-) : MediaUpdateObject()
+) : MediaUpdateDomain()

@@ -7,8 +7,6 @@ import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 
-//import java.time.Instant
-//import java.time.LocalDateTime
 
 @Serializable
 data class PlaylistDomain constructor(
@@ -29,7 +27,7 @@ data class PlaylistDomain constructor(
     val image: ImageDomain? = null,
     val playItemsFromStart: Boolean = false,
     val config: PlaylistConfigDomain = PlaylistConfigDomain()
-) {
+) : Domain {
 
     enum class PlaylistModeDomain {
         SINGLE, LOOP, SHUFFLE

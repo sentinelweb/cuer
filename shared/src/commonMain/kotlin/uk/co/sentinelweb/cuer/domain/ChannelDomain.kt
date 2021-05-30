@@ -19,4 +19,4 @@ data class ChannelDomain constructor(
     val thumbNail: ImageDomain? = null,
     val image: ImageDomain? = null,
     val starred: Boolean = false
-)
+) : Domain

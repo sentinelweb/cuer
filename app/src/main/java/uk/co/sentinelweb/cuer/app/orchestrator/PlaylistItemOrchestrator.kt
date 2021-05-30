@@ -9,7 +9,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.update.UpdateObject
+import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistItemOrchestrator constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
@@ -104,7 +104,7 @@ class PlaylistItemOrchestrator constructor(
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
-    override suspend fun update(update: UpdateObject<PlaylistItemDomain>, options: Options): PlaylistItemDomain? {
+    override suspend fun update(update: UpdateDomain<PlaylistItemDomain>, options: Options): PlaylistItemDomain? {
         TODO("Not yet implemented")
     }
 

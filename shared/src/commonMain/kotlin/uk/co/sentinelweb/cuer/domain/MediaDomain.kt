@@ -29,7 +29,7 @@ data class MediaDomain(
     val isLiveBroadcast: Boolean = false,
     val isLiveBroadcastUpcoming: Boolean = false,
     val playFromStart: Boolean = false,
-    ) {
+) : Domain {
 
     enum class MediaTypeDomain {
         VIDEO, AUDIO, WEB

@@ -14,4 +14,4 @@ data class PlaylistItemDomain(
     val order: Long,
     val archived: Boolean = false,
     val playlistId: Long? = null
-)
+) : Domain
