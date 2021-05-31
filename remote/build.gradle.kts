@@ -1,8 +1,6 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
-
 // ./gradlew :remote:jsBrowserRun --continue
-
-//  ./gradlew :remote:runServer
+// ./gradlew :remote:runServer
 
 plugins {
     kotlin("multiplatform")
@@ -14,6 +12,7 @@ val ver_kotlinx_datetime: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_ktor: String by project
 val ver_jvm: String by project
+val ver_koin: String by project
 val outputJsLibName = "cuer.js"
 
 group = "uk.co.sentinelweb.cuer.remote"
@@ -29,7 +28,6 @@ kotlin {
         binaries.executable()
     }
     jvm {
-        //withJava()
     }
     sourceSets {
 
@@ -39,6 +37,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
+                implementation("io.insert-koin:koin-core:$ver_koin")
             }
         }
 
@@ -47,7 +46,6 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$ver_kotlinx_serialization_core")
                 implementation("io.ktor:ktor-serialization:$ver_ktor")
                 implementation("io.ktor:ktor-server-core:$ver_ktor")
-                //implementation("io.ktor:ktor-server-netty:$ver_ktor")
                 implementation("io.ktor:ktor-server-cio:$ver_ktor")
                 implementation("ch.qos.logback:logback-classic:1.2.3")
             }
@@ -98,7 +96,7 @@ kotlin {
 
 val runServer by tasks.creating(JavaExec::class) {
     group = "application"
-    main = "uk.co.sentinelweb.cuer.remote.server.ServerKt"
+    main = "uk.co.sentinelweb.cuer.remote.server.MainKt"
     kotlin {
         val main = targets["jvm"].compilations["main"]
         dependsOn(main.compileAllTaskName)
@@ -107,18 +105,14 @@ val runServer by tasks.creating(JavaExec::class) {
         dependsOn(jarTaskName)
         val jvmJarTask = tasks.getByName<Jar>(jarTaskName)
         classpath(
-//            { main.output.allOutputs.files },
             { jvmJarTask.outputs.files },
             { configurations["jvmRuntimeClasspath"] }
         )
         println("runServer:" + main.output.allOutputs.files)
     }
-    ///disable app icon on macOS
-    //systemProperty("java.awt.headless", "true")
 }
 
 // include JS artifacts in any JAR we generate
-
 tasks.getByName<Jar>("jvmJar") {
     val taskName = if (project.hasProperty("isProduction")) {
         "jsBrowserProductionWebpack"
@@ -127,7 +121,6 @@ tasks.getByName<Jar>("jvmJar") {
     }
     val webpackTask = tasks.getByName<KotlinWebpack>(taskName)
     dependsOn(webpackTask) // make sure JS gets compiled first
-//    from(File(webpackTask.destinationDirectory, webpackTask.outputFileName))// bring output file along into the JAR
     from(File(webpackTask.destinationDirectory, outputJsLibName))
 //    from(File(webpackTask.destinationDirectory, "cuer.js.map"))
 }
@@ -135,7 +128,6 @@ tasks.getByName<Jar>("jvmJar") {
 tasks {
     withType<KotlinWebpack> {
         outputFileName = outputJsLibName
-        //output.libraryTarget = "commonjs2"
     }
 }
 

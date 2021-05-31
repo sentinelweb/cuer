@@ -11,9 +11,9 @@ import androidx.annotation.RequiresApi
 
 class NotificationWrapper constructor(private val app: Application) {
 
-    fun createChannelId() =
+    fun createChannelId(channelId: String, channelName: String) =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel("cuer_yt_service", "Cuer Youtube Service")
+            createNotificationChannel(channelId, channelName)
         } else {
             // If earlier version channel ID is not used
             // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)

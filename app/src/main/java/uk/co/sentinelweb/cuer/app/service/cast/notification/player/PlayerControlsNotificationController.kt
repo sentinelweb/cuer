@@ -7,8 +7,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Controller
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Presenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.CC_DISCONNECTED
@@ -21,15 +21,15 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-class PlayerControlsNotification constructor(
+class PlayerControlsNotificationController constructor(
     private val view: PlayerControlsNotificationContract.View,
-    private val state: PlayerControlsNotificationState,
+    private val state: PlayerControlsNotificationContract.State,
     private val toastWrapper: ToastWrapper,
     private val log: LogWrapper,
     private val context: Context,
     private val skipControl: SkipContract.External,
     private val mediaSessionManager: MediaSessionManager
-) : External, Presenter, SkipContract.Listener {
+) : External, Controller, SkipContract.Listener {
 
     private var listener: Listener? = null
 
@@ -163,6 +163,18 @@ class PlayerControlsNotification constructor(
 
     }
 
+    override fun skipSeekTo(target: Long) {
+        listener?.seekTo(target)
+    }
+
+    override fun skipSetBackText(text: String) {
+
+    }
+
+    override fun skipSetFwdText(text: String) {
+
+    }
+
     companion object {
         const val ACTION_PAUSE = "pause"
         const val ACTION_PLAY = "play"
@@ -173,18 +185,6 @@ class PlayerControlsNotification constructor(
         const val ACTION_DISCONNECT = "disconnect"
         const val ACTION_STAR = "star"
         const val ACTION_UNSTAR = "unstar"
-
-    }
-
-    override fun skipSeekTo(target: Long) {
-        listener?.seekTo(target)
-    }
-
-    override fun skipSetBackText(text: String) {
-
-    }
-
-    override fun skipSetFwdText(text: String) {
 
     }
 }

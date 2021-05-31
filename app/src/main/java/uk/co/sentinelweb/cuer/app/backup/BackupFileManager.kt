@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.backujp
+package uk.co.sentinelweb.cuer.app.backup
 
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.backup.version.ParserFactory

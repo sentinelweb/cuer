@@ -12,7 +12,7 @@ interface PlayerControlsNotificationContract {
         fun destroy()
     }
 
-    interface Presenter {
+    interface Controller {
 
     }
 
@@ -26,4 +26,14 @@ interface PlayerControlsNotificationContract {
         fun stopSelf()
     }
 
+    data class State(
+        var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
+        var positionMs: Long = 0,
+        var seekPositionMs: Long = 0,
+        var durationMs: Long = 0,
+        var title: String = "",
+        var media: MediaDomain? = null,
+        var bitmap: Bitmap? = null,
+        var playlistName: String = "none"
+    )
 }

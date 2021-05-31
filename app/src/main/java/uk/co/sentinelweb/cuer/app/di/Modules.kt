@@ -6,7 +6,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
-import uk.co.sentinelweb.cuer.app.backujp.BackupFileManager
+import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
@@ -68,6 +69,7 @@ import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
+import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
 object Modules {
 
@@ -87,7 +89,8 @@ object Modules {
         PrefBackupContract.fragmentModule,
         PrefRootContract.fragmentModule,
         SearchContract.fragmentModule,
-        SearchImageContract.fragmentModule
+        SearchImageContract.fragmentModule,
+        RemoteServiceModule.serviceModule
     )
 
     private val uiModule = module {
@@ -182,4 +185,5 @@ object Modules {
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
         .plus(AppSharedModule.objectModule)
+        .plus(RemoteModule.objectModule)
 }

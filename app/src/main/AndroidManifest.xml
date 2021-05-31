@@ -115,6 +115,10 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".service.remote.RemoteService"
+            android:exported="false" />
+
         <!-- media button receiver -->
         <receiver android:name="androidx.media.session.MediaButtonReceiver">
             <intent-filter>

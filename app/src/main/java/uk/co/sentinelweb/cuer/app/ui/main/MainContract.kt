@@ -48,7 +48,7 @@ interface MainContract {
                         ytServiceManager = get(),
                         ytContextHolder = get(),
                         log = get(),
-                        coroutines = get()
+                        remoteServiceManger = get()
                     )
                 }
                 scoped {

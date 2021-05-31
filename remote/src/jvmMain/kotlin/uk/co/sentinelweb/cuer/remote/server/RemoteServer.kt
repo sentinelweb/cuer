@@ -10,64 +10,46 @@ import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import kotlinx.datetime.Clock
-import uk.co.sentinelweb.cuer.domain.*
-import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
-import uk.co.sentinelweb.cuer.domain.ext.deserialiseBackupFileModel
+import io.ktor.util.*
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
-import java.io.File
+import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.net.InetAddress
 
-data class TestDatabase constructor(
-    val data: BackupFileModel,
-    val items: Map<Long, PlaylistItemDomain> = data.playlists.map { it.items }.flatten().associateBy { it.id!! },
-    val media: Map<Long, MediaDomain> = data.playlists.map { it.items.map { it.media } }.flatten().associateBy { it.id!! },
-)
+@KtorExperimentalAPI
+class RemoteServer constructor(
+    private val database: RemoteDatabaseAdapter
+) {
+    val port: Int
+        get() = System.getenv("PORT")?.toInt() ?: 9090
 
-private lateinit var database: TestDatabase
+    val ipAddress: String
+        get() = InetAddress.getLocalHost().hostAddress
 
-fun main() {
-    val backupFile = File(
-        File(System.getProperty("user.dir")).parent,
-        "media/data/v3-2021-05-26_13 28 23-cuer_backup-Pixel_3a.json"
-    )
-    if (backupFile.exists()) {
-        database = TestDatabase(deserialiseBackupFileModel(backupFile.readText()))
-    } else {
-        database = TestDatabase(
-            BackupFileModel(
-                playlists = listOf(
-                    PlaylistDomain(
-                        id = 1, title = "Test", items = listOf(
-                            PlaylistItemDomain(
-                                id = 1,
-                                dateAdded = Clock.System.now(),
-                                order = 1,
-                                media = MediaDomain(
-                                    id = 1,
-                                    title = "marc rebillet & harry mack",
-                                    url = "https://www.youtube.com/watch?v=ggLpFa6CQyU",
-                                    platformId = "ggLpFa6CQyU",
-                                    platform = PlatformDomain.YOUTUBE,
-                                    mediaType = MediaDomain.MediaTypeDomain.VIDEO,
-                                    channelData = ChannelDomain(title = "author", platformId = "xxx", platform = PlatformDomain.YOUTUBE)
-                                )
-                            )
-                        )
-                    )
-                ), medias = listOf()
-            )
-        )
+    val fullAddress: String
+        get() = "http://$ipAddress:$port"
+
+    private var _isRunning: Boolean = false
+    val isRunning: Boolean
+        get() = _isRunning
+
+    fun start() {
+        cioApplicationEngine
+            .start(wait = true)
+        _isRunning = true
     }
-    System.out.println("database loaded")
-    // todo test CIO with android
-    val port = System.getenv("PORT")?.toInt() ?: 9090
-    embeddedServer(/*Netty*/CIO, port) {
+
+    fun stop() {
+        cioApplicationEngine.stop(0, 0)
+        _isRunning = false
+    }
+
+    private val cioApplicationEngine: ApplicationEngine = embeddedServer(CIO, port) {
         install(ContentNegotiation) {
             json()
         }
@@ -92,7 +74,7 @@ fun main() {
                 System.out.println("/ : " + call.request.uri)
             }
             get("/playlists") {
-                database.data.playlists.map { it.copy(items = listOf()) }
+                database.getPlaylists()
                     .let { ResponseDomain(it) }
                     .apply {
                         call.respondText(serialise(), ContentType.Application.Json)
@@ -105,7 +87,7 @@ fun main() {
             get("/playlist/{id}") {
                 (call.parameters["id"]?.toLong())
                     ?.let { id ->
-                        database.data.playlists.find { it.id == id }
+                        database.getPlaylist(id)
                             ?.let { ResponseDomain(it) }
                             ?.apply {
                                 call.respondText(serialise(), ContentType.Application.Json)
@@ -122,7 +104,7 @@ fun main() {
             get("/playlistItem/{id}") {
                 (call.parameters["id"]?.toLong())
                     ?.let { id ->
-                        database.items[id]
+                        database.getPlaylistItem(id)
                             ?.let { ResponseDomain(it) }
                             ?.apply {
                                 call.respondText(serialise(), ContentType.Application.Json)
@@ -137,7 +119,7 @@ fun main() {
                 resources("")
             }
         }
-    }.start(wait = true)
+    }
 }
 
 suspend fun ApplicationCall.error(
