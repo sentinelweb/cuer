@@ -6,7 +6,6 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
     kotlin("multiplatform")
-    //id("com.android.library")
     application
     kotlin("plugin.serialization")
 }
@@ -48,7 +47,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$ver_kotlinx_serialization_core")
                 implementation("io.ktor:ktor-serialization:$ver_ktor")
                 implementation("io.ktor:ktor-server-core:$ver_ktor")
-                implementation("io.ktor:ktor-server-netty:$ver_ktor")
+                //implementation("io.ktor:ktor-server-netty:$ver_ktor")
                 implementation("io.ktor:ktor-server-cio:$ver_ktor")
                 implementation("ch.qos.logback:logback-classic:1.2.3")
             }

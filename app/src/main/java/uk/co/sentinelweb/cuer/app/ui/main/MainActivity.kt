@@ -59,6 +59,7 @@ class MainActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.main_activity)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -72,6 +73,7 @@ class MainActivity :
         }
         intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
         presenter.initialise()
+        presenter.startServer()
     }
 
     override fun onDestroy() {

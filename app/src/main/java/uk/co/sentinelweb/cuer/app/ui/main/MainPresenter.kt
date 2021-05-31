@@ -1,8 +1,10 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class MainPresenter(
@@ -11,7 +13,8 @@ class MainPresenter(
     private val playerControls: CastPlayerContract.PlayerControls,
     private val ytServiceManager: YoutubeCastServiceManager,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val coroutines: CoroutineContextProvider,
 ) : MainContract.Presenter {
 
     init {
@@ -24,6 +27,15 @@ class MainPresenter(
             state.playServiceCheckDone = true
         }
     }
+
+    override fun startServer() {
+        coroutines.ioScope.launch {
+            log.d("SERVER START")
+            uk.co.sentinelweb.cuer.remote.server.main()
+
+        }
+    }
+
 
     override fun onPlayServicesOk() {
         log.d("onPlayServicesOk()")
@@ -69,5 +81,7 @@ class MainPresenter(
         ytContextHolder.create()
     }
 
-    override fun onDestroy() = Unit
+    override fun onDestroy() {
+        coroutines.cancel()
+    }
 }

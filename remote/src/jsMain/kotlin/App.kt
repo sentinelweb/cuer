@@ -98,7 +98,7 @@ external interface AppState : RState {
 
 suspend fun fetchPlaylists(): List<PlaylistDomain> = coroutineScope {
     val response = window
-        .fetch("$BASE_URL/playlists")
+        .fetch("/playlists")//$BASE_URL
         .await()
         .text()
         .await()
@@ -110,7 +110,7 @@ suspend fun fetchPlaylists(): List<PlaylistDomain> = coroutineScope {
 
 suspend fun fetchPlaylist(id: Long): PlaylistDomain = coroutineScope {
     val response = window
-        .fetch("$BASE_URL/playlist/$id")
+        .fetch("/playlist/$id")//$BASE_URL
         .await()
         .text()
         .await()

@@ -10,8 +10,8 @@ import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import kotlinx.datetime.Clock
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseBackupFileModel
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -36,7 +36,34 @@ fun main() {
         File(System.getProperty("user.dir")).parent,
         "media/data/v3-2021-05-26_13 28 23-cuer_backup-Pixel_3a.json"
     )
-    database = TestDatabase(deserialiseBackupFileModel(backupFile.readText()))
+    if (backupFile.exists()) {
+        database = TestDatabase(deserialiseBackupFileModel(backupFile.readText()))
+    } else {
+        database = TestDatabase(
+            BackupFileModel(
+                playlists = listOf(
+                    PlaylistDomain(
+                        id = 1, title = "Test", items = listOf(
+                            PlaylistItemDomain(
+                                id = 1,
+                                dateAdded = Clock.System.now(),
+                                order = 1,
+                                media = MediaDomain(
+                                    id = 1,
+                                    title = "marc rebillet & harry mack",
+                                    url = "https://www.youtube.com/watch?v=ggLpFa6CQyU",
+                                    platformId = "ggLpFa6CQyU",
+                                    platform = PlatformDomain.YOUTUBE,
+                                    mediaType = MediaDomain.MediaTypeDomain.VIDEO,
+                                    channelData = ChannelDomain(title = "author", platformId = "xxx", platform = PlatformDomain.YOUTUBE)
+                                )
+                            )
+                        )
+                    )
+                ), medias = listOf()
+            )
+        )
+    }
     System.out.println("database loaded")
     // todo test CIO with android
     val port = System.getenv("PORT")?.toInt() ?: 9090
