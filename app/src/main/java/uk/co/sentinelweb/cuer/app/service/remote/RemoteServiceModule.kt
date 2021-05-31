@@ -4,7 +4,6 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
-import uk.co.sentinelweb.cuer.remote.server.database.TestDatabase
 
 object RemoteServiceModule {
 
@@ -34,16 +33,18 @@ object RemoteServiceModule {
                     service = getSource(),
                     appState = get(),
                     timeProvider = get(),
-                    log = get()
+                    log = get(),
+                    res = get()
                 )
             }
             scoped { RemoteContract.Notification.State() }
-
-
+        }
+        factory<RemoteDatabaseAdapter> {
+            AppRemoteDatabaseAdapter(playlistDatabaseRepository = get())
         }
         // test injection
-        factory<RemoteDatabaseAdapter> {
-            TestDatabase.hardcoded()
-        }
+//        factory<RemoteDatabaseAdapter> {
+//            TestDatabase.hardcoded()
+//        }
     }
 }

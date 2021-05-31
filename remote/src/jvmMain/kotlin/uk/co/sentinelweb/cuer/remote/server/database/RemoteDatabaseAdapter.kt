@@ -5,8 +5,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface RemoteDatabaseAdapter {
 
-    fun getPlaylists(): List<PlaylistDomain>
-    fun getPlaylist(id: Long): PlaylistDomain?
-    fun getPlaylistItem(id: Long): PlaylistItemDomain?
+    suspend fun getPlaylists(): List<PlaylistDomain>
+    suspend fun getPlaylist(id: Long): PlaylistDomain?
+    suspend fun getPlaylistItem(id: Long): PlaylistItemDomain?
 
 }

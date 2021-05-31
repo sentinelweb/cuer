@@ -73,7 +73,7 @@ class MainActivity :
         }
         intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
         presenter.initialise()
-        presenter.startServer()
+        //presenter.startServer()
     }
 
     override fun onDestroy() {

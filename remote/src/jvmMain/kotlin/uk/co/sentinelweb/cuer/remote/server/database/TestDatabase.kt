@@ -12,11 +12,11 @@ import java.io.File
     val media: Map<Long, MediaDomain> = data.playlists.map { it.items.map { it.media } }.flatten().associateBy { it.id!! },
 ) : RemoteDatabaseAdapter {
 
-    override fun getPlaylists(): List<PlaylistDomain> = data.playlists.map { it.copy(items = listOf()) }
+    override suspend fun getPlaylists(): List<PlaylistDomain> = data.playlists.map { it.copy(items = listOf()) }
 
-    override fun getPlaylist(id: Long): PlaylistDomain? = data.playlists.find { it.id == id }
+    override suspend fun getPlaylist(id: Long): PlaylistDomain? = data.playlists.find { it.id == id }
 
-    override fun getPlaylistItem(id: Long): PlaylistItemDomain? = items[id]
+    override suspend fun getPlaylistItem(id: Long): PlaylistItemDomain? = items[id]
 
     companion object {
         //"media/data/v3-2021-05-26_13 28 23-cuer_backup-Pixel_3a.json"

@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.koin.android.ext.android.inject
@@ -34,6 +35,11 @@ class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContr
         return onCreateView
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        presenter.initialisePrefs()
+    }
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_root, rootKey)
     }
@@ -41,9 +47,18 @@ class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContr
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         when (preference.key) {
             getString(R.string.prefs_root_debug_send_reports_key) -> presenter.sendDebugReports()
+            getString(R.string.prefs_root_remote_service_key) -> presenter.toggleRemoteService()
         }
 
         return super.onPreferenceTreeClick(preference)
+    }
+
+    override fun setRemoteServiceRunning(running: Boolean) {
+        (findPreference(getString(R.string.prefs_root_remote_service_key)) as CheckBoxPreference?)
+            ?.apply {
+                setChecked(!running)
+                setSummary(getString(if (running) R.string.prefs_root_remote_service_running else R.string.prefs_root_remote_service_not_running))
+            }
     }
 
     override fun showMessage(msg: String) {

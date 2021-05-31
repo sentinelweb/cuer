@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- transition -->
     <string name="cast_player_trans_image">castPlayerImage</string>
     <string name="cast_player_trans_title">castPlayerTitle</string>
     <string name="playlist_item_trans_image">playlistItemHeaderImage</string>
     <string name="playlist_item_trans_title">playlistItemHeaderTitle</string>
+
+    <!-- prefs -->
+    <string name="prefs_root_remote_service_key">remote_service</string>
+    <string name="prefs_root_debug_send_reports_key">sendReports</string>
+    <string name="prefs_backup_backup_key">backup</string>
+    <string name="prefs_backup_restore_key">restore</string>
 </resources>

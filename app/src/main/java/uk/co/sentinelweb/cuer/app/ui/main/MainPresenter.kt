@@ -27,9 +27,9 @@ class MainPresenter(
         }
     }
 
-    override fun startServer() {
-        remoteServiceManger.start()
-    }
+//    override fun startServer() {
+//        remoteServiceManger.start()
+//    }
 
 
     override fun onPlayServicesOk() {
@@ -77,6 +77,6 @@ class MainPresenter(
     }
 
     override fun onDestroy() {
-        remoteServiceManger.stop()
+//        remoteServiceManger.stop()
     }
 }

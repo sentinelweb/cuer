@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteNotificationController.Companion.ACTION_STOP
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -15,7 +16,8 @@ class RemoteNotification constructor(
     private val service: RemoteService,
     private val appState: CuerAppState,
     private val timeProvider: TimeProvider,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val res: ResourceWrapper
 ) : RemoteContract.Notification.View {
 
     init {
@@ -47,8 +49,8 @@ class RemoteNotification constructor(
             appState.remoteNotificationChannelId!!
         )
             .setDefaults(Notification.DEFAULT_ALL)
-            .setSmallIcon(R.drawable.ic_platfrom_web)
-            .setContentTitle("Remote service")
+            .setSmallIcon(R.drawable.ic_remote_service_24)
+            .setContentTitle(res.getString(R.string.prefs_root_remote_service_title))
             .setContentText(address)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

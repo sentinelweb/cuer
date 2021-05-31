@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 interface MainContract {
     interface Presenter {
         fun initialise()
-        fun startServer()
+        //fun startServer()
         fun onStart()
         fun onStop()
         fun onPlayServicesOk()
