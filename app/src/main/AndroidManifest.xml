@@ -4,6 +4,7 @@
           package="uk.co.sentinelweb.cuer.app">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:name=".CuerApp"

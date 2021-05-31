@@ -6,7 +6,6 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteNotificationController.Companion.ACTION_STOP
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
@@ -48,7 +47,7 @@ class RemoteNotification constructor(
             appState.remoteNotificationChannelId!!
         )
             .setDefaults(Notification.DEFAULT_ALL)
-            .setSmallIcon(R.drawable.ic_nav_browse_black)
+            .setSmallIcon(R.drawable.ic_platfrom_web)
             .setContentTitle("Remote service")
             .setContentText(address)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -63,7 +62,7 @@ class RemoteNotification constructor(
     }
 
     private fun pendingIntent(action: String): PendingIntent {
-        val intent = Intent(service, YoutubeCastService::class.java).apply {
+        val intent = Intent(service, RemoteService::class.java).apply {
             this.action = action
             putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
         }

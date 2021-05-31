@@ -4,8 +4,7 @@ class RemoteNotificationController constructor(
     private val view: RemoteContract.Notification.View,
     private val state: RemoteContract.Notification.State
 ) : RemoteContract.Notification.External, RemoteContract.Notification.Controller {
-
-    //    init{
+//    init{
 //        log.tag(this)
 //    }
     override fun updateNotification(address: String) {

@@ -16,7 +16,8 @@ object RemoteServiceModule {
                     service = getSource(),
                     notification = get(),
                     webServer = get(),
-                    coroutines = get()
+                    coroutines = get(),
+                    log = get()
                 )
             }
             scoped<RemoteContract.Notification.External> {
