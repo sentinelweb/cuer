@@ -2,16 +2,11 @@ package uk.co.sentinelweb.cuer.domain
 
 import com.flextrade.jfixture.FixtureAnnotations
 import com.flextrade.jfixture.annotations.Fixture
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.plus
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import uk.co.sentinelweb.cuer.domain.serialization.InstantSerializer
-import uk.co.sentinelweb.cuer.domain.serialization.LocalDateTimeSerializer
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseMedia
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class MediaDomainTest_Serialization {
 
@@ -25,24 +20,8 @@ class MediaDomainTest_Serialization {
 
     @Test
     fun serialization() {
-        val json = Json {
-            prettyPrint = true
-            serializersModule = SerializersModule {
-                mapOf(
-                    MediaDomain::class to MediaDomain.serializer()
-                )
-            }.plus(SerializersModule {
-                contextual(Instant::class, InstantSerializer)
-            }
-            ).plus(SerializersModule {
-                contextual(LocalDateTime::class, LocalDateTimeSerializer)
-            }
-            )
-        }
-        val serialized = json.encodeToString(MediaDomain.serializer(), media)
-
-        val deserializedMedia = json.decodeFromString(MediaDomain.serializer(), serialized)
-
+        val serialized = media.serialise()
+        val deserializedMedia = deserialiseMedia(serialized)
         assertEquals(media, deserializedMedia)
     }
 }

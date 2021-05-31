@@ -16,13 +16,8 @@ external interface VideoPlayerProps : RProps {
 @JsExport
 class VideoPlayer : RComponent<VideoPlayerProps, RState>() {
     override fun RBuilder.render() {
-        styledDiv {
-            css {
-                position = Position.absolute
-                top = 10.px
-                right = 10.px
-            }
-            h3 {
+
+        h3 {
                 +"${props.video.channelData.title}: ${props.video.title}"
             }
             reactPlayerLite {
@@ -107,7 +102,6 @@ class VideoPlayer : RComponent<VideoPlayerProps, RState>() {
                 }
             }
 
-        }
     }
 }
 

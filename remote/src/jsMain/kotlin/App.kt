@@ -1,55 +1,75 @@
-
 import kotlinx.browser.window
-import kotlinx.coroutines.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.await
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import react.*
 import react.dom.h1
-import uk.co.sentinelweb.cuer.domain.ChannelDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import styled.css
+import styled.styledDiv
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseResponse
+
+const val BASE_URL = "http://localhost:9090"
 
 @JsExport
 class App : RComponent<RProps, AppState>() {
     override fun RBuilder.render() {
-        h1 {
-            +"Cuer playlists"
-        }
-        videoList {
-            title = "Unwatched videos"
-            videos = state.unwatchedVideos
-            selectedVideo = state.currentVideo
-            onSelectVideo = { video ->
-                setState {
-                    currentVideo = if (currentVideo == video)
-                        null
-                    else video
-                }
+        styledDiv {
+            css {
+                put("grid-area", "banner")
+            }
+            h1 {
+                +"Cuer playlists"
             }
         }
-
-        videoList {
-            title = "Watched videos"
-            videos = state.watchedVideos
-            selectedVideo = state.currentVideo
-            onSelectVideo = { video ->
-                setState {
-                    currentVideo = video
-                }
+        styledDiv {
+            css {
+                put("grid-area", "playlists")
             }
-        }
-        state.currentVideo?.let { currentVideo ->
-            videoPlayer {
-                video = currentVideo
-                unwatchedVideo = currentVideo in state.unwatchedVideos
-                onWatchedButtonPressed = {
-                    if (video in state.unwatchedVideos) {
-                        setState {
-                            unwatchedVideos -= video
-                            watchedVideos += video
+            playlistList {
+                playlists = state.playlists
+                selectedPlaylist = state.currentPlaylist
+                onSelectPlaylist = { playlist ->
+                    if (state.currentPlaylist == null || state.currentPlaylist?.id != playlist.id) {
+                        MainScope().launch {
+                            val playlistDomain = fetchPlaylist(playlist.id!!)
+                            console.log(playlistDomain)
+                            setState {
+                                currentPlaylist = playlistDomain
+                            }
                         }
-                    } else {
+                    }
+                }
+            }
+        }
+        styledDiv {
+            css {
+                put("grid-area", "playlist")
+            }
+            playlist {
+                title = state.currentPlaylist?.title ?: "No playlist"
+                playlist = state.currentPlaylist
+                selectedItem = state.currentItem
+                onSelectItem = { item ->
+                    setState {
+                        currentItem = item
+                    }
+                }
+            }
+        }
+        styledDiv {
+            css {
+                put("grid-area", "item")
+            }
+            state.currentItem?.let { item ->
+                videoPlayer {
+                    video = item.media
+                    unwatchedVideo = item.media.watched
+                    onWatchedButtonPressed = {
                         setState {
-                            watchedVideos -= video
-                            unwatchedVideos += video
+                            currentItem = currentItem?.let { it.copy(media = it.media.copy(watched = !it.media.watched)) }
                         }
                     }
                 }
@@ -58,53 +78,44 @@ class App : RComponent<RProps, AppState>() {
     }
 
     override fun AppState.init() {
-        unwatchedVideos = listOf()
-        watchedVideos = listOf()
+        playlists = listOf()
+        currentPlaylist = null
 
-        val mainScope = MainScope()
-        mainScope.launch {
-            val videos = fetchVideos()
+        MainScope().launch {
+            val videos = fetchPlaylists()
             setState {
-                unwatchedVideos = videos
+                playlists = videos
             }
         }
     }
 }
 
 external interface AppState : RState {
-    var currentVideo: MediaDomain?
-    var unwatchedVideos: List<MediaDomain>
-    var watchedVideos: List<MediaDomain>
+    var currentItem: PlaylistItemDomain?
+    var playlists: List<PlaylistDomain>
+    var currentPlaylist: PlaylistDomain?
 }
 
-suspend fun fetchVideo(id: Int): MediaDomain {
+suspend fun fetchPlaylists(): List<PlaylistDomain> = coroutineScope {
     val response = window
-        .fetch("https://my-json-server.typicode.com/kotlin-hands-on/kotlinconf-json/videos/$id")
+        .fetch("$BASE_URL/playlists")
         .await()
-        .json()
+        .text()
         .await()
-    return (response as Video).let {
-        MediaDomain(
-            id = it.id.toLong(),
-            url = it.videoUrl,
-            title = it.title,
-            channelData = ChannelDomain(
-                title = it.speaker,
-                platform = PlatformDomain.YOUTUBE,
-                platformId = ""
-            ),
-            platformId = it.videoUrl.substring(it.videoUrl.lastIndexOf("=") + 1),
-            platform = PlatformDomain.YOUTUBE,
-            mediaType = MediaDomain.MediaTypeDomain.VIDEO
-        )
+
+    deserialiseResponse(response).let {
+        it.payload as List<PlaylistDomain>
     }
 }
 
-suspend fun fetchVideos(): List<MediaDomain> = coroutineScope {
-    (1..25).map { id ->
-        async {
-            fetchVideo(id)
-        }
-    }.awaitAll()
-}
+suspend fun fetchPlaylist(id: Long): PlaylistDomain = coroutineScope {
+    val response = window
+        .fetch("$BASE_URL/playlist/$id")
+        .await()
+        .text()
+        .await()
 
+    deserialiseResponse(response).let {
+        (it.payload as List<PlaylistDomain>).get(0)
+    }
+}
