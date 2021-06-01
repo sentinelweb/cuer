@@ -36,6 +36,7 @@ kotlin {
                 implementation(project(":shared"))
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
                 implementation("io.insert-koin:koin-core:$ver_koin")
             }
@@ -43,7 +44,7 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$ver_kotlinx_serialization_core")
+                //implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$ver_kotlinx_serialization_core")
                 implementation("io.ktor:ktor-serialization:$ver_ktor")
                 implementation("io.ktor:ktor-server-core:$ver_ktor")
                 implementation("io.ktor:ktor-server-cio:$ver_ktor")
@@ -54,8 +55,8 @@ kotlin {
         val jsMain by getting {
             dependencies {
 
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-js:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-js:$ver_kotlinx_serialization_core")
+//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-js:$ver_kotlinx_serialization_core")
+//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-js:$ver_kotlinx_serialization_core")
                 implementation(npm("kotlinx-serialization-kotlinx-serialization-core-jslegacy", "1.4.2-RC1"))
 
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime-js:$ver_kotlinx_datetime")

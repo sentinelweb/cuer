@@ -2,27 +2,34 @@ import kotlinx.html.js.onClickFunction
 import react.*
 import react.dom.h3
 import react.dom.p
+import styled.css
+import styled.styledDiv
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 @JsExport
 class Playlist : RComponent<PlaylistProps, RState>() {
     override fun RBuilder.render() {
-        h3 {
-            +props.title
-        }
-        props.playlist?.items?.forEach { item ->
-            p {
-                key = item.id.toString()
-                attrs {
-                    onClickFunction = {
-                        props.onSelectItem(item)
+        styledDiv {
+            css {
+                put("grid-area", "playlist")
+            }
+            h3 {
+                +props.title
+            }
+            props.playlist?.items?.forEach { item ->
+                p {
+                    key = item.id.toString()
+                    attrs {
+                        onClickFunction = {
+                            props.onSelectItem(item)
+                        }
                     }
+                    if (item == props.selectedItem) {
+                        +"▶ "
+                    }
+                    +"${item.media.channelData.title}: ${item.media.title}"
                 }
-                if (item == props.selectedItem) {
-                    +"▶ "
-                }
-                +"${item.media.channelData.title}: ${item.media.title}"
             }
         }
     }

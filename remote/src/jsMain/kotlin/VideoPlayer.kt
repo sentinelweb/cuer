@@ -16,8 +16,11 @@ external interface VideoPlayerProps : RProps {
 @JsExport
 class VideoPlayer : RComponent<VideoPlayerProps, RState>() {
     override fun RBuilder.render() {
-
-        h3 {
+        styledDiv {
+            css {
+                put("grid-area", "item")
+            }
+            h3 {
                 +"${props.video.channelData.title}: ${props.video.title}"
             }
             reactPlayerLite {
@@ -101,6 +104,7 @@ class VideoPlayer : RComponent<VideoPlayerProps, RState>() {
                     +"Mark as unwatched"
                 }
             }
+        }
 
     }
 }
