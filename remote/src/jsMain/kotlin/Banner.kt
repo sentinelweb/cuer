@@ -1,7 +1,10 @@
+import kotlinx.css.Float
+import kotlinx.css.border
+import kotlinx.css.float
+import kotlinx.html.InputType
+import material.Checkbox
 import react.*
-import react.dom.h1
-import styled.css
-import styled.styledDiv
+import styled.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -11,8 +14,35 @@ class Banner : RComponent<BannerProps, RState>() {
             css {
                 put("grid-area", "banner")
             }
-            h1 {
+            styledH1 {
+                css {
+                    float = Float.left
+                }
                 +props.title
+            }
+            styledDiv {
+                css {
+                    float = Float.right
+                }
+                styledInput(type = InputType.text) {
+                    css {
+                        border = "1px solid black"
+                    }
+                }
+                Checkbox {
+                    attrs {
+                        id = "rememberMe"
+                        checked = true
+                        onChange = {/*setRememberMeFlag (! rememberMeFlag)*/ }
+                    }
+                }
+                styledLabel {
+                    css {
+//                        + AuthorizationFormStyled.checkBoxLabel
+                    }
+                    attrs["htmlFor"] = "rememberMe"
+                    +"Checkbox"
+                }
             }
         }
     }
