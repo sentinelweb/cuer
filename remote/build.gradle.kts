@@ -11,9 +11,15 @@ plugins {
 
 val ver_kotlinx_datetime: String by project
 val ver_kotlinx_serialization_core: String by project
+val ver_coroutines_core: String by project
 val ver_ktor: String by project
 val ver_jvm: String by project
 val ver_koin: String by project
+val ver_kotlin_react: String by project
+val ver_kotlin_styled: String by project
+val ver_react: String by project
+val ver_styled_cmp: String by project
+
 val outputJsLibName = "cuer.js"
 
 group = "uk.co.sentinelweb.cuer.remote"
@@ -56,18 +62,20 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime-js:$ver_kotlinx_datetime")
-                implementation("org.jetbrains:kotlin-react:17.0.1-pre.148-kotlin-1.4.21")
-                implementation("org.jetbrains:kotlin-react-dom:17.0.1-pre.148-kotlin-1.4.21")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
-                implementation(npm("react", "17.0.1"))
-                implementation(npm("react-dom", "17.0.1"))
-                implementation("org.jetbrains:kotlin-styled:5.2.1-pre.148-kotlin-1.4.21")
-                implementation(npm("styled-components", "~5.2.1"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core")
+                implementation("org.jetbrains:kotlin-react:$ver_kotlin_react")
+                implementation("org.jetbrains:kotlin-react-dom:$ver_kotlin_react")
+                implementation("org.jetbrains:kotlin-styled:$ver_kotlin_styled")
+                implementation(npm("react", ver_react))
+                implementation(npm("react-dom", ver_react))
+                implementation(npm("styled-components", ver_styled_cmp))
                 implementation(npm("react-youtube-lite", "1.0.1"))
                 implementation(npm("react-share", "~4.2.1"))
+                // todo shouldn't be need but breaks build runtime/webpack
                 implementation(npm("kotlinx-serialization-kotlinx-serialization-core-jslegacy", "1.4.2-RC1"))
 
                 implementation(npm("@material-ui/core", "4.11.4"))
+                implementation(npm("@material-ui/styles", "4.11.4"))
                 implementation(npm("@material-ui/icons", "4.11.2"))
             }
         }

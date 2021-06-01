@@ -1,58 +1,93 @@
-import kotlinx.css.Float
-import kotlinx.css.border
-import kotlinx.css.float
-import kotlinx.html.InputType
-import material.Checkbox
+import kotlinx.css.Visibility
+import kotlinx.css.visibility
+import material.AppBar
+import material.LinearProgress
+import material.Toolbar
+import material.Typography
 import react.*
-import styled.*
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import styled.css
+import styled.styledDiv
 
-class Banner : RComponent<BannerProps, RState>() {
+class Banner : RComponent<BannerProps, BannerState>() {
     override fun RBuilder.render() {
         styledDiv {
             css {
                 put("grid-area", "banner")
             }
-            styledH1 {
-                css {
-                    float = Float.left
+            AppBar {
+                attrs {
+                    color = "secondary"
                 }
-                +props.title
-            }
-            styledDiv {
-                css {
-                    float = Float.right
+                Toolbar {
+                    Typography {
+                        attrs {
+                            variant = "h4"
+                        }
+                        +props.title
+                    }
+
                 }
-                styledInput(type = InputType.text) {
+                styledDiv {
                     css {
-                        border = "1px solid black"
+                        visibility = props.loading
                     }
-                }
-                Checkbox {
-                    attrs {
-                        id = "rememberMe"
-                        checked = true
-                        onChange = {/*setRememberMeFlag (! rememberMeFlag)*/ }
+                    LinearProgress {
+                        attrs {
+
+                        }
                     }
-                }
-                styledLabel {
-                    css {
-//                        + AuthorizationFormStyled.checkBoxLabel
-                    }
-                    attrs["htmlFor"] = "rememberMe"
-                    +"Checkbox"
                 }
             }
+
+//
+//                    TextField {
+//                        attrs {
+//                            id = "urlLink"
+//                            required = true
+//                            helperText = "Help me..."
+//                            error = state.checkBoxChecked
+//                        }
+//                    }
+//                    Checkbox {
+//                        attrs {
+//                            id = "rememberMe"
+//                            checked = state.checkBoxChecked
+//                            onChange = {
+//                                setState {
+//                                    checkBoxChecked = !checkBoxChecked
+//                                }
+//                            }
+//                        }
+//                    }
+//                    label {
+//                        attrs["htmlFor"] = "rememberMe"
+//                        +"Checkbox"
+//                    }
+
+//                SwipeableDrawer{
+//                    attrs {
+//                        anchor = "left"
+//                        open = state.checkBoxChecked
+//                    }
+//                    +"Some content"
+//                }
+//            }
+
         }
+    }
+
+    override fun BannerState.init() {
+        checkBoxChecked = false
     }
 }
 
 external interface BannerProps : RProps {
     var title: String
-    var playlist: PlaylistDomain?
-    var selectedItem: PlaylistItemDomain?
-    var onSelectItem: (PlaylistItemDomain) -> Unit
+    var loading: Visibility
+}
+
+external interface BannerState : RState {
+    var checkBoxChecked: Boolean
 }
 
 fun RBuilder.banner(handler: BannerProps.() -> Unit): ReactElement {
