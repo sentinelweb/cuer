@@ -66,13 +66,13 @@ kotlin {
                 implementation("org.jetbrains:kotlin-react:$ver_kotlin_react")
                 implementation("org.jetbrains:kotlin-react-dom:$ver_kotlin_react")
                 implementation("org.jetbrains:kotlin-styled:$ver_kotlin_styled")
-                implementation(npm("react", ver_react))
-                implementation(npm("react-dom", ver_react))
-                implementation(npm("styled-components", ver_styled_cmp))
+//                implementation(npm("react", ver_react))
+//                implementation(npm("react-dom", ver_react))
+//                implementation(npm("styled-components", ver_styled_cmp))
                 implementation(npm("react-youtube-lite", "1.0.1"))
                 implementation(npm("react-share", "~4.2.1"))
                 // todo shouldn't be need but breaks build runtime/webpack
-                implementation(npm("kotlinx-serialization-kotlinx-serialization-core-jslegacy", "1.4.2-RC1"))
+                // implementation(npm("kotlinx-serialization-kotlinx-serialization-core-jslegacy", "1.4.2-RC1"))
 
                 implementation(npm("@material-ui/core", "4.11.4"))
                 implementation(npm("@material-ui/styles", "4.11.4"))

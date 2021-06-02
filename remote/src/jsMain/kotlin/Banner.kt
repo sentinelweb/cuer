@@ -31,11 +31,7 @@ class Banner : RComponent<BannerProps, BannerState>() {
                     css {
                         visibility = props.loading
                     }
-                    LinearProgress {
-                        attrs {
-
-                        }
-                    }
+                    LinearProgress
                 }
             }
 
