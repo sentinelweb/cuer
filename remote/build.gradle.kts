@@ -72,7 +72,7 @@ kotlin {
                 implementation(npm("react-youtube-lite", "1.0.1"))
                 implementation(npm("react-share", "~4.2.1"))
                 // todo shouldn't be need but breaks build runtime/webpack
-                // implementation(npm("kotlinx-serialization-kotlinx-serialization-core-jslegacy", "1.4.2-RC1"))
+                implementation(npm("kotlinx-serialization-kotlinx-serialization-core-jslegacy", "1.4.2-RC1"))
 
                 implementation(npm("@material-ui/core", "4.11.4"))
                 implementation(npm("@material-ui/styles", "4.11.4"))
