@@ -42,10 +42,10 @@ class PlaylistItem : RComponent<PlaylistItemProps, RState>() {
             shareButtons()
             styledDiv {
                 attrs {
-                    id = "description"
+                    id = "item_description"
                 }
             }
-            document.getElementById("description")?.innerHTML =
+            document.getElementById("item_description")?.innerHTML =
                 (props.video.description
                     ?.let { webLink.replaceLinks(it) }
                     ?.replace("\n", "<br/>")
@@ -53,12 +53,11 @@ class PlaylistItem : RComponent<PlaylistItemProps, RState>() {
         }
     }
 
-
     private fun StyledDOMBuilder<DIV>.shareButtons() {
         styledDiv {
             css {
                 display = Display.flex
-                marginBottom = 10.px
+                margin = "10px"
             }
             emailShareButton {
                 attrs.url = props.video.url
