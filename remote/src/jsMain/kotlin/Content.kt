@@ -107,7 +107,7 @@ class Banner : RComponent<ContentProps, ContentState>() {
                     }
 
                     state.currentItem?.let { item ->
-                        videoPlayer {
+                        playlistItem {
                             video = item.media
                             unwatchedVideo = item.media.watched
                             onWatchedButtonPressed = {
