@@ -20,6 +20,8 @@ val ver_kotlin_react: String by project
 val ver_kotlin_styled: String by project
 val ver_react: String by project
 val ver_styled_cmp: String by project
+val ver_jfixture: String by project
+val ver_truth: String by project
 
 val outputJsLibName = "cuer.js"
 
@@ -58,6 +60,15 @@ kotlin {
                 implementation("io.ktor:ktor-server-core:$ver_ktor")
                 implementation("io.ktor:ktor-server-cio:$ver_ktor")
                 implementation("ch.qos.logback:logback-classic:1.2.3")
+            }
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                // Koin for JUnit 4
+                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
+                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
+                implementation("com.google.truth:truth:$ver_truth")
             }
         }
 

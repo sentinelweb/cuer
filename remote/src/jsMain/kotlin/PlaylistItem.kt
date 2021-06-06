@@ -1,13 +1,15 @@
 
+import kotlinx.browser.document
 import kotlinx.css.*
 import kotlinx.html.DIV
+import kotlinx.html.id
 import react.*
 import react.dom.h3
-import react.dom.p
 import styled.StyledDOMBuilder
 import styled.css
 import styled.styledDiv
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.remote.util.WebLink
 
 external interface PlaylistItemProps : RProps {
     var video: MediaDomain
@@ -17,6 +19,7 @@ external interface PlaylistItemProps : RProps {
 
 @JsExport
 class PlaylistItem : RComponent<PlaylistItemProps, RState>() {
+    private val webLink = WebLink()
 
     override fun RBuilder.render() {
         styledDiv {
@@ -38,16 +41,18 @@ class PlaylistItem : RComponent<PlaylistItemProps, RState>() {
             }
             shareButtons()
             styledDiv {
-                props.video.description?.split("\n")
-                    ?.filter { it != "" }
-                    ?.forEach {
-                        p {
-                            +it
-                        }
-                    }
+                attrs {
+                    id = "description"
+                }
             }
+            document.getElementById("description")?.innerHTML =
+                (props.video.description
+                    ?.let { webLink.replaceLinks(it) }
+                    ?.replace("\n", "<br/>")
+                    ?: "")
         }
     }
+
 
     private fun StyledDOMBuilder<DIV>.shareButtons() {
         styledDiv {

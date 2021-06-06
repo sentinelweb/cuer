@@ -83,9 +83,9 @@ class Banner : RComponent<ContentProps, ContentState>() {
                 styledDiv {
                     css {
                         flexGrow = 1.0
-                        transition += Transition("margin", 195.ms, Timing.easeIn, 0.ms)
+                        //transition += Transition("margin", 195.ms, Timing.easeIn, 0.ms)
                         marginLeft = -drawerWidth.px
-                        if (drawerOpen) marginLeft = 0.px
+                        //if (drawerOpen) marginLeft = 0.px
                         display = Display.grid
                         put("grid-template-columns", "300px 1fr")
                         put("grid-template-rows", "1fr")
@@ -133,7 +133,6 @@ external interface ContentProps : RProps {
     var loading: Visibility
     var playlists: List<PlaylistDomain>
     var onSelectPlaylist: (PlaylistDomain) -> Unit
-
     var currentPlaylist: PlaylistDomain?
 }
 

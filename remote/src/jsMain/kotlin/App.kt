@@ -22,15 +22,19 @@ class App : RComponent<RProps, AppState>() {
                     setState {
                         loadingVisibitity = Visibility.visible
                     }
-                    MainScope().launch {
-                        val playlistDomain = fetchPlaylist(playlist.id!!)
-                        console.log(playlistDomain)
-                        setState {
-                            currentPlaylist = playlistDomain
-                            loadingVisibitity = Visibility.hidden
-                        }
-                    }
+                    fetchPlaylist(playlist)
                 }
+            }
+        }
+    }
+
+    private fun fetchPlaylist(playlist: PlaylistDomain) {
+        MainScope().launch {
+            val playlistDomain = fetchPlaylist(playlist.id!!)
+            console.log(playlistDomain)
+            setState {
+                currentPlaylist = playlistDomain
+                loadingVisibitity = Visibility.hidden
             }
         }
     }
@@ -40,11 +44,13 @@ class App : RComponent<RProps, AppState>() {
         currentPlaylist = null
         loadingVisibitity = Visibility.visible
         MainScope().launch {
-            val videos = fetchPlaylists()
+            val playlistsFetched = fetchPlaylists()
             setState {
-                playlists = videos
+                playlists = playlistsFetched
                 loadingVisibitity = Visibility.hidden
             }
+            // todo test code - remove
+            fetchPlaylist(playlistsFetched.find { it.title == "music" } ?: playlistsFetched[0])
         }
     }
 }
