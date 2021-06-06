@@ -1,4 +1,5 @@
 import kotlinx.css.Overflow
+import kotlinx.css.overflowX
 import kotlinx.css.overflowY
 import kotlinx.html.js.onClickFunction
 import react.*
@@ -15,6 +16,7 @@ class PlaylistList : RComponent<PlaylistListProps, RState>() {
             css {
                 put("grid-area", "playlists")
                 overflowY = Overflow.scroll
+                overflowX = Overflow.scroll
             }
             h3 {
                 +"Playlists"

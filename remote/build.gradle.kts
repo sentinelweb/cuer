@@ -9,6 +9,7 @@ plugins {
     //id("com.github.turansky.kfc.multiplatform")
 }
 
+val ver_kotlin: String by project
 val ver_kotlinx_datetime: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_coroutines_core: String by project
@@ -27,6 +28,7 @@ version = "1.0"
 
 kotlin {
     js {
+        useCommonJs()
         browser {
             commonWebpackConfig {
                 cssSupport.enabled = true
@@ -64,7 +66,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime-js:$ver_kotlinx_datetime")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core")
                 implementation("org.jetbrains:kotlin-react:$ver_kotlin_react")
-                implementation("org.jetbrains:kotlin-react-dom:$ver_kotlin_react")
+//                implementation("org.jetbrains:kotlin-react-dom:$ver_kotlin_react")
                 implementation("org.jetbrains:kotlin-styled:$ver_kotlin_styled")
 //                implementation(npm("react", ver_react))
 //                implementation(npm("react-dom", ver_react))
@@ -74,9 +76,14 @@ kotlin {
                 // todo shouldn't be need but breaks build runtime/webpack
                 implementation(npm("kotlinx-serialization-kotlinx-serialization-core-jslegacy", "1.4.2-RC1"))
 
-                implementation(npm("@material-ui/core", "4.11.4"))
-                implementation(npm("@material-ui/styles", "4.11.4"))
-                implementation(npm("@material-ui/icons", "4.11.2"))
+//                implementation(kotlin("stdlib-js", ver_kotlin))
+//                implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.204-kotlin-1.5.0")
+                implementation("com.ccfraser.muirwik:muirwik-components:0.7.0") {
+                    exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-styled")
+                }
+//                implementation(npm("@material-ui/core", "4.11.4"))
+//                implementation(npm("@material-ui/styles", "4.11.4"))
+//                implementation(npm("@material-ui/icons", "4.11.2"))
             }
         }
 

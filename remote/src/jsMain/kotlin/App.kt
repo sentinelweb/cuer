@@ -12,14 +12,11 @@ import uk.co.sentinelweb.cuer.domain.ext.deserialiseResponse
 @JsExport
 class App : RComponent<RProps, AppState>() {
     override fun RBuilder.render() {
-        banner {
+        content {
             title = "Cuer"
             loading = state.loadingVisibitity
-        }
-
-        playlistList {
             playlists = state.playlists
-            selectedPlaylist = state.currentPlaylist
+            currentPlaylist = state.currentPlaylist
             onSelectPlaylist = { playlist ->
                 if (state.currentPlaylist == null || state.currentPlaylist?.id != playlist.id) {
                     setState {
@@ -36,30 +33,6 @@ class App : RComponent<RProps, AppState>() {
                 }
             }
         }
-
-        playlist {
-            title = state.currentPlaylist?.title ?: "No playlist"
-            playlist = state.currentPlaylist
-            selectedItem = state.currentItem
-            onSelectItem = { item ->
-                setState {
-                    currentItem = item
-                }
-            }
-        }
-
-        state.currentItem?.let { item ->
-            videoPlayer {
-                video = item.media
-                unwatchedVideo = item.media.watched
-                onWatchedButtonPressed = {
-                    setState {
-                        currentItem = currentItem?.let { it.copy(media = it.media.copy(watched = !it.media.watched)) }
-                    }
-                }
-            }
-        }
-
     }
 
     override fun AppState.init() {
@@ -77,8 +50,8 @@ class App : RComponent<RProps, AppState>() {
 }
 
 external interface AppState : RState {
-    var currentItem: PlaylistItemDomain?
     var playlists: List<PlaylistDomain>
+    var currentItem: PlaylistItemDomain?
     var currentPlaylist: PlaylistDomain?
     var loadingVisibitity: Visibility
 }
