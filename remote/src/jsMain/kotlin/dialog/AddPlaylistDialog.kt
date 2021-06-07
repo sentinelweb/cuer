@@ -12,7 +12,9 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.css.Visibility
 import kotlinx.css.margin
+import kotlinx.css.visibility
 import kotlinx.html.InputType
 import org.w3c.dom.HTMLInputElement
 import org.w3c.fetch.RequestInit
@@ -21,6 +23,7 @@ import playlistItem
 import react.*
 import styled.StyleSheet
 import styled.css
+import styled.styledDiv
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -38,6 +41,7 @@ external interface AddPlaylistDialogState : RState {
     var url: String?
     var scanned: MediaDomain?
     var selectedPlaylist: PlaylistDomain?
+    var loading: Visibility
 }
 
 @JsExport
@@ -53,6 +57,12 @@ class AddPlaylistDialog : RComponent<AddPlaylistDialogProps, AddPlaylistDialogSt
     override fun RBuilder.render() {
         mDialog(props.isOpen, onClose = { _, _ -> onClose() }) {
             mDialogTitle("Add URL")
+            styledDiv {
+                css {
+                    visibility = state.loading
+                }
+                mLinearProgress(color = MLinearProgressColor.secondary)
+            }
             mDialogContent {
                 state.scanned?.let {
                     mButton(
@@ -117,13 +127,21 @@ class AddPlaylistDialog : RComponent<AddPlaylistDialogProps, AddPlaylistDialogSt
     private fun checkUrl() {
         (document.getElementById(ADD_DIALOG_INPUT_TEXT_ID) as HTMLInputElement?)
             ?.value
-            ?.also { setState { url = it } }
+            ?.also { setState { url = it;loading = Visibility.visible } }
             ?.also {
+
                 MainScope().launch {
                     val checked = checkLink(it)
-                    setState { scanned = checked }
+                    setState {
+                        scanned = checked
+                        loading = Visibility.hidden
+                    }
                 }
             }
+    }
+
+    override fun AddPlaylistDialogState.init() {
+        loading = Visibility.hidden
     }
 
     companion object {

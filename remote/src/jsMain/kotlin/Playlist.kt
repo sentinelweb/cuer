@@ -1,11 +1,12 @@
-import kotlinx.css.Overflow
-import kotlinx.css.overflowY
-import kotlinx.html.js.onClickFunction
+import App.Companion.NO_IMAGE_SRC
+import com.ccfraser.muirwik.components.list.mListItem
+import com.ccfraser.muirwik.components.list.mListItemText
+import com.ccfraser.muirwik.components.list.mListSubheader
+import kotlinx.css.*
 import react.*
-import react.dom.h3
-import react.dom.p
 import styled.css
 import styled.styledDiv
+import styled.styledImg
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -17,24 +18,20 @@ class Playlist : RComponent<PlaylistProps, RState>() {
                 put("grid-area", "playlist")
                 overflowY = Overflow.scroll
             }
-            h3 {
-                +props.title
-            }
+            mListSubheader(props.title, disableSticky = true)
             props.playlist?.items?.forEach { item ->
-                p {
-                    key = item.id.toString()
-                    attrs {
-                        onClickFunction = {
-                            props.onSelectItem(item)
-                        }
+                mListItem(button = true, onClick = { props.onSelectItem(item) }, selected = item == props.selectedItem) {
+                    styledImg(
+                        src = item.media.thumbNail?.url ?: NO_IMAGE_SRC, alt = item.media.title
+                    ) {
+                        css { width = 150.px;paddingRight = 10.px }
                     }
-                    if (item == props.selectedItem) {
-                        +"▶ "
-                    }
-                    +"${item.media.channelData.title}: ${item.media.title}"
+                    mListItemText(
+                        item.media.title ?: "No title",
+                        item.media.channelData?.title ?: "No Channel"
+                    )
                 }
             }
-
         }
     }
 }

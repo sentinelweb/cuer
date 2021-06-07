@@ -30,7 +30,7 @@ external interface ContentState : RState {
 }
 
 class Content : RComponent<ContentProps, ContentState>() {
-    private val drawerWidth = 240
+    private val drawerWidth = 340
     private var drawerOpen: Boolean = false
     private var formDialogOpen: Boolean = false
 
@@ -69,6 +69,12 @@ class Content : RComponent<ContentProps, ContentState>() {
                         mToolbarTitle(props.title)
                         mIconButton("add", color = MColor.inherit, onClick = { setState { formDialogOpen = true } })
                     }
+                    styledDiv {
+                        css {
+                            visibility = props.loading
+                        }
+                        mLinearProgress(color = MLinearProgressColor.secondary)
+                    }
                 }
 
                 val pp: MPaperProps = jsObject { }
@@ -104,7 +110,7 @@ class Content : RComponent<ContentProps, ContentState>() {
                         marginLeft = -drawerWidth.px
                         //if (drawerOpen) marginLeft = 0.px
                         display = Display.grid
-                        put("grid-template-columns", "300px 1fr")
+                        put("grid-template-columns", "400px 1fr")
                         put("grid-template-rows", "1fr")
                         put("grid-gap", "1em")
                         put("grid-template-areas", "'playlist item'")

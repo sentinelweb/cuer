@@ -1,12 +1,12 @@
-import kotlinx.css.Overflow
-import kotlinx.css.overflowX
-import kotlinx.css.overflowY
-import kotlinx.html.js.onClickFunction
+import App.Companion.NO_IMAGE_SRC
+import com.ccfraser.muirwik.components.list.mListItem
+import com.ccfraser.muirwik.components.list.mListItemText
+import com.ccfraser.muirwik.components.list.mListSubheader
+import kotlinx.css.*
 import react.*
-import react.dom.h3
-import react.dom.p
 import styled.css
 import styled.styledDiv
+import styled.styledImg
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 @JsExport
@@ -18,21 +18,21 @@ class PlaylistList : RComponent<PlaylistListProps, RState>() {
                 overflowY = Overflow.scroll
                 overflowX = Overflow.scroll
             }
-            h3 {
-                +"Playlists"
-            }
+            mListSubheader("Playlists", disableSticky = true)
             for (playlist in props.playlists) {
-                p {
-                    key = playlist.id.toString()
-                    attrs {
-                        onClickFunction = {
-                            props.onSelectPlaylist(playlist)
-                        }
-                    }
-                    if (playlist.id == props.selectedPlaylist?.id) {
-                        +"▶ "
-                    }
-                    +playlist.title
+                mListItem(
+                    button = true,
+                    onClick = { props.onSelectPlaylist(playlist) },
+                    selected = playlist.id == props.selectedPlaylist?.id
+                ) {
+                    ((playlist.thumb?.url ?: playlist.image?.url)
+                        // see issue https://github.com/sentinelweb/cuer/issues/186 - need to cache pixabay images somewhere
+                        ?.takeIf { !it.startsWith("gs") && !it.startsWith("https://pixabay.com") }
+                        ?: NO_IMAGE_SRC)
+                        //?.let { mListItemAvatar(src = it, variant = MAvatarVariant.square) }
+                        .let { styledImg(src = it, alt = playlist.title) { css { width = 100.px;paddingRight = 10.px } } }
+
+                    mListItemText(playlist.title)
                 }
             }
         }

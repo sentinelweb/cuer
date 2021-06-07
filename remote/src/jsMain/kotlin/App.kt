@@ -52,6 +52,10 @@ class App : RComponent<RProps, AppState>() {
             fetchPlaylist(playlistsFetched.find { it.title == "music" } ?: playlistsFetched[0])
         }
     }
+
+    companion object {
+        const val NO_IMAGE_SRC = "/noimage.png"
+    }
 }
 
 external interface AppState : RState {
