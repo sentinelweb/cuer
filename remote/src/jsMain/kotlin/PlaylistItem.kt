@@ -43,10 +43,10 @@ class PlaylistItem : RComponent<PlaylistItemProps, RState>() {
             shareButtons()
             styledDiv {
                 attrs {
-                    id = "item_description"
+                    id = ITEM_DESCRIPTION_ID
                 }
             }
-            document.getElementById("item_description")?.innerHTML =
+            document.getElementById(ITEM_DESCRIPTION_ID)?.innerHTML =
                 (props.video.description
                     ?.let { webLink.replaceLinks(it) }
                     ?.replace("\n", "<br/>")
@@ -118,6 +118,10 @@ class PlaylistItem : RComponent<PlaylistItemProps, RState>() {
             }
         }
     }
+
+    companion object {
+        private const val ITEM_DESCRIPTION_ID = "itemDescription"
+    }
 }
 
 fun RBuilder.playlistItem(handler: PlaylistItemProps.() -> Unit): ReactElement {
@@ -125,3 +129,5 @@ fun RBuilder.playlistItem(handler: PlaylistItemProps.() -> Unit): ReactElement {
         this.attrs(handler)
     }
 }
+
+

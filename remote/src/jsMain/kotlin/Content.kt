@@ -1,8 +1,8 @@
+
 import Content.ComponentStyles.drawer
 import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import dialog.addPlaylistDialog
-import dialog.playlistListDialog
 import kotlinext.js.js
 import kotlinext.js.jsObject
 import kotlinx.css.*
@@ -33,7 +33,6 @@ class Content : RComponent<ContentProps, ContentState>() {
     private val drawerWidth = 240
     private var drawerOpen: Boolean = false
     private var formDialogOpen: Boolean = false
-    private var playlistsDialogOpen: Boolean = false
 
     private object ComponentStyles : StyleSheet("ComponentStyles", isStatic = true) {
         val drawer by css {
@@ -137,10 +136,6 @@ class Content : RComponent<ContentProps, ContentState>() {
                 addPlaylistDialog {
                     isOpen = formDialogOpen
                     close = { setState { formDialogOpen = false } }
-                }
-                playlistListDialog {
-                    isOpen = playlistsDialogOpen
-                    close = { setState { playlistsDialogOpen = false } }
                     playlists = props.playlists
                 }
             }

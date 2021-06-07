@@ -1,24 +1,28 @@
 package dialog
 
-import com.ccfraser.muirwik.components.MColor
+import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.MButtonVariant
 import com.ccfraser.muirwik.components.button.mButton
 import com.ccfraser.muirwik.components.dialog.*
 import com.ccfraser.muirwik.components.form.MFormControlMargin
-import com.ccfraser.muirwik.components.mTextField
+import dialog.AddPlaylistDialog.ComponentStyles.buttonMargin
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.css.margin
 import kotlinx.html.InputType
 import org.w3c.dom.HTMLInputElement
 import org.w3c.fetch.RequestInit
 import org.w3c.xhr.FormData
 import playlistItem
 import react.*
+import styled.StyleSheet
+import styled.css
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseResponse
 
@@ -26,22 +30,40 @@ external interface AddPlaylistDialogProps : RProps {
     var isOpen: Boolean
     var close: () -> Unit
     var onConfirm: (PlaylistItemDomain) -> Unit
+    var playlists: List<PlaylistDomain>
 
 }
 
 external interface AddPlaylistDialogState : RState {
     var url: String?
     var scanned: MediaDomain?
+    var selectedPlaylist: PlaylistDomain?
 }
 
 @JsExport
 class AddPlaylistDialog : RComponent<AddPlaylistDialogProps, AddPlaylistDialogState>() {
+    private object ComponentStyles : StyleSheet("ComponentStyles", isStatic = true) {
+        val buttonMargin by css {
+            margin(1.spacingUnits)
+        }
+    }
+
+    private var playlistsDialogOpen: Boolean = false
 
     override fun RBuilder.render() {
         mDialog(props.isOpen, onClose = { _, _ -> onClose() }) {
             mDialogTitle("Add URL")
             mDialogContent {
                 state.scanned?.let {
+                    mButton(
+                        state.selectedPlaylist?.title ?: "Select Playlist",
+                        color = MColor.primary,
+                        onClick = { setState { playlistsDialogOpen = true } },
+                        variant = MButtonVariant.text,
+                    ) {
+                        css(buttonMargin)
+                        attrs.startIcon = mIcon("playlist_add_check", fontSize = MIconFontSize.small, addAsChild = false)
+                    }
                     playlistItem {
                         video = it
                     }
@@ -49,7 +71,7 @@ class AddPlaylistDialog : RComponent<AddPlaylistDialogProps, AddPlaylistDialogSt
                     mDialogContentText("Paste a YouTube Link ...")
                     mTextField(
                         "Youtube URL",
-                        id = "addDialogInputText",
+                        id = ADD_DIALOG_INPUT_TEXT_ID,
                         autoFocus = true,
                         margin = MFormControlMargin.dense,
                         type = InputType.url,
@@ -59,9 +81,24 @@ class AddPlaylistDialog : RComponent<AddPlaylistDialogProps, AddPlaylistDialogSt
             }
             mDialogActions {
                 mButton("Cancel", color = MColor.primary, onClick = { onClose() }, variant = MButtonVariant.text)
-                mButton("Check", color = MColor.primary, onClick = { checkUrl() }, variant = MButtonVariant.text)
-                mButton("Add", color = MColor.primary, onClick = { validateAndSubmit() }, variant = MButtonVariant.text)
+                if (state.scanned == null) {
+                    mButton("Check", color = MColor.primary, onClick = { checkUrl() }, variant = MButtonVariant.text)
+                } else {
+                    mButton("Add", color = MColor.primary, onClick = { validateAndSubmit() }, variant = MButtonVariant.text)
+                }
             }
+        }
+        playlistListDialog {
+            isOpen = playlistsDialogOpen
+            close = { setState { playlistsDialogOpen = false } }
+            playlists = props.playlists
+            onPlayListSelected = {
+                setState {
+                    selectedPlaylist = it
+                    playlistsDialogOpen = false
+                }
+            }
+
         }
     }
 
@@ -78,7 +115,7 @@ class AddPlaylistDialog : RComponent<AddPlaylistDialogProps, AddPlaylistDialogSt
     }
 
     private fun checkUrl() {
-        (document.getElementById("addDialogInputText") as HTMLInputElement?)
+        (document.getElementById(ADD_DIALOG_INPUT_TEXT_ID) as HTMLInputElement?)
             ?.value
             ?.also { setState { url = it } }
             ?.also {
@@ -87,6 +124,10 @@ class AddPlaylistDialog : RComponent<AddPlaylistDialogProps, AddPlaylistDialogSt
                     setState { scanned = checked }
                 }
             }
+    }
+
+    companion object {
+        private const val ADD_DIALOG_INPUT_TEXT_ID = "addDialogInputText"
     }
 }
 
