@@ -1,17 +1,14 @@
 import Content.ComponentStyles.drawer
 import com.ccfraser.muirwik.components.*
-import com.ccfraser.muirwik.components.button.MButtonVariant
-import com.ccfraser.muirwik.components.button.mButton
 import com.ccfraser.muirwik.components.button.mIconButton
-import com.ccfraser.muirwik.components.dialog.*
-import com.ccfraser.muirwik.components.form.MFormControlMargin
+import dialog.addPlaylistDialog
+import dialog.playlistListDialog
 import kotlinext.js.js
 import kotlinext.js.jsObject
 import kotlinx.css.*
 import kotlinx.css.properties.Timing
 import kotlinx.css.properties.Transition
 import kotlinx.css.properties.ms
-import kotlinx.html.InputType
 import react.*
 import styled.StyleSheet
 import styled.css
@@ -36,6 +33,7 @@ class Content : RComponent<ContentProps, ContentState>() {
     private val drawerWidth = 240
     private var drawerOpen: Boolean = false
     private var formDialogOpen: Boolean = false
+    private var playlistsDialogOpen: Boolean = false
 
     private object ComponentStyles : StyleSheet("ComponentStyles", isStatic = true) {
         val drawer by css {
@@ -113,8 +111,6 @@ class Content : RComponent<ContentProps, ContentState>() {
                         put("grid-template-areas", "'playlist item'")
                         marginTop = 60.px
                     }
-                    //spacer()
-                    //mTypography("This is the main content area")
                     playlist {
                         title = props.currentPlaylist?.title ?: "No playlist"
                         playlist = props.currentPlaylist
@@ -138,7 +134,15 @@ class Content : RComponent<ContentProps, ContentState>() {
                         }
                     }
                 }
-                formDialog()
+                addPlaylistDialog {
+                    isOpen = formDialogOpen
+                    close = { setState { formDialogOpen = false } }
+                }
+                playlistListDialog {
+                    isOpen = playlistsDialogOpen
+                    close = { setState { playlistsDialogOpen = false } }
+                    playlists = props.playlists
+                }
             }
         }
     }
@@ -148,31 +152,8 @@ class Content : RComponent<ContentProps, ContentState>() {
         currentItem = null
     }
 
-    private fun RBuilder.formDialog() {
-        //window.alert("Add form")
-        fun handleClose() {
-            setState { formDialogOpen = false }
-        }
-        mDialog(formDialogOpen, onClose = { _, _ -> handleClose() }) {
-            mDialogTitle("Add URL")
-            mDialogContent {
-                mDialogContentText("Paste a YouTube Link ...")
-                mTextField("Youtube URL", autoFocus = true, margin = MFormControlMargin.dense, type = InputType.email, fullWidth = true)
-            }
-            mDialogActions {
-                mButton("Cancel", color = MColor.primary, onClick = { handleClose() }, variant = MButtonVariant.text)
-                mButton("Add", color = MColor.primary, onClick = { handleClose() }, variant = MButtonVariant.text)
-            }
-        }
-    }
 }
 
-//
-//fun RBuilder.content(handler: ContentProps.() -> Unit): ReactElement {
-//    return child(Banner::class) {
-//        this.attrs(handler)
-//    }
-//}
 fun RBuilder.content(handler: ContentProps.() -> Unit) = child(Content::class) { attrs(handler) }
 
 

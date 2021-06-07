@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseBackupFileModel
 import java.io.File
+import kotlin.random.Random
 
 /*internal*/ data class TestDatabase constructor(
     val data: BackupFileModel,
@@ -17,6 +18,16 @@ import java.io.File
     override suspend fun getPlaylist(id: Long): PlaylistDomain? = data.playlists.find { it.id == id }
 
     override suspend fun getPlaylistItem(id: Long): PlaylistItemDomain? = items[id]
+
+    override suspend fun scanUrl(url: String): Domain? =
+        data.playlists
+            .find { it.title == "music" }
+            ?.let {
+                it.items
+                    .get(Random.nextInt(0, it.items.size))
+                    .media
+            }
+
 
     companion object {
         //"media/data/v3-2021-05-26_13 28 23-cuer_backup-Pixel_3a.json"

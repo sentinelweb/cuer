@@ -25,7 +25,8 @@ class PlaylistItem : RComponent<PlaylistItemProps, RState>() {
         styledDiv {
             css {
                 put("grid-area", "item")
-                overflowY = Overflow.scroll
+                overflowY = Overflow.auto
+                fontFamily = "Roboto"
             }
             h3 {
                 +"${props.video.channelData.title}: ${props.video.title}"

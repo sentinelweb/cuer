@@ -22,6 +22,7 @@ val ver_react: String by project
 val ver_styled_cmp: String by project
 val ver_jfixture: String by project
 val ver_truth: String by project
+val ver_logback = "1.2.3"
 
 val outputJsLibName = "cuer.js"
 
@@ -48,6 +49,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
                 implementation("io.insert-koin:koin-core:$ver_koin")
             }
@@ -55,11 +57,10 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
-                //implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$ver_kotlinx_serialization_core")
                 implementation("io.ktor:ktor-serialization:$ver_ktor")
                 implementation("io.ktor:ktor-server-core:$ver_ktor")
                 implementation("io.ktor:ktor-server-cio:$ver_ktor")
-                implementation("ch.qos.logback:logback-classic:1.2.3")
+                implementation("ch.qos.logback:logback-classic:$ver_logback")
             }
         }
 
@@ -74,40 +75,20 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime-js:$ver_kotlinx_datetime")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core")
+                //implementation("org.jetbrains.kotlinx:kotlinx-datetime-js:$ver_kotlinx_datetime")
                 implementation("org.jetbrains:kotlin-react:$ver_kotlin_react")
-//                implementation("org.jetbrains:kotlin-react-dom:$ver_kotlin_react")
                 implementation("org.jetbrains:kotlin-styled:$ver_kotlin_styled")
-//                implementation(npm("react", ver_react))
-//                implementation(npm("react-dom", ver_react))
-//                implementation(npm("styled-components", ver_styled_cmp))
                 implementation(npm("react-youtube-lite", "1.0.1"))
                 implementation(npm("react-share", "~4.2.1"))
                 // todo shouldn't be need but breaks build runtime/webpack
                 implementation(npm("kotlinx-serialization-kotlinx-serialization-core-jslegacy", "1.4.2-RC1"))
-
-//                implementation(kotlin("stdlib-js", ver_kotlin))
-//                implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.204-kotlin-1.5.0")
                 implementation("com.ccfraser.muirwik:muirwik-components:0.7.0") {
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-styled")
                 }
-//                implementation(npm("@material-ui/core", "4.11.4"))
-//                implementation(npm("@material-ui/styles", "4.11.4"))
-//                implementation(npm("@material-ui/icons", "4.11.2"))
+                //https://github.com/CookPete/react-player
+                //implementation(npm("react-player", "2.9.0"))
             }
         }
-
-        //implementation("com.ccfraser.muirwik:muirwik-components:0.5.1")
-
-        //https://github.com/CookPete/react-player
-        //implementation(npm("react-player", "2.9.0"))
-
-        // material-ui ... doesnt work
-        //  implementation(npm("@material-ui/core", "4.11.4"))
-        //  implementation(npm("@material-ui/icons", "4.11.2"))
-        //  implementation(npm("@material-ui/pickers", "3.3.10"))
-        //  implementation(npm("@material-ui/styles", "4.11.4"))
     }
 }
 

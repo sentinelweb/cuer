@@ -111,6 +111,25 @@ class RemoteServer constructor(
                         }
                     System.out.println(call.request.uri)
                 }
+                post("/check") {
+                    val post = call.receiveParameters()
+                    System.out.println("scan:" + post)
+                    (post["url"])
+                        ?.let { url ->
+                            //System.out.println("scan:" + url)
+                            database.scanUrl(url)
+                                ?.let { ResponseDomain(it) }
+                                ?.apply {
+                                    //System.out.println("response:" + serialise())
+                                    call.respondText(serialise(), ContentType.Application.Json)
+                                }
+                                ?: apply {
+                                    call.error(HttpStatusCode.NotFound, "Could not scan url: $url")
+                                }
+                        }
+                        ?: call.error(HttpStatusCode.BadRequest, "url is required")
+                    System.out.println(call.request.uri)
+                }
                 static("/") {
                     resources("")
                 }

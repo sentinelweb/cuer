@@ -31,7 +31,6 @@ class App : RComponent<RProps, AppState>() {
     private fun fetchPlaylist(playlist: PlaylistDomain) {
         MainScope().launch {
             val playlistDomain = fetchPlaylist(playlist.id!!)
-            console.log(playlistDomain)
             setState {
                 currentPlaylist = playlistDomain
                 loadingVisibitity = Visibility.hidden
