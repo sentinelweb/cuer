@@ -91,7 +91,6 @@ private class YoutubeUrlChannelUserMapper : UrlMediaMapper {
 }
 
 // https://youtube.com/channel/<platformId>.
-// todo need to exec https://developers.google.com/youtube/v3/docs/channels/list#forUsername to get platformID
 private class YoutubeUrlChannelMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =

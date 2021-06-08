@@ -1,33 +1,35 @@
 package uk.co.sentinelweb.cuer.app.service.remote
 
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.util.AddLinkOrchestrator
 import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 
 class AppRemoteDatabaseAdapter constructor(
-    private val playlistDatabaseRepository: PlaylistDatabaseRepository
+    private val playlistOrchestrator: PlaylistOrchestrator,
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val addLinkOrchestrator: AddLinkOrchestrator
 ) : RemoteDatabaseAdapter {
     override suspend fun getPlaylists(): List<PlaylistDomain> =
-        playlistDatabaseRepository
-            .loadList(OrchestratorContract.AllFilter(), flat = true)
-            .takeIf { it.isSuccessful }
-            ?.data
-            ?: listOf()
+        playlistOrchestrator
+            .loadList(AllFilter(), LOCAL.flatOptions())
 
     override suspend fun getPlaylist(id: Long): PlaylistDomain? =
-        playlistDatabaseRepository.load(id, flat = false)
-            .takeIf { it.isSuccessful }
-            ?.data
+        playlistOrchestrator
+            .load(id, LOCAL.deepOptions())
 
     override suspend fun getPlaylistItem(id: Long): PlaylistItemDomain? =
-        playlistDatabaseRepository.loadPlaylistItem(id)
-            .takeIf { it.isSuccessful }
-            ?.data
+        playlistItemOrchestrator
+            .load(id, LOCAL.flatOptions())
 
-    override suspend fun scanUrl(url: String): Domain? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun scanUrl(url: String): Domain? = addLinkOrchestrator.scanUrl(url)
+
+    override suspend fun commitPlaylistItem(item: PlaylistItemDomain) = addLinkOrchestrator.commitPlaylistItem(item)
 }

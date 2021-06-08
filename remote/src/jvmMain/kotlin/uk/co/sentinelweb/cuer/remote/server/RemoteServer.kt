@@ -10,7 +10,8 @@ import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.util.*
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
@@ -20,10 +21,14 @@ import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import java.io.PrintWriter
 import java.io.StringWriter
 
-@KtorExperimentalAPI
 class RemoteServer constructor(
-    private val database: RemoteDatabaseAdapter
+    private val database: RemoteDatabaseAdapter,
+    private val logWrapper: LogWrapper
 ) {
+    init {
+        logWrapper.tag(this)
+    }
+
     val port: Int
         get() = System.getenv("PORT")?.toInt() ?: 9090
 
@@ -41,6 +46,7 @@ class RemoteServer constructor(
 
     fun stop() {
         _appEngine?.stop(0, 0)
+        logWrapper.d("Stopped remote server ...")
         _appEngine = null
     }
 
@@ -67,7 +73,7 @@ class RemoteServer constructor(
                         this::class.java.classLoader.getResource("index.html")!!.readText(),
                         ContentType.Text.Html
                     )
-                    System.out.println("/ : " + call.request.uri)
+                    logWrapper.d("/ : " + call.request.uri)
                 }
                 get("/playlists") {
                     database.getPlaylists()
@@ -75,7 +81,7 @@ class RemoteServer constructor(
                         .apply {
                             call.respondText(serialise(), ContentType.Application.Json)
                         }
-                    System.out.println("/playlists : " + call.request.uri)
+                    logWrapper.d("/playlists : " + call.request.uri)
                 }
                 get("/playlist/") {
                     call.error(HttpStatusCode.BadRequest, "No ID")
@@ -92,7 +98,7 @@ class RemoteServer constructor(
                                     call.error(HttpStatusCode.NotFound, "No playlist with ID: $id")
                                 }
                         }
-                    System.out.println(call.request.uri)
+                    logWrapper.d(call.request.uri)
                 }
                 get("/playlistItem/") {
                     call.error(HttpStatusCode.BadRequest, "No ID")
@@ -109,26 +115,53 @@ class RemoteServer constructor(
                                     call.error(HttpStatusCode.NotFound, "No playlist with ID: $id")
                                 }
                         }
-                    System.out.println(call.request.uri)
+                    logWrapper.d(call.request.uri)
                 }
-                post("/check") {
+                post("/checkLink") {
                     val post = call.receiveParameters()
-                    System.out.println("scan:" + post)
-                    (post["url"])
-                        ?.let { url ->
-                            //System.out.println("scan:" + url)
-                            database.scanUrl(url)
-                                ?.let { ResponseDomain(it) }
-                                ?.apply {
-                                    //System.out.println("response:" + serialise())
-                                    call.respondText(serialise(), ContentType.Application.Json)
+                    //logWrapper.d("scan:" + post)
+                    try {
+                        (post["url"])
+                            ?.let { url ->
+                                //logWrapper.d("scan:" + url)
+                                try {
+                                    database.scanUrl(url)
+                                        ?.let { ResponseDomain(it) }
+                                        ?.apply {
+                                            call.respondText(serialise(), ContentType.Application.Json)
+                                        }
+                                        ?: apply {
+                                            call.error(HttpStatusCode.NotFound, "Could not scan url: $url")
+                                        }
+                                } catch (e: Throwable) {
+                                    call.error(HttpStatusCode.NotFound, null, e)
                                 }
-                                ?: apply {
-                                    call.error(HttpStatusCode.NotFound, "Could not scan url: $url")
-                                }
-                        }
-                        ?: call.error(HttpStatusCode.BadRequest, "url is required")
-                    System.out.println(call.request.uri)
+                            }
+                            ?: call.error(HttpStatusCode.BadRequest, "url is required")
+                    } catch (e: Throwable) {
+                        call.error(HttpStatusCode.InternalServerError, null, e)
+                    }
+                    logWrapper.d(call.request.uri)
+                }
+                post("/addItem") {
+                    val post = call.receiveParameters()
+                    //logWrapper.d("scan:" + post)
+                    try {
+                        (post["item"])
+                            ?.let { deserialisePlaylistItem(it) }
+                            ?.let { item ->
+                                database.commitPlaylistItem(item)
+                                    .let { ResponseDomain(it) }
+                                    .apply {
+                                        call.respondText(serialise(), ContentType.Application.Json)
+                                    }
+
+                            }
+                            ?: call.error(HttpStatusCode.BadRequest, "url is required")
+                    } catch (e: Throwable) {
+                        call.error(HttpStatusCode.InternalServerError, null, e)
+                    }
+                    logWrapper.d(call.request.uri)
                 }
                 static("/") {
                     resources("")

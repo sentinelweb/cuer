@@ -11,6 +11,22 @@ import uk.co.sentinelweb.cuer.domain.ext.deserialiseResponse
 
 @JsExport
 class App : RComponent<RProps, AppState>() {
+
+    override fun AppState.init() {
+        playlists = listOf()
+        currentPlaylist = null
+        loadingVisibitity = Visibility.visible
+        MainScope().launch {
+            val playlistsFetched = fetchPlaylists()
+            setState {
+                playlists = playlistsFetched
+                loadingVisibitity = Visibility.hidden
+            }
+            // todo test code - remove
+            fetchPlaylist(playlistsFetched.find { it.title == "music" } ?: playlistsFetched[0])
+        }
+    }
+
     override fun RBuilder.render() {
         content {
             title = "Cuer"
@@ -35,21 +51,6 @@ class App : RComponent<RProps, AppState>() {
                 currentPlaylist = playlistDomain
                 loadingVisibitity = Visibility.hidden
             }
-        }
-    }
-
-    override fun AppState.init() {
-        playlists = listOf()
-        currentPlaylist = null
-        loadingVisibitity = Visibility.visible
-        MainScope().launch {
-            val playlistsFetched = fetchPlaylists()
-            setState {
-                playlists = playlistsFetched
-                loadingVisibitity = Visibility.hidden
-            }
-            // todo test code - remove
-            fetchPlaylist(playlistsFetched.find { it.title == "music" } ?: playlistsFetched[0])
         }
     }
 

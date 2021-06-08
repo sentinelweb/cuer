@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlay
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.AddLinkOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
@@ -114,6 +115,7 @@ object Modules {
         factory { PlaylistMediaLookupOrchestrator(get(), get()) }
         factory { NewMediaPlayistInteractor(get()) }
         factory { RecentItemsPlayistInteractor(get()) }
+        factory { AddLinkOrchestrator(get(), get(), get(), get()) }
         factory { LocalSearchPlayistInteractor(get(), get(named<GeneralPreferences>())) }
         factory { RemoteSearchPlayistOrchestrator(get(named<GeneralPreferences>()), get(), get(), RemoteSearchPlayistOrchestrator.State()) }
     }

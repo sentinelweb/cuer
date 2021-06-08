@@ -99,7 +99,6 @@ android {
 
 dependencies {
     // project
-    //implementation project(":domain")
     implementation project(":core")
     implementation project(":shared")
     implementation project(":net")

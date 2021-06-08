@@ -40,7 +40,11 @@ object RemoteServiceModule {
             scoped { RemoteContract.Notification.State() }
         }
         factory<RemoteDatabaseAdapter> {
-            AppRemoteDatabaseAdapter(playlistDatabaseRepository = get())
+            AppRemoteDatabaseAdapter(
+                playlistOrchestrator = get(),
+                playlistItemOrchestrator = get(),
+                addLinkOrchestrator = get()
+            )
         }
         // test injection
 //        factory<RemoteDatabaseAdapter> {

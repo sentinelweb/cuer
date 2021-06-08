@@ -10,4 +10,5 @@ interface RemoteDatabaseAdapter {
     suspend fun getPlaylist(id: Long): PlaylistDomain?
     suspend fun getPlaylistItem(id: Long): PlaylistItemDomain?
     suspend fun scanUrl(url: String): Domain?
+    suspend fun commitPlaylistItem(item: PlaylistItemDomain): PlaylistItemDomain
 }

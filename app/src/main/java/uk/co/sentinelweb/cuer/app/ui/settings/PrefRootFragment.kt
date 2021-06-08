@@ -56,7 +56,7 @@ class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContr
     override fun setRemoteServiceRunning(running: Boolean) {
         (findPreference(getString(R.string.prefs_root_remote_service_key)) as CheckBoxPreference?)
             ?.apply {
-                setChecked(!running)
+                setChecked(running)
                 setSummary(getString(if (running) R.string.prefs_root_remote_service_running else R.string.prefs_root_remote_service_not_running))
             }
     }

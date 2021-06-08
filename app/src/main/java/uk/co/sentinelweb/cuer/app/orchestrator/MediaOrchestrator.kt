@@ -51,7 +51,11 @@ class MediaOrchestrator constructor(
     suspend override fun load(platformId: String, options: Options): MediaDomain? =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> throw NotImplementedException()
+            LOCAL -> mediaDatabaseRepository
+                .loadList(PlatformIdListFilter(listOf(platformId)), options.flat)
+                .takeIf { it.isSuccessful && it.data?.size == 1 }
+                ?.data
+                ?.get(0)
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM ->

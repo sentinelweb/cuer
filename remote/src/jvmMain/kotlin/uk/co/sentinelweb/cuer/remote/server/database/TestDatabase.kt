@@ -28,6 +28,7 @@ import kotlin.random.Random
                     .media
             }
 
+    override suspend fun commitPlaylistItem(item: PlaylistItemDomain): PlaylistItemDomain = item
 
     companion object {
         //"media/data/v3-2021-05-26_13 28 23-cuer_backup-Pixel_3a.json"
