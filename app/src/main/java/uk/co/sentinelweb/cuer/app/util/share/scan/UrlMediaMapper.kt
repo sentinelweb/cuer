@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.util.share.scan
 
 import android.net.Uri
 import uk.co.sentinelweb.cuer.domain.*
-import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
@@ -28,17 +27,7 @@ private class YoutubeShortUrlMediaMapper : UrlMediaMapper {
     override fun map(uri: Uri): Pair<ObjectTypeDomain, MediaDomain> =
         uri.path
             ?.let {
-                MEDIA to MediaDomain(
-                    id = null,
-                    url = uri.toString(),
-                    platformId = it.substring(1),
-                    mediaType = VIDEO,
-                    platform = YOUTUBE,
-                    channelData = ChannelDomain( // todo add real data
-                        platformId = null,
-                        platform = YOUTUBE
-                    )
-                )
+                MEDIA to MediaDomain.createYoutube(uri.toString(), it.substring(1))
             }
             ?: throw IllegalArgumentException("Link format error: $uri")
 }
@@ -51,17 +40,7 @@ private class YoutubeUrlMediaMapper : UrlMediaMapper {
                 && uri.getQueryParameters("v").isNotEmpty()
 
     override fun map(uri: Uri): Pair<ObjectTypeDomain, MediaDomain> =
-        MEDIA to MediaDomain(
-            id = null,
-            url = uri.toString(),
-            platformId = uri.getQueryParameters("v")[0],
-            mediaType = VIDEO,
-            platform = YOUTUBE,
-            channelData = ChannelDomain(
-                platformId = null,
-                platform = YOUTUBE
-            )
-        )
+        MEDIA to MediaDomain.createYoutube(uri.toString(), uri.getQueryParameters("v")[0])
 }
 
 // https://www.youtube.com/playlist?list=<playlist ID>.
