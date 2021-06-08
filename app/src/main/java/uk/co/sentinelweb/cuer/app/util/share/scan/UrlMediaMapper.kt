@@ -1,13 +1,10 @@
 package uk.co.sentinelweb.cuer.app.util.share.scan
 
 import android.net.Uri
-import uk.co.sentinelweb.cuer.domain.ChannelDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 
@@ -21,7 +18,7 @@ val urlMediaMappers = listOf(
 
 interface UrlMediaMapper {
     fun check(uri: Uri): Boolean
-    fun map(uri: Uri): Pair<ObjectTypeDomain, Any>
+    fun map(uri: Uri): Pair<ObjectTypeDomain, Domain>
 }
 
 private class YoutubeShortUrlMediaMapper : UrlMediaMapper {

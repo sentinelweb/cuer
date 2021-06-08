@@ -11,6 +11,7 @@ include ':app'
 include ':net'
 include ':shared'
 include ':remote'
+include ':muirwik-components' // legacy issues
 include ':core'// todo remove once time mappers are converted to kotlin datetime
 
 //include ':prototype'

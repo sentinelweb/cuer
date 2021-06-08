@@ -53,16 +53,12 @@ class Content : RComponent<ContentProps, ContentState>() {
                     css {
                         position = Position.absolute
                         transition += Transition("width", 195.ms, Timing.easeInOut, 0.ms)
-//                        transition = "width 195ms cubic-bezier(0.4, 0, 0.6, 1) 0ms";
-//                        if (slideOutDrawerOpen) put("width", "calc(100% - ${drawerWidth}px)");
                         if (drawerOpen) width = 100.pct - drawerWidth.px
-                        //put("grid-area", "banner")
                     }
 
                     mToolbar(disableGutters = !drawerOpen) {
                         if (!drawerOpen) {
                             mIconButton("menu", color = MColor.inherit, onClick = {
-                                //window.alert("menu click:"+state.drawerOpen)
                                 setState { drawerOpen = true }
                             })
                         }
@@ -106,9 +102,7 @@ class Content : RComponent<ContentProps, ContentState>() {
                 styledDiv {
                     css {
                         flexGrow = 1.0
-                        //transition += Transition("margin", 195.ms, Timing.easeIn, 0.ms)
                         marginLeft = -drawerWidth.px
-                        //if (drawerOpen) marginLeft = 0.px
                         display = Display.grid
                         put("grid-template-columns", "400px 1fr")
                         put("grid-template-rows", "1fr")
@@ -157,17 +151,3 @@ class Content : RComponent<ContentProps, ContentState>() {
 
 fun RBuilder.content(handler: ContentProps.() -> Unit) = child(Content::class) { attrs(handler) }
 
-
-// todo remove
-private fun RBuilder.spacer() {
-    themeContext.Consumer { theme ->
-
-        // This puts in a spacer to get below the AppBar.
-        styledDiv {
-            css {
-                toolbarJsCssToPartialCss(theme.mixins.toolbar)
-            }
-        }
-        mDivider { }
-    }
-}
