@@ -6,7 +6,6 @@ plugins {
     kotlin("multiplatform")
     application
     kotlin("plugin.serialization")
-    //id("com.github.turansky.kfc.multiplatform")
 }
 
 val ver_kotlin: String by project
@@ -75,19 +74,22 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                //implementation("org.jetbrains.kotlinx:kotlinx-datetime-js:$ver_kotlinx_datetime")
-                implementation("org.jetbrains:kotlin-react:$ver_kotlin_react")
-                implementation("org.jetbrains:kotlin-styled:$ver_kotlin_styled")
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-react:$ver_kotlin_react")
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:$ver_kotlin_react")
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$ver_kotlin_styled")
                 implementation(npm("react-youtube-lite", "1.0.1"))
                 implementation(npm("react-share", "~4.2.1"))
-                // todo shouldn't be need but breaks build runtime/webpack
-                implementation(npm("kotlinx-serialization-kotlinx-serialization-core-jslegacy", "1.4.2-RC1"))
-                implementation("com.ccfraser.muirwik:muirwik-components:0.7.0") {
+
+                implementation(project(":muirwik-components"))
+                /*implementation("com.ccfraser.muirwik:muirwik-components:0.7.0") {
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-styled")
-                }
+                    exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react")
+                    exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react-dom")
+                }*/
                 //https://github.com/CookPete/react-player
                 //implementation(npm("react-player", "2.9.0"))
             }
+            //implementation("org.jetbrains.kotlinx:kotlinx-datetime-js:$ver_kotlinx_datetime")
         }
     }
 }

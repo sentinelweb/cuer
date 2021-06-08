@@ -1,8 +1,6 @@
 
-import kotlinx.browser.document
 import kotlinx.css.*
 import kotlinx.html.DIV
-import kotlinx.html.id
 import react.*
 import react.dom.h3
 import styled.StyledDOMBuilder
@@ -41,16 +39,16 @@ class PlaylistItem : RComponent<PlaylistItemProps, RState>() {
                 }
             }
             shareButtons()
-            styledDiv {
-                attrs {
-                    id = ITEM_DESCRIPTION_ID
-                }
-            }
-            document.getElementById(ITEM_DESCRIPTION_ID)?.innerHTML =
-                (props.video.description
-                    ?.let { webLink.replaceLinks(it) }
-                    ?.replace("\n", "<br/>")
-                    ?: "")
+//            styledDiv {
+//                attrs {
+//                    id = ITEM_DESCRIPTION_ID
+//                }
+//            }
+//            document.getElementById(ITEM_DESCRIPTION_ID)?.innerHTML =
+//                (props.video.description
+//                    ?.let { webLink.replaceLinks(it) }
+//                    ?.replace("\n", "<br/>")
+//                    ?: "")
         }
     }
 

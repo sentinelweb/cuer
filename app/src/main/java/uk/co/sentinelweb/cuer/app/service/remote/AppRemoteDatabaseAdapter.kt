@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.service.remote
 
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
@@ -25,4 +26,8 @@ class AppRemoteDatabaseAdapter constructor(
         playlistDatabaseRepository.loadPlaylistItem(id)
             .takeIf { it.isSuccessful }
             ?.data
+
+    override suspend fun scanUrl(url: String): Domain? {
+        TODO("Not yet implemented")
+    }
 }

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.util.share.scan
 
 import android.net.Uri
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 
 class LinkScanner constructor(
@@ -9,7 +10,7 @@ class LinkScanner constructor(
     private val mappers: List<UrlMediaMapper>
 ) {
 
-    fun scan(uriString: String): Pair<ObjectTypeDomain, Any>? {
+    fun scan(uriString: String): Pair<ObjectTypeDomain, Domain>? {
         try {
             val uri = Uri.parse(clean(uriString))
             mappers.forEach {

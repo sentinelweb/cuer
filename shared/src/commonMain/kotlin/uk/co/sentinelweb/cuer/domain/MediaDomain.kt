@@ -35,4 +35,18 @@ data class MediaDomain(
         VIDEO, AUDIO, WEB
     }
 
+    companion object {
+        fun createYoutube(url: String, platformId: String) = MediaDomain(
+            id = null,
+            url = url,
+            platformId = platformId,
+            mediaType = MediaTypeDomain.VIDEO,
+            platform = PlatformDomain.YOUTUBE,
+            channelData = ChannelDomain(
+                platformId = null,
+                platform = PlatformDomain.YOUTUBE
+            )
+        )
+    }
+
 }
