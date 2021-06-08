@@ -47,7 +47,7 @@ class LinkScannerTest {
 
         assertThat(actual).isNotNull()
         assertThat(actual?.first).isEqualTo(MEDIA)
-        assertThat(actual?.second).isEqualTo(expectedLink)
+        assertThat(actual?.second).isEqualTo(expectedMedia)
     }
 
     @Test
@@ -68,6 +68,6 @@ by "hitherejoe" (https://www.youtube.com/channel/585
 
         assertThat(actual).isNotNull()
         assertThat(actual?.first).isEqualTo(MEDIA)
-        assertThat(actual?.second).isEqualTo(expectedLink)
+        assertThat(actual?.second).isEqualTo(expectedMedia)
     }
 }
