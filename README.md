@@ -10,17 +10,18 @@ Youtube has very bad playlist & chromecast queue useability.
 It's a learning project to hone my Material / Jetpack / Kotlin / Coroutines / Chromecast skillz
 
 Using
+- Kotlin Multiplatform - shared domain model and web / react interface (remote module)
 - Material Design Libraries & Themes (Day/Night)
 - Jetpack Libraries
-   - Room
-   - Lifecycle
-   - Androidx / KTX
-   - Navigation
-   - Jetpack Compose
-     - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/search
-- Architecture 
-   - MVP - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui
-   - Some MVVM for practice - e.g. https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/playlist_item_edit
+  - Room
+  - Lifecycle
+  - Androidx / KTX
+  - Navigation
+  - Jetpack Compose
+    - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/search
+- Architecture
+  - MVP - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui
+  - Some MVVM for practice - e.g. https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/playlist_item_edit
 - Kotlin (1.4)
   - Coroutines
   - Serialisation
