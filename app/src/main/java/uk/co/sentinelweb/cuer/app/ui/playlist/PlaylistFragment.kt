@@ -17,7 +17,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
@@ -39,6 +40,7 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -59,19 +61,21 @@ class PlaylistFragment :
     PlaylistContract.View,
     ItemContract.Interactions,
     ItemBaseContract.ItemMoveInteractions,
-    ShareContract.Committer {
+    ShareContract.Committer,
+    AndroidScopeComponent {
 
-    private val presenter: PlaylistContract.Presenter by currentScope.inject()
-    private val adapter: PlaylistAdapter by currentScope.inject()
-    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
+    override val scope: Scope by fragmentScopeWithSource()
+    private val presenter: PlaylistContract.Presenter by inject()
+    private val adapter: PlaylistAdapter by inject()
+    private val snackbarWrapper: SnackbarWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
-    private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
+    private val itemTouchHelper: ItemTouchHelper by inject()
     private val log: LogWrapper by inject()
-    private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
+    private val alertDialogCreator: AlertDialogCreator by inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
-    private val navMapper: NavigationMapper by currentScope.inject()
+    private val navMapper: NavigationMapper by inject()
 
     // todo consider making binding nulll - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null

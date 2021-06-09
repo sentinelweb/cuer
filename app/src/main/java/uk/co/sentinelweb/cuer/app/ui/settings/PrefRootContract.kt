@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.settings
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
-import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -12,10 +12,13 @@ import java.time.Instant
 interface PrefRootContract {
     interface Presenter {
         fun sendDebugReports()
+        fun toggleRemoteService()
+        fun initialisePrefs()
     }
 
     interface View {
         fun showMessage(msg: String)
+        fun setRemoteServiceRunning(running: Boolean)
     }
 
     data class State constructor(
@@ -33,7 +36,8 @@ interface PrefRootContract {
                         state = get(),
                         log = get(),
                         firebaseWrapper = get(),
-                        timeProvider = get()
+                        timeProvider = get(),
+                        remoteServiceManger = get()
                     )
                 }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }

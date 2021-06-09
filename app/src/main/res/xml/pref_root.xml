@@ -10,6 +10,16 @@
             app:title="@string/prefs_root_backup_item_title"
             />
     </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/prefs_root_remote_service_title">
+        <CheckBoxPreference
+            app:icon="@drawable/ic_remote_service_24"
+            app:key="@string/prefs_root_remote_service_key"
+            app:summary="@string/prefs_root_remote_service_not_running"
+            app:title="@string/prefs_root_remote_service_title"
+            />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/prefs_root_debug_cat_title">
         <Preference
             app:icon="@drawable/ic_baseline_bug_report_24"

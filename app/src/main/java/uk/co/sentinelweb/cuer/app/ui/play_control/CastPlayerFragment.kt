@@ -11,20 +11,26 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
-import org.koin.core.context.KoinContextHandler.get
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.context.GlobalContext.get
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
-class CastPlayerFragment() : Fragment(), CastPlayerContract.View {
+class CastPlayerFragment() :
+    Fragment(),
+    CastPlayerContract.View,
+    AndroidScopeComponent {
 
-    private val presenter: CastPlayerContract.Presenter by currentScope.inject()
+    override val scope: Scope by fragmentScopeWithSource()
+    private val presenter: CastPlayerContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val res: ResourceWrapper by inject()

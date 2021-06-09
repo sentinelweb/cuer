@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.play_control
 import androidx.annotation.ColorRes
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.FragmentNavigator
-import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract

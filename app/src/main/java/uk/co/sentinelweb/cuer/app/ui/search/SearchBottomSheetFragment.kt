@@ -8,21 +8,24 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class SearchBottomSheetFragment : BottomSheetDialogFragment() {
+class SearchBottomSheetFragment : BottomSheetDialogFragment(), AndroidScopeComponent {
 
-    private val viewModel: SearchViewModel by currentScope.inject()
-    private val navMapper: NavigationMapper by currentScope.inject()
-    private val datePickerCreator: DatePickerCreator by currentScope.inject()
-    private val enumPickerCreator: EnumValuesDialogCreator by currentScope.inject()
+    override val scope: Scope by fragmentScopeWithSource()
+    private val viewModel: SearchViewModel by inject()
+    private val navMapper: NavigationMapper by inject()
+    private val datePickerCreator: DatePickerCreator by inject()
+    private val enumPickerCreator: EnumValuesDialogCreator by inject()
     private val log: LogWrapper by inject()
 
     private var _binding: FragmentComposeBinding? = null

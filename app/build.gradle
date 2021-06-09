@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlinx-serialization'
+//apply plugin: 'kotlinx-serialization'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'com.google.firebase.crashlytics'
@@ -48,7 +48,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = ver_jvm
         useIR = true
         // byoass compose kotlin version compatability check
         // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
@@ -56,6 +56,11 @@ android {
                 "-P",
                 "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
         ]
+    }
+
+    composeOptions {
+        kotlinCompilerVersion ver_kotlin
+        kotlinCompilerExtensionVersion ver_compose
     }
 
     buildFeatures {
@@ -78,18 +83,30 @@ android {
         unitTests.returnDefaultValues = true
         unitTests.includeAndroidResources = true
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/INDEX.LIST'
+    }
 }
 
 dependencies {
     // project
-    implementation project(":domain")
     implementation project(":core")
+    implementation project(":shared")
     implementation project(":net")
+    implementation project(":remote")
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // deps
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$ver_kotlinx_serialization_runtime"
     implementation "androidx.appcompat:appcompat:$ver_appcompat"
     implementation "androidx.fragment:fragment-ktx:$ver_fragment_ktx"
     implementation "androidx.core:core:$ver_androidx_core"
@@ -99,7 +116,7 @@ dependencies {
     implementation "com.google.android.material:material:$ver_material"
     implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
     implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
-
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime"
     implementation "androidx.recyclerview:recyclerview:$ver_recyclerview"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$ver_swipe_refresh"
 
@@ -114,6 +131,8 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata:$ver_compose"
     implementation "androidx.compose.ui:ui-tooling:$ver_compose"
     implementation "com.google.android.material:compose-theme-adapter:$ver_compose"
+    implementation "androidx.compose.compiler:compiler:$ver_compose"
+
 
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"
@@ -122,9 +141,9 @@ dependencies {
     implementation "androidx.navigation:navigation-ui:$ver_navigation"
 
     // koin
-    implementation "org.koin:koin-core:$ver_koin"
-    implementation "org.koin:koin-androidx-scope:$ver_koin"
-    implementation "org.koin:koin-android-viewmodel:$ver_koin"
+    implementation "io.insert-koin:koin-core:$ver_koin"
+    implementation "io.insert-koin:koin-android:$ver_koin"
+    //implementation "org.koin:koin-android-viewmodel:$ver_koin"
 
     // room
     implementation "androidx.room:room-runtime:$ver_room"
@@ -170,7 +189,9 @@ dependencies {
     }
 
     testImplementation "junit:junit:$ver_junit"
-    testImplementation "org.koin:koin-test:$ver_koin"
+    testImplementation "io.insert-koin:koin-test:$ver_koin"
+    // Koin for JUnit 4
+    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.google.truth:truth:$ver_truth"
     testImplementation "org.mockito:mockito-core:$ver_mockito"
@@ -190,7 +211,9 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
 //    testImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.16.0'
 
-    androidTestImplementation "org.koin:koin-test:$ver_koin"
+    androidTestImplementation "io.insert-koin:koin-test:$ver_koin"
+    // Koin for JUnit 4
+    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     androidTestImplementation "com.google.truth:truth:$ver_truth"
     androidTestImplementation "org.mockito:mockito-core:$ver_mockito"
     androidTestImplementation "org.mockito:mockito-android:$ver_mockito"

@@ -14,6 +14,7 @@ import org.robolectric.annotation.Config
 import uk.co.sentinelweb.cuer.app.CuerTestApp
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
 
 @RunWith(AndroidJUnit4::class)
@@ -38,14 +39,15 @@ class LinkScannerTest {
     @Test
     fun `scan - basic`() {
         val expectedLink = "https://youtu.be/gim0Q5-zCRk"
+        val expectedMedia = MediaDomain.createYoutube("https://youtu.be/gim0Q5-zCRk", "gim0Q5-zCRk")
         every { mockUrlMediaMapper.check(Uri.parse(expectedLink)) } returns true
-        every { mockUrlMediaMapper.map(Uri.parse(expectedLink)) } returns (MEDIA to expectedLink)
+        every { mockUrlMediaMapper.map(Uri.parse(expectedLink)) } returns (MEDIA to expectedMedia)
 
         val actual = sut.scan(expectedLink)
 
         assertThat(actual).isNotNull()
         assertThat(actual?.first).isEqualTo(MEDIA)
-        assertThat(actual?.second).isEqualTo(expectedLink)
+        assertThat(actual?.second).isEqualTo(expectedMedia)
     }
 
     @Test
@@ -57,13 +59,15 @@ https://youtu.be/gim0Q5-zCRk
 by "hitherejoe" (https://www.youtube.com/channel/585
 ) """
         val expectedLink = "https://youtu.be/gim0Q5-zCRk"
+        val expectedMedia = MediaDomain.createYoutube("https://youtu.be/gim0Q5-zCRk", "gim0Q5-zCRk")
+
         every { mockUrlMediaMapper.check(Uri.parse(expectedLink)) } returns true
-        every { mockUrlMediaMapper.map(Uri.parse(expectedLink)) } returns (MEDIA to expectedLink)
+        every { mockUrlMediaMapper.map(Uri.parse(expectedLink)) } returns (MEDIA to expectedMedia)
 
         val actual = sut.scan(fixtText)
 
         assertThat(actual).isNotNull()
         assertThat(actual?.first).isEqualTo(MEDIA)
-        assertThat(actual?.second).isEqualTo(expectedLink)
+        assertThat(actual?.second).isEqualTo(expectedMedia)
     }
 }

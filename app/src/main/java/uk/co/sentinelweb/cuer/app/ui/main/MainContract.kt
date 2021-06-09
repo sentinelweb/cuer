@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
 import androidx.lifecycle.ViewModel
-import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 interface MainContract {
     interface Presenter {
         fun initialise()
+        //fun startServer()
         fun onStart()
         fun onStop()
         fun onPlayServicesOk()
@@ -46,7 +47,8 @@ interface MainContract {
                         playerControls = get(),
                         ytServiceManager = get(),
                         ytContextHolder = get(),
-                        log = get()
+                        log = get(),
+                        remoteServiceManger = get()
                     )
                 }
                 scoped {

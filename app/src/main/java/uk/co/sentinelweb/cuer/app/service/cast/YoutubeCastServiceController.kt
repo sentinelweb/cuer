@@ -1,8 +1,8 @@
 package uk.co.sentinelweb.cuer.app.service.cast
 
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_DISCONNECT
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotification.Companion.ACTION_STAR
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_DISCONNECT
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_STAR
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper

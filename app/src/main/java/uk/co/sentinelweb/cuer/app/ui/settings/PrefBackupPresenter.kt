@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
-import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager.Companion.VERSION
+import kotlinx.datetime.toJavaInstant
+import kotlinx.datetime.toJavaLocalDateTime
+import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
+import uk.co.sentinelweb.cuer.app.backup.BackupFileManager.Companion.VERSION
 import uk.co.sentinelweb.cuer.app.util.wrapper.FileWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
@@ -32,10 +34,16 @@ class PrefBackupPresenter constructor(
                 .also {
                     state.writeData = it
                     val device = Build.MODEL.replace(" ", "_")
-                    view.promptForSaveLocation("v$VERSION-${timeStampMapper.mapDateTimeSimple(timeProvider.localDateTime())}-cuer_backup-$device.json")
+                    view.promptForSaveLocation(
+                        "v$VERSION-${
+                            timeStampMapper.mapDateTimeSimple(
+                                timeProvider.localDateTime().toJavaLocalDateTime()
+                            )
+                        }-cuer_backup-$device.json"
+                    )
                     view.showProgress(false)
                 }
-            state.lastBackedUp = timeProvider.instant()
+            state.lastBackedUp = timeProvider.instant().toJavaInstant()
         }
     }
 

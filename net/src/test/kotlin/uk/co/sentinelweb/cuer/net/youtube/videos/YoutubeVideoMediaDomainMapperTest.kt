@@ -6,6 +6,8 @@ import com.flextrade.jfixture.annotations.Fixture
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toJavaLocalDateTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -19,7 +21,7 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.dto.ThumbnailDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeImageMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainMapper
-import java.time.LocalDateTime
+
 
 class YoutubeVideoMediaDomainMapperTest {
     @MockK
@@ -66,7 +68,7 @@ class YoutubeVideoMediaDomainMapperTest {
                 )
             )
         })
-        every { mockStampMapper.mapTimestamp(any<String>()) } returns fixtDate
+        every { mockStampMapper.mapTimestamp(any<String>()) } returns fixtDate.toJavaLocalDateTime()
         every { mockStampMapper.mapDuration(any()) } returns fixtDuration
         dto.items.forEach {
             every { mockImageMapper.mapThumb(it.snippet.thumbnails) } returns fixtMediumDomain

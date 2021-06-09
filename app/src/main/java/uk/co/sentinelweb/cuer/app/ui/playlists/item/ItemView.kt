@@ -16,8 +16,8 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.android.synthetic.main.view_playlists_item.view.*
-import org.koin.core.KoinComponent
-import org.koin.core.context.KoinContextHandler.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.extension.fade
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
@@ -30,7 +30,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     constructor(c: Context, a: AttributeSet?) : this(c, a, 0)
 
     private lateinit var presenter: ItemContract.Presenter
-    private var imageProvider: FirebaseDefaultImageProvider = get().get()// todo use inject
+    private val imageProvider: FirebaseDefaultImageProvider by inject()
 
     val itemView: View
         get() = listitem

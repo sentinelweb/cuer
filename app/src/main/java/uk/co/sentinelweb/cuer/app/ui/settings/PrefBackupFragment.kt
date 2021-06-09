@@ -15,16 +15,20 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import org.koin.android.scope.currentScope
+import org.koin.android.ext.android.inject
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import java.io.File
 
-class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupContract.View {
+class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupContract.View, AndroidScopeComponent {
 
-    private val presenter: PrefBackupContract.Presenter by currentScope.inject()
-    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
+    override val scope: Scope by fragmentScopeWithSource()
+    private val presenter: PrefBackupContract.Presenter by inject()
+    private val snackbarWrapper: SnackbarWrapper by inject()
     private lateinit var progress: ProgressBar
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

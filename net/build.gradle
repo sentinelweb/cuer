@@ -3,13 +3,18 @@ apply plugin: 'kotlin'
 apply plugin: "org.jetbrains.kotlin.jvm"
 apply plugin: 'kotlinx-serialization'
 
+compileKotlin {
+    kotlinOptions.jvmTarget = ver_jvm
+}
+
 dependencies {
-    api project(":domain")
-    api project(":core")
+    implementation project(":core")
+    implementation project(":shared")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$ver_kotlinx_serialization_runtime"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core"
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime"
 
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:$ver_retrofit"
@@ -18,11 +23,12 @@ dependencies {
 //    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:$ver_retrofit2_kotlinx_serialization_converter"
 
     // koin
-    implementation  "org.koin:koin-core:$ver_koin"
+    implementation  "io.insert-koin:koin-core:$ver_koin"
 
     // test
     testImplementation "junit:junit:$ver_junit"
-    testImplementation "org.koin:koin-test:$ver_koin"
+    testImplementation "io.insert-koin:koin-test:$ver_koin"
+    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
 }

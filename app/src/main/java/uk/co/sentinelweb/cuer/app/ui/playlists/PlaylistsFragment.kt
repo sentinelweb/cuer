@@ -13,7 +13,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistsFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
@@ -23,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -33,12 +35,14 @@ class PlaylistsFragment :
     Fragment(),
     PlaylistsContract.View,
     ItemContract.Interactions,
-    ItemBaseContract.ItemMoveInteractions {
+    ItemBaseContract.ItemMoveInteractions,
+    AndroidScopeComponent {
 
-    private val presenter: PlaylistsContract.Presenter by currentScope.inject()
-    private val adapter: PlaylistsAdapter by currentScope.inject()
-    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
-    private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
+    override val scope: Scope by fragmentScopeWithSource()
+    private val presenter: PlaylistsContract.Presenter by inject()
+    private val adapter: PlaylistsAdapter by inject()
+    private val snackbarWrapper: SnackbarWrapper by inject()
+    private val itemTouchHelper: ItemTouchHelper by inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val log: LogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()

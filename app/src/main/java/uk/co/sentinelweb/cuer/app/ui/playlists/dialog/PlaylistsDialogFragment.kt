@@ -8,22 +8,26 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistsDialogFragmentBinding
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsAdapter
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config) :
     DialogFragment(),
     PlaylistsDialogContract.View,
     ItemContract.Interactions,
-    ItemBaseContract.ItemMoveInteractions {
+    ItemBaseContract.ItemMoveInteractions,
+    AndroidScopeComponent {
 
-    private val presenter: PlaylistsDialogContract.Presenter by currentScope.inject()
-    private val adapter: PlaylistsAdapter by currentScope.inject()
-    private val itemTouchHelper: ItemTouchHelper by currentScope.inject()
+    override val scope: Scope by fragmentScopeWithSource()
+    private val presenter: PlaylistsDialogContract.Presenter by inject()
+    private val adapter: PlaylistsAdapter by inject()
+    private val itemTouchHelper: ItemTouchHelper by inject()
     private val log: LogWrapper by inject()
 
     private var _binding: PlaylistsDialogFragmentBinding? = null

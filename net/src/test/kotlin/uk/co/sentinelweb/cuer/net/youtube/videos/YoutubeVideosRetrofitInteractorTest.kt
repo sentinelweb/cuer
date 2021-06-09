@@ -12,15 +12,14 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.koin.core.KoinComponent
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
-import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
@@ -32,7 +31,7 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeSearchMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainMapper
 
 // todo test update and channels
-class YoutubeVideosRetrofitInteractorTest : KoinComponent {
+class YoutubeVideosRetrofitInteractorTest {
 
     @MockK
     private lateinit var mockService: YoutubeService

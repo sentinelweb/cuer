@@ -20,8 +20,9 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.playlist_item_edit_fragment.*
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
-import org.koin.core.context.KoinContextHandler
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.context.GlobalContext.get
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
@@ -39,6 +40,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -50,18 +53,19 @@ import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
 class PlaylistItemEditFragment
     : Fragment(R.layout.playlist_item_edit_fragment),
-    ShareContract.Committer {
+    ShareContract.Committer, AndroidScopeComponent {
 
-    private val viewModel: PlaylistItemEditViewModel by currentScope.inject()
+    override val scope: Scope by fragmentScopeWithSource()
+    private val viewModel: PlaylistItemEditViewModel by inject()
     private val log: LogWrapper by inject()
-    private val navMapper: NavigationMapper by currentScope.inject()
-    private val chipCreator: ChipCreator by currentScope.inject()
-    private val selectDialogCreator: SelectDialogCreator by currentScope.inject()
-    private val res: ResourceWrapper by currentScope.inject()
+    private val navMapper: NavigationMapper by inject()
+    private val chipCreator: ChipCreator by inject()
+    private val selectDialogCreator: SelectDialogCreator by inject()
+    private val res: ResourceWrapper by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
-    private val alertDialogCreator: AlertDialogCreator by currentScope.inject()
-    private val doneNavigation: PlaylistItemEditContract.DoneNavigation by currentScope.inject()// from activity (see onAttach)
-    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
+    private val alertDialogCreator: AlertDialogCreator by inject()
+    private val doneNavigation: PlaylistItemEditContract.DoneNavigation by inject()// from activity (see onAttach)
+    private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
     private val starMenuItem: MenuItem
@@ -241,7 +245,7 @@ class PlaylistItemEditFragment
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback(this, saveCallback)
-        currentScope.linkTo(requireActivity().currentScope)
+        linkScopeToActivity()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -347,6 +351,8 @@ class PlaylistItemEditFragment
                             dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
                         }
                         DialogModel.Type.PLAYLIST_ADD -> {
+                            // todo need a callback to select the parent in the add dialog i.e. another type DialogModel.Type.PLAYLIST_SELECT_PARENT ??
+                            // todo also to select the image
                             dialogFragment = PlaylistEditFragment.newInstance()
                                 .apply {
                                     listener = object : PlaylistEditFragment.Listener {
@@ -400,10 +406,7 @@ class PlaylistItemEditFragment
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
         private val SELECT_PLAYLIST_TAG = "pdf_dialog"
 
-        val TRANS_IMAGE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
-
-        val TRANS_TITLE by lazy { KoinContextHandler.get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
-
-
+        val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
+        val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
     }
 }

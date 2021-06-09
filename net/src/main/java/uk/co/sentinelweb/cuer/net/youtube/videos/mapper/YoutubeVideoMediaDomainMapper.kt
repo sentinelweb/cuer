@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 
+import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -32,7 +33,7 @@ internal class YoutubeVideoMediaDomainMapper(
                     title = it.snippet.channelTitle,
                     platform = PlatformDomain.YOUTUBE
                 ),
-                published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) },
+                published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts)?.toKotlinLocalDateTime() },
                 isLiveBroadcast = it.snippet.liveBroadcastContent.let { it == LIVE || it == UPCOMING },
                 isLiveBroadcastUpcoming = it.snippet.liveBroadcastContent.let { it == UPCOMING }
             )

@@ -14,7 +14,8 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import kotlinx.android.synthetic.main.main_activity.*
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
@@ -28,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
+import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -37,13 +39,15 @@ class MainActivity :
     MainContract.View,
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     NavigationProvider,
-    PlaylistItemEditContract.DoneNavigation {
+    PlaylistItemEditContract.DoneNavigation,
+    AndroidScopeComponent {
 
-    private val presenter: MainContract.Presenter by currentScope.inject()
+    override val scope: Scope by activityScopeWithSource()
+    private val presenter: MainContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
-    private val snackBarWrapper: SnackbarWrapper by currentScope.inject()
-    private val log: LogWrapper by currentScope.inject()
-    private val navMapper: NavigationMapper by currentScope.inject()
+    private val snackBarWrapper: SnackbarWrapper by inject()
+    private val log: LogWrapper by inject()
+    private val navMapper: NavigationMapper by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
@@ -55,6 +59,7 @@ class MainActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.main_activity)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -68,6 +73,12 @@ class MainActivity :
         }
         intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
         presenter.initialise()
+        //presenter.startServer()
+    }
+
+    override fun onDestroy() {
+        presenter.onDestroy()
+        super.onDestroy()
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
@@ -125,11 +136,6 @@ class MainActivity :
     override fun onStop() {
         super.onStop()
         presenter.onStop()
-    }
-
-    override fun onDestroy() {
-        presenter.onDestroy()
-        super.onDestroy()
     }
 
     override fun isRecreating() = isChangingConfigurations

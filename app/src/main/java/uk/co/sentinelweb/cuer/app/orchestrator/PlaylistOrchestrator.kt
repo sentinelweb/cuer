@@ -12,7 +12,7 @@ import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
-import uk.co.sentinelweb.cuer.domain.update.UpdateObject
+import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
 class PlaylistOrchestrator constructor(
@@ -136,7 +136,7 @@ class PlaylistOrchestrator constructor(
             else -> throw InvalidOperationException(this::class, null, options)
         }
 
-    suspend fun updateMedia(playlist: PlaylistDomain, update: UpdateObject<MediaDomain>, options: Options): MediaDomain? =
+    suspend fun updateMedia(playlist: PlaylistDomain, update: UpdateDomain<MediaDomain>, options: Options): MediaDomain? =
         when (options.source) {
             MEMORY -> if (playlist.type == APP) {
                 mediaOrchestrator.update(update, options.copy(source = LOCAL))
@@ -145,7 +145,7 @@ class PlaylistOrchestrator constructor(
             else -> throw InvalidOperationException(this::class, null, options)
         }
 
-    override suspend fun update(update: UpdateObject<PlaylistDomain>, options: Options): PlaylistDomain? {
+    override suspend fun update(update: UpdateDomain<PlaylistDomain>, options: Options): PlaylistDomain? {
         throw NotImplementedException()
     }
 

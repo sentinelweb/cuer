@@ -35,7 +35,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.matchesHeader
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
-import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdate
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import uk.co.sentinelweb.cuer.tools.ext.build
 import uk.co.sentinelweb.cuer.tools.ext.buildCollection
 
@@ -587,7 +587,7 @@ class QueueMediatorTest {
             createSut()
             val currentItemBefore = sut.currentItem!!
             val expectedCurrentItem = currentItemBefore.copy(media = currentItemBefore.media.copy(positon = 0, watched = true))
-            val mediaPositionUpdate = MediaPositionUpdate(
+            val mediaPositionUpdate = MediaPositionUpdateDomain(
                 id = expectedCurrentItem.media.id!!,
                 positon = expectedCurrentItem.media.positon,
                 duration = expectedCurrentItem.media.duration,
@@ -626,7 +626,7 @@ class QueueMediatorTest {
             val selectedItem = fixtCurrentPlaylist.items.get(selectedItemIndex)
             val fixtUpdatedPlaylist = fixtCurrentPlaylist.copy(currentIndex = selectedItemIndex)
             val expectedSelectedItem = selectedItem.copy(media = selectedItem.media.copy(positon = 0, watched = true))
-            val mediaPositionUpdate = MediaPositionUpdate(
+            val mediaPositionUpdate = MediaPositionUpdateDomain(
                 id = expectedSelectedItem.media.id!!,
                 positon = expectedSelectedItem.media.positon,
                 duration = expectedSelectedItem.media.duration,
@@ -677,7 +677,7 @@ class QueueMediatorTest {
         testCoroutineScope.runBlockingTest {
             createSut()
             val fixtUpdateMedia: MediaDomain = fixture.build()
-            val mediaPositionUpdate = MediaPositionUpdate(
+            val mediaPositionUpdate = MediaPositionUpdateDomain(
                 id = sut.currentItem!!.media.id!!,
                 positon = fixtUpdateMedia.positon,
                 duration = fixtUpdateMedia.duration,

@@ -17,7 +17,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistEditFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
@@ -36,6 +37,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageDialogFragment
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -44,18 +46,18 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
+class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
-class PlaylistEditFragment : DialogFragment() {
-
-    private val viewModel: PlaylistEditViewModel by currentScope.inject()
-    private val chipCreator: ChipCreator by currentScope.inject()
+    override val scope: Scope by fragmentScopeWithSource()
+    private val viewModel: PlaylistEditViewModel by inject()
+    private val chipCreator: ChipCreator by inject()
     private val log: LogWrapper by inject()
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val softKeyboard: SoftKeyboardWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
-    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
+    private val snackbarWrapper: SnackbarWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
-    private val navMapper: NavigationMapper by currentScope.inject()
+    private val navMapper: NavigationMapper by inject()
 
     private val starMenuItem: MenuItem
         get() = binding.peToolbar.menu.findItem(R.id.pe_star)

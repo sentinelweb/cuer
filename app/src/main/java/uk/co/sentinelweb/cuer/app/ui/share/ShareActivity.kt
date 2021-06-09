@@ -16,7 +16,8 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_share.*
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
@@ -30,19 +31,26 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
+import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-class ShareActivity : AppCompatActivity(), ShareContract.View, ScanContract.Listener, PlaylistItemEditContract.DoneNavigation {
-    private val presenter: ShareContract.Presenter by currentScope.inject()
-    private val shareWrapper: ShareWrapper by currentScope.inject()
-    private val snackbarWrapper: SnackbarWrapper by currentScope.inject()
+class ShareActivity : AppCompatActivity(),
+    ShareContract.View,
+    ScanContract.Listener,
+    PlaylistItemEditContract.DoneNavigation,
+    AndroidScopeComponent {
+
+    override val scope: Scope by activityScopeWithSource()
+    private val presenter: ShareContract.Presenter by inject()
+    private val shareWrapper: ShareWrapper by inject()
+    private val snackbarWrapper: SnackbarWrapper by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
-    private val navMapper: NavigationMapper by currentScope.inject()
+    private val navMapper: NavigationMapper by inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
