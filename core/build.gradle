@@ -7,6 +7,7 @@ compileKotlin {
 }
 
 dependencies {
+    api project(":shared")
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core"
@@ -14,6 +15,7 @@ dependencies {
     implementation  "io.insert-koin:koin-core:$ver_koin"
 
     // test
+    testApi project(":shared")
     testImplementation "junit:junit:$ver_junit"
     testImplementation "io.insert-koin:koin-test:$ver_koin"
     // Koin for JUnit 4

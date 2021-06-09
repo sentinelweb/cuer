@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.domain.update.UpdateObject
+import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import kotlin.reflect.KClass
 
@@ -29,7 +29,7 @@ interface OrchestratorContract<Domain> {
 
     suspend fun delete(domain: Domain, options: Options): Boolean
 
-    suspend fun update(update: UpdateObject<Domain>, options: Options): Domain?
+    suspend fun update(update: UpdateDomain<Domain>, options: Options): Domain?
 
     interface Filter
 

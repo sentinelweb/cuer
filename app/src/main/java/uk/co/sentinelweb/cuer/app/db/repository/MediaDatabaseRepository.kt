@@ -18,9 +18,9 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdate
-import uk.co.sentinelweb.cuer.domain.update.MediaUpdateObject
-import uk.co.sentinelweb.cuer.domain.update.UpdateObject
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
+import uk.co.sentinelweb.cuer.domain.update.MediaUpdateDomain
+import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import java.io.InvalidClassException
 import java.io.InvalidObjectException
 
@@ -169,12 +169,12 @@ class MediaDatabaseRepository constructor(
             RepoResult.Error<Int>(e, msg)
         }
 
-    override suspend fun update(update: UpdateObject<MediaDomain>, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
+    override suspend fun update(update: UpdateDomain<MediaDomain>, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             try {
-                when (update as? MediaUpdateObject) {
-                    is MediaPositionUpdate ->
-                        (update as MediaPositionUpdate)
+                when (update as? MediaUpdateDomain) {
+                    is MediaPositionUpdateDomain ->
+                        (update as MediaPositionUpdateDomain)
                             // .apply { database.beginTransaction() }
                             .let { it to mediaDao.getFlags(it.id) }
                             .let { mediaUpdateMapper.map(it.first, it.second) }

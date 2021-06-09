@@ -351,6 +351,8 @@ class PlaylistItemEditFragment
                             dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
                         }
                         DialogModel.Type.PLAYLIST_ADD -> {
+                            // todo need a callback to select the parent in the add dialog i.e. another type DialogModel.Type.PLAYLIST_SELECT_PARENT ??
+                            // todo also to select the image
                             dialogFragment = PlaylistEditFragment.newInstance()
                                 .apply {
                                     listener = object : PlaylistEditFragment.Listener {

@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
+import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
@@ -49,7 +50,7 @@ class PlaylistItemEditModelMapper(
         position = domain.positon
             ?.takeIf { domain.duration != null && domain.duration!! > 0L }
             ?.let { (it / domain.duration!!).toFloat() },
-        pubDate = dateTimeFormater.formatDateTimeNullable(domain.published),
+        pubDate = dateTimeFormater.formatDateTimeNullable(domain.published?.toJavaLocalDateTime()),
         empty = false,
         isLive = domain.isLiveBroadcast,
         isUpcoming = domain.isLiveBroadcastUpcoming,

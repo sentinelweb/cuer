@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
-import uk.co.sentinelweb.cuer.domain.update.UpdateObject
+import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
 class ChannelOrchestrator constructor(
@@ -47,7 +47,7 @@ class ChannelOrchestrator constructor(
         throw OrchestratorContract.NotImplementedException()
     }
 
-    override suspend fun update(update: UpdateObject<ChannelDomain>, options: OrchestratorContract.Options): ChannelDomain? {
+    override suspend fun update(update: UpdateDomain<ChannelDomain>, options: OrchestratorContract.Options): ChannelDomain? {
         throw OrchestratorContract.NotImplementedException()
     }
 

@@ -6,9 +6,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
+import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
-import uk.co.sentinelweb.cuer.app.db.backup.BackupFileManager
-import uk.co.sentinelweb.cuer.app.db.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.orchestrator.*
@@ -18,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlay
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.AddLinkOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
@@ -25,6 +25,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServiceModule
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
@@ -57,6 +58,7 @@ import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
+import uk.co.sentinelweb.cuer.core.di.CoreJvmModule
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -68,6 +70,7 @@ import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
+import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
 object Modules {
 
@@ -87,7 +90,8 @@ object Modules {
         PrefBackupContract.fragmentModule,
         PrefRootContract.fragmentModule,
         SearchContract.fragmentModule,
-        SearchImageContract.fragmentModule
+        SearchImageContract.fragmentModule,
+        RemoteServiceModule.serviceModule
     )
 
     private val uiModule = module {
@@ -111,6 +115,7 @@ object Modules {
         factory { PlaylistMediaLookupOrchestrator(get(), get()) }
         factory { NewMediaPlayistInteractor(get()) }
         factory { RecentItemsPlayistInteractor(get()) }
+        factory { AddLinkOrchestrator(get(), get(), get(), get()) }
         factory { LocalSearchPlayistInteractor(get(), get(named<GeneralPreferences>())) }
         factory { RemoteSearchPlayistOrchestrator(get(named<GeneralPreferences>()), get(), get(), RemoteSearchPlayistOrchestrator.State()) }
     }
@@ -143,7 +148,6 @@ object Modules {
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
         factory { BackupFileManager(get(), get(), get(), get(), get(), get(), get()) }
-        factory { ParserFactory() }
     }
 
     private val wrapperModule = module {
@@ -179,6 +183,9 @@ object Modules {
         .plus(NetModule.netModule)
         .plus(CoreModule.objectModule)
         .plus(DomainModule.objectModule)
+        .plus(CoreJvmModule.objectModule)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
+        .plus(AppSharedModule.objectModule)
+        .plus(RemoteModule.objectModule)
 }

@@ -79,7 +79,7 @@ fun PlaylistDomain.scanOrder(): StringBuilder {
         orderString.append(",")
     }
     orderString
-        .deleteCharAt(orderString.length - 1)
+        //.deleteCharAt(orderString.length - 1)
         .append("]")
     return orderString
 }

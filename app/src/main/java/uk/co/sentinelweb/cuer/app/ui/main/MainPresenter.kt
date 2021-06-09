@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServiceManager
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -11,7 +12,8 @@ class MainPresenter(
     private val playerControls: CastPlayerContract.PlayerControls,
     private val ytServiceManager: YoutubeCastServiceManager,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val remoteServiceManger: RemoteServiceManager
 ) : MainContract.Presenter {
 
     init {
@@ -24,6 +26,11 @@ class MainPresenter(
             state.playServiceCheckDone = true
         }
     }
+
+//    override fun startServer() {
+//        remoteServiceManger.start()
+//    }
+
 
     override fun onPlayServicesOk() {
         log.d("onPlayServicesOk()")
@@ -69,5 +76,7 @@ class MainPresenter(
         ytContextHolder.create()
     }
 
-    override fun onDestroy() = Unit
+    override fun onDestroy() {
+//        remoteServiceManger.stop()
+    }
 }

@@ -62,7 +62,8 @@ internal class YoutubeRetrofitInteractor constructor(
                         key = keyProvider.key
                     )
                         .let { videoMapper.map(it) }
-                        .let { medias ->
+                        .takeIf { it.size > 0 }
+                        ?.let { medias ->
                             updateChannelData(medias)
                                 .takeIf { it.isSuccessful }
                                 .let { it?.data }

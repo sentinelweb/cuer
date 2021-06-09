@@ -1,8 +1,10 @@
 package uk.co.sentinelweb.cuer.domain
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import java.time.Instant
+
+//import java.time.Instant
 
 @Serializable
 data class PlaylistItemDomain(
@@ -12,4 +14,4 @@ data class PlaylistItemDomain(
     val order: Long,
     val archived: Boolean = false,
     val playlistId: Long? = null
-)
+) : Domain

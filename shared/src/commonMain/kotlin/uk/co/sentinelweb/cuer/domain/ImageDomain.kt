@@ -7,4 +7,4 @@ data class ImageDomain constructor(
     val url: String,
     val width: Int? = null,
     val height: Int? = null
-)
+) : Domain

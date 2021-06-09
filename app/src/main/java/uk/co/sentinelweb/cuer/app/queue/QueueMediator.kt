@@ -17,7 +17,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.*
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
-import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdate
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 
 class QueueMediator constructor(
     private val state: QueueMediatorState,
@@ -205,7 +205,7 @@ class QueueMediator constructor(
         state.currentItem = state.currentItem
             ?.run {
                 media.let {
-                    MediaPositionUpdate(
+                    MediaPositionUpdateDomain(
                         id = it.id!!,
                         positon = updatedMedia.positon,
                         duration = updatedMedia.duration,

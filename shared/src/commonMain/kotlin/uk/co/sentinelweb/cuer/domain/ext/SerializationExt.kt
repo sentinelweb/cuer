@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.domain.ext
 
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -8,8 +10,11 @@ import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.serialization.InstantSerializer
 import uk.co.sentinelweb.cuer.domain.serialization.LocalDateTimeSerializer
-import java.time.Instant
-import java.time.LocalDateTime
+import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
+import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
+
+//import java.time.Instant
+//import java.time.LocalDateTime
 
 fun ChannelDomain.serialise() = domainJsonSerializer.encodeToString(
     ChannelDomain.serializer(), this
@@ -19,13 +24,18 @@ fun MediaDomain.serialise() = domainJsonSerializer.encodeToString(
     MediaDomain.serializer(), this
 )
 
-fun List<MediaDomain>.serialiseList() = domainJsonSerializer.encodeToString(
+fun List<MediaDomain>.serialiseMedias() = domainJsonSerializer.encodeToString(
     ListSerializer(MediaDomain.serializer()), this
 )
 
 fun PlaylistDomain.serialise() = domainJsonSerializer.encodeToString(
     PlaylistDomain.serializer(), this
 )
+
+fun List<PlaylistDomain>.serialisePlaylists() = domainJsonSerializer.encodeToString(
+    ListSerializer(PlaylistDomain.serializer()), this
+)
+
 
 fun PlaylistDomain.PlaylistConfigDomain.serialise() = domainJsonSerializer.encodeToString(
     PlaylistDomain.PlaylistConfigDomain.serializer(), this
@@ -95,9 +105,18 @@ fun deserialiseBackupFileModel(input: String) = domainJsonSerializer.decodeFromS
     BackupFileModel.serializer(), input
 )
 
+fun ResponseDomain.serialise() = domainJsonSerializer.encodeToString(
+    ResponseDomain.serializer(), this
+)
+
+fun deserialiseResponse(input: String) = domainJsonSerializer.decodeFromString(
+    ResponseDomain.serializer(), input
+)
+
 val domainJsonSerializer = Json {
     prettyPrint = true
     isLenient = true
+    classDiscriminator = "domainType"// property added when base domain type is use (see ResponseDomain)
     serializersModule = SerializersModule {
         mapOf(
             PlaylistItemDomain::class to PlaylistItemDomain.serializer(),
@@ -105,9 +124,20 @@ val domainJsonSerializer = Json {
             PlaylistDomain::class to PlaylistDomain.serializer(),
             ChannelDomain::class to ChannelDomain.serializer(),
             MediaDomain::class to MediaDomain.serializer(),
-            SearchRemoteDomain to SearchRemoteDomain.serializer(),
-            SearchLocalDomain to SearchLocalDomain.serializer(),
+            SearchRemoteDomain::class to SearchRemoteDomain.serializer(),
+            SearchLocalDomain::class to SearchLocalDomain.serializer(),
+            BackupFileModel::class to BackupFileModel.serializer(),
+            ErrorDomain::class to ErrorDomain.serializer(),
+            ResponseDomain::class to ResponseDomain.serializer(),
         )
+        polymorphic(Domain::class, PlaylistDomain::class, PlaylistDomain.serializer())
+        polymorphic(Domain::class, MediaDomain::class, MediaDomain.serializer())
+        polymorphic(Domain::class, ImageDomain::class, ImageDomain.serializer())
+        polymorphic(Domain::class, ChannelDomain::class, ChannelDomain.serializer())
+        polymorphic(Domain::class, PlaylistItemDomain::class, PlaylistItemDomain.serializer())
+        polymorphic(Domain::class, PlaylistTreeDomain::class, PlaylistTreeDomain.serializer())
+        polymorphic(Domain::class, SearchLocalDomain::class, SearchLocalDomain.serializer())
+        polymorphic(Domain::class, SearchRemoteDomain::class, SearchRemoteDomain.serializer())
     }.plus(SerializersModule {
         contextual(Instant::class, InstantSerializer)
     }

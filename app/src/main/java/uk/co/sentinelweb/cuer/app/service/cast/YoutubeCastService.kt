@@ -27,7 +27,7 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
         log.tag(this)
         _instance = this
         log.d("Service created")
-        appState.castNotificationChannelId = notificationWrapper.createChannelId()
+        appState.castNotificationChannelId = notificationWrapper.createChannelId(CHANNEL_ID, CHANNEL_NAME)
         controller.initialise()
 
     }
@@ -55,6 +55,8 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
     override fun onBind(p0: Intent?): IBinder? = null
 
     companion object {
+        private const val CHANNEL_ID: String = "cuer_yt_service"
+        private const val CHANNEL_NAME: String = "Cuer Youtube Service"
         private var _instance: YoutubeCastService? = null
 
         fun instance(): YoutubeCastService? = _instance

@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.mapper
 
+import kotlinx.datetime.toJavaInstant
+import kotlinx.datetime.toKotlinInstant
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.entity.*
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity.Companion.FLAG_ARCHIVED
@@ -16,7 +18,7 @@ class PlaylistItemMapper(
         flags = if (domain.archived) FLAG_ARCHIVED else 0,
         playlistId = domain.playlistId
             ?: throw IllegalStateException("playlist item has no laylist id"),
-        dateAdded = domain.dateAdded
+        dateAdded = domain.dateAdded.toJavaInstant()
     )
 
     fun map(domain: MediaDomain): MediaEntity = mediaMapper.map(domain)
@@ -33,7 +35,7 @@ class PlaylistItemMapper(
         media = mediaMapper.map(mediaEntity, channelEntity),// todo enforce consistency better
         order = entity.order,
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
-        dateAdded = entity.dateAdded,
+        dateAdded = entity.dateAdded.toKotlinInstant(),
         playlistId = entity.playlistId
     )
 
@@ -45,7 +47,7 @@ class PlaylistItemMapper(
         media = if (entity.mediaId == mediaDomain.id) mediaDomain else throw IllegalStateException("Media id does not match item"),
         order = entity.order,
         archived = entity.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
-        dateAdded = entity.dateAdded,
+        dateAdded = entity.dateAdded.toKotlinInstant(),
         playlistId = entity.playlistId
     )
 
@@ -56,7 +58,7 @@ class PlaylistItemMapper(
         media = mediaMapper.map(entity.media.media, entity.media.channel),
         order = entity.item.order,
         archived = entity.item.flags and FLAG_ARCHIVED == FLAG_ARCHIVED,
-        dateAdded = entity.item.dateAdded,
+        dateAdded = entity.item.dateAdded.toKotlinInstant(),
         playlistId = entity.item.playlistId
     )
 

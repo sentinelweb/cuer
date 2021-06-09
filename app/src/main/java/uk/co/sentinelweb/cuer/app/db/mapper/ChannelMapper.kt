@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.mapper
 
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
 import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity.Companion.FLAG_STARRED
@@ -17,7 +19,7 @@ class ChannelMapper constructor(val imageMapper: ImageMapper) {
         thumbNail = imageMapper.mapImage(domain.thumbNail),
         image = imageMapper.mapImage(domain.image),
         flags = if (domain.starred) FLAG_STARRED else 0,
-        published = domain.published
+        published = domain.published?.toJavaLocalDateTime()
     )
 
     fun map(entity: ChannelEntity): ChannelDomain = ChannelDomain(
@@ -31,6 +33,6 @@ class ChannelMapper constructor(val imageMapper: ImageMapper) {
         thumbNail = imageMapper.mapImage(entity.thumbNail),
         image = imageMapper.mapImage(entity.image),
         starred = entity.flags and FLAG_STARRED == FLAG_STARRED,
-        published = entity.published
+        published = entity.published?.toKotlinLocalDateTime()
     )
 }

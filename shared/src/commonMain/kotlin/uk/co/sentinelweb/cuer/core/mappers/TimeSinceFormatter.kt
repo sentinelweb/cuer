@@ -1,38 +1,47 @@
 package uk.co.sentinelweb.cuer.core.mappers
 
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
-import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.math.abs
 
 class TimeSinceFormatter(
     private val timeProvider: TimeProvider
 ) {
     fun formatTimeSince(millis: Long): String {
-        val diff = (timeProvider.currentTimeMillis() - millis) / 1000L
-        return if (diff >= 0) {
-            when (diff) {
-                in 0L..5L -> "now"
-                in 5L..59L -> "${SECONDS.toSeconds(diff)}s"
-                in 60L..60 * 60 -> "${SECONDS.toMinutes(diff)}m"
-                in 60L * 60..60L * 60 * 24L -> "${SECONDS.toHours(diff)}h"
-                in 60L * 60 * 24..60L * 60 * 24 * 365L -> "${SECONDS.toDays(diff)}d"
-                in 60L * 60 * 24 * 365..60L * 60 * 24 * 365L * 20 -> "${SECONDS.toDays(diff) / 365}y"
+        val differenceSeconds = (timeProvider.currentTimeMillis() - millis) / 1000L
+        return if (differenceSeconds >= 0) {
+            when {
+                differenceSeconds < 5 -> "now"
+                differenceSeconds < SEC_TO_MIN -> "${differenceSeconds}s"
+                differenceSeconds < SEC_TO_HOURS -> "${differenceSeconds / SEC_TO_MIN}m"
+                differenceSeconds < SEC_TO_DAYS -> "${differenceSeconds / SEC_TO_HOURS}h"
+                differenceSeconds < SEC_TO_MONTHS -> "${differenceSeconds / SEC_TO_DAYS}d"
+                differenceSeconds < SEC_TO_YEARS -> "${differenceSeconds / SEC_TO_MONTHS}mth"
+                differenceSeconds < SEC_TO_YEARS * 20 -> "${differenceSeconds / SEC_TO_YEARS}y"
                 else -> "-"
             }
         } else "!"
     }
 
-    fun formatTimeShort(diff: Long): String {
-        val isNegative = diff < 0
-        val xdiffSec = abs(diff) / 1000L
+    fun formatTimeShort(millis: Long): String {
+        val isNegative = millis < 0
+        val positiveSeconds = abs(millis) / 1000L
         val sign = if (isNegative) "-" else ""
-        return when (xdiffSec) {
-            in 0L..59L -> "$sign${SECONDS.toSeconds(xdiffSec)}s"
-            in 60L..60 * 60 -> "$sign${SECONDS.toMinutes(xdiffSec)}m"
-            in 60L * 60..60L * 60 * 24L -> "$sign${SECONDS.toHours(xdiffSec)}h"
-            in 60L * 60 * 24..60L * 60 * 24 * 365L -> "$sign${SECONDS.toDays(xdiffSec)}d"
-            in 60L * 60 * 24 * 365..60L * 60 * 24 * 365L * 20 -> "$sign${SECONDS.toDays(xdiffSec) / 365}y"
+        return when {
+            positiveSeconds < SEC_TO_MIN -> "$sign${positiveSeconds}s"
+            positiveSeconds < SEC_TO_HOURS -> "$sign${positiveSeconds / SEC_TO_MIN}m"
+            positiveSeconds < SEC_TO_DAYS -> "$sign${positiveSeconds / SEC_TO_HOURS}h"
+            positiveSeconds < SEC_TO_MONTHS -> "$sign${positiveSeconds / SEC_TO_DAYS}d"
+            positiveSeconds < SEC_TO_YEARS -> "$sign${positiveSeconds / SEC_TO_MONTHS}mth"
+            positiveSeconds < SEC_TO_YEARS * 20 -> "$sign${positiveSeconds / SEC_TO_YEARS}y"
             else -> "-"
         }
+    }
+
+    companion object {
+        private val SEC_TO_MIN = 60
+        private val SEC_TO_HOURS = 60 * 60
+        private val SEC_TO_DAYS = 60 * 60 * 24
+        private val SEC_TO_MONTHS = 60 * 60 * 24 * 30
+        private val SEC_TO_YEARS = 60 * 60 * 24 * 365
     }
 }

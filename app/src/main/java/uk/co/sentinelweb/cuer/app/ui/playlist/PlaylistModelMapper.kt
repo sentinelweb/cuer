@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
+import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
@@ -109,11 +110,12 @@ class PlaylistModelMapper constructor(
             thumbNailUrl = item.media.thumbNail?.url,
             progress = progress,
             starred = item.media.starred,
-            watchedSince = item.media.dateLastPlayed?.let { timeSinceFormatter.formatTimeSince(it.toEpochMilli()) } ?: "-",
+            watchedSince = item.media.dateLastPlayed?.let { timeSinceFormatter.formatTimeSince(it.toEpochMilliseconds()) } ?: "-",
             isWatched = item.media.watched,
             published = item.media.published?.let {
                 timeSinceFormatter.formatTimeSince(
-                    it.toInstant(OffsetDateTime.now().getOffset()).toEpochMilli()
+                    // todo shorten this
+                    it.toJavaLocalDateTime().toInstant(OffsetDateTime.now().getOffset()).toEpochMilli()
                 )
             } ?: "-",
             platform = item.media.platform,

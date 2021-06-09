@@ -96,7 +96,6 @@
     <string name="cd_check">Select item</string>
 
     <!-- prefs -->
-    <string name="prefs_root_debug_send_reports_key">sendReports</string>
     <string name="prefs_root_backup_item_title">Backup</string>
     <string name="prefs_root_backup_cat_title">Backup/Restore</string>
     <string name="prefs_root_backup_summary">Data backup options</string>
@@ -104,8 +103,10 @@
     <string
         name="prefs_root_debug_send_reports_summary">Trigger unsent crash report to crashlytics</string>
     <string name="prefs_root_debug_send_reports_title">Send unsent reports</string>
-    <string name="prefs_backup_backup_key">backup</string>
-    <string name="prefs_backup_restore_key">restore</string>
+    <string name="prefs_root_remote_service_not_running">Not running</string>
+    <string name="prefs_root_remote_service_running">Running</string>
+    <string name="prefs_root_remote_service_title">Remote service</string>
+
 
     <!-- playlist edit -->
     <string name="pe_default_display_title">Enter a title …</string>

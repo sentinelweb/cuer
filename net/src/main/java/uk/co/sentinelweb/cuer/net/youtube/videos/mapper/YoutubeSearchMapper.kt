@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.*
@@ -38,8 +40,8 @@ internal class YoutubeSearchMapper(
             relatedToVideoId = null,
             type = VIDEO.param,
             channelId = domain.channelPlatformId,
-            publishedBefore = domain.toDate?.let { timeStampMapper.mapTimestamp(it) },
-            publishedAfter = domain.fromDate?.let { timeStampMapper.mapTimestamp(it) },
+            publishedBefore = domain.toDate?.let { timeStampMapper.mapTimestamp(it.toJavaLocalDateTime()) },
+            publishedAfter = domain.fromDate?.let { timeStampMapper.mapTimestamp(it.toJavaLocalDateTime()) },
             order = mapOrder(domain.order).param,
             eventType = domain.isLive.let {
                 if (it) LIVE.param else null
@@ -91,7 +93,7 @@ internal class YoutubeSearchMapper(
             thumbNail = imageMapper.mapThumb(it.snippet.thumbnails),
             image = imageMapper.mapImage(it.snippet.thumbnails),
             channelData = channelLookup[it.snippet.channelId] ?: throw BadDataException("Channel not found"),
-            published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) },
+            published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts)?.toKotlinLocalDateTime() },
             isLiveBroadcast = !(listOf(COMPLETED, NONE).contains(EVENT_TYPE_MAP[it.snippet.liveBroadcastContent])),
             isLiveBroadcastUpcoming = (EVENT_TYPE_MAP[it.snippet.liveBroadcastContent] == UPCOMING)
         )

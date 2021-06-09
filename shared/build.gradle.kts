@@ -22,7 +22,7 @@ android {
     compileSdkVersion(30)
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdkVersion(16)
+        minSdkVersion(26)
         targetSdkVersion(30)
     }
     // remove when upgrading to kotlin 1.5
@@ -39,10 +39,9 @@ android {
 kotlin {
     jvm()
     js {
-        //browser()// use in usage lib
+        browser()
     }
     android()
-
 
     sourceSets {
         val commonMain by getting {
@@ -75,7 +74,6 @@ kotlin {
             dependencies {
                 // Koin for JUnit 4
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
-
                 implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
                 implementation("com.google.truth:truth:$ver_truth")
             }

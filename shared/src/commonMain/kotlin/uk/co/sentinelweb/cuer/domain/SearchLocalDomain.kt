@@ -1,8 +1,10 @@
 package uk.co.sentinelweb.cuer.domain
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import java.time.Instant
+
+//import java.time.Instant
 
 @Serializable
 data class SearchLocalDomain(
@@ -14,6 +16,6 @@ data class SearchLocalDomain(
     var dateRangeType: DateRange = DateRange.PUBLISHED,
     @Contextual var fromDate: Instant? = null,
     @Contextual var toDate: Instant? = null
-) {
+) : Domain {
     enum class DateRange { PUBLISHED, ADDED, WATCHED }
 }

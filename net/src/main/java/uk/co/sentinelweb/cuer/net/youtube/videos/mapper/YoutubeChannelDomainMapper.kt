@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 
+import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
@@ -24,6 +25,6 @@ internal class YoutubeChannelDomainMapper(
         image = imageMapper.mapImage(it.snippet.thumbnails),
         starred = false,
         customUrl = it.snippet.customUrl?.let { "https://youtube.com/channel/$it" },
-        published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) }
+        published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts)?.toKotlinLocalDateTime() }
     )
 }

@@ -12,10 +12,13 @@ import java.time.Instant
 interface PrefRootContract {
     interface Presenter {
         fun sendDebugReports()
+        fun toggleRemoteService()
+        fun initialisePrefs()
     }
 
     interface View {
         fun showMessage(msg: String)
+        fun setRemoteServiceRunning(running: Boolean)
     }
 
     data class State constructor(
@@ -33,7 +36,8 @@ interface PrefRootContract {
                         state = get(),
                         log = get(),
                         firebaseWrapper = get(),
-                        timeProvider = get()
+                        timeProvider = get(),
+                        remoteServiceManger = get()
                     )
                 }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
