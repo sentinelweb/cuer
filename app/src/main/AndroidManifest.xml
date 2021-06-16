@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="uk.co.sentinelweb.cuer.app">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="uk.co.sentinelweb.cuer.app">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
-        android:name=".CuerApp"
+        android:name="uk.co.sentinelweb.cuer.app.CuerApp"
         android:allowBackup="true"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
@@ -23,7 +23,7 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name="uk.co.sentinelweb.cuer.app.ui.main.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme">
@@ -36,7 +36,7 @@
         </activity>
 
         <activity
-            android:name=".ui.share.ShareActivity"
+            android:name="uk.co.sentinelweb.cuer.app.ui.share.ShareActivity"
             android:label="@string/app_name"
             android:launchMode="standard"
             android:theme="@style/AppTheme">
@@ -95,7 +95,7 @@
         </activity>
 
         <activity
-            android:name=".ui.ytplayer.YoutubeActivity"
+            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_fullscreen"
             android:screenOrientation="landscape"
@@ -103,7 +103,7 @@
             tools:ignore="LockedOrientationActivity" />
 
         <service
-            android:name=".service.cast.YoutubeCastService"
+            android:name="uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService"
             android:exported="false">
 
             <!--            android:foregroundServiceType="mediaPlayback"-->
@@ -117,7 +117,7 @@
         </service>
 
         <service
-            android:name=".service.remote.RemoteService"
+            android:name="uk.co.sentinelweb.cuer.app.service.remote.RemoteService"
             android:exported="false" />
 
         <!-- media button receiver -->

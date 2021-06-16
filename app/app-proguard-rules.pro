@@ -20,13 +20,18 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+# dont obfuscate for now
+-dontobfuscate
+
 # https://github.com/Kotlin/kotlinx.serialization
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.SerializationKt
--keep,includedescriptorclasses class uk.co.sentinelweb.cuer.domain.**$$serializer { *; } # <-- change package name to your app's
--keepclassmembers class uk.co.sentinelweb.cuer.domain.** { # <-- change package name to your app's
+-keep class uk.co.sentinelweb.cuer.domain.**
+-keep class uk.co.sentinelweb.cuer.net.youtube.videos.dto.**
+-keep,includedescriptorclasses class uk.co.sentinelweb.cuer.domain.**$$serializer { *; }
+-keepclassmembers class uk.co.sentinelweb.cuer.domain.** {
     *** Companion;
 }
--keepclasseswithmembers uk.co.sentinelweb.cuer.domain.** { # <-- change package name to your app's
+-keepclasseswithmembers class uk.co.sentinelweb.cuer.domain.** {
     kotlinx.serialization.KSerializer serializer(...);
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cuer</string>
+    <string name="app_name">Cuer Dbg</string>
 
     <!-- nav -->
     <string name="bottomnav_title_browse">Browse</string>
