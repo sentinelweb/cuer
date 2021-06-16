@@ -9,7 +9,6 @@ apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion project.properties.app_compileSdkVersion as int
-    buildToolsVersion project.properties.app_buildToolsVersion
 
     useLibrary 'android.test.runner'
     useLibrary 'android.test.base'
@@ -35,10 +34,25 @@ android {
 
     }
 
-    buildTypes {
+    signingConfigs {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            keyAlias "$CUER_SIGNING_KEY_ALIAS"
+            keyPassword "$CUER_SIGNING_PASSWORD"
+            storeFile file("$CUER_SIGNING_KEY_FILE")
+            storePassword "$CUER_SIGNING_PASSWORD"
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-DEBUG'
+        }
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'app-proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -50,7 +64,7 @@ android {
     kotlinOptions {
         jvmTarget = ver_jvm
         useIR = true
-        // byoass compose kotlin version compatability check
+        // bypass compose kotlin version compatability check
         // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
         freeCompilerArgs += [
                 "-P",
@@ -143,7 +157,6 @@ dependencies {
     // koin
     implementation "io.insert-koin:koin-core:$ver_koin"
     implementation "io.insert-koin:koin-android:$ver_koin"
-    //implementation "org.koin:koin-android-viewmodel:$ver_koin"
 
     // room
     implementation "androidx.room:room-runtime:$ver_room"
@@ -190,7 +203,6 @@ dependencies {
 
     testImplementation "junit:junit:$ver_junit"
     testImplementation "io.insert-koin:koin-test:$ver_koin"
-    // Koin for JUnit 4
     testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.google.truth:truth:$ver_truth"
@@ -209,10 +221,8 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
-//    testImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.16.0'
 
     androidTestImplementation "io.insert-koin:koin-test:$ver_koin"
-    // Koin for JUnit 4
     testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     androidTestImplementation "com.google.truth:truth:$ver_truth"
     androidTestImplementation "org.mockito:mockito-core:$ver_mockito"
