@@ -35,10 +35,17 @@ jobs:
         env:
           YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
           PIXABAY_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"
+          CUER_SIGNING_KEY_ALIAS: "${{ secrets.CUER_SIGNING_KEY_ALIAS }}"
+          CUER_SIGNING_KEY_FILE: "${{ secrets.CUER_SIGNING_KEY_FILE }}"
+          CUER_SIGNING_PASSWORD: "${{ secrets.CUER_SIGNING_PASSWORD }}"
       - name: Test
         run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY  -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD core:test shared:test net:test app:testDebugUnitTest
         env:
           YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
+          PIXABAY_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"
+          CUER_SIGNING_KEY_ALIAS: "${{ secrets.CUER_SIGNING_KEY_ALIAS }}"
+          CUER_SIGNING_KEY_FILE: "${{ secrets.CUER_SIGNING_KEY_FILE }}"
+          CUER_SIGNING_PASSWORD: "${{ secrets.CUER_SIGNING_PASSWORD }}"
       - name: Android Test Report
         uses: asadmansr/android-test-report-action@v1.2.0
         if: ${{ always() }} # IMPORTANT: run Android Test Report regardless
