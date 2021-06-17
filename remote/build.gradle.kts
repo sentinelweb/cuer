@@ -80,16 +80,14 @@ kotlin {
                 implementation(npm("react-youtube-lite", "1.0.1"))
                 implementation(npm("react-share", "~4.2.1"))
 
-                implementation(project(":muirwik-components"))
-                /*implementation("com.ccfraser.muirwik:muirwik-components:0.7.0") {
+                implementation("com.ccfraser.muirwik:muirwik-components:0.8.0") {
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-styled")
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react")
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react-dom")
-                }*/
+                }
                 //https://github.com/CookPete/react-player
                 //implementation(npm("react-player", "2.9.0"))
             }
-            //implementation("org.jetbrains.kotlinx:kotlinx-datetime-js:$ver_kotlinx_datetime")
         }
     }
 }
