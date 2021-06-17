@@ -74,7 +74,7 @@ fun SearchParametersUi(
                 Box(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = model.type + " " + stringResource(id = R.string.search_title),
-                        style = MaterialTheme.typography.h4
+                        style = MaterialTheme.typography.h5
                     )
                     Button(
                         onClick = localOrRemoteClick,
