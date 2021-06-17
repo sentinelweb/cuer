@@ -101,6 +101,33 @@
     </style>
     <!-- end TextAppearance -->
 
+    <!-- TextAppearance ActionBar -->
+    <style name="TextAppearance" />
+
+    <style name="TextAppearance.ActionBar" />
+
+    <style name="TextAppearance.ActionBar.Collapsed">
+        <item name="android:textSize">18sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="TextAppearance.ActionBar.Expanded">
+        <item name="android:textSize">22sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+    <!-- end TextAppearance ActionBar-->
+
+
     <style name="Toolbar" parent="@style/Widget.MaterialComponents.Toolbar">
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
@@ -131,8 +158,6 @@
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1
         </item>
     </style>
-
-
     <!-- end Headers =========================== -->
 
     <!-- ItemView =========================== -->
@@ -282,26 +307,6 @@
         <item name="android:background">@color/grey_800</item>
     </style>
 
-    <style name="TextAppearance" />
-
-    <style name="TextAppearance.App" />
-
-    <style name="TextAppearance.App.CollapsingToolbar" />
-
-    <style name="TextAppearance.App.CollapsingToolbar.Expanded">
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-        <item name="android:textSize">20sp</item>
-    </style>
-
-    <style name="TextAppearance.App.CollapsingToolbar.Collapsed.Small">
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="TextAppearance.App.CollapsingToolbar.Collapsed">
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-    </style>
-
     <style name="FabButton" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="backgroundTint">@color/fab_primary_csl</item>
         <item name="tint">?colorOnPrimary</item>
@@ -322,6 +327,4 @@
         <item name="android:minHeight">48dp</item>
     </style>
 
-    <dimen name="itemview_icon_height">72dp</dimen>
-    <dimen name="itemview_icon_width">128dp</dimen>
 </resources>
