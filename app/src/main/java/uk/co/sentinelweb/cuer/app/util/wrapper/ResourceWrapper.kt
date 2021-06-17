@@ -66,7 +66,7 @@ class ResourceWrapper constructor(
     ) {
         string.apply {
             setSpan(
-                ImageSpan(d, ImageSpan.ALIGN_BASELINE),
+                ImageSpan(d, ImageSpan.ALIGN_BOTTOM),
                 start, end,
                 Spannable.SPAN_INCLUSIVE_INCLUSIVE
             )
