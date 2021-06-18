@@ -1,9 +1,10 @@
-import kotlinx.browser.document
+
 import kotlinx.css.*
 import kotlinx.html.DIV
-import kotlinx.html.id
+import kotlinx.html.unsafe
 import react.*
 import react.dom.attrs
+import react.dom.div
 import react.dom.h3
 import styled.StyledDOMBuilder
 import styled.css
@@ -17,8 +18,12 @@ external interface PlaylistItemProps : RProps {
     var unwatchedVideo: Boolean
 }
 
+external interface PlaylistItemState : RState {
+    var itemDescription: String
+}
+
 @JsExport
-class PlaylistItem : RComponent<PlaylistItemProps, RState>() {
+class PlaylistItem : RComponent<PlaylistItemProps, PlaylistItemState>() {
     private val webLink = WebLink()
 
     override fun RBuilder.render() {
@@ -41,16 +46,17 @@ class PlaylistItem : RComponent<PlaylistItemProps, RState>() {
                 }
             }
             shareButtons()
-            styledDiv {
+
+            div {
                 attrs {
-                    id = ITEM_DESCRIPTION_ID
+                    unsafe {
+                        +(props.video.description
+                            ?.let { webLink.replaceLinks(it) }
+                            ?.replace("\n", "<br/>")
+                            ?: "")
+                    }
                 }
             }
-            document.getElementById(ITEM_DESCRIPTION_ID)?.innerHTML =
-                (props.video.description
-                    ?.let { webLink.replaceLinks(it) }
-                    ?.replace("\n", "<br/>")
-                    ?: "")
         }
     }
 

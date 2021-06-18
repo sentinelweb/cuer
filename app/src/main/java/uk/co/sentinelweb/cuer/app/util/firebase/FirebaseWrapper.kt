@@ -14,7 +14,6 @@ class FirebaseWrapper constructor(
         FirebaseApp.initializeApp(appContext)
         imageProvider.checkToInit()
         Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
-
     }
 
     fun logException(t: Throwable) {

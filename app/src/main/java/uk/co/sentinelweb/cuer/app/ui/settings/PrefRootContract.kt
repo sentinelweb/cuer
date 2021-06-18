@@ -18,7 +18,7 @@ interface PrefRootContract {
 
     interface View {
         fun showMessage(msg: String)
-        fun setRemoteServiceRunning(running: Boolean)
+        fun setRemoteServiceRunning(running: Boolean, address: String?)
     }
 
     data class State constructor(
@@ -37,7 +37,8 @@ interface PrefRootContract {
                         log = get(),
                         firebaseWrapper = get(),
                         timeProvider = get(),
-                        remoteServiceManger = get()
+                        remoteServiceManger = get(),
+                        coroutines = get()
                     )
                 }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }

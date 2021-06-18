@@ -57,8 +57,8 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
     companion object {
         private const val CHANNEL_ID: String = "cuer_yt_service"
         private const val CHANNEL_NAME: String = "Cuer Youtube Service"
-        private var _instance: YoutubeCastService? = null
 
+        private var _instance: YoutubeCastService? = null
         fun instance(): YoutubeCastService? = _instance
     }
 }
