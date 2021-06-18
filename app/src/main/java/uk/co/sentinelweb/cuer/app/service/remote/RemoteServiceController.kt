@@ -29,6 +29,15 @@ class RemoteServiceController constructor(
 
     private var serverJob: Job? = null
 
+    override val isServerStarted: Boolean
+        get() = webServer.isRunning
+
+    override val address: String?
+        get() = let {
+            if (webServer.isRunning) wifiIpAddress(service)?.let { webServer.fullAddress(it) }
+            else null
+        }.apply { log.d("address: $this ${webServer.isRunning}") }
+
     override fun initialise() {
         notification.updateNotification("x")
         serverJob?.cancel()

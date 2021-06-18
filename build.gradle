@@ -22,6 +22,12 @@ buildscript {
 }
 
 allprojects {
+    task setProductionFlag {
+        switch (project.gradle.startParameter.taskNames[0]) {
+            case "assembleRelease":
+                allprojects {it.setProperty("isProduction", "true")}
+        }
+    }
     repositories {
         google()
         jcenter()
@@ -32,4 +38,3 @@ allprojects {
         maven { url 'https://androidx.dev/snapshots/builds/7166224/artifacts/repository' }
     }
 }
-

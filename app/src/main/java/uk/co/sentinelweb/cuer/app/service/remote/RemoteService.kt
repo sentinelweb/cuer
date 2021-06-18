@@ -12,11 +12,17 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class RemoteService : Service(), RemoteContract.Service, AndroidScopeComponent {
+    override val isServerStarted: Boolean
+        get() = controller.isServerStarted
+
+    override val address: String?
+        get() = controller.address
 
     override val scope: Scope by serviceScopeWithSource()
     private val controller: RemoteContract.Controller by scope.inject()
     private val notificationWrapper: NotificationWrapper by inject()
     private val appState: CuerAppState by inject()
+
     private val log: LogWrapper by inject()
 
     override fun onCreate() {
@@ -41,7 +47,6 @@ class RemoteService : Service(), RemoteContract.Service, AndroidScopeComponent {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // this routes media buttons to the MediaSessionCompat
         controller.handleAction(intent?.action)
-
         return START_NOT_STICKY
     }
 
@@ -52,7 +57,6 @@ class RemoteService : Service(), RemoteContract.Service, AndroidScopeComponent {
         private const val CHANNEL_NAME: String = "Cuer Remote Service"
 
         private var _instance: RemoteService? = null
-
         fun instance(): RemoteService? = _instance
     }
 }

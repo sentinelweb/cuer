@@ -35,11 +35,13 @@ class RemoteServer constructor(
     fun fullAddress(ip: String) = "http://$ip:$port"
 
     private var _appEngine: ApplicationEngine? = null
+
     val isRunning: Boolean
         get() = _appEngine != null
 
     fun start() {
-        _appEngine = buildServer().apply {
+        buildServer().apply {
+            _appEngine = this // start is a blocking call
             start(wait = true)
         }
     }

@@ -21,6 +21,7 @@ val ver_react: String by project
 val ver_styled_cmp: String by project
 val ver_jfixture: String by project
 val ver_truth: String by project
+val isProduction: String by project
 val ver_logback = "1.2.3"
 
 val outputJsLibName = "cuer.js"
@@ -112,15 +113,14 @@ val runServer by tasks.creating(JavaExec::class) {
 
 // include JS artifacts in any JAR we generate
 tasks.getByName<Jar>("jvmJar") {
-    val taskName = //if (project.hasProperty("isProduction")) {
+    val taskName = if (project.property("isProduction") == "true") {
         "jsBrowserProductionWebpack"
-//    } else {
-//        "jsBrowserDevelopmentWebpack"
-//    }
+    } else {
+        "jsBrowserDevelopmentWebpack"
+    }
     val webpackTask = tasks.getByName<KotlinWebpack>(taskName)
     dependsOn(webpackTask) // make sure JS gets compiled first
     from(File(webpackTask.destinationDirectory, outputJsLibName))
-//    from(File(webpackTask.destinationDirectory, "cuer.js.map"))
 }
 
 tasks {

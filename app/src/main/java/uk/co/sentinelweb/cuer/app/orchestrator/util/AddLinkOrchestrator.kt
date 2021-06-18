@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator.util
 
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DefaultFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
@@ -14,6 +15,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 class AddLinkOrchestrator constructor(
     private val mediaOrchestrator: MediaOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val playlistOrchestrator: PlaylistOrchestrator,
     private val linkScanner: LinkScanner,
     private val coProvider: CoroutineContextProvider,
 ) {
@@ -45,6 +47,14 @@ class AddLinkOrchestrator constructor(
     } ?: throw Exception("Couldn't scan link")
 
     suspend fun commitPlaylistItem(item: PlaylistItemDomain) =
-        playlistItemOrchestrator.save(item, LOCAL.deepOptions())
+        item.playlistId
+            ?.let { playlistItemOrchestrator.save(item, LOCAL.deepOptions()) }
+            ?: let {
+                playlistOrchestrator.loadList(DefaultFilter(), LOCAL.flatOptions())
+                    .get(0)// throws exception if not found but should always be there
+                    .let { item.copy(playlistId = it.id) }
+                    .let { playlistItemOrchestrator.save(it, LOCAL.deepOptions()) }
+            }
+
 
 }

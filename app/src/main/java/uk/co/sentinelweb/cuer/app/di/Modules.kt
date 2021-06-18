@@ -24,8 +24,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
-import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceModule
-import uk.co.sentinelweb.cuer.app.service.remote.RemoteServiceModule
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
@@ -86,12 +86,12 @@ object Modules {
         ScanContract.fragmentModule,
         PlaylistItemEditContract.fragmentModule,
         PlaylistEditContract.fragmentModule,
-        YoutubeCastServiceModule.serviceModule,
+        YoutubeCastServiceContract.serviceModule,
         PrefBackupContract.fragmentModule,
         PrefRootContract.fragmentModule,
         SearchContract.fragmentModule,
         SearchImageContract.fragmentModule,
-        RemoteServiceModule.serviceModule
+        RemoteContract.serviceModule
     )
 
     private val uiModule = module {
@@ -115,7 +115,7 @@ object Modules {
         factory { PlaylistMediaLookupOrchestrator(get(), get()) }
         factory { NewMediaPlayistInteractor(get()) }
         factory { RecentItemsPlayistInteractor(get()) }
-        factory { AddLinkOrchestrator(get(), get(), get(), get()) }
+        factory { AddLinkOrchestrator(get(), get(), get(), get(), get()) }
         factory { LocalSearchPlayistInteractor(get(), get(named<GeneralPreferences>())) }
         factory { RemoteSearchPlayistOrchestrator(get(named<GeneralPreferences>()), get(), get(), RemoteSearchPlayistOrchestrator.State()) }
     }
