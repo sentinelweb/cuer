@@ -14,7 +14,7 @@ class WebLinkTest {
         """.trimIndent()
 
         val textExpect = """
-            dddd <a href="http://www.gmail.com">http://www.gmail.com</a> dddd
+            dddd <a href="http://www.gmail.com" target="_blank">http://www.gmail.com</a> dddd
         """.trimIndent()
 
         assertEquals(textExpect, sut.replaceLinks(text))
@@ -26,12 +26,14 @@ class WebLinkTest {
             dddd http://www.gmail.com dddd
             dddd www.gmail.com dddd
             dddd goo.gl/1 dddd
+            dddd ggg. dddd
         """.trimIndent()
 
         val textExpect = """
-            dddd <a href="http://www.gmail.com">http://www.gmail.com</a> dddd
-            dddd <a href="www.gmail.com">www.gmail.com</a> dddd
-            dddd <a href="goo.gl/1">goo.gl/1</a> dddd
+            dddd <a href="http://www.gmail.com" target="_blank">http://www.gmail.com</a> dddd
+            dddd <a href="www.gmail.com" target="_blank">www.gmail.com</a> dddd
+            dddd <a href="goo.gl/1" target="_blank">goo.gl/1</a> dddd
+            dddd ggg. dddd
         """.trimIndent()
 
         assertEquals(textExpect, sut.replaceLinks(text))
