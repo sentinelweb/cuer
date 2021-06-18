@@ -35,8 +35,8 @@ class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContr
         return onCreateView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onStart() {
+        super.onStart()
         presenter.initialisePrefs()
     }
 
