@@ -16,7 +16,6 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
@@ -39,12 +38,8 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 class PlaylistItemEditViewModel constructor(
     private val state: PlaylistItemEditContract.State,
     private val modelMapper: PlaylistItemEditModelMapper,
-//    private val playlistRepo: PlaylistDatabaseRepository,
-    private val playlistDialogModelCreator: PlaylistSelectDialogModelCreator,
-//    private val mediaRepo: MediaDatabaseRepository,
     private val itemCreator: PlaylistItemCreator,
     private val log: LogWrapper,
-//    private val ytInteractor: YoutubeInteractor,
     private val queue: QueueMediatorContract.Producer,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val toast: ToastWrapper,
@@ -380,5 +375,11 @@ class PlaylistItemEditViewModel constructor(
             log.e("Error saving playlistItem", e)
             throw IllegalStateException("Save failed")
         }
+
+    fun onLaunchVideo() {
+        state.media?.platformId?.let { platformId ->
+            _navigateLiveData.value = NavigationModel(YOUTUBE_VIDEO, mapOf(NavigationModel.Param.PLATFORM_ID to platformId))
+        }
+    }
 
 }

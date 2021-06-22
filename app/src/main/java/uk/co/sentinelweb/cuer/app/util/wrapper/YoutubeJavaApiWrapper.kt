@@ -39,7 +39,6 @@ class YoutubeJavaApiWrapper(
                 activity.startActivity(createChannelIntent(activity, id))
             } ?: false
 
-
     fun launchPlaylist(id: String) =
         canLaunchPlaylist()
             .takeIf { it }
@@ -47,6 +46,12 @@ class YoutubeJavaApiWrapper(
                 activity.startActivity(createPlayPlaylistIntent(activity, id))
             } ?: false
 
+    fun launchVideo(platformId: String) =
+        canLaunchVideo()
+            .takeIf { it }
+            ?.also {
+                activity.startActivity(createPlayVideoIntent(activity, platformId))
+            } ?: false
 
     fun launchVideo(media: MediaDomain) =
         canLaunchVideo()

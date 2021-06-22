@@ -73,7 +73,6 @@ interface PlaylistItemEditContract {
                         state = get(),
                         modelMapper = get(),
                         itemCreator = get(),
-                        playlistDialogModelCreator = get(),
                         log = get(),
                         queue = get(),
                         ytContextHolder = get(),

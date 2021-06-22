@@ -23,7 +23,7 @@ data class NavigationModel constructor(
     ) {
         LOCAL_PLAYER(listOf(MEDIA_ID)),
         WEB_LINK(listOf(LINK)),
-        YOUTUBE_VIDEO(listOf(MEDIA_ID)),
+        YOUTUBE_VIDEO(listOf(PLATFORM_ID)),
         YOUTUBE_CHANNEL(listOf(CHANNEL_ID)),
         MAIN_MEDIA(listOf(MEDIA)),
         MAIN_MEDIA_PLAY(listOf(MEDIA), listOf(PLAY_NOW)),
@@ -49,6 +49,7 @@ data class NavigationModel constructor(
     // todo add types as a class field - verify types in init
     enum class Param {
         MEDIA_ID, /* String */
+        PLATFORM_ID, /* String */
         CHANNEL_ID, /* String */
         MEDIA, /* MediaDomain */
         LINK, /* String */

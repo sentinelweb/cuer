@@ -123,6 +123,7 @@ dependencies {
     // deps
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
     implementation "androidx.appcompat:appcompat:$ver_appcompat"
+    implementation "androidx.fragment:fragment:$ver_fragment_ktx"
     implementation "androidx.fragment:fragment-ktx:$ver_fragment_ktx"
     implementation "androidx.core:core:$ver_androidx_core"
     implementation "androidx.core:core-ktx:$ver_androidx_core"
@@ -147,7 +148,6 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling:$ver_compose"
     implementation "com.google.android.material:compose-theme-adapter:$ver_compose"
     implementation "androidx.compose.compiler:compiler:$ver_compose"
-
 
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"
@@ -190,6 +190,7 @@ dependencies {
     annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
     kapt "com.github.bumptech.glide:compiler:$ver_glide"
 
+    // https://google.github.io/accompanist/glide/
     implementation ("com.google.accompanist:accompanist-glide:$ver_glide_accompanist"){
         exclude group:"androidx.compose.runtime"
         exclude group:"androidx.compose.ui"
