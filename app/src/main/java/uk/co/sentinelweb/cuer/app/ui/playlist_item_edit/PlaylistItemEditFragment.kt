@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
-import android.transition.TransitionInflater
 import android.view.*
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -15,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
@@ -72,8 +72,10 @@ class PlaylistItemEditFragment
         get() = ple_toolbar.menu.findItem(R.id.plie_star)
     private val playMenuItem: MenuItem
         get() = ple_toolbar.menu.findItem(R.id.plie_play)
-    private val ediitMenuItem: MenuItem
+    private val editMenuItem: MenuItem
         get() = ple_toolbar.menu.findItem(R.id.plie_play)
+    private val launchMenuItem: MenuItem
+        get() = ple_toolbar.menu.findItem(R.id.plie_launch)
 
     private var dialog: AppCompatDialog? = null
     private var dialogFragment: DialogFragment? = null
@@ -140,6 +142,7 @@ class PlaylistItemEditFragment
                 return true
             }
         })
+        ple_desc.setTextIsSelectable(true)
         ple_toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.plie_star -> {
@@ -152,6 +155,10 @@ class PlaylistItemEditFragment
                 }
                 R.id.plie_play -> {
                     viewModel.onPlayVideo()
+                    true
+                }
+                R.id.plie_launch -> {
+                    viewModel.onLaunchVideo()
                     true
                 }
                 else -> false

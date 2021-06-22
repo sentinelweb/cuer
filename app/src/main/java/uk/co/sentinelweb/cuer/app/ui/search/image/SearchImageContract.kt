@@ -63,6 +63,5 @@ interface SearchImageContract {
             }
             factory { Mapper() }
         }
-
     }
 }
