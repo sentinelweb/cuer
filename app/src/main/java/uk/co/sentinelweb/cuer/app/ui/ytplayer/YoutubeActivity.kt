@@ -11,22 +11,28 @@ import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
 import kotlinx.android.synthetic.main.activity_youtube.*
 import org.koin.android.ext.android.inject
+import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.qualifier.named
+import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA_ID
+import uk.co.sentinelweb.cuer.app.util.extension.activityLegacyScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
+import uk.co.sentinelweb.cuer.net.retrofit.ServiceType
 
 /**
  * TODO clean up (a lot)
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener {
+class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener, AndroidScopeComponent {
+
+    override val scope: Scope by activityLegacyScopeWithSource()
 
     private val toastWrapper: ToastWrapper by inject()
-    private val apiKeyProvider: ApiKeyProvider by inject()
+    private val apiKeyProvider: ApiKeyProvider by inject(named(ServiceType.YOUTUBE))
 
     // jesus fin christ ..
     private val mHideHandler = Handler()
@@ -75,6 +81,7 @@ class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListen
 
         // Set up the user interaction to manually show or hide the system UI.
         youtube_view.initialize(apiKeyProvider.key, this)
+
         youtube_wrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
             override fun touched() {
                 toggle()
@@ -85,6 +92,11 @@ class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListen
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
 //        dummy_button.setOnTouchListener(mDelayHideTouchListener)
+    }
+
+    override fun onDestroy() {
+        scope.close()
+        super.onDestroy()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -148,7 +160,7 @@ class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListen
             intent?.getStringExtra(MEDIA_ID.toString())?.let {
                 player.cueVideo(it)
                 player.setShowFullscreenButton(false)
-
+                // player.cueVideos()
                 player.setPlayerStateChangeListener(object :
                     YouTubePlayer.PlayerStateChangeListener {
                     override fun onVideoEnded() {
@@ -168,6 +180,27 @@ class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListen
                     override fun onLoaded(p0: String?) {
                         player.play()
                     }
+                })
+                player.setPlaybackEventListener(object : YouTubePlayer.PlaybackEventListener {
+                    override fun onPlaying() = Unit
+
+                    override fun onPaused() = Unit
+
+                    override fun onStopped() = Unit
+
+                    override fun onBuffering(p0: Boolean) = Unit
+
+                    override fun onSeekTo(p0: Int) = Unit
+
+                })
+                // youtube playlist
+                player.setPlaylistEventListener(object : YouTubePlayer.PlaylistEventListener {
+                    override fun onPrevious() = Unit
+
+                    override fun onNext() = Unit
+
+                    override fun onPlaylistEnded() = Unit
+
                 })
             }
         }

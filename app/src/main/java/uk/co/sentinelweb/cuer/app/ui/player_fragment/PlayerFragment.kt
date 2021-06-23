@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.player
+package uk.co.sentinelweb.cuer.app.ui.player_fragment
 
 import android.os.Bundle
 import android.view.View
@@ -16,11 +16,11 @@ import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 
 class PlayerFragment : Fragment(R.layout.player_fragment),
-    PlayerContract.View,
+    PlayerFragmentContract.View,
     AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource()
-    private val presenter: PlayerContract.Presenter by inject()
+    private val presenter: PlayerFragmentContract.Presenter by inject()
     private val toastWrapper: ToastWrapper by inject()
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences> by inject(named<GeneralPreferences>())
 

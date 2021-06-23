@@ -33,7 +33,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
@@ -45,6 +44,7 @@ import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
@@ -78,7 +78,6 @@ object Modules {
         PlaylistContract.fragmentModule,
         PlaylistsContract.fragmentModule,
         PlaylistsDialogContract.fragmentModule,
-        PlayerContract.fragmentModule,
         BrowseContract.fragmentModule,
         MainContract.activityModule,
         CastPlayerContract.viewModule,
@@ -91,7 +90,8 @@ object Modules {
         PrefRootContract.fragmentModule,
         SearchContract.fragmentModule,
         SearchImageContract.fragmentModule,
-        RemoteContract.serviceModule
+        RemoteContract.serviceModule,
+        YoutubeActivity.activityModule
     )
 
     private val uiModule = module {

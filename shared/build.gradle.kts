@@ -15,6 +15,7 @@ val ver_jvm: String by project
 val ver_jfixture: String by project
 val ver_junit: String by project
 val ver_truth: String by project
+val ver_mvikotlin: String by project
 
 version = "1.0"
 
@@ -51,6 +52,9 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("io.insert-koin:koin-core:$ver_koin")
+                implementation("com.arkivanov.mvikotlin:mvikotlin:$ver_mvikotlin")
+                implementation("com.arkivanov.mvikotlin:mvikotlin-main:$ver_mvikotlin")
+                implementation("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$ver_mvikotlin")
             }
         }
         val commonTest by getting {
@@ -59,7 +63,14 @@ kotlin {
                 implementation("io.mockk:mockk:$ver_mockk")
             }
         }
-        val androidMain by getting
+        val androidMain by getting {
+            dependencies {
+                //implementation("com.arkivanov.mvikotlin:mvikotlin-android:$ver_mvikotlin")
+//                implementation("com.arkivanov.mvikotlin:mvikotlin-main-android:$ver_mvikotlin")
+//                implementation("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines-android:$ver_mvikotlin")
+                //implementation("com.arkivanov.mvikotlin:mvikotlin-android-debug:$ver_mvikotlin")
+            }
+        }
         val androidTest by getting {
             dependencies {
                 // Koin for JUnit 4
@@ -67,7 +78,12 @@ kotlin {
                 implementation("junit:junit:$ver_junit")
             }
         }
-        val jsMain by getting
+        val jsMain by getting {
+            dependencies {
+//                implementation("com.arkivanov.mvikotlin:mvikotlin-js:$ver_mvikotlin")
+//                implementation("com.arkivanov.mvikotlin:mvikotlin-main-js:$ver_mvikotlin")
+            }
+        }
         val jsTest by getting
         val jvmMain by getting
         val jvmTest by getting {
