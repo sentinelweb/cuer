@@ -65,10 +65,6 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                //implementation("com.arkivanov.mvikotlin:mvikotlin-android:$ver_mvikotlin")
-//                implementation("com.arkivanov.mvikotlin:mvikotlin-main-android:$ver_mvikotlin")
-//                implementation("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines-android:$ver_mvikotlin")
-                //implementation("com.arkivanov.mvikotlin:mvikotlin-android-debug:$ver_mvikotlin")
             }
         }
         val androidTest by getting {

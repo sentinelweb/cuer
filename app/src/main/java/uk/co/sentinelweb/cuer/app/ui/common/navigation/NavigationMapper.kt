@@ -36,9 +36,9 @@ class NavigationMapper constructor(
     fun navigate(nav: NavigationModel) {
         when (nav.target) {
             LOCAL_PLAYER ->
-                nav.params[MEDIA_ID]?.let {
-                    YoutubeActivity.start(activity, it.toString())
-                } ?: throw IllegalArgumentException("$LOCAL_PLAYER: $MEDIA_ID param required")
+                (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
+                    YoutubeActivity.start(activity, it)
+                } ?: throw IllegalArgumentException("$LOCAL_PLAYER: $PLAYLIST_ITEM param required")
             WEB_LINK ->
                 nav.params[LINK]?.let {
                     val parse = Uri.parse(it.toString())

@@ -47,7 +47,6 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -370,8 +369,8 @@ class PlaylistFragment :
         }
     }
 
-    override fun playLocal(media: MediaDomain) {
-        YoutubeActivity.start(requireContext(), media.platformId)
+    override fun playLocal(item: PlaylistItemDomain) {
+        YoutubeActivity.start(requireContext(), item)
     }
 
     override fun highlightPlayingItem(currentItemIndex: Int?) {

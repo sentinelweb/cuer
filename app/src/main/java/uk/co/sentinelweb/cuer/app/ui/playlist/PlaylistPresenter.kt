@@ -486,7 +486,7 @@ class PlaylistPresenter(
                         toastWrapper.show("can't launch video")
                     }
                 } else {
-                    view.playLocal(it.media)// todo playlistitem
+                    view.playLocal(it)
                 }
             }
             ?: toastWrapper.show("can't find video")

@@ -19,26 +19,20 @@ data class NavigationModel constructor(
 
     enum class Target constructor(
         val requiredParams: List<Param> = listOf(),
-        val optionalParams: List<Param> = listOf()
+        @Suppress("unused") val optionalParams: List<Param> = listOf()
     ) {
-        LOCAL_PLAYER(listOf(MEDIA_ID)),
+        LOCAL_PLAYER(listOf(PLAYLIST_ITEM)),
         WEB_LINK(listOf(LINK)),
         YOUTUBE_VIDEO(listOf(PLATFORM_ID)),
         YOUTUBE_CHANNEL(listOf(CHANNEL_ID)),
-        MAIN_MEDIA(listOf(MEDIA)),
-        MAIN_MEDIA_PLAY(listOf(MEDIA), listOf(PLAY_NOW)),
-        SHARE(listOf(MEDIA)),
-        PLAYLIST_EDIT(listOf(PLAYLIST_ID, SOURCE)),
-        PLAYLIST_CREATE(),
         PLAYLIST_FRAGMENT(listOf(PLAYLIST_ID, SOURCE), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
         PLAYLIST_ITEM_FRAGMENT(listOf(PLAYLIST_ITEM, SOURCE), listOf(FRAGMENT_NAV_EXTRAS)),
         PLAYLISTS_FRAGMENT(listOf(), listOf(PLAYLIST_ID)),
-        BROWSE_FRAGMENT(),
-        PLAYER_FRAGMENT(),
-        NAV_BACK(), // use navigation to go back
-        NAV_FINISH(), // use navigation to finish activity
-        NAV_DONE(), // nav after operation is finished
-        NAV_SEARCH()
+        BROWSE_FRAGMENT,
+        PLAYER_FRAGMENT,
+        NAV_BACK, // use navigation to go back
+        NAV_FINISH, // use navigation to finish activity
+        NAV_DONE, // nav after operation is finished
         ;
 
         companion object {
@@ -48,10 +42,8 @@ data class NavigationModel constructor(
 
     // todo add types as a class field - verify types in init
     enum class Param {
-        MEDIA_ID, /* String */
         PLATFORM_ID, /* String */
         CHANNEL_ID, /* String */
-        MEDIA, /* MediaDomain */
         LINK, /* String */
         PLAY_NOW, /* Boolean */
         PLAYLIST_ID, /* Long */

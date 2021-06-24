@@ -14,43 +14,46 @@ interface PlayerContract {
         sealed class Intent {
             object Play : Intent()
             object Pause : Intent()
-
+            object Load : Intent()
             //            object SkipFwd : Intent()
 //            object SkipBack : Intent()
 //            object TrackFwd : Intent()
 //            object TrackBack : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
-            data class LoadVideo(val playlistItemId: Long) : Intent()
         }
 
         data class State constructor(
             val item: PlaylistItemDomain? = null,
-            val state: PlayerStateDomain = PlayerStateDomain.UNKNOWN
+            val state: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
+            val command: PlayerCommand = PlayerCommand.NONE
         )
+
 
     }
 
     interface View : MviView<View.Model, View.Event> {
 
         data class Model(
-            val title: String,
-            val url: String,
-            val playState: PlayerStateDomain
+            val title: String?,
+            val platformId: String?,
+            val playState: PlayerStateDomain,
+            val playCommand: PlayerCommand
         )
 
         sealed class Event {
             object PlayClicked : Event()
             object PauseClicked : Event()
-            object LoadClicked : Event()
+            object Initialised : Event()
+            data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
         }
     }
 
-    interface PlaylistItemLoader {
-        suspend fun load(id: Long): PlaylistItemDomain
+    enum class PlayerCommand {
+        NONE, PLAY, PAUSE
     }
 
-    interface PlaylistItemIdParser {
-        val id: Long
+    interface PlaylistItemLoader {
+        suspend fun load(): PlaylistItemDomain?
     }
 
 }

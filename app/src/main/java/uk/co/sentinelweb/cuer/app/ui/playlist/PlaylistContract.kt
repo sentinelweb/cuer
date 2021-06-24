@@ -26,7 +26,6 @@ import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
@@ -74,7 +73,7 @@ interface PlaylistContract {
         fun setList(items: List<ItemContract.Model>, animate: Boolean)
         fun scrollToItem(index: Int)
         fun scrollTo(direction: ScrollDirection)
-        fun playLocal(media: MediaDomain)
+        fun playLocal(item: PlaylistItemDomain)
         fun showUndo(msg: String, undoFunction: () -> Unit)
         fun highlightPlayingItem(currentItemIndex: Int?)
         fun setSubTitle(subtitle: String)

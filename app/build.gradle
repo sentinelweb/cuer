@@ -148,8 +148,12 @@ dependencies {
     implementation "com.google.android.material:compose-theme-adapter:$ver_compose"
     implementation "androidx.compose.compiler:compiler:$ver_compose"
 
+    // mvikotlin
     debugImplementation "com.arkivanov.mvikotlin:mvikotlin-android-debug:$ver_mvikotlin"
     releaseImplementation "com.arkivanov.mvikotlin:mvikotlin-android:$ver_mvikotlin"
+    // for debugging only remove
+    implementation "com.arkivanov.mvikotlin:mvikotlin-logging:$ver_mvikotlin"
+    implementation "com.arkivanov.mvikotlin:mvikotlin-main:$ver_mvikotlin"
 
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"
