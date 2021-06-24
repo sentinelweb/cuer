@@ -73,7 +73,6 @@ interface PlaylistContract {
         fun setList(items: List<ItemContract.Model>, animate: Boolean)
         fun scrollToItem(index: Int)
         fun scrollTo(direction: ScrollDirection)
-        fun playLocal(item: PlaylistItemDomain)
         fun showUndo(msg: String, undoFunction: () -> Unit)
         fun highlightPlayingItem(currentItemIndex: Int?)
         fun setSubTitle(subtitle: String)

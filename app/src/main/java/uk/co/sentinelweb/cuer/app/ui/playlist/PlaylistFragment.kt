@@ -38,7 +38,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
@@ -367,10 +366,6 @@ class PlaylistFragment :
                 binding.playlistList.scrollToPosition(useIndex)
             }
         }
-    }
-
-    override fun playLocal(item: PlaylistItemDomain) {
-        YoutubeActivity.start(requireContext(), item)
     }
 
     override fun highlightPlayingItem(currentItemIndex: Int?) {
