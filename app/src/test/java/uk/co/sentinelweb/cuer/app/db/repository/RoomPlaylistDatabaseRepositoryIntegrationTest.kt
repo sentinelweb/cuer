@@ -34,7 +34,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 @RunWith(RobolectricTestRunner::class)
 @Config(application = CuerTestApp::class)
 @ExperimentalCoroutinesApi
-class PlaylistDatabaseRepositoryIntegrationTest {
+class RoomPlaylistDatabaseRepositoryIntegrationTest {
     private lateinit var database: AppDatabase
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val coCxtProvider: CoroutineContextProvider =
@@ -51,9 +51,9 @@ class PlaylistDatabaseRepositoryIntegrationTest {
     private val mediaMapper = MediaMapper(imageMapper, channelMapper)
     private val mediaUpdateMapper = MediaUpdateMapper(InstantTypeConverter())
     private val playlistItemMapper = PlaylistItemMapper(mediaMapper)
-    private lateinit var mediaRepo: MediaDatabaseRepository
+    private lateinit var roomMediaRepo: RoomMediaDatabaseRepository
 
-    private lateinit var sut: PlaylistDatabaseRepository
+    private lateinit var sut: RoomPlaylistDatabaseRepository
 
     @get:Rule
     var instantTaskExecutor = InstantTaskExecutorRule()
@@ -68,7 +68,7 @@ class PlaylistDatabaseRepositoryIntegrationTest {
             Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
                 .allowMainThreadQueries()
                 .build()
-        mediaRepo = MediaDatabaseRepository(
+        roomMediaRepo = RoomMediaDatabaseRepository(
             mediaDao = database.mediaDao(),
             channelDao = database.channelDao(),
             log = systemLogWrapper,
@@ -78,13 +78,13 @@ class PlaylistDatabaseRepositoryIntegrationTest {
             coProvider = coCxtProvider,
             mediaUpdateMapper = mediaUpdateMapper
         )
-        sut = PlaylistDatabaseRepository(
+        sut = RoomPlaylistDatabaseRepository(
             playlistDao = database.playlistDao(),
             playlistMapper = PlaylistMapper(imageMapper, playlistItemMapper, channelMapper, systemLogWrapper),
             playlistItemDao = database.playlistItemDao(),
             channelDao = database.channelDao(),
             playlistItemMapper = playlistItemMapper,
-            mediaRepository = mediaRepo,
+            mediaRepository = roomMediaRepo,
             log = systemLogWrapper,
             coProvider = coCxtProvider,
             database = database
@@ -94,7 +94,8 @@ class PlaylistDatabaseRepositoryIntegrationTest {
 
     private fun savePlaylistMedia() {
         runBlocking {
-            mediaRepo.save(playlists.map { it.items.map { it.media.copy(channelData = it.media.channelData.copy(id = null)) } }.flatten())
+            roomMediaRepo.save(playlists.map { it.items.map { it.media.copy(channelData = it.media.channelData.copy(id = null)) } }
+                .flatten())
         }
     }
 

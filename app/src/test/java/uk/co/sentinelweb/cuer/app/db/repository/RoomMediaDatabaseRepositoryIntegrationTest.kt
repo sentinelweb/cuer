@@ -37,7 +37,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 @Config(application = CuerTestApp::class)
 @ExperimentalCoroutinesApi
 
-class MediaDatabaseRepositoryIntegrationTest {
+class RoomMediaDatabaseRepositoryIntegrationTest {
     private lateinit var database: AppDatabase
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val coCxtProvider: CoroutineContextProvider =
@@ -54,7 +54,7 @@ class MediaDatabaseRepositoryIntegrationTest {
     private val mediaMapper = MediaMapper(imageMapper, channelMapper)
     private val mediaUpdateMapper = MediaUpdateMapper(InstantTypeConverter())
 
-    private lateinit var sut: MediaDatabaseRepository
+    private lateinit var sut: RoomMediaDatabaseRepository
 
     @get:Rule
     var instantTaskExecutor = InstantTaskExecutorRule()
@@ -70,7 +70,7 @@ class MediaDatabaseRepositoryIntegrationTest {
                 .allowMainThreadQueries()
                 .build()
 
-        sut = MediaDatabaseRepository(
+        sut = RoomMediaDatabaseRepository(
             mediaDao = database.mediaDao(),
             mediaMapper = mediaMapper,
             channelDao = database.channelDao(),

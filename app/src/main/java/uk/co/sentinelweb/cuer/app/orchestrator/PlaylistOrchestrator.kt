@@ -4,7 +4,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
@@ -16,7 +16,7 @@ import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
 class PlaylistOrchestrator constructor(
-    private val playlistDatabaseRepository: PlaylistDatabaseRepository,
+    private val roomPlaylistDatabaseRepository: RoomPlaylistDatabaseRepository,
     private val playlistMemoryRepository: PlaylistMemoryRepository,
     private val mediaOrchestrator: MediaOrchestrator,
     private val ytInteractor: YoutubeInteractor
@@ -24,7 +24,7 @@ class PlaylistOrchestrator constructor(
 
     override val updates: Flow<Triple<Operation, Source, PlaylistDomain>>
         get() = merge(
-            playlistDatabaseRepository.updates
+            roomPlaylistDatabaseRepository.updates
                 .map { it.first to LOCAL then it.second },
             (playlistMemoryRepository.updates
                 .map { it.first to MEMORY then it.second })
@@ -32,7 +32,7 @@ class PlaylistOrchestrator constructor(
 
     suspend override fun load(id: Long, options: Options): PlaylistDomain? = when (options.source) {
         MEMORY -> playlistMemoryRepository.load(id, options)
-        LOCAL -> playlistDatabaseRepository.load(id)
+        LOCAL -> roomPlaylistDatabaseRepository.load(id)
             .forceDatabaseSuccess()
         LOCAL_NETWORK -> throw NotImplementedException()
         REMOTE -> throw NotImplementedException()
@@ -42,7 +42,7 @@ class PlaylistOrchestrator constructor(
     suspend override fun loadList(filter: Filter, options: Options): List<PlaylistDomain> =
         when (options.source) {
             MEMORY -> playlistMemoryRepository.loadList(filter, options)
-            LOCAL -> playlistDatabaseRepository.loadList(filter, options.flat)
+            LOCAL -> roomPlaylistDatabaseRepository.loadList(filter, options.flat)
                 .allowDatabaseListResultEmpty()
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
@@ -53,7 +53,7 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> playlistMemoryRepository.loadList(PlatformIdListFilter(listOf(platformId)), options)
                 .firstOrNull()
-            LOCAL -> playlistDatabaseRepository.loadList(PlatformIdListFilter(listOf(platformId)))
+            LOCAL -> roomPlaylistDatabaseRepository.loadList(PlatformIdListFilter(listOf(platformId)))
                 .allowDatabaseListResultEmpty()
                 .firstOrNull()
             LOCAL_NETWORK -> throw NotImplementedException()
@@ -70,7 +70,7 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> playlistMemoryRepository.save(domain, options)
             LOCAL ->
-                playlistDatabaseRepository.save(domain, options.flat, options.emit)
+                roomPlaylistDatabaseRepository.save(domain, options.flat, options.emit)
                     .forceDatabaseSuccessNotNull("Save failed ${domain.id}")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
@@ -81,7 +81,7 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> throw NotImplementedException()
             LOCAL ->
-                playlistDatabaseRepository.save(domains, options.flat, options.emit)
+                roomPlaylistDatabaseRepository.save(domains, options.flat, options.emit)
                     .forceDatabaseListResultNotEmpty("Save failed ${domains.map { it.id }}")
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
@@ -93,7 +93,7 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> playlistMemoryRepository.count(filter, options)
             LOCAL ->
-                playlistDatabaseRepository.count(filter)
+                roomPlaylistDatabaseRepository.count(filter)
                     .forceDatabaseSuccessNotNull("Count failed $filter")
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
@@ -104,7 +104,7 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> playlistMemoryRepository.delete(domain, options)
             LOCAL ->
-                playlistDatabaseRepository.delete(domain, options.emit)
+                roomPlaylistDatabaseRepository.delete(domain, options.emit)
                     .forceDatabaseSuccessNotNull("Delete failed ${domain.id}")
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
@@ -117,10 +117,10 @@ class PlaylistOrchestrator constructor(
                 playlistMemoryRepository.load(playlistId!!, options) // TODO FALLBACK OR ERROR?
                     ?.apply { delay(20) } // fixme: fucking menu items don't load in time sine memory is sequential
                     ?.let { it to MEMORY }
-                    ?: playlistDatabaseRepository.getPlaylistOrDefault(null, options.flat)
+                    ?: roomPlaylistDatabaseRepository.getPlaylistOrDefault(null, options.flat)
                         ?.let { it to LOCAL }
             LOCAL ->
-                playlistDatabaseRepository.getPlaylistOrDefault(playlistId, options.flat)
+                roomPlaylistDatabaseRepository.getPlaylistOrDefault(playlistId, options.flat)
                     ?.let { it to LOCAL }
             else -> throw InvalidOperationException(this::class, null, options)
         }
@@ -130,7 +130,7 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> true // todo : persist current item? for new
             LOCAL ->
-                playlistDatabaseRepository.updateCurrentIndex(it, options.emit)
+                roomPlaylistDatabaseRepository.updateCurrentIndex(it, options.emit)
                     .forceDatabaseSuccessNotNull("Update did not succeed")
 
             else -> throw InvalidOperationException(this::class, null, options)

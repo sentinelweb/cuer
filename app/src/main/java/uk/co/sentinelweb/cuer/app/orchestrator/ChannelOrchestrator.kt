@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RoomMediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
@@ -9,7 +9,7 @@ import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
 class ChannelOrchestrator constructor(
-    private val mediaDatabaseRepository: MediaDatabaseRepository,
+    private val roomMediaDatabaseRepository: RoomMediaDatabaseRepository,
     private val ytInteractor: YoutubeInteractor
 ) : OrchestratorContract<ChannelDomain> {
     override val updates: Flow<Triple<Operation, Source, ChannelDomain>>

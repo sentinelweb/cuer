@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RoomMediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.core.ntuple.then
@@ -12,18 +12,18 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 class MediaOrchestrator constructor(
-    private val mediaDatabaseRepository: MediaDatabaseRepository,
+    private val roomMediaDatabaseRepository: RoomMediaDatabaseRepository,
     private val ytInteractor: YoutubeInteractor
 ) : OrchestratorContract<MediaDomain> {
 
     override val updates: Flow<Triple<Operation, Source, MediaDomain>>
-        get() = mediaDatabaseRepository.updates
+        get() = roomMediaDatabaseRepository.updates
             .map { it.first to LOCAL then it.second }
 
     suspend override fun load(id: Long, options: Options): MediaDomain? =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> mediaDatabaseRepository
+            LOCAL -> roomMediaDatabaseRepository
                 .load(id, options.flat)
                 .forceDatabaseSuccess()
             LOCAL_NETWORK -> throw NotImplementedException()
@@ -34,7 +34,7 @@ class MediaOrchestrator constructor(
     suspend override fun loadList(filter: Filter, options: Options): List<MediaDomain> =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> mediaDatabaseRepository
+            LOCAL -> roomMediaDatabaseRepository
                 .loadList(filter, options.flat)
                 .allowDatabaseListResultEmpty()
             LOCAL_NETWORK -> throw NotImplementedException()
@@ -51,7 +51,7 @@ class MediaOrchestrator constructor(
     suspend override fun load(platformId: String, options: Options): MediaDomain? =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> mediaDatabaseRepository
+            LOCAL -> roomMediaDatabaseRepository
                 .loadList(PlatformIdListFilter(listOf(platformId)), options.flat)
                 .takeIf { it.isSuccessful && it.data?.size == 1 }
                 ?.data
@@ -72,7 +72,7 @@ class MediaOrchestrator constructor(
     suspend override fun save(domain: MediaDomain, options: Options): MediaDomain =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> mediaDatabaseRepository
+            LOCAL -> roomMediaDatabaseRepository
                 .save(domain, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
             LOCAL_NETWORK -> throw NotImplementedException()
@@ -84,7 +84,7 @@ class MediaOrchestrator constructor(
     suspend override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> mediaDatabaseRepository
+            LOCAL -> roomMediaDatabaseRepository
                 .save(domains, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed ${domains.map { it.platformId }}")
             LOCAL_NETWORK -> throw NotImplementedException()
@@ -103,7 +103,7 @@ class MediaOrchestrator constructor(
     override suspend fun update(update: UpdateDomain<MediaDomain>, options: Options): MediaDomain? =
         when (options.source) {
             MEMORY -> throw NotImplementedException()
-            LOCAL -> mediaDatabaseRepository
+            LOCAL -> roomMediaDatabaseRepository
                 .update(update, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Update failed: ${update}")
             LOCAL_NETWORK -> throw NotImplementedException()

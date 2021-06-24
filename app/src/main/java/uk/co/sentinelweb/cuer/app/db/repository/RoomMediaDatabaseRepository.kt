@@ -5,10 +5,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
-import uk.co.sentinelweb.cuer.app.db.dao.ChannelDao
 import uk.co.sentinelweb.cuer.app.db.dao.MediaDao
 import uk.co.sentinelweb.cuer.app.db.entity.update.MediaUpdateMapper
-import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data.Empty
@@ -16,26 +14,23 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.MediaUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import java.io.InvalidClassException
-import java.io.InvalidObjectException
 
 // todo emit
 @Suppress("DEPRECATION")
-class MediaDatabaseRepository constructor(
+class RoomMediaDatabaseRepository constructor(
     private val mediaDao: MediaDao,
     private val mediaMapper: MediaMapper,
-    private val channelDao: ChannelDao,
-    private val channelMapper: ChannelMapper,
+    private val channelDatabaseRepository: RoomChannelDatabaseRepository,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
     private val database: AppDatabase,
     private val mediaUpdateMapper: MediaUpdateMapper
-) : DatabaseRepository<MediaDomain> {// todo extract channel repo
+) : MediaDatabaseRepository {// todo extract channel repo
 
     init {
         log.tag(this)
@@ -50,7 +45,7 @@ class MediaDatabaseRepository constructor(
         withContext(coProvider.IO) {
             try {
                 domain
-                    .let { if (!flat) it.copy(channelData = checkToSaveChannel(it.channelData)) else it }
+                    .let { if (!flat) it.copy(channelData = channelDatabaseRepository.checkToSaveChannel(it.channelData)) else it }
                     .let { mediaMapper.map(it) }
                     .let { mediaDao.insert(it) }
                     .let { Data(load(id = it, flat).data) }
@@ -68,7 +63,7 @@ class MediaDatabaseRepository constructor(
             try { // todo better transactions
                 domains
                     .also { database.beginTransaction() }
-                    .map { if (!flat) it.copy(channelData = checkToSaveChannel(it.channelData)) else it }
+                    .map { if (!flat) it.copy(channelData = channelDatabaseRepository.checkToSaveChannel(it.channelData)) else it }
                     .map { mediaMapper.map(it) }
                     .let { mediaDao.insertAll(it) }
                     .also { database.setTransactionSuccessful() }
@@ -193,55 +188,5 @@ class MediaDatabaseRepository constructor(
                 RepoResult.Error<MediaDomain>(e, msg)
             }
         }
-
-    suspend fun loadChannel(id: Long): RepoResult<ChannelDomain> =
-        withContext(coProvider.IO) {
-            try {
-                channelDao.load(id)!!
-                    .let { channelMapper.map(it) }
-                    .let { Data(it) }
-            } catch (e: Throwable) {
-                val msg = "couldn't load $id"
-                log.e(msg, e)
-                RepoResult.Error<ChannelDomain>(e, msg)
-            }
-        }
-
-    suspend fun checkToSaveChannel(channel: ChannelDomain): ChannelDomain {
-        if (channel.platformId.isNullOrEmpty())
-            throw InvalidObjectException("Channel data is missing remoteID")
-        return channel
-            .let { channelMapper.map(it) }
-            .let { toCheck ->
-                channelDao.findByChannelId(toCheck.remoteId)?.let { saved ->
-                    // check for updated channel data + save
-                    if (toCheck.image != saved.image ||
-                        toCheck.thumbNail != saved.thumbNail ||
-                        toCheck.published != saved.published ||
-                        toCheck.description != saved.description
-                    ) {
-                        channelDao.update(toCheck.copy(id = saved.id))
-                    }
-                    saved.id
-                } ?: channelDao.insert(toCheck)
-            }
-            .let { channel.copy(id = it) }
-    }
-
-    suspend fun deleteAllChannels(): RepoResult<Boolean> =
-        withContext(coProvider.IO) {
-            try {
-                channelDao
-                    .also { database.beginTransaction() }
-                    .deleteAll()
-                    .also { database.setTransactionSuccessful() }
-                Empty(true)
-            } catch (e: Throwable) {
-                val msg = "couldn't delete all channels"
-                log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
-            }
-        }.also { database.endTransaction() }
-
 
 }

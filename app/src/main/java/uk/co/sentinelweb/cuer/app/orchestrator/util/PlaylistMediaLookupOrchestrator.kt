@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.util
 
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
  */
 class PlaylistMediaLookupOrchestrator constructor(
     private val mediaOrchestrator: MediaOrchestrator,
-    private val playlistRepository: PlaylistDatabaseRepository
+    private val roomPlaylistItemDatabaseRepository: RoomPlaylistItemDatabaseRepository
 ) {
     suspend fun lookupMediaAndReplace(playlist: PlaylistDomain, target: Source): PlaylistDomain {
         val mediaLookup = buildMediaLookup(playlist, target)
@@ -28,7 +28,7 @@ class PlaylistMediaLookupOrchestrator constructor(
     suspend fun lookupPlaylistItemsAndReplace(playlist: PlaylistDomain): PlaylistDomain =
         buildMediaLookup(playlist, Source.LOCAL)
             .let { it.values.mapNotNull { it.id } }
-            .let { playlistRepository.loadPlaylistItems(MediaIdListFilter(it)) }
+            .let { roomPlaylistItemDatabaseRepository.loadPlaylistItems(MediaIdListFilter(it)) }
             .data
             ?.distinctBy { it.media.platformId }
             ?.associateBy { it.media.platformId }

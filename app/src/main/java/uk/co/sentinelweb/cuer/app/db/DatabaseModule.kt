@@ -5,8 +5,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.entity.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.mapper.*
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.*
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 
 object DatabaseModule {
@@ -15,35 +14,63 @@ object DatabaseModule {
         single { RoomWrapper(androidApplication()) }
 
         single {
-            MediaDatabaseRepository(
-                mediaDao = get<AppDatabase>().mediaDao(),
-                mediaMapper = get(),
+            RoomChannelDatabaseRepository(
                 channelDao = get<AppDatabase>().channelDao(),
                 channelMapper = get(),
                 coProvider = get(),
                 log = get(),
-                database = get(),
-                mediaUpdateMapper = get()
+                database = get()
             )
         }
+        factory<ChannelDatabaseRepository> { get<RoomChannelDatabaseRepository>() }
+
         single {
-            PlaylistDatabaseRepository(
+            RoomMediaDatabaseRepository(
+                mediaDao = get<AppDatabase>().mediaDao(),
+                mediaMapper = get(),
+                coProvider = get(),
+                log = get(),
+                database = get(),
+                mediaUpdateMapper = get(),
+                channelDatabaseRepository = get()
+            )
+        }
+        factory<MediaDatabaseRepository> { get<RoomMediaDatabaseRepository>() }
+
+        single {
+            RoomPlaylistDatabaseRepository(
                 playlistDao = get<AppDatabase>().playlistDao(),
                 playlistMapper = get(),
                 playlistItemDao = get<AppDatabase>().playlistItemDao(),
                 playlistItemMapper = get(),
-                mediaRepository = get(),
+                roomMediaRepository = get(),
+                roomChannelRepository = get(),
                 channelDao = get<AppDatabase>().channelDao(),
                 coProvider = get(),
                 log = get(),
                 database = get()
             )
         }
+        factory<PlaylistDatabaseRepository> { get<RoomPlaylistDatabaseRepository>() }
+
+        single {
+            RoomPlaylistItemDatabaseRepository(
+                playlistItemDao = get<AppDatabase>().playlistItemDao(),
+                playlistItemMapper = get(),
+                roomMediaRepository = get(),
+                coProvider = get(),
+                log = get(),
+                database = get()
+            )
+        }
+        factory<PlaylistItemDatabaseRepository> { get<RoomPlaylistItemDatabaseRepository>() }
+
         single {
             DatabaseInitializer(
                 ytInteractor = get(),
-                mediaRepository = get(),
-                playlistRepository = get(),
+                roomMediaRepository = get(),
+                roomPlaylistRepository = get(),
+                roomPlaylistItemRepository = get(),
                 timeProvider = get(),
                 contextProvider = get(),
                 log = get()

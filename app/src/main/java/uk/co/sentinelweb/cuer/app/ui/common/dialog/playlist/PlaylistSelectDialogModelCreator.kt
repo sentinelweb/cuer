@@ -1,21 +1,21 @@
 package uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist
 
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistSelectDialogModelCreator constructor(
-    private val playlistRepo: PlaylistDatabaseRepository,
+    private val roomPlaylistRepo: RoomPlaylistDatabaseRepository,
     private val res: ResourceWrapper
 ) {
 
     suspend fun loadPlaylists(
         block: (List<PlaylistDomain>) -> Unit
     ) {
-        playlistRepo
+        roomPlaylistRepo
             .loadList(null)
             .takeIf { it.isSuccessful }
             ?.data?.apply { block(this) }

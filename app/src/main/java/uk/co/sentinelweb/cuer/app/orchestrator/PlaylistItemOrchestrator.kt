@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
@@ -12,19 +12,19 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistItemOrchestrator constructor(
-    private val playlistDatabaseRepository: PlaylistDatabaseRepository,
+    private val roomPlaylistItemDatabaseRepository: RoomPlaylistItemDatabaseRepository,
     private val playlistItemMemoryRepository: MemoryRepository<PlaylistItemDomain>,
     private val log: LogWrapper
 ) : OrchestratorContract<PlaylistItemDomain> {
 
     override val updates: Flow<Triple<Operation, Source, PlaylistItemDomain>>
-        get() = playlistDatabaseRepository.playlistItemFlow
+        get() = roomPlaylistItemDatabaseRepository.updates
             .map { it.first to LOCAL then it.second }
 
     suspend override fun load(id: Long, options: Options): PlaylistItemDomain? =
         when (options.source) {
             MEMORY -> TODO()
-            LOCAL -> (playlistDatabaseRepository.loadPlaylistItem(id)
+            LOCAL -> (roomPlaylistItemDatabaseRepository.loadPlaylistItem(id)
                 .takeIf { it.isSuccessful }
                 ?: throw DoesNotExistException("PlaylistItemDomain($id)"))
                 .data
@@ -37,7 +37,7 @@ class PlaylistItemOrchestrator constructor(
     suspend override fun loadList(filter: Filter, options: Options): List<PlaylistItemDomain> =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.loadList(filter, options)
-            LOCAL -> playlistDatabaseRepository.loadPlaylistItems(filter)
+            LOCAL -> roomPlaylistItemDatabaseRepository.loadPlaylistItems(filter)
                 .allowDatabaseListResultEmpty()
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
@@ -52,7 +52,7 @@ class PlaylistItemOrchestrator constructor(
         when (options.source) {
             MEMORY -> TODO()
             LOCAL -> domain.id?.let {
-                playlistDatabaseRepository.loadPlaylistItem(it)
+                roomPlaylistItemDatabaseRepository.loadPlaylistItem(it)
                     .forceDatabaseSuccess()
             }
 
@@ -64,7 +64,7 @@ class PlaylistItemOrchestrator constructor(
     suspend override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.save(domain, options)
-            LOCAL -> playlistDatabaseRepository.savePlaylistItem(domain, options.emit, options.flat)
+            LOCAL -> roomPlaylistItemDatabaseRepository.savePlaylistItem(domain, options.emit, options.flat)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
@@ -76,7 +76,7 @@ class PlaylistItemOrchestrator constructor(
             MEMORY -> domains.map {
                 playlistItemMemoryRepository.save(it, options)
             }
-            LOCAL -> playlistDatabaseRepository.savePlaylistItems(domains, options.emit)
+            LOCAL -> roomPlaylistItemDatabaseRepository.savePlaylistItems(domains, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed $domains")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
@@ -87,8 +87,8 @@ class PlaylistItemOrchestrator constructor(
     override suspend fun count(filter: Filter, options: Options): Int =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.count(filter, options)
-            LOCAL -> playlistDatabaseRepository.count(filter)
-                .forceDatabaseSuccessNotNull("Count failed $filter")
+            LOCAL -> TODO()//roomPlaylistItemDatabaseRepository.count(filter)
+            //.forceDatabaseSuccessNotNull("Count failed $filter")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -97,7 +97,7 @@ class PlaylistItemOrchestrator constructor(
     override suspend fun delete(domain: PlaylistItemDomain, options: Options): Boolean =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.delete(domain, options)
-            LOCAL -> playlistDatabaseRepository.delete(domain, options.emit)
+            LOCAL -> roomPlaylistItemDatabaseRepository.delete(domain, options.emit)
                 .forceDatabaseSuccessNotNull("Delete failed $domain")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()

@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
 
 class LocalSearchPlayistInteractor constructor(
-    private val playlistDatabaseRepository: PlaylistDatabaseRepository,
+    private val roomPlaylistItemDatabaseRepository: RoomPlaylistItemDatabaseRepository,
     private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
 ) {
     fun search(): SearchLocalDomain? =
@@ -25,7 +25,7 @@ class LocalSearchPlayistInteractor constructor(
         search()
             ?.let { mapToFilter(it) }
             ?.let {
-                playlistDatabaseRepository
+                roomPlaylistItemDatabaseRepository
                     .loadPlaylistItems(it)
                     .takeIf { it.isSuccessful }
                     ?.data
