@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapNotNull
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.NONE
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.None
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -36,7 +36,7 @@ class PlayerController constructor(
                 playState = state,
                 playCommand = command
             )
-        } ?: PlayerContract.View.Model(null, null, UNKNOWN, NONE)
+        } ?: PlayerContract.View.Model(null, null, UNKNOWN, None)
     }
 
     private val eventToIntent: suspend PlayerContract.View.Event.() -> PlayerContract.MviStore.Intent = {
@@ -45,8 +45,10 @@ class PlayerController constructor(
             is PlayClicked -> Play
             is PauseClicked -> Pause
             is PlayerStateChanged -> PlayState(state)
-            TrackFwdClicked -> TrackFwd
-            TrackBackClicked -> TrackBack
+            is TrackFwdClicked -> TrackFwd
+            is TrackBackClicked -> TrackBack
+            is SkipFwdClicked -> SkipFwd
+            is SkipBackClicked -> SkipBack
         }
     }
 

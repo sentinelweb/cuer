@@ -9,8 +9,7 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.State
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.NONE
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.PLAY
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -52,16 +51,18 @@ class PlayerStoreFactory(
                 is Intent.TrackChange -> dispatch(Result.LoadVideo(intent.item))
                 is Intent.TrackFwd -> queueConsumer.nextItem()
                 is Intent.TrackBack -> queueConsumer.previousItem()
+                is Intent.SkipBack -> dispatch(Result.Command(SkipBack(30000)))
+                is Intent.SkipFwd -> dispatch(Result.Command(SkipFwd(30000)))
             }
 
         private fun checkCommand(playState: PlayerStateDomain) =
             when (playState) {
-                VIDEO_CUED -> PLAY
+                VIDEO_CUED -> Play
                 ENDED -> {
                     queueConsumer.onTrackEnded()
-                    NONE
+                    None
                 }
-                else -> NONE
+                else -> None
             }.let { dispatch(Result.Command(it, playState)) }
 
 

@@ -4,7 +4,9 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.State
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.None
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface PlayerContract {
@@ -15,9 +17,8 @@ interface PlayerContract {
             object Play : Intent()
             object Pause : Intent()
             object Load : Intent()
-
-            //            object SkipFwd : Intent()
-//            object SkipBack : Intent()
+            object SkipFwd : Intent()
+            object SkipBack : Intent()
             object TrackFwd : Intent()
             object TrackBack : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
@@ -26,8 +27,8 @@ interface PlayerContract {
 
         data class State constructor(
             val item: PlaylistItemDomain? = null,
-            val state: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
-            val command: PlayerCommand = PlayerCommand.NONE
+            val state: PlayerStateDomain = UNKNOWN,
+            val command: PlayerCommand = None
         )
 
 
@@ -47,13 +48,20 @@ interface PlayerContract {
             object PauseClicked : Event()
             object TrackFwdClicked : Event()
             object TrackBackClicked : Event()
+            object SkipFwdClicked : Event()
+            object SkipBackClicked : Event()
             object Initialised : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
         }
     }
 
-    enum class PlayerCommand {
-        NONE, PLAY, PAUSE
+    sealed class PlayerCommand {
+        object None : PlayerCommand()
+        object Play : PlayerCommand()
+        object Pause : PlayerCommand()
+        data class SkipFwd(val ms: Int) : PlayerCommand()
+        data class SkipBack(val ms: Int) : PlayerCommand()
+        data class JumpTo(val ms: Int) : PlayerCommand()
     }
 
     interface PlaylistItemLoader {

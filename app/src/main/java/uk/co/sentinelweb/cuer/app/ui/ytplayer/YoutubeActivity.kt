@@ -1,13 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import androidx.core.view.isVisible
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
@@ -27,10 +23,8 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.PAUSE
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.PLAY
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.PlayerStateChanged
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.TrackFwdClicked
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.util.extension.activityLegacyScopeWithSource
@@ -59,48 +53,12 @@ class YoutubeActivity : YouTubeBaseActivity(),
     private val controller: PlayerController by inject()
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
+    private val showHideUi: ShowHideUi by inject()
 
     lateinit var view: YouTubePlayerViewImpl
 
     init {
         log.tag(this)
-    }
-
-    // jesus fin christ .. todo conver all runnables to coroutines
-    private val mHideHandler = Handler()
-    private val mHidePart2Runnable = Runnable {
-        // Delayed removal of status and navigation bar
-
-        // Note that some of these constants are new as of API 16 (Jelly Bean)
-        // and API 19 (KitKat). It is safe to use them, as they are inlined
-        // at compile-time and do nothing on earlier devices.
-        youtube_view.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LOW_PROFILE or
-                    View.SYSTEM_UI_FLAG_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-    }
-    private val mShowPart2Runnable = Runnable {
-        // Delayed display of UI elements
-        actionBar?.show()
-        //fullscreen_content_controls.visibility = View.VISIBLE
-    }
-    private var mVisible: Boolean = false
-    private val mHideRunnable = Runnable { hide() }
-
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    @SuppressLint("ClickableViewAccessibility")
-    private val mDelayHideTouchListener = View.OnTouchListener { _, _ ->
-        if (AUTO_HIDE) {
-            delayedHide(AUTO_HIDE_DELAY_MILLIS)
-        }
-        false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,35 +67,19 @@ class YoutubeActivity : YouTubeBaseActivity(),
         setContentView(R.layout.activity_youtube)
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
-        mVisible = true
-
-        // Set up the user interaction to manually show or hide the system UI.
+        showHideUi.showElements = { controls.isVisible = true }
+        showHideUi.hideElements = { controls.isVisible = false }
+        youtube_track_next.setOnClickListener { view.dispatch(TrackFwdClicked) }
+        youtube_track_last.setOnClickListener { view.dispatch(TrackBackClicked) }
+        youtube_seek_back.setOnClickListener { view.dispatch(SkipBackClicked) }
+        youtube_seek_forward.setOnClickListener { view.dispatch(SkipFwdClicked) }
         youtube_view.initialize(apiKeyProvider.key, this)
 
         youtube_wrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
             override fun touched() {
-                toggle()
+                showHideUi.toggle()
             }
         }
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-//        dummy_button.setOnTouchListener(mDelayHideTouchListener)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        super.onCreateOptionsMenu(menu)
-        menuInflater.inflate(R.menu.local_player_actionbar, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.next -> view.dispatch(TrackFwdClicked)
-            R.id.previous -> view.dispatch(PlayerContract.View.Event.TrackBackClicked)
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroy() {
@@ -159,11 +101,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
-        delayedHide(100)
+        showHideUi.delayedHide(100)
     }
 
     inner class YouTubePlayerViewImpl constructor(
@@ -173,12 +111,12 @@ class YoutubeActivity : YouTubeBaseActivity(),
         init {
             player.setPlayerStateChangeListener(object : YouTubePlayer.PlayerStateChangeListener {
                 override fun onVideoEnded() {
-                    show()
+                    showHideUi.show()
                     dispatch(PlayerStateChanged(ENDED))
                 }
 
                 override fun onVideoStarted() {
-                    hide()
+                    showHideUi.hide()
                 }
 
                 override fun onError(p0: YouTubePlayer.ErrorReason?) = dispatch(PlayerStateChanged(ERROR))
@@ -198,9 +136,18 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
                 override fun onStopped() = Unit //dispatch(PlayerStateChanged(ENDED))
 
-                override fun onBuffering(p0: Boolean) = dispatch(PlayerStateChanged(BUFFERING))
+                override fun onBuffering(isBuffering: Boolean) {
+                    if (isBuffering)
+                        dispatch(PlayerStateChanged(BUFFERING))
+                    else
+                        dispatch(if (player.isPlaying) PlayerStateChanged(PLAYING) else PlayerStateChanged(PAUSED))
+                }
 
-                override fun onSeekTo(p0: Int) = Unit //dispatch(PlayerStateChanged(BUFFERING))
+                override fun onSeekTo(targetPosition: Int) {
+                    showHideUi.hide()
+                    player.play()
+                    //dispatch(PlayerStateChanged(BUFFERING))
+                }
 
             })
         }
@@ -210,8 +157,11 @@ class YoutubeActivity : YouTubeBaseActivity(),
             diff(get = Model::title, set = { actionBar?.setTitle(it) })
             diff(get = Model::playCommand, set = {
                 when (it) {
-                    PLAY -> player.play()
-                    PAUSE -> player.pause()
+                    is Play -> player.play()
+                    is Pause -> player.pause()
+                    is SkipFwd -> player.seekToMillis(player.currentTimeMillis + it.ms)
+                    is SkipBack -> player.seekToMillis(player.currentTimeMillis - it.ms)
+                    is JumpTo -> player.seekToMillis(it.ms)
                 }
             })
         }
@@ -219,50 +169,9 @@ class YoutubeActivity : YouTubeBaseActivity(),
         fun init() {
             log.d("view.init")
             player.setShowFullscreenButton(false)
-            dispatch(PlayerContract.View.Event.Initialised)
+            dispatch(Initialised)
         }
 
-    }
-
-    private fun toggle() {
-        if (mVisible) {
-            hide()
-        } else {
-            show()
-            delayedHide(AUTO_HIDE_DELAY_MILLIS)
-        }
-    }
-
-    private fun hide() {
-        // Hide UI first
-        actionBar?.hide()
-        //fullscreen_content_controls.visibility = View.GONE
-        mVisible = false
-
-        // Schedule a runnable to remove the status and navigation bar after a delay
-        mHideHandler.removeCallbacks(mShowPart2Runnable)
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY.toLong())
-    }
-
-    private fun show() {
-        // Show the system bar
-        youtube_view.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-        mVisible = true
-
-        // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable)
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY.toLong())
-    }
-//
-    /**
-     * Schedules a call to hide() in [delayMillis], canceling any
-     * previously scheduled calls.
-     */
-    private fun delayedHide(delayMillis: Int) {
-        mHideHandler.removeCallbacks(mHideRunnable)
-        mHideHandler.postDelayed(mHideRunnable, delayMillis.toLong())
     }
 
     // region YouTubePlayer.OnInitializedListener
@@ -289,7 +198,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
         if (errorReason.isUserRecoverableError()) {
             errorReason.getErrorDialog(this, RECOVERY_DIALOG_REQUEST).show()
         } else {
-            toastWrapper.show("Could init Youtube player $errorReason")
+            toastWrapper.show("Couldn't init Youtube player $errorReason")
         }
     }
     // endregion
@@ -302,15 +211,13 @@ class YoutubeActivity : YouTubeBaseActivity(),
             })
 
         private const val RECOVERY_DIALOG_REQUEST = 1
-        private val AUTO_HIDE = true
-        private val AUTO_HIDE_DELAY_MILLIS = 3000
-        private val UI_ANIMATION_DELAY = 300
 
         @JvmStatic
         val activityModule = module {
             scope(named<YoutubeActivity>()) {
                 scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
+                scoped { ShowHideUi(getSource()) }
             }
 
         }
