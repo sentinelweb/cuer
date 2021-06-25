@@ -255,7 +255,7 @@ class QueueMediator constructor(
         }
     }
 
-    override fun onTrackEnded(media: MediaDomain?) {
+    override fun onTrackEnded() {
         nextItem()
     }
 

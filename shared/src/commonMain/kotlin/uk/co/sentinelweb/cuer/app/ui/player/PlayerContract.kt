@@ -15,11 +15,13 @@ interface PlayerContract {
             object Play : Intent()
             object Pause : Intent()
             object Load : Intent()
+
             //            object SkipFwd : Intent()
 //            object SkipBack : Intent()
-//            object TrackFwd : Intent()
-//            object TrackBack : Intent()
+            object TrackFwd : Intent()
+            object TrackBack : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
+            data class TrackChange(val item: PlaylistItemDomain) : Intent()
         }
 
         data class State constructor(
@@ -43,6 +45,8 @@ interface PlayerContract {
         sealed class Event {
             object PlayClicked : Event()
             object PauseClicked : Event()
+            object TrackFwdClicked : Event()
+            object TrackBackClicked : Event()
             object Initialised : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
         }

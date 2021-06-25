@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
@@ -28,6 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.PAUSE
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.PLAY
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.PlayerStateChanged
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.TrackFwdClicked
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.util.extension.activityLegacyScopeWithSource
@@ -123,6 +126,20 @@ class YoutubeActivity : YouTubeBaseActivity(),
 //        dummy_button.setOnTouchListener(mDelayHideTouchListener)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.local_player_actionbar, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.next -> view.dispatch(TrackFwdClicked)
+            R.id.previous -> view.dispatch(PlayerContract.View.Event.TrackBackClicked)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onDestroy() {
         controller.onViewDestroyed()
         controller.onDestroy()
@@ -157,6 +174,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
             player.setPlayerStateChangeListener(object : YouTubePlayer.PlayerStateChangeListener {
                 override fun onVideoEnded() {
                     show()
+                    dispatch(PlayerStateChanged(ENDED))
                 }
 
                 override fun onVideoStarted() {
@@ -291,7 +309,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
         @JvmStatic
         val activityModule = module {
             scope(named<YoutubeActivity>()) {
-                scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get()) }
+                scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
             }
 

@@ -191,7 +191,7 @@ class YouTubePlayerListener(
         playerUi?.setPlayerState(state.playState)
         updateMediaSessionManagerPlaybackState()
         if (state.playState == PlayerStateDomain.ENDED) {
-            queue.onTrackEnded(state.currentMedia)
+            queue.onTrackEnded()
         }
     }
 

@@ -26,7 +26,7 @@ interface QueueMediatorContract {
 
     interface Consumer : Shared {
         val source: OrchestratorContract.Source
-        fun onTrackEnded(media: MediaDomain?)
+        fun onTrackEnded()
         fun nextItem()
         fun previousItem()
         fun updateCurrentMediaItem(updatedMedia: MediaDomain)

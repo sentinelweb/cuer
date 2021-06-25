@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.State
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.NONE
@@ -18,8 +19,10 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 class PlayerStoreFactory(
     private val storeFactory: StoreFactory,
     private val itemLoader: PlayerContract.PlaylistItemLoader,
+    private val queueConsumer: QueueMediatorContract.Consumer,
     private val log: LogWrapper
 ) {
+
     private sealed class Result {
         object NoVideo : Result()
         class State(val state: PlayerStateDomain) : Result()
@@ -45,26 +48,29 @@ class PlayerStoreFactory(
                 is Intent.Play -> dispatch(Result.State(PLAYING))
                 is Intent.Pause -> dispatch(Result.State(PAUSED))
                 is Intent.PlayState -> checkCommand(intent.state)
-                is Intent.Load -> {
-                    loadVideo()
-                }
+                is Intent.Load -> loadVideo()
+                is Intent.TrackChange -> dispatch(Result.LoadVideo(intent.item))
+                is Intent.TrackFwd -> queueConsumer.nextItem()
+                is Intent.TrackBack -> queueConsumer.previousItem()
             }
 
-        private fun checkCommand(state: PlayerStateDomain) =
-            when (state) {
+        private fun checkCommand(playState: PlayerStateDomain) =
+            when (playState) {
                 VIDEO_CUED -> PLAY
+                ENDED -> {
+                    queueConsumer.onTrackEnded()
+                    NONE
+                }
                 else -> NONE
-            }.let { dispatch(Result.Command(it, state)) }
+            }.let { dispatch(Result.Command(it, playState)) }
 
 
         private suspend fun loadVideo() {
             withContext(Dispatchers.Default) {
-                //log.d("loadVideo()")
                 itemLoader.load()
             }
                 ?.apply { dispatch(Result.LoadVideo(this)) }
                 ?: apply { dispatch(Result.NoVideo) }
-
         }
     }
 
