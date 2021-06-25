@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -31,9 +32,8 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
-import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -51,7 +51,6 @@ import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.ext.*
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
-// todo add error handling interface
 class PlaylistPresenter(
     private val view: PlaylistContract.View,
     private val state: PlaylistContract.State,
@@ -60,6 +59,7 @@ class PlaylistPresenter(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val playlistUpdateOrchestrator: PlaylistUpdateOrchestrator,
+    private val playlistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator,
     private val modelMapper: PlaylistModelMapper,
     private val queue: QueueMediatorContract.Producer,
     private val toastWrapper: ToastWrapper,
@@ -68,7 +68,7 @@ class PlaylistPresenter(
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val shareWrapper: ShareWrapper,
     private val playlistMutator: PlaylistMutator,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
+    private val prefsWrapper: GeneralPreferencesWrapper,
     private val log: LogWrapper,
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider,
@@ -179,7 +179,7 @@ class PlaylistPresenter(
                         ?.also { updateView() }
             }.takeIf { !isQueuedPlaylist && currentIndexBefore != state.playlist?.currentIndex }
                 ?.apply {
-                    state.playlist?.apply { playlistOrchestrator.updateCurrentIndex(this, state.playlistIdentifier.flatOptions()) }
+                    state.playlist?.apply { playlistOrDefaultOrchestrator.updateCurrentIndex(this, state.playlistIdentifier.flatOptions()) }
                 }
         }.launchIn(coroutines.mainScope)
 
@@ -622,7 +622,7 @@ class PlaylistPresenter(
     private suspend fun executeRefresh(animate: Boolean = true, scrollToItem: Boolean = false) {
         view.showRefresh()
         try {
-            playlistOrchestrator
+            playlistOrDefaultOrchestrator
                 .getPlaylistOrDefault(state.playlistIdentifier.id as Long, state.playlistIdentifier.source.flatOptions())
                 .also { state.playlist = it?.first }
                 ?.also { (playlist, source) ->

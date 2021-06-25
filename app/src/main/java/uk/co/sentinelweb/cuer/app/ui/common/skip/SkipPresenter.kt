@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.common.skip
 
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -12,7 +12,7 @@ class SkipPresenter constructor(
     private val state: SkipContract.State,
     private val mapper: SkipContract.Mapper,
     private val log: LogWrapper,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
+    private val prefsWrapper: GeneralPreferencesWrapper
 ) : SkipContract.Presenter, SkipContract.External {
 
     override val skipBackText: String get() = mapper.mapBackTime(state.backJumpInterval.toLong())

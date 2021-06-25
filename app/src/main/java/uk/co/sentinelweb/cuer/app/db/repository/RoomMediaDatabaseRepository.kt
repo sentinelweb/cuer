@@ -40,6 +40,9 @@ class RoomMediaDatabaseRepository constructor(
     override val updates: Flow<Pair<Operation, MediaDomain>>
         get() = _mediaFlow
 
+    override val stats: Flow<Pair<Operation, Nothing>>
+        get() = TODO("Not yet implemented")
+
     @Transaction
     override suspend fun save(domain: MediaDomain, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
@@ -121,6 +124,10 @@ class RoomMediaDatabaseRepository constructor(
             log.e(msg, e)
             RepoResult.Error<List<MediaDomain>>(e, msg)
         }.also { database.endTransaction() }
+    }
+
+    override suspend fun loadStatsList(filter: Filter?): RepoResult<List<Nothing>> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun delete(domain: MediaDomain, emit: Boolean): RepoResult<Boolean> =

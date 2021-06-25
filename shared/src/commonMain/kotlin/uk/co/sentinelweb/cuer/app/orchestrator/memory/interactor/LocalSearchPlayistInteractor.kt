@@ -1,10 +1,10 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistItemDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
@@ -13,8 +13,8 @@ import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
 
 class LocalSearchPlayistInteractor constructor(
-    private val roomPlaylistItemDatabaseRepository: RoomPlaylistItemDatabaseRepository,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
+    private val playlistItemDatabaseRepository: PlaylistItemDatabaseRepository,
+    private val prefsWrapper: GeneralPreferencesWrapper
 ) {
     fun search(): SearchLocalDomain? =
         prefsWrapper
@@ -25,8 +25,8 @@ class LocalSearchPlayistInteractor constructor(
         search()
             ?.let { mapToFilter(it) }
             ?.let {
-                roomPlaylistItemDatabaseRepository
-                    .loadPlaylistItems(it)
+                playlistItemDatabaseRepository
+                    .loadList(it)
                     .takeIf { it.isSuccessful }
                     ?.data
                     ?.let {

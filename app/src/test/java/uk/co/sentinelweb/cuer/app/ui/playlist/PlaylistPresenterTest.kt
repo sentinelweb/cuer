@@ -91,7 +91,7 @@ class PlaylistPresenterTest {
     lateinit var mockShareWrapper: ShareWrapper
 
     @MockK
-    lateinit var mockPrefsWrapper: SharedPrefsWrapper<GeneralPreferences>
+    lateinit var mockPrefsWrapper: GeneralPreferences
 
     @MockK
     lateinit var mockTimeProvider: TimeProvider

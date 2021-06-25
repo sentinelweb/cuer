@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistItemDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.NewMediaFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.NEWITEMS_PLAYLIST
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -9,11 +9,11 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class NewMediaPlayistInteractor constructor(
-    private val roomPlaylistItemDatabaseRepository: RoomPlaylistItemDatabaseRepository,
+    private val playlistItemDatabaseRepository: PlaylistItemDatabaseRepository,
 ) {
     suspend fun getPlaylist(): PlaylistDomain? =
-        roomPlaylistItemDatabaseRepository
-            .loadPlaylistItems(NewMediaFilter())
+        playlistItemDatabaseRepository
+            .loadList(NewMediaFilter())
             .takeIf { it.isSuccessful }
             ?.data
             ?.let {

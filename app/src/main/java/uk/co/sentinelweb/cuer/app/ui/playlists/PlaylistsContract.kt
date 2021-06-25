@@ -93,7 +93,7 @@ interface PlaylistsContract {
                         queue = get(),
                         log = get(),
                         toastWrapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>()),
+                        prefsWrapper = get(),
                         coroutines = get(),
                         newMedia = get(),
                         recentItems = get(),

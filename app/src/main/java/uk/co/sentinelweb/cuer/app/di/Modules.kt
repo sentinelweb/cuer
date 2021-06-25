@@ -10,20 +10,6 @@ import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
-import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.AddLinkOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
-import uk.co.sentinelweb.cuer.app.queue.QueueMediator
-import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract
@@ -50,9 +36,10 @@ import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
+import uk.co.sentinelweb.cuer.app.util.share.scan.AndroidLinkScanner
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
@@ -62,7 +49,6 @@ import uk.co.sentinelweb.cuer.core.di.CoreJvmModule
 import uk.co.sentinelweb.cuer.core.di.CoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.di.DomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
@@ -101,47 +87,15 @@ object Modules {
         factory { BackgroundMapper(get()) }
     }
 
-    private val orchestratorModule = module {
-        single { PlaylistOrchestrator(get(), get(), get(), get()) }
-        single { PlaylistItemOrchestrator(get(), get(), get()) }
-        single { MediaOrchestrator(get(), get()) }
-        single { ChannelOrchestrator(get(), get()) }
-        single { PlaylistStatsOrchestrator(get()) }
-        single { PlaylistMemoryRepository(get(), get(), get(), get(), get()) }
-        single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
-        factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get(), get(), get()) }
-        factory<PlaylistUpdateOrchestrator.UpdateCheck> { PlaylistUpdateOrchestrator.PlatformUpdateCheck() }
-        factory { PlaylistMergeOrchestrator(get(), get()) }
-        factory { PlaylistMediaLookupOrchestrator(get(), get()) }
-        factory { NewMediaPlayistInteractor(get()) }
-        factory { RecentItemsPlayistInteractor(get()) }
-        factory { AddLinkOrchestrator(get(), get(), get(), get(), get()) }
-        factory { LocalSearchPlayistInteractor(get(), get(named<GeneralPreferences>())) }
-        factory { RemoteSearchPlayistOrchestrator(get(named<GeneralPreferences>()), get(), get(), RemoteSearchPlayistOrchestrator.State()) }
-    }
-
     private val utilModule = module {
-        factory {
-            LinkScanner(
+        factory<LinkScanner> {
+            AndroidLinkScanner(
                 log = get(),
                 mappers = urlMediaMappers
             )
         }
         single { CuerAppState() }
 
-        single<QueueMediatorContract.Producer> {
-            QueueMediator(
-                state = QueueMediatorState(),
-                playlistOrchestrator = get(),
-                playlistItemOrchestrator = get(),
-                coroutines = get(),
-                mediaSessionManager = get(),
-                playlistMutator = get(),
-                prefsWrapper = get(named<GeneralPreferences>()),
-                log = get()
-            )
-        }
-        single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }
         factory { MediaSessionManager(get(), androidApplication(), get(), get(), get()) }
         factory { MediaMetadataMapper(get()) }
         factory { PlaybackStateMapper() }
@@ -160,8 +114,8 @@ object Modules {
         factory { AndroidLogWrapper() }
         factory { FileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
-        single(named<GeneralPreferences>()) {
-            SharedPrefsWrapper(GeneralPreferences::class, androidApplication(), get())
+        single {
+            SharedPrefsWrapper(androidApplication(), get()) as GeneralPreferencesWrapper
         }
         factory { ServiceWrapper(androidApplication(), get()) }
         factory { EdgeToEdgeWrapper() }
@@ -178,7 +132,6 @@ object Modules {
         .plus(wrapperModule)
         .plus(scopedModules)
         .plus(appNetModule)
-        .plus(orchestratorModule)
         .plus(DatabaseModule.dbModule)
         .plus(NetModule.netModule)
         .plus(CoreModule.objectModule)

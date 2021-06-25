@@ -91,7 +91,7 @@ interface PlaylistsDialogContract {
                         modelMapper = get(),
                         log = get(),
                         toastWrapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>()),
+                        prefsWrapper = get(),
                         coroutines = get(),
                         dialogModelMapper = get()
                     )

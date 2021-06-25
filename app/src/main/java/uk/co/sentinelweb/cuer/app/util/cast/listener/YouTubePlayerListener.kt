@@ -9,9 +9,8 @@ import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
-import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -27,7 +26,7 @@ class YouTubePlayerListener(
     private val log: LogWrapper,
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider,
-    private val prefs: SharedPrefsWrapper<GeneralPreferences>
+    private val prefs: GeneralPreferencesWrapper
 ) : AbstractYouTubePlayerListener(),
     CastPlayerContract.PlayerControls.Listener {
 
@@ -58,6 +57,7 @@ class YouTubePlayerListener(
         queue.currentItemFlow
             .distinctUntilChanged { old, new -> old?.media?.id == new?.media?.id }
             .onEach { loadVideo(it) }
+            .onEach { item -> item?.let { mediaSessionManager.setMedia(item.media) } }
             .launchIn(coroutines.mainScope)
     }
 

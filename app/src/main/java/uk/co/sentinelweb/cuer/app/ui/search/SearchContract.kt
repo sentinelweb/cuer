@@ -60,7 +60,7 @@ interface SearchContract {
                         state = get(),
                         log = get(),
                         mapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>()),
+                        prefsWrapper = get(),
                         timeStampMapper = get(),
                         timeProvider = get()
                     )

@@ -23,6 +23,8 @@ class RoomPlaylistItemDatabaseRepository constructor(
     private val _playlistItemFlow = MutableSharedFlow<Pair<OrchestratorContract.Operation, PlaylistItemDomain>>()
     override val updates: Flow<Pair<OrchestratorContract.Operation, PlaylistItemDomain>>
         get() = _playlistItemFlow
+    override val stats: Flow<Pair<OrchestratorContract.Operation, Nothing>>
+        get() = TODO("Not yet implemented")
 
     override suspend fun save(domain: PlaylistItemDomain, flat: Boolean, emit: Boolean): RepoResult<PlaylistItemDomain> =
         savePlaylistItem(domain, emit, flat)
@@ -35,6 +37,10 @@ class RoomPlaylistItemDatabaseRepository constructor(
 
     override suspend fun loadList(filter: OrchestratorContract.Filter?, flat: Boolean): RepoResult<List<PlaylistItemDomain>> =
         loadPlaylistItems(filter)
+
+    override suspend fun loadStatsList(filter: OrchestratorContract.Filter?): RepoResult<List<Nothing>> {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> {
         TODO("Not yet implemented")
@@ -171,12 +177,14 @@ class RoomPlaylistItemDatabaseRepository constructor(
                     is OrchestratorContract.RecentMediaFilter ->
                         playlistItemDao.loadAllPlaylistItemsRecent(200)
                             .map { playlistItemMapper.map(it) }
-                    is OrchestratorContract.SearchFilter ->
-                        if (filter.playlistIds.isNullOrEmpty()) {
+                    is OrchestratorContract.SearchFilter -> {
+                        val playlistIds = filter.playlistIds
+                        if (playlistIds.isNullOrEmpty()) {
                             playlistItemDao.search(filter.text.toLowerCase(), 200)
                         } else {
-                            playlistItemDao.search(filter.text.toLowerCase(), filter.playlistIds, 200)
+                            playlistItemDao.search(filter.text.toLowerCase(), playlistIds, 200)
                         }.map { playlistItemMapper.map(it) }
+                    }
                     else -> playlistItemDao.loadAllItems()
                         .map { playlistItemMapper.map(it, roomMediaRepository.load(it.mediaId).data!!) }
                 }.let { RepoResult.Data(it) }

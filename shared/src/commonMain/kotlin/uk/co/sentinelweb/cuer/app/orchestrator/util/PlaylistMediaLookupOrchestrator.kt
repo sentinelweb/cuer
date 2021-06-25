@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.util
 
-import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistItemDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
  */
 class PlaylistMediaLookupOrchestrator constructor(
     private val mediaOrchestrator: MediaOrchestrator,
-    private val roomPlaylistItemDatabaseRepository: RoomPlaylistItemDatabaseRepository
+    private val roomPlaylistItemDatabaseRepository: PlaylistItemDatabaseRepository
 ) {
     suspend fun lookupMediaAndReplace(playlist: PlaylistDomain, target: Source): PlaylistDomain {
         val mediaLookup = buildMediaLookup(playlist, target)
@@ -20,7 +20,7 @@ class PlaylistMediaLookupOrchestrator constructor(
             items = playlist.items.map {
                 it.copy(
                     media = mediaLookup.get(it.media.platformId)
-                        ?: throw java.lang.IllegalStateException("Media save failed")
+                        ?: throw IllegalStateException("Media save failed")
                 )
             })
     }
@@ -28,7 +28,7 @@ class PlaylistMediaLookupOrchestrator constructor(
     suspend fun lookupPlaylistItemsAndReplace(playlist: PlaylistDomain): PlaylistDomain =
         buildMediaLookup(playlist, Source.LOCAL)
             .let { it.values.mapNotNull { it.id } }
-            .let { roomPlaylistItemDatabaseRepository.loadPlaylistItems(MediaIdListFilter(it)) }
+            .let { roomPlaylistItemDatabaseRepository.loadList(MediaIdListFilter(it)) }
             .data
             ?.distinctBy { it.media.platformId }
             ?.associateBy { it.media.platformId }
@@ -52,7 +52,7 @@ class PlaylistMediaLookupOrchestrator constructor(
         val mediaLookup = playlist.items
             .map { it.media }
             .toMutableList()
-            .apply { removeIf { existingMediaPlatformIds.contains(it.platformId) } }
+            .apply { removeAll { existingMediaPlatformIds.contains(it.platformId) } }
             .map { it.copy(id = null) }
             .let { mediaOrchestrator.save(it, Options(target, flat = false)) }
             .toMutableList()

@@ -1,7 +1,5 @@
 package uk.co.sentinelweb.cuer.net
 
-import retrofit2.HttpException
-import java.io.IOException
 
 sealed class NetResult<R> constructor(
     val isSuccessful: Boolean,
@@ -29,15 +27,15 @@ sealed class NetResult<R> constructor(
     ) : NetResult<R>(false)
 
     class NetworkError<R>(
-        t: IOException,
+        t: Exception,
         msg: String? = null,
         code: String? = null
     ) : Error<R>(t, msg, code)
 
     class HttpError<R>(
-        t: HttpException,
-        msg: String = t.message().toString(),
-        code: String = t.code().toString()
+        t: Exception,
+        msg: String = t.message.toString(),
+        code: String
     ) : Error<R>(t, msg, code)
 
     class NotConnectedError<R>(

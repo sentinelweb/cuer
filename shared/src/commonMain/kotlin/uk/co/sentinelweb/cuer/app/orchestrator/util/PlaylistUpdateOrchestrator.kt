@@ -57,7 +57,7 @@ class PlaylistUpdateOrchestrator constructor(
                 .map { it.platformId }
         val maxOrder = existing.items.maxOf { it.order }
         val newItems =
-            platform.items.toMutableList().apply { removeIf { platformPlaylistExistingMediaPlatformIds.contains(it.media.platformId) } }
+            platform.items.toMutableList().apply { removeAll { platformPlaylistExistingMediaPlatformIds.contains(it.media.platformId) } }
         return existing.copy(items = newItems.mapIndexed { i, item ->
             item.copy(
                 id = null,

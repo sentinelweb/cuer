@@ -16,7 +16,7 @@ internal class ErrorMapper(
         }
         is HttpException -> {
             log.e(msg, t)
-            NetResult.HttpError<R>(t)
+            NetResult.HttpError<R>(t, code = t.code().toString())
         }
         else -> {
             log.e(msg, t)

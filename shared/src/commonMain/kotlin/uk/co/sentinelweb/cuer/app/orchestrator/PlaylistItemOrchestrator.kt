@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistItemDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
@@ -12,7 +12,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistItemOrchestrator constructor(
-    private val roomPlaylistItemDatabaseRepository: RoomPlaylistItemDatabaseRepository,
+    private val roomPlaylistItemDatabaseRepository: PlaylistItemDatabaseRepository,
     private val playlistItemMemoryRepository: MemoryRepository<PlaylistItemDomain>,
     private val log: LogWrapper
 ) : OrchestratorContract<PlaylistItemDomain> {
@@ -24,7 +24,7 @@ class PlaylistItemOrchestrator constructor(
     suspend override fun load(id: Long, options: Options): PlaylistItemDomain? =
         when (options.source) {
             MEMORY -> TODO()
-            LOCAL -> (roomPlaylistItemDatabaseRepository.loadPlaylistItem(id)
+            LOCAL -> (roomPlaylistItemDatabaseRepository.load(id)
                 .takeIf { it.isSuccessful }
                 ?: throw DoesNotExistException("PlaylistItemDomain($id)"))
                 .data
@@ -37,7 +37,7 @@ class PlaylistItemOrchestrator constructor(
     suspend override fun loadList(filter: Filter, options: Options): List<PlaylistItemDomain> =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.loadList(filter, options)
-            LOCAL -> roomPlaylistItemDatabaseRepository.loadPlaylistItems(filter)
+            LOCAL -> roomPlaylistItemDatabaseRepository.loadList(filter)
                 .allowDatabaseListResultEmpty()
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
@@ -52,7 +52,7 @@ class PlaylistItemOrchestrator constructor(
         when (options.source) {
             MEMORY -> TODO()
             LOCAL -> domain.id?.let {
-                roomPlaylistItemDatabaseRepository.loadPlaylistItem(it)
+                roomPlaylistItemDatabaseRepository.load(it)
                     .forceDatabaseSuccess()
             }
 
@@ -64,7 +64,7 @@ class PlaylistItemOrchestrator constructor(
     suspend override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.save(domain, options)
-            LOCAL -> roomPlaylistItemDatabaseRepository.savePlaylistItem(domain, options.emit, options.flat)
+            LOCAL -> roomPlaylistItemDatabaseRepository.save(domain, emit = options.emit, flat = options.flat)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
@@ -76,7 +76,7 @@ class PlaylistItemOrchestrator constructor(
             MEMORY -> domains.map {
                 playlistItemMemoryRepository.save(it, options)
             }
-            LOCAL -> roomPlaylistItemDatabaseRepository.savePlaylistItems(domains, options.emit)
+            LOCAL -> roomPlaylistItemDatabaseRepository.save(domains, emit = options.emit)
                 .forceDatabaseSuccessNotNull("Save failed $domains")
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()

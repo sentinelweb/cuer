@@ -85,7 +85,7 @@ interface ShareContract {
                         log = get(),
                         ytContextHolder = get(),
                         mapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>()),
+                        prefsWrapper = get(),
                         timeProvider = get(),
                         playlistItemOrchestrator = get()
                     )

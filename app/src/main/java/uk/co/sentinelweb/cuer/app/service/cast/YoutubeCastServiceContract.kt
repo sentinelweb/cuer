@@ -49,7 +49,7 @@ interface YoutubeCastServiceContract {
                         state = SkipContract.State(),
                         log = get(),
                         mapper = SkipContract.Mapper(timeSinceFormatter = get(), res = get()),
-                        prefsWrapper = get(named<GeneralPreferences>())
+                        prefsWrapper = get()
                     )
                 }
                 scoped<PlayerControlsNotificationContract.External> {

@@ -12,7 +12,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -130,7 +129,7 @@ interface CastPlayerContract {
                         state = SkipContract.State(),
                         log = get(),
                         mapper = SkipContract.Mapper(timeSinceFormatter = get(), res = get()),
-                        prefsWrapper = get(named<GeneralPreferences>())
+                        prefsWrapper = get()
                     )
                 }
                 scoped<SkipContract.View> {

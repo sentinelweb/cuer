@@ -55,7 +55,7 @@ class QueueMediatorTest {
     lateinit var mockMediaSessionManager: MediaSessionManager
 
     @MockK
-    lateinit var mockPrefsWrapper: SharedPrefsWrapper<GeneralPreferences>
+    lateinit var mockPrefsWrapper: GeneralPreferences
 
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())

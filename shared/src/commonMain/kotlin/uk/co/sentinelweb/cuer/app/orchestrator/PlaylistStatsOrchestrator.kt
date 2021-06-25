@@ -1,19 +1,16 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
-import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistStatsOrchestrator constructor(
-    private val roomPlaylistDatabaseRepository: RoomPlaylistDatabaseRepository,
+    private val roomPlaylistDatabaseRepository: PlaylistDatabaseRepository,
 ) : OrchestratorContract<PlaylistStatDomain> {
     override val updates: Flow<Triple<Operation, Source, PlaylistStatDomain>>
-        get() = roomPlaylistDatabaseRepository.playlistStatFlow
-            .map { it.first to Source.LOCAL then it.second }
+        get() = TODO()
 
     suspend override fun load(platformId: String, options: Options): PlaylistStatDomain? {
         throw NotImplementedException()
@@ -30,7 +27,7 @@ class PlaylistStatsOrchestrator constructor(
     suspend override fun loadList(filter: Filter, options: Options): List<PlaylistStatDomain> =
         when (options.source) {
             Source.MEMORY -> throw NotImplementedException()
-            Source.LOCAL -> roomPlaylistDatabaseRepository.loadPlaylistStatList(filter)
+            Source.LOCAL -> roomPlaylistDatabaseRepository.loadStatsList(filter)
                 .allowDatabaseListResultEmpty()
             Source.LOCAL_NETWORK -> throw NotImplementedException()
             Source.REMOTE -> throw NotImplementedException()

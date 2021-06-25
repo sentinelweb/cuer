@@ -22,6 +22,8 @@ class RoomChannelDatabaseRepository constructor(
 
     override val updates: Flow<Pair<OrchestratorContract.Operation, ChannelDomain>>
         get() = TODO("Not yet implemented")
+    override val stats: Flow<Pair<OrchestratorContract.Operation, Nothing>>
+        get() = TODO("Not yet implemented")
 
     override suspend fun save(domain: ChannelDomain, flat: Boolean, emit: Boolean): RepoResult<ChannelDomain> {
         TODO("Not yet implemented")
@@ -34,6 +36,10 @@ class RoomChannelDatabaseRepository constructor(
     override suspend fun load(id: Long, flat: Boolean): RepoResult<ChannelDomain> = loadChannel(id)
 
     override suspend fun loadList(filter: OrchestratorContract.Filter?, flat: Boolean): RepoResult<List<ChannelDomain>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun loadStatsList(filter: OrchestratorContract.Filter?): RepoResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 

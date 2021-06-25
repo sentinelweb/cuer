@@ -14,10 +14,9 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.PINNED_PLAYLIST
-import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -31,7 +30,7 @@ class PlaylistEditViewModel constructor(
     private val mediaOrchestrator: MediaOrchestrator,
     private val log: LogWrapper,
     private val imageProvider: FirebaseDefaultImageProvider,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
+    private val prefsWrapper: GeneralPreferencesWrapper
 ) : ViewModel() {
 
     data class UiEvent(

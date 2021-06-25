@@ -18,7 +18,9 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
+import java.io.InvalidClassException
 
 // todo update stats automatically on save/delete
 @Suppress("DEPRECATION")
@@ -40,7 +42,7 @@ class RoomPlaylistDatabaseRepository constructor(
         get() = _playlistFlow
 
     private val _playlistStatFlow = MutableSharedFlow<Pair<Operation, PlaylistStatDomain>>()
-    val playlistStatFlow: Flow<Pair<Operation, PlaylistStatDomain>>
+    override val stats: Flow<Pair<Operation, PlaylistStatDomain>>
         get() = _playlistStatFlow
 
     private val _playlistStats: MutableList<PlaylistStatDomain> = mutableListOf()
@@ -270,25 +272,8 @@ class RoomPlaylistDatabaseRepository constructor(
             }
         }
 
-    suspend fun updateCurrentIndex(playlist: PlaylistDomain, emit: Boolean = true): RepoResult<Boolean> =
-        withContext(coProvider.IO) {
-            try {
-                RepoResult.Data(playlist.id?.let {
-                    playlistDao.updateIndex(it, playlist.currentIndex) > 0
-                } ?: false).also {
-                    if (emit) {
-                        _playlistFlow.emit(FLAT to playlist)
-                    }
-                }
-            } catch (e: Exception) {
-                val msg = "couldn't delete all media"
-                log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
-            }
-        }
-
     // region PlaylistStatDomain
-    suspend fun loadPlaylistStatList(filter: Filter): RepoResult<List<PlaylistStatDomain>> =
+    override suspend fun loadStatsList(filter: Filter?): RepoResult<List<PlaylistStatDomain>> =
         withContext(coProvider.IO) {
             try {
                 database.beginTransaction()
@@ -312,20 +297,36 @@ class RoomPlaylistDatabaseRepository constructor(
         }
     // endregion PlaylistStatDomain
 
-    suspend fun getPlaylistOrDefault(playlistId: Long?, flat: Boolean = false) =
-        (playlistId
-            ?.let { load(it, flat = false) }
-            ?.takeIf { it.isSuccessful }
-            ?.data
-            ?: run {
-                loadList(DefaultFilter(), flat)
-                    .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
-                    ?.data?.get(0)
-            })
+    override suspend fun update(update: UpdateDomain<PlaylistDomain>, flat: Boolean, emit: Boolean): RepoResult<PlaylistDomain> =
+        withContext(coProvider.IO) {
+            try {
+                when (update) {
+                    is PlaylistIndexUpdateDomain -> updateCurrentIndex(update, emit)
+                    else -> throw InvalidClassException("update object not valid: ${update::class.simpleName}")
+                }
+            } catch (e: Throwable) {
+                val msg = "couldn't delete all channels"
+                log.e(msg, e)
+                RepoResult.Error<PlaylistDomain>(e, msg)
+            }
+        }
 
-    override suspend fun update(update: UpdateDomain<PlaylistDomain>, flat: Boolean, emit: Boolean): RepoResult<PlaylistDomain> {
-        TODO("Not yet implemented")
-    }
-
+    private suspend fun updateCurrentIndex(update: PlaylistIndexUpdateDomain, emit: Boolean = true): RepoResult<PlaylistDomain> =
+        withContext(coProvider.IO) {
+            try {
+                update.id
+                    .let { playlistDao.updateIndex(it, update.currentIndex); it }
+                    .let { load(it, flat = true) }
+                    .also {
+                        if (emit) {
+                            _playlistFlow.emit(FLAT to it.data!!)
+                        }
+                    }
+            } catch (e: Exception) {
+                val msg = "couldn't delete all media"
+                log.e(msg, e)
+                RepoResult.Error<PlaylistDomain>(e, msg)
+            }
+        }
 
 }

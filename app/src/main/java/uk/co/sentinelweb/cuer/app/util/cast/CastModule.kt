@@ -20,7 +20,7 @@ object CastModule {
                 mediaSessionManager = get(),
                 castWrapper = get(),
                 timeProvider = get(),
-                prefs = get(named<GeneralPreferences>())
+                prefs = get()
             )
         }
         factory { CastDialogWrapper(get()) }

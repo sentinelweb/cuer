@@ -147,14 +147,15 @@ interface PlaylistContract {
                         chromeCastWrapper = get(),
                         ytJavaApi = get(),
                         shareWrapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>()),
+                        prefsWrapper = get(),
                         playlistMutator = get(),
                         log = get(),
                         timeProvider = get(),
                         coroutines = get(),
                         res = get(),
                         playlistMediaLookupOrchestrator = get(),
-                        playlistUpdateOrchestrator = get()
+                        playlistUpdateOrchestrator = get(),
+                        playlistOrDefaultOrchestrator = get()
                     )
                 }
                 scoped {

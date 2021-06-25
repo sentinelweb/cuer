@@ -53,7 +53,7 @@ interface OrchestratorContract<Domain> {
         Filter
 
     class InvalidOperationException(clazz: KClass<out OrchestratorContract<out Any>>, filter: Filter?, options: Options) :
-        java.lang.UnsupportedOperationException("class = ${clazz.simpleName} filter = $filter options = $options")
+        UnsupportedOperationException("class = ${clazz.simpleName} filter = $filter options = $options")
 
     class NotImplementedException(msg: String? = null) : Exception(msg)
     class DoesNotExistException(msg: String? = null) : Exception(msg)

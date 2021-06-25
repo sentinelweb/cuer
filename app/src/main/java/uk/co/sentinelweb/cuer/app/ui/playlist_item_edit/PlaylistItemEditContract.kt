@@ -80,7 +80,7 @@ interface PlaylistItemEditContract {
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         playlistOrchestrator = get(),
-                        prefsWrapper = get(named<GeneralPreferences>())
+                        prefsWrapper = get()
                     )
                 }
                 scoped { State() }
