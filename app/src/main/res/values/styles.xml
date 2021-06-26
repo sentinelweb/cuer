@@ -283,14 +283,14 @@
 
     <style name="YoutubePlayer.Button">
         <item name="android:background">@drawable/ic_ripple_play_background</item>
-        <item name="android:layout_width">@dimen/youtube_button_size</item>
-        <item name="android:layout_height">@dimen/youtube_button_size</item>
-        <item name="android:padding">@dimen/player_button_padding</item>
+        <item name="android:layout_width">@dimen/controls_button_size</item>
+        <item name="android:layout_height">@dimen/controls_button_size</item>
+        <item name="android:padding">@dimen/controls_button_padding</item>
         <item name="android:tint">@color/white</item>
-        <item name="android:layout_margin">60dp</item>
+        <item name="android:layout_margin">@dimen/controls_button_margin</item>
     </style>
 
-    <style name="YoutubePlayer.Text" parent="TextAppearance.App.Headline4">
+    <style name="YoutubePlayer.Text" parent="TextAppearance.App.Body1">
         <item name="android:textColor">@color/white</item>
     </style>
     <!-- end CompactPlayer =========================== -->

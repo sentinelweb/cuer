@@ -12,7 +12,6 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.google.android.youtube.player.YouTubeBaseActivity
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
-import kotlinx.android.synthetic.main.activity_youtube.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -20,13 +19,14 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.util.extension.activityLegacyScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -38,9 +38,11 @@ import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType
 
 /**
- * TODO clean up (a lot)
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
+ * YouTube standalone player (Landscape only)
+ * Since YouTubeBaseActivity is older than time and still uses Activity then thee are no fragments
+ * https://issuetracker.google.com/issues/35172585
+ *
+ * Other players exist which are used here - this is just one option for playback
  */
 class YoutubeActivity : YouTubeBaseActivity(),
     YouTubePlayer.OnInitializedListener,
@@ -56,6 +58,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
     private val showHideUi: ShowHideUi by inject()
 
     lateinit var view: YouTubePlayerViewImpl
+    private lateinit var binding: ActivityYoutubeBinding
 
     init {
         log.tag(this)
@@ -63,19 +66,20 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityYoutubeBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        setContentView(R.layout.activity_youtube)
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
-        showHideUi.showElements = { controls.isVisible = true }
-        showHideUi.hideElements = { controls.isVisible = false }
-        youtube_track_next.setOnClickListener { view.dispatch(TrackFwdClicked) }
-        youtube_track_last.setOnClickListener { view.dispatch(TrackBackClicked) }
-        youtube_seek_back.setOnClickListener { view.dispatch(SkipBackClicked) }
-        youtube_seek_forward.setOnClickListener { view.dispatch(SkipFwdClicked) }
-        youtube_view.initialize(apiKeyProvider.key, this)
+        showHideUi.showElements = { binding.controls.root.isVisible = true }
+        showHideUi.hideElements = { binding.controls.root.isVisible = false }
+        binding.controls.controlsTrackNext.setOnClickListener { view.dispatch(TrackFwdClicked) }
+        binding.controls.controlsTrackLast.setOnClickListener { view.dispatch(TrackBackClicked) }
+        binding.controls.controlsSeekBack.setOnClickListener { view.dispatch(SkipBackClicked) }
+        binding.controls.controlsSeekForward.setOnClickListener { view.dispatch(SkipFwdClicked) }
+        binding.youtubeView.initialize(apiKeyProvider.key, this)
 
-        youtube_wrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
+        binding.youtubeWrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
             override fun touched() {
                 showHideUi.toggle()
             }
@@ -154,7 +158,17 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
         override val renderer: ViewRenderer<Model> = diff {
             diff(get = Model::platformId, set = player::cueVideo)
-            diff(get = Model::title, set = { actionBar?.setTitle(it) })
+            diff(get = Model::texts, set = { texts ->
+                binding.controls.apply {
+                    controlsVideoTitle.text = texts.title
+                    controlsVideoPlaylist.text = texts.playlistTitle
+                    controlsVideoPlaylistData.text = texts.playlistData
+                    controlsTrackLastText.text = texts.lastTrackText
+                    controlsTrackNextText.text = texts.nextTrackText
+
+
+                }
+            })
             diff(get = Model::playCommand, set = {
                 when (it) {
                     is Play -> player.play()
@@ -169,6 +183,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
         fun init() {
             log.d("view.init")
             player.setShowFullscreenButton(false)
+            player.setPlayerStyle(YouTubePlayer.PlayerStyle.MINIMAL)
             dispatch(Initialised)
         }
 
@@ -215,9 +230,10 @@ class YoutubeActivity : YouTubeBaseActivity(),
         @JvmStatic
         val activityModule = module {
             scope(named<YoutubeActivity>()) {
-                scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get()) }
+                scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get(), get()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { ShowHideUi(getSource()) }
+                scoped { PlayerModelMapper() }
             }
 
         }

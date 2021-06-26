@@ -10,33 +10,22 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapNotNull
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.None
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlayerController constructor(
     itemLoader: PlayerContract.PlaylistItemLoader,
     storeFactory: StoreFactory = DefaultStoreFactory,
     private val queueConsumer: QueueMediatorContract.Consumer,
+    private val modelMapper: PlayerModelMapper,
     private val log: LogWrapper,
     private val coroutineContextProvider: CoroutineContextProvider
 ) {
     init {
         log.tag(this)
-    }
-
-    private val stateToModel: suspend PlayerContract.MviStore.State.() -> PlayerContract.View.Model = {
-        item?.let {
-            PlayerContract.View.Model(
-                title = it.media.title,
-                platformId = it.media.platformId,
-                playState = state,
-                playCommand = command
-            )
-        } ?: PlayerContract.View.Model(null, null, UNKNOWN, None)
     }
 
     private val eventToIntent: suspend PlayerContract.View.Event.() -> PlayerContract.MviStore.Intent = {
@@ -56,16 +45,21 @@ class PlayerController constructor(
         TrackChange(this)
     }
 
+    private val playlistChangeToIntent: suspend PlaylistDomain.() -> PlayerContract.MviStore.Intent = {
+        PlaylistChange(this)
+    }
+
     private val store = PlayerStoreFactory(storeFactory, itemLoader, queueConsumer, log).create()
 
     private var binder: Binder? = null
 
     fun onViewCreated(view: PlayerContract.View) {
         binder = bind(coroutineContextProvider.Main) {
-            store.states.mapNotNull(stateToModel) bindTo view
+            store.states.mapNotNull { modelMapper.map(it) } bindTo view
             // Use store.labels to bind Labels to a consumer
 
             queueConsumer.currentItemFlow.filterNotNull().mapNotNull { trackChangeToIntent(it) } bindTo store
+            queueConsumer.currentPlaylistFlow.filterNotNull().mapNotNull { playlistChangeToIntent(it) } bindTo store
             view.events.mapNotNull(eventToIntent) bindTo store
         }
     }

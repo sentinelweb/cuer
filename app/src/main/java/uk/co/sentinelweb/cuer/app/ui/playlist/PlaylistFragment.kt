@@ -75,7 +75,7 @@ class PlaylistFragment :
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navMapper: NavigationMapper by inject()
 
-    // todo consider making binding nulll - getting crashes - or tighten up coroutine scope
+    // todo consider making binding null - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
     private val binding get() = _binding!!
 

@@ -7,12 +7,11 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.State
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.None
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface PlayerContract {
-
     interface MviStore : Store<Intent, State, Nothing> {
-
         sealed class Intent {
             object Play : Intent()
             object Pause : Intent()
@@ -23,25 +22,34 @@ interface PlayerContract {
             object TrackBack : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
             data class TrackChange(val item: PlaylistItemDomain) : Intent()
+            data class PlaylistChange(val item: PlaylistDomain) : Intent()
         }
 
         data class State constructor(
             val item: PlaylistItemDomain? = null,
-            val state: PlayerStateDomain = UNKNOWN,
+            val playlist: PlaylistDomain? = null,
+            val playerState: PlayerStateDomain = UNKNOWN,
             val command: PlayerCommand = None
         )
-
-
     }
 
     interface View : MviView<View.Model, View.Event> {
-
         data class Model(
-            val title: String?,
+            val texts: Texts,
             val platformId: String?,
             val playState: PlayerStateDomain,
             val playCommand: PlayerCommand
-        )
+        ) {
+            data class Texts(
+                val title: String?,
+                val playlistTitle: String?,
+                val playlistData: String?,
+                val nextTrackText: String?,
+                val lastTrackText: String?,
+                val skipFwdText: String?,
+                val skipBackText: String?,
+            )
+        }
 
         sealed class Event {
             object PlayClicked : Event()
@@ -67,5 +75,4 @@ interface PlayerContract {
     interface PlaylistItemLoader {
         suspend fun load(): PlaylistItemDomain?
     }
-
 }
