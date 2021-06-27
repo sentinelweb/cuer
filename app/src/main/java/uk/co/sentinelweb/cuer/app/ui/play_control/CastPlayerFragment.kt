@@ -82,6 +82,11 @@ class CastPlayerFragment() :
         _binding = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        presenter.onResume()
+    }
+
     override fun initMediaRouteButton() {
         chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
     }

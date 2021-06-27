@@ -11,8 +11,10 @@ interface SkipContract {
     }
 
     interface External {
-        val skipBackText: String
         val skipForwardText: String
+        val skipBackText: String
+        val skipForwardInterval: Int
+        val skipBackInterval: Int
         var duration: Long
         var listener: Listener
         fun skipFwd()
@@ -20,6 +22,7 @@ interface SkipContract {
         fun updatePosition(ms: Long)
         fun stateChange(playState: PlayerStateDomain)
         fun onSelectSkipTime(fwd: Boolean)
+        fun updateSkipTimes()
     }
 
     interface View {

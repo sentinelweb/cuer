@@ -15,8 +15,8 @@ class PlayerModelMapper constructor(
                     playlistData = playlist?.let { "${it.currentIndex + 1}/${it.items.size}" } ?: "",
                     nextTrackText = trackTitle(playlist, 1),
                     lastTrackText = trackTitle(playlist, -1),
-                    skipBackText = "-1m",
-                    skipFwdText = "1m"
+                    skipFwdText = skipFwdText,
+                    skipBackText = skipBackText
                 ),
                 nextTrackEnabled = playlist?.run { currentIndex < playlist.items.size - 1 } ?: false,
                 prevTrackEnabled = playlist?.run { currentIndex > 0 } ?: false,

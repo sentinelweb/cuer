@@ -33,6 +33,10 @@ class CastPlayerPresenter(
 
     override fun initialise() {
         state.isDestroyed = false
+    }
+
+    override fun onResume() {
+        skipControl.updateSkipTimes()
         view.setSkipBackText(skipControl.skipBackText)
         view.setSkipFwdText(skipControl.skipForwardText)
     }

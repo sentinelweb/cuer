@@ -30,21 +30,24 @@ class SkipPresenter constructor(
 
     private val isSeeking: Boolean
         get() = state.targetPosition != null && state.currentPlayState == BUFFERING // todo check
-    private val forwardJumpInterval: Int
+    override val skipForwardInterval: Int
         get() = state.forwardJumpInterval
-
-    private val backJumpInterval: Int
+    override val skipBackInterval: Int
         get() = state.backJumpInterval
 
 
     init {
         log.tag(this)
+        updateSkipTimes()
+    }
+
+    override fun updateSkipTimes() {
         state.forwardJumpInterval = prefsWrapper.getInt(GeneralPreferences.SKIP_FWD_TIME, 30000)
         state.backJumpInterval = prefsWrapper.getInt(GeneralPreferences.SKIP_BACK_TIME, 30000)
     }
 
     override fun skipFwd() {
-        state.accumulator += forwardJumpInterval
+        state.accumulator += skipForwardInterval
         //log.d("skipFwd: accum=$accumulator isSeeking=$isSeeking")
         if (!isSeeking) {
             sendAccumulation()
@@ -54,7 +57,7 @@ class SkipPresenter constructor(
     }
 
     override fun skipBack() {
-        state.accumulator -= backJumpInterval
+        state.accumulator -= skipBackInterval
         //log.d("skipBack: accum=$accumulator isSeeking=$isSeeking")
         if (!isSeeking) {
             sendAccumulation()

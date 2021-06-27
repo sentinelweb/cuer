@@ -78,7 +78,7 @@ class FABProgress(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
             )
         }
     }
-
+    // https://stackoverflow.com/questions/54827455/how-to-implement-timer-with-kotlin-coroutines
     @ObsoleteCoroutinesApi // fixme replace ticker with something else
     fun showProgress(show: Boolean) {
         showProgress = show

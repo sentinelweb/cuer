@@ -33,6 +33,7 @@ interface CastPlayerContract {
         fun onPlaylistItemClick()
         fun onSeekBackSelectTimePressed(): Boolean
         fun onSeekSelectTimeFwdPressed(): Boolean
+        fun onResume()
     }
 
     // todo think about this maybe sub with android MediaControl interface

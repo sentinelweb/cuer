@@ -19,6 +19,9 @@ interface PlayerContract {
             object SkipBack : Intent()
             object TrackFwd : Intent()
             object TrackBack : Intent()
+            object SkipFwdSelect : Intent()
+            object SkipBackSelect : Intent()
+            data class Position(val ms: Int) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
             data class TrackChange(val item: PlaylistItemDomain) : Intent()
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
@@ -31,7 +34,9 @@ interface PlayerContract {
         data class State constructor(
             val item: PlaylistItemDomain? = null,
             val playlist: PlaylistDomain? = null,
-            val playerState: PlayerStateDomain = UNKNOWN
+            val playerState: PlayerStateDomain = UNKNOWN,
+            val skipFwdText: String = "-",
+            val skipBackText: String = "-"
         )
     }
 
@@ -63,6 +68,9 @@ interface PlayerContract {
             object SkipFwdClicked : Event()
             object SkipBackClicked : Event()
             object Initialised : Event()
+            object SkipFwdSelectClicked : Event()
+            object SkipBackSelectClicked : Event()
+            data class SendPosition(val ms: Int) : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
         }
     }

@@ -13,6 +13,9 @@ import com.google.android.youtube.player.YouTubeBaseActivity
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -20,16 +23,23 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubeBinding
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.util.extension.activityLegacyScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.core.ext.tickerFlow
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -78,6 +88,8 @@ class YoutubeActivity : YouTubeBaseActivity(),
         binding.controls.controlsTrackLast.setOnClickListener { view.dispatch(TrackBackClicked);showHideUi.delayedHide() }
         binding.controls.controlsSeekBack.setOnClickListener { view.dispatch(SkipBackClicked);showHideUi.delayedHide() }
         binding.controls.controlsSeekForward.setOnClickListener { view.dispatch(SkipFwdClicked);showHideUi.delayedHide() }
+        binding.controls.controlsSeekBack.setOnLongClickListener { view.dispatch(SkipBackSelectClicked);true }
+        binding.controls.controlsSeekForward.setOnLongClickListener { view.dispatch(SkipFwdSelectClicked);true }
         binding.youtubeView.initialize(apiKeyProvider.key, this)
 
         binding.youtubeWrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
@@ -110,9 +122,10 @@ class YoutubeActivity : YouTubeBaseActivity(),
         showHideUi.delayedHide(100)
     }
 
+    // region MVI view
     inner class YouTubePlayerViewImpl constructor(
         private val player: YouTubePlayer
-    ) : BaseMviView<Model, PlayerContract.View.Event>(),
+    ) : BaseMviView<Model, Event>(),
         PlayerContract.View {
         init {
             player.setPlayerStateChangeListener(object : YouTubePlayer.PlayerStateChangeListener {
@@ -140,14 +153,14 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
                 override fun onPaused() = dispatch(PlayerStateChanged(PAUSED))
 
-                override fun onStopped() = Unit //dispatch(PlayerStateChanged(ENDED))
+                override fun onStopped() = Unit
 
                 override fun onBuffering(isBuffering: Boolean) {
                     if (isBuffering)
                         dispatch(PlayerStateChanged(BUFFERING))
                     else
                         showHideUi.hide()
-                        dispatch(if (player.isPlaying) PlayerStateChanged(PLAYING) else PlayerStateChanged(PAUSED))
+                    dispatch(if (player.isPlaying) PlayerStateChanged(PLAYING) else PlayerStateChanged(PAUSED))
                 }
 
                 override fun onSeekTo(targetPosition: Int) {
@@ -156,6 +169,11 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
             })
         }
+
+        val ticker = tickerFlow(1000)
+            .filter { player.isPlaying }
+            .onEach { dispatch(SendPosition(player.currentTimeMillis)) }
+            .launchIn(coroutines.mainScope)
 
         override val renderer: ViewRenderer<Model> = diff {
             diff(get = Model::platformId, set = player::cueVideo)
@@ -167,16 +185,10 @@ class YoutubeActivity : YouTubeBaseActivity(),
                     controlsVideoPlaylistData.text = texts.playlistData
                     controlsTrackLastText.text = texts.lastTrackText
                     controlsTrackNextText.text = texts.nextTrackText
+                    controlsSkipfwdText.text = texts.skipFwdText
+                    controlsSkipbackText.text = texts.skipBackText
                 }
             })
-        }
-
-        fun init() {
-            log.d("view.init")
-            player.setShowFullscreenButton(false)
-            // todo use chromeless and make seek/time display and play/pause/buffer
-//            player.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS)
-            dispatch(Initialised)
         }
 
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
@@ -193,11 +205,21 @@ class YoutubeActivity : YouTubeBaseActivity(),
             }
         }
 
+        fun init() {
+            log.d("view.init")
+            player.setShowFullscreenButton(false)
+            // todo use chromeless and make seek/time display and play/pause/buffer
+//            player.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS)
+            dispatch(Initialised)
+        }
+
         fun release() {
+            ticker.cancel()
             player.release()
         }
 
     }
+    // endregion
 
     // region YouTubePlayer.OnInitializedListener
     override fun onInitializationSuccess(
@@ -229,23 +251,37 @@ class YoutubeActivity : YouTubeBaseActivity(),
     // endregion
 
     companion object {
+        private const val RECOVERY_DIALOG_REQUEST = 1
 
         fun start(c: Context, playlistItem: PlaylistItemDomain) = c.startActivity(
             Intent(c, YoutubeActivity::class.java).apply {
                 putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
             })
 
-        private const val RECOVERY_DIALOG_REQUEST = 1
-
         @JvmStatic
         val activityModule = module {
             scope(named<YoutubeActivity>()) {
-                scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get(), get()) }
+                scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get(), get(), get()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { ShowHideUi(getSource()) }
                 scoped { PlayerModelMapper() }
+                scoped<SkipContract.External> {
+                    SkipPresenter(
+                        view = get(),
+                        state = SkipContract.State(),
+                        log = get(),
+                        mapper = SkipModelMapper(timeSinceFormatter = get(), res = get()),
+                        prefsWrapper = get()
+                    )
+                }
+                scoped<SkipContract.View> {
+                    SkipView(
+                        selectDialogCreator = SelectDialogCreator(
+                            context = getSource<YoutubeActivity>()
+                        )
+                    )
+                }
             }
-
         }
     }
 
