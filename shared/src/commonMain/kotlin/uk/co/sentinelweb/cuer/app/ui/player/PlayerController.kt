@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.core.binder.Binder
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.bind
 import com.arkivanov.mvikotlin.extensions.coroutines.events
+import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.states
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.flow.filterNotNull
@@ -56,7 +57,7 @@ class PlayerController constructor(
     fun onViewCreated(view: PlayerContract.View) {
         binder = bind(coroutineContextProvider.Main) {
             store.states.mapNotNull { modelMapper.map(it) } bindTo view
-            // Use store.labels to bind Labels to a consumer
+            store.labels bindTo { label -> view.processLabel(label) }
 
             queueConsumer.currentItemFlow.filterNotNull().mapNotNull { trackChangeToIntent(it) } bindTo store
             queueConsumer.currentPlaylistFlow.filterNotNull().mapNotNull { playlistChangeToIntent(it) } bindTo store
@@ -81,3 +82,4 @@ class PlayerController constructor(
         store.dispose()
     }
 }
+

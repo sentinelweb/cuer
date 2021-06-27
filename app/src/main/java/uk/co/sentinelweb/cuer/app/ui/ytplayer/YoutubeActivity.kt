@@ -22,6 +22,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
@@ -167,15 +168,6 @@ class YoutubeActivity : YouTubeBaseActivity(),
                     controlsTrackNextText.text = texts.nextTrackText
                 }
             })
-            diff(get = Model::playCommand, set = {
-                when (it) {
-                    is Play -> player.play()
-                    is Pause -> player.pause()
-                    is SkipFwd -> player.seekToMillis(player.currentTimeMillis + it.ms)
-                    is SkipBack -> player.seekToMillis(player.currentTimeMillis - it.ms)
-                    is JumpTo -> player.seekToMillis(it.ms)
-                }
-            })
         }
 
         fun init() {
@@ -183,6 +175,20 @@ class YoutubeActivity : YouTubeBaseActivity(),
             player.setShowFullscreenButton(false)
             player.setPlayerStyle(YouTubePlayer.PlayerStyle.MINIMAL)
             dispatch(Initialised)
+        }
+
+        override suspend fun processLabel(l: PlayerContract.MviStore.Label) {
+            when (l) {
+                is Command -> l.command.let { command ->
+                    when (command) {
+                        is Play -> player.play()
+                        is Pause -> player.pause()
+                        is SkipBack -> player.seekToMillis(player.currentTimeMillis - command.ms)
+                        is SkipFwd -> player.seekToMillis(player.currentTimeMillis + command.ms)
+                        is JumpTo -> player.seekToMillis(command.ms)
+                    }
+                }
+            }
         }
 
     }

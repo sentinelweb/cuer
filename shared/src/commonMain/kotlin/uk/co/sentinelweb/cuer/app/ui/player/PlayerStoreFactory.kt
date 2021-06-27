@@ -8,8 +8,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.State
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -27,7 +26,6 @@ class PlayerStoreFactory(
     private sealed class Result {
         object NoVideo : Result()
         class State(val state: PlayerStateDomain) : Result()
-        class Command(val command: PlayerContract.PlayerCommand, val state: PlayerStateDomain? = null) : Result()
         class LoadVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain?) : Result()
         class Playlist(val playlist: PlaylistDomain) : Result()
     }
@@ -36,11 +34,12 @@ class PlayerStoreFactory(
         class Playlist(val playlist: PlaylistDomain) : Action()
     }
 
+
     private object ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
             when (result) {
                 is Result.State -> copy(playerState = result.state)
-                is Result.Command -> copy(command = result.command, playerState = result.state ?: playerState)
+                //is Result.Command -> copy(command = result.command, playerState = result.state ?: playerState)
                 is Result.LoadVideo -> copy(item = result.item, playlist = result.playlist ?: playlist)
                 is Result.Playlist -> copy(playlist = result.playlist)
                 is Result.NoVideo -> copy(item = null)
@@ -55,7 +54,7 @@ class PlayerStoreFactory(
 
     private inner class ExecutorImpl(
         private val itemLoader: PlayerContract.PlaylistItemLoader
-    ) : SuspendExecutor<Intent, Action, State, Result, Nothing>() {
+    ) : SuspendExecutor<Intent, Action, State, Result, Label>() {
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
                 is Intent.Play -> dispatch(Result.State(PLAYING))
@@ -68,8 +67,8 @@ class PlayerStoreFactory(
                 is Intent.PlaylistChange -> dispatch(Result.Playlist(intent.item))
                 is Intent.TrackFwd -> queueConsumer.nextItem()
                 is Intent.TrackBack -> queueConsumer.previousItem()
-                is Intent.SkipBack -> dispatch(Result.Command(SkipBack(30000)))
-                is Intent.SkipFwd -> dispatch(Result.Command(SkipFwd(30000)))
+                is Intent.SkipBack -> publish(Label.Command(SkipBack(30000)))
+                is Intent.SkipFwd -> publish(Label.Command(SkipFwd(30000)))
             }
 
         override suspend fun executeAction(action: Action, getState: () -> State) =
@@ -85,7 +84,10 @@ class PlayerStoreFactory(
                     None
                 }
                 else -> None
-            }.let { dispatch(Result.Command(it, playState)) }
+            }.let {
+                dispatch(Result.State(playState))
+                publish(Label.Command(it))
+            }
 
 
         private suspend fun loadVideo() {
@@ -99,7 +101,7 @@ class PlayerStoreFactory(
 
 
     fun create(): PlayerContract.MviStore =
-        object : PlayerContract.MviStore, Store<Intent, State, Nothing> by storeFactory.create(
+        object : PlayerContract.MviStore, Store<Intent, State, Label> by storeFactory.create(
             name = "PlayerStore",
             initialState = State(),
             bootstrapper = BootstrapperImpl(queueConsumer),

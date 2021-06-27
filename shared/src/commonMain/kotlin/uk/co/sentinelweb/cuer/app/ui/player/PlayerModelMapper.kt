@@ -21,8 +21,7 @@ class PlayerModelMapper constructor(
                 nextTrackEnabled = playlist?.run { currentIndex < playlist.items.size - 1 } ?: false,
                 prevTrackEnabled = playlist?.run { currentIndex > 0 } ?: false,
                 platformId = item?.media?.platformId,
-                playState = playerState,
-                playCommand = command
+                playState = playerState
             )
         }
 

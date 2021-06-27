@@ -2,16 +2,14 @@ package uk.co.sentinelweb.cuer.app.ui.player
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.State
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.None
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface PlayerContract {
-    interface MviStore : Store<Intent, State, Nothing> {
+    interface MviStore : Store<Intent, State, Label> {
         sealed class Intent {
             object Play : Intent()
             object Pause : Intent()
@@ -25,20 +23,23 @@ interface PlayerContract {
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
         }
 
+        sealed class Label {
+            class Command(val command: PlayerContract.PlayerCommand) : Label()
+        }
+
         data class State constructor(
             val item: PlaylistItemDomain? = null,
             val playlist: PlaylistDomain? = null,
-            val playerState: PlayerStateDomain = UNKNOWN,
-            val command: PlayerCommand = None
+            val playerState: PlayerStateDomain = UNKNOWN
         )
     }
 
     interface View : MviView<View.Model, View.Event> {
+        suspend fun processLabel(l: Label)
         data class Model(
             val texts: Texts,
             val platformId: String?,
             val playState: PlayerStateDomain,
-            val playCommand: PlayerCommand,
             val nextTrackEnabled: Boolean,
             val prevTrackEnabled: Boolean
         ) {
