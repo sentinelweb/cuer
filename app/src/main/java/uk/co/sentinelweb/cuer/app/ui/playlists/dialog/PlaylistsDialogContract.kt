@@ -15,7 +15,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain

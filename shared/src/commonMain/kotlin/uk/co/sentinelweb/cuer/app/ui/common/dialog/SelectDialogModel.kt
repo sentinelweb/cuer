@@ -1,10 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.common.dialog
 
-import androidx.annotation.StringRes
-
 data class SelectDialogModel constructor(
     override val type: Type,
-    @StringRes override val title: Int,
+    override val title: Int,// todo change to string
     val multi: Boolean,
     val items: List<Item> = listOf(),
     val itemClick: (Int, Boolean) -> Unit,

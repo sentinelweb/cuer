@@ -38,7 +38,9 @@ interface PlayerContract {
             val texts: Texts,
             val platformId: String?,
             val playState: PlayerStateDomain,
-            val playCommand: PlayerCommand
+            val playCommand: PlayerCommand,
+            val nextTrackEnabled: Boolean,
+            val prevTrackEnabled: Boolean
         ) {
             data class Texts(
                 val title: String?,

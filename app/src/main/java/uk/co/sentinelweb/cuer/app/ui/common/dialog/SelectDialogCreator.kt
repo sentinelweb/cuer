@@ -29,7 +29,7 @@ class SelectDialogCreator(
             builder
                 .setPositiveButton(R.string.ok, object : DialogInterface.OnClickListener {
                     override fun onClick(p0: DialogInterface?, p1: Int) {
-                        model.confirm.let { it() }
+                        model.confirm.let { it?.invoke() }
                         p0?.dismiss()
                     }
                 })
@@ -61,7 +61,7 @@ class SelectDialogCreator(
             builder
                 .setPositiveButton(R.string.ok, object : DialogInterface.OnClickListener {
                     override fun onClick(p0: DialogInterface?, p1: Int) {
-                        model.confirm.let { it() }
+                        model.confirm.let { it?.invoke() }
                         p0?.dismiss()
                     }
                 })

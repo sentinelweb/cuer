@@ -144,13 +144,13 @@ class YoutubeActivity : YouTubeBaseActivity(),
                     if (isBuffering)
                         dispatch(PlayerStateChanged(BUFFERING))
                     else
+                        showHideUi.hide()
                         dispatch(if (player.isPlaying) PlayerStateChanged(PLAYING) else PlayerStateChanged(PAUSED))
                 }
 
                 override fun onSeekTo(targetPosition: Int) {
                     showHideUi.hide()
                     player.play()
-                    //dispatch(PlayerStateChanged(BUFFERING))
                 }
 
             })
@@ -165,8 +165,6 @@ class YoutubeActivity : YouTubeBaseActivity(),
                     controlsVideoPlaylistData.text = texts.playlistData
                     controlsTrackLastText.text = texts.lastTrackText
                     controlsTrackNextText.text = texts.nextTrackText
-
-
                 }
             })
             diff(get = Model::playCommand, set = {

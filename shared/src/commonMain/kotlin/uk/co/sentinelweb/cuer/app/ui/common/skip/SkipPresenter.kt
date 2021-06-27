@@ -6,6 +6,8 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 class SkipPresenter constructor(
     private val view: SkipContract.View,
@@ -114,8 +116,8 @@ class SkipPresenter constructor(
     private fun onSkipAvailable(target: Long) {
         if (target != 0L) {
             if (duration > 0) {
-                val mx = java.lang.Long.max(0L, target)
-                val mn: Long = java.lang.Long.min(duration, mx)
+                val mx = max(0L, target)
+                val mn: Long = min(duration, mx)
                 listener.skipSeekTo(mn)
             }
         }

@@ -28,7 +28,7 @@ class PlayerStoreFactory(
         object NoVideo : Result()
         class State(val state: PlayerStateDomain) : Result()
         class Command(val command: PlayerContract.PlayerCommand, val state: PlayerStateDomain? = null) : Result()
-        class LoadVideo(val item: PlaylistItemDomain) : Result()
+        class LoadVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain?) : Result()
         class Playlist(val playlist: PlaylistDomain) : Result()
     }
 
@@ -41,7 +41,7 @@ class PlayerStoreFactory(
             when (result) {
                 is Result.State -> copy(playerState = result.state)
                 is Result.Command -> copy(command = result.command, playerState = result.state ?: playerState)
-                is Result.LoadVideo -> copy(item = result.item)
+                is Result.LoadVideo -> copy(item = result.item, playlist = result.playlist ?: playlist)
                 is Result.Playlist -> copy(playlist = result.playlist)
                 is Result.NoVideo -> copy(item = null)
             }
@@ -62,7 +62,9 @@ class PlayerStoreFactory(
                 is Intent.Pause -> dispatch(Result.State(PAUSED))
                 is Intent.PlayState -> checkCommand(intent.state)
                 is Intent.Load -> loadVideo()
-                is Intent.TrackChange -> dispatch(Result.LoadVideo(intent.item))
+                is Intent.TrackChange -> {
+                    dispatch(Result.LoadVideo(intent.item, queueConsumer.playlist))
+                }
                 is Intent.PlaylistChange -> dispatch(Result.Playlist(intent.item))
                 is Intent.TrackFwd -> queueConsumer.nextItem()
                 is Intent.TrackBack -> queueConsumer.previousItem()
@@ -90,7 +92,7 @@ class PlayerStoreFactory(
             withContext(Dispatchers.Default) {
                 itemLoader.load()
             }
-                ?.apply { dispatch(Result.LoadVideo(this)) }
+                ?.apply { dispatch(Result.LoadVideo(this, null)) }
                 ?: apply { dispatch(Result.NoVideo) }
         }
     }
