@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface PlayerContract {
+
     interface MviStore : Store<Intent, State, Label> {
         sealed class Intent {
             object Play : Intent()
@@ -24,7 +25,7 @@ interface PlayerContract {
         }
 
         sealed class Label {
-            class Command(val command: PlayerContract.PlayerCommand) : Label()
+            class Command(val command: PlayerCommand) : Label()
         }
 
         data class State constructor(
@@ -35,7 +36,7 @@ interface PlayerContract {
     }
 
     interface View : MviView<View.Model, View.Event> {
-        suspend fun processLabel(l: Label)
+        suspend fun processLabel(label: Label)
         data class Model(
             val texts: Texts,
             val platformId: String?,
@@ -72,7 +73,7 @@ interface PlayerContract {
         object Pause : PlayerCommand()
         data class SkipFwd(val ms: Int) : PlayerCommand()
         data class SkipBack(val ms: Int) : PlayerCommand()
-        data class JumpTo(val ms: Int) : PlayerCommand()
+        data class JumpTo(val ms: Long) : PlayerCommand()
     }
 
     interface PlaylistItemLoader {

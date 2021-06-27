@@ -21,7 +21,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -143,7 +142,7 @@ interface PlaylistContract {
                         modelMapper = get(),
                         queue = get(),
                         toastWrapper = get(),
-                        ytContextHolder = get(),
+                        ytCastContextHolder = get(),
                         chromeCastWrapper = get(),
                         ytJavaApi = get(),
                         shareWrapper = get(),

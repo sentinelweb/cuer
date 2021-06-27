@@ -74,10 +74,10 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
         showHideUi.showElements = { binding.controls.root.isVisible = true }
         showHideUi.hideElements = { binding.controls.root.isVisible = false }
-        binding.controls.controlsTrackNext.setOnClickListener { view.dispatch(TrackFwdClicked) }
-        binding.controls.controlsTrackLast.setOnClickListener { view.dispatch(TrackBackClicked) }
-        binding.controls.controlsSeekBack.setOnClickListener { view.dispatch(SkipBackClicked) }
-        binding.controls.controlsSeekForward.setOnClickListener { view.dispatch(SkipFwdClicked) }
+        binding.controls.controlsTrackNext.setOnClickListener { view.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
+        binding.controls.controlsTrackLast.setOnClickListener { view.dispatch(TrackBackClicked);showHideUi.delayedHide() }
+        binding.controls.controlsSeekBack.setOnClickListener { view.dispatch(SkipBackClicked);showHideUi.delayedHide() }
+        binding.controls.controlsSeekForward.setOnClickListener { view.dispatch(SkipFwdClicked);showHideUi.delayedHide() }
         binding.youtubeView.initialize(apiKeyProvider.key, this)
 
         binding.youtubeWrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
@@ -88,6 +88,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
     }
 
     override fun onDestroy() {
+        view.release()
         controller.onViewDestroyed()
         controller.onDestroy()
         scope.close()
@@ -150,7 +151,6 @@ class YoutubeActivity : YouTubeBaseActivity(),
                 }
 
                 override fun onSeekTo(targetPosition: Int) {
-                    showHideUi.hide()
                     player.play()
                 }
 
@@ -161,7 +161,8 @@ class YoutubeActivity : YouTubeBaseActivity(),
             diff(get = Model::platformId, set = player::cueVideo)
             diff(get = Model::texts, set = { texts ->
                 binding.controls.apply {
-                    controlsVideoTitle.text = texts.title
+                    // controlsVideoTitle.text = texts.title
+                    controlsVideoTitle.isVisible = false
                     controlsVideoPlaylist.text = texts.playlistTitle
                     controlsVideoPlaylistData.text = texts.playlistData
                     controlsTrackLastText.text = texts.lastTrackText
@@ -173,22 +174,27 @@ class YoutubeActivity : YouTubeBaseActivity(),
         fun init() {
             log.d("view.init")
             player.setShowFullscreenButton(false)
-            player.setPlayerStyle(YouTubePlayer.PlayerStyle.MINIMAL)
+            // todo use chromeless and make seek/time display and play/pause/buffer
+//            player.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS)
             dispatch(Initialised)
         }
 
-        override suspend fun processLabel(l: PlayerContract.MviStore.Label) {
-            when (l) {
-                is Command -> l.command.let { command ->
+        override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
+            when (label) {
+                is Command -> label.command.let { command ->
                     when (command) {
                         is Play -> player.play()
                         is Pause -> player.pause()
                         is SkipBack -> player.seekToMillis(player.currentTimeMillis - command.ms)
                         is SkipFwd -> player.seekToMillis(player.currentTimeMillis + command.ms)
-                        is JumpTo -> player.seekToMillis(command.ms)
+                        is JumpTo -> player.seekToMillis(command.ms.toInt())
                     }
                 }
             }
+        }
+
+        fun release() {
+            player.release()
         }
 
     }

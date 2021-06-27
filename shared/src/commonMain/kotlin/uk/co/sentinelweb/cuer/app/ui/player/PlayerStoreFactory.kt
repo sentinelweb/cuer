@@ -39,7 +39,6 @@ class PlayerStoreFactory(
         override fun State.reduce(result: Result): State =
             when (result) {
                 is Result.State -> copy(playerState = result.state)
-                //is Result.Command -> copy(command = result.command, playerState = result.state ?: playerState)
                 is Result.LoadVideo -> copy(item = result.item, playlist = result.playlist ?: playlist)
                 is Result.Playlist -> copy(playlist = result.playlist)
                 is Result.NoVideo -> copy(item = null)
@@ -59,7 +58,7 @@ class PlayerStoreFactory(
             when (intent) {
                 is Intent.Play -> dispatch(Result.State(PLAYING))
                 is Intent.Pause -> dispatch(Result.State(PAUSED))
-                is Intent.PlayState -> checkCommand(intent.state)
+                is Intent.PlayState -> checkCommand(intent.state, getState().item)
                 is Intent.Load -> loadVideo()
                 is Intent.TrackChange -> {
                     dispatch(Result.LoadVideo(intent.item, queueConsumer.playlist))
@@ -76,9 +75,14 @@ class PlayerStoreFactory(
                 is Action.Playlist -> dispatch(Result.Playlist(action.playlist))
             }
 
-        private fun checkCommand(playState: PlayerStateDomain) =
+        private fun checkCommand(playState: PlayerStateDomain, item: PlaylistItemDomain?) =
             when (playState) {
-                VIDEO_CUED -> Play
+                VIDEO_CUED -> {
+                    item?.media?.positon
+                        ?.takeIf { pos -> pos > 0 && item.media.duration?.let { pos < it - 10000 } ?: false }
+                        ?.also { publish(Label.Command(JumpTo(it))) }
+                    Play
+                }
                 ENDED -> {
                     queueConsumer.onTrackEnded()
                     None
@@ -89,7 +93,6 @@ class PlayerStoreFactory(
                 publish(Label.Command(it))
             }
 
-
         private suspend fun loadVideo() {
             withContext(Dispatchers.Default) {
                 itemLoader.load()
@@ -98,7 +101,6 @@ class PlayerStoreFactory(
                 ?: apply { dispatch(Result.NoVideo) }
         }
     }
-
 
     fun create(): PlayerContract.MviStore =
         object : PlayerContract.MviStore, Store<Intent, State, Label> by storeFactory.create(

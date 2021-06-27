@@ -24,7 +24,7 @@ class ShowHideUi constructor(private val a: Activity) {
             hide()
         } else {
             show()
-            delayedHide(AUTO_HIDE_DELAY_MILLIS)
+            delayedHide()
         }
     }
 
@@ -49,7 +49,7 @@ class ShowHideUi constructor(private val a: Activity) {
         mHideHandler.postDelayed(showActionBar, UI_ANIMATION_DELAY.toLong())
     }
 
-    fun delayedHide(delayMillis: Int) {
+    fun delayedHide(delayMillis: Int = AUTO_HIDE_DELAY_MILLIS) {
         mHideHandler.removeCallbacks(mHideRunnable)
         mHideHandler.postDelayed(mHideRunnable, delayMillis.toLong())
     }
@@ -72,7 +72,7 @@ class ShowHideUi constructor(private val a: Activity) {
 
     companion object {
         private val AUTO_HIDE = true
-        private val AUTO_HIDE_DELAY_MILLIS = 3000
+        private val AUTO_HIDE_DELAY_MILLIS = 1000
         private val UI_ANIMATION_DELAY = 300
     }
 }

@@ -63,7 +63,7 @@ class PlaylistPresenter(
     private val modelMapper: PlaylistModelMapper,
     private val queue: QueueMediatorContract.Producer,
     private val toastWrapper: ToastWrapper,
-    private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val ytCastContextHolder: ChromecastYouTubePlayerContextHolder,
     private val chromeCastWrapper: ChromeCastWrapper,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val shareWrapper: ShareWrapper,
@@ -79,7 +79,7 @@ class PlaylistPresenter(
         log.tag(this)
     }
 
-    private fun isPlaylistPlaying() = isQueuedPlaylist && ytContextHolder.isConnected()
+    private fun isPlaylistPlaying() = isQueuedPlaylist && ytCastContextHolder.isConnected()
     private fun isPlaylistPinned() = state.playlist?.let { prefsWrapper.getLong(PINNED_PLAYLIST, 0) == it.id } ?: false
 
     private val isQueuedPlaylist: Boolean
@@ -106,7 +106,7 @@ class PlaylistPresenter(
     }
 
     override fun onResume() {
-        ytContextHolder.addConnectionListener(castConnectionListener)
+        ytCastContextHolder.addConnectionListener(castConnectionListener)
         queue.currentPlaylistFlow
             .filter { isQueuedPlaylist }
             .onEach { log.d("q.playlist change id=${it.id} index=${it.currentIndex}") }
@@ -117,7 +117,7 @@ class PlaylistPresenter(
     }
 
     override fun onPause() {
-        ytContextHolder.removeConnectionListener(castConnectionListener)
+        ytCastContextHolder.removeConnectionListener(castConnectionListener)
         coroutines.cancel()
     }
 
@@ -271,7 +271,7 @@ class PlaylistPresenter(
                         ?: toastWrapper.show("No items to play")
                 }
             }
-            if (!ytContextHolder.isConnected()) {
+            if (!ytCastContextHolder.isConnected()) {
                 view.showCastRouteSelectorDialog()
             }
         }
@@ -330,9 +330,10 @@ class PlaylistPresenter(
     override fun onItemClicked(itemModel: ItemContract.Model) {
         playlistItemDomain(itemModel)
             ?.let { itemDomain ->
-                if (!(ytContextHolder.isConnected())) {
-                    val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
-                    view.showItemDescription(itemModel.id, itemDomain, source)
+                if (!(ytCastContextHolder.isConnected())) {
+//                    val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
+//                    view.showItemDescription(itemModel.id, itemDomain, source)
+                    view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to itemDomain)))
                 } else {
                     itemDomain.playlistId?.let {
                         playItem(itemModel.id, itemDomain, false)
@@ -347,7 +348,7 @@ class PlaylistPresenter(
     override fun onPlayStartClick(itemModel: ItemContract.Model) {
         playlistItemDomain(itemModel)
             ?.let { itemDomain ->
-                if (!(ytContextHolder.isConnected())) {
+                if (!ytCastContextHolder.isConnected()) {
                     //view.showItemDescription(item.id, itemDomain)
                 } else {
                     playItem(itemModel.id, itemDomain, true)
@@ -451,7 +452,6 @@ class PlaylistPresenter(
         } else {
             view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
                 state.playlist?.let {
-                    // todo merge with above onPlayPlaylist
                     val toIdentifier = if (it.config.playable) {
                         state.playlistIdentifier
                     } else {
