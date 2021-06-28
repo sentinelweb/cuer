@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey_700"
-    tools:context=".ui.ytplayer.YoutubeActivity"
+    tools:context=".ui.ytplayer.YoutubeFullScreenActivity"
     >
 
     <uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout

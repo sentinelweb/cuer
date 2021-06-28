@@ -30,7 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeFullScreenActivity
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
@@ -77,7 +77,7 @@ object Modules {
         SearchContract.fragmentModule,
         SearchImageContract.fragmentModule,
         RemoteContract.serviceModule,
-        YoutubeActivity.activityModule
+        YoutubeFullScreenActivity.activityModule
     )
 
     private val uiModule = module {

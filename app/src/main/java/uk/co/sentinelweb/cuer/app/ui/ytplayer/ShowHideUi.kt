@@ -4,7 +4,6 @@ import android.app.Activity
 import android.os.Handler
 import android.view.View
 
-// todo convert all runnables to coroutines
 class ShowHideUi constructor(private val a: Activity) {
     var showElements: () -> Unit = {}
     var hideElements: () -> Unit = {}
@@ -19,7 +18,7 @@ class ShowHideUi constructor(private val a: Activity) {
     private var isUiVisible: Boolean = true
     private val hideRunnable = Runnable { hide() }
 
-    fun toggle() {
+    fun showUiIfNotVisible() {
         if (!isUiVisible) {
             show()
             delayedHide()

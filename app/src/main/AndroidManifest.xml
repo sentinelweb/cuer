@@ -94,7 +94,7 @@
         </activity>
 
         <activity
-            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeActivity"
+            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeFullScreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_fullscreen"
             android:screenOrientation="landscape"

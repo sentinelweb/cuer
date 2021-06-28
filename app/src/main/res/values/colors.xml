@@ -19,6 +19,7 @@
     <color name="upcoming_background">@color/orange_700</color>
     <color name="live_background">@color/red_700</color>
     <color name="info_text_overlay_background">@color/black_transparent_background</color>
+    <color name="controls_overlay_background">#33000000</color>
 
 
     <color name="default_tint">@color/white</color>

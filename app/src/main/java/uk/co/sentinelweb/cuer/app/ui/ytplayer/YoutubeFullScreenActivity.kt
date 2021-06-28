@@ -26,7 +26,7 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubeBinding
+import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubeFullsreenBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -61,7 +61,7 @@ import android.R as RA
  *
  * Other players exist which are used here - this is just one option for playback
  */
-class YoutubeActivity : YouTubeBaseActivity(),
+class YoutubeFullScreenActivity : YouTubeBaseActivity(),
     YouTubePlayer.OnInitializedListener,
     AndroidScopeComponent {
 
@@ -76,7 +76,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
     private val res: ResourceWrapper by inject()
 
     lateinit var view: YouTubePlayerViewImpl
-    private lateinit var binding: ActivityYoutubeBinding
+    private lateinit var binding: ActivityYoutubeFullsreenBinding
 
     init {
         log.tag(this)
@@ -84,7 +84,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityYoutubeBinding.inflate(layoutInflater)
+        binding = ActivityYoutubeFullsreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -98,8 +98,14 @@ class YoutubeActivity : YouTubeBaseActivity(),
         showHideUi.hideElements = { binding.controls.root.isVisible = false }
         binding.controls.controlsTrackNext.setOnClickListener { view.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
         binding.controls.controlsTrackLast.setOnClickListener { view.dispatch(TrackBackClicked);showHideUi.delayedHide() }
-        binding.controls.controlsSeekBack.setOnClickListener { view.dispatch(SkipBackClicked);showHideUi.delayedHide() }
-        binding.controls.controlsSeekForward.setOnClickListener { view.dispatch(SkipFwdClicked);showHideUi.delayedHide() }
+        binding.controls.controlsSeekBack.setOnClickListener {
+            view.dispatch(SkipBackClicked);
+            showHideUi.delayedHide()
+        }
+        binding.controls.controlsSeekForward.setOnClickListener {
+            view.dispatch(SkipFwdClicked);
+            showHideUi.delayedHide()
+        }
         binding.controls.controlsSeekBack.setOnLongClickListener { view.dispatch(SkipBackSelectClicked);true }
         binding.controls.controlsSeekForward.setOnLongClickListener { view.dispatch(SkipFwdSelectClicked);true }
         binding.controls.controlsPlayFab.setOnClickListener { view.playPause() }
@@ -119,9 +125,13 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
         binding.youtubeWrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
             override fun touched() {
-                showHideUi.toggle()
+
+                if (!binding.controls.root.isVisible) {
+                    showHideUi.showUiIfNotVisible()
+                }
             }
         }
+
     }
 
     override fun onDestroy() {
@@ -281,7 +291,8 @@ class YoutubeActivity : YouTubeBaseActivity(),
         fun init() {
             log.d("view.init")
             player.setShowFullscreenButton(false)
-            player.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS)
+            //player.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS)
+            useYtOverlay()
             dispatch(Initialised)
         }
 
@@ -300,6 +311,16 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
         fun playPause() {
             view.dispatch(PlayPauseClicked(player.isPlaying))
+        }
+
+        fun useYtOverlay() {
+            binding.controls.apply {
+                controlsPlayFab.isVisible = false
+                controlsSeek.isVisible = false
+                controlsVideoTitle.isVisible = false
+                controlsDuration.isVisible = false
+                controlsCurrentTime.isVisible = false
+            }
         }
 
     }
@@ -339,13 +360,13 @@ class YoutubeActivity : YouTubeBaseActivity(),
         private const val RECOVERY_DIALOG_REQUEST = 1
 
         fun start(c: Context, playlistItem: PlaylistItemDomain) = c.startActivity(
-            Intent(c, YoutubeActivity::class.java).apply {
+            Intent(c, YoutubeFullScreenActivity::class.java).apply {
                 putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
             })
 
         @JvmStatic
         val activityModule = module {
-            scope(named<YoutubeActivity>()) {
+            scope(named<YoutubeFullScreenActivity>()) {
                 scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get(), get(), get(), get()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { ShowHideUi(getSource()) }
@@ -362,7 +383,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
                 scoped<SkipContract.View> {
                     SkipView(
                         selectDialogCreator = SelectDialogCreator(
-                            context = getSource<YoutubeActivity>()
+                            context = getSource<YoutubeFullScreenActivity>()
                         )
                     )
                 }

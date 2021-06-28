@@ -18,6 +18,7 @@ import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
+import kotlinx.android.synthetic.main.playlist_item_description.*
 import kotlinx.android.synthetic.main.playlist_item_edit_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -129,8 +130,8 @@ class PlaylistItemEditFragment
         ple_play_fab.setOnClickListener { viewModel.onPlayVideo() }
         starMenuItem.isVisible = true
         playMenuItem.isVisible = false
-        ple_author_image.setOnClickListener { viewModel.onChannelClick() }
-        ple_desc.setMovementMethod(object : LinkMovementMethod() {
+        pid_author_image.setOnClickListener { viewModel.onChannelClick() }
+        pid_desc.setMovementMethod(object : LinkMovementMethod() {
             override fun handleMovementKey(
                 widget: TextView?,
                 buffer: Spannable?,
@@ -142,7 +143,7 @@ class PlaylistItemEditFragment
                 return true
             }
         })
-        ple_desc.setTextIsSelectable(true)
+        pid_desc.setTextIsSelectable(true)
         ple_toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.plie_star -> {
@@ -200,7 +201,7 @@ class PlaylistItemEditFragment
                         .into(ple_image)
                 }
                 //ple_play_button.isVisible = false
-                ple_author_image.isVisible = false
+                pid_author_image.isVisible = false
                 ple_title_pos.isVisible = false
                 ple_title_bg.isVisible = false
                 //ple_star_fab.isVisible = false
@@ -266,7 +267,7 @@ class PlaylistItemEditFragment
             object : Observer<PlaylistItemEditContract.Model> {
                 override fun onChanged(model: PlaylistItemEditContract.Model) {
                     ple_title_bg.isVisible = true
-                    ple_author_image.isVisible = !model.empty
+                    pid_author_image.isVisible = !model.empty
                     ple_title_pos.isVisible = !model.empty
                     ple_duration.isVisible = !model.empty
                     //ple_star_fab.isVisible = !model.empty
@@ -281,8 +282,8 @@ class PlaylistItemEditFragment
                         .load(model.imageUrl)
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(ple_image)
-                    ple_desc.text = model.description
-                    ple_title.text = model.title
+                    pid_desc.text = model.description
+                    pid_title.text = model.title
                     ple_collapsing_toolbar.title = model.title
                     ple_toolbar.title = model.title
                     menuState.modelEmpty = model.empty
@@ -295,14 +296,14 @@ class PlaylistItemEditFragment
                         Glide.with(requireContext())
                             .load(url)
                             .transition(DrawableTransitionOptions.withCrossFade())
-                            .addListener(GlideFallbackLoadListener(ple_author_image, url, ytDrawable, log))
-                            .into(ple_author_image)
-                    } ?: run { ple_author_image.setImageDrawable(ytDrawable) }
+                            .addListener(GlideFallbackLoadListener(pid_author_image, url, ytDrawable, log))
+                            .into(pid_author_image)
+                    } ?: run { pid_author_image.setImageDrawable(ytDrawable) }
 
-                    ple_chips.removeAllViews()
+                    pid_chips.removeAllViews()
                     model.chips.forEach { chipModel ->
-                        chipCreator.create(chipModel, ple_chips).apply {
-                            ple_chips.addView(this)
+                        chipCreator.create(chipModel, pid_chips).apply {
+                            pid_chips.addView(this)
                             when (chipModel.type) {
                                 PLAYLIST_SELECT -> {
                                     setOnClickListener { viewModel.onSelectPlaylistChipClick(chipModel) }
@@ -313,16 +314,16 @@ class PlaylistItemEditFragment
                             }
                         }
                     }
-                    ple_pub_date.text = model.pubDate
+                    pid_pub_date.text = model.pubDate
                     ple_duration.text = model.durationText
                     ple_duration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
 
                     model.position?.let { ratio ->
                         ple_title_pos.layoutParams.width = (ratio * ple_title_bg.width).toInt()
                     } ?: ple_title_pos.apply { isVisible = false }
-                    ple_pub_date.text = model.pubDate
-                    ple_author_title.text = model.channelTitle
-                    ple_author_desc.text = model.channelDescription
+                    pid_pub_date.text = model.pubDate
+                    pid_author_title.text = model.channelTitle
+                    pid_author_desc.text = model.channelDescription
                     val starIconResource =
                         if (model.starred) R.drawable.ic_button_starred_white
                         else R.drawable.ic_button_unstarred_white
