@@ -21,10 +21,12 @@ interface PlayerContract {
             object TrackBack : Intent()
             object SkipFwdSelect : Intent()
             object SkipBackSelect : Intent()
+            data class PlayPause(val isPlaying: Boolean) : Intent()
             data class Position(val ms: Int) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
             data class TrackChange(val item: PlaylistItemDomain) : Intent()
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
+            data class SeekTo(val fraction: Float) : Intent()
         }
 
         sealed class Label {
@@ -47,7 +49,8 @@ interface PlayerContract {
             val platformId: String?,
             val playState: PlayerStateDomain,
             val nextTrackEnabled: Boolean,
-            val prevTrackEnabled: Boolean
+            val prevTrackEnabled: Boolean,
+            val times: Times
         ) {
             data class Texts(
                 val title: String?,
@@ -57,6 +60,13 @@ interface PlayerContract {
                 val lastTrackText: String?,
                 val skipFwdText: String?,
                 val skipBackText: String?,
+            )
+
+            data class Times constructor(
+                val positionText: String,
+                val durationText: String,
+                val isLive: Boolean,
+                val seekBarFraction: Float
             )
         }
 
@@ -70,6 +80,8 @@ interface PlayerContract {
             object Initialised : Event()
             object SkipFwdSelectClicked : Event()
             object SkipBackSelectClicked : Event()
+            data class SeekBarChanged(val fraction: Float) : Event()
+            data class PlayPauseClicked(val isPlaying: Boolean) : Event()
             data class SendPosition(val ms: Int) : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
         }
@@ -81,7 +93,7 @@ interface PlayerContract {
         object Pause : PlayerCommand()
         data class SkipFwd(val ms: Int) : PlayerCommand()
         data class SkipBack(val ms: Int) : PlayerCommand()
-        data class JumpTo(val ms: Long) : PlayerCommand()
+        data class SeekTo(val ms: Long) : PlayerCommand()
     }
 
     interface PlaylistItemLoader {

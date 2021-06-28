@@ -5,14 +5,16 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory.Action.InitSkipTimes
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory.Action.Playlist
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -23,7 +25,9 @@ class PlayerStoreFactory(
     private val storeFactory: StoreFactory,
     private val itemLoader: PlayerContract.PlaylistItemLoader,
     private val queueConsumer: QueueMediatorContract.Consumer,
+    private val queueProducer: QueueMediatorContract.Producer,
     private val skip: SkipContract.External,
+    private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper
 ) {
 
@@ -39,7 +43,6 @@ class PlayerStoreFactory(
         class Playlist(val playlist: PlaylistDomain) : Action()
         object InitSkipTimes : Action()
     }
-
 
     private object ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
@@ -86,7 +89,13 @@ class PlayerStoreFactory(
                 is Intent.Position -> updatePosition(intent.ms, getState().item)
                 is Intent.SkipFwdSelect -> skip.onSelectSkipTime(true)
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
+                is Intent.PlayPause -> publish(Label.Command(if (intent.isPlaying) Pause else Play))
+                is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
             }
+
+        private fun seekTo(fraction: Float, item: PlaylistItemDomain?) {
+            item?.media?.duration?.let { dur -> publish(Label.Command(SeekTo(ms = (fraction * dur).toLong()))) }
+        }
 
         private fun trackChange(intent: Intent.TrackChange) {
             intent.item.media.duration?.apply { skip.duration = this }
@@ -112,7 +121,7 @@ class PlayerStoreFactory(
                 VIDEO_CUED -> {
                     item?.media?.positon
                         ?.takeIf { pos -> pos > 0 && item.media.duration?.let { pos < it - 10000 } ?: false }
-                        ?.also { publish(Label.Command(JumpTo(it))) }
+                        ?.also { publish(Label.Command(SeekTo(it))) }
                     Play
                 }
                 ENDED -> {
@@ -127,15 +136,19 @@ class PlayerStoreFactory(
             }
 
         private suspend fun loadVideo() {
-            withContext(Dispatchers.Default) {
+            withContext(coroutines.Computation) {
                 itemLoader.load()
+                    ?.also { item ->
+                        item.playlistId?.toIdentifier(OrchestratorContract.Source.LOCAL)
+                            ?.apply { queueProducer.playNow(this, item.id) }
+                    }
             }
                 ?.apply { dispatch(Result.LoadVideo(this, null)) }
                 ?: apply { dispatch(Result.NoVideo) }
         }
 
         override fun skipSeekTo(target: Long) {
-            publish(Label.Command(JumpTo(target)))
+            publish(Label.Command(SeekTo(target)))
         }
 
         override fun skipSetBackText(text: String) {

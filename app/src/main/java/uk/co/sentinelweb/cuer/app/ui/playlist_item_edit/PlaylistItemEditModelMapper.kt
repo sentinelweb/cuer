@@ -12,7 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
-import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter.Format.SECS
+import uk.co.sentinelweb.cuer.core.mappers.Format.SECS
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 

@@ -63,24 +63,6 @@ kotlin {
                 implementation("io.mockk:mockk:$ver_mockk")
             }
         }
-        val androidMain by getting {
-            dependencies {
-            }
-        }
-        val androidTest by getting {
-            dependencies {
-                // Koin for JUnit 4
-                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
-                implementation("junit:junit:$ver_junit")
-            }
-        }
-        val jsMain by getting {
-            dependencies {
-//                implementation("com.arkivanov.mvikotlin:mvikotlin-js:$ver_mvikotlin")
-//                implementation("com.arkivanov.mvikotlin:mvikotlin-main-js:$ver_mvikotlin")
-            }
-        }
-        val jsTest by getting
         val jvmMain by getting
         val jvmTest by getting {
             dependencies {
@@ -90,6 +72,21 @@ kotlin {
                 implementation("com.google.truth:truth:$ver_truth")
             }
         }
+        val androidMain by getting {
+            // todo consider having a folder called something like androidAndJvmMain/Test and add it to both sourcesets
+            dependsOn(jvmMain)
+            dependencies {
+            }
+        }
+        val androidTest by getting {
+            dependencies {
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+            }
+        }
+        val jsTest by getting
     }
 }
 

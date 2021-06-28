@@ -8,7 +8,7 @@ import android.view.View
 class ShowHideUi constructor(private val a: Activity) {
     var showElements: () -> Unit = {}
     var hideElements: () -> Unit = {}
-    private val mHideHandler = Handler()
+    private val handler = Handler()
     private val hideStatusBar = Runnable {
         hideStatusBar()
     }
@@ -16,13 +16,11 @@ class ShowHideUi constructor(private val a: Activity) {
     private val showActionBar = Runnable {
         a.actionBar?.show()
     }
-    private var mVisible: Boolean = true
-    private val mHideRunnable = Runnable { hide() }
+    private var isUiVisible: Boolean = true
+    private val hideRunnable = Runnable { hide() }
 
     fun toggle() {
-        if (mVisible) {
-            hide()
-        } else {
+        if (!isUiVisible) {
             show()
             delayedHide()
         }
@@ -30,34 +28,35 @@ class ShowHideUi constructor(private val a: Activity) {
 
     fun hide() {
         // Schedule a runnable to remove the status and navigation bar after a delay
-        mHideHandler.removeCallbacks(showActionBar)
+        handler.removeCallbacks(showActionBar)
         a.actionBar?.hide()
-        mVisible = false
+        isUiVisible = false
         hideElements()
 
-        mHideHandler.postDelayed(hideStatusBar, UI_ANIMATION_DELAY.toLong())
+        handler.postDelayed(hideStatusBar, UI_ANIMATION_DELAY.toLong())
     }
 
     fun show() {
         // Show the system bar
         showStatusBar()
-        mVisible = true
+        isUiVisible = true
         showElements()
 
         // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(hideStatusBar)
-        mHideHandler.postDelayed(showActionBar, UI_ANIMATION_DELAY.toLong())
+        handler.removeCallbacks(hideStatusBar)
+        handler.postDelayed(showActionBar, UI_ANIMATION_DELAY.toLong())
     }
 
     fun delayedHide(delayMillis: Int = AUTO_HIDE_DELAY_MILLIS) {
-        mHideHandler.removeCallbacks(mHideRunnable)
-        mHideHandler.postDelayed(mHideRunnable, delayMillis.toLong())
+        handler.removeCallbacks(hideRunnable)
+        handler.postDelayed(hideRunnable, delayMillis.toLong())
     }
 
     private fun showStatusBar() {
         a.window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
     }
 
     private fun hideStatusBar() {
@@ -71,7 +70,6 @@ class ShowHideUi constructor(private val a: Activity) {
     }
 
     companion object {
-        private val AUTO_HIDE = true
         private val AUTO_HIDE_DELAY_MILLIS = 1000
         private val UI_ANIMATION_DELAY = 300
     }

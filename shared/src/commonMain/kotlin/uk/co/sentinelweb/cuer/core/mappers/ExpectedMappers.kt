@@ -1,9 +1,13 @@
 package uk.co.sentinelweb.cuer.core.mappers
 
+import kotlinx.datetime.LocalDateTime
 
-//expect class TimeStampMapper {
-//    fun mapTimestamp(dateString: String): LocalDateTime?
-//    fun mapTimestamp(date: LocalDateTime): String
-//    fun mapTimestamp(date: Instant): String
-//    fun mapDuration(duration: String): Long?
-//}
+enum class Format { SECS, MILLIS }
+
+expect class TimeFormatter() {
+    fun formatTime(time: LocalDateTime, format: Format = Format.SECS): String
+    fun formatTime(timeSecs: Float, format: Format = Format.SECS): String
+    fun formatNow(format: Format = Format.SECS): String
+    fun formatMillis(l: Long, format: Format = Format.MILLIS): String
+    fun formatFrom(time: LocalDateTime, format: Format = Format.SECS): String
+}

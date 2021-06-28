@@ -1,8 +1,10 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer
 
+
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.SeekBar
 import androidx.core.view.isVisible
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
@@ -12,6 +14,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.google.android.youtube.player.YouTubeBaseActivity
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
@@ -22,6 +25,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
@@ -38,6 +42,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.util.extension.activityLegacyScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.ext.tickerFlow
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -47,6 +52,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType
+import android.R as RA
 
 /**
  * YouTube standalone player (Landscape only)
@@ -67,6 +73,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
     private val showHideUi: ShowHideUi by inject()
+    private val res: ResourceWrapper by inject()
 
     lateinit var view: YouTubePlayerViewImpl
     private lateinit var binding: ActivityYoutubeBinding
@@ -82,7 +89,12 @@ class YoutubeActivity : YouTubeBaseActivity(),
 
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
-        showHideUi.showElements = { binding.controls.root.isVisible = true }
+        showHideUi.showElements = {
+            binding.controls.root.isVisible = true
+            if (this::view.isInitialized) {
+                view.updatePlayingIcon()
+            }
+        }
         showHideUi.hideElements = { binding.controls.root.isVisible = false }
         binding.controls.controlsTrackNext.setOnClickListener { view.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
         binding.controls.controlsTrackLast.setOnClickListener { view.dispatch(TrackBackClicked);showHideUi.delayedHide() }
@@ -90,6 +102,19 @@ class YoutubeActivity : YouTubeBaseActivity(),
         binding.controls.controlsSeekForward.setOnClickListener { view.dispatch(SkipFwdClicked);showHideUi.delayedHide() }
         binding.controls.controlsSeekBack.setOnLongClickListener { view.dispatch(SkipBackSelectClicked);true }
         binding.controls.controlsSeekForward.setOnLongClickListener { view.dispatch(SkipFwdSelectClicked);true }
+        binding.controls.controlsPlayFab.setOnClickListener { view.playPause() }
+        binding.controls.controlsSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    showHideUi.delayedHide()
+                }
+            }
+
+            override fun onStartTrackingTouch(view: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                view.dispatch(SeekBarChanged(seekBar.progress / seekBar.max.toFloat()));showHideUi.delayedHide()
+            }
+        })
         binding.youtubeView.initialize(apiKeyProvider.key, this)
 
         binding.youtubeWrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
@@ -110,10 +135,14 @@ class YoutubeActivity : YouTubeBaseActivity(),
     override fun onStart() {
         super.onStart()
         controller.onStart()
+        if (this::view.isInitialized) {
+            view.onStart()
+        }
     }
 
     override fun onStop() {
         super.onStop()
+        view.onStop()
         controller.onStop()
     }
 
@@ -160,35 +189,79 @@ class YoutubeActivity : YouTubeBaseActivity(),
                         dispatch(PlayerStateChanged(BUFFERING))
                     else
                         showHideUi.hide()
-                    dispatch(if (player.isPlaying) PlayerStateChanged(PLAYING) else PlayerStateChanged(PAUSED))
+                    //dispatch(if (player.isPlaying) PlayerStateChanged(PLAYING) else PlayerStateChanged(PAUSED))
+                    if (!player.isPlaying) player.play() else dispatch(PlayerStateChanged(PLAYING))
                 }
 
                 override fun onSeekTo(targetPosition: Int) {
+                    showHideUi.hide()
                     player.play()
                 }
 
             })
         }
 
-        val ticker = tickerFlow(1000)
-            .filter { player.isPlaying }
-            .onEach { dispatch(SendPosition(player.currentTimeMillis)) }
-            .launchIn(coroutines.mainScope)
+        var ticker: Job? = null
+
+        private fun startTicker() {
+            ticker = tickerFlow(1000)
+                .filter { player.isPlaying }
+                .onEach { dispatch(SendPosition(player.currentTimeMillis)) }
+                .launchIn(coroutines.mainScope)
+        }
 
         override val renderer: ViewRenderer<Model> = diff {
             diff(get = Model::platformId, set = player::cueVideo)
+            diff(get = Model::playState, set = {
+                when (it) {
+                    BUFFERING -> binding.controls.controlsPlayFab.showProgress(true)
+                    PLAYING -> {
+                        updatePlayingIcon(true)
+                        binding.controls.controlsPlayFab.showProgress(false)
+                    }
+                    PAUSED -> {
+                        updatePlayingIcon(false)
+                        binding.controls.controlsPlayFab.showProgress(false)
+                    }
+                }
+            })
             diff(get = Model::texts, set = { texts ->
                 binding.controls.apply {
-                    // controlsVideoTitle.text = texts.title
-                    controlsVideoTitle.isVisible = false
+                    controlsVideoTitle.text = texts.title
                     controlsVideoPlaylist.text = texts.playlistTitle
                     controlsVideoPlaylistData.text = texts.playlistData
                     controlsTrackLastText.text = texts.lastTrackText
+                    controlsTrackLastText.isVisible = texts.lastTrackText != ""
                     controlsTrackNextText.text = texts.nextTrackText
+                    controlsTrackNextText.isVisible = texts.nextTrackText != ""
                     controlsSkipfwdText.text = texts.skipFwdText
                     controlsSkipbackText.text = texts.skipBackText
                 }
             })
+            diff(get = Model::times, set = { times ->
+                binding.controls.apply {
+                    controlsSeek.progress = (times.seekBarFraction * controlsSeek.max).toInt()
+                    controlsCurrentTime.text = times.positionText
+
+                    if (times.isLive) {
+                        controlsDuration.setBackgroundColor(res.getColor(R.color.live_background))
+                        controlsDuration.text = res.getString(R.string.live)
+                        controlsSeek.isEnabled = false
+                    } else {
+                        controlsDuration.setBackgroundColor(res.getColor(R.color.info_text_overlay_background))
+                        controlsDuration.text = times.durationText
+                        controlsSeek.isEnabled = true
+                    }
+                }
+            })
+        }
+
+        fun updatePlayingIcon(isPlaying: Boolean = player.isPlaying) {
+            if (isPlaying) {
+                binding.controls.controlsPlayFab.setImageState(intArrayOf(RA.attr.state_enabled, RA.attr.state_checked), false)
+            } else {
+                binding.controls.controlsPlayFab.setImageState(intArrayOf(RA.attr.state_enabled), false)
+            }
         }
 
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
@@ -199,7 +272,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
                         is Pause -> player.pause()
                         is SkipBack -> player.seekToMillis(player.currentTimeMillis - command.ms)
                         is SkipFwd -> player.seekToMillis(player.currentTimeMillis + command.ms)
-                        is JumpTo -> player.seekToMillis(command.ms.toInt())
+                        is SeekTo -> player.seekToMillis(command.ms.toInt())
                     }
                 }
             }
@@ -208,14 +281,25 @@ class YoutubeActivity : YouTubeBaseActivity(),
         fun init() {
             log.d("view.init")
             player.setShowFullscreenButton(false)
-            // todo use chromeless and make seek/time display and play/pause/buffer
-//            player.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS)
+            player.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS)
             dispatch(Initialised)
         }
 
+        fun onStart() {
+            startTicker()
+        }
+
+        fun onStop() {
+            player.pause()
+            ticker?.cancel()
+        }
+
         fun release() {
-            ticker.cancel()
             player.release()
+        }
+
+        fun playPause() {
+            view.dispatch(PlayPauseClicked(player.isPlaying))
         }
 
     }
@@ -231,6 +315,7 @@ class YoutubeActivity : YouTubeBaseActivity(),
             view = YouTubePlayerViewImpl(player)
             controller.onViewCreated(view)
             controller.onStart()
+            view.onStart()
             coroutines.mainScope.launch {
                 delay(300)
                 view.init()
@@ -261,10 +346,10 @@ class YoutubeActivity : YouTubeBaseActivity(),
         @JvmStatic
         val activityModule = module {
             scope(named<YoutubeActivity>()) {
-                scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get(), get(), get()) }
+                scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get(), get(), get(), get()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { ShowHideUi(getSource()) }
-                scoped { PlayerModelMapper() }
+                scoped { PlayerModelMapper(get(), get()) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = get(),

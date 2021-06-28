@@ -93,7 +93,6 @@ class CastPlayerPresenter(
         if (state.durationMs > 0) {
             state.seekPositionMs = (ratio * state.durationMs).toLong()
             view.setCurrentSecond(mapper.formatTime(state.seekPositionMs))
-
         }
     }
 

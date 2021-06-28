@@ -23,8 +23,9 @@ class PlayerController constructor(
     itemLoader: PlayerContract.PlaylistItemLoader,
     storeFactory: StoreFactory = DefaultStoreFactory,
     private val queueConsumer: QueueMediatorContract.Consumer,
+    private val queueProducer: QueueMediatorContract.Producer,
     private val modelMapper: PlayerModelMapper,
-    private val coroutineContextProvider: CoroutineContextProvider,
+    private val coroutines: CoroutineContextProvider,
     skip: SkipContract.External,
     log: LogWrapper
 ) {
@@ -45,6 +46,8 @@ class PlayerController constructor(
             is SendPosition -> Position(ms)
             is SkipFwdSelectClicked -> SkipFwdSelect
             is SkipBackSelectClicked -> SkipBackSelect
+            is PlayPauseClicked -> PlayPause(isPlaying)
+            is SeekBarChanged -> SeekTo(fraction)
         }
     }
 
@@ -56,13 +59,13 @@ class PlayerController constructor(
         PlaylistChange(this)
     }
 
-    private val store = PlayerStoreFactory(storeFactory, itemLoader, queueConsumer, skip, log).create()
+    private val store = PlayerStoreFactory(storeFactory, itemLoader, queueConsumer, queueProducer, skip, coroutines, log).create()
 
     private var binder: Binder? = null
 
     @ExperimentalCoroutinesApi
     fun onViewCreated(view: PlayerContract.View) {
-        binder = bind(coroutineContextProvider.Main) {
+        binder = bind(coroutines.Main) {
             // store > view
             store.states.mapNotNull { modelMapper.map(it) } bindTo view
             store.labels bindTo { label -> view.processLabel(label) }

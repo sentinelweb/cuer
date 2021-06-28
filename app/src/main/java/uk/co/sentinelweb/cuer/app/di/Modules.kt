@@ -46,7 +46,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.core.di.CoreJvmModule
-import uk.co.sentinelweb.cuer.core.di.CoreModule
+import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.di.DomainModule
@@ -134,7 +134,7 @@ object Modules {
         .plus(appNetModule)
         .plus(DatabaseModule.dbModule)
         .plus(NetModule.netModule)
-        .plus(CoreModule.objectModule)
+        .plus(SharedCoreModule.objectModule)
         .plus(DomainModule.objectModule)
         .plus(CoreJvmModule.objectModule)
         .plus(CastModule.castModule)
