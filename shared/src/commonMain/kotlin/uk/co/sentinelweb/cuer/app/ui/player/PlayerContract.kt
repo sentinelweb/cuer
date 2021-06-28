@@ -21,12 +21,15 @@ interface PlayerContract {
             object TrackBack : Intent()
             object SkipFwdSelect : Intent()
             object SkipBackSelect : Intent()
+            object PlaylistView : Intent()
+            object PlaylistItemView : Intent()
             data class PlayPause(val isPlaying: Boolean) : Intent()
             data class Position(val ms: Int) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
             data class TrackChange(val item: PlaylistItemDomain) : Intent()
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
             data class SeekTo(val fraction: Float) : Intent()
+
         }
 
         sealed class Label {
@@ -80,6 +83,8 @@ interface PlayerContract {
             object Initialised : Event()
             object SkipFwdSelectClicked : Event()
             object SkipBackSelectClicked : Event()
+            object ItemClicked : Event()
+            object PlaylistClicked : Event()
             data class SeekBarChanged(val fraction: Float) : Event()
             data class PlayPauseClicked(val isPlaying: Boolean) : Event()
             data class SendPosition(val ms: Int) : Event()

@@ -91,6 +91,8 @@ class PlayerStoreFactory(
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> publish(Label.Command(if (intent.isPlaying) Pause else Play))
                 is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
+                is Intent.PlaylistView -> Unit // todo
+                is Intent.PlaylistItemView -> Unit // todo
             }
 
         private fun seekTo(fraction: Float, item: PlaylistItemDomain?) {

@@ -43,6 +43,7 @@ class MainActivity :
     AndroidScopeComponent {
 
     override val scope: Scope by activityScopeWithSource()
+
     private val presenter: MainContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val snackBarWrapper: SnackbarWrapper by inject()

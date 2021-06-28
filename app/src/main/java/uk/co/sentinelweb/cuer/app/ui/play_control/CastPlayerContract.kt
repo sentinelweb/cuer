@@ -38,6 +38,7 @@ interface CastPlayerContract {
 
     // todo think about this maybe sub with android MediaControl interface
     interface PlayerControls {
+        // essentially External interface
         fun initMediaRouteButton()
         fun setConnectionState(connState: ConnectionState)
         fun setPlayerState(playState: PlayerStateDomain)

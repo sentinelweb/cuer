@@ -48,6 +48,8 @@ class PlayerController constructor(
             is SkipBackSelectClicked -> SkipBackSelect
             is PlayPauseClicked -> PlayPause(isPlaying)
             is SeekBarChanged -> SeekTo(fraction)
+            is PlaylistClicked -> PlaylistView
+            is ItemClicked -> PlaylistItemView
         }
     }
 
@@ -64,21 +66,23 @@ class PlayerController constructor(
     private var binder: Binder? = null
 
     @ExperimentalCoroutinesApi
-    fun onViewCreated(view: PlayerContract.View) {
+    fun onViewCreated(views: List<PlayerContract.View>) {
         binder = bind(coroutines.Main) {
-            // store > view
-            store.states.mapNotNull { modelMapper.map(it) } bindTo view
-            store.labels bindTo { label -> view.processLabel(label) }
+            views.forEach { view ->
+                // store -> view
+                store.states.mapNotNull { modelMapper.map(it) } bindTo view
+                store.labels bindTo { label -> view.processLabel(label) }
 
-            // -> store
+                // view -> store
+                view.events.mapNotNull(eventToIntent) bindTo store
+            }
+            // queue -> store
             queueConsumer.currentItemFlow.filterNotNull().mapNotNull { trackChangeToIntent(it) } bindTo store
             queueConsumer.currentPlaylistFlow.filterNotNull().mapNotNull { playlistChangeToIntent(it) } bindTo store
-            view.events.mapNotNull(eventToIntent) bindTo store
         }
     }
 
     fun onStart() {
-        //log.d("onStart:"+binder)
         binder?.start()
     }
 

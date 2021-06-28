@@ -73,7 +73,7 @@
         android:layout_marginTop="24dp"
         android:singleLine="true"
         app:layout_constraintTop_toTopOf="@id/controls_seek_back"
-        app:layout_constraintLeft_toLeftOf="@+id/controls_seek_back"
+        app:layout_constraintLeft_toLeftOf="@id/controls_seek_back"
         tools:text="-30s"
         />
 
@@ -94,7 +94,7 @@
         android:maxWidth="160dp"
         android:maxLines="2"
         app:layout_constraintBottom_toBottomOf="@id/controls_track_last"
-        app:layout_constraintLeft_toLeftOf="@+id/controls_track_last"
+        app:layout_constraintLeft_toLeftOf="@id/controls_track_last"
         tools:text="Prev Track with a very long title"
         />
 
@@ -116,7 +116,7 @@
         android:layout_marginRight="24dp"
         android:singleLine="true"
         app:layout_constraintTop_toTopOf="@id/controls_seek_forward"
-        app:layout_constraintRight_toRightOf="@+id/controls_seek_forward"
+        app:layout_constraintRight_toRightOf="@id/controls_seek_forward"
         tools:ignore="RtlHardcoded"
         tools:text="+30s"
         />
@@ -139,7 +139,7 @@
         android:maxLines="2"
         android:textAlignment="textEnd"
         app:layout_constraintBottom_toBottomOf="@id/controls_track_next"
-        app:layout_constraintRight_toRightOf="@+id/controls_track_next"
+        app:layout_constraintRight_toRightOf="@id/controls_track_next"
         tools:text="Next Track with a very long title"
         />
 
@@ -194,6 +194,4 @@
         app:layout_constraintLeft_toRightOf="@id/controls_current_time"
         app:layout_constraintRight_toLeftOf="@id/controls_duration"
         />
-
-    <!--    android:layout_marginBottom="16dp"-->
 </androidx.constraintlayout.widget.ConstraintLayout>

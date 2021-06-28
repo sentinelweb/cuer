@@ -9,8 +9,6 @@ import androidx.core.view.isVisible
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
-import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
-import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.google.android.youtube.player.YouTubeBaseActivity
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
@@ -24,15 +22,9 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
-import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubeFullsreenBinding
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
@@ -40,7 +32,6 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.util.extension.activityLegacyScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -75,7 +66,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
     private val showHideUi: ShowHideUi by inject()
     private val res: ResourceWrapper by inject()
 
-    lateinit var view: YouTubePlayerViewImpl
+    lateinit var mviView: YouTubePlayerViewImpl
     private lateinit var binding: ActivityYoutubeFullsreenBinding
 
     init {
@@ -91,24 +82,24 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
 
         showHideUi.showElements = {
             binding.controls.root.isVisible = true
-            if (this::view.isInitialized) {
-                view.updatePlayingIcon()
+            if (this::mviView.isInitialized) {
+                mviView.updatePlayingIcon()
             }
         }
         showHideUi.hideElements = { binding.controls.root.isVisible = false }
-        binding.controls.controlsTrackNext.setOnClickListener { view.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
-        binding.controls.controlsTrackLast.setOnClickListener { view.dispatch(TrackBackClicked);showHideUi.delayedHide() }
+        binding.controls.controlsTrackNext.setOnClickListener { mviView.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
+        binding.controls.controlsTrackLast.setOnClickListener { mviView.dispatch(TrackBackClicked);showHideUi.delayedHide() }
         binding.controls.controlsSeekBack.setOnClickListener {
-            view.dispatch(SkipBackClicked);
+            mviView.dispatch(SkipBackClicked);
             showHideUi.delayedHide()
         }
         binding.controls.controlsSeekForward.setOnClickListener {
-            view.dispatch(SkipFwdClicked);
+            mviView.dispatch(SkipFwdClicked);
             showHideUi.delayedHide()
         }
-        binding.controls.controlsSeekBack.setOnLongClickListener { view.dispatch(SkipBackSelectClicked);true }
-        binding.controls.controlsSeekForward.setOnLongClickListener { view.dispatch(SkipFwdSelectClicked);true }
-        binding.controls.controlsPlayFab.setOnClickListener { view.playPause() }
+        binding.controls.controlsSeekBack.setOnLongClickListener { mviView.dispatch(SkipBackSelectClicked);true }
+        binding.controls.controlsSeekForward.setOnLongClickListener { mviView.dispatch(SkipFwdSelectClicked);true }
+        binding.controls.controlsPlayFab.setOnClickListener { mviView.playPause() }
         binding.controls.controlsSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -118,7 +109,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
 
             override fun onStartTrackingTouch(view: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                view.dispatch(SeekBarChanged(seekBar.progress / seekBar.max.toFloat()));showHideUi.delayedHide()
+                mviView.dispatch(SeekBarChanged(seekBar.progress / seekBar.max.toFloat()));showHideUi.delayedHide()
             }
         })
         binding.youtubeView.initialize(apiKeyProvider.key, this)
@@ -135,7 +126,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
     }
 
     override fun onDestroy() {
-        view.release()
+        mviView.release()
         controller.onViewDestroyed()
         controller.onDestroy()
         scope.close()
@@ -145,14 +136,14 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
     override fun onStart() {
         super.onStart()
         controller.onStart()
-        if (this::view.isInitialized) {
-            view.onStart()
+        if (this::mviView.isInitialized) {
+            mviView.onStart()
         }
     }
 
     override fun onStop() {
         super.onStop()
-        view.onStop()
+        mviView.onStop()
         controller.onStop()
     }
 
@@ -310,7 +301,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
         }
 
         fun playPause() {
-            view.dispatch(PlayPauseClicked(player.isPlaying))
+            mviView.dispatch(PlayPauseClicked(player.isPlaying))
         }
 
         fun useYtOverlay() {
@@ -333,13 +324,13 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
     ) {
         if (!wasRestored) {
             log.d("onInitializationSuccess")
-            view = YouTubePlayerViewImpl(player)
-            controller.onViewCreated(view)
+            mviView = YouTubePlayerViewImpl(player)
+            controller.onViewCreated(listOf(mviView))
             controller.onStart()
-            view.onStart()
+            mviView.onStart()
             coroutines.mainScope.launch {
                 delay(300)
-                view.init()
+                mviView.init()
             }
         }
     }
@@ -363,32 +354,6 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
             Intent(c, YoutubeFullScreenActivity::class.java).apply {
                 putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
             })
-
-        @JvmStatic
-        val activityModule = module {
-            scope(named<YoutubeFullScreenActivity>()) {
-                scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get(), get(), get(), get()) }
-                scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
-                scoped { ShowHideUi(getSource()) }
-                scoped { PlayerModelMapper(get(), get()) }
-                scoped<SkipContract.External> {
-                    SkipPresenter(
-                        view = get(),
-                        state = SkipContract.State(),
-                        log = get(),
-                        mapper = SkipModelMapper(timeSinceFormatter = get(), res = get()),
-                        prefsWrapper = get()
-                    )
-                }
-                scoped<SkipContract.View> {
-                    SkipView(
-                        selectDialogCreator = SelectDialogCreator(
-                            context = getSource<YoutubeFullScreenActivity>()
-                        )
-                    )
-                }
-            }
-        }
     }
 
 }
