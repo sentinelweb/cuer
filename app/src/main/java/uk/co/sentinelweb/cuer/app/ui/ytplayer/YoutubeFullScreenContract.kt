@@ -20,7 +20,19 @@ interface YoutubeFullScreenContract {
         @JvmStatic
         val activityModule = module {
             scope(named<YoutubeFullScreenActivity>()) {
-                scoped { PlayerController(get(), LoggingStoreFactory(DefaultStoreFactory), get(), get(), get(), get(), get(), get()) }
+                scoped {
+                    PlayerController(
+                        itemLoader = get(),
+                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+                        queueConsumer = get(),
+                        queueProducer = get(),
+                        modelMapper = get(),
+                        coroutines = get(),
+                        lifecycle = null,
+                        skip = get(),
+                        log = get()
+                    )
+                }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { ShowHideUi(getSource()) }
                 scoped { PlayerModelMapper(get(), get()) }

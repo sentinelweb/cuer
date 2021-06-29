@@ -1,6 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.player
 
 import com.arkivanov.mvikotlin.core.binder.Binder
+import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
+import com.arkivanov.mvikotlin.core.lifecycle.Lifecycle
+import com.arkivanov.mvikotlin.core.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.bind
 import com.arkivanov.mvikotlin.extensions.coroutines.events
@@ -26,11 +29,15 @@ class PlayerController constructor(
     private val queueProducer: QueueMediatorContract.Producer,
     private val modelMapper: PlayerModelMapper,
     private val coroutines: CoroutineContextProvider,
+    private val lifecycle: Lifecycle?,
     skip: SkipContract.External,
     log: LogWrapper
 ) {
+    private val store = PlayerStoreFactory(storeFactory, itemLoader, queueConsumer, queueProducer, skip, coroutines, log).create()
+
     init {
         log.tag(this)
+        lifecycle?.doOnDestroy(store::dispose)
     }
 
     private val eventToIntent: suspend PlayerContract.View.Event.() -> PlayerContract.MviStore.Intent = {
@@ -61,13 +68,31 @@ class PlayerController constructor(
         PlaylistChange(this)
     }
 
-    private val store = PlayerStoreFactory(storeFactory, itemLoader, queueConsumer, queueProducer, skip, coroutines, log).create()
 
     private var binder: Binder? = null
 
     @ExperimentalCoroutinesApi
     fun onViewCreated(views: List<PlayerContract.View>) {
+        if (binder != null) throw IllegalStateException("Already bound")
         binder = bind(coroutines.Main) {
+            views.forEach { view ->
+                // store -> view
+                store.states.mapNotNull { modelMapper.map(it) } bindTo view
+                store.labels bindTo { label -> view.processLabel(label) }
+
+                // view -> store
+                view.events.mapNotNull(eventToIntent) bindTo store
+            }
+            // queue -> store
+            queueConsumer.currentItemFlow.filterNotNull().mapNotNull { trackChangeToIntent(it) } bindTo store
+            queueConsumer.currentPlaylistFlow.filterNotNull().mapNotNull { playlistChangeToIntent(it) } bindTo store
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    fun onViewCreated(views: List<PlayerContract.View>, viewLifecycle: Lifecycle) {
+        if (binder != null) throw IllegalStateException("Already bound")
+        binder = bind(viewLifecycle, BinderLifecycleMode.START_STOP) {
             views.forEach { view ->
                 // store -> view
                 store.states.mapNotNull { modelMapper.map(it) } bindTo view

@@ -12,10 +12,8 @@
         android:id="@+id/portrait_player_video"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:autoPlay="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:showFullScreenButton="false"
-        app:videoId="S0Q4gqBUs7c"
+        app:showFullScreenButton="true"
         />
 
     <ScrollView
@@ -39,13 +37,6 @@
         android:layout_gravity="bottom"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="test"
-        tools:ignore="MissingConstraints"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>
 

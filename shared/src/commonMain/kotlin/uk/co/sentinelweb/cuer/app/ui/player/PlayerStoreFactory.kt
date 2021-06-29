@@ -89,11 +89,15 @@ class PlayerStoreFactory(
                 is Intent.Position -> updatePosition(intent.ms, getState().item)
                 is Intent.SkipFwdSelect -> skip.onSelectSkipTime(true)
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
-                is Intent.PlayPause -> publish(Label.Command(if (intent.isPlaying) Pause else Play))
+                is Intent.PlayPause -> playPause(intent, getState().playerState)
                 is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
                 is Intent.PlaylistView -> Unit // todo
                 is Intent.PlaylistItemView -> Unit // todo
             }
+
+        private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {
+            publish(Label.Command(if (intent.isPlaying ?: playerState == PLAYING) Pause else Play))
+        }
 
         private fun seekTo(fraction: Float, item: PlaylistItemDomain?) {
             item?.media?.duration?.let { dur -> publish(Label.Command(SeekTo(ms = (fraction * dur).toLong()))) }
@@ -118,7 +122,7 @@ class PlayerStoreFactory(
                 InitSkipTimes -> dispatch(Result.SkipTimes(skip.skipForwardText, skip.skipBackText))
             }
 
-        private fun playStateChange(playState: PlayerStateDomain, item: PlaylistItemDomain?) =
+        private fun playStateChange(playState: PlayerStateDomain, item: PlaylistItemDomain?): Unit =
             when (playState) {
                 VIDEO_CUED -> {
                     item?.media?.positon
@@ -128,13 +132,13 @@ class PlayerStoreFactory(
                 }
                 ENDED -> {
                     queueConsumer.onTrackEnded()
-                    None
+                    null
                 }
-                else -> None
-            }.let {
+                else -> null
+            }.let { command ->
                 skip.stateChange(playState)
                 dispatch(Result.State(playState))
-                publish(Label.Command(it))
+                command?.apply { publish(Label.Command(this)) }
             }
 
         private suspend fun loadVideo() {

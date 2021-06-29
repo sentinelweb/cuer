@@ -23,7 +23,7 @@ interface PlayerContract {
             object SkipBackSelect : Intent()
             object PlaylistView : Intent()
             object PlaylistItemView : Intent()
-            data class PlayPause(val isPlaying: Boolean) : Intent()
+            data class PlayPause(val isPlaying: Boolean?) : Intent()
             data class Position(val ms: Int) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
             data class TrackChange(val item: PlaylistItemDomain) : Intent()
@@ -53,7 +53,8 @@ interface PlayerContract {
             val playState: PlayerStateDomain,
             val nextTrackEnabled: Boolean,
             val prevTrackEnabled: Boolean,
-            val times: Times
+            val times: Times,
+            val itemImage: String?
         ) {
             data class Texts(
                 val title: String?,
@@ -86,14 +87,13 @@ interface PlayerContract {
             object ItemClicked : Event()
             object PlaylistClicked : Event()
             data class SeekBarChanged(val fraction: Float) : Event()
-            data class PlayPauseClicked(val isPlaying: Boolean) : Event()
+            data class PlayPauseClicked(val isPlaying: Boolean? = null) : Event()
             data class SendPosition(val ms: Int) : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
         }
     }
 
     sealed class PlayerCommand {
-        object None : PlayerCommand()
         object Play : PlayerCommand()
         object Pause : PlayerCommand()
         data class SkipFwd(val ms: Int) : PlayerCommand()

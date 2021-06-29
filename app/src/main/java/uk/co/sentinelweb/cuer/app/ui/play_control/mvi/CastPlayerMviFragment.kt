@@ -9,10 +9,11 @@ import android.widget.SeekBar
 import androidx.annotation.ColorRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.FragmentNavigatorExtras
+import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
+import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.youtube.player.YouTubePlayer
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.context.GlobalContext.get
@@ -46,28 +47,31 @@ class CastPlayerMviFragment() :
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var mviView: CastPlayerViewImpl
+    private lateinit var _mviView: CastPlayerViewImpl
+    val mviView: CastPlayerViewImpl // todo remove and inject into parent
+        get() = _mviView
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = CastPlayerViewBinding.inflate(layoutInflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.castPlayerFab.setOnClickListener { mviView.dispatch(Event.PlayPauseClicked(true)) }// todo get playstate
-        binding.castPlayerSeekBack.setOnClickListener { mviView.dispatch(Event.SkipBackClicked) }
-        binding.castPlayerSeekForward.setOnClickListener { mviView.dispatch(Event.SkipFwdClicked) }
-        binding.castPlayerSeekBack.setOnLongClickListener { mviView.dispatch(Event.SkipBackSelectClicked); true }
-        binding.castPlayerSeekForward.setOnLongClickListener { mviView.dispatch(Event.SkipFwdSelectClicked); true }
-        binding.castPlayerTrackLast.setOnClickListener { mviView.dispatch(Event.TrackBackClicked) }
-        binding.castPlayerTrackNext.setOnClickListener { mviView.dispatch(Event.TrackFwdClicked) }
-        binding.castPlayerPlaylistText.setOnClickListener { mviView.dispatch(Event.PlaylistClicked) }
-        binding.castPlayerImage.setOnClickListener { mviView.dispatch(Event.ItemClicked) }
+        _mviView = CastPlayerViewImpl()
+        binding.castPlayerFab.setOnClickListener { _mviView.dispatch(Event.PlayPauseClicked()) }// todo get playstate
+        binding.castPlayerSeekBack.setOnClickListener { _mviView.dispatch(Event.SkipBackClicked) }
+        binding.castPlayerSeekForward.setOnClickListener { _mviView.dispatch(Event.SkipFwdClicked) }
+        binding.castPlayerSeekBack.setOnLongClickListener { _mviView.dispatch(Event.SkipBackSelectClicked); true }
+        binding.castPlayerSeekForward.setOnLongClickListener { _mviView.dispatch(Event.SkipFwdSelectClicked); true }
+        binding.castPlayerTrackLast.setOnClickListener { _mviView.dispatch(Event.TrackBackClicked) }
+        binding.castPlayerTrackNext.setOnClickListener { _mviView.dispatch(Event.TrackFwdClicked) }
+        binding.castPlayerPlaylistText.setOnClickListener { _mviView.dispatch(Event.PlaylistClicked) }
+        binding.castPlayerImage.setOnClickListener { _mviView.dispatch(Event.ItemClicked) }
         binding.castPlayerSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -78,7 +82,7 @@ class CastPlayerMviFragment() :
             override fun onStartTrackingTouch(view: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 //presenter.onSeekFinished()
-                mviView.dispatch(Event.SeekBarChanged(seekBar.progress / seekBar.max.toFloat()));
+                _mviView.dispatch(Event.SeekBarChanged(seekBar.progress / seekBar.max.toFloat()));
             }
         })
     }
@@ -194,20 +198,43 @@ class CastPlayerMviFragment() :
 
     // region MVI view
     inner class CastPlayerViewImpl constructor(
-        private val player: YouTubePlayer
     ) : BaseMviView<Model, Event>(),
         PlayerContract.View {
-        init {
 
+        override val renderer: ViewRenderer<Model> = diff {
+            diff(get = Model::playState, set = {
+                when (it) {
+                    PlayerStateDomain.BUFFERING -> showBuffering()
+                    PlayerStateDomain.PLAYING -> setPlaying()
+                    PlayerStateDomain.PAUSED -> setPaused()
+                }
+            })
+            diff(get = Model::itemImage, set = { url ->
+                url?.let { setImage(it) }
+            })
+            diff(get = Model::texts, set = { texts ->
+                texts.title?.let { setTitle(it) }
+                texts.playlistTitle?.let { setPlaylistName(it) }
+                texts.playlistTitle?.let { setPlaylistName(it) }
+                texts.skipFwdText?.let { setSkipFwdText(it) }
+                texts.skipBackText?.let { setSkipBackText(it) }
+            })
+            diff(get = Model::times, set = { times ->
+                updateSeekPosition(times.seekBarFraction)
+                setCurrentSecond(times.positionText)
+                if (times.isLive) {
+                    setDurationColors(R.color.white, R.color.live_background)
+                    setDuration(res.getString(R.string.live))
+
+                } else {
+                    setDurationColors(R.color.text_primary, R.color.transparent)
+                    setDuration(times.durationText)
+                }
+                setSeekEnabled(times.isLive)
+            })
         }
 
-        override fun render(model: Model) {
-
-        }
-
-        override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
-
-        }
+        override suspend fun processLabel(label: PlayerContract.MviStore.Label) = Unit
     }
     // endreigon
 
