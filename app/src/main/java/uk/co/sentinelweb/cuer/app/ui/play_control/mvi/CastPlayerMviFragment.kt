@@ -230,7 +230,7 @@ class CastPlayerMviFragment() :
                     setDurationColors(R.color.text_primary, R.color.transparent)
                     setDuration(times.durationText)
                 }
-                setSeekEnabled(times.isLive)
+                setSeekEnabled(!times.isLive)
             })
         }
 

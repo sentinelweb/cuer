@@ -16,9 +16,18 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubePortraitBinding
+import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.CHANNEL_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.LINK
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.WEB_LINK
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.YOUTUBE_CHANNEL
+import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.ChannelOpen
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.LinkOpen
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
@@ -41,6 +50,7 @@ class YoutubePortraitActivity : AppCompatActivity(),
     private val coroutines: CoroutineContextProvider by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val playerFragment: CastPlayerMviFragment by inject()
+    private val navMapper: NavigationMapper by inject()
 
     private lateinit var mviView: YoutubePortraitActivity.MviViewImpl
     private lateinit var binding: ActivityYoutubePortraitBinding
@@ -54,7 +64,6 @@ class YoutubePortraitActivity : AppCompatActivity(),
         binding = ActivityYoutubePortraitBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
-
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -63,6 +72,20 @@ class YoutubePortraitActivity : AppCompatActivity(),
         getLifecycle().addObserver(binding.portraitPlayerVideo)
         playerFragment.initMediaRouteButton()
         controller.onViewCreated(listOf(mviView, playerFragment.mviView), lifecycle.asMviLifecycle())
+        binding.portraitPlayerDescription.interactions = object : DescriptionContract.Interactions {
+            override fun onLinkClick(urlString: String) {
+                mviView.dispatch(Event.LinkClick(urlString))
+            }
+
+            override fun onChannelClick() {
+                mviView.dispatch(Event.ChannelClick)
+            }
+
+            override fun onSelectPlaylistChipClick(model: ChipModel) = Unit
+
+            override fun onRemovePlaylist(chipModel: ChipModel) = Unit
+
+        }
     }
 
     // region MVI view
@@ -71,7 +94,6 @@ class YoutubePortraitActivity : AppCompatActivity(),
         PlayerContract.View {
         private var player: YouTubePlayer? = null
         private var lastPositionSec: Float = -1f
-        private var loadWhenReady: String? = null
 
         init {
             playerView.addYouTubePlayerListener(object : YouTubePlayerListener {
@@ -100,10 +122,7 @@ class YoutubePortraitActivity : AppCompatActivity(),
 
                 override fun onReady(youTubePlayer: YouTubePlayer) {
                     player = youTubePlayer
-                    loadWhenReady
-                        ?.apply { player?.loadVideo(this, 0f) }
-                        ?: apply { dispatch(Event.Initialised) }// this will likely never get hit - queue trackchange fires before player ready
-
+                    apply { dispatch(Event.Initialised) }
                 }
 
                 override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
@@ -118,7 +137,7 @@ class YoutubePortraitActivity : AppCompatActivity(),
                         PlayerConstants.PlayerState.VIDEO_CUED -> PlayerStateDomain.VIDEO_CUED
                     }
                     dispatch(Event.PlayerStateChanged(playStateDomain))
-                    //updateMediaSessionManagerPlaybackState()
+                    //updateMediaSessionManagerPlaybackState()// todo ??
                 }
 
                 override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
@@ -141,12 +160,9 @@ class YoutubePortraitActivity : AppCompatActivity(),
             // todo use compare and get start pos
             diff(get = Model::platformId, set = { id: String? ->
                 log.d("got id : $id")
-                id?.apply {
-                    player
-                        ?.loadVideo(this, 0f)
-                        ?: apply { loadWhenReady = this }
-                }
+                id?.apply { player?.loadVideo(this, 0f) }
             })
+            diff(get = Model::description, set = binding.portraitPlayerDescription::setModel)
         }
 
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
@@ -160,6 +176,10 @@ class YoutubePortraitActivity : AppCompatActivity(),
                         is PlayerContract.PlayerCommand.SeekTo -> player?.seekTo(command.ms.toFloat() / 1000)
                     }
                 }
+                is LinkOpen ->
+                    navMapper.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
+                is ChannelOpen ->
+                    navMapper.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to label.channel.platformId!!)))
             }
         }
     }

@@ -2,7 +2,9 @@ package uk.co.sentinelweb.cuer.app.ui.player
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
+import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
+import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -23,17 +25,20 @@ interface PlayerContract {
             object SkipBackSelect : Intent()
             object PlaylistView : Intent()
             object PlaylistItemView : Intent()
+            object ChannelOpen : Intent()
             data class PlayPause(val isPlaying: Boolean?) : Intent()
             data class Position(val ms: Int) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
             data class TrackChange(val item: PlaylistItemDomain) : Intent()
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
             data class SeekTo(val fraction: Float) : Intent()
-
+            data class LinkOpen(val url: String) : Intent()
         }
 
         sealed class Label {
             class Command(val command: PlayerCommand) : Label()
+            class LinkOpen(val url: String) : Label()
+            class ChannelOpen(val channel: ChannelDomain) : Label()
         }
 
         data class State constructor(
@@ -54,7 +59,8 @@ interface PlayerContract {
             val nextTrackEnabled: Boolean,
             val prevTrackEnabled: Boolean,
             val times: Times,
-            val itemImage: String?
+            val itemImage: String?,
+            val description: DescriptionModel
         ) {
             data class Texts(
                 val title: String?,
@@ -90,6 +96,8 @@ interface PlayerContract {
             data class PlayPauseClicked(val isPlaying: Boolean? = null) : Event()
             data class SendPosition(val ms: Int) : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
+            object ChannelClick : Event()
+            data class LinkClick(val url: String) : Event()
         }
     }
 

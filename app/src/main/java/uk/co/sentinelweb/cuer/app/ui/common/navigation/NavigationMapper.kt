@@ -30,7 +30,7 @@ class NavigationMapper constructor(
     private val toastWrapper: ToastWrapper,
     private val fragment: Fragment? = null,
     private val ytJavaApi: YoutubeJavaApiWrapper,
-    private val navController: NavController,
+    private val navController: NavController?,
     private val log: LogWrapper
 ) {
 
@@ -56,7 +56,7 @@ class NavigationMapper constructor(
                         )
                     )
                 } ?: throw IllegalArgumentException("$WEB_LINK: $LINK param required")
-            NAV_BACK -> navController.popBackStack()
+            NAV_BACK -> navController?.popBackStack()
             NAV_FINISH -> activity.finish()
             YOUTUBE_CHANNEL -> if (!ytJavaApi.launchChannel(nav.params[CHANNEL_ID] as String)) {
                 toastWrapper.show("can't launch channel")
@@ -64,7 +64,7 @@ class NavigationMapper constructor(
             YOUTUBE_VIDEO -> if (!ytJavaApi.launchVideo(nav.params[PLATFORM_ID] as String)) {
                 toastWrapper.show("can't launch channel")
             }
-            PLAYLIST_FRAGMENT -> navController.navigate(
+            PLAYLIST_FRAGMENT -> navController?.navigate(
                 R.id.navigation_playlist,
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
@@ -78,7 +78,7 @@ class NavigationMapper constructor(
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
-            PLAYLISTS_FRAGMENT -> navController.navigate(
+            PLAYLISTS_FRAGMENT -> navController?.navigate(
                 R.id.navigation_playlists,
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID]
@@ -86,7 +86,7 @@ class NavigationMapper constructor(
                 nav.navOpts,
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
-            PLAYLIST_ITEM_FRAGMENT -> navController.navigate(
+            PLAYLIST_ITEM_FRAGMENT -> navController?.navigate(
                 R.id.navigation_playlist_item_edit,
                 bundleOf(PLAYLIST_ITEM.name to (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain).serialise()),
                 nav.navOpts ?: navOptions(optionsBuilder = {// todo remove
@@ -118,18 +118,20 @@ class NavigationMapper constructor(
     }
 }
 
-fun Scope.navigationMapper(isFragment: Boolean, sourceActivity: AppCompatActivity) = NavigationMapper(
+fun Scope.navigationMapper(isFragment: Boolean, sourceActivity: AppCompatActivity, withNavHost: Boolean = true) = NavigationMapper(
     activity = sourceActivity,
     toastWrapper = ToastWrapper(sourceActivity),
     fragment = if (isFragment) (getSource() as Fragment) else null,
     ytJavaApi = YoutubeJavaApiWrapper(sourceActivity),
-    navController = if (isFragment) {
-        (getSource() as Fragment).findNavController()
-    } else {
-        (getSource<AppCompatActivity>()
-            .supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
-            .navController
-    },
+    navController = if (withNavHost) {
+        if (isFragment) {
+            (getSource() as Fragment).findNavController()
+        } else {
+            (getSource<AppCompatActivity>()
+                .supportFragmentManager
+                .findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+                .navController
+        }
+    } else null,
     log = AndroidLogWrapper()
 )

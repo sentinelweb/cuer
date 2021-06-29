@@ -7,6 +7,7 @@ import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
@@ -15,6 +16,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.createScope
 import org.koin.core.scope.Scope
+import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistItemDescriptionBinding
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
@@ -107,5 +109,12 @@ class DescriptionView @JvmOverloads constructor(
         binding.pidAuthorImage.isVisible = b
     }
 
+    companion object {
+        val viewModule = module {
+            scope<DescriptionView> {
+                scoped { ChipCreator((getSource() as View).context, get(), get()) }
+            }
+        }
+    }
 
 }

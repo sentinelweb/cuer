@@ -57,6 +57,8 @@ class PlayerController constructor(
             is SeekBarChanged -> SeekTo(fraction)
             is PlaylistClicked -> PlaylistView
             is ItemClicked -> PlaylistItemView
+            is LinkClick -> LinkOpen(url)
+            is ChannelClick -> ChannelOpen
         }
     }
 

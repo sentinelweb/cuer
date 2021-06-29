@@ -13,20 +13,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:showFullScreenButton="true"
         />
 
     <ScrollView
-        android:id="@+id/portrait_player_description"
-        android:layout_width="wrap_content"
+        android:id="@+id/portrait_player_description_scroll"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/portrait_player_controls"
+        android:layout_marginBottom="104dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/portrait_player_video"
         >
 
-        <include layout="@layout/playlist_item_description" />
+        <uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
+            android:id="@+id/portrait_player_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="48dp"
+            />
     </ScrollView>
 
     <androidx.fragment.app.FragmentContainerView

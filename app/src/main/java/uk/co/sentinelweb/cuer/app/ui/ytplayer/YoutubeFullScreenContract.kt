@@ -35,7 +35,7 @@ interface YoutubeFullScreenContract {
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { ShowHideUi(getSource()) }
-                scoped { PlayerModelMapper(get(), get()) }
+                scoped { PlayerModelMapper(get(), get(), get()) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = get(),

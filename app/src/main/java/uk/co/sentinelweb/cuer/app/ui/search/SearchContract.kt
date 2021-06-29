@@ -8,7 +8,6 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain

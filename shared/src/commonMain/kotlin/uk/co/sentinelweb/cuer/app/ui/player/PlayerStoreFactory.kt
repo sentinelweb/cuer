@@ -93,6 +93,8 @@ class PlayerStoreFactory(
                 is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
                 is Intent.PlaylistView -> Unit // todo
                 is Intent.PlaylistItemView -> Unit // todo
+                is Intent.LinkOpen -> publish(Label.LinkOpen(intent.url))
+                is Intent.ChannelOpen -> getState().item?.media?.channelData?.let { publish(Label.ChannelOpen(it)) } ?: Unit
             }
 
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {

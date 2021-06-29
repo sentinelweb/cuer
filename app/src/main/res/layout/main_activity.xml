@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        android:layout_marginBottom="96dp"
+        android:layout_marginBottom="104dp"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/main_navigation"
@@ -39,4 +39,5 @@
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
         />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

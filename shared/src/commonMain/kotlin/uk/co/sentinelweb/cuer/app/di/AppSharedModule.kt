@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.di
 
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.orchestrator.*
@@ -14,12 +13,11 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.*
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 object AppSharedModule {
-    val objectModule = module {
-        factory { ParserFactory() }
+    private val queueModule = module {
         single<QueueMediatorContract.Producer> {
             QueueMediator(
                 state = QueueMediatorState(),
@@ -34,16 +32,14 @@ object AppSharedModule {
             )
         }
         single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }
+    }
 
+    private val orchectratorModule = module {
         single { PlaylistOrchestrator(get(), get(), get()) }
         single { PlaylistItemOrchestrator(get(), get(), get()) }
         single { MediaOrchestrator(get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
-
         single { PlaylistStatsOrchestrator(get()) }
-
-        single { PlaylistMemoryRepository(get(), get(), get(), get(), get()) }
-        single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get(), get(), get()) }
         factory<PlaylistUpdateOrchestrator.UpdateCheck> { PlaylistUpdateOrchestrator.PlatformUpdateCheck() }
         factory { PlaylistMergeOrchestrator(get(), get()) }
@@ -56,4 +52,16 @@ object AppSharedModule {
         factory { PlaylistMediaUpdateOrchestrator(get()) }
         factory { PlaylistOrDefaultOrchestrator(get(), get()) }
     }
+
+    private val objectModule = module {
+        factory { ParserFactory() }
+        single { PlaylistMemoryRepository(get(), get(), get(), get(), get()) }
+        single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
+    }
+
+    val modules = listOf(objectModule)
+        .plus(orchectratorModule)
+        .plus(queueModule)
+        .plus(DescriptionContract.viewModule)
+
 }

@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.player
 
+import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionMapper
 import uk.co.sentinelweb.cuer.core.mappers.Format.SECS
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
@@ -8,7 +9,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlayerModelMapper constructor(
     private val timeSinceFormatter: TimeSinceFormatter,
-    private val timeFormatter: TimeFormatter
+    private val timeFormatter: TimeFormatter,
+    private val descriptionMapper: DescriptionMapper
 ) {
     fun map(state: PlayerContract.MviStore.State): PlayerContract.View.Model =
         state.run {
@@ -22,6 +24,9 @@ class PlayerModelMapper constructor(
                     skipFwdText = skipFwdText,
                     skipBackText = skipBackText
                 ),
+                description = item?.media
+                    ?.let { descriptionMapper.map(it, playlist?.let { setOf(it) }, false) }
+                    ?: descriptionMapper.mapEmpty(),
                 nextTrackEnabled = playlist?.run { currentIndex < playlist.items.size - 1 } ?: false,
                 prevTrackEnabled = playlist?.run { currentIndex > 0 } ?: false,
                 platformId = item?.media?.platformId,

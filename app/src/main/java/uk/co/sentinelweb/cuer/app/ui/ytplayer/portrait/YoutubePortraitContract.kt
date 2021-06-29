@@ -7,6 +7,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
@@ -37,7 +38,7 @@ interface YoutubePortraitContract {
                     )
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
-                scoped { PlayerModelMapper(get(), get()) }
+                scoped { PlayerModelMapper(get(), get(), get()) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = get(),
@@ -59,6 +60,7 @@ interface YoutubePortraitContract {
                         .supportFragmentManager
                         .findFragmentById(R.id.portrait_player_controls) as CastPlayerMviFragment)
                 }
+                scoped { navigationMapper(false, getSource(), withNavHost = false) }
             }
         }
     }

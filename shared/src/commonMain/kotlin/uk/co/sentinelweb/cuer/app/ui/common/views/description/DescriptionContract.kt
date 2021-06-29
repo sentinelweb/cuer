@@ -1,8 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.common.views.description
 
-import android.view.View
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 
 interface DescriptionContract {
@@ -27,11 +25,7 @@ interface DescriptionContract {
 
     companion object {
         val viewModule = module {
-            scope<DescriptionView> {
-                scoped { ChipCreator((getSource() as View).context, get(), get()) }
-            }
-
-            factory { DescriptionMapper(get(), get()) }
+            factory { DescriptionMapper(get()) }
         }
     }
 }

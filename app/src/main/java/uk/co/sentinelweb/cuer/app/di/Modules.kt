@@ -17,7 +17,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
-import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
+import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
@@ -83,7 +83,7 @@ object Modules {
         YoutubeFullScreenContract.activityModule,
         YoutubePortraitContract.activityModule,
         CastPlayerMviFragment.fragmentModule,
-        DescriptionContract.viewModule
+        DescriptionView.viewModule
     )
 
     private val uiModule = module {
@@ -145,6 +145,6 @@ object Modules {
         .plus(CoreJvmModule.objectModule)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
-        .plus(AppSharedModule.objectModule)
+        .plus(AppSharedModule.modules)
         .plus(RemoteModule.objectModule)
 }
