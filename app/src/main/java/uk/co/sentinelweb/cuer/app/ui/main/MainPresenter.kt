@@ -27,11 +27,6 @@ class MainPresenter(
         }
     }
 
-//    override fun startServer() {
-//        remoteServiceManger.start()
-//    }
-
-
     override fun onPlayServicesOk() {
         log.d("onPlayServicesOk()")
         state.playServicesAvailable = true
@@ -40,10 +35,13 @@ class MainPresenter(
         }
     }
 
+    override fun onDestroy() {
+
+    }
+
     private fun initialiseCastContext() {
         ytContextHolder.create()
     }
-
 
     override fun onStart() {
         log.d("onStart()")
@@ -60,7 +58,6 @@ class MainPresenter(
     }
 
     override fun onStop() {
-        log.d("onStop()")
         ytContextHolder.playerUi = null
         if (!view.isRecreating()) {
             if (ytContextHolder.isCreated() && !ytContextHolder.isConnected()) {
@@ -76,7 +73,4 @@ class MainPresenter(
         ytContextHolder.create()
     }
 
-    override fun onDestroy() {
-//        remoteServiceManger.stop()
-    }
 }

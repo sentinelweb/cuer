@@ -61,6 +61,7 @@ class YoutubePortraitActivity : AppCompatActivity(),
         super.onPostCreate(savedInstanceState)
         mviView = MviViewImpl(binding.portraitPlayerVideo)
         getLifecycle().addObserver(binding.portraitPlayerVideo)
+        playerFragment.initMediaRouteButton()
         controller.onViewCreated(listOf(mviView, playerFragment.mviView), lifecycle.asMviLifecycle())
     }
 
