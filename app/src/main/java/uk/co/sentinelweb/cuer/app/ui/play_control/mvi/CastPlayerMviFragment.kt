@@ -243,7 +243,7 @@ class CastPlayerMviFragment() :
         val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title) }
 
         @JvmStatic
-        val viewModule = module {
+        val fragmentModule = module {
             scope(named<CastPlayerMviFragment>()) {
 
             }

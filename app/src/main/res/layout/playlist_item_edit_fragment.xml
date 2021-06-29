@@ -103,7 +103,11 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             >
 
-            <include layout="@layout/playlist_item_description" />
+            <uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
+                android:id="@+id/ple_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
 
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
@@ -31,7 +32,6 @@ import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeFullScreenActivity
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.portrait.YoutubePortraitContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
@@ -82,7 +82,8 @@ object Modules {
         RemoteContract.serviceModule,
         YoutubeFullScreenContract.activityModule,
         YoutubePortraitContract.activityModule,
-        CastPlayerMviFragment.viewModule
+        CastPlayerMviFragment.fragmentModule,
+        DescriptionContract.viewModule
     )
 
     private val uiModule = module {

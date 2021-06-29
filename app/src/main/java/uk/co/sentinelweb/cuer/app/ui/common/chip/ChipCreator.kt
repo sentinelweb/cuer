@@ -41,6 +41,7 @@ class ChipCreator(
                 .inflate(R.layout.playlist_chip, parent, false) as Chip).apply {
                 tag = model
                 text = if (model.text.length > 15) model.text.substring(0, 14) + "\u2026" else model.text
+                isCloseIconVisible = model.deleteable
                 model.thumb?.let {
                     Glide.with(c)
                         .asBitmap()

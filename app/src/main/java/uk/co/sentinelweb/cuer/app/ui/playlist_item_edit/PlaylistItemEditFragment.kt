@@ -1,12 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.text.Spannable
-import android.text.method.LinkMovementMethod
 import android.view.*
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialog
@@ -18,17 +14,13 @@ import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
-import kotlinx.android.synthetic.main.playlist_item_description.*
-import kotlinx.android.synthetic.main.playlist_item_edit_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.context.GlobalContext.get
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.databinding.PlaylistItemEditFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
-import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
-import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
-import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -43,7 +35,6 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
-import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -52,15 +43,12 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
-class PlaylistItemEditFragment
-    : Fragment(R.layout.playlist_item_edit_fragment),
-    ShareContract.Committer, AndroidScopeComponent {
+class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource()
     private val viewModel: PlaylistItemEditViewModel by inject()
     private val log: LogWrapper by inject()
     private val navMapper: NavigationMapper by inject()
-    private val chipCreator: ChipCreator by inject()
     private val selectDialogCreator: SelectDialogCreator by inject()
     private val res: ResourceWrapper by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
@@ -69,22 +57,19 @@ class PlaylistItemEditFragment
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
+    private lateinit var binding: PlaylistItemEditFragmentBinding
+
     private val starMenuItem: MenuItem
-        get() = ple_toolbar.menu.findItem(R.id.plie_star)
+        get() = binding.pleToolbar.menu.findItem(R.id.plie_star)
     private val playMenuItem: MenuItem
-        get() = ple_toolbar.menu.findItem(R.id.plie_play)
+        get() = binding.pleToolbar.menu.findItem(R.id.plie_play)
     private val editMenuItem: MenuItem
-        get() = ple_toolbar.menu.findItem(R.id.plie_play)
+        get() = binding.pleToolbar.menu.findItem(R.id.plie_play)
     private val launchMenuItem: MenuItem
-        get() = ple_toolbar.menu.findItem(R.id.plie_launch)
+        get() = binding.pleToolbar.menu.findItem(R.id.plie_launch)
 
     private var dialog: AppCompatDialog? = null
     private var dialogFragment: DialogFragment? = null
-
-    // todo extract
-    private val ytDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_platform_youtube_24_black, R.color.primary)
-    }
 
     private object menuState {
         var modelEmpty = false
@@ -120,31 +105,23 @@ class PlaylistItemEditFragment
         }
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = PlaylistItemEditFragmentBinding.inflate(inflater)
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ple_toolbar.let {
+        binding.pleToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
         //ple_play_button.setOnClickListener { viewModel.onPlayVideoLocal() }
         //ple_star_fab.setOnClickListener { viewModel.onStarClick() }
-        ple_play_fab.setOnClickListener { viewModel.onPlayVideo() }
+        binding.plePlayFab.setOnClickListener { viewModel.onPlayVideo() }
         starMenuItem.isVisible = true
         playMenuItem.isVisible = false
-        pid_author_image.setOnClickListener { viewModel.onChannelClick() }
-        pid_desc.setMovementMethod(object : LinkMovementMethod() {
-            override fun handleMovementKey(
-                widget: TextView?,
-                buffer: Spannable?,
-                keyCode: Int,
-                movementMetaState: Int,
-                event: KeyEvent?
-            ): Boolean {
-                buffer?.run { viewModel.onLinkClick(this.toString()) }
-                return true
-            }
-        })
-        pid_desc.setTextIsSelectable(true)
-        ple_toolbar.setOnMenuItemClickListener { menuItem ->
+        binding.pleDescription.interactions = viewModel
+        binding.pleToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.plie_star -> {
                     viewModel.onStarClick()
@@ -165,8 +142,8 @@ class PlaylistItemEditFragment
                 else -> false
             }
         }
-        ple_swipe.setOnRefreshListener { viewModel.refreshMediaBackground() }
-        ple_appbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+        binding.pleSwipe.setOnRefreshListener { viewModel.refreshMediaBackground() }
+        binding.pleAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false
             var scrollRange = -1
@@ -198,14 +175,11 @@ class PlaylistItemEditFragment
                 media.image?.apply {
                     Glide.with(requireContext())
                         .load(this.url)
-                        .into(ple_image)
+                        .into(binding.pleImage)
                 }
-                //ple_play_button.isVisible = false
-                pid_author_image.isVisible = false
-                ple_title_pos.isVisible = false
-                ple_title_bg.isVisible = false
-                //ple_star_fab.isVisible = false
-                //starMenuItem.isVisible = false
+                binding.pleDescription.channelImageVisible(false)
+                binding.pleTitlePos.isVisible = false
+                binding.pleTitleBg.isVisible = false
                 playMenuItem.isVisible = false
 
                 viewModel.delayedSetData(this, sourceArg)
@@ -235,7 +209,7 @@ class PlaylistItemEditFragment
             object : Observer<PlaylistItemEditViewModel.UiEvent> {
                 override fun onChanged(model: PlaylistItemEditViewModel.UiEvent) {
                     when (model.type) {
-                        REFRESHING -> ple_swipe.isRefreshing = model.data as Boolean
+                        REFRESHING -> binding.pleSwipe.isRefreshing = model.data as Boolean
                         ERROR -> snackbarWrapper.makeError(model.data as String).show()
                         UNPIN -> snackbarWrapper
                             .make("Unpin playlist?", actionText = "UNPIN", action = { viewModel.onUnPin() })
@@ -266,10 +240,9 @@ class PlaylistItemEditFragment
             this.viewLifecycleOwner,
             object : Observer<PlaylistItemEditContract.Model> {
                 override fun onChanged(model: PlaylistItemEditContract.Model) {
-                    ple_title_bg.isVisible = true
-                    pid_author_image.isVisible = !model.empty
-                    ple_title_pos.isVisible = !model.empty
-                    ple_duration.isVisible = !model.empty
+                    binding.pleTitleBg.isVisible = true
+                    binding.pleTitlePos.isVisible = !model.empty
+                    binding.pleDuration.isVisible = !model.empty
                     //ple_star_fab.isVisible = !model.empty
                     if (menuState.scrolledDown) {
                         //starMenuItem.isVisible = !model.empty
@@ -281,54 +254,27 @@ class PlaylistItemEditFragment
                     Glide.with(requireContext())
                         .load(model.imageUrl)
                         .transition(DrawableTransitionOptions.withCrossFade())
-                        .into(ple_image)
-                    pid_desc.text = model.description
-                    pid_title.text = model.title
-                    ple_collapsing_toolbar.title = model.title
-                    ple_toolbar.title = model.title
+                        .into(binding.pleImage)
+
+                    binding.pleCollapsingToolbar.title = model.description.title
+                    binding.pleToolbar.title = model.description.title
                     menuState.modelEmpty = model.empty
-                    ple_swipe.isRefreshing = false
+                    binding.pleSwipe.isRefreshing = false
                     if (model.empty) {
                         return
                     }
 
-                    model.channelThumbUrl?.also { url ->
-                        Glide.with(requireContext())
-                            .load(url)
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .addListener(GlideFallbackLoadListener(pid_author_image, url, ytDrawable, log))
-                            .into(pid_author_image)
-                    } ?: run { pid_author_image.setImageDrawable(ytDrawable) }
-
-                    pid_chips.removeAllViews()
-                    model.chips.forEach { chipModel ->
-                        chipCreator.create(chipModel, pid_chips).apply {
-                            pid_chips.addView(this)
-                            when (chipModel.type) {
-                                PLAYLIST_SELECT -> {
-                                    setOnClickListener { viewModel.onSelectPlaylistChipClick(chipModel) }
-                                }
-                                PLAYLIST -> {
-                                    setOnCloseIconClickListener { viewModel.onRemovePlaylist(chipModel) }
-                                }
-                            }
-                        }
-                    }
-                    pid_pub_date.text = model.pubDate
-                    ple_duration.text = model.durationText
-                    ple_duration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
+                    binding.pleDescription.setModel(model.description)
+                    binding.pleDuration.text = model.durationText
+                    binding.pleDuration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
 
                     model.position?.let { ratio ->
-                        ple_title_pos.layoutParams.width = (ratio * ple_title_bg.width).toInt()
-                    } ?: ple_title_pos.apply { isVisible = false }
-                    pid_pub_date.text = model.pubDate
-                    pid_author_title.text = model.channelTitle
-                    pid_author_desc.text = model.channelDescription
+                        binding.pleTitlePos.layoutParams.width = (ratio * binding.pleTitleBg.width).toInt()
+                    } ?: binding.pleTitlePos.apply { isVisible = false }
                     val starIconResource =
                         if (model.starred) R.drawable.ic_button_starred_white
                         else R.drawable.ic_button_unstarred_white
                     starMenuItem.setIcon(starIconResource)
-//                    ple_star_fab.setImageResource(starIconResource)
                 }
             })
     }
