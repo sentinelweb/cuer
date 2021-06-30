@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
 
 interface YoutubePortraitContract {
@@ -59,6 +60,11 @@ interface YoutubePortraitContract {
                     (getSource<YoutubePortraitActivity>()
                         .supportFragmentManager
                         .findFragmentById(R.id.portrait_player_controls) as CastPlayerMviFragment)
+                }
+                scoped {
+                    (getSource<YoutubePortraitActivity>()
+                        .supportFragmentManager
+                        .findFragmentById(R.id.portrait_player_playlist) as PlaylistFragment)
                 }
                 scoped { navigationMapper(false, getSource(), withNavHost = false) }
             }

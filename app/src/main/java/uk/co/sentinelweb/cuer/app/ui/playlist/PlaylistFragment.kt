@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 //import kotlinx.android.synthetic.main.view_playlist_item.view.*
+import android.content.Context
 import android.os.Bundle
 import android.transition.TransitionInflater
 import android.view.*
@@ -37,9 +38,11 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
+import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -63,6 +66,9 @@ class PlaylistFragment :
     AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource()
+    override val external: PlaylistContract.External
+        get() = presenter as PlaylistContract.External
+
     private val presenter: PlaylistContract.Presenter by inject()
     private val adapter: PlaylistAdapter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
@@ -74,6 +80,7 @@ class PlaylistFragment :
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navMapper: NavigationMapper by inject()
+
 
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
@@ -99,6 +106,8 @@ class PlaylistFragment :
             binding.playlistToolbar.menu.findItem(R.id.playlist_mode_loop),
             binding.playlistToolbar.menu.findItem(R.id.playlist_mode_shuffle)
         )
+    private val isHeadless: Boolean
+        get() = HEADLESS.getBoolean(arguments)
 
     private var snackbar: Snackbar? = null
     private var dialogFragment: DialogFragment? = null
@@ -174,12 +183,16 @@ class PlaylistFragment :
         binding.playlistList.doOnPreDraw {
             startPostponedEnterTransition()
         }
-
+        if (isHeadless) {
+            binding.playlistAppbar.isVisible = false
+            binding.playlistFabPlay.isVisible = false
+            binding.playlistFabPlaymode.isVisible = false
+        }
     }
 
     private fun updatePlayModeMenuItems() {
         val shouldShow = menuState.isShow && menuState.isPlayable
-        modeMenuItems.forEachIndexed { i, item -> item?.isVisible = (shouldShow && i == menuState.lastPlayModeIndex) }
+        modeMenuItems.forEachIndexed { i, item -> item.isVisible = (shouldShow && i == menuState.lastPlayModeIndex) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -200,13 +213,28 @@ class PlaylistFragment :
         }
         searchMenuItem.setOnMenuItemClickListener {
             val bottomSheetFragment = SearchBottomSheetFragment()
-            bottomSheetFragment.show(childFragmentManager, "bottomSheetFragment.tag")
+            bottomSheetFragment.show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
             true
         }
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        linkScopeToActivity()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun setArguments(args: Bundle?) {
+        super.setArguments(args)
+        if (isHeadless) {
+            binding.playlistAppbar.isVisible = false
+            binding.playlistFabPlay.isVisible = false
+            binding.playlistFabPlaymode.isVisible = false
+        }
+        activity?.apply { makeNavFromArguments()?.setPlaylistData() }
     }
 
     override fun onDestroyView() {
@@ -220,31 +248,13 @@ class PlaylistFragment :
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         // todo clean up after im sure it works for all cases
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
-        ((activity as? NavigationProvider)?.checkForPendingNavigation(PLAYLIST_FRAGMENT)?.apply {
-            //onResumeGotArguments = true
-            log.d("onResume: got nav on callup model = $this")
-        } ?: let {
-            val plId = PLAYLIST_ID.getLong(arguments)
-            val source: Source? = SOURCE.getEnum<Source>(arguments)
-            val plItemId = PLAYLIST_ITEM_ID.getLong(arguments)
-            val playNow = PLAY_NOW.getBoolean(arguments) ?: false
-            arguments?.putBoolean(PLAY_NOW.name, false)
-            log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source")
-            val onResumeGotArguments = plId?.let { it != -1L } ?: false
-            if (onResumeGotArguments) {
-                //log.d("onResume: got nav on args model = plid = $plId plitemId = ${PLAYLIST_ITEM_ID.getLong(arguments)} playNow = ${PLAY_NOW.getBoolean(arguments) }" )
-                makeNav(plId, plItemId, playNow, source)
-            } else null
-        })?.apply {
-            log.d("onResume: apply nav args model = $this")
-            presenter.setPlaylistData(
-                params[PLAYLIST_ID] as Long?,
-                params[PLAYLIST_ITEM_ID] as Long?,
-                params[PLAY_NOW] as Boolean? ?: false,
-                params[SOURCE] as Source
-            )
-            (activity as? NavigationProvider)?.clearPendingNavigation(PLAYLIST_FRAGMENT)
-        } ?: run {
+        ((activity as? NavigationProvider)?.checkForPendingNavigation(PLAYLIST_FRAGMENT)
+            ?: let { makeNavFromArguments() })
+            ?.apply {
+                log.d("onResume: apply nav args model = $this")
+                setPlaylistData()
+                (activity as? NavigationProvider)?.clearPendingNavigation(PLAYLIST_FRAGMENT)
+            } ?: run {
             log.d("onResume: got no nav args")
             presenter.setPlaylistData()
         }
@@ -260,6 +270,30 @@ class PlaylistFragment :
         super.onStop()
         dialogFragment?.dismissAllowingStateLoss()
     }
+
+    private fun NavigationModel.setPlaylistData() {
+        presenter.setPlaylistData(
+            params[PLAYLIST_ID] as Long?,
+            params[PLAYLIST_ITEM_ID] as Long?,
+            params[PLAY_NOW] as Boolean? ?: false,
+            params[SOURCE] as Source
+        )
+    }
+
+    private fun makeNavFromArguments(): NavigationModel? {
+        val plId = PLAYLIST_ID.getLong(arguments)
+        val source: Source? = SOURCE.getEnum<Source>(arguments)
+        val plItemId = PLAYLIST_ITEM_ID.getLong(arguments)
+        val playNow = PLAY_NOW.getBoolean(arguments)
+        arguments?.putBoolean(PLAY_NOW.name, false)
+        log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source")
+        val onResumeGotArguments = plId?.let { it != -1L } ?: false
+        return if (onResumeGotArguments) {
+            PlaylistContract.makeNav(plId, plItemId, playNow, source)
+        } else null
+    }
+
+
     // endregion
 
     // region PlaylistContract.View
@@ -517,23 +551,8 @@ class PlaylistFragment :
     // endregion
 
     companion object {
-
-        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean, source: Source?): NavigationModel {
-            val params = mutableMapOf(
-                PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
-                PLAY_NOW to play,
-                SOURCE to (source ?: throw IllegalArgumentException("No Source"))
-            ).apply {
-                plItemId?.also { put(PLAYLIST_ITEM_ID, it) }
-            }
-            return NavigationModel(
-                PLAYLIST_FRAGMENT, params
-            )
-        }
-
-        private val CREATE_PLAYLIST_TAG = "pe_dialog"
-        private val SELECT_PLAYLIST_TAG = "pdf_dialog"
-
+        private const val CREATE_PLAYLIST_TAG = "pe_dialog"
+        private const val SELECT_PLAYLIST_TAG = "pdf_dialog"
     }
 
 }

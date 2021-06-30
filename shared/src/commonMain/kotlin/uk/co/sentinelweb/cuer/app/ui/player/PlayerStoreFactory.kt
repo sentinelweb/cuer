@@ -6,7 +6,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -37,6 +37,7 @@ class PlayerStoreFactory(
         class LoadVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) : Result()
         class Playlist(val playlist: PlaylistDomain) : Result()
         class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
+        class Screen(val screen: PlayerContract.MviStore.Screen) : Result()
     }
 
     private sealed class Action {
@@ -51,6 +52,7 @@ class PlayerStoreFactory(
                 is Result.LoadVideo -> copy(item = result.item, playlist = result.playlist ?: playlist)
                 is Result.Playlist -> copy(playlist = result.playlist)
                 is Result.NoVideo -> copy(item = null)
+                is Result.Screen -> copy(screen = result.screen)
                 is Result.SkipTimes -> copy(
                     skipFwdText = result.fwd ?: skipFwdText,
                     skipBackText = result.back ?: skipFwdText
@@ -91,10 +93,11 @@ class PlayerStoreFactory(
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> playPause(intent, getState().playerState)
                 is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
-                is Intent.PlaylistView -> Unit // todo
-                is Intent.PlaylistItemView -> Unit // todo
+                is Intent.PlaylistView -> dispatch(Result.Screen(Screen.PLAYLIST))
+                is Intent.PlaylistItemView -> dispatch(Result.Screen(Screen.DESCRIPTION))
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.url))
                 is Intent.ChannelOpen -> getState().item?.media?.channelData?.let { publish(Label.ChannelOpen(it)) } ?: Unit
+                is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
             }
 
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {
@@ -145,14 +148,23 @@ class PlayerStoreFactory(
 
         private suspend fun loadVideo() {
             withContext(coroutines.Computation) {
-                itemLoader.load()
-                    ?.also { item ->
-                        item.playlistId?.toIdentifier(OrchestratorContract.Source.LOCAL)
-                            ?.apply { queueProducer.playNow(this, item.id) }
-                    }
+                itemLoader.load()?.also { item ->
+                    item.playlistId?.toIdentifier(LOCAL)
+                        ?.apply { queueProducer.playNow(this, item.id) }
+                }
             }
-                ?.apply { dispatch(Result.LoadVideo(this, null)) }
-                ?: apply { dispatch(Result.NoVideo) }
+//                ?.apply { dispatch(Result.LoadVideo(this, null)) }
+//                ?: apply { dispatch(Result.NoVideo) }
+        }
+
+        private suspend fun trackSelected(item: PlaylistItemDomain, resetPosition: Boolean) {
+            withContext(coroutines.Computation) {
+                item.also { item ->
+                    item.playlistId?.toIdentifier(LOCAL)
+                        ?.apply { queueProducer.onItemSelected(item, false, resetPosition) }
+                }
+            }
+//                .apply { dispatch(Result.LoadVideo(this, null)) }
         }
 
         override fun skipSeekTo(target: Long) {

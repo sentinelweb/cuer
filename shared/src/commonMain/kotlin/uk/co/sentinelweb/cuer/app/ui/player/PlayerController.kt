@@ -59,6 +59,7 @@ class PlayerController constructor(
             is ItemClicked -> PlaylistItemView
             is LinkClick -> LinkOpen(url)
             is ChannelClick -> ChannelOpen
+            is TrackClick -> TrackSelected(item, resetPosition)
         }
     }
 

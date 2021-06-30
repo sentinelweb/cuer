@@ -30,6 +30,7 @@ interface PlayerContract {
             data class Position(val ms: Int) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
             data class TrackChange(val item: PlaylistItemDomain) : Intent()
+            data class TrackSelected(val item: PlaylistItemDomain, val resetPosition: Boolean) : Intent()
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
             data class SeekTo(val fraction: Float) : Intent()
             data class LinkOpen(val url: String) : Intent()
@@ -41,12 +42,15 @@ interface PlayerContract {
             class ChannelOpen(val channel: ChannelDomain) : Label()
         }
 
+        enum class Screen { DESCRIPTION, PLAYLIST, PLAYLISTS }
+
         data class State constructor(
             val item: PlaylistItemDomain? = null,
             val playlist: PlaylistDomain? = null,
             val playerState: PlayerStateDomain = UNKNOWN,
             val skipFwdText: String = "-",
-            val skipBackText: String = "-"
+            val skipBackText: String = "-",
+            val screen: Screen = Screen.DESCRIPTION
         )
     }
 
@@ -60,7 +64,8 @@ interface PlayerContract {
             val prevTrackEnabled: Boolean,
             val times: Times,
             val itemImage: String?,
-            val description: DescriptionModel
+            val description: DescriptionModel,
+            val screen: Screen
         ) {
             data class Texts(
                 val title: String?,
@@ -96,6 +101,7 @@ interface PlayerContract {
             data class PlayPauseClicked(val isPlaying: Boolean? = null) : Event()
             data class SendPosition(val ms: Int) : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
+            data class TrackClick(val item: PlaylistItemDomain, val resetPosition: Boolean) : Event()
             object ChannelClick : Event()
             data class LinkClick(val url: String) : Event()
         }
@@ -110,6 +116,6 @@ interface PlayerContract {
     }
 
     interface PlaylistItemLoader {
-        suspend fun load(): PlaylistItemDomain?
+        fun load(): PlaylistItemDomain?
     }
 }

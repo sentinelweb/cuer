@@ -15,8 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
-    <ScrollView
-        android:id="@+id/portrait_player_description_scroll"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="104dp"
@@ -26,13 +25,28 @@
         app:layout_constraintTop_toBottomOf="@id/portrait_player_video"
         >
 
-        <uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
-            android:id="@+id/portrait_player_description"
+        <ScrollView
+            android:id="@+id/portrait_player_description_scroll"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="48dp"
+            android:layout_height="match_parent"
+            >
+
+            <uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
+                android:id="@+id/portrait_player_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="48dp"
+                />
+        </ScrollView>
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/portrait_player_playlist"
+            android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
             />
-    </ScrollView>
+    </FrameLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/portrait_player_controls"

@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
@@ -16,21 +18,24 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubePortraitBinding
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.CHANNEL_ID
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.LINK
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.WEB_LINK
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.YOUTUBE_CHANNEL
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.ChannelOpen
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.LinkOpen
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -50,7 +55,9 @@ class YoutubePortraitActivity : AppCompatActivity(),
     private val coroutines: CoroutineContextProvider by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val playerFragment: CastPlayerMviFragment by inject()
+    private val playlistFragment: PlaylistFragment by inject()
     private val navMapper: NavigationMapper by inject()
+    private val itemLoader: PlayerContract.PlaylistItemLoader by inject()
 
     private lateinit var mviView: YoutubePortraitActivity.MviViewImpl
     private lateinit var binding: ActivityYoutubePortraitBinding
@@ -86,6 +93,14 @@ class YoutubePortraitActivity : AppCompatActivity(),
             override fun onRemovePlaylist(chipModel: ChipModel) = Unit
 
         }
+        val playlistItem = itemLoader.load()
+        playlistFragment.arguments = bundleOf(
+            HEADLESS.name to true,
+            SOURCE.name to OrchestratorContract.Source.LOCAL.toString(),
+            PLAYLIST_ID.name to (playlistItem?.playlistId ?: throw IllegalArgumentException("Playlist ID is null")),
+            PLAYLIST_ITEM_ID.name to (playlistItem.id ?: throw IllegalArgumentException("Playlist item is null")),
+        )
+        playlistFragment.external.interactions = playlistInteractions
     }
 
     // region MVI view
@@ -159,15 +174,26 @@ class YoutubePortraitActivity : AppCompatActivity(),
         override val renderer: ViewRenderer<Model> = diff {
             // todo use compare and get start pos
             diff(get = Model::platformId, set = { id: String? ->
-                log.d("got id : $id")
                 id?.apply { player?.loadVideo(this, 0f) }
             })
             diff(get = Model::description, set = binding.portraitPlayerDescription::setModel)
+            diff(get = Model::screen, set = {
+                when (it) {
+                    DESCRIPTION -> {
+                        binding.portraitPlayerDescription.isVisible = true
+                        binding.portraitPlayerPlaylist.isVisible = false
+                    }
+                    PLAYLIST -> {
+                        binding.portraitPlayerDescription.isVisible = false
+                        binding.portraitPlayerPlaylist.isVisible = true
+                    }
+                }
+            })
         }
 
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
             when (label) {
-                is PlayerContract.MviStore.Label.Command -> label.command.let { command ->
+                is Command -> label.command.let { command ->
                     when (command) {
                         is PlayerContract.PlayerCommand.Play -> player?.play()
                         is PlayerContract.PlayerCommand.Pause -> player?.pause()
@@ -179,9 +205,29 @@ class YoutubePortraitActivity : AppCompatActivity(),
                 is LinkOpen ->
                     navMapper.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
                 is ChannelOpen ->
-                    navMapper.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to label.channel.platformId!!)))
+                    label.channel.platformId?.let { id -> navMapper.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
             }
         }
+    }
+
+    private val playlistInteractions = object : PlaylistContract.Interactions {
+
+        override fun onPlayStartClick(item: PlaylistItemDomain) {
+            mviView.dispatch(Event.TrackClick(item, true))
+        }
+
+        override fun onRelated(item: PlaylistItemDomain) {
+
+        }
+
+        override fun onView(item: PlaylistItemDomain) {
+            mviView.dispatch(Event.TrackClick(item, false))
+        }
+
+        override fun onPlay(item: PlaylistItemDomain) {
+            mviView.dispatch(Event.TrackClick(item, false))
+        }
+
     }
 
     companion object {
@@ -191,5 +237,6 @@ class YoutubePortraitActivity : AppCompatActivity(),
                 putExtra(NavigationModel.Param.PLAYLIST_ITEM.toString(), playlistItem.serialise())
             })
     }
+
 
 }

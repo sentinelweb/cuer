@@ -12,7 +12,6 @@ class NavigationFragmentMapper constructor(
         R.id.navigation_browse -> NavigationModel.Target.BROWSE_FRAGMENT
         R.id.navigation_playlists -> NavigationModel.Target.PLAYLISTS_FRAGMENT
         R.id.navigation_playlist -> NavigationModel.Target.PLAYLIST_FRAGMENT
-        R.id.navigation_player -> NavigationModel.Target.PLAYER_FRAGMENT
         else -> throw IllegalArgumentException("No model for ID :" + activity.resources.getResourceName(itemId))
     }
 }

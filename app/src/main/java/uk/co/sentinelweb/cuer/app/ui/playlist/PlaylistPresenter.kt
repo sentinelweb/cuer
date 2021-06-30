@@ -27,7 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
-import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
+import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -72,7 +72,9 @@ class PlaylistPresenter(
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider,
     private val res: ResourceWrapper
-) : PlaylistContract.Presenter {
+) : PlaylistContract.Presenter, PlaylistContract.External {
+
+    override var interactions: PlaylistContract.Interactions? = null
 
     init {
         log.tag(this)
@@ -111,7 +113,6 @@ class PlaylistPresenter(
             .onEach { log.d("q.playlist change id=${it.id} index=${it.currentIndex}") }
             .onEach { view.highlightPlayingItem(it.currentIndex) }
             .launchIn(coroutines.mainScope)
-
         listen()
     }
 
@@ -144,57 +145,72 @@ class PlaylistPresenter(
                         }
                     }
                 }
-            }.launchIn(coroutines.mainScope)
-
-        playlistItemOrchestrator.updates.onEach { (op, source, plistItem) ->
-            log.d("item changed: $op, $source, id=${plistItem.id} media=${plistItem.media.title}")
-            val currentIndexBefore = state.playlist?.currentIndex
-            when (op) { // todo just apply model updates (instead of full rebuild)
-                FLAT,
-                FULL -> if (plistItem.playlistId?.toIdentifier(source) == state.playlistIdentifier) {
-                    state.playlist
-                        ?.let { playlistMutator.addOrReplaceItem(it, plistItem) }
-                        ?.takeIf { it != state.playlist }
-                        ?.also { state.playlist = it }
-                        ?.also { updateView() }
-                } else if (state.playlist?.type == APP) {// check to replace item in an app playlist
-                    state.playlist
-                        ?.items
-                        ?.find { it.media.platformId == plistItem.media.platformId }
-                        ?.also { updatePlaylistItemByMediaId(plistItem, plistItem.media) }
-                        ?.let { state.playlist }
-                } else {
-                    state.playlist
-                        ?.let { playlistMutator.remove(it, plistItem) }
-                        ?.takeIf { it != state.playlist }
-                        ?.also { state.playlist = it }
-                        ?.also { updateView() }
-                }
-                DELETE ->
-                    state.playlist
-                        ?.let { playlistMutator.remove(it, plistItem) }
-                        ?.takeIf { it != state.playlist }
-                        ?.also { state.playlist = it }
-                        ?.also { updateView() }
-            }.takeIf { !isQueuedPlaylist && currentIndexBefore != state.playlist?.currentIndex }
-                ?.apply {
-                    state.playlist?.apply { playlistOrDefaultOrchestrator.updateCurrentIndex(this, state.playlistIdentifier.flatOptions()) }
-                }
-        }.launchIn(coroutines.mainScope)
-
-        mediaOrchestrator.updates.onEach { (op, source, media) ->
-            log.d("media changed: $op, $source, id=${media.id} title=${media.title}")
-            when (op) {
-                FLAT,
-                FULL -> {
-                    val containsMedia = state.playlist?.items?.find { it.media.platformId == media.platformId } != null
-                    if (containsMedia) {
-                        updatePlaylistItemByMediaId(null, media)
-                    }
-                }
-                DELETE -> Unit
             }
-        }.launchIn(coroutines.mainScope)
+            .launchIn(coroutines.mainScope)
+
+        playlistItemOrchestrator.updates
+            .onEach { (op, source, plistItem) ->
+                log.d("item changed: $op, $source, id=${plistItem.id} media=${plistItem.media.title}")
+                val currentIndexBefore = state.playlist?.currentIndex
+                when (op) { // todo just apply model updates (instead of full rebuild)
+                    FLAT,
+                    FULL -> if (plistItem.playlistId?.toIdentifier(source) == state.playlistIdentifier) {
+                        state.playlist
+                            ?.let { playlistMutator.addOrReplaceItem(it, plistItem) }
+                            ?.takeIf { it != state.playlist }
+                            ?.also { state.playlist = it }
+                            ?.also { updateView() }
+                    } else if (state.playlist?.type == APP) {// check to replace item in an app playlist
+                        state.playlist
+                            ?.items
+                            ?.find { it.media.platformId == plistItem.media.platformId }
+                            ?.also { updatePlaylistItemByMediaId(plistItem, plistItem.media) }
+                            ?.let { state.playlist }
+                    } else {
+                        state.playlist
+                            ?.let { playlistMutator.remove(it, plistItem) }
+                            ?.takeIf { it != state.playlist }
+                            ?.also { state.playlist = it }
+                            ?.also { updateView() }
+                    }
+                    DELETE ->
+                        state.playlist
+                            ?.let { playlistMutator.remove(it, plistItem) }
+                            ?.takeIf { it != state.playlist }
+                            ?.also { state.playlist = it }
+                            ?.also { updateView() }
+                }.takeIf { !isQueuedPlaylist && currentIndexBefore != state.playlist?.currentIndex }
+                    ?.apply {
+                        state.playlist?.apply {
+                            playlistOrDefaultOrchestrator.updateCurrentIndex(this, state.playlistIdentifier.flatOptions())
+                        }
+                    }
+            }
+            .launchIn(coroutines.mainScope)
+
+        mediaOrchestrator.updates
+            .onEach { (op, source, media) ->
+                log.d("media changed: $op, $source, id=${media.id} title=${media.title}")
+                when (op) {
+                    FLAT,
+                    FULL -> {
+                        val containsMedia = state.playlist?.items?.find { it.media.platformId == media.platformId } != null
+                        if (containsMedia) {
+                            updatePlaylistItemByMediaId(null, media)
+                        }
+                    }
+                    DELETE -> Unit
+                }
+            }
+            .launchIn(coroutines.mainScope)
+
+        queue.currentItemFlow
+            .onEach { item ->
+                state.playlist?.items
+                    ?.indexOfFirst { item?.id == it.id }
+                    ?.also { view.highlightPlayingItem(it) }
+            }
+            .launchIn(coroutines.mainScope)
     }
 
     override fun initialise() {
@@ -321,15 +337,21 @@ class PlaylistPresenter(
     override fun onItemViewClick(itemModel: ItemContract.Model) {
         playlistItemDomain(itemModel)
             ?.apply {
-                val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
-                view.showItemDescription(itemModel.id, this, source)
-            }// todo pass identifier?
+                interactions
+                    ?.onView(this)
+                    ?: run {
+                        val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
+                        view.showItemDescription(itemModel.id, this, source)
+                    }
+            } // todo pass identifier?
     }
 
     override fun onItemClicked(itemModel: ItemContract.Model) {
         playlistItemDomain(itemModel)
             ?.let { itemDomain ->
-                if (!(ytCastContextHolder.isConnected())) {
+                if (interactions != null) {
+                    interactions?.onPlay(itemDomain)
+                } else if (!(ytCastContextHolder.isConnected())) {
 //                    val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
 //                    view.showItemDescription(itemModel.id, itemDomain, source)
 
@@ -356,8 +378,10 @@ class PlaylistPresenter(
     override fun onPlayStartClick(itemModel: ItemContract.Model) {
         playlistItemDomain(itemModel)
             ?.let { itemDomain ->
-                if (!ytCastContextHolder.isConnected()) {
-                    //view.showItemDescription(item.id, itemDomain)
+                if (interactions != null) {
+                    interactions?.onPlayStartClick(itemDomain)
+                } else if (!ytCastContextHolder.isConnected()) {
+                    view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to itemDomain)))
                 } else {
                     playItem(itemModel.id, itemDomain, true)
                 }
@@ -422,15 +446,11 @@ class PlaylistPresenter(
                         relatedToMediaTitle = item.media.title
                     ).serialise()
                 )
-                prefsWrapper.putEnum(LAST_SEARCH_TYPE, SearchContract.SearchType.REMOTE)
+                prefsWrapper.putEnum(LAST_SEARCH_TYPE, REMOTE)
 
                 view.navigate(
-                    NavigationModel(
-                        NavigationModel.Target.PLAYLIST_FRAGMENT,
-                        mapOf(PLAYLIST_ID to REMOTE_SEARCH_PLAYLIST, PLAY_NOW to false, SOURCE to MEMORY)
-                    )
+                    PlaylistContract.makeNav(REMOTE_SEARCH_PLAYLIST, null, false, MEMORY)
                 )
-
             }
     }
 
@@ -447,7 +467,7 @@ class PlaylistPresenter(
             ?.let {
                 view.navigate(
                     NavigationModel(
-                        NavigationModel.Target.PLAYLIST_FRAGMENT,
+                        PLAYLIST_FRAGMENT,
                         mapOf(PLAYLIST_ID to it, PLAY_NOW to false, SOURCE to LOCAL)
                     )
                 )
@@ -495,7 +515,11 @@ class PlaylistPresenter(
                         toastWrapper.show("can't launch video")
                     }
                 } else {
-                    view.navigate(NavigationModel(LOCAL_PLAYER_FULL, mapOf(PLAYLIST_ITEM to it)))
+                    if (interactions != null) {
+                        interactions?.onPlay(it)
+                    } else {
+                        view.navigate(NavigationModel(LOCAL_PLAYER_FULL, mapOf(PLAYLIST_ITEM to it)))
+                    }
                 }
             }
             ?: toastWrapper.show("can't find video")

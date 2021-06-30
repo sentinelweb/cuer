@@ -12,7 +12,7 @@ class ItemLoader(
     private val log: LogWrapper
 ) : PlayerContract.PlaylistItemLoader {
 
-    override suspend fun load(): PlaylistItemDomain? =
+    override fun load(): PlaylistItemDomain? =
         activity.intent
             ?.getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
             //?.apply {log.d("item: "+this)}

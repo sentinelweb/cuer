@@ -39,7 +39,8 @@ class PlayerModelMapper constructor(
                     seekBarFraction = item?.media?.positon?.let { pos ->
                         item.media.duration?.let { pos.toFloat() / it }
                     } ?: 0f
-                )
+                ),
+                screen = screen
             )
         }
 

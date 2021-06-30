@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -17,13 +16,15 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistsFragmentBinding
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
+import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
@@ -46,6 +47,7 @@ class PlaylistsFragment :
     private val imageProvider: FirebaseDefaultImageProvider by inject()
     private val log: LogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+    private val navMapper: NavigationMapper by inject()
 
     private var _binding: PlaylistsFragmentBinding? = null
     private val binding get() = _binding!!
@@ -89,7 +91,7 @@ class PlaylistsFragment :
         inflater.inflate(R.menu.playlists_actionbar, menu)
         searchMenuItem.setOnMenuItemClickListener {
             val bottomSheetFragment = SearchBottomSheetFragment()
-            bottomSheetFragment.show(childFragmentManager, "bottomSheetFragment.tag")
+            bottomSheetFragment.show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
             true
         }
     }
@@ -141,15 +143,16 @@ class PlaylistsFragment :
             .apply { show() }
     }
 
-    override fun gotoPlaylist(id: Long, play: Boolean, source: Source) {
-        PlaylistsFragmentDirections.actionGotoPlaylist(id, play, source.toString())
-            .apply { findNavController().navigate(this) }
-    }
-
-    override fun gotoEdit(id: Long, source: Source) {
-        PlaylistsFragmentDirections.actionEditPlaylist(id, source.toString())
-            .apply { findNavController().navigate(this) }
-    }
+//    override fun gotoPlaylist(id: Long, play: Boolean, source: Source) {
+//        PlaylistsFragmentDirections.actionGotoPlaylist(id, play, source.toString())
+//            .apply { findNavController().navigate(this) }
+//
+//    }
+//
+//    override fun gotoEdit(id: Long, source: Source) {
+//        PlaylistsFragmentDirections.actionEditPlaylist(id, source.toString())
+//            .apply { findNavController().navigate(this) }
+//    }
 
     override fun scrollToItem(index: Int) {
         (binding.playlistsList.layoutManager as LinearLayoutManager).run {
@@ -171,6 +174,10 @@ class PlaylistsFragment :
         dialogFragment?.dismissAllowingStateLoss()
         dialogFragment = PlaylistsDialogFragment.newInstance(model)
         dialogFragment?.show(childFragmentManager, "PlaylistsSelector")
+    }
+
+    override fun navigate(nav: NavigationModel) {
+        navMapper.navigate(nav)
     }
     //endregion
 

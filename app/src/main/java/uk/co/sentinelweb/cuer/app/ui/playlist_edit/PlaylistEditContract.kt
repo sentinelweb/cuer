@@ -10,6 +10,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.validator.ValidatorModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -48,6 +49,12 @@ interface PlaylistEditContract {
     }
 
     companion object {
+        fun makeNav(id: Long, source: OrchestratorContract.Source) = NavigationModel(
+            NavigationModel.Target.PLAYLIST_EDIT_FRAGMENT, mapOf(
+                NavigationModel.Param.PLAYLIST_ID to id,
+                NavigationModel.Param.SOURCE to source
+            )
+        )
 
         @JvmStatic
         val fragmentModule = module {

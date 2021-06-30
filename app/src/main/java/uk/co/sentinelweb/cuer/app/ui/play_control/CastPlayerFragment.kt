@@ -185,7 +185,5 @@ class CastPlayerFragment() :
     companion object {
         val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_image) }
         val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title) }
-
-
     }
 }
