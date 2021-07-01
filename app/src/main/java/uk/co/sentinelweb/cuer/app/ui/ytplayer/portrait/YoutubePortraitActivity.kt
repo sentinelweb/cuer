@@ -32,7 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.DurationReceived
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
@@ -80,13 +80,14 @@ class YoutubePortraitActivity : AppCompatActivity(),
         getLifecycle().addObserver(binding.portraitPlayerVideo)
         playerFragment.initMediaRouteButton()
         controller.onViewCreated(listOf(mviView, playerFragment.mviView), lifecycle.asMviLifecycle())
+
         binding.portraitPlayerDescription.interactions = object : DescriptionContract.Interactions {
             override fun onLinkClick(urlString: String) {
-                mviView.dispatch(Event.LinkClick(urlString))
+                mviView.dispatch(LinkClick(urlString))
             }
 
             override fun onChannelClick() {
-                mviView.dispatch(Event.ChannelClick)
+                mviView.dispatch(ChannelClick)
             }
 
             override fun onSelectPlaylistChipClick(model: ChipModel) = Unit
@@ -112,20 +113,26 @@ class YoutubePortraitActivity : AppCompatActivity(),
         private var lastPositionSec: Float = -1f
 
         init {
+            val playWhenReady = object {
+                var id: String? = null
+                var pos: Long = 0
+            }
             playerView.addYouTubePlayerListener(object : YouTubePlayerListener {
                 override fun onApiChange(youTubePlayer: YouTubePlayer) = Unit
 
                 override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
                     player = youTubePlayer
-                    if (abs(lastPositionSec - second) > 1) {
-                        dispatch(Event.PositionReceived((second * 1000).toLong()))
+                    if (abs(lastPositionSec - second) > 0.1) {
                         lastPositionSec = second
+                    }
+                    if (abs(lastPositionSec - second) > 1) {
+                        dispatch(PositionReceived((second * 1000).toLong()))
                     }
                 }
 
                 override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
                     player = youTubePlayer
-                    dispatch(Event.PlayerStateChanged(ERROR))
+                    dispatch(PlayerStateChanged(ERROR))
                 }
 
                 override fun onPlaybackQualityChange(youTubePlayer: YouTubePlayer, playbackQuality: PlayerConstants.PlaybackQuality) {
@@ -138,7 +145,9 @@ class YoutubePortraitActivity : AppCompatActivity(),
 
                 override fun onReady(youTubePlayer: YouTubePlayer) {
                     player = youTubePlayer
-                    apply { dispatch(Event.Initialised) }
+                    log.d("onReady")
+
+                    dispatch(PlayerStateChanged(VIDEO_CUED))
                 }
 
                 override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
@@ -152,7 +161,7 @@ class YoutubePortraitActivity : AppCompatActivity(),
                         PlayerConstants.PlayerState.UNKNOWN -> UNKNOWN
                         PlayerConstants.PlayerState.VIDEO_CUED -> VIDEO_CUED
                     }
-                    dispatch(Event.PlayerStateChanged(playStateDomain))
+                    dispatch(PlayerStateChanged(playStateDomain))
                     //updateMediaSessionManagerPlaybackState()// todo ??
                 }
 
@@ -163,8 +172,8 @@ class YoutubePortraitActivity : AppCompatActivity(),
 
                 override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
                     player = youTubePlayer
-                    dispatch(Event.IdReceived(videoId))
-                    dispatch(Event.PlayerStateChanged(VIDEO_CUED))
+                    dispatch(IdReceived(videoId))
+                    //dispatch(PlayerStateChanged(VIDEO_CUED))
                 }
 
                 override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {
@@ -172,14 +181,21 @@ class YoutubePortraitActivity : AppCompatActivity(),
                 }
 
             })
+
         }
 
         override val renderer: ViewRenderer<Model> = diff {
             // todo use compare and get start pos
-            diff(get = Model::platformId, set = { id: String? ->
-                id?.apply { player?.loadVideo(this, 0f) }
+//            diff(get = Model::platformId, set = { id: String? ->
+//                id?.apply {
+//                    log.d("loadVideo:$this")
+//                    player?.loadVideo(this, 0f)
+//                }
+//            })
+            diff(get = Model::description, set = {
+                log.d("set description")
+                binding.portraitPlayerDescription.setModel(it)
             })
-            diff(get = Model::description, set = binding.portraitPlayerDescription::setModel)
             diff(get = Model::screen, set = {
                 when (it) {
                     DESCRIPTION -> {
@@ -196,13 +212,19 @@ class YoutubePortraitActivity : AppCompatActivity(),
 
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
             when (label) {
+
                 is Command -> label.command.let { command ->
+                    log.d(command.toString())
                     when (command) {
+                        is PlayerContract.PlayerCommand.Load -> player?.loadVideo(command.platformId, command.startPosition / 1000f)
                         is PlayerContract.PlayerCommand.Play -> player?.play()
                         is PlayerContract.PlayerCommand.Pause -> player?.pause()
-                        is PlayerContract.PlayerCommand.SkipBack -> player?.seekTo(lastPositionSec - command.ms / 1000)
-                        is PlayerContract.PlayerCommand.SkipFwd -> player?.seekTo(lastPositionSec + command.ms / 1000)
-                        is PlayerContract.PlayerCommand.SeekTo -> player?.seekTo(command.ms.toFloat() / 1000)
+                        is PlayerContract.PlayerCommand.SkipBack -> player?.seekTo(lastPositionSec - command.ms / 1000f)
+                        is PlayerContract.PlayerCommand.SkipFwd -> player?.seekTo(lastPositionSec + command.ms / 1000f)
+                        is PlayerContract.PlayerCommand.SeekTo -> {
+                            log.d(command.toString())
+                            player?.seekTo(command.ms.toFloat() / 1000f)
+                        }
                     }
                 }
                 is LinkOpen ->

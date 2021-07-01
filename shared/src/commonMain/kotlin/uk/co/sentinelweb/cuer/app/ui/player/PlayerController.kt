@@ -53,7 +53,6 @@ class PlayerController constructor(
 
     private val eventToIntent: suspend PlayerContract.View.Event.() -> PlayerContract.MviStore.Intent = {
         when (this) {
-            is Initialised -> Load
             is PlayClicked -> Play
             is PauseClicked -> Pause
             is PlayerStateChanged -> PlayState(state)

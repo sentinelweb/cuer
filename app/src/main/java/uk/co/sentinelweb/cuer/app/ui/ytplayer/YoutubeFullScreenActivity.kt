@@ -212,7 +212,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
         }
 
         override val renderer: ViewRenderer<Model> = diff {
-            diff(get = Model::platformId, set = player::cueVideo)
+            //diff(get = Model::platformId, set = player::cueVideo)
             diff(get = Model::playState, set = {
                 when (it) {
                     BUFFERING -> binding.controls.controlsPlayFab.showProgress(true)
@@ -284,7 +284,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
             player.setShowFullscreenButton(false)
             //player.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS)
             useYtOverlay()
-            dispatch(Initialised)
+            //dispatch(Initialised)
         }
 
         fun onStart() {

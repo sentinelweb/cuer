@@ -16,7 +16,7 @@ interface PlayerContract {
         sealed class Intent {
             object Play : Intent()
             object Pause : Intent()
-            object Load : Intent()
+            //object Load : Intent()
             object SkipFwd : Intent()
             object SkipBack : Intent()
             object TrackFwd : Intent()
@@ -61,7 +61,8 @@ interface PlayerContract {
         suspend fun processLabel(label: Label)
         data class Model(
             val texts: Texts,
-            val platformId: String?,
+//            val platformId: String?,
+//            val startPosition: Long,
             val playState: PlayerStateDomain,
             val nextTrackEnabled: Boolean,
             val prevTrackEnabled: Boolean,
@@ -95,7 +96,8 @@ interface PlayerContract {
             object TrackBackClicked : Event()
             object SkipFwdClicked : Event()
             object SkipBackClicked : Event()
-            object Initialised : Event()
+
+            //object Initialised : Event()
             object SkipFwdSelectClicked : Event()
             object SkipBackSelectClicked : Event()
             object ItemClicked : Event()
@@ -115,6 +117,7 @@ interface PlayerContract {
     sealed class PlayerCommand {
         object Play : PlayerCommand()
         object Pause : PlayerCommand()
+        data class Load(val platformId: String, val startPosition: Long) : PlayerCommand()
         data class SkipFwd(val ms: Int) : PlayerCommand()
         data class SkipBack(val ms: Int) : PlayerCommand()
         data class SeekTo(val ms: Long) : PlayerCommand()

@@ -27,7 +27,8 @@ class PlayerModelMapper constructor(
                     ?: descriptionMapper.mapEmpty(),
                 nextTrackEnabled = playlist?.run { currentIndex < playlist.items.size - 1 } ?: false,
                 prevTrackEnabled = playlist?.run { currentIndex > 0 } ?: false,
-                platformId = item?.media?.platformId,
+//                platformId = item?.media?.platformId,
+//                startPosition = item?.media?.positon ?: 0,
                 itemImage = item?.media?.thumbNail?.url,
                 playState = playerState,
                 times = PlayerContract.View.Model.Times(
