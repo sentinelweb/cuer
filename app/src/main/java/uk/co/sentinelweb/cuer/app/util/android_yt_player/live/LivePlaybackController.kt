@@ -12,25 +12,25 @@ class LivePlaybackController constructor(
     private val log: LogWrapper
 ) : LivePlaybackContract.Controller {
 
-    override fun setCurrentPosition(sec: Float) {
-        state.positionSec = sec
+    override fun setCurrentPosition(ms: Long) {
+        state.positionMs = ms
     }
 
     override fun getLiveOffsetMs(): Long {
         if (state.durationObtainedTime > -1) {
             val timeSinceDurationMs = timeProvider.currentTimeMillis() - state.durationObtainedTime
-            val currentDurationSec = state.durationSec + (timeSinceDurationMs / 1000f)
-            val offsetSec =
-                currentDurationSec - state.positionSec - 3600 //  - timeProvider.timeZomeOffsetSecs() // some problem here 1 hour more (not timezone?)
-            log.d("offsetSec:$offsetSec state.durationSec:${state.durationSec} state.durationObtainedTime:${state.durationObtainedTime}")
-            return (offsetSec * 1000).toLong()
+            val currentDurationMs = state.durationMs + timeSinceDurationMs
+            val offsetMs =
+                currentDurationMs - state.positionMs - (3600 * 1000) //  - timeProvider.timeZomeOffsetSecs() // some problem here 1 hour more (not timezone?)
+            //log.d("offsetSec:$offsetMs state.durationSec:${state.durationMs} state.durationObtainedTime:${state.durationObtainedTime}")
+            return offsetMs
         }
         return -1
     }
 
-    override fun gotDuration(duration: Float) {
+    override fun gotDuration(durationMs: Long) {
         if (state.durationObtainedTime == -1L) {
-            state.durationSec = duration
+            state.durationMs = durationMs
             state.durationObtainedTime = timeProvider.currentTimeMillis()
             state.receivedVideoId?.let { saveLiveDurationPref() }
         }
@@ -44,13 +44,13 @@ class LivePlaybackController constructor(
     private fun saveLiveDurationPref() {
         prefs.putLong(prefKeys.durationObtainedTime, state.durationObtainedTime)
         prefs.putString(prefKeys.durationVideoId, state.receivedVideoId ?: throw IllegalStateException("Should have id"))
-        prefs.putLong(prefKeys.durationValue, state.durationSec.toLong())
+        prefs.putLong(prefKeys.durationValue, state.durationMs)
     }
 
     override fun gotVideoId(id: String) {
         state.receivedVideoId = id
         if (prefs.getString(prefKeys.durationVideoId, null) == id) {
-            state.durationSec = prefs.getLong(prefKeys.durationValue)?.toFloat() ?: 0f
+            state.durationMs = prefs.getLong(prefKeys.durationValue) ?: 0
             state.durationObtainedTime = prefs.getLong(prefKeys.durationObtainedTime) ?: -1
             log.d("restored duration")
         } else {

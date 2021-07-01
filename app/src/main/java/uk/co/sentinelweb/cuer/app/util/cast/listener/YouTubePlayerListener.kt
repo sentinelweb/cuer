@@ -98,7 +98,7 @@ class YouTubePlayerListener(
 //                    state.durationObtainedTime = timeProvider.currentTimeMillis()
 //                    state.receivedVideoId?.let { saveLiveDurationPref() }
 //                }
-                livePlaybackController.gotDuration(duration)
+                livePlaybackController.gotDuration((duration * 1000).toLong())
                 state.durationSec = duration
             }
             ?: run { state.durationSec = duration }
@@ -113,7 +113,7 @@ class YouTubePlayerListener(
         if (state.positionSec != second) {
             state.positionSec = second
             updateMedia(true, posSec = second)
-            livePlaybackController.setCurrentPosition(second)
+            livePlaybackController.setCurrentPosition((second * 1000).toLong())
         }
         if (shouldUpdateUi()) {
             playerUi?.setCurrentSecond(second)
