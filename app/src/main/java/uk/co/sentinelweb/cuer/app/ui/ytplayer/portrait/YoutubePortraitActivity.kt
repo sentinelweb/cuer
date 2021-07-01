@@ -32,6 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.DurationReceived
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
@@ -40,7 +41,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import kotlin.math.abs
@@ -117,14 +118,14 @@ class YoutubePortraitActivity : AppCompatActivity(),
                 override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
                     player = youTubePlayer
                     if (abs(lastPositionSec - second) > 1) {
-                        dispatch(Event.SendPosition((second * 1000).toInt()))
+                        dispatch(Event.PositionReceived((second * 1000).toLong()))
                         lastPositionSec = second
                     }
                 }
 
                 override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
                     player = youTubePlayer
-                    dispatch(Event.PlayerStateChanged(PlayerStateDomain.ERROR))
+                    dispatch(Event.PlayerStateChanged(ERROR))
                 }
 
                 override fun onPlaybackQualityChange(youTubePlayer: YouTubePlayer, playbackQuality: PlayerConstants.PlaybackQuality) {
@@ -143,13 +144,13 @@ class YoutubePortraitActivity : AppCompatActivity(),
                 override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
                     player = youTubePlayer
                     val playStateDomain = when (state) {
-                        PlayerConstants.PlayerState.ENDED -> PlayerStateDomain.ENDED
-                        PlayerConstants.PlayerState.PAUSED -> PlayerStateDomain.PAUSED
-                        PlayerConstants.PlayerState.PLAYING -> PlayerStateDomain.PLAYING
-                        PlayerConstants.PlayerState.BUFFERING -> PlayerStateDomain.BUFFERING
-                        PlayerConstants.PlayerState.UNSTARTED -> PlayerStateDomain.UNSTARTED
-                        PlayerConstants.PlayerState.UNKNOWN -> PlayerStateDomain.UNKNOWN
-                        PlayerConstants.PlayerState.VIDEO_CUED -> PlayerStateDomain.VIDEO_CUED
+                        PlayerConstants.PlayerState.ENDED -> ENDED
+                        PlayerConstants.PlayerState.PAUSED -> PAUSED
+                        PlayerConstants.PlayerState.PLAYING -> PLAYING
+                        PlayerConstants.PlayerState.BUFFERING -> BUFFERING
+                        PlayerConstants.PlayerState.UNSTARTED -> UNSTARTED
+                        PlayerConstants.PlayerState.UNKNOWN -> UNKNOWN
+                        PlayerConstants.PlayerState.VIDEO_CUED -> VIDEO_CUED
                     }
                     dispatch(Event.PlayerStateChanged(playStateDomain))
                     //updateMediaSessionManagerPlaybackState()// todo ??
@@ -157,13 +158,13 @@ class YoutubePortraitActivity : AppCompatActivity(),
 
                 override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
                     player = youTubePlayer
-                    //log.d("onVideoDuration dur=${state.durationSec} durObTime=${state.durationObtainedTime}")
-                    //log.d("onVideoDuration dur=${duration}")
+                    dispatch(DurationReceived((duration * 1000).toLong()))
                 }
 
                 override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
                     player = youTubePlayer
-                    dispatch(Event.PlayerStateChanged(PlayerStateDomain.VIDEO_CUED))
+                    dispatch(Event.IdReceived(videoId))
+                    dispatch(Event.PlayerStateChanged(VIDEO_CUED))
                 }
 
                 override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {
@@ -236,7 +237,7 @@ class YoutubePortraitActivity : AppCompatActivity(),
 
         fun start(c: Context, playlistItem: PlaylistItemDomain) = c.startActivity(
             Intent(c, YoutubePortraitActivity::class.java).apply {
-                putExtra(NavigationModel.Param.PLAYLIST_ITEM.toString(), playlistItem.serialise())
+                putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
             })
     }
 

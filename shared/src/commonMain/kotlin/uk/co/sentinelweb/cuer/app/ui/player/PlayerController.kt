@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
+import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -29,11 +30,21 @@ class PlayerController constructor(
     private val queueProducer: QueueMediatorContract.Producer,
     private val modelMapper: PlayerModelMapper,
     private val coroutines: CoroutineContextProvider,
-    private val lifecycle: Lifecycle?,
+    lifecycle: Lifecycle?,
+    livePlaybackController: LivePlaybackContract.Controller,
     skip: SkipContract.External,
     log: LogWrapper
 ) {
-    private val store = PlayerStoreFactory(storeFactory, itemLoader, queueConsumer, queueProducer, skip, coroutines, log).create()
+    private val store = PlayerStoreFactory(
+        storeFactory,
+        itemLoader,
+        queueConsumer,
+        queueProducer,
+        skip,
+        coroutines,
+        log,
+        livePlaybackController
+    ).create()
 
     init {
         log.tag(this)
@@ -50,7 +61,7 @@ class PlayerController constructor(
             is TrackBackClicked -> TrackBack
             is SkipFwdClicked -> SkipFwd
             is SkipBackClicked -> SkipBack
-            is SendPosition -> Position(ms)
+            is PositionReceived -> Position(ms)
             is SkipFwdSelectClicked -> SkipFwdSelect
             is SkipBackSelectClicked -> SkipBackSelect
             is PlayPauseClicked -> PlayPause(isPlaying)
@@ -60,6 +71,8 @@ class PlayerController constructor(
             is LinkClick -> LinkOpen(url)
             is ChannelClick -> ChannelOpen
             is TrackClick -> TrackSelected(item, resetPosition)
+            is DurationReceived -> Duration(ms)
+            is IdReceived -> Id(videoId)
         }
     }
 

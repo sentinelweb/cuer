@@ -11,7 +11,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 
 interface YoutubeFullScreenContract {
 
@@ -30,12 +29,13 @@ interface YoutubeFullScreenContract {
                         coroutines = get(),
                         lifecycle = null,
                         skip = get(),
-                        log = get()
+                        log = get(),
+                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER))
                     )
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { ShowHideUi(getSource()) }
-                scoped { PlayerModelMapper(get(), get(), get()) }
+//                scoped { PlayerModelMapper(get(), get()) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = get(),

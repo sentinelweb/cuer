@@ -27,13 +27,15 @@ interface PlayerContract {
             object PlaylistItemView : Intent()
             object ChannelOpen : Intent()
             data class PlayPause(val isPlaying: Boolean?) : Intent()
-            data class Position(val ms: Int) : Intent()
+            data class Position(val ms: Long) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
             data class TrackChange(val item: PlaylistItemDomain) : Intent()
             data class TrackSelected(val item: PlaylistItemDomain, val resetPosition: Boolean) : Intent()
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
             data class SeekTo(val fraction: Float) : Intent()
             data class LinkOpen(val url: String) : Intent()
+            data class Duration(val ms: Long) : Intent()
+            data class Id(val videoId: String) : Intent()
         }
 
         sealed class Label {
@@ -50,7 +52,8 @@ interface PlayerContract {
             val playerState: PlayerStateDomain = UNKNOWN,
             val skipFwdText: String = "-",
             val skipBackText: String = "-",
-            val screen: Screen = Screen.DESCRIPTION
+            val screen: Screen = Screen.DESCRIPTION,
+            val position: Long = -1
         )
     }
 
@@ -99,11 +102,13 @@ interface PlayerContract {
             object PlaylistClicked : Event()
             data class SeekBarChanged(val fraction: Float) : Event()
             data class PlayPauseClicked(val isPlaying: Boolean? = null) : Event()
-            data class SendPosition(val ms: Int) : Event()
+            data class PositionReceived(val ms: Long) : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
             data class TrackClick(val item: PlaylistItemDomain, val resetPosition: Boolean) : Event()
             object ChannelClick : Event()
             data class LinkClick(val url: String) : Event()
+            data class DurationReceived(val ms: Long) : Event()
+            data class IdReceived(val videoId: String) : Event()
         }
     }
 

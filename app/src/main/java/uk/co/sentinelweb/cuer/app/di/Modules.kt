@@ -32,6 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.portrait.YoutubePortraitContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
@@ -147,4 +148,5 @@ object Modules {
         .plus(FirebaseModule.fbModule)
         .plus(AppSharedModule.modules)
         .plus(RemoteModule.objectModule)
+        .plus(PlayerModule.localPlayerModule)
 }

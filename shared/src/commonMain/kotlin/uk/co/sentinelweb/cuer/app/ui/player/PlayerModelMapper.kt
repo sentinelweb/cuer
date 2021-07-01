@@ -3,12 +3,10 @@ package uk.co.sentinelweb.cuer.app.ui.player
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionMapper
 import uk.co.sentinelweb.cuer.core.mappers.Format.SECS
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
-import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 
 class PlayerModelMapper constructor(
-    private val timeSinceFormatter: TimeSinceFormatter,
     private val timeFormatter: TimeFormatter,
     private val descriptionMapper: DescriptionMapper
 ) {
@@ -33,7 +31,7 @@ class PlayerModelMapper constructor(
                 itemImage = item?.media?.thumbNail?.url,
                 playState = playerState,
                 times = PlayerContract.View.Model.Times(
-                    positionText = item?.media?.positon?.let { timeFormatter.formatMillis(it, SECS) } ?: "-",
+                    positionText = mapPosition(),
                     durationText = item?.media?.duration?.let { timeFormatter.formatMillis(it, SECS) } ?: "-",
                     isLive = item?.media?.run { isLiveBroadcast || isLiveBroadcastUpcoming } ?: false,
                     seekBarFraction = item?.media?.positon?.let { pos ->
@@ -43,6 +41,14 @@ class PlayerModelMapper constructor(
                 screen = screen
             )
         }
+
+    private fun PlayerContract.MviStore.State.mapPosition() = item?.media?.let {
+        if (it.isLiveBroadcast) {
+            "-" + if (position > 0) timeFormatter.formatTime(position / 1000f) else ""
+        } else {
+            it.positon?.let { timeFormatter.formatMillis(it, SECS) } ?: "-"
+        }
+    } ?: "-"
 
     private fun trackTitle(playlist: PlaylistDomain?, offset: Int): String =
         playlist?.currentIndex

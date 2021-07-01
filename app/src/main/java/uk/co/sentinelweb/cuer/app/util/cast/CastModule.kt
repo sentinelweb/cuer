@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 
 object CastModule {
-    const val CAST = "CAST"
+    const val CAST_PLAYER = "CAST_PLAYER"
     val castModule = module {
         single { ChromecastYouTubePlayerContextHolder(get(), get()) }
         single { CuerCastSessionListener(get(), get()) }
@@ -23,11 +23,11 @@ object CastModule {
                 mediaSessionManager = get(),
                 castWrapper = get(),
                 timeProvider = get(),
-                livePlayback = get(named(CAST)),
+                livePlayback = get(named(CAST_PLAYER)),
                 coroutines = get()
             )
         }
-        factory<LivePlaybackContract.Controller>(named(CAST)) {
+        factory<LivePlaybackContract.Controller>(named(CAST_PLAYER)) {
             LivePlaybackController(
                 state = LivePlaybackContract.State(),
                 prefKeys = object : LivePlaybackContract.PrefKeys {

@@ -207,7 +207,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
         private fun startTicker() {
             ticker = tickerFlow(1000)
                 .filter { player.isPlaying }
-                .onEach { dispatch(SendPosition(player.currentTimeMillis)) }
+                .onEach { dispatch(PositionReceived(player.currentTimeMillis.toLong())) }
                 .launchIn(coroutines.mainScope)
         }
 

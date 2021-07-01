@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory.Action.InitSkipTimes
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory.Action.Playlist
+import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -28,7 +29,8 @@ class PlayerStoreFactory(
     private val queueProducer: QueueMediatorContract.Producer,
     private val skip: SkipContract.External,
     private val coroutines: CoroutineContextProvider,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val livePlaybackController: LivePlaybackContract.Controller
 ) {
 
     private sealed class Result {
@@ -38,6 +40,7 @@ class PlayerStoreFactory(
         class Playlist(val playlist: PlaylistDomain) : Result()
         class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
         class Screen(val screen: PlayerContract.MviStore.Screen) : Result()
+        class Position(val pos: Long) : Result()
     }
 
     private sealed class Action {
@@ -57,6 +60,7 @@ class PlayerStoreFactory(
                     skipFwdText = result.fwd ?: skipFwdText,
                     skipBackText = result.back ?: skipFwdText
                 )
+                is Result.Position -> copy(position = result.pos)
             }
     }
 
@@ -75,6 +79,12 @@ class PlayerStoreFactory(
         init {
             skip.listener = this
         }
+
+        override suspend fun executeAction(action: Action, getState: () -> State) =
+            when (action) {
+                is Playlist -> dispatch(Result.Playlist(action.playlist))
+                InitSkipTimes -> dispatch(Result.SkipTimes(skip.skipForwardText, skip.skipBackText))
+            }
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
@@ -98,6 +108,8 @@ class PlayerStoreFactory(
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.url))
                 is Intent.ChannelOpen -> getState().item?.media?.channelData?.let { publish(Label.ChannelOpen(it)) } ?: Unit
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
+                is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
+                is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
             }
 
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {
@@ -110,22 +122,25 @@ class PlayerStoreFactory(
 
         private fun trackChange(intent: Intent.TrackChange) {
             intent.item.media.duration?.apply { skip.duration = this }
+            livePlaybackController.clear(intent.item.media.platformId)
             dispatch(Result.LoadVideo(intent.item, queueConsumer.playlist))
         }
 
-        private fun updatePosition(ms: Int, item: PlaylistItemDomain?) {
+        private fun updatePosition(ms: Long, item: PlaylistItemDomain?) {
             item
-                ?.run { copy(media = media.copy(positon = ms.toLong())) }
+                ?.run { copy(media = media.copy(positon = ms)) }
                 ?.apply { queueConsumer.updateCurrentMediaItem(media) }
-                ?.apply { skip.updatePosition(ms.toLong()) }
+                ?.apply { skip.updatePosition(ms) }
+                ?.apply { livePlaybackController.setCurrentPosition(ms) }
                 ?.run { dispatch(Result.LoadVideo(this)) }
+                ?.run {
+                    dispatch(
+                        Result.Position(
+                            if (item.media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else ms
+                        )
+                    )
+                }
         }
-
-        override suspend fun executeAction(action: Action, getState: () -> State) =
-            when (action) {
-                is Playlist -> dispatch(Result.Playlist(action.playlist))
-                InitSkipTimes -> dispatch(Result.SkipTimes(skip.skipForwardText, skip.skipBackText))
-            }
 
         private fun playStateChange(playState: PlayerStateDomain, item: PlaylistItemDomain?): Unit =
             when (playState) {
@@ -149,7 +164,9 @@ class PlayerStoreFactory(
         private suspend fun loadVideo() {
             withContext(coroutines.Computation) {
                 itemLoader.load()?.also { item ->
-                    item.playlistId?.toIdentifier(LOCAL)
+                    item.playlistId
+                        ?.toIdentifier(LOCAL)
+                        ?.apply { livePlaybackController.clear(item.media.platformId) }
                         ?.apply { queueProducer.playNow(this, item.id) }
                 }
             }
@@ -160,7 +177,9 @@ class PlayerStoreFactory(
         private suspend fun trackSelected(item: PlaylistItemDomain, resetPosition: Boolean) {
             withContext(coroutines.Computation) {
                 item.also { item ->
-                    item.playlistId?.toIdentifier(LOCAL)
+                    item.playlistId
+                        ?.toIdentifier(LOCAL)
+                        ?.apply { livePlaybackController.clear(item.media.platformId) }
                         ?.apply { queueProducer.onItemSelected(item, false, resetPosition) }
                 }
             }

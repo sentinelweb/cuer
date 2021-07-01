@@ -41,12 +41,6 @@ class LivePlaybackController constructor(
         clearLiveDurationPrefIfNotSame(id)
     }
 
-    private fun saveLiveDurationPref() {
-        prefs.putLong(prefKeys.durationObtainedTime, state.durationObtainedTime)
-        prefs.putString(prefKeys.durationVideoId, state.receivedVideoId ?: throw IllegalStateException("Should have id"))
-        prefs.putLong(prefKeys.durationValue, state.durationMs)
-    }
-
     override fun gotVideoId(id: String) {
         state.receivedVideoId = id
         if (prefs.getString(prefKeys.durationVideoId, null) == id) {
@@ -56,6 +50,12 @@ class LivePlaybackController constructor(
         } else {
             log.d("did not restore")
         }
+    }
+
+    private fun saveLiveDurationPref() {
+        prefs.putLong(prefKeys.durationObtainedTime, state.durationObtainedTime)
+        prefs.putString(prefKeys.durationVideoId, state.receivedVideoId ?: throw IllegalStateException("Should have id"))
+        prefs.putLong(prefKeys.durationValue, state.durationMs)
     }
 
     private fun clearLiveDurationPrefIfNotSame(id: String) {
