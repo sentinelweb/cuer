@@ -157,6 +157,8 @@ class YoutubePortraitActivity : AppCompatActivity(),
 
                 override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
                     player = youTubePlayer
+                    //log.d("onVideoDuration dur=${state.durationSec} durObTime=${state.durationObtainedTime}")
+                    //log.d("onVideoDuration dur=${duration}")
                 }
 
                 override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {

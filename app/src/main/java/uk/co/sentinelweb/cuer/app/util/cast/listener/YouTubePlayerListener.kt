@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -26,7 +26,7 @@ class YouTubePlayerListener(
     private val log: LogWrapper,
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider,
-    private val prefs: GeneralPreferencesWrapper
+    private val livePlaybackController: LivePlaybackContract.Controller
 ) : AbstractYouTubePlayerListener(),
     CastPlayerContract.PlayerControls.Listener {
 
@@ -34,7 +34,7 @@ class YouTubePlayerListener(
         var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
         var positionSec: Float = 0f,
         var durationSec: Float = 0f,
-        var durationObtainedTime: Long = -1,
+        //var durationObtainedTime: Long = -1,
         var currentMedia: MediaDomain? = null,
         var lastUpdateMedia: Long = -1L,
         var lastUpdateUI: Long = -1L,
@@ -88,20 +88,23 @@ class YouTubePlayerListener(
     }
 
     override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
-        log.d("onVideoDuration dur=${state.durationSec} durObTime=${state.durationObtainedTime}")
+        // log.d("onVideoDuration dur=${state.durationSec} durObTime=${state.durationObtainedTime}")
         this.youTubePlayer = youTubePlayer
         state.currentMedia
             ?.takeIf { it.isLiveBroadcast }
             ?.apply {
-                if (state.durationObtainedTime == -1L) {
-                    state.durationSec = duration
-                    state.durationObtainedTime = timeProvider.currentTimeMillis()
-                    state.receivedVideoId?.let { saveLiveDurationPref() }
-                }
+//                if (state.durationObtainedTime == -1L) {
+//                    state.durationSec = duration
+//                    state.durationObtainedTime = timeProvider.currentTimeMillis()
+//                    state.receivedVideoId?.let { saveLiveDurationPref() }
+//                }
+                livePlaybackController.gotDuration(duration)
+                state.durationSec = duration
             }
             ?: run { state.durationSec = duration }
         playerUi?.setDuration(duration)
         updateMedia(false, durSec = duration)
+
         state.currentMedia?.apply { mediaSessionManager.setMedia(this) }
     }
 
@@ -110,6 +113,7 @@ class YouTubePlayerListener(
         if (state.positionSec != second) {
             state.positionSec = second
             updateMedia(true, posSec = second)
+            livePlaybackController.setCurrentPosition(second)
         }
         if (shouldUpdateUi()) {
             playerUi?.setCurrentSecond(second)
@@ -198,7 +202,8 @@ class YouTubePlayerListener(
     override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
         this.youTubePlayer = youTubePlayer
         state.receivedVideoId = videoId
-        restoreLiveDurationPref(videoId)
+        //restoreLiveDurationPref(videoId)
+        livePlaybackController.gotVideoId(videoId)
         log.d("Got id: $videoId media=${state.currentMedia?.stringMedia()}")
     }
 
@@ -249,14 +254,15 @@ class YouTubePlayerListener(
     }
 
     override fun getLiveOffsetMs(): Long {
-        if (state.durationObtainedTime > -1) {
-            val timeSinceDurationMs = timeProvider.currentTimeMillis() - state.durationObtainedTime
-            val currentDurationSec = state.durationSec + (timeSinceDurationMs / 1000f)
-            val offsetSec =
-                currentDurationSec - state.positionSec - 3600 //  - timeProvider.timeZomeOffsetSecs() // some problem here 1 hour more (not timezone?)
-            return (offsetSec * 1000).toLong()
-        }
-        return -1
+//        if (state.durationObtainedTime > -1) {
+//            val timeSinceDurationMs = timeProvider.currentTimeMillis() - state.durationObtainedTime
+//            val currentDurationSec = state.durationSec + (timeSinceDurationMs / 1000f)
+//            val offsetSec =
+//                currentDurationSec - state.positionSec - 3600 //  - timeProvider.timeZomeOffsetSecs() // some problem here 1 hour more (not timezone?)
+//            return (offsetSec * 1000).toLong()
+//        }
+//        return -1
+        return livePlaybackController.getLiveOffsetMs()
     }
     // endregion
 
@@ -278,8 +284,9 @@ class YouTubePlayerListener(
                     0f
                 }
             }
-            state.durationObtainedTime = -1
-            clearLiveDurationPrefIfNotSame(media.platformId)
+//            state.durationObtainedTime = -1
+//            clearLiveDurationPrefIfNotSame(media.platformId)
+            livePlaybackController.clear(media.platformId)
             log.d("loadVideo: play position: pos =  $startPos sec")
             youTubePlayer?.loadVideo(media.platformId, startPos)
             state.currentMedia = media
@@ -317,33 +324,33 @@ class YouTubePlayerListener(
             reset()
         }
     }
-
-    private fun saveLiveDurationPref() {
-        prefs.putLong(LIVE_DURATION_TIME, state.durationObtainedTime)
-        prefs.putString(LIVE_DURATION_ID, state.receivedVideoId ?: throw IllegalStateException("Should have id"))
-        prefs.putLong(LIVE_DURATION_DURATION, state.durationSec.toLong())
-    }
-
-    private fun restoreLiveDurationPref(id: String) {
-        if (prefs.getString(LIVE_DURATION_ID, null) == id) {
-            state.durationSec = prefs.getLong(LIVE_DURATION_DURATION)?.toFloat() ?: 0f
-            state.durationObtainedTime = prefs.getLong(LIVE_DURATION_TIME) ?: -1
-            log.d("restored duration")
-        } else {
-            log.d("did not restore")
-        }
-    }
-
-    private fun clearLiveDurationPrefIfNotSame(id: String) {
-        if (prefs.getString(LIVE_DURATION_ID, null) != id) {
-            prefs.remove(LIVE_DURATION_DURATION)
-            prefs.remove(LIVE_DURATION_TIME)
-            prefs.remove(LIVE_DURATION_ID)
-            log.d("cleared duration")
-        } else {
-            log.d("did not clear duration")
-        }
-    }
+//
+//    private fun saveLiveDurationPref() {
+//        prefs.putLong(LIVE_DURATION_TIME, state.durationObtainedTime)
+//        prefs.putString(LIVE_DURATION_ID, state.receivedVideoId ?: throw IllegalStateException("Should have id"))
+//        prefs.putLong(LIVE_DURATION, state.durationSec.toLong())
+//    }
+//
+//    private fun restoreLiveDurationPref(id: String) {
+//        if (prefs.getString(LIVE_DURATION_ID, null) == id) {
+//            state.durationSec = prefs.getLong(LIVE_DURATION)?.toFloat() ?: 0f
+//            state.durationObtainedTime = prefs.getLong(LIVE_DURATION_TIME) ?: -1
+//            log.d("restored duration")
+//        } else {
+//            log.d("did not restore")
+//        }
+//    }
+//
+//    private fun clearLiveDurationPrefIfNotSame(id: String) {
+//        if (prefs.getString(LIVE_DURATION_ID, null) != id) {
+//            prefs.remove(LIVE_DURATION)
+//            prefs.remove(LIVE_DURATION_TIME)
+//            prefs.remove(LIVE_DURATION_ID)
+//            log.d("cleared duration")
+//        } else {
+//            log.d("did not clear duration")
+//        }
+//    }
 
     companion object {
         private const val UI_UPDATE_INTERVAL = 500
