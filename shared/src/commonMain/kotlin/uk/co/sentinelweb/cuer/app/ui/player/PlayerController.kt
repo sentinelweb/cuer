@@ -5,10 +5,7 @@ import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
 import com.arkivanov.mvikotlin.core.lifecycle.Lifecycle
 import com.arkivanov.mvikotlin.core.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.arkivanov.mvikotlin.extensions.coroutines.bind
-import com.arkivanov.mvikotlin.extensions.coroutines.events
-import com.arkivanov.mvikotlin.extensions.coroutines.labels
-import com.arkivanov.mvikotlin.extensions.coroutines.states
+import com.arkivanov.mvikotlin.extensions.coroutines.*
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
@@ -97,18 +94,7 @@ class PlayerController constructor(
     fun onViewCreated(views: List<PlayerContract.View>) {
         if (binder != null) throw IllegalStateException("Already bound")
         binder = bind(coroutines.Main) {
-            views.forEach { view ->
-                // store -> view
-                store.states.mapNotNull { modelMapper.map(it) } bindTo view
-                store.labels bindTo { label -> view.processLabel(label) }
-
-                // view -> store
-                view.events.mapNotNull(eventToIntent) bindTo store
-            }
-            // queue -> store
-            queueConsumer.currentItemFlow.filterNotNull().mapNotNull { trackChangeToIntent(it) } bindTo store
-            queueConsumer.currentPlaylistFlow.filterNotNull().mapNotNull { playlistChangeToIntent(it) } bindTo store
-            playControls.intentFlow bindTo store
+            bindTheThings(views)
         }
     }
 
@@ -116,19 +102,23 @@ class PlayerController constructor(
     fun onViewCreated(views: List<PlayerContract.View>, viewLifecycle: Lifecycle) {
         if (binder != null) throw IllegalStateException("Already bound")
         binder = bind(viewLifecycle, BinderLifecycleMode.START_STOP) {
-            views.forEach { view ->
-                // store -> view
-                store.states.mapNotNull { modelMapper.map(it) } bindTo view
-                store.labels bindTo { label -> view.processLabel(label) }
-
-                // view -> store
-                view.events.mapNotNull(eventToIntent) bindTo store
-            }
-            // queue -> store
-            queueConsumer.currentItemFlow.filterNotNull().mapNotNull { trackChangeToIntent(it) } bindTo store
-            queueConsumer.currentPlaylistFlow.filterNotNull().mapNotNull { playlistChangeToIntent(it) } bindTo store
-            playControls.intentFlow bindTo store
+            bindTheThings(views)
         }
+    }
+
+    private fun BindingsBuilder.bindTheThings(views: List<PlayerContract.View>) {
+        views.forEach { view ->
+            // store -> view
+            store.states.mapNotNull { modelMapper.map(it) } bindTo view
+            store.labels bindTo { label -> view.processLabel(label) }
+
+            // view -> store
+            view.events.mapNotNull(eventToIntent) bindTo store
+        }
+        // queue -> store
+        queueConsumer.currentItemFlow.filterNotNull().mapNotNull { trackChangeToIntent(it) } bindTo store
+        queueConsumer.currentPlaylistFlow.filterNotNull().mapNotNull { playlistChangeToIntent(it) } bindTo store
+        playControls.intentFlow bindTo store
     }
 
     fun onStart() {
