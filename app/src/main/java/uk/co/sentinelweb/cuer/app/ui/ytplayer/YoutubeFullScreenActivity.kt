@@ -24,9 +24,11 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubeFullsreenBinding
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
@@ -65,6 +67,8 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
     private val coroutines: CoroutineContextProvider by inject()
     private val showHideUi: ShowHideUi by inject()
     private val res: ResourceWrapper by inject()
+    private val navMapper: NavigationMapper by inject()
+    private val toast: ToastWrapper by inject()
 
     lateinit var mviView: YouTubePlayerViewImpl
     private lateinit var binding: ActivityYoutubeFullsreenBinding
@@ -100,6 +104,8 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
         binding.controls.controlsSeekBack.setOnLongClickListener { mviView.dispatch(SkipBackSelectClicked);true }
         binding.controls.controlsSeekForward.setOnLongClickListener { mviView.dispatch(SkipFwdSelectClicked);true }
         binding.controls.controlsPlayFab.setOnClickListener { mviView.playPause() }
+        binding.controls.controlsPortraitFab.setOnClickListener { mviView.dispatch(PortraitClick); }
+        binding.controls.controlsPipFab.setOnClickListener { mviView.dispatch(PipClick); }
         binding.controls.controlsSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -173,9 +179,11 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
                 override fun onAdStarted() = Unit
 
                 override fun onLoading() = dispatch(PlayerStateChanged(BUFFERING))
+                // button id name skip_ad_button (FrameLayout)
 
                 override fun onLoaded(p0: String?) {
-                    dispatch(PlayerStateChanged(VIDEO_CUED))
+                    //dispatch(PlayerStateChanged(VIDEO_CUED))
+                    player.play()
                 }
             })
             player.setPlaybackEventListener(object : YouTubePlayer.PlaybackEventListener {
@@ -269,12 +277,19 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
             when (label) {
                 is Command -> label.command.let { command ->
                     when (command) {
+                        is Load -> player.cueVideo(command.platformId, command.startPosition.toInt())
                         is Play -> player.play()
                         is Pause -> player.pause()
                         is SkipBack -> player.seekToMillis(player.currentTimeMillis - command.ms)
                         is SkipFwd -> player.seekToMillis(player.currentTimeMillis + command.ms)
                         is SeekTo -> player.seekToMillis(command.ms.toInt())
                     }
+                }
+                is FullScreenPlayerOpen -> toast.show("Already in Fullscreen mode - shouldnt get here")
+                is PipPlayerOpen -> toast.show("PIP Open")
+                is PortraitPlayerOpen -> label.also {
+                    navMapper.navigate(NavigationModel(NavigationModel.Target.LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))
+                    finish()
                 }
             }
         }

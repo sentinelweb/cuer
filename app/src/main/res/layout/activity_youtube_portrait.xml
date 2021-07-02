@@ -13,6 +13,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        app:showFullScreenButton="false"
+        app:showVideoCurrentTime="false"
+        app:showVideoDuration="false"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/portrait_player_fullscreen"
+        style="@style/FabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:contentDescription="@string/player_fab_fullscreen"
+        app:fabSize="mini"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/portrait_player_video"
+        app:srcCompat="@drawable/ic_fullscreen_24"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/portrait_player_pip"
+        style="@style/FabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:contentDescription="@string/player_fab_pip"
+        app:fabSize="mini"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/portrait_player_fullscreen"
+        app:srcCompat="@drawable/ic_picture_in_picture_24"
         />
 
     <FrameLayout
@@ -25,10 +54,11 @@
         app:layout_constraintTop_toBottomOf="@id/portrait_player_video"
         >
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/portrait_player_description_scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             >
 
             <uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
@@ -37,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="48dp"
                 />
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/portrait_player_playlist"
@@ -46,6 +76,7 @@
             android:layout_height="match_parent"
             android:visibility="visible"
             />
+
     </FrameLayout>
 
     <androidx.fragment.app.FragmentContainerView

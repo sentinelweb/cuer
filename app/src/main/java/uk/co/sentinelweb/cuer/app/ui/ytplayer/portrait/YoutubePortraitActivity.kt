@@ -23,8 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.WEB_LINK
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.YOUTUBE_CHANNEL
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -39,6 +38,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -59,6 +59,8 @@ class YoutubePortraitActivity : AppCompatActivity(),
     private val playlistFragment: PlaylistFragment by inject()
     private val navMapper: NavigationMapper by inject()
     private val itemLoader: PlayerContract.PlaylistItemLoader by inject()
+    private val toast: ToastWrapper by inject()
+
 
     private lateinit var mviView: YoutubePortraitActivity.MviViewImpl
     private lateinit var binding: ActivityYoutubePortraitBinding
@@ -103,6 +105,8 @@ class YoutubePortraitActivity : AppCompatActivity(),
             PLAYLIST_ITEM_ID.name to (playlistItem.id ?: throw IllegalArgumentException("Playlist item is null")),
         )
         playlistFragment.external.interactions = playlistInteractions
+        binding.portraitPlayerFullscreen.setOnClickListener { mviView.dispatch(FullScreenClick) }
+        binding.portraitPlayerPip.setOnClickListener { mviView.dispatch(PipClick); }
     }
 
     // region MVI view
@@ -111,21 +115,17 @@ class YoutubePortraitActivity : AppCompatActivity(),
         PlayerContract.View {
         private var player: YouTubePlayer? = null
         private var lastPositionSec: Float = -1f
+        private var lastPositionSend: Float = -1f
 
         init {
-            val playWhenReady = object {
-                var id: String? = null
-                var pos: Long = 0
-            }
             playerView.addYouTubePlayerListener(object : YouTubePlayerListener {
                 override fun onApiChange(youTubePlayer: YouTubePlayer) = Unit
 
                 override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
                     player = youTubePlayer
-                    if (abs(lastPositionSec - second) > 0.1) {
-                        lastPositionSec = second
-                    }
-                    if (abs(lastPositionSec - second) > 1) {
+                    lastPositionSec = second
+                    if (abs(lastPositionSend - second) > 1) {
+                        lastPositionSend = second
                         dispatch(PositionReceived((second * 1000).toLong()))
                     }
                 }
@@ -146,7 +146,6 @@ class YoutubePortraitActivity : AppCompatActivity(),
                 override fun onReady(youTubePlayer: YouTubePlayer) {
                     player = youTubePlayer
                     log.d("onReady")
-
                     dispatch(PlayerStateChanged(VIDEO_CUED))
                 }
 
@@ -185,13 +184,6 @@ class YoutubePortraitActivity : AppCompatActivity(),
         }
 
         override val renderer: ViewRenderer<Model> = diff {
-            // todo use compare and get start pos
-//            diff(get = Model::platformId, set = { id: String? ->
-//                id?.apply {
-//                    log.d("loadVideo:$this")
-//                    player?.loadVideo(this, 0f)
-//                }
-//            })
             diff(get = Model::description, set = {
                 log.d("set description")
                 binding.portraitPlayerDescription.setModel(it)
@@ -212,7 +204,6 @@ class YoutubePortraitActivity : AppCompatActivity(),
 
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
             when (label) {
-
                 is Command -> label.command.let { command ->
                     log.d(command.toString())
                     when (command) {
@@ -231,6 +222,12 @@ class YoutubePortraitActivity : AppCompatActivity(),
                     navMapper.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
                 is ChannelOpen ->
                     label.channel.platformId?.let { id -> navMapper.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
+                is FullScreenPlayerOpen -> label.also {
+                    navMapper.navigate(NavigationModel(LOCAL_PLAYER_FULL, mapOf(PLAYLIST_ITEM to it.item)))
+                    finish()
+                }
+                is PipPlayerOpen -> toast.show("PIP Open")
+                is PortraitPlayerOpen -> toast.show("Already in protrait mode - shouldnt get here")
             }
         }
     }
@@ -238,7 +235,7 @@ class YoutubePortraitActivity : AppCompatActivity(),
     private val playlistInteractions = object : PlaylistContract.Interactions {
 
         override fun onPlayStartClick(item: PlaylistItemDomain) {
-            mviView.dispatch(Event.TrackClick(item, true))
+            mviView.dispatch(TrackClick(item, true))
         }
 
         override fun onRelated(item: PlaylistItemDomain) {
@@ -246,11 +243,11 @@ class YoutubePortraitActivity : AppCompatActivity(),
         }
 
         override fun onView(item: PlaylistItemDomain) {
-            mviView.dispatch(Event.TrackClick(item, false))
+            mviView.dispatch(TrackClick(item, false))
         }
 
         override fun onPlay(item: PlaylistItemDomain) {
-            mviView.dispatch(Event.TrackClick(item, false))
+            mviView.dispatch(TrackClick(item, false))
         }
 
     }

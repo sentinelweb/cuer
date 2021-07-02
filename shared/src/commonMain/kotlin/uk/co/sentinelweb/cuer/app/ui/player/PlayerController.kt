@@ -72,6 +72,9 @@ class PlayerController constructor(
             is TrackClick -> TrackSelected(item, resetPosition)
             is DurationReceived -> Duration(ms)
             is IdReceived -> Id(videoId)
+            is FullScreenClick -> FullScreenPlayerOpen
+            is PortraitClick -> PortraitPlayerOpen
+            is PipClick -> PipPlayerOpen
         }
     }
 

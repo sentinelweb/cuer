@@ -12,6 +12,10 @@ class LivePlaybackController constructor(
     private val log: LogWrapper
 ) : LivePlaybackContract.Controller {
 
+    init {
+        log.tag(this)
+    }
+
     override fun setCurrentPosition(ms: Long) {
         state.positionMs = ms
     }
@@ -22,13 +26,14 @@ class LivePlaybackController constructor(
             val currentDurationMs = state.durationMs + timeSinceDurationMs
             val offsetMs =
                 currentDurationMs - state.positionMs - (3600 * 1000) //  - timeProvider.timeZomeOffsetSecs() // some problem here 1 hour more (not timezone?)
-            //log.d("offsetSec:$offsetMs state.durationSec:${state.durationMs} state.durationObtainedTime:${state.durationObtainedTime}")
+            log.d("getLiveOffsetMs: id: ${state.receivedVideoId} offsetSec:$offsetMs state.durationSec:${state.durationMs} state.durationObtainedTime:${state.durationObtainedTime}")
             return offsetMs
         }
         return -1
     }
 
     override fun gotDuration(durationMs: Long) {
+        log.d("gotDuration: id: ${state.receivedVideoId} durationMs:$durationMs state.durationObtainedTime:${state.durationObtainedTime}")
         if (state.durationObtainedTime == -1L) {
             state.durationMs = durationMs
             state.durationObtainedTime = timeProvider.currentTimeMillis()

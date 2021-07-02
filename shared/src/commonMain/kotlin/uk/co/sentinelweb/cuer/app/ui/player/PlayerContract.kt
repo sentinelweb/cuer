@@ -16,7 +16,6 @@ interface PlayerContract {
         sealed class Intent {
             object Play : Intent()
             object Pause : Intent()
-            //object Load : Intent()
             object SkipFwd : Intent()
             object SkipBack : Intent()
             object TrackFwd : Intent()
@@ -26,6 +25,9 @@ interface PlayerContract {
             object PlaylistView : Intent()
             object PlaylistItemView : Intent()
             object ChannelOpen : Intent()
+            object FullScreenPlayerOpen : Intent()
+            object PortraitPlayerOpen : Intent()
+            object PipPlayerOpen : Intent()
             data class PlayPause(val isPlaying: Boolean?) : Intent()
             data class Position(val ms: Long) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
@@ -39,9 +41,12 @@ interface PlayerContract {
         }
 
         sealed class Label {
-            class Command(val command: PlayerCommand) : Label()
-            class LinkOpen(val url: String) : Label()
-            class ChannelOpen(val channel: ChannelDomain) : Label()
+            data class Command(val command: PlayerCommand) : Label()
+            data class LinkOpen(val url: String) : Label()
+            data class ChannelOpen(val channel: ChannelDomain) : Label()
+            data class FullScreenPlayerOpen(val item: PlaylistItemDomain) : Label()
+            data class PortraitPlayerOpen(val item: PlaylistItemDomain) : Label()
+            data class PipPlayerOpen(val item: PlaylistItemDomain) : Label()
         }
 
         enum class Screen { DESCRIPTION, PLAYLIST, PLAYLISTS }
@@ -61,8 +66,6 @@ interface PlayerContract {
         suspend fun processLabel(label: Label)
         data class Model(
             val texts: Texts,
-//            val platformId: String?,
-//            val startPosition: Long,
             val playState: PlayerStateDomain,
             val nextTrackEnabled: Boolean,
             val prevTrackEnabled: Boolean,
@@ -96,18 +99,20 @@ interface PlayerContract {
             object TrackBackClicked : Event()
             object SkipFwdClicked : Event()
             object SkipBackClicked : Event()
-
-            //object Initialised : Event()
             object SkipFwdSelectClicked : Event()
             object SkipBackSelectClicked : Event()
             object ItemClicked : Event()
             object PlaylistClicked : Event()
+            object FullScreenClick : Event()
+            object PortraitClick : Event()
+            object PipClick : Event()
+            object ChannelClick : Event()
+
             data class SeekBarChanged(val fraction: Float) : Event()
             data class PlayPauseClicked(val isPlaying: Boolean? = null) : Event()
             data class PositionReceived(val ms: Long) : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
             data class TrackClick(val item: PlaylistItemDomain, val resetPosition: Boolean) : Event()
-            object ChannelClick : Event()
             data class LinkClick(val url: String) : Event()
             data class DurationReceived(val ms: Long) : Event()
             data class IdReceived(val videoId: String) : Event()

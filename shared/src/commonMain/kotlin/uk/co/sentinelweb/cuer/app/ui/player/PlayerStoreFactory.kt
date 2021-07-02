@@ -94,7 +94,6 @@ class PlayerStoreFactory(
                 is Intent.Play -> dispatch(Result.State(PLAYING))
                 is Intent.Pause -> dispatch(Result.State(PAUSED))
                 is Intent.PlayState -> playStateChange(intent.state, getState().item)
-                //is Intent.Load -> loadVideo()
                 is Intent.TrackChange -> trackChange(intent)
                 is Intent.PlaylistChange -> dispatch(Result.Playlist(intent.item))
                 is Intent.TrackFwd -> queueConsumer.nextItem()
@@ -113,6 +112,9 @@ class PlayerStoreFactory(
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
                 is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
                 is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
+                is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().item!!))
+                is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().item!!))
+                is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().item!!))
             }
 
         private suspend fun init() {
@@ -126,8 +128,6 @@ class PlayerStoreFactory(
 
                 }
             }
-//                ?.apply { dispatch(Result.LoadVideo(this, null)) }
-//                ?: apply { dispatch(Result.NoVideo) }
         }
 
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {
@@ -135,7 +135,8 @@ class PlayerStoreFactory(
         }
 
         private fun seekTo(fraction: Float, item: PlaylistItemDomain?) {
-            item?.media?.duration?.let { dur -> publish(Label.Command(SeekTo(ms = (fraction * dur).toLong()))) }
+            item?.media?.duration
+                ?.let { dur -> publish(Label.Command(SeekTo(ms = (fraction * dur).toLong()))) }
         }
 
         private fun trackChange(intent: Intent.TrackChange) {
@@ -168,18 +169,15 @@ class PlayerStoreFactory(
                     item?.media?.apply {
                         publish(Label.Command(Load(platformId, startPosition())))
                     }
-                    //Play
-                    null
+                    Unit
                 }
                 ENDED -> {
                     queueConsumer.onTrackEnded()
-                    null
                 }
-                else -> null
-            }.let { command ->
+                else -> Unit
+            }.also {
                 skip.stateChange(playState)
                 dispatch(Result.State(playState))
-                //command?.apply { publish(Label.Command(this)) }
             }
 
         private suspend fun trackSelected(item: PlaylistItemDomain, resetPosition: Boolean) {
@@ -191,7 +189,6 @@ class PlayerStoreFactory(
                         ?.apply { queueProducer.onItemSelected(item, false, resetPosition) }
                 }
             }
-//                .apply { dispatch(Result.LoadVideo(this, null)) }
         }
 
         override fun skipSeekTo(target: Long) {

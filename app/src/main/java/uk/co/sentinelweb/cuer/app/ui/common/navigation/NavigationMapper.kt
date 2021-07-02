@@ -133,16 +133,16 @@ class NavigationMapper constructor(
     }
 }
 
-fun Scope.navigationMapper(isFragment: Boolean, sourceActivity: AppCompatActivity, withNavHost: Boolean = true) = NavigationMapper(
+fun Scope.navigationMapper(isFragment: Boolean, sourceActivity: Activity, withNavHost: Boolean = true) = NavigationMapper(
     activity = sourceActivity,
     toastWrapper = ToastWrapper(sourceActivity),
     fragment = if (isFragment) (getSource() as Fragment) else null,
     ytJavaApi = YoutubeJavaApiWrapper(sourceActivity),
-    navController = if (withNavHost) {
+    navController = if (withNavHost && sourceActivity is AppCompatActivity) {
         if (isFragment) {
             (getSource() as Fragment).findNavController()
         } else {
-            (getSource<AppCompatActivity>()
+            (sourceActivity
                 .supportFragmentManager
                 .findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
                 .navController

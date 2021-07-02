@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
@@ -33,6 +34,7 @@ interface YoutubeFullScreenContract {
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER))
                     )
                 }
+                scoped { navigationMapper(false, getSource(), withNavHost = false) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { ShowHideUi(getSource()) }
 //                scoped { PlayerModelMapper(get(), get()) }

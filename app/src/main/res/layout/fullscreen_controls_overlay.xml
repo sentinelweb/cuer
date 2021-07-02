@@ -194,4 +194,32 @@
         app:layout_constraintLeft_toRightOf="@id/controls_current_time"
         app:layout_constraintRight_toLeftOf="@id/controls_duration"
         />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/controls_portrait_fab"
+        style="@style/FabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginRight="8dp"
+        android:contentDescription="@string/player_fab_fullscreen"
+        app:fabSize="mini"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_portrait_black_24"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/controls_pip_fab"
+        style="@style/FabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginRight="8dp"
+        android:contentDescription="@string/player_fab_pip"
+        app:fabSize="mini"
+        app:layout_constraintRight_toLeftOf="@id/controls_portrait_fab"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_picture_in_picture_24"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

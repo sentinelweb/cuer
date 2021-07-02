@@ -225,10 +225,11 @@ class CastPlayerMviFragment() :
                 if (times.isLive) {
                     setDurationColors(R.color.white, R.color.live_background)
                     setDuration(res.getString(R.string.live))
-
+                    updateSeekPosition(0f)
                 } else {
                     setDurationColors(R.color.text_primary, R.color.transparent)
                     setDuration(times.durationText)
+                    updateSeekPosition(times.seekBarFraction)
                 }
                 setSeekEnabled(!times.isLive)
             })
