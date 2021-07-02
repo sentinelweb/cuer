@@ -4,7 +4,7 @@ import android.app.ActivityManager
 import android.app.Application
 import android.app.Service.*
 import android.content.Context.ACTIVITY_SERVICE
-import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
+import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 
 
 class ServiceWrapper(

@@ -16,7 +16,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-object AppSharedModule {
+object SharedAppModule {
     private val queueModule = module {
         single<QueueMediatorContract.Producer> {
             QueueMediator(

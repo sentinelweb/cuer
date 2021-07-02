@@ -278,6 +278,7 @@ class PlaylistPresenter(
         if (isPlaylistPlaying()) {
             chromeCastWrapper.killCurrentSession()
         } else {
+            // todo local play option?
             state.playlist?.let {
                 coroutines.computationScope.launch {
                     it.id?.apply { queue.switchToPlaylist(state.playlistIdentifier) }
@@ -352,18 +353,7 @@ class PlaylistPresenter(
                 if (interactions != null) {
                     interactions?.onPlay(itemDomain)
                 } else if (!(ytCastContextHolder.isConnected())) {
-//                    val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
-//                    view.showItemDescription(itemModel.id, itemDomain, source)
-
-//                    coroutines.mainScope.launch {
-//                        if (state.playlist?.type == APP) {
-//                            itemDomain.playlistId?.toIdentifier(LOCAL)
-//                        } else {
-//                            state.playlistIdentifier
-//                        }?.apply { queue.playNow(this, itemDomain.id) }
-//                        delay(100)
                     view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to itemDomain)))
-//                    }
                 } else {
                     itemDomain.playlistId?.let {
                         playItem(itemModel.id, itemDomain, false)

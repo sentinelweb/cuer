@@ -50,11 +50,10 @@ import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
-import uk.co.sentinelweb.cuer.core.di.CoreJvmModule
 import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.di.DomainModule
+import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModule
@@ -150,11 +149,10 @@ object Modules {
         .plus(DatabaseModule.dbModule)
         .plus(NetModule.netModule)
         .plus(SharedCoreModule.objectModule)
-        .plus(DomainModule.objectModule)
-        .plus(CoreJvmModule.objectModule)
+        .plus(SharedDomainModule.objectModule)
+        .plus(SharedAppModule.modules)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
-        .plus(AppSharedModule.modules)
         .plus(RemoteModule.objectModule)
         .plus(PlayerModule.localPlayerModule)
 }

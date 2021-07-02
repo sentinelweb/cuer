@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.core.mappers
+package uk.co.sentinelweb.cuer.net.mappers
 
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import java.time.*
