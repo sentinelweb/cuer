@@ -8,7 +8,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import uk.co.sentinelweb.cuer.app.CuerAppState
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -16,22 +16,18 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class MediaSessionManager constructor(
     private val appState: CuerAppState,
-    private val state: State,
+    private val state: MediaSessionContract.State,
     private val context: Context,
     private val log: LogWrapper,
     private val metadataMapper: MediaMetadataMapper,
     private val playbackStateMapper: PlaybackStateMapper,
-) {
+) : MediaSessionContract.Manager {
+
     init {
         log.tag(this)
     }
 
-    data class State constructor(
-        var bitmapUrl: String? = null,
-        var bitmap: Bitmap? = null,
-    )
-
-    fun checkCreateMediaSession(controls: CastPlayerContract.PlayerControls.Listener) {
+    override fun checkCreateMediaSession(controls: PlayerContract.PlayerControls.Listener) {
         if (appState.mediaSession == null) {
             appState.mediaSession = MediaSessionCompat(context, "CuerCastService")
                 .apply {
@@ -41,12 +37,14 @@ class MediaSessionManager constructor(
         }
     }
 
-    fun destroyMediaSession() {
+    override fun destroyMediaSession() {
         appState.mediaSession?.release()
         appState.mediaSession = null
+        state.bitmap = null
+        state.bitmapUrl = null
     }
 
-    fun setMedia(media: MediaDomain, playlist: PlaylistDomain?) {
+    override fun setMedia(media: MediaDomain, playlist: PlaylistDomain?) {
         if (media.thumbNail == null) {
             state.bitmapUrl = null
             state.bitmap = null
@@ -70,12 +68,12 @@ class MediaSessionManager constructor(
         override fun onLoadCleared(placeholder: Drawable?) {}
     }
 
-    fun updatePlaybackState(media: MediaDomain, state: PlayerStateDomain, liveOffset: Long?) {
-        appState.mediaSession?.setPlaybackState(playbackStateMapper.map(media, state, liveOffset))
+    override fun updatePlaybackState(media: MediaDomain, state: PlayerStateDomain, liveOffset: Long?, playlist: PlaylistDomain?) {
+        appState.mediaSession?.setPlaybackState(playbackStateMapper.map(media, state, liveOffset, playlist))
     }
 
     // todo this will go somewhere near the player controls
-    inner class CuerMediaSessionCallback(private val controls: CastPlayerContract.PlayerControls.Listener) :
+    inner class CuerMediaSessionCallback(private val controls: PlayerContract.PlayerControls.Listener) :
         MediaSessionCompat.Callback() {
 
         override fun onPlay() {
@@ -88,14 +86,14 @@ class MediaSessionManager constructor(
             log.d("onPause")
         }
 
-        override fun onSkipToPrevious() {
-            controls.trackBack()
-            log.d("onSkipToPrevious")
-        }
-
         override fun onStop() {
             controls.pause()
             log.d("onStop")
+        }
+
+        override fun onSkipToPrevious() {
+            controls.trackBack()
+            log.d("onSkipToPrevious")
         }
 
         override fun onSkipToNext() {
@@ -109,11 +107,13 @@ class MediaSessionManager constructor(
         }
 
         override fun onRewind() {
+            controls.skipBack()
             // todo add methods in interface (if needed)
             log.d("onRewind")
         }
 
         override fun onFastForward() {
+            controls.skipFwd()
             // todo add methods in interface (if needed)
             log.d("onFastForward")
         }

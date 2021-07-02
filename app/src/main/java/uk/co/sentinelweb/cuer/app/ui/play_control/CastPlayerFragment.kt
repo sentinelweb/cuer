@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
@@ -38,14 +39,14 @@ class CastPlayerFragment() :
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding!!
 
-    override val playerControls: CastPlayerContract.PlayerControls
-        get() = presenter as CastPlayerContract.PlayerControls
+    override val playerControls: PlayerContract.PlayerControls
+        get() = presenter as PlayerContract.PlayerControls
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+        savedInstanceState: Bundle?,
+    ): View {
         _binding = CastPlayerViewBinding.inflate(layoutInflater)
         return binding.root
     }

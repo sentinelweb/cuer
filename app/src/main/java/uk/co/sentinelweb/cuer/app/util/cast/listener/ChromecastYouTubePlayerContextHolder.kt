@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 
 class ChromecastYouTubePlayerContextHolder constructor(
@@ -13,7 +13,7 @@ class ChromecastYouTubePlayerContextHolder constructor(
     private var context: ChromecastYouTubePlayerContext? = null
     private var listener: YoutubeCastConnectionListener? = null
 
-    var playerUi: CastPlayerContract.PlayerControls? = null
+    var playerUi: PlayerContract.PlayerControls? = null
         get() = field
         set(value) {
             field = value

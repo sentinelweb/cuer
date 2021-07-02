@@ -5,7 +5,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsend
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
-import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -13,11 +13,11 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 class YoutubePlayerContextCreator constructor(
     private val queue: QueueMediatorContract.Consumer,
     private val log: LogWrapper,
-    private val mediaSessionManager: MediaSessionManager,
+    private val mediaSessionManager: MediaSessionContract.Manager,
     private val castWrapper: ChromeCastWrapper,
     private val timeProvider: TimeProvider,
     private val livePlayback: LivePlaybackContract.Controller,
-    private val coroutines: CoroutineContextProvider
+    private val coroutines: CoroutineContextProvider,
 ) {
 
     fun createContext(

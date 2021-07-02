@@ -1,13 +1,13 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
 import android.graphics.Bitmap
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 interface PlayerControlsNotificationContract {
 
-    interface External : CastPlayerContract.PlayerControls {
+    interface External : PlayerContract.PlayerControls {
         fun handleAction(action: String?)
         fun destroy()
     }

@@ -5,25 +5,24 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsend
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
-import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 class YoutubeCastConnectionListener constructor(
     private val state: State,
     private val creator: YoutubePlayerContextCreator,
-    private val mediaSessionManager: MediaSessionManager,
+    private val mediaSessionManager: MediaSessionContract.Manager,
     private val castWrapper: ChromeCastWrapper,
     private val queue: QueueMediatorContract.Consumer,
-    private val coroutines: CoroutineContextProvider
+    private val coroutines: CoroutineContextProvider,
 ) : ChromecastConnectionListener {
 
     data class State constructor(
-        var connectionState: ConnectionState? = null
+        var connectionState: PlayerContract.ConnectionState? = null,
     )
 
     private var context: ChromecastYouTubePlayerContext? = null
@@ -44,7 +43,7 @@ class YoutubeCastConnectionListener constructor(
         }
     }
 
-    var playerUi: CastPlayerContract.PlayerControls? = null
+    var playerUi: PlayerContract.PlayerControls? = null
         get() = field
         set(value) {
             field = value
@@ -77,6 +76,7 @@ class YoutubeCastConnectionListener constructor(
     private fun setupPlayerListener() {
         youTubePlayerListener = creator.createPlayerListener().also {
             context?.initialize(it) ?: throw IllegalStateException("context has not been initialised")
+            mediaSessionManager.checkCreateMediaSession(it)
             it.playerUi = playerUi
         }
     }

@@ -2,13 +2,11 @@ package uk.co.sentinelweb.cuer.app.ui.player
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
-import uk.co.sentinelweb.cuer.domain.ChannelDomain
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface PlayerContract {
 
@@ -130,5 +128,39 @@ interface PlayerContract {
 
     interface PlaylistItemLoader {
         fun load(): PlaylistItemDomain?
+    }
+
+    enum class ConnectionState {
+        CC_DISCONNECTED, CC_CONNECTING, CC_CONNECTED,
+    }
+
+    // todo think about this maybe sub with android MediaControl interface
+    interface PlayerControls {
+        fun initMediaRouteButton()
+        fun setConnectionState(connState: ConnectionState)
+        fun setPlayerState(playState: PlayerStateDomain)
+        fun addListener(l: Listener)
+        fun removeListener(l: Listener)
+        fun setCurrentSecond(second: Float) // todo ms long
+        fun setDuration(duration: Float) // todo ms long
+        fun error(msg: String)
+        fun setTitle(title: String)
+        fun reset()
+        fun restoreState()
+        fun setPlaylistName(name: String)
+        fun setPlaylistImage(image: ImageDomain?)
+        fun setPlaylistItem(playlistItem: PlaylistItemDomain?, source: OrchestratorContract.Source)
+
+        interface Listener {
+            fun play()
+            fun pause()
+            fun trackBack()
+            fun trackFwd()
+            fun seekTo(positionMs: Long)
+            fun getLiveOffsetMs(): Long
+            fun skipBack()
+            fun skipFwd()
+        }
+
     }
 }

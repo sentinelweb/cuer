@@ -38,6 +38,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.portrait.YoutubePortraitContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
@@ -103,7 +104,14 @@ object Modules {
         }
         single { CuerAppState() }
 
-        factory { MediaSessionManager(get(), MediaSessionManager.State(), androidApplication(), get(), get(), get()) }
+        factory<MediaSessionContract.Manager> {
+            MediaSessionManager(get(),
+                MediaSessionContract.State(),
+                androidApplication(),
+                get(),
+                get(),
+                get())
+        }
         factory { MediaMetadataMapper(get()) }
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
