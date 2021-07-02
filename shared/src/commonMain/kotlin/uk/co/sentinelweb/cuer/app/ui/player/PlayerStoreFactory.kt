@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
@@ -14,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory.Action.*
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -30,8 +32,11 @@ class PlayerStoreFactory(
     private val skip: SkipContract.External,
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,
-    private val livePlaybackController: LivePlaybackContract.Controller
-) {
+    private val livePlaybackController: LivePlaybackContract.Controller,
+    private val mediaSessionManager: MediaSessionContract.Manager,
+    private val playerControls: PlayerContract.PlayerControls.Listener,
+
+    ) {
 
     private sealed class Result {
         object NoVideo : Result()
@@ -115,6 +120,7 @@ class PlayerStoreFactory(
                 is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().item!!))
                 is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().item!!))
                 is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().item!!))
+                is Intent.SeekToPosition -> publish(Label.Command(SeekTo(ms = intent.ms)))
             }
 
         private suspend fun init() {
@@ -124,10 +130,16 @@ class PlayerStoreFactory(
                         ?.toIdentifier(LOCAL)
                         ?.apply { livePlaybackController.clear(item.media.platformId) }
                         ?.apply { queueProducer.playNow(this, item.id) }
+                    coroutines.mainScope.launch {
+                        mediaSessionManager.checkCreateMediaSession(playerControls)
+                    }
                     log.d("itemLoader.load(${item.media.title}))")
-
                 }
             }
+        }
+
+        private fun destroy() {
+            mediaSessionManager.destroyMediaSession()
         }
 
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {
@@ -144,6 +156,9 @@ class PlayerStoreFactory(
             livePlaybackController.clear(intent.item.media.platformId)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
             publish(Label.Command(Load(intent.item.media.platformId, intent.item.media.positon ?: 0)))
+            //coroutines.mainScope.launch {
+            mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
+            //}
             log.d("trackChange(${intent.item.media.title}))")
         }
 
@@ -154,6 +169,7 @@ class PlayerStoreFactory(
                 ?.apply { skip.updatePosition(ms) }
                 ?.apply { livePlaybackController.setCurrentPosition(ms) }
                 ?.run { dispatch(Result.SetVideo(this)) }
+
                 ?.run {
                     dispatch(
                         Result.Position(
@@ -168,6 +184,9 @@ class PlayerStoreFactory(
                 VIDEO_CUED -> {
                     item?.media?.apply {
                         publish(Label.Command(Load(platformId, startPosition())))
+                        //coroutines.mainScope.launch {
+                        //    mediaSessionManager.setMedia(item.media, queueConsumer.playlist)
+                        //}
                     }
                     Unit
                 }
@@ -176,6 +195,17 @@ class PlayerStoreFactory(
                 }
                 else -> Unit
             }.also {
+                item?.apply {
+                    //coroutines.mainScope.launch {
+                    mediaSessionManager.updatePlaybackState(
+                        media,
+                        playState,
+                        if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
+                        queueConsumer.playlist
+                    )
+                    // }
+                }
+
                 skip.stateChange(playState)
                 dispatch(Result.State(playState))
             }
@@ -214,6 +244,7 @@ class PlayerStoreFactory(
                 0
             }
         }
+
     }
 
     fun create(): PlayerContract.MviStore =

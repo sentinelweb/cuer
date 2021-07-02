@@ -31,7 +31,8 @@ interface YoutubeFullScreenContract {
                         lifecycle = null,
                         skip = get(),
                         log = get(),
-                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER))
+                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
+                        mediaSessionManager = get()
                     )
                 }
                 scoped { navigationMapper(false, getSource(), withNavHost = false) }

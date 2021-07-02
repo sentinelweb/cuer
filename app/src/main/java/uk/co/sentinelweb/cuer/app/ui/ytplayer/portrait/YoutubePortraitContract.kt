@@ -36,7 +36,8 @@ interface YoutubePortraitContract {
                         lifecycle = getSource<YoutubePortraitActivity>().lifecycle.asMviLifecycle(),
                         skip = get(),
                         log = get(),
-                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER))
+                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
+                        mediaSessionManager = get()
                     )
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }

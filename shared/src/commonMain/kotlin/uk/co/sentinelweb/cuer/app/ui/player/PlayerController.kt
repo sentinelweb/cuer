@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -27,14 +28,16 @@ class PlayerController constructor(
     itemLoader: PlayerContract.PlaylistItemLoader,
     storeFactory: StoreFactory = DefaultStoreFactory,
     private val queueConsumer: QueueMediatorContract.Consumer,
-    private val queueProducer: QueueMediatorContract.Producer,
     private val modelMapper: PlayerModelMapper,
     private val coroutines: CoroutineContextProvider,
+    queueProducer: QueueMediatorContract.Producer,
+    mediaSessionManager: MediaSessionContract.Manager,
     lifecycle: Lifecycle?,
     livePlaybackController: LivePlaybackContract.Controller,
     skip: SkipContract.External,
-    log: LogWrapper
+    log: LogWrapper,
 ) {
+    private val playControls = PlayerListener(coroutines)
     private val store = PlayerStoreFactory(
         storeFactory,
         itemLoader,
@@ -43,7 +46,9 @@ class PlayerController constructor(
         skip,
         coroutines,
         log,
-        livePlaybackController
+        livePlaybackController,
+        mediaSessionManager,
+        playControls
     ).create()
 
     init {
@@ -86,7 +91,6 @@ class PlayerController constructor(
         PlaylistChange(this)
     }
 
-
     private var binder: Binder? = null
 
     @ExperimentalCoroutinesApi
@@ -104,6 +108,7 @@ class PlayerController constructor(
             // queue -> store
             queueConsumer.currentItemFlow.filterNotNull().mapNotNull { trackChangeToIntent(it) } bindTo store
             queueConsumer.currentPlaylistFlow.filterNotNull().mapNotNull { playlistChangeToIntent(it) } bindTo store
+            playControls.intentFlow bindTo store
         }
     }
 
@@ -122,6 +127,7 @@ class PlayerController constructor(
             // queue -> store
             queueConsumer.currentItemFlow.filterNotNull().mapNotNull { trackChangeToIntent(it) } bindTo store
             queueConsumer.currentPlaylistFlow.filterNotNull().mapNotNull { playlistChangeToIntent(it) } bindTo store
+            playControls.intentFlow bindTo store
         }
     }
 

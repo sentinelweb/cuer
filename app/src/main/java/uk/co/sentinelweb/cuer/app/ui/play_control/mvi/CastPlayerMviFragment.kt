@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.annotation.ColorRes
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
@@ -189,12 +188,6 @@ class CastPlayerMviFragment() :
     fun navigate(navModel: NavigationModel) {
         (activity as NavigationProvider).navigate(navModel)
     }
-
-    fun makeItemTransitionExtras() =
-        FragmentNavigatorExtras(
-            binding.castPlayerTitle to TRANS_TITLE,
-            binding.castPlayerImage to TRANS_IMAGE
-        )
 
     // region MVI view
     inner class CastPlayerViewImpl constructor(

@@ -104,12 +104,14 @@ object Modules {
         single { CuerAppState() }
 
         factory<MediaSessionContract.Manager> {
-            MediaSessionManager(get(),
-                MediaSessionContract.State(),
+            MediaSessionManager(
+                get(),
+                MediaSessionManager.State(),
                 androidApplication(),
                 get(),
                 get(),
-                get())
+                get()
+            )
         }
         factory { MediaMetadataMapper(get()) }
         factory { PlaybackStateMapper() }

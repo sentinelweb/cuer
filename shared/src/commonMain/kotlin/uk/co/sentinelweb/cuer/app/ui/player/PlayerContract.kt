@@ -33,6 +33,7 @@ interface PlayerContract {
             data class TrackSelected(val item: PlaylistItemDomain, val resetPosition: Boolean) : Intent()
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
             data class SeekTo(val fraction: Float) : Intent()
+            data class SeekToPosition(val ms: Long) : Intent()
             data class LinkOpen(val url: String) : Intent()
             data class Duration(val ms: Long) : Intent()
             data class Id(val videoId: String) : Intent()
