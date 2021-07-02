@@ -57,7 +57,7 @@ class YouTubePlayerListener(
         queue.currentItemFlow
             .distinctUntilChanged { old, new -> old?.media?.id == new?.media?.id }
             .onEach { loadVideo(it) }
-            .onEach { item -> item?.let { mediaSessionManager.setMedia(item.media) } }
+            .onEach { item -> item?.let { mediaSessionManager.setMedia(item.media, queue.playlist) } }
             .launchIn(coroutines.mainScope)
     }
 
@@ -105,7 +105,7 @@ class YouTubePlayerListener(
         playerUi?.setDuration(duration)
         updateMedia(false, durSec = duration)
 
-        state.currentMedia?.apply { mediaSessionManager.setMedia(this) }
+        state.currentMedia?.apply { mediaSessionManager.setMedia(this, queue.playlist) }
     }
 
     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {

@@ -103,7 +103,7 @@ object Modules {
         }
         single { CuerAppState() }
 
-        factory { MediaSessionManager(get(), androidApplication(), get(), get(), get()) }
+        factory { MediaSessionManager(get(), MediaSessionManager.State(), androidApplication(), get(), get(), get()) }
         factory { MediaMetadataMapper(get()) }
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }

@@ -11,12 +11,24 @@ class PlaybackStateMapper {
     fun map(domain: MediaDomain, state: PlayerStateDomain, liveOffset: Long?): PlaybackStateCompat = if (domain.isLiveBroadcast) {
         PlaybackStateCompat.Builder()
             .setState(mapState(state), liveOffset ?: 0, 1f)
-            .setActions(PlaybackStateCompat.ACTION_REWIND or PlaybackStateCompat.ACTION_FAST_FORWARD)
+            .setActions(PlaybackStateCompat.ACTION_REWIND or
+                    PlaybackStateCompat.ACTION_FAST_FORWARD or
+                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                    PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                    PlaybackStateCompat.ACTION_PLAY or
+                    PlaybackStateCompat.ACTION_PAUSE
+            )
             .build()
     } else {
         PlaybackStateCompat.Builder()
             .setState(mapState(state), domain.positon ?: 0, 1f)
-            .setActions(PlaybackStateCompat.ACTION_SEEK_TO)
+            .setActions(PlaybackStateCompat.ACTION_SEEK_TO or
+                    PlaybackStateCompat.ACTION_REWIND or
+                    PlaybackStateCompat.ACTION_FAST_FORWARD or
+                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                    PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                    PlaybackStateCompat.ACTION_PLAY or
+                    PlaybackStateCompat.ACTION_PAUSE)
             .build()
     }
 
