@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.ytplayer
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_DOWN
 import android.widget.FrameLayout
 import org.koin.core.context.GlobalContext.get
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -24,9 +25,9 @@ class InterceptorFrameLayout constructor(c: Context, a: AttributeSet?, def: Int 
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-        if (ev.action == MotionEvent.ACTION_DOWN) {
-            listener?.touched()
+        if (ev.action == ACTION_DOWN) {
             log.d("onInterceptTouchEvent.ACTION_DOWN -  touched")
+            listener?.touched()
         }
         return false
     }

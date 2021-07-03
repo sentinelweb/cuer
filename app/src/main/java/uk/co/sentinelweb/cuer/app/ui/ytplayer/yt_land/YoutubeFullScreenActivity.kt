@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.ytplayer
+package uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land
 
 
 import android.content.Context
@@ -34,6 +34,8 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.ShowHideUi
 import uk.co.sentinelweb.cuer.app.util.extension.activityLegacyScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper

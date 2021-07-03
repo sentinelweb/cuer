@@ -56,7 +56,7 @@
         />
 
     <!-- back -->
-    <androidx.appcompat.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/controls_seek_back"
         style="@style/YoutubePlayer.Button"
         android:src="@drawable/ic_player_fast_rewind_black"
@@ -77,7 +77,7 @@
         tools:text="-30s"
         />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/controls_track_last"
         style="@style/YoutubePlayer.Button"
         android:src="@drawable/ic_player_track_b_black"
@@ -99,7 +99,7 @@
         />
 
     <!-- fwd -->
-    <androidx.appcompat.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/controls_seek_forward"
         style="@style/YoutubePlayer.Button"
         android:src="@drawable/ic_player_fast_forward_black"
@@ -121,7 +121,7 @@
         tools:text="+30s"
         />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/controls_track_next"
         style="@style/YoutubePlayer.Button"
         android:src="@drawable/ic_player_track_f_black"

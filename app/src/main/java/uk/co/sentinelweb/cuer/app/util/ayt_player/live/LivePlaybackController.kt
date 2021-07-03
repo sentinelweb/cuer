@@ -1,5 +1,6 @@
-package uk.co.sentinelweb.cuer.app.util.android_yt_player.live
+package uk.co.sentinelweb.cuer.app.util.ayt_player.live
 
+import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper

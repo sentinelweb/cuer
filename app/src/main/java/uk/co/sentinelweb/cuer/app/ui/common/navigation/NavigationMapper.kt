@@ -16,8 +16,8 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.Companion.KEY
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeFullScreenActivity
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.portrait.YoutubePortraitActivity
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandActivity
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
@@ -38,12 +38,13 @@ class NavigationMapper constructor(
         when (nav.target) {
             LOCAL_PLAYER_FULL ->
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
-                    YoutubeFullScreenActivity.start(activity, it)
+                    //YoutubeFullScreenActivity.start(activity, it)
+                    AytLandActivity.start(activity, it)
                 } ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
             LOCAL_PLAYER -> {
                 log.d("YoutubePortraitActivity.NavigationMapper")
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
-                    YoutubePortraitActivity.start(activity, it)
+                    AytPortraitActivity.start(activity, it)
                     log.d("YoutubePortraitActivity.start called")
                 } ?: throw IllegalArgumentException("$LOCAL_PLAYER: $PLAYLIST_ITEM param required")
             }

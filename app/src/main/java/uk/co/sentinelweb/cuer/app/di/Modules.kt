@@ -33,8 +33,9 @@ import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeFullScreenContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.portrait.YoutubePortraitContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
@@ -82,7 +83,8 @@ object Modules {
         SearchImageContract.fragmentModule,
         RemoteContract.serviceModule,
         YoutubeFullScreenContract.activityModule,
-        YoutubePortraitContract.activityModule,
+        AytPortraitContract.activityModule,
+        AytLandContract.activityModule,
         CastPlayerMviFragment.fragmentModule,
         DescriptionView.viewModule
     )

@@ -4,7 +4,7 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
-import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackController
+import uk.co.sentinelweb.cuer.app.util.ayt_player.live.LivePlaybackController
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences

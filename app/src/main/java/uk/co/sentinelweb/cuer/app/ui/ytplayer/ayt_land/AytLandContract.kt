@@ -1,30 +1,28 @@
-package uk.co.sentinelweb.cuer.app.ui.ytplayer.portrait
+package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land
 
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
-import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.ShowHideUi
 
-interface YoutubePortraitContract {
+interface AytLandContract {
     companion object {
 
         @JvmStatic
         val activityModule = module {
-            scope(named<YoutubePortraitActivity>()) {
+            scope(named<AytLandActivity>()) {
                 scoped {
                     PlayerController(
                         itemLoader = get(),
@@ -33,25 +31,15 @@ interface YoutubePortraitContract {
                         queueProducer = get(),
                         modelMapper = get(),
                         coroutines = get(),
-                        lifecycle = getSource<YoutubePortraitActivity>().lifecycle.asMviLifecycle(),
+                        lifecycle = getSource<AytLandActivity>().lifecycle.asMviLifecycle(),
                         skip = get(),
                         log = get(),
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get()
                     )
                 }
+                scoped { ShowHideUi(getSource()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
-
-                scoped {
-                    (getSource<YoutubePortraitActivity>()
-                        .supportFragmentManager
-                        .findFragmentById(R.id.portrait_player_controls) as CastPlayerMviFragment)
-                }
-                scoped {
-                    (getSource<YoutubePortraitActivity>()
-                        .supportFragmentManager
-                        .findFragmentById(R.id.portrait_player_playlist) as PlaylistFragment)
-                }
                 scoped { navigationMapper(false, getSource(), withNavHost = false) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
@@ -65,7 +53,7 @@ interface YoutubePortraitContract {
                 scoped<SkipContract.View> {
                     SkipView(
                         selectDialogCreator = SelectDialogCreator(
-                            context = getSource<YoutubePortraitActivity>()
+                            context = getSource<AytLandActivity>()
                         )
                     )
                 }

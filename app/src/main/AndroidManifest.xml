@@ -93,16 +93,22 @@
         </activity>
 
         <activity
-            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.YoutubeFullScreenActivity"
+            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenActivity"
             android:label="@string/title_activity_fullscreen"
             android:screenOrientation="landscape"
             android:theme="@style/FullscreenTheme"
             tools:ignore="LockedOrientationActivity" />
 
         <activity
-            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.portrait.YoutubePortraitActivity"
+            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity"
             android:label="@string/title_activity_fullscreen"
             android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandActivity"
+            android:label="@string/title_activity_fullscreen"
+            android:screenOrientation="landscape"
             tools:ignore="LockedOrientationActivity" />
 
         <service
