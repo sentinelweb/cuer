@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.orchestrator
+package uk.co.sentinelweb.cuer.app.orchestrator.orchestrator
 
 import com.flextrade.jfixture.JFixture
 import com.google.common.truth.Truth.assertThat

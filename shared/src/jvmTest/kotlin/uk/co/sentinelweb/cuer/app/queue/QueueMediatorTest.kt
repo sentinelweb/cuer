@@ -20,9 +20,11 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
-import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaUpdateOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
@@ -48,13 +50,13 @@ class QueueMediatorTest {
     lateinit var mockPlaylistItemOrchestrator: PlaylistItemOrchestrator
 
     @MockK
-    lateinit var mockMediaOrchestrator: MediaOrchestrator
+    lateinit var mockPrefsWrapper: GeneralPreferencesWrapper
 
     @MockK
-    lateinit var mockMediaSessionManager: MediaSessionManager
+    lateinit var mediaUpdate: PlaylistMediaUpdateOrchestrator
 
     @MockK
-    lateinit var mockPrefsWrapper: GeneralPreferences
+    lateinit var playlistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator
 
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())
@@ -107,7 +109,8 @@ class QueueMediatorTest {
 
         every { mockPlaylistOrchestrator.updates } returns fixtPlaylistOrchestratorFlow
         coEvery {
-            mockPlaylistOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id, Options(fixtCurrentIdentifier.source, flat = false))
+            playlistOrDefaultOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id,
+                Options(fixtCurrentIdentifier.source, flat = false))
         } returns (fixtCurrentPlaylist to fixtSource)
         every { mockPlaylistItemOrchestrator.updates } returns fixtPlaylistItemOrchestratorFlow
         every {
@@ -121,8 +124,9 @@ class QueueMediatorTest {
             mockPlaylistOrchestrator,
             mockPlaylistItemOrchestrator,
             coroutines,
-            mockMediaSessionManager,
             playlistMutator,
+            mediaUpdate,
+            playlistOrDefaultOrchestrator,
             mockPrefsWrapper,
             log
         )
@@ -169,7 +173,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlist header changed`() {
+    fun test_flow_playlist_header_changed() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val fixChangedHeader = fixtCurrentPlaylist.copy(currentIndex = 1)
@@ -213,7 +217,8 @@ class QueueMediatorTest {
         testCoroutineScope.runBlockingTest {
             createSut()
             coEvery {
-                mockPlaylistOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id, Options(fixtCurrentIdentifier.source, flat = false))
+                playlistOrDefaultOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id,
+                    Options(fixtCurrentIdentifier.source, flat = false))
             } returns (fixtPlaylistDefault to fixtDefaultSource)
 
             // test
@@ -510,7 +515,7 @@ class QueueMediatorTest {
             val fixtSwitchSource: Source = fixture.build()
             val switchIdentifier = switchPlaylistId.toIdentifier(fixtSwitchSource)
             coEvery {
-                mockPlaylistOrchestrator.getPlaylistOrDefault(fixtSwitchPlaylist.id, Options(fixtSwitchSource, flat = false))
+                playlistOrDefaultOrchestrator.getPlaylistOrDefault(fixtSwitchPlaylist.id, Options(fixtSwitchSource, flat = false))
             } returns (fixtSwitchPlaylist to fixtSwitchSource)
             // test
             sut.switchToPlaylist(switchIdentifier)
@@ -541,7 +546,7 @@ class QueueMediatorTest {
             assertThat(sut.currentItem).isEqualTo(selectedItem)
             assertThat(captureItemFlow.last()).isEqualTo(selectedItem)
             assertThat(captureItemFlow.size).isEqualTo(2) // should emit
-            verify { mockMediaSessionManager.setMedia(selectedItem.media, queue.playlist) }
+            //verify { mockMediaSessionManager.setMedia(selectedItem.media, queue.playlist) }
         }
     }
 
@@ -558,7 +563,7 @@ class QueueMediatorTest {
             assertThat(sut.currentItem).isEqualTo(currentItem)
             assertThat(captureItemFlow.last()).isEqualTo(currentItem)
             assertThat(itemFlowSize).isEqualTo(itemFlowSize)
-            verify { mockMediaSessionManager.setMedia(currentItem.media, queue.playlist) }
+            //verify { mockMediaSessionManager.setMedia(currentItem.media, queue.playlist) }
         }
     }
 
@@ -574,8 +579,8 @@ class QueueMediatorTest {
             assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
             assertThat(sut.currentItem).isEqualTo(currentItem)
             assertThat(captureItemFlow.last()).isEqualTo(currentItem)
-            verify { mockMediaSessionManager.setMedia(currentItem.media, queue.playlist) }
-            coVerify { mockPlaylistOrchestrator.updateCurrentIndex(fixtCurrentPlaylist, fixtCurrentIdentifier.flatOptions(true)) }
+            //verify { mockMediaSessionManager.setMedia(currentItem.media, queue.playlist) }
+            coVerify { playlistOrDefaultOrchestrator.updateCurrentIndex(fixtCurrentPlaylist, fixtCurrentIdentifier.flatOptions(true)) }
             assertThat(itemFlowSize).isEqualTo(itemFlowSize) // doesnt emit same object
         }
     }
@@ -600,7 +605,7 @@ class QueueMediatorTest {
                 watched = mediaPositionUpdate.watched
             )
             coEvery {
-                mockPlaylistOrchestrator.updateMedia(
+                mediaUpdate.updateMedia(
                     fixtCurrentPlaylist, mediaPositionUpdate, fixtCurrentIdentifier.flatOptions(emit = true)
                 )
             } returns expectedMediaAfterUpdate
@@ -611,8 +616,8 @@ class QueueMediatorTest {
             assertThat(sut.currentItem).isNotEqualTo(currentItemBefore) // position changed
             assertThat(sut.currentItem).isEqualTo(expectedCurrentItem) // position changed
             assertThat(captureItemFlow.last()).isEqualTo(expectedCurrentItem)
-            verify { mockMediaSessionManager.setMedia(expectedCurrentItem.media, queue.playlist) }
-            coVerify { mockPlaylistOrchestrator.updateCurrentIndex(fixtCurrentPlaylist, fixtCurrentIdentifier.flatOptions(true)) }
+            //verify { mockMediaSessionManager.setMedia(expectedCurrentItem.media, queue.playlist) }
+            coVerify { playlistOrDefaultOrchestrator.updateCurrentIndex(fixtCurrentPlaylist, fixtCurrentIdentifier.flatOptions(true)) }
             assertThat(captureItemFlow.size).isEqualTo(2)
         }
     }
@@ -639,7 +644,7 @@ class QueueMediatorTest {
                 watched = mediaPositionUpdate.watched
             )
             coEvery {
-                mockPlaylistOrchestrator.updateMedia(
+                mediaUpdate.updateMedia(
                     fixtUpdatedPlaylist, mediaPositionUpdate, fixtCurrentIdentifier.flatOptions(emit = true)
                 )
             } returns expectedMediaAfterUpdate
@@ -650,9 +655,9 @@ class QueueMediatorTest {
             assertThat(sut.currentItem).isNotEqualTo(selectedItem) // position changed
             assertThat(sut.currentItem).isEqualTo(expectedSelectedItem) // position changed
             assertThat(captureItemFlow.last()).isEqualTo(expectedSelectedItem)
-            verify { mockMediaSessionManager.setMedia(expectedSelectedItem.media, queue.playlist) }
+            //verify { mockMediaSessionManager.setMedia(expectedSelectedItem.media, queue.playlist) }
             coVerify {
-                mockPlaylistOrchestrator.updateCurrentIndex(
+                playlistOrDefaultOrchestrator.updateCurrentIndex(
                     fixtCurrentPlaylist.copy(currentIndex = selectedItemIndex),
                     fixtCurrentIdentifier.flatOptions(true)
                 )
@@ -690,7 +695,7 @@ class QueueMediatorTest {
                 watched = mediaPositionUpdate.watched
             )
             coEvery {
-                mockPlaylistOrchestrator.updateMedia(
+                mediaUpdate.updateMedia(
                     fixtCurrentPlaylist, mediaPositionUpdate, fixtCurrentIdentifier.flatOptions(emit = true)
                 )
             } returns expectedMediaAfterUpdate
@@ -702,7 +707,7 @@ class QueueMediatorTest {
             assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
             assertThat(sut.currentItem!!.media).isEqualTo(expectedMediaAfterUpdate) // position changed
             coVerify {
-                mockPlaylistOrchestrator.updateMedia(fixtCurrentPlaylist, mediaPositionUpdate, sut.playlistId!!.flatOptions(true))
+                mediaUpdate.updateMedia(fixtCurrentPlaylist, mediaPositionUpdate, sut.playlistId!!.flatOptions(true))
             }
             // todo fix
         }
@@ -732,9 +737,9 @@ class QueueMediatorTest {
             assertThat(sut.currentItemIndex).isEqualTo(expectedIndex)
             assertThat(sut.currentItem).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
             assertThat(captureItemFlow.last()).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
-            verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media, queue.playlist) }
+            //verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media, queue.playlist) }
             coVerify {
-                mockPlaylistOrchestrator.updateCurrentIndex(
+                playlistOrDefaultOrchestrator.updateCurrentIndex(
                     fixtCurrentPlaylist.copy(currentIndex = expectedIndex),
                     fixtCurrentIdentifier.flatOptions(true)
                 )
@@ -755,9 +760,9 @@ class QueueMediatorTest {
             assertThat(sut.currentItemIndex).isEqualTo(expectedIndex)
             assertThat(sut.currentItem).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
             assertThat(captureItemFlow.last()).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
-            verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media, queue.playlist) }
+            //verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media, queue.playlist) }
             coVerify {
-                mockPlaylistOrchestrator.updateCurrentIndex(
+                playlistOrDefaultOrchestrator.updateCurrentIndex(
                     fixtCurrentPlaylist.copy(currentIndex = expectedIndex),
                     fixtCurrentIdentifier.flatOptions(true)
                 )
@@ -772,15 +777,15 @@ class QueueMediatorTest {
             val expectedIndex = fixtCurrentCurentIndex + 1
 
             // test
-            sut.onTrackEnded(sut.currentItem?.media)
+            sut.onTrackEnded()
 
             // verify
             assertThat(sut.currentItemIndex).isEqualTo(expectedIndex)
             assertThat(sut.currentItem).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
             assertThat(captureItemFlow.last()).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
-            verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media, queue.playlist) }
+            //verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media, queue.playlist) }
             coVerify {
-                mockPlaylistOrchestrator.updateCurrentIndex(
+                playlistOrDefaultOrchestrator.updateCurrentIndex(
                     fixtCurrentPlaylist.copy(currentIndex = expectedIndex),
                     fixtCurrentIdentifier.flatOptions(true)
                 )
