@@ -766,7 +766,7 @@ class PlaylistPresenter(
     }
 
     companion object {
-        private val localPlayerTarget = NavigationModel.Target.LOCAL_PLAYER_FULL
+        private val localPlayerTarget = NavigationModel.Target.LOCAL_PLAYER
     }
 
 }

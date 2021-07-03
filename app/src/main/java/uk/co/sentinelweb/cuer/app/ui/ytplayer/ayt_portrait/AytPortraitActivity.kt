@@ -28,14 +28,16 @@ import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContrac
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
+import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -60,7 +62,8 @@ class AytPortraitActivity : AppCompatActivity(),
     private val navMapper: NavigationMapper by inject()
     private val itemLoader: PlayerContract.PlaylistItemLoader by inject()
     private val toast: ToastWrapper by inject()
-
+    private val castListener: LocalPlayerCastListener by inject()
+    private val ytContextHolder: ChromecastYouTubePlayerContextHolder by inject()
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl
     private lateinit var binding: ActivityAytPortraitBinding
@@ -74,6 +77,13 @@ class AytPortraitActivity : AppCompatActivity(),
         binding = ActivityAytPortraitBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
+        //ytContextHolder.create()
+        castListener.listen()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        castListener.release()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -207,12 +217,12 @@ class AytPortraitActivity : AppCompatActivity(),
                 is Command -> label.command.let { command ->
                     log.d(command.toString())
                     when (command) {
-                        is PlayerContract.PlayerCommand.Load -> player?.loadVideo(command.platformId, command.startPosition / 1000f)
-                        is PlayerContract.PlayerCommand.Play -> player?.play()
-                        is PlayerContract.PlayerCommand.Pause -> player?.pause()
-                        is PlayerContract.PlayerCommand.SkipBack -> player?.seekTo(lastPositionSec - command.ms / 1000f)
-                        is PlayerContract.PlayerCommand.SkipFwd -> player?.seekTo(lastPositionSec + command.ms / 1000f)
-                        is PlayerContract.PlayerCommand.SeekTo -> {
+                        is Load -> player?.loadVideo(command.platformId, command.startPosition / 1000f)
+                        is Play -> player?.play()
+                        is Pause -> player?.pause()
+                        is SkipBack -> player?.seekTo(lastPositionSec - command.ms / 1000f)
+                        is SkipFwd -> player?.seekTo(lastPositionSec + command.ms / 1000f)
+                        is SeekTo -> {
                             log.d(command.toString())
                             player?.seekTo(command.ms.toFloat() / 1000f)
                         }

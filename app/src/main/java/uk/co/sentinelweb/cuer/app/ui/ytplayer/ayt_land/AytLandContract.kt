@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ShowHideUi
 
@@ -57,6 +58,7 @@ interface AytLandContract {
                         )
                     )
                 }
+                scoped { LocalPlayerCastListener(getSource(), get()) }
             }
         }
     }

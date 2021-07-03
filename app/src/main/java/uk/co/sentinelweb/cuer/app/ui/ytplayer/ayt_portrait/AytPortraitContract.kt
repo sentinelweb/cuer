@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 
 interface AytPortraitContract {
@@ -69,6 +70,7 @@ interface AytPortraitContract {
                         )
                     )
                 }
+                scoped { LocalPlayerCastListener(getSource(), get()) }
             }
         }
     }

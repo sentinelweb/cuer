@@ -223,4 +223,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_picture_in_picture_24"
         />
+
+    <androidx.mediarouter.app.MediaRouteButton
+        android:id="@+id/controls_media_route_button"
+        android:layout_width="@dimen/player_button_size"
+        android:layout_height="@dimen/player_button_size"
+        android:layout_marginTop="24dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toLeftOf="@id/controls_pip_fab"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mediaRouteButtonTint="@color/white"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

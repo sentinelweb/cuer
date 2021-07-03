@@ -48,8 +48,7 @@ interface MainContract {
                         playerControls = get(),
                         ytServiceManager = get(),
                         ytContextHolder = get(),
-                        log = get(),
-                        remoteServiceManger = get()
+                        log = get()
                     )
                 }
                 scoped {

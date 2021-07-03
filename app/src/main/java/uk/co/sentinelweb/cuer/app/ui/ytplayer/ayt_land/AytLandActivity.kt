@@ -32,8 +32,12 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ShowHideUi
+import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
+import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -43,8 +47,6 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import kotlin.math.abs
-import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
-import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
 
 class AytLandActivity : AppCompatActivity(),
     AndroidScopeComponent {
@@ -59,6 +61,8 @@ class AytLandActivity : AppCompatActivity(),
     private val toast: ToastWrapper by inject()
     private val showHideUi: ShowHideUi by inject()
     private val res: ResourceWrapper by inject()
+    private val castListener: LocalPlayerCastListener by inject()
+    private val chromeCastWrapper: ChromeCastWrapper by inject()
 
     private lateinit var mviView: AytLandActivity.MviViewImpl
     private lateinit var binding: ActivityAytFullsreenBinding
@@ -72,6 +76,12 @@ class AytLandActivity : AppCompatActivity(),
         binding = ActivityAytFullsreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
+        castListener.listen()
+    }
+
+    override fun onDestroy() {
+        castListener.release()
+        super.onDestroy()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -79,20 +89,14 @@ class AytLandActivity : AppCompatActivity(),
         mviView = MviViewImpl(binding.fullscreenPlayerVideo)
         getLifecycle().addObserver(binding.fullscreenPlayerVideo)
         controller.onViewCreated(listOf(mviView), lifecycle.asMviLifecycle())
-        //binding.controls.root.requestDisallowInterceptTouchEvent(true)
         showHideUi.showElements = {
             log.d("showElements")
-//            binding.controls.root.isVisible = true
             binding.controls.root.fadeIn()
             binding.controls.root.requestFocus()
-//            if (this::mviView.isInitialized) {
-//                mviView.updatePlayingIcon()
-//            }
         }
         showHideUi.hideElements = {
             log.d("hideElements")
             binding.controls.root.fadeOut()
-//            binding.controls.root.isVisible = false
         }
         binding.controls.controlsTrackNext.setOnClickListener { mviView.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
         binding.controls.controlsTrackLast.setOnClickListener { mviView.dispatch(TrackBackClicked);showHideUi.delayedHide() }
@@ -139,8 +143,8 @@ class AytLandActivity : AppCompatActivity(),
 
         })
 
+        chromeCastWrapper.initMediaRouteButton(binding.controls.controlsMediaRouteButton)
         // defaults
-        //showHideUi.show()
         showHideUi.hide()
         binding.controls.controlsPlayFab.isVisible = false
         binding.controls.controlsSeek.isVisible = false
