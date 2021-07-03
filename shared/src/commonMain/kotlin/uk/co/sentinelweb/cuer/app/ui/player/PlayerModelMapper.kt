@@ -4,7 +4,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionMapper
 import uk.co.sentinelweb.cuer.core.mappers.Format.SECS
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SHUFFLE
 
 class PlayerModelMapper constructor(
     private val timeFormatter: TimeFormatter,
@@ -27,8 +27,6 @@ class PlayerModelMapper constructor(
                     ?: descriptionMapper.mapEmpty(),
                 nextTrackEnabled = playlist?.run { currentIndex < playlist.items.size - 1 } ?: false,
                 prevTrackEnabled = playlist?.run { currentIndex > 0 } ?: false,
-//                platformId = item?.media?.platformId,
-//                startPosition = item?.media?.positon ?: 0,
                 itemImage = item?.media?.thumbNail?.url,
                 playState = playerState,
                 times = PlayerContract.View.Model.Times(
@@ -52,7 +50,9 @@ class PlayerModelMapper constructor(
     } ?: "-"
 
     private fun trackTitle(playlist: PlaylistDomain?, offset: Int): String =
-        playlist?.currentIndex
+        playlist
+            ?.takeIf { it.mode != SHUFFLE }
+            ?.currentIndex
             ?.let { it + offset }
             ?.takeIf { it >= 0 && it < playlist.items.size }
             ?.let { playlist.items.get(it).media.title }

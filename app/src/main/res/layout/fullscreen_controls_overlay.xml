@@ -5,12 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:visibility="gone"
     android:background="@color/controls_overlay_background"
     tools:background="@color/black"
     tools:visibility="visible"
     >
 
+<!--    android:visibility="gone"-->
     <TextView
         android:id="@+id/controls_video_title"
         style="@style/TextAppearance.App.Headline4"
@@ -163,7 +163,7 @@
         android:layout_width="88dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:gravity="right"
+        android:gravity="left"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:ignore="RtlHardcoded"
@@ -176,6 +176,7 @@
         android:layout_width="88dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
+        android:gravity="right"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         tools:ignore="RtlHardcoded"

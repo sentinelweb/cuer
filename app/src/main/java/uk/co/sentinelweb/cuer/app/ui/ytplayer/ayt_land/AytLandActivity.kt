@@ -43,6 +43,8 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import kotlin.math.abs
+import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
+import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
 
 class AytLandActivity : AppCompatActivity(),
     AndroidScopeComponent {
@@ -80,7 +82,8 @@ class AytLandActivity : AppCompatActivity(),
         //binding.controls.root.requestDisallowInterceptTouchEvent(true)
         showHideUi.showElements = {
             log.d("showElements")
-            binding.controls.root.isVisible = true
+//            binding.controls.root.isVisible = true
+            binding.controls.root.fadeIn()
             binding.controls.root.requestFocus()
 //            if (this::mviView.isInitialized) {
 //                mviView.updatePlayingIcon()
@@ -88,7 +91,8 @@ class AytLandActivity : AppCompatActivity(),
         }
         showHideUi.hideElements = {
             log.d("hideElements")
-            binding.controls.root.isVisible = false
+            binding.controls.root.fadeOut()
+//            binding.controls.root.isVisible = false
         }
         binding.controls.controlsTrackNext.setOnClickListener { mviView.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
         binding.controls.controlsTrackLast.setOnClickListener { mviView.dispatch(TrackBackClicked);showHideUi.delayedHide() }

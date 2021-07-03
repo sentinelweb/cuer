@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.view_playlists_item.view.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.util.extension.fade
+import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 
