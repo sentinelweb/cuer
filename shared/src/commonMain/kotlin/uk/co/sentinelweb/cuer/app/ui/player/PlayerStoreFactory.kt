@@ -64,7 +64,7 @@ class PlayerStoreFactory(
                 is Result.Screen -> copy(screen = result.screen)
                 is Result.SkipTimes -> copy(
                     skipFwdText = result.fwd ?: skipFwdText,
-                    skipBackText = result.back ?: skipFwdText
+                    skipBackText = result.back ?: skipBackText
                 )
                 is Result.Position -> copy(position = result.pos)
             }
@@ -103,8 +103,8 @@ class PlayerStoreFactory(
                 is Intent.PlaylistChange -> dispatch(Result.Playlist(intent.item))
                 is Intent.TrackFwd -> queueConsumer.nextItem()
                 is Intent.TrackBack -> queueConsumer.previousItem()
-                is Intent.SkipBack -> publish(Label.Command(SkipBack(skip.skipBackInterval)))// todo skip.skipBack() not working
-                is Intent.SkipFwd -> publish(Label.Command(SkipFwd(skip.skipForwardInterval)))// todo skip.skipFwd() not working
+                is Intent.SkipBack -> skip.skipBack()
+                is Intent.SkipFwd -> skip.skipFwd()
                 is Intent.Position -> updatePosition(intent.ms, getState().item)
                 is Intent.SkipFwdSelect -> skip.onSelectSkipTime(true)
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
