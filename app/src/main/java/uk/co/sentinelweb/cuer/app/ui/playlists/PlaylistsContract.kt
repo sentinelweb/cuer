@@ -51,9 +51,6 @@ interface PlaylistsContract {
         fun scrollToItem(index: Int)
         fun hideRefresh()
         fun showUndo(msg: String, undo: () -> Unit)
-
-        //        fun gotoPlaylist(id: Long, play: Boolean, source: Source)
-//        fun gotoEdit(id: Long, source: Source)
         fun showMessage(msg: String)
         fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
         fun navigate(nav: NavigationModel)

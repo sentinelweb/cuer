@@ -28,7 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.State
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_VIEWED
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
@@ -91,7 +91,7 @@ class PlaylistPresenterTest {
     lateinit var mockShareWrapper: ShareWrapper
 
     @MockK
-    lateinit var mockPrefsWrapper: GeneralPreferences
+    lateinit var mockPrefsWrapper: GeneralPreferencesWrapper
 
     @MockK
     lateinit var mockTimeProvider: TimeProvider

@@ -153,7 +153,6 @@ class PlaylistsPresenter(
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        //view.gotoPlaylist(item.id, false, item.source)
         view.navigate(PlaylistContract.makeNav(item.id, null, false, item.source))
     }
 
@@ -166,7 +165,6 @@ class PlaylistsPresenter(
             }
             ?: findPlaylist(item)?.id?.apply {
                 view.navigate(PlaylistContract.makeNav(this, null, false, item.source))
-                //view.gotoPlaylist(this, false, item.source)
             }
     }
 
@@ -180,7 +178,6 @@ class PlaylistsPresenter(
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
         if (!external) {
             view.navigate(PlaylistContract.makeNav(item.id, null, true, item.source))
-            //view.gotoPlaylist(item.id, true, item.source)
         } else {
             findPlaylist(item)
                 ?.takeIf { it.type == PLATFORM }
@@ -211,7 +208,6 @@ class PlaylistsPresenter(
     }
 
     override fun onEdit(item: ItemContract.Model) {
-        //view.gotoEdit(item.id, LOCAL)
         view.navigate(PlaylistEditContract.makeNav(item.id, LOCAL))
     }
 

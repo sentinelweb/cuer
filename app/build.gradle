@@ -149,9 +149,9 @@ dependencies {
     // mvikotlin
     debugImplementation "com.arkivanov.mvikotlin:mvikotlin-android-debug:$ver_mvikotlin"
     releaseImplementation "com.arkivanov.mvikotlin:mvikotlin-android:$ver_mvikotlin"
-    // for debugging only remove
-    implementation "com.arkivanov.mvikotlin:mvikotlin-logging:$ver_mvikotlin"
     implementation "com.arkivanov.mvikotlin:mvikotlin-main:$ver_mvikotlin"
+    // for debugging only remove
+//    implementation "com.arkivanov.mvikotlin:mvikotlin-logging:$ver_mvikotlin"
 
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"

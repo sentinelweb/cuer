@@ -10,7 +10,6 @@
     tools:visibility="visible"
     >
 
-<!--    android:visibility="gone"-->
     <TextView
         android:id="@+id/controls_video_title"
         style="@style/TextAppearance.App.Headline4"

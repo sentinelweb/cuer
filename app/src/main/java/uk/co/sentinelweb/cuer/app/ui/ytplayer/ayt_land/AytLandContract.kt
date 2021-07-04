@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land
 
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
-import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -27,7 +26,8 @@ interface AytLandContract {
                 scoped {
                     PlayerController(
                         itemLoader = get(),
-                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+//                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+                        storeFactory = DefaultStoreFactory,
                         queueConsumer = get(),
                         queueProducer = get(),
                         modelMapper = get(),

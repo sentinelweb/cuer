@@ -29,8 +29,8 @@ class RoomMediaDatabaseRepository constructor(
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
     private val database: AppDatabase,
-    private val mediaUpdateMapper: MediaUpdateMapper
-) : MediaDatabaseRepository {// todo extract channel repo
+    private val mediaUpdateMapper: MediaUpdateMapper,
+) : MediaDatabaseRepository {
 
     init {
         log.tag(this)
