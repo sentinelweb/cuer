@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.CC_DISCONNECTED
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls.Listener
-import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -28,7 +28,7 @@ class PlayerControlsNotificationController constructor(
     private val log: LogWrapper,
     private val context: Context,
     private val skipControl: SkipContract.External,
-    private val mediaSessionManager: MediaSessionManager
+    private val mediaSessionManager: MediaSessionContract.Manager,
 ) : External, Controller, SkipContract.Listener {
 
     private var listener: Listener? = null

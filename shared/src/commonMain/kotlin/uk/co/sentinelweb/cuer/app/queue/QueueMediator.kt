@@ -52,9 +52,9 @@ class QueueMediator constructor(
     init {
         log.tag(this)
         state.playlistIdentifier = prefsWrapper.getPair(GeneralPreferences.CURRENT_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
+        _currentItemFlow = MutableStateFlow(state.currentItem)
         coroutines.computationScope.launch {
             refreshQueue(state.playlistIdentifier)
-            _currentItemFlow = MutableStateFlow(state.currentItem)
         }
         listenToDb()
     }
