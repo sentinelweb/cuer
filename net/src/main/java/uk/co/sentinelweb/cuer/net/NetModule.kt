@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.net
 
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayInteractor
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayRetrofitInteractor
 import uk.co.sentinelweb.cuer.net.pixabay.mapper.PixabayImageMapper
@@ -53,5 +54,7 @@ object NetModule {
         factory { PixabayImageMapper() }
 
         factory { ErrorMapper(log = get()) }
+
+        factory { TimeStampMapper(log = get()) }
     }
 }

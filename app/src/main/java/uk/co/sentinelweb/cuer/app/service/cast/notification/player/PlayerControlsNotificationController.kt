@@ -10,9 +10,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Controller
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.CC_DISCONNECTED
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.PlayerControls.Listener
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.CC_DISCONNECTED
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -126,7 +126,7 @@ class PlayerControlsNotificationController constructor(
         state.title = title
     }
 
-    override fun setConnectionState(connState: CastPlayerContract.ConnectionState) {
+    override fun setConnectionState(connState: PlayerContract.ConnectionState) {
         if (connState == CC_DISCONNECTED) {
             view.stopSelf()
         }

@@ -122,13 +122,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_player"
-        android:name="uk.co.sentinelweb.cuer.app.ui.player.PlayerFragment"
-        android:label="@string/bottomnav_title_player"
-        tools:layout="@layout/player_fragment"
-        />
-
-    <fragment
         android:id="@+id/navigation_settings_root"
         android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefRootFragment"
         android:label="@string/menu_settings"

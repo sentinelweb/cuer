@@ -24,7 +24,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
@@ -43,6 +43,7 @@ class MainActivity :
     AndroidScopeComponent {
 
     override val scope: Scope by activityScopeWithSource()
+
     private val presenter: MainContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val snackBarWrapper: SnackbarWrapper by inject()
@@ -165,7 +166,7 @@ class MainActivity :
             ?.let {
                 return when (it) {
                     PLAYLIST_FRAGMENT.name ->
-                        PlaylistFragment.makeNav(
+                        PlaylistContract.makeNav(
                             PLAYLIST_ID.getLong(intent) ?: throw IllegalArgumentException("Playlist ID is required"),
                             PLAYLIST_ITEM_ID.getLong(intent),
                             PLAY_NOW.getBoolean(intent),
@@ -188,7 +189,7 @@ class MainActivity :
 
     companion object {
         val TOP_LEVEL_DESTINATIONS =
-            setOf(R.id.navigation_browse, R.id.navigation_playlists, R.id.navigation_playlist, R.id.navigation_player)
+            setOf(R.id.navigation_browse, R.id.navigation_playlists, R.id.navigation_playlist)
         private const val SERVICES_REQUEST_CODE = 1
     }
 }

@@ -8,7 +8,6 @@ compileKotlin {
 }
 
 dependencies {
-    implementation project(":core")
     implementation project(":shared")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"

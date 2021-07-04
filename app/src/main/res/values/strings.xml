@@ -154,6 +154,8 @@
     <string name="menu_show_children">Show children</string>
     <string name="playlist_item_menu_goto_playlist">Goto playlist</string>
     <string name="menu_launch">Launch</string>
+    <string name="player_fab_fullscreen">Fullscreen</string>
+    <string name="player_fab_pip">Picutre in Picture</string>
 
 
 </resources>

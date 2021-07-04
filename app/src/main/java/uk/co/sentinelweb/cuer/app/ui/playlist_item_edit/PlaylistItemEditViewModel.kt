@@ -18,13 +18,14 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
-import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -46,8 +47,8 @@ class PlaylistItemEditViewModel constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>
-) : ViewModel() {
+    private val prefsWrapper: GeneralPreferencesWrapper
+) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
     }
@@ -201,7 +202,7 @@ class PlaylistItemEditViewModel constructor(
             ?.also { update() }
     }
 
-    fun onLinkClick(urlString: String) {
+    override fun onLinkClick(urlString: String) {
         _navigateLiveData.value =
             NavigationModel(
                 WEB_LINK,
@@ -209,7 +210,7 @@ class PlaylistItemEditViewModel constructor(
             )
     }
 
-    fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
+    override fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
         _dialogModelLiveData.value =
             PlaylistsDialogContract.Config(
                 state.selectedPlaylists,
@@ -280,7 +281,7 @@ class PlaylistItemEditViewModel constructor(
         }
     }
 
-    fun onRemovePlaylist(chipModel: ChipModel) {
+    override fun onRemovePlaylist(chipModel: ChipModel) {
         state.isPlaylistsChanged = true
         val plId = chipModel.value?.toLong()
         state.selectedPlaylists.removeIf { it.id == plId }
@@ -292,7 +293,7 @@ class PlaylistItemEditViewModel constructor(
         update()
     }
 
-    fun onChannelClick() {
+    override fun onChannelClick() {
         state.media?.channelData?.platformId?.let { channelId ->
             _navigateLiveData.value = NavigationModel(YOUTUBE_CHANNEL, mapOf(NavigationModel.Param.CHANNEL_ID to channelId))
         }
@@ -320,10 +321,13 @@ class PlaylistItemEditViewModel constructor(
                     _navigateLiveData.value = NavigationModel(NAV_DONE)
                 })
             } else {
-                // todo alert if taken off all playlists
-                viewModelScope.launch {
-                    commitPlaylistItems()
-                    _navigateLiveData.value = NavigationModel(NAV_DONE)
+                if (state.selectedPlaylists.size > 0) {
+                    viewModelScope.launch {
+                        commitPlaylistItems()
+                        _navigateLiveData.value = NavigationModel(NAV_DONE)
+                    }
+                } else {
+                    _uiLiveData.value = UiEvent(ERROR, "Please select a playlist (or delete the item)")
                 }
             }
         } else {

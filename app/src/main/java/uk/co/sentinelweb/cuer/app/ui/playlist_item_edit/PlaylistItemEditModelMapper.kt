@@ -1,24 +1,20 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
-import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
-import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
-import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
+import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
+import uk.co.sentinelweb.cuer.core.mappers.Format.SECS
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
-import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter.Format.SECS
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistItemEditModelMapper(
     private val timeFormater: TimeFormatter,
-    private val dateTimeFormater: DateTimeFormatter,
+    private val descriptionMapper: DescriptionMapper,
     private val res: ResourceWrapper,
     private val backgroundMapper: BackgroundMapper
 ) {
@@ -27,17 +23,8 @@ class PlaylistItemEditModelMapper(
         domain: MediaDomain,
         selectedPlaylists: Set<PlaylistDomain>
     ) = PlaylistItemEditContract.Model(
-        title = domain.title,
-        description = domain.description,
+        description = descriptionMapper.map(domain, selectedPlaylists),
         imageUrl = (domain.image ?: domain.thumbNail)?.url,
-        channelTitle = domain.channelData.title,
-        channelThumbUrl = (domain.channelData.thumbNail ?: domain.channelData.image)?.url,
-        channelDescription = domain.channelData.description,
-        chips = mutableListOf(PLAYLIST_SELECT_MODEL).apply {
-            selectedPlaylists.forEachIndexed { index, playlist ->
-                add(index, ChipModel(PLAYLIST, playlist.title, playlist.id.toString(), playlist.thumb ?: playlist.image))
-            }
-        },
         starred = domain.starred,
         canPlay = domain.platformId.isNotEmpty(),
         durationText = (
@@ -50,7 +37,6 @@ class PlaylistItemEditModelMapper(
         position = domain.positon
             ?.takeIf { domain.duration != null && domain.duration!! > 0L }
             ?.let { (it / domain.duration!!).toFloat() },
-        pubDate = dateTimeFormater.formatDateTimeNullable(domain.published?.toJavaLocalDateTime()),
         empty = false,
         isLive = domain.isLiveBroadcast,
         isUpcoming = domain.isLiveBroadcastUpcoming,
@@ -58,17 +44,11 @@ class PlaylistItemEditModelMapper(
     )
 
     fun mapEmpty(): PlaylistItemEditContract.Model = PlaylistItemEditContract.Model(
-        title = res.getString(R.string.pie_empty_title),
+        description = descriptionMapper.mapEmpty(),
         imageUrl = EMPTY_IMAGE,
-        description = res.getString(R.string.pie_empty_desc),
-        pubDate = null,
         position = -1f,
         positionText = null,
         durationText = null,
-        chips = listOf(),
-        channelTitle = null,
-        channelThumbUrl = null,
-        channelDescription = null,
         starred = false,
         canPlay = false,
         empty = true,
@@ -96,6 +76,7 @@ class PlaylistItemEditModelMapper(
         confirm,
         {}
     )
+
 
     companion object {
         private const val EMPTY_IMAGE = "file:///android_asset/sad_puppy.jpg"

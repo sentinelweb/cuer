@@ -8,13 +8,13 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -51,10 +51,9 @@ interface PlaylistsContract {
         fun scrollToItem(index: Int)
         fun hideRefresh()
         fun showUndo(msg: String, undo: () -> Unit)
-        fun gotoPlaylist(id: Long, play: Boolean, source: Source)
-        fun gotoEdit(id: Long, source: Source)
         fun showMessage(msg: String)
         fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
+        fun navigate(nav: NavigationModel)
     }
 
     data class State constructor(
@@ -93,7 +92,7 @@ interface PlaylistsContract {
                         queue = get(),
                         log = get(),
                         toastWrapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>()),
+                        prefsWrapper = get(),
                         coroutines = get(),
                         newMedia = get(),
                         recentItems = get(),
@@ -118,6 +117,7 @@ interface PlaylistsContract {
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }
+                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
                 viewModel { State() }
             }
         }

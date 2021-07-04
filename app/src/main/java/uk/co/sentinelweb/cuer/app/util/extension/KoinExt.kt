@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.util.extension
 
+import android.app.Activity
 import android.app.Service
 import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
@@ -32,6 +33,9 @@ fun Fragment.linkScopeToActivity() {
 
 /** copied from org.koin.android.scope.ServiceExtKt  */
 fun Service.serviceScopeWithSource() = lazy { getScopeOrNull() ?: createScope(this) }
+
+/** legacy activity scope (manually destroy)  */
+fun Activity.activityLegacyScopeWithSource() = lazy { getScopeOrNull() ?: createScope(this) }
 
 /** wraps org.koin.androidx.scope.LifecycleScopeDelegate - to add source  */
 class LifecycleScopeWithSourceDelegate(

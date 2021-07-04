@@ -7,7 +7,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -21,18 +23,22 @@ class CastPlayerPresenter(
     private val mapper: CastPlayerUiMapper,
     private val log: LogWrapper,
     private val skipControl: SkipContract.External,
-    private val res: ResourceWrapper
-) : CastPlayerContract.Presenter, CastPlayerContract.PlayerControls, SkipContract.Listener {
+    private val res: ResourceWrapper,
+) : CastPlayerContract.Presenter, PlayerControls, SkipContract.Listener {
 
     init {
         log.tag(this)
         skipControl.listener = this
     }
 
-    private var listener: CastPlayerContract.PlayerControls.Listener? = null // todo data only here move to presenter?
+    private var listener: PlayerControls.Listener? = null // todo data only here move to presenter?
 
     override fun initialise() {
         state.isDestroyed = false
+    }
+
+    override fun onResume() {
+        skipControl.updateSkipTimes()
         view.setSkipBackText(skipControl.skipBackText)
         view.setSkipFwdText(skipControl.skipForwardText)
     }
@@ -59,11 +65,11 @@ class CastPlayerPresenter(
         state.isDestroyed = true
     }
 
-    override fun addListener(l: CastPlayerContract.PlayerControls.Listener) {
+    override fun addListener(l: PlayerControls.Listener) {
         listener = l
     }
 
-    override fun removeListener(l: CastPlayerContract.PlayerControls.Listener) {
+    override fun removeListener(l: PlayerControls.Listener) {
         if (listener == l) {
             listener = null;
         }
@@ -89,7 +95,6 @@ class CastPlayerPresenter(
         if (state.durationMs > 0) {
             state.seekPositionMs = (ratio * state.durationMs).toLong()
             view.setCurrentSecond(mapper.formatTime(state.seekPositionMs))
-
         }
     }
 
@@ -102,7 +107,7 @@ class CastPlayerPresenter(
         view.initMediaRouteButton()
     }
 
-    override fun setConnectionState(connState: CastPlayerContract.ConnectionState) {
+    override fun setConnectionState(connState: ConnectionState) {
         when (connState) {
             CC_DISCONNECTED -> view.hideBuffering()
             CC_CONNECTING -> view.showBuffering()

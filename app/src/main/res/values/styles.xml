@@ -278,6 +278,26 @@
     </style>
     <!-- end CompactPlayer =========================== -->
 
+    <!-- YoutubePlayer =========================== -->
+    <style name="YoutubePlayer" />
+
+    <style name="YoutubePlayer.Button">
+        <item name="android:background">@drawable/ic_ripple_play_background</item>
+        <item name="android:layout_width">@dimen/controls_button_size</item>
+        <item name="android:layout_height">@dimen/controls_button_size</item>
+        <item name="android:padding">@dimen/controls_button_padding</item>
+        <item name="android:tint">@color/white</item>
+        <item name="android:layout_margin">@dimen/controls_button_margin</item>
+    </style>
+
+    <style name="YoutubePlayer.InfoText" parent="TextAppearance.App.Body1">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">4dp</item>
+    </style>
+    <!-- end CompactPlayer =========================== -->
+
     <!-- Chips =========================== -->
     <style name="Chip" />
 
@@ -295,7 +315,6 @@
         <item name="android:checkable">false</item>
     </style>
     <!-- end Chips =========================== -->
-
 
     <style name="FullscreenTheme" parent="AppTheme">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>

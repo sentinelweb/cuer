@@ -1,8 +1,9 @@
 package uk.co.sentinelweb.cuer.app.db.init
 
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RoomMediaDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RoomPlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -12,15 +13,16 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 class DatabaseInitializer constructor(
     private val ytInteractor: YoutubeInteractor,
     private val contextProvider: CoroutineContextProvider,
-    private val playlistRepository: PlaylistDatabaseRepository,
-    private val mediaRepository: MediaDatabaseRepository,
+    private val roomPlaylistRepository: RoomPlaylistDatabaseRepository,
+    private val roomPlaylistItemRepository: RoomPlaylistItemDatabaseRepository,
+    private val roomMediaRepository: RoomMediaDatabaseRepository,
     private val timeProvider: TimeProvider,
     private val log: LogWrapper
 ) {
 
     fun initDatabase() {
         contextProvider.ioScope.launch {
-            (mediaRepository.count()
+            (roomMediaRepository.count()
                 .takeIf { it.isSuccessful && it.data == 0 }
                 ?: let { return@launch })
                 .let { initPlaylists() }
@@ -31,11 +33,11 @@ class DatabaseInitializer constructor(
                 }
                 .takeIf { (_, result) -> result.isSuccessful }
                 ?.let { (playlist, result) ->
-                    playlist to result.data?.let { mediaRepository.save(it) }
+                    playlist to result.data?.let { roomMediaRepository.save(it) }
                 }
                 ?.let { (playlist, result) -> makePlaylistItems(playlist, result?.data!!) }
                 ?.let {
-                    playlistRepository.savePlaylistItems(it)
+                    roomPlaylistItemRepository.save(it)
                 }
                 ?.takeIf { result -> result.isSuccessful }
                 ?: throw ExceptionInInitializerError("failed to init database")
@@ -56,7 +58,7 @@ class DatabaseInitializer constructor(
     }
 
     suspend fun initPlaylists(): List<PlaylistDomain> =
-        playlistRepository.count()
+        roomPlaylistRepository.count()
             .takeIf { it.isSuccessful && it.data == 0 }
             ?.let {
                 listOf(
@@ -83,9 +85,9 @@ class DatabaseInitializer constructor(
                     )
                 )
             }
-            ?.let { playlistRepository.save(it) }
+            ?.let { roomPlaylistRepository.save(it) }
             ?.takeIf { it.isSuccessful }?.data
-            ?: playlistRepository.loadList().data!!
+            ?: roomPlaylistRepository.loadList().data!!
 
     private fun mapQueueToMedia(it: QueueItem) = MediaDomain(
         url = it.url,

@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 
 import kotlinx.datetime.toKotlinLocalDateTime
-import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
+import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.exception.BadDataException

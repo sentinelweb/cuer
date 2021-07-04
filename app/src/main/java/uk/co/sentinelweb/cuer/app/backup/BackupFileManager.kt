@@ -3,9 +3,7 @@ package uk.co.sentinelweb.cuer.app.backup
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.db.repository.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
@@ -15,8 +13,10 @@ import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class BackupFileManager constructor(
+    private val channelRepository: ChannelDatabaseRepository,
     private val mediaRepository: MediaDatabaseRepository,
     private val playlistRepository: PlaylistDatabaseRepository,
+    private val playlistItemRepository: PlaylistItemDatabaseRepository,
     private val contextProvider: CoroutineContextProvider,
     private val parserFactory: ParserFactory,
     private val initialiser: DatabaseInitializer,
@@ -38,7 +38,7 @@ class BackupFileManager constructor(
         if (backupFileModel.version == 3) {
             return@withContext mediaRepository.deleteAll()
                 .takeIf { it.isSuccessful }
-                ?.let { mediaRepository.deleteAllChannels() }
+                ?.let { channelRepository.deleteAll() }
                 ?.takeIf { it.isSuccessful }
                 ?.let { playlistRepository.deleteAll() }
                 ?.takeIf { it.isSuccessful }
@@ -75,7 +75,7 @@ class BackupFileManager constructor(
         } else {
             return@withContext mediaRepository.deleteAll()
                 .takeIf { it.isSuccessful }
-                ?.let { mediaRepository.deleteAllChannels() }
+                ?.let { channelRepository.deleteAll() }
                 ?.takeIf { it.isSuccessful }
                 ?.let { mediaRepository.save(backupFileModel.medias) }
                 ?.takeIf { it.isSuccessful }
@@ -104,7 +104,7 @@ class BackupFileManager constructor(
                                     )
                                 }
                             }.let {
-                                playlistRepository.savePlaylistItems(it)
+                                playlistItemRepository.save(it)
                             }.isSuccessful
                         } ?: true
                 } ?: false

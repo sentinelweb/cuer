@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.wrapper
 
+import android.app.Activity
 import androidx.annotation.VisibleForTesting
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.youtube.player.YouTubeApiServiceUtil.isYouTubeApiServiceAvailable
 import com.google.android.youtube.player.YouTubeInitializationResult.SUCCESS
 import com.google.android.youtube.player.YouTubeIntents.*
@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class YoutubeJavaApiWrapper(
-    private val activity: AppCompatActivity
+    private val activity: Activity,
 ) {
 
     @VisibleForTesting

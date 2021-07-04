@@ -38,6 +38,6 @@
         android:orderInCategory="100"
         android:title="@string/menu_launch"
         app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="never"
+        app:showAsAction="ifRoom"
         />
 </menu>

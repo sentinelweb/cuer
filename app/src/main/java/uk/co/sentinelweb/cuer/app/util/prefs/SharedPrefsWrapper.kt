@@ -4,69 +4,64 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.SharedPreferences
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import kotlin.reflect.KClass
 
-interface Field {
-    val fname: String
-}
-
-class SharedPrefsWrapper<T : Field> constructor(
-    private val clazz: KClass<T>,
+class SharedPrefsWrapper constructor(
     private val app: Application,
     private val log: LogWrapper
-) {
+) : GeneralPreferencesWrapper {
+
     private val prefs: SharedPreferences by lazy {
-        app.getSharedPreferences(clazz.simpleName, 0)
+        app.getSharedPreferences(GeneralPreferences::class.simpleName, 0)
     }
 
-    fun getLong(field: T, def: Long): Long = prefs.getLong(field.fname, def)
+    override fun getLong(field: GeneralPreferences, def: Long): Long = prefs.getLong(field.fname, def)
 
-    fun getLong(field: T): Long? =
+    override fun getLong(field: GeneralPreferences): Long? =
         if (prefs.contains(field.fname)) prefs.getLong(field.fname, 0)
         else null
 
     @SuppressLint("ApplySharedPref")
-    fun putLong(field: T, value: Long) {
+    override fun putLong(field: GeneralPreferences, value: Long) {
         prefs.edit().putLong(field.fname, value).commit()
     }
 
-    fun getInt(field: T, def: Int): Int =
+    override fun getInt(field: GeneralPreferences, def: Int): Int =
         prefs.getInt(field.fname, def)
 
-    fun getInt(field: T): Int? =
+    override fun getInt(field: GeneralPreferences): Int? =
         if (prefs.contains(field.fname)) prefs.getInt(field.fname, 0)
         else null
 
-    fun putInt(field: T, value: Int) {
+    override fun putInt(field: GeneralPreferences, value: Int) {
         prefs.edit().putInt(field.fname, value).apply()
     }
 
-    fun getString(field: T, def: String?): String? =
+    override fun getString(field: GeneralPreferences, def: String?): String? =
         prefs.getString(field.fname, def)
 
-    fun putString(field: T, value: String) {
+    override fun putString(field: GeneralPreferences, value: String) {
         prefs.edit().putString(field.fname, value).apply()
     }
 
-    fun putEnum(field: T, value: Enum<*>) {
+    override fun putEnum(field: GeneralPreferences, value: Enum<*>) {
         prefs.edit().putString(field.fname, value.toString()).apply()
     }
 
-    fun <E : Enum<E>> getEnum(field: T, def: E): E =
+    override fun <E : Enum<E>> getEnum(field: GeneralPreferences, def: E): E =
         getString(field, null)
             ?.let { pref -> def::class.java.enumConstants.find { it.name == pref } }
             ?: def
 
-    fun getBoolean(field: T, def: Boolean): Boolean =
+    override fun getBoolean(field: GeneralPreferences, def: Boolean): Boolean =
         prefs.getBoolean(field.fname, def)
 
-    fun putBoolean(field: T, value: Boolean) {
+    override fun putBoolean(field: GeneralPreferences, value: Boolean) {
         prefs.edit()
             .putBoolean(field.fname, value)
             .apply()
     }
 
-    fun remove(field: T) {
+    override fun remove(field: GeneralPreferences) {
         prefs.edit()
             .remove(field.fname)
             .remove(field.fname + PAIR_FIRST)
@@ -74,18 +69,18 @@ class SharedPrefsWrapper<T : Field> constructor(
             .apply()
     }
 
-    fun has(field: T): Boolean = prefs.contains(field.fname) || prefs.contains(field.fname + PAIR_FIRST)
+    override fun has(field: GeneralPreferences): Boolean = prefs.contains(field.fname) || prefs.contains(field.fname + PAIR_FIRST)
 
-    fun <T1 : Any?, T2 : Any?> putPair(field: T, pair: Pair<T1, T2>) {
+    override fun <T1 : Any?, T2 : Any?> putPair(field: GeneralPreferences, pair: Pair<T1, T2>) {
         putValue(field.fname + PAIR_FIRST, pair.first)
         putValue(field.fname + PAIR_SECOND, pair.second)
     }
 
-    fun <T1 : Any?, T2 : Any?> getPair(field: T, def: Pair<T1, T2>): Pair<T1, T2> =
+    override fun <T1 : Any?, T2 : Any?> getPair(field: GeneralPreferences, def: Pair<T1, T2>): Pair<T1, T2> =
         getVal(field.fname + PAIR_FIRST, def.first) to
                 getVal(field.fname + PAIR_SECOND, def.second)
 
-    fun <T1 : Any?, T2 : Any?> getPairNonNull(field: T, def: Pair<T1, T2>): Pair<T1, T2>? =
+    override fun <T1 : Any?, T2 : Any?> getPairNonNull(field: GeneralPreferences, def: Pair<T1, T2>): Pair<T1, T2>? =
         if (has(field))
             getPair(field, def)
                 .takeIf { it.first != null && it.second != null }
@@ -123,17 +118,10 @@ class SharedPrefsWrapper<T : Field> constructor(
             ?.let { pref -> def::class.java.enumConstants.find { it.name == pref } }
             ?: def
 
-// try with inline class
-//    fun <E : Enum<E>> getEnum(field: T, def: E): E =
-//        getEnum(prefs, field, def)
-
-    //    inline fun <reified E : Enum<E>> getEnum(prefs:SharedPrefsWrapper<T>,field: T, def: E): E =
-//        prefs.prefs.getString(field.fname, null)
-//            ?.let { enumValueOf<E>(it) } ?: def
-//
     companion object {
         private val PAIR_FIRST = ".first"
         private val PAIR_SECOND = ".second"
     }
+
 
 }

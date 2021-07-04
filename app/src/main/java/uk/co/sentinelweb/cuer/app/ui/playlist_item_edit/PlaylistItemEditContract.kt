@@ -7,13 +7,10 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
-import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
-import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -26,14 +23,8 @@ interface PlaylistItemEditContract {
     }
 
     data class Model constructor(
+        val description: DescriptionModel,
         val imageUrl: String?,
-        val title: CharSequence?,
-        val description: String?,
-        val chips: List<ChipModel> = listOf(PLAYLIST_SELECT_MODEL),
-        val channelTitle: String?,
-        val channelThumbUrl: String?,
-        val channelDescription: String?,
-        val pubDate: String?,
         val durationText: String?,
         val positionText: String?,
         val position: Float?,
@@ -80,14 +71,12 @@ interface PlaylistItemEditContract {
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         playlistOrchestrator = get(),
-                        prefsWrapper = get(named<GeneralPreferences>())
+                        prefsWrapper = get()
                     )
                 }
                 scoped { State() }
                 scoped { PlaylistItemEditModelMapper(get(), get(), get(), get()) }
                 scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
-                //scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ChipCreator((getSource() as Fragment).requireActivity(), get(), get()) }
                 scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
                 scoped { getSource<Fragment>().requireActivity() }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }

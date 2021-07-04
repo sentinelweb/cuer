@@ -22,10 +22,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
-import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
-import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -39,7 +38,7 @@ class SearchViewModel(
     private val state: SearchContract.State,
     private val mapper: SearchMapper,
     private val log: LogWrapper,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
+    private val prefsWrapper: GeneralPreferencesWrapper,
     private val timeStampMapper: TimeStampMapper,
     private val timeProvider: TimeProvider
 ) : ViewModel() {

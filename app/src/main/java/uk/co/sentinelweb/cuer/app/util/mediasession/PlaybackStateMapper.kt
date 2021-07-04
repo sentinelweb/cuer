@@ -4,20 +4,40 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaybackStateMapper {
 
     @Suppress("RemoveRedundantQualifierName")
-    fun map(domain: MediaDomain, state: PlayerStateDomain, liveOffset: Long?): PlaybackStateCompat = if (domain.isLiveBroadcast) {
-        PlaybackStateCompat.Builder()
-            .setState(mapState(state), liveOffset ?: 0, 1f)
-            .setActions(PlaybackStateCompat.ACTION_REWIND or PlaybackStateCompat.ACTION_FAST_FORWARD)
-            .build()
-    } else {
-        PlaybackStateCompat.Builder()
-            .setState(mapState(state), domain.positon ?: 0, 1f)
-            .setActions(PlaybackStateCompat.ACTION_SEEK_TO)
-            .build()
+    fun map(domain: MediaDomain, state: PlayerStateDomain, liveOffset: Long?, playlist: PlaylistDomain?): PlaybackStateCompat {
+        var actionsBase = PlaybackStateCompat.ACTION_REWIND or
+                PlaybackStateCompat.ACTION_FAST_FORWARD or
+                PlaybackStateCompat.ACTION_PLAY or
+                PlaybackStateCompat.ACTION_PAUSE
+        playlist?.apply {
+            items.indexOfFirst { it.media.platformId == domain.platformId }
+                .takeIf { it != -1 }
+                ?.also {
+                    if (it < items.size - 1) {
+                        actionsBase = actionsBase or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                    }
+                    if (it > 0) {
+                        actionsBase = actionsBase or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                    }
+                }
+
+        }
+        return if (domain.isLiveBroadcast) {
+            PlaybackStateCompat.Builder()
+                .setState(mapState(state), liveOffset ?: 0, 1f)
+                .setActions(actionsBase)
+                .build()
+        } else {
+            PlaybackStateCompat.Builder()
+                .setState(mapState(state), domain.positon ?: 0, 1f)
+                .setActions(actionsBase or PlaybackStateCompat.ACTION_SEEK_TO)
+                .build()
+        }
     }
 
     private fun mapState(state: PlayerStateDomain) = when (state) {

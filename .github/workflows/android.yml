@@ -36,7 +36,8 @@ jobs:
           CUER_SIGNING_KEY_FILE: "${{ secrets.CUER_SIGNING_KEY_FILE }}"
           CUER_SIGNING_PASSWORD: "${{ secrets.CUER_SIGNING_PASSWORD }}"
       - name: Test
-        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD core:test shared:test net:test remote:test app:testDebugUnitTest
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD shared:test shared:jvmTest net:test remote:test
+        #        app:testDebugUnitTest
         env:
           YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
           PIXABAY_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"

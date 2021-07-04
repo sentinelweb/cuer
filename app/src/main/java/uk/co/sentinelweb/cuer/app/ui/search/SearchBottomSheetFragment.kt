@@ -106,7 +106,8 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment(), AndroidScopeCompo
     }
 
     companion object {
-        private val SELECT_PLAYLIST_TAG = "pdf_dialog"
-        private val SELECT_DATES_TAG = "date_picker"
+        const val SEARCH_BOTTOMSHEET_TAG = "searchBottomSheetFragmentTag"
+        private const val SELECT_PLAYLIST_TAG = "pdf_dialog"
+        private const val SELECT_DATES_TAG = "date_picker"
     }
 }

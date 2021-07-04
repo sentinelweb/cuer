@@ -12,7 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
-import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -29,7 +29,7 @@ class PlaylistsDialogPresenter(
     private val dialogModelMapper: PlaylistsDialogModelMapper,
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
+    private val prefsWrapper: GeneralPreferencesWrapper,
     private val coroutines: CoroutineContextProvider
 ) : PlaylistsDialogContract.Presenter {
 

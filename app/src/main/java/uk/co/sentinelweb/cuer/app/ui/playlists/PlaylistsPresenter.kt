@@ -17,12 +17,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlay
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchMapper
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
-import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -46,7 +47,7 @@ class PlaylistsPresenter(
     private val modelMapper: PlaylistsModelMapper,
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
-    private val prefsWrapper: SharedPrefsWrapper<GeneralPreferences>,
+    private val prefsWrapper: GeneralPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
     private val newMedia: NewMediaPlayistInteractor,
     private val recentItems: RecentItemsPlayistInteractor,
@@ -152,7 +153,7 @@ class PlaylistsPresenter(
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        view.gotoPlaylist(item.id, false, item.source)
+        view.navigate(PlaylistContract.makeNav(item.id, null, false, item.source))
     }
 
     override fun onItemImageClicked(item: ItemContract.Model) {
@@ -162,7 +163,9 @@ class PlaylistsPresenter(
                 state.treeCurrentNodeId = it.id
                 showCurrentNode()
             }
-            ?: findPlaylist(item)?.apply { view.gotoPlaylist(id!!, false, item.source) }
+            ?: findPlaylist(item)?.id?.apply {
+                view.navigate(PlaylistContract.makeNav(this, null, false, item.source))
+            }
     }
 
     override fun onUpClicked() {
@@ -174,7 +177,7 @@ class PlaylistsPresenter(
 
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
         if (!external) {
-            view.gotoPlaylist(item.id, true, item.source)
+            view.navigate(PlaylistContract.makeNav(item.id, null, true, item.source))
         } else {
             findPlaylist(item)
                 ?.takeIf { it.type == PLATFORM }
@@ -205,7 +208,7 @@ class PlaylistsPresenter(
     }
 
     override fun onEdit(item: ItemContract.Model) {
-        view.gotoEdit(item.id, LOCAL)
+        view.navigate(PlaylistEditContract.makeNav(item.id, LOCAL))
     }
 
     override fun onMerge(item: ItemContract.Model) {

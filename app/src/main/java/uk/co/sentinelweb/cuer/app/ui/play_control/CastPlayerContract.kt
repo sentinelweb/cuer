@@ -10,10 +10,10 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.domain.ImageDomain
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -33,40 +33,11 @@ interface CastPlayerContract {
         fun onPlaylistItemClick()
         fun onSeekBackSelectTimePressed(): Boolean
         fun onSeekSelectTimeFwdPressed(): Boolean
-    }
-
-    // todo think about this maybe sub with android MediaControl interface
-    interface PlayerControls {
-        fun initMediaRouteButton()
-        fun setConnectionState(connState: ConnectionState)
-        fun setPlayerState(playState: PlayerStateDomain)
-        fun addListener(l: Listener)
-        fun removeListener(l: Listener)
-        fun setCurrentSecond(second: Float) // todo ms long
-        fun setDuration(duration: Float) // todo ms long
-        fun error(msg: String)
-        fun setTitle(title: String)
-        fun reset()
-        fun restoreState()
-
-        //fun setMedia(media: MediaDomain)// todo remove - use playlistitem
-        fun setPlaylistName(name: String)
-        fun setPlaylistImage(image: ImageDomain?)
-        fun setPlaylistItem(playlistItem: PlaylistItemDomain?, source: OrchestratorContract.Source)
-
-        interface Listener {
-            fun play()
-            fun pause()
-            fun trackBack()
-            fun trackFwd()
-            fun seekTo(positionMs: Long)
-            fun getLiveOffsetMs(): Long
-        }
-
+        fun onResume()
     }
 
     interface View {
-        val playerControls: PlayerControls
+        val playerControls: PlayerContract.PlayerControls
         fun initMediaRouteButton()
         fun setCurrentSecond(second: String)
         fun setDuration(duration: String)
@@ -88,10 +59,6 @@ interface CastPlayerContract {
         fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int)
         fun setSeekEnabled(enabled: Boolean)
         fun setState(state: PlayerStateDomain?)
-    }
-
-    enum class ConnectionState {
-        CC_DISCONNECTED, CC_CONNECTING, CC_CONNECTED,
     }
 
     data class State(
@@ -129,8 +96,8 @@ interface CastPlayerContract {
                         view = get(),
                         state = SkipContract.State(),
                         log = get(),
-                        mapper = SkipContract.Mapper(timeSinceFormatter = get(), res = get()),
-                        prefsWrapper = get(named<GeneralPreferences>())
+                        mapper = SkipModelMapper(timeSinceFormatter = get(), res = get()),
+                        prefsWrapper = get()
                     )
                 }
                 scoped<SkipContract.View> {

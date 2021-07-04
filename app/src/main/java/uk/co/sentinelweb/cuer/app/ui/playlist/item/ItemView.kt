@@ -25,7 +25,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistItemBinding
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_IMAGE
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_TITLE
-import uk.co.sentinelweb.cuer.app.util.extension.fade
+import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 

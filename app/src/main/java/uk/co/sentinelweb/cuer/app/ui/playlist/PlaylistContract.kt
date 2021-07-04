@@ -16,17 +16,18 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
@@ -68,13 +69,20 @@ interface PlaylistContract {
         fun undoMoveItem()
     }
 
+    interface Interactions {
+        fun onPlayStartClick(item: PlaylistItemDomain)
+        fun onRelated(item: PlaylistItemDomain)
+        fun onView(item: PlaylistItemDomain)
+        fun onPlay(item: PlaylistItemDomain)
+    }
+
     interface View {
+        val external: External
         fun setModel(model: Model, animate: Boolean = true)
         fun setHeaderModel(model: Model)
         fun setList(items: List<ItemContract.Model>, animate: Boolean)
         fun scrollToItem(index: Int)
         fun scrollTo(direction: ScrollDirection)
-        fun playLocal(media: MediaDomain)
         fun showUndo(msg: String, undoFunction: () -> Unit)
         fun highlightPlayingItem(currentItemIndex: Int?)
         fun setSubTitle(subtitle: String)
@@ -92,6 +100,10 @@ interface PlaylistContract {
         fun showError(message: String)
         fun updateItemModel(model: ItemContract.Model)
         fun navigate(nav: NavigationModel)
+    }
+
+    interface External {
+        var interactions: Interactions?
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
@@ -131,6 +143,19 @@ interface PlaylistContract {
     )
 
     companion object {
+        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean, source: Source?): NavigationModel {
+            val params = mutableMapOf(
+                PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
+                NavigationModel.Param.PLAY_NOW to play,
+                SOURCE to (source ?: throw IllegalArgumentException("No Source"))
+            ).apply {
+                plItemId?.also { put(NavigationModel.Param.PLAYLIST_ITEM_ID, it) }
+            }
+            return NavigationModel(
+                PLAYLIST_FRAGMENT, params
+            )
+        }
+
         @JvmStatic
         val fragmentModule = module {
             scope(named<PlaylistFragment>()) {
@@ -145,20 +170,22 @@ interface PlaylistContract {
                         modelMapper = get(),
                         queue = get(),
                         toastWrapper = get(),
-                        ytContextHolder = get(),
+                        ytCastContextHolder = get(),
                         chromeCastWrapper = get(),
                         ytJavaApi = get(),
                         shareWrapper = get(),
-                        prefsWrapper = get(named<GeneralPreferences>()),
+                        prefsWrapper = get(),
                         playlistMutator = get(),
                         log = get(),
                         timeProvider = get(),
                         coroutines = get(),
                         res = get(),
                         playlistMediaLookupOrchestrator = get(),
-                        playlistUpdateOrchestrator = get()
+                        playlistUpdateOrchestrator = get(),
+                        playlistOrDefaultOrchestrator = get()
                     )
                 }
+                scoped { get<Presenter>() as External }
                 scoped {
                     PlaylistModelMapper(
                         res = get(),

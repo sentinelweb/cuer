@@ -1,19 +1,17 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
-import uk.co.sentinelweb.cuer.app.service.remote.RemoteServiceManager
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class MainPresenter(
     private val view: MainContract.View,
     private val state: MainContract.State,
-    private val playerControls: CastPlayerContract.PlayerControls,
+    private val playerControls: PlayerContract.PlayerControls,
     private val ytServiceManager: YoutubeCastServiceManager,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val log: LogWrapper,
-    private val remoteServiceManger: RemoteServiceManager
 ) : MainContract.Presenter {
 
     init {
@@ -27,11 +25,6 @@ class MainPresenter(
         }
     }
 
-//    override fun startServer() {
-//        remoteServiceManger.start()
-//    }
-
-
     override fun onPlayServicesOk() {
         log.d("onPlayServicesOk()")
         state.playServicesAvailable = true
@@ -40,10 +33,13 @@ class MainPresenter(
         }
     }
 
+    override fun onDestroy() {
+
+    }
+
     private fun initialiseCastContext() {
         ytContextHolder.create()
     }
-
 
     override fun onStart() {
         log.d("onStart()")
@@ -60,7 +56,6 @@ class MainPresenter(
     }
 
     override fun onStop() {
-        log.d("onStop()")
         ytContextHolder.playerUi = null
         if (!view.isRecreating()) {
             if (ytContextHolder.isCreated() && !ytContextHolder.isConnected()) {
@@ -76,7 +71,4 @@ class MainPresenter(
         ytContextHolder.create()
     }
 
-    override fun onDestroy() {
-//        remoteServiceManger.stop()
-    }
 }

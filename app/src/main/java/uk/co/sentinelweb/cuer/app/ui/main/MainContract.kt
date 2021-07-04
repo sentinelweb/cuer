@@ -7,6 +7,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -47,8 +48,7 @@ interface MainContract {
                         playerControls = get(),
                         ytServiceManager = get(),
                         ytContextHolder = get(),
-                        log = get(),
-                        remoteServiceManger = get()
+                        log = get()
                     )
                 }
                 scoped {
@@ -61,6 +61,8 @@ interface MainContract {
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
                 scoped<PlaylistItemEditContract.DoneNavigation> { getSource() }
+                // fragment interactions
+                scoped<PlaylistContract.Interactions?> { null }
             }
         }
     }

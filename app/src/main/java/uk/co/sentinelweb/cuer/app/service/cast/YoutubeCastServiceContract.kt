@@ -8,8 +8,8 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationMedia
 import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 
 interface YoutubeCastServiceContract {
 
@@ -48,8 +48,8 @@ interface YoutubeCastServiceContract {
                         view = EmptySkipView(),
                         state = SkipContract.State(),
                         log = get(),
-                        mapper = SkipContract.Mapper(timeSinceFormatter = get(), res = get()),
-                        prefsWrapper = get(named<GeneralPreferences>())
+                        mapper = SkipModelMapper(timeSinceFormatter = get(), res = get()),
+                        prefsWrapper = get()
                     )
                 }
                 scoped<PlayerControlsNotificationContract.External> {

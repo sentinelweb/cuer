@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract.ItemTouchHelperViewHolder
-import uk.co.sentinelweb.cuer.app.util.extension.fade
+import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 
 /**
  * https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf

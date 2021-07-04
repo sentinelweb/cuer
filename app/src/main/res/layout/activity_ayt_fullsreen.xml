@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_700"
+    tools:context=".ui.ytplayer.yt_land.YoutubeFullScreenActivity"
+    >
+
+    <uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
+        android:id="@+id/fullscreen_video_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+            android:id="@+id/fullscreen_player_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:showFullScreenButton="false"
+            app:showVideoCurrentTime="false"
+            app:showVideoDuration="false"
+            />
+    </uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout>
+
+    <include
+        android:id="@+id/controls"
+        layout="@layout/fullscreen_controls_overlay"
+        />
+
+</FrameLayout>

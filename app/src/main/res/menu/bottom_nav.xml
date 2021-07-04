@@ -20,11 +20,4 @@
         android:title="@string/bottomnav_title_playlist"
         />
 
-    <item
-        android:id="@id/navigation_player"
-        android:icon="@drawable/ic_nav_play_black"
-        android:title="@string/bottomnav_title_player"
-        android:visible="false"
-        />
-
 </menu>
