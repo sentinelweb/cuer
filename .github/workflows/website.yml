@@ -1,0 +1,36 @@
+name: App website Build and Publish
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths: [ website ]
+jobs:
+  build:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    steps:
+      # Setup Java 1.8 environment for the next steps
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v2
+
+      # Build application
+      - name: Test and Build
+        run: ./gradlew :website:build
+
+      # If main branch update, deploy to gh-pages
+      - name: Deploy
+        if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: build/distributions # The folder the action should deploy.
+          CLEAN: true # Automatically remove deleted files from the deploy branch
+
