@@ -10887,7 +10887,7 @@ section {
 .app-icon {
   height: 3rem;
   position: relative;
-  top:10px;
+  top:12px;
 }
 
 #mainNav {
@@ -10951,6 +10951,37 @@ section {
   cursor: pointer;
 }
 
+.device[data-device=iPhoneX][data-orientation=portrait][data-color=black] .button {
+  display: none;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+}
+.device[data-device=Pixel][data-orientation=portrait][data-color=black] {
+  padding-bottom: 198.898071625%;
+}
+
+.device[data-device=Pixel][data-orientation=portrait][data-color=black] .screen {
+  top: 10%;
+  left: 5%;
+  width: 90%;
+  height: 80%;
+}
+
+.device[data-device=Pixel][data-orientation=portrait][data-color=black]::after {
+  content: "";
+  background-image: url("../assets/img/pixel_portrait_black.png");
+}
+
+.device[data-device=Pixel][data-orientation=portrait][data-color=black] .button {
+  display: none;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+}
+
 .device[data-device=iPhoneX][data-orientation=portrait][data-color=black] {
   padding-bottom: 198.898071625%;
 }
@@ -10964,16 +10995,9 @@ section {
 
 .device[data-device=iPhoneX][data-orientation=portrait][data-color=black]::after {
   content: "";
-  background-image: url("../assets/img/portrait_black.png");
+  background-image: url("../assets/img/ios_portrait_black.png");
 }
 
-.device[data-device=iPhoneX][data-orientation=portrait][data-color=black] .button {
-  display: none;
-  top: 0%;
-  left: 0%;
-  width: 100%;
-  height: 100%;
-}
 
 section.cta {
   position: relative;
@@ -10982,11 +11006,36 @@ section.cta {
   background-position: center;
   background-size: cover;
 }
+
 section.cta .cta-content {
   position: relative;
   z-index: 1;
 }
 section.cta:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+
+section.cta-psych {
+  position: relative;
+  padding: 15rem 0;
+  background-image: url("/assets/img/psychology-4440675_1920.jpg");
+  background-position: center;
+  background-size: cover;
+}
+
+
+section.cta-psych .cta-content {
+  position: relative;
+  z-index: 1;
+}
+section.cta-psych:before {
   content: "";
   position: absolute;
   top: 0;
