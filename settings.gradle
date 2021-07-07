@@ -11,6 +11,7 @@ include ':app'
 include ':net'
 include ':shared'
 include ':remote'
+include ':website'
 //include ':core'// todo remove once time mappers are converted to kotlin datetime
 
 //include ':prototype'
