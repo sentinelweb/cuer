@@ -1,8 +1,9 @@
 name: App website Build and Publish
-on:
-  pull_request:
-    paths:
-      - website/**
+on: [ push, pull_request ]
+#on:
+#  pull_request:
+#    paths:
+#      - website/**
 jobs:
   build:
     name: Test and Build
