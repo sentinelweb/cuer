@@ -1,9 +1,6 @@
 name: App website Build and Publish
 on:
   pull_request:
-    branches:
-      - develop
-      - main
     paths:
       - website/**
 jobs:
