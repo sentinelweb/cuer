@@ -4,7 +4,8 @@ on:
     branches:
       - develop
       - main
-    paths: [ website ]
+    paths:
+      - website/**
 jobs:
   build:
     name: Test and Build
