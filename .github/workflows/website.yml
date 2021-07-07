@@ -30,7 +30,7 @@ jobs:
           CUER_SIGNING_PASSWORD: "${{ secrets.CUER_SIGNING_PASSWORD }}"
       # If main branch update, deploy to gh-pages
       - name: Deploy
-        if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+#        if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
