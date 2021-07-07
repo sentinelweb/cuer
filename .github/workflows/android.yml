@@ -3,13 +3,14 @@ name: Android CI
 on:
   push:
     branches: [ develop ]
+    paths: [ app remote shared net ]
   pull_request:
     branches:
       - feature/**
       - bugfix/**
       - develop
       - main
-
+    paths: [ app remote shared net ]
 jobs:
   build:
 
