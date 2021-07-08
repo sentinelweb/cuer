@@ -119,7 +119,7 @@ object Modules {
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
-        factory { BackupFileManager(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+        factory { BackupFileManager(get(), get(), get(), get(), get(), get(), get(), get()) }
     }
 
     private val wrapperModule = module {

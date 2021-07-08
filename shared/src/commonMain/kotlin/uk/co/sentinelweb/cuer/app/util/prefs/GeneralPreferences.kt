@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.util.prefs
 enum class GeneralPreferences constructor(
     override val fname: String
 ) : Field {
+    DB_INITIALISED("dbInitialised"),
     CURRENT_PLAYLIST("currentPlaylist"),
     LAST_PLAYLIST_CREATED("lastPlaylistCreated"),
     LAST_PLAYLIST_VIEWED("lastViewedPlaylist"),

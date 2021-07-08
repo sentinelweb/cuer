@@ -50,7 +50,9 @@ class CuerApp : Application() {
             pushDirectShareTargets(this@CuerApp)
         }
 
-        databaseInit.initDatabase()
+        if (!databaseInit.isInitialized()) {
+            databaseInit.initDatabase()
+        }
 
         firebaseWrapper.init()
         firebaseWrapper.sendUnsentReports()

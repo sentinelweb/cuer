@@ -4,6 +4,7 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.entity.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
+import uk.co.sentinelweb.cuer.app.db.init.JsonDatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.mapper.*
 import uk.co.sentinelweb.cuer.app.db.repository.*
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
@@ -65,17 +66,18 @@ object DatabaseModule {
         }
         factory<PlaylistItemDatabaseRepository> { get<RoomPlaylistItemDatabaseRepository>() }
 
-        single {
-            DatabaseInitializer(
-                ytInteractor = get(),
-                roomMediaRepository = get(),
-                roomPlaylistRepository = get(),
-                roomPlaylistItemRepository = get(),
-                timeProvider = get(),
-                contextProvider = get(),
-                log = get()
-            )
-        }
+//        single {
+//            MemoryDatabaseInitializer(
+//                ytInteractor = get(),
+//                roomMediaRepository = get(),
+//                roomPlaylistRepository = get(),
+//                roomPlaylistItemRepository = get(),
+//                timeProvider = get(),
+//                contextProvider = get(),
+//                log = get()
+//            )
+//        }
+        single<DatabaseInitializer> { JsonDatabaseInitializer(get(), get(), get(), get(), get()) }
         factory { PlaylistMapper(get(), get(), get(), get()) }
         factory { PlaylistItemMapper(get()) }
         factory { MediaMapper(get(), get()) }

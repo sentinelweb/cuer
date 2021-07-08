@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
+import kotlinx.coroutines.Job
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -182,7 +183,8 @@ interface PlaylistContract {
                         res = get(),
                         playlistMediaLookupOrchestrator = get(),
                         playlistUpdateOrchestrator = get(),
-                        playlistOrDefaultOrchestrator = get()
+                        playlistOrDefaultOrchestrator = get(),
+                        dbInit = get()
                     )
                 }
                 scoped { get<Presenter>() as External }

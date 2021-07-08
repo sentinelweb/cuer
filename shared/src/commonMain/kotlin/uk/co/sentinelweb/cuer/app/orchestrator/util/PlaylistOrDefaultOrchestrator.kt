@@ -14,7 +14,7 @@ class PlaylistOrDefaultOrchestrator constructor(
 ) {
     suspend fun getPlaylistOrDefault(
         playlistId: Long?,
-        options: OrchestratorContract.Options
+        options: OrchestratorContract.Options,
     ): Pair<PlaylistDomain, OrchestratorContract.Source>? =
         when (options.source) {
             OrchestratorContract.Source.MEMORY ->
@@ -31,6 +31,7 @@ class PlaylistOrDefaultOrchestrator constructor(
 
     private suspend fun getPlaylistOrDefault(playlistId: Long?, flat: Boolean = false) =
         (playlistId
+            ?.takeIf { it >= 0 }
             ?.let { playlistDatabaseRepository.load(it, flat = false) }
             ?.takeIf { it.isSuccessful }
             ?.data
