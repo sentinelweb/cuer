@@ -75,7 +75,7 @@ Using
 
 ### Landscape Player
 
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/player-land_20210708-231437.png" width="800">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/player-land_20210708-231437.png" height="400">
 
 ### Add via Share
 
