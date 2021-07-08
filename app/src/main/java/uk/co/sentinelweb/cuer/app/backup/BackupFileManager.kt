@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.backup
 
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.backup.version.ParserFactory
-import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
+import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer.Companion.DEFAULT_PLAYLIST_TEMPLATE
 import uk.co.sentinelweb.cuer.app.db.repository.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -19,7 +19,6 @@ class BackupFileManager constructor(
     private val playlistItemRepository: PlaylistItemDatabaseRepository,
     private val contextProvider: CoroutineContextProvider,
     private val parserFactory: ParserFactory,
-    private val initialiser: DatabaseInitializer,
     private val playlistItemCreator: PlaylistItemCreator,
     private val timeProvider: TimeProvider
 ) {
@@ -84,7 +83,7 @@ class BackupFileManager constructor(
                 ?.let {
                     playlistRepository.save(backupFileModel.playlists).let {
                         if (it.isSuccessful && it.data?.filter { it.default }?.size ?: 0 == 0) {
-                            playlistRepository.save(DatabaseInitializer.DEFAULT_PLAYLIST)
+                            playlistRepository.save(DEFAULT_PLAYLIST_TEMPLATE)
                         } else it
                     }
                 }

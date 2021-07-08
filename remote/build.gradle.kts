@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+
 // ./gradlew :remote:jsBrowserRun --continue
 // ./gradlew :remote:runServer
 
@@ -24,7 +25,7 @@ val ver_truth: String by project
 val isProduction: String by project
 val ver_logback = "1.2.3"
 
-val outputJsLibName = "cuer.js"
+val outputJsLibName = "cuer_remote.js"
 
 group = "uk.co.sentinelweb.cuer.remote"
 version = "1.0"
@@ -35,7 +36,16 @@ kotlin {
         browser {
             commonWebpackConfig {
                 cssSupport.enabled = true
+                outputFileName = outputJsLibName
             }
+            runTask {
+                devServer = devServer?.copy(port = 3000)
+            }
+//            webpackTask {
+//                webpackConfigApplier {
+//                    outputFileName = outputJsLibName
+//                }
+//            }
         }
         binaries.executable()
     }
@@ -81,7 +91,7 @@ kotlin {
                 implementation(npm("react-youtube-lite", "1.0.1"))
                 implementation(npm("react-share", "~4.2.1"))
 
-                implementation("com.ccfraser.muirwik:muirwik-components:0.8.0") {
+                implementation("com.ccfraser.muirwik:muirwik-components:0.8.2") {
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-styled")
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react")
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react-dom")
@@ -121,12 +131,6 @@ tasks.getByName<Jar>("jvmJar") {
     val webpackTask = tasks.getByName<KotlinWebpack>(taskName)
     dependsOn(webpackTask) // make sure JS gets compiled first
     from(File(webpackTask.destinationDirectory, outputJsLibName))
-}
-
-tasks {
-    withType<KotlinWebpack> {
-        outputFileName = outputJsLibName
-    }
 }
 
 tasks {

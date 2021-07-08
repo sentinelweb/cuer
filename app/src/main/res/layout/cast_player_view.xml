@@ -45,48 +45,26 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:transitionName="@string/cast_player_trans_image"
-                android:background="@color/surface"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Player.Icon"
                 />
 
-            <LinearLayout
-                android:id="@+id/cast_player_playlist_button"
+            <TextView
+                android:id="@+id/cast_player_playlist_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:translationY="4dp"
-                app:layout_constraintBottom_toBottomOf="@+id/cast_player_image"
+                android:layout_gravity="left"
+                android:ellipsize="end"
+                android:maxWidth="88dp"
+                android:maxLines="1"
+                android:paddingLeft="2dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:textSize="12sp"
+                android:translationY="-8dp"
                 app:layout_constraintLeft_toLeftOf="@id/cast_player_image"
-                >
-
-                <!--                <androidx.appcompat.widget.AppCompatImageView-->
-                <!--                    android:id="@+id/cast_player_playlist_image"-->
-                <!--                    android:layout_width="32dp"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_gravity="end"-->
-                <!--                    android:background="@color/white"-->
-                <!--                    android:padding="1dp"-->
-                <!--                    android:src="@drawable/ic_nav_playlist_black"-->
-                <!--                    android:visibility="gone"-->
-                <!--                    />-->
-
-                <TextView
-                    android:id="@+id/cast_player_playlist_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:background="#ccffffff"
-                    android:paddingLeft="2dp"
-                    android:paddingTop="0dp"
-                    android:paddingRight="2dp"
-                    android:textColor="@color/black"
-                    android:textSize="12sp"
-                    android:ellipsize="end"
-                    android:maxWidth="88dp"
-                    android:maxLines="1"
-                    tools:text="playlist"
-                    />
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@+id/cast_player_image"
+                tools:text="playlist"
+                />
 
             <View
                 android:id="@+id/cast_player_center"

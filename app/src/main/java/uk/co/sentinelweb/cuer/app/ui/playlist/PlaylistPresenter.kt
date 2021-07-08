@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
@@ -72,7 +73,8 @@ class PlaylistPresenter(
     private val log: LogWrapper,
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider,
-    private val res: ResourceWrapper
+    private val res: ResourceWrapper,
+    private val dbInit: DatabaseInitializer,
 ) : PlaylistContract.Presenter, PlaylistContract.External {
 
     override var interactions: PlaylistContract.Interactions? = null
@@ -155,7 +157,8 @@ class PlaylistPresenter(
                 val currentIndexBefore = state.playlist?.currentIndex
                 when (op) { // todo just apply model updates (instead of full rebuild)
                     FLAT,
-                    FULL -> if (plistItem.playlistId?.toIdentifier(source) == state.playlistIdentifier) {
+                    FULL,
+                    -> if (plistItem.playlistId?.toIdentifier(source) == state.playlistIdentifier) {
                         state.playlist
                             ?.let { playlistMutator.addOrReplaceItem(it, plistItem) }
                             ?.takeIf { it != state.playlist }
@@ -194,7 +197,8 @@ class PlaylistPresenter(
                 log.d("media changed: $op, $source, id=${media.id} title=${media.title}")
                 when (op) {
                     FLAT,
-                    FULL -> {
+                    FULL,
+                    -> {
                         val containsMedia = state.playlist?.items?.find { it.media.platformId == media.platformId } != null
                         if (containsMedia) {
                             updatePlaylistItemByMediaId(null, media)
@@ -216,6 +220,7 @@ class PlaylistPresenter(
 
     override fun initialise() {
         state.playlistIdentifier = prefsWrapper.getPair(CURRENT_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
+
     }
 
     override fun destroy() {
@@ -584,8 +589,21 @@ class PlaylistPresenter(
                     }
                 }
                 ?: run {
-                    state.playlistIdentifier = prefsWrapper.getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair()).toIdentifier()
-                    executeRefresh()
+                    log.d("is db init; ${dbInit.isInitialized()}")
+                    if (dbInit.isInitialized()) {
+                        state.playlistIdentifier = prefsWrapper.getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair()).toIdentifier()
+                        log.d("id; ${state.playlistIdentifier.id}")
+                        executeRefresh()
+                    } else {
+                        dbInit.addListener({ b: Boolean ->
+                            log.d("got db init: $b")
+                            if (b) {
+                                state.playlistIdentifier = 3L.toIdentifier(LOCAL) // philosophy
+                                refreshPlaylist()
+                            }
+                        })
+                    }
+
                 }
         }
     }
@@ -645,6 +663,7 @@ class PlaylistPresenter(
     private suspend fun executeRefresh(animate: Boolean = true, scrollToItem: Boolean = false) {
         view.showRefresh()
         try {
+            log.d("executeRefresh: ${state.playlistIdentifier.id}")
             playlistOrDefaultOrchestrator
                 .getPlaylistOrDefault(state.playlistIdentifier.id as Long, state.playlistIdentifier.source.flatOptions())
                 .also { state.playlist = it?.first }
@@ -743,7 +762,7 @@ class PlaylistPresenter(
     private fun updateItem(
         index: Int,
         modelId: Long,
-        changedItem: PlaylistItemDomain
+        changedItem: PlaylistItemDomain,
     ) {
         state.playlist = state.playlist?.let {
             it.copy(items = it.items.toMutableList().apply { set(index, changedItem) })

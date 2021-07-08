@@ -9,9 +9,10 @@ import android.text.style.ImageSpan
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import java.io.InputStream
 
 class ResourceWrapper constructor(
-    private val context: Context
+    private val context: Context,
 ) {
 
     val resources: Resources = context.resources
@@ -52,7 +53,7 @@ class ResourceWrapper constructor(
         @DrawableRes icon: Int,
         @ColorRes tint: Int,
         @DimenRes textSize: Int,
-        scale: Float = 1f
+        scale: Float = 1f,
     ): Drawable {
         val textPixelSize = (getDimensionPixelSize(textSize) * scale).toInt()
         return getDrawable(icon, tint).apply { setBounds(0, 0, textPixelSize, textPixelSize); }
@@ -62,7 +63,7 @@ class ResourceWrapper constructor(
         string: SpannableString,
         d: Drawable,
         start: Int,
-        end: Int
+        end: Int,
     ) {
         string.apply {
             setSpan(
@@ -74,4 +75,13 @@ class ResourceWrapper constructor(
     }
 
     fun getIntArray(@ArrayRes id: Int): List<Int> = resources.getIntArray(id).toList()
+
+    fun getAssetString(path: String): String? =
+        try {
+            val inputStream: InputStream = context.assets.open(path)
+            inputStream.bufferedReader().use { it.readText() }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            null
+        }
 }

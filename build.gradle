@@ -23,9 +23,14 @@ buildscript {
 
 allprojects {
     task setProductionFlag {
-        switch (project.gradle.startParameter.taskNames[0]) {
-            case "assembleRelease":
-                allprojects {it.setProperty("isProduction", "true")}
+        def taskNames = project.gradle.startParameter.taskNames
+        if (taskNames[taskNames.size()] > 0) {
+            switch (taskNames[taskNames.size() - 1]) {
+                case "assembleRelease":
+                    allprojects { it.setProperty("isProduction", "true") }
+                case ":app:assembleRelease":
+                    allprojects { it.setProperty("isProduction", "true") }
+            }
         }
     }
     repositories {
