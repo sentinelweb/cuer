@@ -27,10 +27,12 @@ Using
   - Jetpack Compose
     - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/search
 - Architecture
-  - MVP - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui
+  - MVP
+    - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui
   - Some MVVM for practice -
     e.g. https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/playlist_item_edit
-  - MVI (using https://arkivanov.github.io/MVIKotlin/) - e.g.
+  - MVI (using https://arkivanov.github.io/MVIKotlin/) -
+    e.g.https://github.com/sentinelweb/cuer/tree/develop/shared/src/commonMain/kotlin/uk/co/sentinelweb/cuer/app/ui/player
 - Kotlin (1.4)
   - Coroutines
   - Serialisation
