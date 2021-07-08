@@ -10971,7 +10971,7 @@ section {
 
 .device[data-device=Pixel][data-orientation=portrait][data-color=black]::after {
   content: "";
-  background-image: url("../assets/img/pixel_portrait_black.png");
+  background-image: url("/assets/img/pixel_portrait_black.png");
 }
 
 .device[data-device=Pixel][data-orientation=portrait][data-color=black] .button {
@@ -10995,14 +10995,14 @@ section {
 
 .device[data-device=iPhoneX][data-orientation=portrait][data-color=black]::after {
   content: "";
-  background-image: url("assets/img/ios_portrait_black.png");
+  background-image: url("/assets/img/ios_portrait_black.png");
 }
 
 
 section.cta {
   position: relative;
   padding: 15rem 0;
-  background-image: url("assets/img/art-school-of-athens-1143741_1920.jpg");
+  background-image: url("/assets/img/art-school-of-athens-1143741_1920.jpg");
   background-position: center;
   background-size: cover;
 }
