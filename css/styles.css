@@ -11007,11 +11007,16 @@ section.cta {
   background-size: cover;
 }
 
-section.cta .cta-content {
+.cta-content {
   position: relative;
   z-index: 1;
 }
-section.cta:before {
+
+.cta-title {
+  color:white;
+}
+
+section.cta:before, section.cta-psych:before {
   content: "";
   position: absolute;
   top: 0;
@@ -11028,21 +11033,6 @@ section.cta-psych {
   background-image: url("/assets/img/psychology-4440675_1920.jpg");
   background-position: center;
   background-size: cover;
-}
-
-
-section.cta-psych .cta-content {
-  position: relative;
-  z-index: 1;
-}
-section.cta-psych:before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
 }
 
 .icon-feature {
