@@ -37,7 +37,7 @@ class DatabaseInitializer constructor(
                 }
                 ?.let { (playlist, result) -> makePlaylistItems(playlist, result?.data!!) }
                 ?.let {
-                    roomPlaylistItemRepository.save(it)
+                    roomPlaylistItemRepository.save(it, emit = true)
                 }
                 ?.takeIf { result -> result.isSuccessful }
                 ?: throw ExceptionInInitializerError("failed to init database")

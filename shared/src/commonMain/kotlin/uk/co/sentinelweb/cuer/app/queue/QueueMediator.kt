@@ -42,7 +42,7 @@ class QueueMediator constructor(
     override val source: Source
         get() = state.playlistIdentifier.source
 
-    private lateinit var _currentItemFlow: MutableStateFlow<PlaylistItemDomain?>
+    private /*lateinit*/ var _currentItemFlow: MutableStateFlow<PlaylistItemDomain?>
     override val currentItemFlow: Flow<PlaylistItemDomain?>
         get() = _currentItemFlow.distinctUntilChanged { old, new -> old == new }
     private var _currentPlaylistFlow: MutableSharedFlow<PlaylistDomain> = MutableSharedFlow()
@@ -55,6 +55,7 @@ class QueueMediator constructor(
         _currentItemFlow = MutableStateFlow(state.currentItem)
         coroutines.computationScope.launch {
             refreshQueue(state.playlistIdentifier)
+            //_currentItemFlow = MutableStateFlow(state.currentItem)
         }
         listenToDb()
     }
@@ -275,9 +276,9 @@ class QueueMediator constructor(
 //            mediaSessionManager.setMedia(media)
 //        }
         log.d("playlist: ${state.playlist?.scanOrder()}")
-        if (this::_currentItemFlow.isInitialized) {
+        //if (this::_currentItemFlow.isInitialized) {
             _currentItemFlow.emit(currentItem)
-        }
+        //}
         state.playlist?.also { _currentPlaylistFlow.emit(it) }
     }
 

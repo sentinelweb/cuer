@@ -30,18 +30,22 @@ kotlin {
             binaries.executable()
             commonWebpackConfig {
                 cssSupport.enabled = true
+                outputFileName = outputJsLibName
             }
             testTask {
                 useKarma {
                     useChromeHeadless()
                 }
             }
+            runTask {
+                devServer = devServer?.copy(port = 3030)
+            }
         }
     }
 }
-
-tasks {
-    withType<org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack> {
-        outputFileName = outputJsLibName
-    }
-}
+//
+//tasks {
+//    withType<org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack> {
+//        outputFileName = outputJsLibName
+//    }
+//}

@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+
 // ./gradlew :remote:jsBrowserRun --continue
 // ./gradlew :remote:runServer
 
@@ -24,7 +25,7 @@ val ver_truth: String by project
 val isProduction: String by project
 val ver_logback = "1.2.3"
 
-val outputJsLibName = "cuer.js"
+val outputJsLibName = "cuer_remote.js"
 
 group = "uk.co.sentinelweb.cuer.remote"
 version = "1.0"
@@ -35,7 +36,16 @@ kotlin {
         browser {
             commonWebpackConfig {
                 cssSupport.enabled = true
+                outputFileName = outputJsLibName
             }
+            runTask {
+                devServer = devServer?.copy(port = 3000)
+            }
+//            webpackTask {
+//                webpackConfigApplier {
+//                    outputFileName = outputJsLibName
+//                }
+//            }
         }
         binaries.executable()
     }
@@ -121,12 +131,6 @@ tasks.getByName<Jar>("jvmJar") {
     val webpackTask = tasks.getByName<KotlinWebpack>(taskName)
     dependsOn(webpackTask) // make sure JS gets compiled first
     from(File(webpackTask.destinationDirectory, outputJsLibName))
-}
-
-tasks {
-    withType<KotlinWebpack> {
-        outputFileName = outputJsLibName
-    }
 }
 
 tasks {
