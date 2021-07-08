@@ -81,7 +81,7 @@ kotlin {
                 implementation(npm("react-youtube-lite", "1.0.1"))
                 implementation(npm("react-share", "~4.2.1"))
 
-                implementation("com.ccfraser.muirwik:muirwik-components:0.8.0") {
+                implementation("com.ccfraser.muirwik:muirwik-components:0.8.2") {
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-styled")
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react")
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react-dom")
