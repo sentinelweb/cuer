@@ -11,9 +11,7 @@ val ver_kotlin_styled: String by project
 val outputJsLibName = "cuer_website.js"
 
 repositories {
-    jcenter()
     mavenCentral()
-    //maven { url = uri("https://dl.bintray.com/kotlin/kotlin-js-wrappers") }
 }
 
 dependencies {
