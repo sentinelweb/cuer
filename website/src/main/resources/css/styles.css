@@ -11002,7 +11002,7 @@ section {
 section.cta {
   position: relative;
   padding: 15rem 0;
-  background-image: url("/assets/img/art-school-of-athens-1143741_1920.jpg");
+  background-image: url("/assets/img/art-school-of-athens-1143741_640.jpg");
   background-position: center;
   background-size: cover;
 }
@@ -11026,11 +11026,10 @@ section.cta:before, section.cta-psych:before {
   background: rgba(0, 0, 0, 0.5);
 }
 
-
 section.cta-psych {
   position: relative;
   padding: 15rem 0;
-  background-image: url("/assets/img/psychology-4440675_1920.jpg");
+  background-image: url("/assets/img/psychology-4440675_640.jpg");
   background-position: center;
   background-size: cover;
 }

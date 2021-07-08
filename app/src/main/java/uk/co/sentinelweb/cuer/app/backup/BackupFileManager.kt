@@ -84,7 +84,7 @@ class BackupFileManager constructor(
                 ?.let {
                     playlistRepository.save(backupFileModel.playlists).let {
                         if (it.isSuccessful && it.data?.filter { it.default }?.size ?: 0 == 0) {
-                            playlistRepository.save(DatabaseInitializer.DEFAULT_PLAYLIST)
+                            playlistRepository.save(DatabaseInitializer.DEFAULT_PLAYLIST_TEMPLATE)
                         } else it
                     }
                 }

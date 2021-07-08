@@ -19,6 +19,9 @@ class DatabaseInitializer constructor(
     private val timeProvider: TimeProvider,
     private val log: LogWrapper
 ) {
+    init {
+        log.tag(this)
+    }
 
     fun initDatabase() {
         contextProvider.ioScope.launch {
@@ -89,7 +92,7 @@ class DatabaseInitializer constructor(
             ?.takeIf { it.isSuccessful }?.data
             ?: roomPlaylistRepository.loadList().data!!
 
-    private fun mapQueueToMedia(it: QueueItem) = MediaDomain(
+    private fun mapQueueToMedia(it: DefaultItem) = MediaDomain(
         url = it.url,
         platformId = it.getId(),
         title = it.title,
@@ -106,65 +109,59 @@ class DatabaseInitializer constructor(
         )
     )
 
-    /**
-     * A dummy item representing a piece of content.
-     */
-    data class QueueItem(
+    data class DefaultItem(
         val url: String,
-        val title: String
+        val title: String,
     ) {
         override fun toString(): String = "$title - $url"
         fun getId() = url.substring(url.indexOf("?v=") + 3)
     }
 
-    /**
-     * An array of sample (dummy) items.
-     */
-    val ITEMS: List<QueueItem> = listOf(
-        QueueItem(
+    val ITEMS: List<DefaultItem> = listOf(
+        DefaultItem(
             "https://www.youtube.com/watch?v=c2_t3M_vSsg",
             "Responding to a Pandemic: The Myth of Sisyphus"
         ),
-        QueueItem(
+        DefaultItem(
             "https://www.youtube.com/watch?v=6a2dLVx8THA",
             "Animating Poststructuralism"
         ),
-        QueueItem(
+        DefaultItem(
             "https://www.youtube.com/watch?v=CkHooEp3vRE",
             "Masters Of Money | Part 1 | John Maynard Keynes"
         ),
-        QueueItem(
+        DefaultItem(
             "https://www.youtube.com/watch?v=EIYqTj402PE",
             "Masters Of Money | Part 2 | Friedrich Hayek"
         ),
-        QueueItem(
+        DefaultItem(
             "https://www.youtube.com/watch?v=oaIpYo3Z5lc",
             "Masters Of Money | Part 3 | Karl Marx"
         ),
-        QueueItem(
+        DefaultItem(
             "https://www.youtube.com/watch?v=OFdgR8Zt084",
             "Order! High Voltage - John Bercow x Electric Six"
         ),
-        QueueItem(
+        DefaultItem(
             "https://www.youtube.com/watch?v=vMiF9Bv-72s",
             "Adorno and Horkheimer: Dialectic of Enlightenment - Part I"
         ),
-        QueueItem(
+        DefaultItem(
             "https://https://www.youtube.com/watch?v=AXyr4Zasdkg",
             "Foucault: Biopower, Governmentality, and the Subject"
         ),
-        QueueItem(
+        DefaultItem(
             "https://www.youtube.com/watch?v=GNGvqjwich0&t=73s",
             "The Marketplace of Ideas: A Critique"
         ),
-        QueueItem(
+        DefaultItem(
             "https://www.youtube.com/watch?v=52nqjrCs57s",
             "Why You Can't FOCUS - And How To Fix That"
         )
     )
 
     companion object {
-        val DEFAULT_PLAYLIST = PlaylistDomain(
+        val DEFAULT_PLAYLIST_TEMPLATE = PlaylistDomain(
             title = "Default",
             image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-freestocksorg-34407-600.jpg"),
             default = true

@@ -50,7 +50,7 @@ object SharedAppModule {
         factory { LocalSearchPlayistInteractor(get(), get()) }
         factory { RemoteSearchPlayistOrchestrator(get(), get(), get(), RemoteSearchPlayistOrchestrator.State()) }
         factory { PlaylistMediaUpdateOrchestrator(get()) }
-        factory { PlaylistOrDefaultOrchestrator(get(), get()) }
+        factory { PlaylistOrDefaultOrchestrator(get(), get(), get()) }
     }
 
     private val objectModule = module {
