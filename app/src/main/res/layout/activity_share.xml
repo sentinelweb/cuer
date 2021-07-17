@@ -57,7 +57,6 @@
         app:layout_constraintEnd_toStartOf="@id/bottom_right_button"
         app:layout_constraintStart_toStartOf="parent"
         android:visibility="gone"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -75,7 +74,6 @@
         app:layout_constraintEnd_toStartOf="@id/top_right_button"
         app:layout_constraintStart_toStartOf="parent"
         android:visibility="gone"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -93,7 +91,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/top_left_button"
         android:visibility="gone"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -111,7 +108,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/bottom_left_button"
         android:visibility="gone"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -81,7 +81,6 @@ fun SearchParametersUi(
                         modifier = Modifier
                             .padding(2.dp)
                             .align(Alignment.TopEnd)
-                            .clip(shape = MaterialTheme.shapes.small)
                     ) {
                         Text(
                             text = model.otherType,
@@ -114,10 +113,9 @@ fun SearchParametersUi(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .align(Alignment.End)
-                        .clip(shape = MaterialTheme.shapes.small)
                 ) {
                     Text(
-                        text = "Search",
+                        text = stringResource(id = R.string.search_title),
                         style = MaterialTheme.typography.button
                     )
                 }

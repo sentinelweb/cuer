@@ -36,7 +36,6 @@
             @drawable/ic_ripple_item_background_borderless
         </item>
         <item name="android:actionOverflowButtonStyle">@style/Cuer.AppBar.OverFlow</item>
-<!--        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Item.Icon</item>-->
 
         <!-- custom attributes -->
         <item name="colorCheckIcon">@color/green_700</item>
@@ -56,6 +55,11 @@
         <item name="android:popupMenuStyle">@style/ContextMenu</item>
         <item name="android:toolbarStyle">@style/Toolbar</item>
         <item name="toolbarStyle">@style/Toolbar</item>
+
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Large</item>
+
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
         <item name="textAppearanceHeadline1">@style/TextAppearance.App.Headline1</item>
         <item name="textAppearanceHeadline2">@style/TextAppearance.App.Headline2</item>

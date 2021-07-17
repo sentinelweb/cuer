@@ -11,7 +11,7 @@ import com.google.android.material.composethemeadapter.createMdcTheme
 @Composable
 fun CuerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
     val layoutDirection = LocalLayoutDirection.current
@@ -21,9 +21,9 @@ fun CuerTheme(
     )
 
     MaterialTheme(
-        colors = colors!!,
-        typography = CuerTypography,
-        shapes = makeShapes(),
+        colors = colors ?: throw IllegalArgumentException("Colors were not imported from MDC theme"),
+        typography = CuerTypography, //type!!, //
+        shapes = shapes ?: throw IllegalArgumentException("Shapes were not imported from MDC theme"),
         content = content
     )
 }

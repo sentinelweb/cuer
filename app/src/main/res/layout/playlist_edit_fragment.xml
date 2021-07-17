@@ -211,7 +211,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_parent_chip"
                 tools:text="Commit"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
                 />
 
             <View
@@ -284,7 +283,6 @@
                 app:icon="@drawable/ic_visibility_24"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_other_actions_title"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.Button"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

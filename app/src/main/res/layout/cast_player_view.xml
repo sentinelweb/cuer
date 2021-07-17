@@ -210,6 +210,7 @@
         android:tint="@color/white"
         app:backgroundTint="?colorPrimary"
         app:layout_anchor="@id/bottom_bar"
+        app:shapeAppearance="@null"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
