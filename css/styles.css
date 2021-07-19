@@ -10885,9 +10885,8 @@ section {
 }
 
 .app-icon {
-  height: 3rem;
+  height: 2rem;
   position: relative;
-  top:12px;
 }
 
 #mainNav {
