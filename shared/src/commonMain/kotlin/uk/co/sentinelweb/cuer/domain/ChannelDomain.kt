@@ -4,8 +4,6 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
-//import java.time.LocalDateTime
-
 @Serializable
 data class ChannelDomain constructor(
     val id: Long? = null,

@@ -78,7 +78,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.browse.BrowseFragment"
+        tools:context=".ui.browse_old.BrowseFragment"
         >
 
         <TextView

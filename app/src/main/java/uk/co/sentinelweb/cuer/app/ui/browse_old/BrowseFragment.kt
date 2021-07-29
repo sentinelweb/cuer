@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.browse
+package uk.co.sentinelweb.cuer.app.ui.browse_old
 
 import android.os.Bundle
 import android.view.View
