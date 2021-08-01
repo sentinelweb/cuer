@@ -5,7 +5,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -189,11 +188,6 @@ class ShareActivity : AppCompatActivity(),
 
     override fun navigate(nav: NavigationModel) {
         navMapper.navigate(nav)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-        super.onSaveInstanceState(outState, outPersistentState)
-        // todo save state see issue https://github.com/sentinelweb/cuer/issues/158
     }
 
     companion object {

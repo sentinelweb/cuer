@@ -34,7 +34,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
-            BrowseUi(browseMviView)
+            BrowseComposables.BrowseUi(browseMviView)
         }
     }
 
