@@ -6,6 +6,6 @@ import org.koin.dsl.module
 object FirebaseModule {
     val fbModule = module {
         single { FirebaseWrapper(androidApplication(), get()) }
-        single { FirebaseDefaultImageProvider(get()) }
+        single { FirebaseImageProvider(get()) }
     }
 }

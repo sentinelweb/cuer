@@ -12,7 +12,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 
@@ -24,7 +24,7 @@ class BrowseFragment : Fragment(R.layout.browse_fragment),
 
     override val scope: Scope by fragmentScopeWithSource()
     private val presenter: BrowseContract.Presenter by inject()
-    private val imageProvider: FirebaseDefaultImageProvider by inject()
+    private val imageProvider: FirebaseImageProvider by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {

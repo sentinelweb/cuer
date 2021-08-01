@@ -1,29 +1,32 @@
 package uk.co.sentinelweb.cuer.app.ui.browse
 
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Model
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 
-class BrowseModelMapper {
-    fun map(state: BrowseContract.MviStore.State): BrowseContract.View.Model {
-        return state.categories.find { it.id == state.currentCategory }!!// todo error
-            .let {
-                BrowseContract.View.Model(listOf(categoryModel(it)))
-            }
+class BrowseModelMapper constructor(
+    private val log: LogWrapper,
+) {
+    init {
+        log.tag(this)
     }
 
-    private fun categoryModel(it: CategoryDomain) = BrowseContract.View.CategoryModel(
-        id = it.id,
-        title = it.title,
-        description = it.description,
-        subCategories = it.subCategories.map {
-            subcategoryModel(it)
-        }
-    )
+    fun map(state: BrowseContract.MviStore.State): Model =
+//        (state.currentCategory
+//            ?.let { catId -> state.categories.filter { it.id == catId } }
+//            ?: state.categories)
+        state.categories
+            .let { Model(it.map { categoryModel(it) }) }
+            .also { log.d(it.toString()) }
 
-    //todo weird should be able to recurese with fun categoryModel
-    private fun subcategoryModel(it: CategoryDomain) = BrowseContract.View.CategoryModel(
+    private fun categoryModel(it: CategoryDomain): BrowseContract.View.CategoryModel = BrowseContract.View.CategoryModel(
         id = it.id,
         title = it.title,
         description = it.description,
-        subCategories = listOf()
+        thumbNailUrl = it.thumb?.url,
+        subCategories = it.subCategories.map {
+            categoryModel(it)
+        },
+        videoCount = it.subCategories.size
     )
 }

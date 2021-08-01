@@ -12,7 +12,7 @@ import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
-import uk.co.sentinelweb.cuer.app.ui.browse_old.BrowseContract
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
@@ -69,7 +69,6 @@ object Modules {
         PlaylistContract.fragmentModule,
         PlaylistsContract.fragmentModule,
         PlaylistsDialogContract.fragmentModule,
-        BrowseContract.fragmentModule,
         MainContract.activityModule,
         CastPlayerContract.viewModule,
         ShareContract.activityModule,
@@ -86,7 +85,8 @@ object Modules {
         AytPortraitContract.activityModule,
         AytLandContract.activityModule,
         CastPlayerMviFragment.fragmentModule,
-        DescriptionView.viewModule
+        DescriptionView.viewModule,
+        BrowseFragment.fragmentModule,
     )
 
     private val uiModule = module {

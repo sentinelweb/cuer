@@ -10,8 +10,8 @@ import com.google.firebase.storage.ktx.storage
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 
-class FirebaseDefaultImageProvider constructor(
-    private val log: AndroidLogWrapper
+class FirebaseImageProvider constructor(
+    private val log: AndroidLogWrapper,
 ) {
     private lateinit var rootStorageRef: StorageReference
     private lateinit var listStorageRef: List<StorageReference>
@@ -98,12 +98,12 @@ class FirebaseDefaultImageProvider constructor(
     }
 }
 
-inline fun RequestManager.loadFirebaseOrOtherUrl(url: String, imageProvider: FirebaseDefaultImageProvider) = this.run {
+inline fun RequestManager.loadFirebaseOrOtherUrl(url: String, imageProvider: FirebaseImageProvider) = this.run {
     if (url.startsWith("gs://")) load(imageProvider.makeRef(url))
     else load(url)
 }
 
-inline fun RequestBuilder<Bitmap>.loadFirebaseOrOtherUrl(url: String, imageProvider: FirebaseDefaultImageProvider) = this.run {
+inline fun RequestBuilder<Bitmap>.loadFirebaseOrOtherUrl(url: String, imageProvider: FirebaseImageProvider) = this.run {
     if (url.startsWith("gs://")) load(imageProvider.makeRef(url))
     else load(url)
 }

@@ -63,7 +63,6 @@ fun SearchParametersUi(
     selectOrderClick: () -> Unit,
     submit: () -> Unit
 ) {
-
     CuerTheme {
         Surface {
             Column(
@@ -71,7 +70,8 @@ fun SearchParametersUi(
                     .height(dimensionResource(R.dimen.search_height))
                     .padding(dimensionResource(R.dimen.page_margin))
             ) {
-                Box(modifier = Modifier.fillMaxWidth()) {
+
+            Box(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = model.type + " " + stringResource(id = R.string.search_title),
                         style = MaterialTheme.typography.h5

@@ -132,6 +132,5 @@ fun PlaylistTreeDomain.buildLookup(): Map<Long, PlaylistTreeDomain> =
         .also { map -> this.chidren.forEach { map.putAll(it.buildLookup()) } }
 
 fun PlaylistTreeDomain.dumpTree(pfx: String = "") {
-    println(pfx + ":" + node?.title)
     chidren.forEach { it.dumpTree("-$pfx") }
 }
