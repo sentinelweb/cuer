@@ -19,6 +19,7 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnResume
+import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -31,6 +32,8 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
     private val browseMviView: BrowseMviView by inject()
+    private val playerView: MainContract.PlayerViewControl by inject()
+
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
 
@@ -61,12 +64,23 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
             delay(300)
             browseMviView.dispatch(OnResume)
         }
+//        browseMviView.observableLabel
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback(this, upCallback)
         linkScopeToActivity()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        playerView.hidePlayer()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        playerView.showPlayer()
     }
 
     companion object {

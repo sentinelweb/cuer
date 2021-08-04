@@ -40,7 +40,7 @@ object BrowseComposables {
             Surface {
                 Column(
                     modifier = Modifier
-                        .background(MaterialTheme.colors.primaryVariant)
+                        .background(MaterialTheme.colors.secondaryVariant)
                         .padding(dimensionResource(R.dimen.page_margin))
                         .verticalScroll(rememberScrollState())
                 ) {

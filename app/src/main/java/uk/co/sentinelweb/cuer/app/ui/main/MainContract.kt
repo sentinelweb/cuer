@@ -30,10 +30,15 @@ interface MainContract {
         fun showMessage(msg: String)
     }
 
+    interface PlayerViewControl {
+        fun showPlayer()
+        fun hidePlayer()
+    }
+
     data class State constructor(
         var playServicesAvailable: Boolean = false,
         var playServiceCheckDone: Boolean = false,
-        var playControlsInit: Boolean = false
+        var playControlsInit: Boolean = false,
     ) : ViewModel()
 
     companion object {
@@ -41,6 +46,7 @@ interface MainContract {
         val activityModule = module {
             scope(named<MainActivity>()) {
                 scoped<View> { getSource() }
+                scoped<PlayerViewControl> { getSource() }
                 scoped<Presenter> {
                     MainPresenter(
                         view = get(),
