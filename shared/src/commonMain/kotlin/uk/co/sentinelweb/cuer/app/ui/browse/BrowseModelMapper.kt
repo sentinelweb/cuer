@@ -14,7 +14,7 @@ class BrowseModelMapper constructor(
 
     fun map(state: BrowseContract.MviStore.State): Model {
         return Model(
-            title = state.currentCategory!!.title,
+            title = state.currentCategory.title,
             categories = state.currentCategory.subCategories
                 .map { categoryModel(it) }
                 .also { log.d(it.toString()) },
@@ -30,6 +30,7 @@ class BrowseModelMapper constructor(
         subCategories = it.subCategories.map {
             categoryModel(it)
         },
-        videoCount = it.subCategories.size
+        subCount = it.subCategories.size,
+        isPlaylist = it.platformId != null
     )
 }

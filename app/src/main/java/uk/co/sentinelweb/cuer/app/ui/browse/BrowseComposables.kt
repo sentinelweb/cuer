@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import org.koin.java.KoinJavaComponent.getKoin
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.CategoryClicked
-import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerBrowseTheme
 import uk.co.sentinelweb.cuer.app.ui.common.compose.image.NetworkImage
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import kotlin.math.max
@@ -36,7 +36,7 @@ object BrowseComposables {
 
     @Composable
     fun BrowseView(model: BrowseContract.View.Model, view: BrowseMviView) {
-        CuerTheme {
+        CuerBrowseTheme {
             Surface {
                 Column(
                     modifier = Modifier
@@ -67,7 +67,9 @@ object BrowseComposables {
             Text(
                 text = model.title,
                 style = MaterialTheme.typography.h4,
-                color = Color.White
+                color = Color.White,
+                modifier = Modifier
+                    .clickable(onClick = { view.dispatch(CategoryClicked(model.id)) })
             )
             model.description?.let {
                 Text(
@@ -94,13 +96,13 @@ object BrowseComposables {
                 .padding(horizontal = 8.dp)
         ) {
             list.forEach {
-                SubCategory(it, view)
+                CatChip(it, view)
             }
         }
     }
 
     @Composable
-    fun SubCategory(
+    fun CatChip(
         subCategory: BrowseContract.View.CategoryModel,
         view: BrowseMviView,
     ) {
@@ -142,18 +144,28 @@ object BrowseComposables {
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_platform_youtube_24_black),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .padding(start = 16.dp)
-                                    .size(12.dp)
-                            )
-                            Text(
-                                text = subCategory.videoCount.toString(),
-                                style = MaterialTheme.typography.caption,
-                                modifier = Modifier.padding(start = 8.dp)
-                            )
+                            if (subCategory.subCount > 0) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_tree_24),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .padding(start = 16.dp)
+                                        .size(16.dp)
+                                )
+                                Text(
+                                    text = subCategory.subCount.toString(),
+                                    style = MaterialTheme.typography.caption,
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+                            } else if (subCategory.isPlaylist) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_playlist_black),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .padding(start = 16.dp)
+                                        .size(16.dp)
+                                )
+                            }
                         }
                     }
                 }

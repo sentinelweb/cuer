@@ -29,7 +29,9 @@ class BrowseContract {
     }
 
     interface View : MviView<View.Model, View.Event> {
+
         suspend fun processLabel(label: MviStore.Label)
+
         data class Model(
             val title: String,
             val categories: List<CategoryModel>,
@@ -42,7 +44,8 @@ class BrowseContract {
             val description: String?,
             val thumbNailUrl: String?,
             val subCategories: List<CategoryModel>,
-            val videoCount: Int,
+            val subCount: Int,
+            val isPlaylist: Boolean,
         )
 
         sealed class Event {

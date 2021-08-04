@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.browse
 
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.ImageDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.ext.buildIdLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildParentLookup
 import uk.co.sentinelweb.cuer.domain.ext.makeIds
@@ -22,8 +23,15 @@ object BrowseTestData {
                             image = ImageDomain(url = "https://d1e4pidl3fu268.cloudfront.net/fb1ef83c-4a76-4d9b-9bd8-609ef1000462/Picture1.crop_573x430_99%2C0.preview.jpg"),
                             subCategories = listOf(
                                 CategoryDomain(id = -1,
+                                    title = "Socrates",
+                                    image = ImageDomain(url = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Socrates_Louvre.jpg/1200px-Socrates_Louvre.jpg"),
+                                    platform = PlatformDomain.YOUTUBE,
+                                    platformId = "PLmmblQQ1XpT8QRHv8tBQPfgN8uFy9Joo6"),
+                                CategoryDomain(id = -1,
                                     title = "Plato",
-                                    image = ImageDomain(url = "https://i.pinimg.com/originals/5f/eb/34/5feb34c5d9ddf9f4310a850f4a1b1a70.jpg")),
+                                    image = ImageDomain(url = "https://i.pinimg.com/originals/5f/eb/34/5feb34c5d9ddf9f4310a850f4a1b1a70.jpg"),
+                                    platform = PlatformDomain.YOUTUBE,
+                                    platformId = "PLmmblQQ1XpT-kNxMgQSOEboS80Dh1xL8L"),
                                 CategoryDomain(id = -1,
                                     title = "Aristotle",
                                     image = ImageDomain(url = "https://www.livius.org/site/assets/files/6784/aristotle_khmw.jpg")),

@@ -99,9 +99,8 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                 override fun onChanged(label: Label) {
                     when (label) {
                         is Label.Error -> snackbarWrapper.makeError(label.message).show()
-                        Label.TopReached -> {
-                            navMapper.navigate(NavigationModel.FINISH)
-                        }
+                        Label.TopReached -> navMapper.navigate(NavigationModel.FINISH)
+
                     }
                 }
             })
