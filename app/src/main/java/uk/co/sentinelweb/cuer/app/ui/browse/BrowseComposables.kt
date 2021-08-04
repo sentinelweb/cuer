@@ -221,7 +221,7 @@ object BrowseComposables {
 @Composable
 private fun BrowsePreview() {
     val browseModelMapper = BrowseModelMapper(getKoin().get())
-    val view = BrowseMviView(getKoin().get())
+    val view = BrowseMviView(getKoin().get(), getKoin().get())
     BrowseComposables.BrowseView(
         browseModelMapper.map(BrowseTestData.state),
         view

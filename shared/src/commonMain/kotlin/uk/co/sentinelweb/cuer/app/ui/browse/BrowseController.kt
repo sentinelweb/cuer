@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.lifecycle.Lifecycle
 import com.arkivanov.mvikotlin.core.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.extensions.coroutines.bind
 import com.arkivanov.mvikotlin.extensions.coroutines.events
+import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.states
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
@@ -44,6 +45,7 @@ class BrowseController constructor(
             views.forEach { view ->
                 // store -> view
                 store.states.mapNotNull { modelMapper.map(it) } bindTo view
+                store.labels bindTo { label -> view.processLabel(label) }
 
                 // view -> store
                 view.events.mapNotNull(eventToIntent) bindTo store

@@ -68,4 +68,10 @@ data class NavigationModel constructor(
             i?.getStringExtra(name)?.let { pref -> enumValues<T>().find { it.name == pref } }
     }
 
+    companion object {
+        val BACK = NavigationModel(Target.NAV_BACK)
+        val DONE = NavigationModel(Target.NAV_DONE)
+        val FINISH = NavigationModel(Target.NAV_FINISH)
+    }
+
 }
