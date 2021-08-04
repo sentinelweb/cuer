@@ -7,5 +7,9 @@ data class CategoryDomain constructor(
     val subCategories: List<CategoryDomain> = listOf(),
     val media: PlaylistDomain? = null,
     val image: ImageDomain? = null,
-    val thumb: ImageDomain? = null,
-)
+) {
+    companion object {
+        val EMPTY_CATEGORY = CategoryDomain(0, "Empty")
+        const val ROOT_ID = 1L
+    }
+}

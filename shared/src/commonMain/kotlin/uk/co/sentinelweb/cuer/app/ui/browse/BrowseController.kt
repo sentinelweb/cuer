@@ -10,11 +10,9 @@ import com.arkivanov.mvikotlin.extensions.coroutines.states
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Intent
-import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Intent.ClickCategory
-import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Intent.Display
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Intent.*
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event
-import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.CategoryClicked
-import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnResume
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class BrowseController constructor(
@@ -34,6 +32,7 @@ class BrowseController constructor(
     private val eventToIntent: suspend Event.() -> Intent = {
         when (this) {
             is CategoryClicked -> ClickCategory(id = id)
+            is UpClicked -> Up
             is OnResume -> Display
         }
     }

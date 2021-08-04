@@ -1,32 +1,29 @@
 package uk.co.sentinelweb.cuer.app.ui.browse
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
 import org.koin.java.KoinJavaComponent.getKoin
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.CategoryClicked
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
+import uk.co.sentinelweb.cuer.app.ui.common.compose.image.NetworkImage
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import kotlin.math.max
 
 object BrowseComposables {
 
-    private val log: LogWrapper = getKoin().get<LogWrapper>()
+    private val log: LogWrapper = getKoin().get()
 
     init {
         log.tag(this)
@@ -34,8 +31,7 @@ object BrowseComposables {
 
     @Composable
     fun BrowseUi(view: BrowseMviView) {
-        val model = remember { view.observableModel }
-        BrowseView(model, view)
+        BrowseView(view.observableModel, view)
     }
 
     @Composable
@@ -44,11 +40,21 @@ object BrowseComposables {
             Surface {
                 Column(
                     modifier = Modifier
+                        .background(MaterialTheme.colors.primaryVariant)
                         .padding(dimensionResource(R.dimen.page_margin))
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    log.d(model.categories.toString())
-                    model.categories.forEach {
-                        Category(it, view)
+                    Text(
+                        text = model.title,
+                        style = MaterialTheme.typography.h2,
+                        color = Color.White
+                    )
+                    if (model.isRoot) {
+                        model.categories.forEach {
+                            Category(it, view)
+                        }
+                    } else {
+                        CategoryGrid(6, model.categories, view)
                     }
                 }
             }
@@ -60,23 +66,35 @@ object BrowseComposables {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = model.title,
-                style = MaterialTheme.typography.h4
+                style = MaterialTheme.typography.h4,
+                color = Color.White
             )
             model.description?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.body1
+                    style = MaterialTheme.typography.body1,
+                    color = Color.White
                 )
             }
-            Divider()
-            StaggeredGrid(
-                modifier = Modifier
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 8.dp)
-            ) {
-                model.subCategories.forEach {
-                    SubCategory(it, view)
-                }
+            CategoryGrid(3, model.subCategories, view)
+        }
+    }
+
+    @Composable
+    private fun CategoryGrid(
+        rows: Int,
+        list: List<BrowseContract.View.CategoryModel>,
+        view: BrowseMviView,
+    ) {
+        Divider(color = Color.White)
+        StaggeredGrid(
+            rows = rows,
+            modifier = Modifier
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp)
+        ) {
+            list.forEach {
+                SubCategory(it, view)
             }
         }
     }
@@ -86,39 +104,22 @@ object BrowseComposables {
         subCategory: BrowseContract.View.CategoryModel,
         view: BrowseMviView,
     ) {
-//    val (selected, onSelected) = remember { mutableStateOf(false) }
-        // val topicChipTransitionState = topicChipTransition(selected)
-
         Surface(
             modifier = Modifier.padding(4.dp),
             elevation = 4.dp,
             shape = MaterialTheme.shapes.medium
-//            .copy(
-//            topStart = CornerSize(
-//                topicChipTransitionState.cornerRadius
-//            )
-//        )
         ) {
             Row(modifier = Modifier
                 .clickable(onClick = { view.dispatch(CategoryClicked(subCategory.id)) })) {
                 Box {
                     subCategory.thumbNailUrl?.let {
-                        Image(
-                            painter = rememberImagePainter(it),
+                        NetworkImage(
+                            url = it,
                             contentDescription = null,
-                            modifier = Modifier.size(72.dp)
+                            modifier = Modifier
+                                .size(width = 72.dp, height = 72.dp)
+                                .aspectRatio(1f)
                         )
-
-//                    Image(
-//                        painter = rememberGlidePainter(
-//                            request = subCategory.thumbNailUrl,
-//                            previewPlaceholder = R.drawable.ic_image_placeholder
-//                        ),
-//                        contentDescription = subCategory.title,
-//                        modifier = Modifier
-//                            .size(width = 72.dp, height = 72.dp)
-//                            .aspectRatio(1f)
-//                    )
                     } ?: Icon(
                         painter = painterResource(R.drawable.ic_baseline_category_24),
                         contentDescription = null,

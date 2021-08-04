@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.browse
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Model
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
+import uk.co.sentinelweb.cuer.domain.CategoryDomain.Companion.ROOT_ID
 
 class BrowseModelMapper constructor(
     private val log: LogWrapper,
@@ -11,19 +12,21 @@ class BrowseModelMapper constructor(
         log.tag(this)
     }
 
-    fun map(state: BrowseContract.MviStore.State): Model =
-//        (state.currentCategory
-//            ?.let { catId -> state.categories.filter { it.id == catId } }
-//            ?: state.categories)
-        state.categories
-            .let { Model(it.map { categoryModel(it) }) }
-            .also { log.d(it.toString()) }
+    fun map(state: BrowseContract.MviStore.State): Model {
+        return Model(
+            title = state.currentCategory!!.title,
+            categories = state.currentCategory.subCategories
+                .map { categoryModel(it) }
+                .also { log.d(it.toString()) },
+            isRoot = state.currentCategory.id == ROOT_ID
+        )
+    }
 
     private fun categoryModel(it: CategoryDomain): BrowseContract.View.CategoryModel = BrowseContract.View.CategoryModel(
         id = it.id,
         title = it.title,
         description = it.description,
-        thumbNailUrl = it.thumb?.url,
+        thumbNailUrl = it.image?.url,
         subCategories = it.subCategories.map {
             categoryModel(it)
         },
