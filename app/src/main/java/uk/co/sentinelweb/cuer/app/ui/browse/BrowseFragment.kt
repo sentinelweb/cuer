@@ -127,7 +127,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                     )
                 }
                 scoped { BrowseRepository() }
-                scoped { BrowseModelMapper(get()) }
+                scoped { BrowseModelMapper() }
                 scoped { BrowseMviView(get(), get()) }
                 scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
 

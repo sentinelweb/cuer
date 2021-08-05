@@ -13,21 +13,22 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.koin.java.KoinJavaComponent.getKoin
+import com.arkivanov.mvikotlin.core.view.BaseMviView
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.*
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.CategoryClicked
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerBrowseTheme
 import uk.co.sentinelweb.cuer.app.ui.common.compose.image.NetworkImage
-import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerTopAppBarComposables
 import kotlin.math.max
 
 object BrowseComposables {
 
-    private val log: LogWrapper = getKoin().get()
+    //private val log: LogWrapper = getKoin().get()
 
-    init {
-        log.tag(this)
-    }
+//    init {
+//        log.tag(this)
+//    }
 
     @Composable
     fun BrowseUi(view: BrowseMviView) {
@@ -35,26 +36,27 @@ object BrowseComposables {
     }
 
     @Composable
-    fun BrowseView(model: BrowseContract.View.Model, view: BrowseMviView) {
+    fun BrowseView(model: Model, view: BaseMviView<Model, Event>) {
         CuerBrowseTheme {
             Surface {
-                Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colors.secondaryVariant)
-                        .padding(dimensionResource(R.dimen.page_margin))
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Text(
+                Column {
+                    CuerTopAppBarComposables.CuerAppBar(
                         text = model.title,
-                        style = MaterialTheme.typography.h2,
-                        color = Color.White
+                        backgroundColor = Color.White// todo dark theme make color?
                     )
-                    if (model.isRoot) {
-                        model.categories.forEach {
-                            Category(it, view)
+                    Column(
+                        modifier = Modifier
+                            .background(MaterialTheme.colors.secondaryVariant)
+                            .padding(dimensionResource(R.dimen.page_margin))
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        if (model.isRoot) {
+                            model.categories.forEach {
+                                Category(it, view)
+                            }
+                        } else {
+                            CategoryGrid(6, model.categories, view)
                         }
-                    } else {
-                        CategoryGrid(6, model.categories, view)
                     }
                 }
             }
@@ -62,7 +64,7 @@ object BrowseComposables {
     }
 
     @Composable
-    private fun Category(model: BrowseContract.View.CategoryModel, view: BrowseMviView) {
+    private fun Category(model: CategoryModel, view: BaseMviView<Model, Event>) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = model.title,
@@ -85,8 +87,8 @@ object BrowseComposables {
     @Composable
     private fun CategoryGrid(
         rows: Int,
-        list: List<BrowseContract.View.CategoryModel>,
-        view: BrowseMviView,
+        list: List<CategoryModel>,
+        view: BaseMviView<Model, Event>,
     ) {
         Divider(color = Color.White)
         StaggeredGrid(
@@ -103,8 +105,8 @@ object BrowseComposables {
 
     @Composable
     fun CatChip(
-        subCategory: BrowseContract.View.CategoryModel,
-        view: BrowseMviView,
+        subCategory: CategoryModel,
+        view: BaseMviView<Model, Event>,
     ) {
         Surface(
             modifier = Modifier.padding(4.dp),
@@ -232,8 +234,8 @@ object BrowseComposables {
 @Preview(name = "Top level")
 @Composable
 private fun BrowsePreview() {
-    val browseModelMapper = BrowseModelMapper(getKoin().get())
-    val view = BrowseMviView(getKoin().get(), getKoin().get())
+    val browseModelMapper = BrowseModelMapper()
+    val view = object : BaseMviView<Model, Event>() {}
     BrowseComposables.BrowseView(
         browseModelMapper.map(BrowseTestData.state),
         view
