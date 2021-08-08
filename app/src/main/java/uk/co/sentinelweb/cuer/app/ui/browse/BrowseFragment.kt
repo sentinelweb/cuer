@@ -19,15 +19,19 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Label
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnResume
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -42,6 +46,8 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     private val playerView: MainContract.PlayerViewControl by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val navMapper: NavigationMapper by inject()
+    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+    private val navigationProvider: NavigationProvider by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
@@ -87,6 +93,11 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
         playerView.hidePlayer()
     }
 
+    override fun onResume() {
+        super.onResume()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+    }
+
     override fun onStop() {
         super.onStop()
         playerView.showPlayer()
@@ -98,9 +109,9 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
             object : Observer<Label> {
                 override fun onChanged(label: Label) {
                     when (label) {
-                        is Label.Error -> snackbarWrapper.makeError(label.message).show()
-                        Label.TopReached -> navMapper.navigate(NavigationModel.FINISH)
-
+                        is Error -> snackbarWrapper.makeError(label.message).show()
+                        TopReached -> navMapper.navigate(NavigationModel.FINISH)
+                        ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
                     }
                 }
             })
@@ -130,7 +141,6 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                 scoped { BrowseModelMapper() }
                 scoped { BrowseMviView(get(), get()) }
                 scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
-
             }
         }
     }

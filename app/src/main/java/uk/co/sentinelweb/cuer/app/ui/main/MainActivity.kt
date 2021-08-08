@@ -83,9 +83,8 @@ class MainActivity :
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
         }
-        intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
+        //intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
         presenter.initialise()
-        //presenter.startServer()
     }
 
     override fun onDestroy() {
@@ -105,8 +104,8 @@ class MainActivity :
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.paste_add -> startActivity(ShareActivity.intent(this, true))
-            R.id.settings -> navController.navigate(R.id.navigation_settings_root)
+            R.id.menu_paste_add -> startActivity(ShareActivity.intent(this, true))
+            R.id.menu_settings -> navigate(R.id.navigation_settings_root)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -168,6 +167,10 @@ class MainActivity :
 
     override fun navigate(destination: NavigationModel) {
         navMapper.navigate(destination)
+    }
+
+    override fun navigate(id: Int) {
+        navController.navigate(id)
     }
 
     override fun checkForPendingNavigation(target: Target?): NavigationModel? {

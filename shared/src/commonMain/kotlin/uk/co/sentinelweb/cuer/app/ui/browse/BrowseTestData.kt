@@ -11,7 +11,7 @@ object BrowseTestData {
     val data =
         CategoryDomain(
             id = -1,
-            title = "All categories",
+            title = "Browse",
             subCategories = listOf(
                 // -1 = build id in loader
                 CategoryDomain(

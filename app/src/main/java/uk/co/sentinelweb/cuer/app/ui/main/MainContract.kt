@@ -5,6 +5,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
@@ -47,6 +48,7 @@ interface MainContract {
             scope(named<MainActivity>()) {
                 scoped<View> { getSource() }
                 scoped<PlayerViewControl> { getSource() }
+                scoped<NavigationProvider> { getSource() }
                 scoped<Presenter> {
                     MainPresenter(
                         view = get(),

@@ -45,8 +45,8 @@ fun CuerBrowseTheme(
     colors = colors?.copy(
         onSurface = Color.White,
         surface = colorResource(id = R.color.indigo_400),
-        secondary = colorResource(id = R.color.indigo_600),
-        secondaryVariant = colorResource(id = R.color.dark_indigo),
+        primary = colorResource(id = R.color.secondary),
+        secondary = colorResource(id = R.color.secondary),
     )
     MaterialTheme(
         colors = colors ?: throw IllegalArgumentException("Colors were not imported from MDC theme"),

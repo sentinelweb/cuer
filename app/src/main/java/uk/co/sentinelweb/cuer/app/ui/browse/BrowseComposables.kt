@@ -19,6 +19,8 @@ import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.*
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.CategoryClicked
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerBrowseTheme
 import uk.co.sentinelweb.cuer.app.ui.common.compose.image.NetworkImage
+import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.Action
+import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerTopAppBarComposables
 import kotlin.math.max
 
@@ -42,20 +44,24 @@ object BrowseComposables {
                 Column {
                     CuerTopAppBarComposables.CuerAppBar(
                         text = model.title,
-                        backgroundColor = Color.White// todo dark theme make color?
+                        //backgroundColor = Color.White// todo dark theme make color?
+                        actions = listOf(
+                            Action(CuerMenuItem.Settings, { view.dispatch(Event.ActionSettingsClick) })
+                        )
                     )
                     Column(
                         modifier = Modifier
+                            .fillMaxSize()
                             .background(MaterialTheme.colors.secondaryVariant)
-                            .padding(dimensionResource(R.dimen.page_margin))
                             .verticalScroll(rememberScrollState())
+                            .padding(dimensionResource(R.dimen.page_margin))
                     ) {
                         if (model.isRoot) {
                             model.categories.forEach {
                                 Category(it, view)
                             }
                         } else {
-                            CategoryGrid(6, model.categories, view)
+                            CategoryGrid(7, model.categories, view)
                         }
                     }
                 }
@@ -80,6 +86,7 @@ object BrowseComposables {
                     color = Color.White
                 )
             }
+            Divider(color = Color.White, modifier = Modifier.padding(bottom = 8.dp))
             CategoryGrid(3, model.subCategories, view)
         }
     }
@@ -90,7 +97,6 @@ object BrowseComposables {
         list: List<CategoryModel>,
         view: BaseMviView<Model, Event>,
     ) {
-        Divider(color = Color.White)
         StaggeredGrid(
             rows = rows,
             modifier = Modifier

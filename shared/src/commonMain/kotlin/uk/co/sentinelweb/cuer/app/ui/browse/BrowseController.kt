@@ -35,6 +35,7 @@ class BrowseController constructor(
             is CategoryClicked -> ClickCategory(id = id)
             is UpClicked -> Up
             is OnResume -> Display
+            is ActionSettingsClick -> ActionSettings
         }
     }
 

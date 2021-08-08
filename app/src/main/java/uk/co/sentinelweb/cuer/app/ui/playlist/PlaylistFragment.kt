@@ -80,6 +80,7 @@ class PlaylistFragment :
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navMapper: NavigationMapper by inject()
+    private val navigationProvider: NavigationProvider by inject()
 
 
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
@@ -248,12 +249,12 @@ class PlaylistFragment :
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         // todo clean up after im sure it works for all cases
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
-        ((activity as? NavigationProvider)?.checkForPendingNavigation(PLAYLIST_FRAGMENT)
+        (navigationProvider.checkForPendingNavigation(PLAYLIST_FRAGMENT)
             ?: let { makeNavFromArguments() })
             ?.apply {
                 log.d("onResume: apply nav args model = $this")
                 setPlaylistData()
-                (activity as? NavigationProvider)?.clearPendingNavigation(PLAYLIST_FRAGMENT)
+                navigationProvider.clearPendingNavigation(PLAYLIST_FRAGMENT)
             } ?: run {
             log.d("onResume: got no nav args")
             presenter.setPlaylistData()

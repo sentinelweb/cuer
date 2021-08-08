@@ -56,7 +56,7 @@ class BrowseStoreFactory constructor(
                 is Intent.ClickCategory -> {
                     getState().categoryLookup.get(intent.id)
                         ?.apply { dispatch(Result.SetCategory(category = this)) }
-                        ?: apply { publish(Label.Error("")) }
+                        ?: apply { publish(Label.Error("No cateory with that id = ${intent.id}")) }
                     Unit
                 }
                 is Intent.Display -> dispatch(Result.Display)
@@ -66,6 +66,7 @@ class BrowseStoreFactory constructor(
                         ?: apply { publish(Label.TopReached) }
                     Unit
                 }
+                Intent.ActionSettings -> publish(Label.ActionSettings)
             }
 
         private fun loadCategories() {

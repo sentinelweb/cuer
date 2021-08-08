@@ -12,7 +12,7 @@
         android:id="@+id/navigation_scan"
         android:name="uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragment"
         android:label="@string/sharenav_title_scan"
-        tools:layout="@layout/browse_fragment"
+        tools:layout="@layout/scan_fragment"
         >
         <action
             android:id="@+id/action_goto_playlist"

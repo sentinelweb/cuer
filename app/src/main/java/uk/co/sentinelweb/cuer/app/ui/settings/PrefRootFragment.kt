@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
@@ -15,7 +14,6 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
@@ -29,8 +27,7 @@ class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContr
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
         (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
             (onCreateView as ViewGroup).addView(it, 0)
-            //(activity as AppCompatActivity).setSupportActionBar(it)
-            it.setupWithNavController(findNavController(), AppBarConfiguration(MainActivity.TOP_LEVEL_DESTINATIONS))
+            it.setupWithNavController(findNavController())
         }
         return onCreateView
     }

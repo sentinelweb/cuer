@@ -12,12 +12,14 @@ class BrowseContract {
             object Display : Intent()
             data class ClickCategory(val id: Long) : Intent()
             object Up : Intent()
+            object ActionSettings : Intent()
         }
 
         sealed class Label {
             object None : Label()
             data class Error(val message: String, val exception: Throwable? = null) : Label()
             object TopReached : Label()
+            object ActionSettings : Label()
 
         }
 
@@ -51,6 +53,7 @@ class BrowseContract {
         sealed class Event {
             object OnResume : Event()
             object UpClicked : Event()
+            object ActionSettingsClick : Event()
             data class CategoryClicked(val id: Long) : Event()
         }
     }
