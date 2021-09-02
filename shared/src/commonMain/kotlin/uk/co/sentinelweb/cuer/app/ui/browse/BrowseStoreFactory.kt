@@ -55,7 +55,11 @@ class BrowseStoreFactory constructor(
             when (intent) {
                 is Intent.ClickCategory -> {
                     getState().categoryLookup.get(intent.id)
-                        ?.apply { dispatch(Result.SetCategory(category = this)) }
+                        ?.also { cat ->
+                            cat.platformId
+                                ?.let { id -> publish(Label.LaunchPlaylist(cat.platformId, cat.platform)) }
+                                ?: run { dispatch(Result.SetCategory(category = cat)) }
+                        }
                         ?: apply { publish(Label.Error("No cateory with that id = ${intent.id}")) }
                     Unit
                 }

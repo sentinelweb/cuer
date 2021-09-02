@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
@@ -203,6 +204,12 @@ class ShareActivity : AppCompatActivity(),
                 }
             }
 
+        fun urlIntent(c: Context, url: String) =
+            Intent(c, ShareActivity::class.java).apply {
+                action = Intent.ACTION_VIEW
+                if (c is Application) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                data = Uri.parse(url)
+            }
     }
 
 

@@ -29,10 +29,12 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -112,6 +114,11 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         is Error -> snackbarWrapper.makeError(label.message).show()
                         TopReached -> navMapper.navigate(NavigationModel.FINISH)
                         ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
+                        is LaunchPlaylist -> {
+                            startActivity(ShareActivity.urlIntent(requireContext(), YoutubeJavaApiWrapper.playlistUrl(label.id)))
+                            //snackbarWrapper.make(label.run{"$platform:$id"}).show()
+                        }
+                        None -> Unit
                     }
                 }
             })
