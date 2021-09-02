@@ -54,7 +54,7 @@ object BrowseComposables {
                             .fillMaxSize()
                             .background(MaterialTheme.colors.secondaryVariant)
                             .verticalScroll(rememberScrollState())
-                            .padding(dimensionResource(R.dimen.page_margin))
+                            .padding(vertical = dimensionResource(R.dimen.page_margin))
                     ) {
                         if (model.isRoot) {
                             model.categories.forEach {
@@ -78,6 +78,7 @@ object BrowseComposables {
                 color = Color.White,
                 modifier = Modifier
                     .clickable(onClick = { view.dispatch(CategoryClicked(model.id)) })
+                    .padding(start = dimensionResource(R.dimen.page_margin))
             )
             model.description?.let {
                 Text(
@@ -86,7 +87,10 @@ object BrowseComposables {
                     color = Color.White
                 )
             }
-            Divider(color = Color.White, modifier = Modifier.padding(bottom = 8.dp))
+            Divider(color = Color.White, modifier = Modifier
+                .padding(bottom = 8.dp)
+                .padding(start = dimensionResource(R.dimen.page_margin))
+            )
             CategoryGrid(3, model.subCategories, view)
         }
     }
@@ -101,7 +105,8 @@ object BrowseComposables {
             rows = rows,
             modifier = Modifier
                 .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = dimensionResource(R.dimen.page_margin))
+                .padding(bottom = dimensionResource(R.dimen.page_margin))
         ) {
             list.forEach {
                 CatChip(it, view)

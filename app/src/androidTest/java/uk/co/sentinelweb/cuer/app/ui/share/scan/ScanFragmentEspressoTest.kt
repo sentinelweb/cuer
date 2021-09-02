@@ -68,7 +68,7 @@ class ScanFragmentEspressoTest : FragmentScenarioProvider<ScanFragment> {
     fun showMessage() {
         val fixtMsg = fixture.create(String::class.java)
         get().onFragment { it.showMessage(fixtMsg) }
-        onView(withId(com.google.android.material.R.id.snackbar_text))
+        onView(withId(R.id.snackbar_text))
             .check(matches(withText(fixtMsg)))
     }
 
