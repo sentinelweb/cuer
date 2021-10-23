@@ -6,6 +6,10 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.*
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
@@ -15,6 +19,8 @@ import uk.co.sentinelweb.cuer.domain.ext.buildParentLookup
 class BrowseStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory,
     private val repository: BrowseRepository,
+    private val playlistOrchestrator: PlaylistOrchestrator,
+    private val browseStrings: BrowseContract.BrowseStrings,
 ) {
     private sealed class Result {
         class SetCategory(val category: CategoryDomain) : Result()
@@ -57,10 +63,22 @@ class BrowseStoreFactory constructor(
                     getState().categoryLookup.get(intent.id)
                         ?.also { cat ->
                             cat.platformId
-                                ?.let { id -> publish(Label.LaunchPlaylist(cat.platformId, cat.platform)) }
-                                ?: run { dispatch(Result.SetCategory(category = cat)) }
+                                ?.let {
+                                    playlistOrchestrator.loadList(PlatformIdListFilter(ids = listOf(cat.platformId)), LOCAL.flatOptions())
+                                        .takeIf { it.isNotEmpty() }
+                                        ?.let { it[0].id }
+                                        ?.also { publish(Label.OpenLocalPlaylist(it)) }
+                                        ?: also { publish(Label.AddPlaylist(cat.platformId, cat.platform)) }
+                                }
+                                ?: run {
+                                    if (cat.subCategories.isNotEmpty()) {
+                                        dispatch(Result.SetCategory(category = cat))
+                                    } else {
+                                        publish(Label.Error(browseStrings.errorNoPlaylistConfigured))
+                                    }
+                                }
                         }
-                        ?: apply { publish(Label.Error("No cateory with that id = ${intent.id}")) }
+                        ?: apply { publish(Label.Error(browseStrings.errorNoCatWithID(intent.id))) }
                     Unit
                 }
                 is Intent.Display -> dispatch(Result.Display)

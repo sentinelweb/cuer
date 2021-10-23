@@ -29,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
@@ -114,10 +115,10 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         is Error -> snackbarWrapper.makeError(label.message).show()
                         TopReached -> navMapper.navigate(NavigationModel.FINISH)
                         ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
-                        is LaunchPlaylist -> {
+                        is AddPlaylist -> { // todo set parent playlist from intent to keep groupings
                             startActivity(ShareActivity.urlIntent(requireContext(), YoutubeJavaApiWrapper.playlistUrl(label.id)))
-                            //snackbarWrapper.make(label.run{"$platform:$id"}).show()
                         }
+                        is OpenLocalPlaylist -> navMapper.navigate(PlaylistContract.makeNav(label.id, play = label.play))
                         None -> Unit
                     }
                 }
@@ -141,7 +142,9 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                 scoped {
                     BrowseStoreFactory(
                         storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        repository = get()
+                        repository = get(),
+                        playlistOrchestrator = get(),
+                        browseStrings = BrowseContract.TestBrowseStrings()
                     )
                 }
                 scoped { BrowseRepository() }

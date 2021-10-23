@@ -21,7 +21,8 @@ class BrowseContract {
             data class Error(val message: String, val exception: Throwable? = null) : Label()
             object TopReached : Label()
             object ActionSettings : Label()
-            data class LaunchPlaylist(val id: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) : Label()
+            data class AddPlaylist(val id: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) : Label()
+            data class OpenLocalPlaylist(val id: Long, val play: Boolean = false) : Label()
         }
 
         data class State(
@@ -57,5 +58,15 @@ class BrowseContract {
             object ActionSettingsClick : Event()
             data class CategoryClicked(val id: Long) : Event()
         }
+    }
+
+    interface BrowseStrings {
+        val errorNoPlaylistConfigured: String
+        fun errorNoCatWithID(id: Long): String
+    }
+
+    class TestBrowseStrings : BrowseStrings {
+        override val errorNoPlaylistConfigured = "No playlist configured"
+        override fun errorNoCatWithID(id: Long) = "No cateory with that id = $id"
     }
 }

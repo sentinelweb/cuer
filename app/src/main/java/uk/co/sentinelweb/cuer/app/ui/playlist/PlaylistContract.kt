@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
-import kotlinx.coroutines.Job
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -144,7 +143,7 @@ interface PlaylistContract {
     )
 
     companion object {
-        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean, source: Source?): NavigationModel {
+        fun makeNav(plId: Long?, plItemId: Long? = null, play: Boolean, source: Source? = LOCAL): NavigationModel {
             val params = mutableMapOf(
                 PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
                 NavigationModel.Param.PLAY_NOW to play,
