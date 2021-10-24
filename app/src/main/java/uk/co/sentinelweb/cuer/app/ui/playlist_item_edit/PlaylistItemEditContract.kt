@@ -45,7 +45,8 @@ interface PlaylistItemEditContract {
         var isPlaylistsChanged: Boolean = false,
         var isMediaChanged: Boolean = false,
         var isSaved: Boolean = false,
-        val editSettings: Edit = Edit()
+        val editSettings: Edit = Edit(),
+        var parentPlaylistId: Long = -1,
     ) {
         lateinit var source: OrchestratorContract.Source
 

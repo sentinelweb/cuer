@@ -8,10 +8,12 @@ import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.TitleFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.*
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.ext.buildIdLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildParentLookup
@@ -21,7 +23,13 @@ class BrowseStoreFactory constructor(
     private val repository: BrowseRepository,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val browseStrings: BrowseContract.BrowseStrings,
+    private val log: LogWrapper,
 ) {
+
+    init {
+        log.tag(this)
+    }
+
     private sealed class Result {
         class SetCategory(val category: CategoryDomain) : Result()
         class LoadCatgeories(val root: CategoryDomain) : Result()
@@ -68,7 +76,14 @@ class BrowseStoreFactory constructor(
                                         .takeIf { it.isNotEmpty() }
                                         ?.let { it[0].id }
                                         ?.also { publish(Label.OpenLocalPlaylist(it)) }
-                                        ?: also { publish(Label.AddPlaylist(cat.platformId, cat.platform)) }
+                                        ?: also {
+                                            val catParent = getTopLevelCategory(cat, getState)
+                                            val parentId =
+                                                playlistOrchestrator.loadList(TitleFilter(title = catParent.title), LOCAL.flatOptions())
+                                                    .takeIf { it.isNotEmpty() }
+                                                    ?.get(0)?.id
+                                            publish(Label.AddPlaylist(cat.platformId, cat.platform, parentId))
+                                        }
                                 }
                                 ?: run {
                                     if (cat.subCategories.isNotEmpty()) {
@@ -90,6 +105,21 @@ class BrowseStoreFactory constructor(
                 }
                 Intent.ActionSettings -> publish(Label.ActionSettings)
             }
+
+        private fun getTopLevelCategory(
+            cat: CategoryDomain,
+            getState: () -> State,
+        ): CategoryDomain {
+            var catParent = cat
+            while (getState().parentLookup[catParent] != null) {
+                // check next parent is not root
+                val nextParent = getState().parentLookup[catParent]
+                if (getState().parentLookup[nextParent] == null) break
+                catParent =
+                    getState().parentLookup[catParent] ?: throw IllegalStateException("parent lookup error")
+            }
+            return catParent
+        }
 
         private fun loadCategories() {
             dispatch(Result.LoadCatgeories(repository.loadAll()))

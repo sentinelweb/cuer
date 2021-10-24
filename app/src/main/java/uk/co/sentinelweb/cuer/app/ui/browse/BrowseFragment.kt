@@ -34,6 +34,7 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -116,7 +117,11 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         TopReached -> navMapper.navigate(NavigationModel.FINISH)
                         ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
                         is AddPlaylist -> { // todo set parent playlist from intent to keep groupings
-                            startActivity(ShareActivity.urlIntent(requireContext(), YoutubeJavaApiWrapper.playlistUrl(label.id)))
+                            startActivity(ShareActivity.urlIntent(
+                                requireContext(),
+                                YoutubeJavaApiWrapper.playlistUrl(label.platformId),
+                                label.parentId
+                            ))
                         }
                         is OpenLocalPlaylist -> navMapper.navigate(PlaylistContract.makeNav(label.id, play = label.play))
                         None -> Unit
@@ -125,9 +130,12 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
             })
     }
 
+    class BrowseStrings(private val res: ResourceWrapper) : BrowseContract.BrowseStrings {
+        override val errorNoPlaylistConfigured = res.getString(R.string.browse_error_no_playlist)
+        override fun errorNoCatWithID(id: Long) = res.getString(R.string.browse_error_no_category, id)
+    }
 
     companion object {
-
         @JvmStatic
         val fragmentModule = module {
             scope(named<BrowseFragment>()) {
@@ -144,7 +152,8 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         storeFactory = LoggingStoreFactory(DefaultStoreFactory),
                         repository = get(),
                         playlistOrchestrator = get(),
-                        browseStrings = BrowseContract.TestBrowseStrings()
+                        browseStrings = BrowseStrings(get()),
+                        log = get()
                     )
                 }
                 scoped { BrowseRepository() }
@@ -154,6 +163,5 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
             }
         }
     }
-
 
 }

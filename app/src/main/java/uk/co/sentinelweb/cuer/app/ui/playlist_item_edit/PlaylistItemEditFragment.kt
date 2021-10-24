@@ -24,8 +24,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
@@ -82,6 +81,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     private val sourceArg: Source by lazy {
         SOURCE.getEnum<Source>(arguments) ?: Source.LOCAL
+    }
+
+    private val parentArg: Long? by lazy {
+        PLAYLIST_PARENT.getLong(arguments)
     }
 
     init {
@@ -182,9 +185,9 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 binding.pleTitleBg.isVisible = false
                 playMenuItem.isVisible = false
 
-                viewModel.delayedSetData(this, sourceArg)
+                viewModel.delayedSetData(this, sourceArg, parentArg)
             } else {
-                viewModel.setData(this, sourceArg)
+                viewModel.setData(this, sourceArg, parentArg)
             }
         }
         observeUi()

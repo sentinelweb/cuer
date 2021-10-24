@@ -156,6 +156,10 @@
     <string name="menu_launch">Launch</string>
     <string name="player_fab_fullscreen">Fullscreen</string>
     <string name="player_fab_pip">Picutre in Picture</string>
-
+    <string name="browse_error_no_playlist">No playlist configured</string>
+    <string name="browse_error_no_category">No category with that id = %1$s</string>
+    <string name="share_error_no_link">Could not find a link to process</string>
+    <string name="share_error_already_exists">%1$s already exists …</string>
+    <string name="share_error_no_default_playlist">No default playlist - select a playlist to save the item</string>
 
 </resources>

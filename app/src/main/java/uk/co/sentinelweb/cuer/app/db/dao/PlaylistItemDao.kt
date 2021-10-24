@@ -57,6 +57,6 @@ interface PlaylistItemDao {
     suspend fun search(text: String, limit: Int): List<PlaylistItemAndMediaAndChannel>
 
     @Transaction
-    @Query("SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),:text) and playlist_item.playlist_id IN (:playlistIds) and media.id = playlist_item.media_id order by media.date_last_played desc LIMIT :limit")
+    @Query("SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),LOWER(:text)) and playlist_item.playlist_id IN (:playlistIds) and media.id = playlist_item.media_id order by media.date_last_played desc LIMIT :limit")
     suspend fun search(text: String, playlistIds: List<Long>, limit: Int): List<PlaylistItemAndMediaAndChannel>
 }

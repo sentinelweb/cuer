@@ -50,6 +50,7 @@ interface OrchestratorContract<Domain> {
     class ChannelPlatformIdFilter(val platformId: String) : Filter
     class NewMediaFilter() : Filter
     class RecentMediaFilter() : Filter
+    class TitleFilter(val title: String) : Filter
     class SearchFilter(val text: String, val isWatched: Boolean, val isNew: Boolean, val isLive: Boolean, val playlistIds: List<Long>?) :
         Filter
 

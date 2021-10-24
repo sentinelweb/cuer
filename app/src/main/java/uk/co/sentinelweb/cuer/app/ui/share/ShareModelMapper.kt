@@ -25,23 +25,27 @@ class ShareModelMapper constructor(
                     text = if (isConnected) res.getString(R.string.share_button_play_now) else null,
                     icon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white
                     else R.drawable.ic_button_play_black,
+                    enabled = true
                 ),
                 topLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ true, /*forward = */ false) },
                     text = if (isConnected) res.getString(R.string.share_button_play_return) else null,
                     icon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white
-                    else R.drawable.ic_button_play_black
+                    else R.drawable.ic_button_play_black,
+                    enabled = true
                 ),
                 bottomRight = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ false, /*forward = */ true) },
                     text = if (isMedia) res.getString(R.string.share_button_add_to_queue)
                     else res.getString(R.string.share_button_add_playlist),
-                    icon = R.drawable.ic_button_add_black
+                    icon = R.drawable.ic_button_add_black,
+                    enabled = true
                 ),
                 bottomLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ false, /*forward = */ false) },
                     text = res.getString(R.string.share_button_add_return),
-                    icon = R.drawable.ic_button_back_black
+                    icon = R.drawable.ic_button_back_black,
+                    enabled = true
                 )
             )
         } else {
@@ -51,23 +55,27 @@ class ShareModelMapper constructor(
                     action = { finish(/*add = */false, /*play = */ true, /*forward = */ true) },
                     text = if (isConnected) res.getString(R.string.share_button_play_now) else null,
                     icon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white
-                    else R.drawable.ic_button_play_black
+                    else R.drawable.ic_button_play_black,
+                    enabled = true
                 ),
                 topLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */false, /*play = */ true, /*forward = */ false) },
                     text = if (isConnected) res.getString(R.string.share_button_play_return) else null,
                     icon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white
-                    else R.drawable.ic_button_play_black
+                    else R.drawable.ic_button_play_black,
+                    enabled = true
                 ),
                 bottomRight = ShareContract.Model.Button(
                     action = { finish(/*add = */false, /*play = */ false, /*forward = */ true) },
                     text = res.getString(R.string.share_button_goto_item),
-                    icon = R.drawable.ic_button_forward_black
+                    icon = R.drawable.ic_button_forward_black,
+                    enabled = true
                 ),
                 bottomLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */false, /*play = */ false, /*forward = */ false) },
                     text = res.getString(R.string.share_button_return),
-                    icon = R.drawable.ic_button_back_black
+                    icon = R.drawable.ic_button_back_black,
+                    enabled = true
                 )
             )
         }

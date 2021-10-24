@@ -82,7 +82,6 @@ class PlaylistFragment :
     private val navMapper: NavigationMapper by inject()
     private val navigationProvider: NavigationProvider by inject()
 
-
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
     private val binding get() = _binding!!
@@ -117,7 +116,7 @@ class PlaylistFragment :
         var isShow: Boolean = false,
         var isPlayable: Boolean = false,
         var lastPlayModeIndex: Int = 0,
-        var reloadHeaderAfterMenuInit: Boolean = false
+        var reloadHeaderAfterMenuInit: Boolean = false,
     )
 
     private val menuState = MenuState()
@@ -279,6 +278,7 @@ class PlaylistFragment :
             params[PLAY_NOW] as Boolean? ?: false,
             params[SOURCE] as Source
         )
+        params[PLAYLIST_PARENT]?.apply { presenter.setAddPlaylistParent(this as Long) }
     }
 
     private fun makeNavFromArguments(): NavigationModel? {
@@ -286,15 +286,16 @@ class PlaylistFragment :
         val source: Source? = SOURCE.getEnum<Source>(arguments)
         val plItemId = PLAYLIST_ITEM_ID.getLong(arguments)
         val playNow = PLAY_NOW.getBoolean(arguments)
+        val addPlaylistParent =
+            PLAYLIST_PARENT.getLong(arguments)
+                ?.takeIf { it > 0 }
         arguments?.putBoolean(PLAY_NOW.name, false)
-        log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source")
+        log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source, addPlaylistParent=$addPlaylistParent")
         val onResumeGotArguments = plId?.let { it != -1L } ?: false
         return if (onResumeGotArguments) {
-            PlaylistContract.makeNav(plId, plItemId, playNow, source)
+            PlaylistContract.makeNav(plId, plItemId, playNow, source, addPlaylistParent)
         } else null
     }
-
-
     // endregion
 
     // region PlaylistContract.View
@@ -545,7 +546,7 @@ class PlaylistFragment :
     }
     // endregion
 
-    // region ItemContract.Interactions
+    // region ShareContract.Committer
     override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) {
         presenter.commitPlaylist(onCommit)
     }

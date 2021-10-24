@@ -25,14 +25,10 @@ class BrowseMviView constructor(
     var observableModel: Model by mutableStateOf(Model(res.getString(R.string.bottomnav_title_browse), listOf(), true))
         private set
 
-    var observableLabel: Label by mutableStateOf(Label.None)
-        // todo maybe not needed
-        private set
     private val _labelData: MutableLiveData<Label> = MutableLiveData()
     fun labelObservable(): LiveData<Label> = _labelData
 
     override suspend fun processLabel(label: Label) {
-        observableLabel = label
         _labelData.value = label
         log.d("Got label: $label")
     }
