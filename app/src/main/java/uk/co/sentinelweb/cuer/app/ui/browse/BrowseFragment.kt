@@ -116,7 +116,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         is Error -> snackbarWrapper.makeError(label.message).show()
                         TopReached -> navMapper.navigate(NavigationModel.FINISH)
                         ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
-                        is AddPlaylist -> { // todo set parent playlist from intent to keep groupings
+                        is AddPlaylist -> {
                             startActivity(ShareActivity.urlIntent(
                                 requireContext(),
                                 YoutubeJavaApiWrapper.playlistUrl(label.platformId),
