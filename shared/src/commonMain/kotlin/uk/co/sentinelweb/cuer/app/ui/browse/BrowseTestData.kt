@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.ext.buildIdLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildParentLookup
 import uk.co.sentinelweb.cuer.domain.ext.makeIds
-
+//         File(activity?.cacheDir,"browse.json").writeText(BrowseTestData.data.serialise())
 object BrowseTestData {
     val data =
         CategoryDomain(
@@ -137,7 +137,7 @@ object BrowseTestData {
             )
         ).makeIds()
 
-    val state = BrowseContract.MviStore.State(
+    val previewState = BrowseContract.MviStore.State(
         data,
         data.buildIdLookup(),
         data.buildParentLookup()

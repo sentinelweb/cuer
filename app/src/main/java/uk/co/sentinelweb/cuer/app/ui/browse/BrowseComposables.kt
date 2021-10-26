@@ -248,7 +248,7 @@ private fun BrowsePreview() {
     val browseModelMapper = BrowseModelMapper()
     val view = object : BaseMviView<Model, Event>() {}
     BrowseComposables.BrowseView(
-        browseModelMapper.map(BrowseTestData.state),
+        browseModelMapper.map(BrowseTestData.previewState),
         view
     )
 }

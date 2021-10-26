@@ -67,6 +67,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         controller.onViewCreated(listOf(browseMviView), lifecycle.asMviLifecycle())
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -157,7 +158,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         prefs = get()
                     )
                 }
-                scoped { BrowseRepository() }
+                scoped { BrowseRepository(BrowseJsonLoader(get())) }
                 scoped { BrowseModelMapper() }
                 scoped { BrowseMviView(get(), get()) }
                 scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }

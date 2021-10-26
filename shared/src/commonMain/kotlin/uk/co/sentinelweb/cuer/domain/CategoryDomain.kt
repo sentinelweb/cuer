@@ -1,7 +1,9 @@
 package uk.co.sentinelweb.cuer.domain
 
+import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 
+@Serializable
 data class CategoryDomain constructor(
     val id: Long,
     val title: String,

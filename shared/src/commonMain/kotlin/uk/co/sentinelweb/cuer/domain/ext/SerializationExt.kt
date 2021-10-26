@@ -61,6 +61,10 @@ fun SearchRemoteDomain.serialise() = domainJsonSerializer.encodeToString(
     SearchRemoteDomain.serializer(), this
 )
 
+fun CategoryDomain.serialise() = domainJsonSerializer.encodeToString(
+    CategoryDomain.serializer(), this
+)
+
 fun deserialiseSearchRemote(input: String) = domainJsonSerializer.decodeFromString(
     SearchRemoteDomain.serializer(), input
 )
@@ -111,6 +115,10 @@ fun ResponseDomain.serialise() = domainJsonSerializer.encodeToString(
 
 fun deserialiseResponse(input: String) = domainJsonSerializer.decodeFromString(
     ResponseDomain.serializer(), input
+)
+
+fun deserialiseCategory(input: String) = domainJsonSerializer.decodeFromString(
+    CategoryDomain.serializer(), input
 )
 
 val domainJsonSerializer = Json {

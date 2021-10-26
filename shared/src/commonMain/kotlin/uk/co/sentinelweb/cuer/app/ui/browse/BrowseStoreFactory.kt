@@ -56,7 +56,8 @@ class BrowseStoreFactory constructor(
                         ?.let { copy(currentCategory = it) }
                         ?: this
                 }
-                is Result.LoadCatgeories -> copy(currentCategory = result.root,
+                is Result.LoadCatgeories -> copy(
+                    currentCategory = result.root,
                     categoryLookup = result.root.buildIdLookup(),
                     parentLookup = result.root.buildParentLookup()
                 )
@@ -140,7 +141,7 @@ class BrowseStoreFactory constructor(
             return catParent
         }
 
-        private fun loadCategories() {
+        private suspend fun loadCategories() {
             val root = repository.loadAll()
             dispatch(Result.LoadCatgeories(root))
 
