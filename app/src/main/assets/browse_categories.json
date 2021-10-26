@@ -160,7 +160,7 @@
           "subCategories": [
             {
               "id": -1,
-              "title": "Baurillard",
+              "title": "Baudrillard",
               "image": {
                 "url": "https://www.doppiozero.com/sites/default/files/jean-baudrillard.jpg"
               }
@@ -168,6 +168,7 @@
             {
               "id": -1,
               "title": "Delueze",
+              "platformId": "PLmmblQQ1XpT9Xu1ZAwC1HByiRO-RiqHw6",
               "image": {
                 "url": "https://assets.mubicdn.net/images/cast_member/386450/image-original.jpg"
               }
