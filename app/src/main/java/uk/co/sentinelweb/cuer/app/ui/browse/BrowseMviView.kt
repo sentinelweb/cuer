@@ -22,7 +22,7 @@ class BrowseMviView constructor(
         log.tag(this)
     }
 
-    var observableModel: Model by mutableStateOf(Model(res.getString(R.string.bottomnav_title_browse), listOf(), true))
+    var observableModel: Model by mutableStateOf(Model(res.getString(R.string.bottomnav_title_browse), listOf(), null, true))
         private set
 
     private val _labelData: MutableLiveData<Label> = MutableLiveData()

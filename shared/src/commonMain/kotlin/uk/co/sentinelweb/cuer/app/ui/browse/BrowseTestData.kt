@@ -140,6 +140,7 @@ object BrowseTestData {
     val previewState = BrowseContract.MviStore.State(
         data,
         data.buildIdLookup(),
-        data.buildParentLookup()
+        data.buildParentLookup(),
+        listOf(data.subCategories.get(0).subCategories.get(0), data.subCategories.get(0).subCategories.get(1))// recent
     )
 }

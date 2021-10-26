@@ -161,5 +161,6 @@
     <string name="share_error_no_link">Could not find a link to process</string>
     <string name="share_error_already_exists">%1$s already exists …</string>
     <string name="share_error_no_default_playlist">No default playlist - select a playlist to save the item</string>
+    <string name="browse_recent">Recently viewed</string>
 
 </resources>

@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.*
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapperImpl
@@ -60,6 +61,7 @@ object SharedAppModule {
         single { PlaylistMemoryRepository(get(), get(), get(), get(), get()) }
         single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperImpl() }
+        factory { BrowseRecentCategories(get(), get()) }
     }
 
     val modules = listOf(objectModule)

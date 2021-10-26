@@ -27,6 +27,7 @@ class BrowseStoreFactory constructor(
     private val browseStrings: BrowseContract.BrowseStrings,
     private val log: LogWrapper,
     private val prefs: MultiPlatformPreferencesWrapper,
+    private val recentCategories: BrowseRecentCategories,
 ) {
 
     init {
@@ -45,7 +46,7 @@ class BrowseStoreFactory constructor(
     }
 
 
-    private object ReducerImpl : Reducer<State, Result> {
+    private inner class ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
             when (result) {
                 is Result.Display -> this
@@ -56,11 +57,19 @@ class BrowseStoreFactory constructor(
                         ?.let { copy(currentCategory = it) }
                         ?: this
                 }
-                is Result.LoadCatgeories -> copy(
-                    currentCategory = result.root,
-                    categoryLookup = result.root.buildIdLookup(),
-                    parentLookup = result.root.buildParentLookup()
-                )
+                is Result.LoadCatgeories -> {
+                    val categoryLookup1 = result.root.buildIdLookup()
+                    copy(
+                        currentCategory = result.root,
+                        categoryLookup = categoryLookup1,
+                        parentLookup = result.root.buildParentLookup(),
+                        recent = recentCategories.getRecent().reversed()
+                            .mapNotNull { recentTitle ->
+                                categoryLookup1.values
+                                    .find { it.title == recentTitle }
+                            }
+                    )
+                }
             }
     }
 
@@ -89,13 +98,17 @@ class BrowseStoreFactory constructor(
                                     playlistOrchestrator.loadList(PlatformIdListFilter(ids = listOf(cat.platformId)), LOCAL.flatOptions())
                                         .takeIf { it.isNotEmpty() }
                                         ?.let { it[0].id }
-                                        ?.also { publish(Label.OpenLocalPlaylist(it)) }
+                                        ?.also {
+                                            recentCategories.addRecent(cat)
+                                            publish(Label.OpenLocalPlaylist(it))
+                                        }
                                         ?: also {
                                             val catParent = getTopLevelCategory(cat, getState)
                                             val parentId =
                                                 playlistOrchestrator.loadList(TitleFilter(title = catParent.title), LOCAL.flatOptions())
                                                     .takeIf { it.isNotEmpty() }
                                                     ?.get(0)?.id
+                                            recentCategories.addRecent(cat)
                                             publish(Label.AddPlaylist(cat.platformId, cat.platform, parentId))
                                         }
                                 }
@@ -148,8 +161,9 @@ class BrowseStoreFactory constructor(
             prefs.getString(BROWSE_CAT_TITLE, null)
                 ?.also { dispatch(Result.SetCategoryByTitle(it)) }
         }
-    }
 
+
+    }
 
     fun create(): MviStore =
         object : MviStore, Store<Intent, State, Label> by storeFactory.create(
@@ -157,6 +171,8 @@ class BrowseStoreFactory constructor(
             initialState = State(),
             bootstrapper = BootstrapperImpl(),
             executorFactory = { ExecutorImpl() },
-            reducer = ReducerImpl
+            reducer = ReducerImpl()
         ) {}
+
+
 }

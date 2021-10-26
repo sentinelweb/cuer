@@ -34,6 +34,7 @@ class BrowseContract {
             val currentCategory: CategoryDomain = EMPTY_CATEGORY,
             val categoryLookup: Map<Long, CategoryDomain> = mapOf(),
             val parentLookup: Map<CategoryDomain, CategoryDomain> = mapOf(),
+            val recent: List<CategoryDomain> = listOf(),
         )
     }
 
@@ -44,6 +45,7 @@ class BrowseContract {
         data class Model(
             val title: String,
             val categories: List<CategoryModel>,
+            val recent: CategoryModel?,
             val isRoot: Boolean,
         )
 
@@ -66,6 +68,7 @@ class BrowseContract {
     }
 
     interface BrowseStrings {
+        val recent: String
         val errorNoPlaylistConfigured: String
         fun errorNoCatWithID(id: Long): String
     }

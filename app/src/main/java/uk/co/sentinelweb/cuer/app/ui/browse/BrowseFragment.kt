@@ -132,6 +132,8 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     }
 
     class BrowseStrings(private val res: ResourceWrapper) : BrowseContract.BrowseStrings {
+        override val recent: String
+            get() = res.getString(R.string.browse_recent)
         override val errorNoPlaylistConfigured = res.getString(R.string.browse_error_no_playlist)
         override fun errorNoCatWithID(id: Long) = res.getString(R.string.browse_error_no_category, id)
     }
@@ -153,13 +155,15 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         storeFactory = LoggingStoreFactory(DefaultStoreFactory),
                         repository = get(),
                         playlistOrchestrator = get(),
-                        browseStrings = BrowseStrings(get()),
+                        browseStrings = get(),
                         log = get(),
-                        prefs = get()
+                        prefs = get(),
+                        recentCategories = get()
                     )
                 }
+                scoped<BrowseContract.BrowseStrings> { BrowseStrings(get()) }
                 scoped { BrowseRepository(BrowseJsonLoader(get())) }
-                scoped { BrowseModelMapper() }
+                scoped { BrowseModelMapper(get(), get()) }
                 scoped { BrowseMviView(get(), get()) }
                 scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
             }

@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.compose.image.NetworkImage
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.Action
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerTopAppBarComposables
+import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import kotlin.math.max
 
 object BrowseComposables {
@@ -57,8 +58,11 @@ object BrowseComposables {
                             .padding(vertical = dimensionResource(R.dimen.page_margin))
                     ) {
                         if (model.isRoot) {
+                            if (model.recent != null) {
+                                Category(model.recent!!, view, 1)
+                            }
                             model.categories.forEach {
-                                Category(it, view)
+                                Category(it, view, 3)
                             }
                         } else {
                             CategoryGrid(7, model.categories, view)
@@ -70,7 +74,7 @@ object BrowseComposables {
     }
 
     @Composable
-    private fun Category(model: CategoryModel, view: BaseMviView<Model, Event>) {
+    private fun Category(model: CategoryModel, view: BaseMviView<Model, Event>, rows: Int = 3) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = model.title,
@@ -91,7 +95,7 @@ object BrowseComposables {
                 .padding(bottom = 8.dp)
                 .padding(start = dimensionResource(R.dimen.page_margin))
             )
-            CategoryGrid(3, model.subCategories, view)
+            CategoryGrid(rows, model.subCategories, view)
         }
     }
 
@@ -239,13 +243,18 @@ object BrowseComposables {
         }
     }
 
+}
 
+class TestStrings : BrowseContract.BrowseStrings {
+    override val recent = "Recent"
+    override val errorNoPlaylistConfigured = "Error no playlist"
+    override fun errorNoCatWithID(id: Long) = "Error no cat"
 }
 
 @Preview(name = "Top level")
 @Composable
 private fun BrowsePreview() {
-    val browseModelMapper = BrowseModelMapper()
+    val browseModelMapper = BrowseModelMapper(TestStrings(), AndroidLogWrapper())
     val view = object : BaseMviView<Model, Event>() {}
     BrowseComposables.BrowseView(
         browseModelMapper.map(BrowseTestData.previewState),
