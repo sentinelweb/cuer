@@ -13,6 +13,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.*
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.BROWSE_CAT_TITLE
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.ext.buildIdLookup
@@ -24,6 +26,7 @@ class BrowseStoreFactory constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val browseStrings: BrowseContract.BrowseStrings,
     private val log: LogWrapper,
+    private val prefs: MultiPlatformPreferencesWrapper,
 ) {
 
     init {
@@ -32,6 +35,7 @@ class BrowseStoreFactory constructor(
 
     private sealed class Result {
         class SetCategory(val category: CategoryDomain) : Result()
+        class SetCategoryByTitle(val title: String) : Result()
         class LoadCatgeories(val root: CategoryDomain) : Result()
         object Display : Result()
     }
@@ -44,8 +48,14 @@ class BrowseStoreFactory constructor(
     private object ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
             when (result) {
-                is Result.Display -> copy()
+                is Result.Display -> this
                 is Result.SetCategory -> copy(currentCategory = result.category)
+                is Result.SetCategoryByTitle -> {
+                    this.categoryLookup.values
+                        .find { it.title == result.title }
+                        ?.let { copy(currentCategory = it) }
+                        ?: this
+                }
                 is Result.LoadCatgeories -> copy(currentCategory = result.root,
                     categoryLookup = result.root.buildIdLookup(),
                     parentLookup = result.root.buildParentLookup()
@@ -70,6 +80,9 @@ class BrowseStoreFactory constructor(
                 is Intent.ClickCategory -> {
                     getState().categoryLookup.get(intent.id)
                         ?.also { cat ->
+                            if (cat.subCategories.size > 0) {
+                                prefs.putString(BROWSE_CAT_TITLE, cat.title)
+                            }
                             cat.platformId
                                 ?.let {
                                     playlistOrchestrator.loadList(PlatformIdListFilter(ids = listOf(cat.platformId)), LOCAL.flatOptions())
@@ -99,8 +112,14 @@ class BrowseStoreFactory constructor(
                 is Intent.Display -> dispatch(Result.Display)
                 is Intent.Up -> {
                     getState().parentLookup.get(getState().currentCategory)
-                        ?.apply { dispatch(Result.SetCategory(category = this)) }
-                        ?: apply { publish(Label.TopReached) }
+                        ?.apply {
+                            prefs.putString(BROWSE_CAT_TITLE, this.title)
+                            dispatch(Result.SetCategory(category = this))
+                        }
+                        ?: apply {
+                            prefs.remove(BROWSE_CAT_TITLE)
+                            publish(Label.TopReached)
+                        }
                     Unit
                 }
                 Intent.ActionSettings -> publish(Label.ActionSettings)
@@ -122,7 +141,11 @@ class BrowseStoreFactory constructor(
         }
 
         private fun loadCategories() {
-            dispatch(Result.LoadCatgeories(repository.loadAll()))
+            val root = repository.loadAll()
+            dispatch(Result.LoadCatgeories(root))
+
+            prefs.getString(BROWSE_CAT_TITLE, null)
+                ?.also { dispatch(Result.SetCategoryByTitle(it)) }
         }
     }
 

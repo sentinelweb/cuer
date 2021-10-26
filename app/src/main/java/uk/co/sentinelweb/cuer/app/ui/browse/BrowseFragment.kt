@@ -153,7 +153,8 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         repository = get(),
                         playlistOrchestrator = get(),
                         browseStrings = BrowseStrings(get()),
-                        log = get()
+                        log = get(),
+                        prefs = get()
                     )
                 }
                 scoped { BrowseRepository() }

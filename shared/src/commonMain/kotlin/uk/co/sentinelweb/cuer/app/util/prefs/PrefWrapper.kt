@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.prefs
 
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences
+
 interface Field {
     val fname: String
 }

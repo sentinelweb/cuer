@@ -14,6 +14,8 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapperImpl
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 object SharedAppModule {
@@ -34,7 +36,7 @@ object SharedAppModule {
         single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }
     }
 
-    private val orchectratorModule = module {
+    private val orchestratorModule = module {
         single { PlaylistOrchestrator(get(), get(), get()) }
         single { PlaylistItemOrchestrator(get(), get(), get()) }
         single { MediaOrchestrator(get(), get()) }
@@ -57,10 +59,11 @@ object SharedAppModule {
         factory { ParserFactory() }
         single { PlaylistMemoryRepository(get(), get(), get(), get(), get()) }
         single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
+        single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperImpl() }
     }
 
     val modules = listOf(objectModule)
-        .plus(orchectratorModule)
+        .plus(orchestratorModule)
         .plus(queueModule)
         .plus(DescriptionContract.viewModule)
 
