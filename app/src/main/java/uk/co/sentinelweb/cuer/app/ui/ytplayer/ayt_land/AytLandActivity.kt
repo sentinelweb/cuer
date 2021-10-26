@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
@@ -289,15 +290,16 @@ class AytLandActivity : AppCompatActivity(),
                 is Command -> label.command.let { command ->
                     log.d(command.toString())
                     when (command) {
-                        is PlayerContract.PlayerCommand.Load -> player?.loadVideo(command.platformId, command.startPosition / 1000f)
-                        is PlayerContract.PlayerCommand.Play -> player?.play()
-                        is PlayerContract.PlayerCommand.Pause -> player?.pause()
-                        is PlayerContract.PlayerCommand.SkipBack -> player?.seekTo(lastPositionSec - command.ms / 1000f)
-                        is PlayerContract.PlayerCommand.SkipFwd -> player?.seekTo(lastPositionSec + command.ms / 1000f)
-                        is PlayerContract.PlayerCommand.SeekTo -> {
+                        is Load -> player?.loadVideo(command.platformId, command.startPosition / 1000f)
+                        is Play -> player?.play()
+                        is Pause -> player?.pause()
+                        is SkipBack -> player?.seekTo(lastPositionSec - command.ms / 1000f)
+                        is SkipFwd -> player?.seekTo(lastPositionSec + command.ms / 1000f)
+                        is SeekTo -> {
                             log.d(command.toString())
                             player?.seekTo(command.ms.toFloat() / 1000f)
                         }
+                        else -> Unit
                     }
                 }
                 is LinkOpen ->

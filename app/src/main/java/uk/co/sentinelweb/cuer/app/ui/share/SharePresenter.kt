@@ -37,7 +37,8 @@ class SharePresenter constructor(
     private val mapper: ShareModelMapper,
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val shareStrings: ShareContract.ShareStrings,
 ) : ShareContract.Presenter {
 
     init {
@@ -48,16 +49,18 @@ class SharePresenter constructor(
         coroutines.cancel()
     }
 
+    override fun setPlaylistParent(longExtra: Long) {
+        state.parentPlaylistId = longExtra
+    }
+
     private fun mapDisplayModel() {
         (state.scanResult
             ?.also {
                 if ((it.type == MEDIA && (!it.isNew || it.isOnPlaylist)) || (it.type == PLAYLIST && !it.isNew))
-                    view.warning("${it.type.toString().toLowerCase().capitalize()} already exists ...")
+                    view.warning(shareStrings.errorExists(it.type.toString().toLowerCase().capitalize()))
             }
-            ?.let {
-                mapper.mapShareModel(it, ::finish)
-            }
-            ?: mapper.mapEmptyState(::finish))// todo fail result
+            ?.let { mapper.mapShareModel(it, ::finish) }
+            ?: mapper.mapEmptyState(::finish)) // todo fail result
             .apply {
                 state.model = this
                 view.setData(this)
@@ -80,12 +83,12 @@ class SharePresenter constructor(
         when (result.type) {
             MEDIA -> (result.result as MediaDomain).let {
                 val itemDomain = PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null)
-                view.showMedia(itemDomain, if (result.isNew) MEMORY else LOCAL)
+                view.showMedia(itemDomain, if (result.isNew) MEMORY else LOCAL, state.parentPlaylistId)
                 mapDisplayModel()
             }
             PLAYLIST -> (result.result as PlaylistDomain).let {
                 it.id?.let {
-                    view.showPlaylist(it.toIdentifier(if (result.isNew) MEMORY else LOCAL))
+                    view.showPlaylist(it.toIdentifier(if (result.isNew) MEMORY else LOCAL), state.parentPlaylistId)
                     mapDisplayModel()
                 } ?: throw IllegalStateException("Playlist needs an id (isNew = MEMORY)")
             }
@@ -173,7 +176,7 @@ class SharePresenter constructor(
         } catch (t: Throwable) {
             when (t) {
                 is NoDefaultPlaylistException -> // todo make a dialog or just create the playlist
-                    view.error("No default playlist - select a playlist to save the item")
+                    view.error(shareStrings.errorNoDefaultPlaylist)
                 else -> view.error(t.message ?: (t::class.java.simpleName + " error ... sorry"))
             }
         }

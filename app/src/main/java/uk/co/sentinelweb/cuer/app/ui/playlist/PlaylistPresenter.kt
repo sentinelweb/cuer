@@ -325,6 +325,10 @@ class PlaylistPresenter(
         }
     }
 
+    override fun setAddPlaylistParent(id: Long) {
+        state.addPlaylistParent = id
+    }
+
     // delete item
     override fun onItemSwipeLeft(itemModel: ItemContract.Model) {
         state.viewModelScope.launch {
@@ -644,6 +648,15 @@ class PlaylistPresenter(
                             playable = true, editable = true, deletable = true, deletableItems = true, editableItems = true
                         )
                     )
+                }
+                ?.let { playlist ->
+                    state.addPlaylistParent
+                        ?.takeIf { it > 0 }
+                        ?.let { parentId ->
+                            playlistOrchestrator.load(parentId, LOCAL.flatOptions())
+                                ?.let { playlist.copy(parentId = parentId) }
+                        }
+                        ?: playlist
                 }
                 ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
                 ?.also { state.playlistIdentifier = it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure") }

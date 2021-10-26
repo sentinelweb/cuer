@@ -2,12 +2,10 @@
 <resources>
     <color name="primary">@color/red_600</color>
     <color name="primary_on">@color/white</color>
-    <color name="primary_variant">@color/red_800</color>
-    <color name="primary_dark">@color/dark_red</color>
+    <color name="primary_variant">@color/dark_red</color>
     <color name="secondary">@color/indigo_600</color>
     <color name="secondary_on">@color/white</color>
-    <color name="secondary_variant">@color/indigo_800</color>
-    <color name="secondary_dark">@color/dark_indigo</color>
+    <color name="secondary_variant">@color/dark_indigo</color>
     <color name="text_primary">@color/grey_900</color>
     <color name="text_secondary">@color/grey_600</color>
     <color name="surface">@color/grey_50</color>
@@ -30,7 +28,7 @@
     <color name="player_button_tint">@color/black</color>
     <color name="player_button_background_tint">@color/surface</color>
     <color name="player_button_ripple_tint">@color/grey_400</color>
-    <color name="player_button_progress">@color/primary_dark</color>
+    <color name="player_button_progress">@color/primary_variant</color>
     <color name="text_edit_background">@color/white</color>
 
     <!--    custom colors-->

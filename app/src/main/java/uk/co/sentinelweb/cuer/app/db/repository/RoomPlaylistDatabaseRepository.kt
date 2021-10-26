@@ -210,6 +210,11 @@ class RoomPlaylistDatabaseRepository constructor(
                                     .findPlaylistsForChannePlatformlId(filter.platformId)
                                     .mapFlat()
                                 else throw IllegalArgumentException("Only flat supported for ChannelPlatformIdFilter")
+                            is TitleFilter ->
+                                if (flat) playlistDao
+                                    .findPlaylistsWithTitle(filter.title)
+                                    .mapFlat()
+                                else throw IllegalArgumentException("Only flat supported for TitleFilter")
                             else ->// todo return empty for else
                                 playlistDao
                                     .getAllPlaylists()

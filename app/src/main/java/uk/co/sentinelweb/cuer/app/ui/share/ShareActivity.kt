@@ -4,8 +4,8 @@ import android.app.Application
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -85,24 +85,9 @@ class ShareActivity : AppCompatActivity(),
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
         if (volumeControl.handleVolumeKey(event)) true else super.dispatchKeyEvent(event)
 
-    override fun error(msg: String) {
-        snackbar?.dismiss()
-        snackbar = snackbarWrapper.make("ERROR: $msg").apply { show() }
-    }
-
-    override fun warning(msg: String) {
-        msg.apply {
-            share_warning.setText(msg)
-            share_warning.isVisible = true
-        }
-    }
-
-    override fun exit() {
-        finish()
-    }
-
     override fun onWindowFocusChanged(hasFocus: Boolean) {
-        if (hasFocus && intent.getBooleanExtra(EXTRA_PASTE, false)) {
+        if (hasFocus && intent.getBooleanExtra(PASTE.toString(), false)) {
+            checkForPlaylistParentInIntent()
             clipboard.getPrimaryClip()
                 ?.getItemAt(0)
                 ?.text
@@ -120,12 +105,19 @@ class ShareActivity : AppCompatActivity(),
 
     override fun onStart() {
         super.onStart()
-        if (!intent.getBooleanExtra(EXTRA_PASTE, false)) {
+        if (!intent.getBooleanExtra(PASTE.toString(), false)) {
+            checkForPlaylistParentInIntent()
             (shareWrapper.getLinkFromIntent(intent) ?: shareWrapper.getTextFromIntent(intent))?.apply {
                 if (!presenter.isAlreadyScanned(this)) {
                     scanFragment?.fromShareUrl(this) ?: throw IllegalStateException("Scan fragment not visible")
                 }
-            } ?: presenter.linkError("Could not find a link to process")
+            } ?: presenter.linkError(getString(R.string.share_error_no_link))
+        }
+    }
+
+    private fun checkForPlaylistParentInIntent() {
+        if (intent.hasExtra(PLAYLIST_PARENT.toString())) {
+            presenter.setPlaylistParent(intent.getLongExtra(PLAYLIST_PARENT.toString(), -1))
         }
     }
 
@@ -157,16 +149,17 @@ class ShareActivity : AppCompatActivity(),
         setOnClickListener { model.action() }
         setText(model.text)
         setIconResource(model.icon)
+        setEnabled(model.enabled)
     }
 
-    override fun showMedia(itemDomain: PlaylistItemDomain, source: Source) {
-        ScanFragmentDirections.actionGotoPlaylistItem(itemDomain.serialise(), source.toString())
+    override fun showMedia(itemDomain: PlaylistItemDomain, source: Source, playlistParentId: Long?) {
+        ScanFragmentDirections.actionGotoPlaylistItem(itemDomain.serialise(), source.toString(), playlistParentId ?: -1)
             .apply { navController.navigate(this) }
         //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
     }
 
-    override fun showPlaylist(id: OrchestratorContract.Identifier<Long>) {
-        ScanFragmentDirections.actionGotoPlaylist(id.id, id.source.toString())
+    override fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?) {
+        ScanFragmentDirections.actionGotoPlaylist(id.id, id.source.toString(), playlistParentId ?: -1)
             .apply { navController.navigate(this) }
     }
 
@@ -177,10 +170,21 @@ class ShareActivity : AppCompatActivity(),
     override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) =
         commitFragment?.commit(onCommit) ?: throw IllegalStateException("Commit fragment not visible")
 
-//
-//    override fun getCommittedItems() =
-//        commitFragment?.getEditedDomains()
-//            ?.filterNotNull()
+    override fun error(msg: String) {
+        snackbar?.dismiss()
+        snackbar = snackbarWrapper.make("ERROR: $msg").apply { show() }
+    }
+
+    override fun warning(msg: String) {
+        msg.apply {
+            share_warning.setText(msg)
+            share_warning.isVisible = true
+        }
+    }
+
+    override fun exit() {
+        finish()
+    }
 
     // PlaylistItemEditContract.DoneNavigation
     override fun navigateDone() {
@@ -191,24 +195,30 @@ class ShareActivity : AppCompatActivity(),
         navMapper.navigate(nav)
     }
 
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-        super.onSaveInstanceState(outState, outPersistentState)
-        // todo save state see issue https://github.com/sentinelweb/cuer/issues/158
-    }
-
     companion object {
 
-        private const val EXTRA_PASTE = "paste"
-
-        fun intent(c: Context, paste: Boolean = false) =
+        // todo add parent id if in playlist fragment (called form main atm)
+        fun intent(c: Context, paste: Boolean = false, parentId: Long? = null) =
             Intent(c, ShareActivity::class.java).apply {
                 action = Intent.ACTION_VIEW
                 if (c is Application) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 if (paste) {
-                    putExtra(EXTRA_PASTE, true)
+                    putExtra(PASTE.toString(), true)
+                }
+                if (parentId != null) {
+                    this.putExtra(PLAYLIST_PARENT.toString(), parentId)
                 }
             }
 
+        fun urlIntent(c: Context, url: String, parentId: Long? = null) =
+            Intent(c, ShareActivity::class.java).apply {
+                action = Intent.ACTION_VIEW
+                if (c is Application) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                data = Uri.parse(url)
+                if (parentId != null) {
+                    this.putExtra(PLAYLIST_PARENT.toString(), parentId)
+                }
+            }
     }
 
 

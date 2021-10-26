@@ -17,6 +17,7 @@ val ver_junit: String by project
 val ver_truth: String by project
 val ver_mvikotlin: String by project
 val ver_kotlinx_coroutines_test: String by project
+val ver_multiplatform_settings: String by project
 
 version = "1.0"
 
@@ -56,6 +57,8 @@ kotlin {
                 implementation("com.arkivanov.mvikotlin:mvikotlin:$ver_mvikotlin")
                 implementation("com.arkivanov.mvikotlin:mvikotlin-main:$ver_mvikotlin")
                 implementation("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$ver_mvikotlin")
+                implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
+                implementation("com.russhwolf:multiplatform-settings-no-arg:$ver_multiplatform_settings")
             }
         }
         val commonTest by getting {

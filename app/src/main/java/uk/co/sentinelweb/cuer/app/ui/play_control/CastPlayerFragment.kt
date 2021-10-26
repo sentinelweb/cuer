@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +22,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
@@ -33,8 +35,9 @@ class CastPlayerFragment() :
     override val scope: Scope by fragmentScopeWithSource()
     private val presenter: CastPlayerContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
-    private val imageProvider: FirebaseDefaultImageProvider by inject()
+    private val imageProvider: FirebaseImageProvider by inject()
     private val res: ResourceWrapper by inject()
+    private val navigationProvider: NavigationProvider by inject()
 
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding!!
@@ -75,6 +78,11 @@ class CastPlayerFragment() :
             }
         })
         presenter.initialise()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        linkScopeToActivity()
     }
 
     override fun onDestroyView() {
@@ -174,7 +182,7 @@ class CastPlayerFragment() :
     }
 
     override fun navigate(navModel: NavigationModel) {
-        (activity as NavigationProvider).navigate(navModel)
+        navigationProvider.navigate(navModel)
     }
 
     override fun makeItemTransitionExtras() =

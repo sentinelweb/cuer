@@ -12,7 +12,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -22,7 +22,7 @@ class SearchImageDialogFragment(private val config: SearchImageContract.Config) 
     private val viewModel: SearchImageViewModel by inject()
     private val log: LogWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
-    private val imageProvider: FirebaseDefaultImageProvider by inject()
+    private val imageProvider: FirebaseImageProvider by inject()
 
     init {
         log.tag(this)

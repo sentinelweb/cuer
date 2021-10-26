@@ -7,7 +7,7 @@ import com.google.firebase.ktx.Firebase
 
 class FirebaseWrapper constructor(
     private val appContext: Context,
-    private val imageProvider: FirebaseDefaultImageProvider
+    private val imageProvider: FirebaseImageProvider,
 ) {
 
     fun init() {

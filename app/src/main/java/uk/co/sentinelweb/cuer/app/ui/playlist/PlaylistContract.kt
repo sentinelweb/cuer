@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
-import kotlinx.coroutines.Job
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -68,6 +67,7 @@ interface PlaylistContract {
         suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit)
         fun reloadHeader()
         fun undoMoveItem()
+        fun setAddPlaylistParent(id: Long)
     }
 
     interface Interactions {
@@ -122,7 +122,8 @@ interface PlaylistContract {
         var selectedPlaylistItem: PlaylistItemDomain? = null,
         var model: Model? = null,
         var playlistsTree: PlaylistTreeDomain? = null,
-        var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null
+        var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null,
+        var addPlaylistParent: Long? = null,
     ) : ViewModel()
 
     data class Model constructor(
@@ -140,17 +141,25 @@ interface PlaylistContract {
         val canEdit: Boolean,
         val items: List<ItemContract.Model>?,
         val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
-        val hasChildren: Int
+        val hasChildren: Int,
     )
 
     companion object {
-        fun makeNav(plId: Long?, plItemId: Long?, play: Boolean, source: Source?): NavigationModel {
+        fun makeNav(
+            plId: Long?,
+            plItemId: Long? = null,
+            play: Boolean,
+            source: Source? = LOCAL,
+            addPlaylistParent: Long? = null,
+        ): NavigationModel {
             val params = mutableMapOf(
                 PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
                 NavigationModel.Param.PLAY_NOW to play,
                 SOURCE to (source ?: throw IllegalArgumentException("No Source"))
             ).apply {
                 plItemId?.also { put(NavigationModel.Param.PLAYLIST_ITEM_ID, it) }
+            }.apply {
+                addPlaylistParent?.also { put(NavigationModel.Param.PLAYLIST_PARENT, it) }
             }
             return NavigationModel(
                 PLAYLIST_FRAGMENT, params

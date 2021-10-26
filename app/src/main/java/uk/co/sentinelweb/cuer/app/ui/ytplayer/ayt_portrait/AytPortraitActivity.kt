@@ -28,7 +28,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContrac
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
@@ -226,6 +227,7 @@ class AytPortraitActivity : AppCompatActivity(),
                             log.d(command.toString())
                             player?.seekTo(command.ms.toFloat() / 1000f)
                         }
+                        else -> Unit
                     }
                 }
                 is LinkOpen ->

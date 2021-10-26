@@ -31,7 +31,7 @@
         <scale android:scaleWidth="100%">
             <shape android:shape="rectangle">
                 <size android:height="@dimen/list_item_progress_height" />
-                <solid android:color="@color/primary_dark" />
+                <solid android:color="@color/primary_variant" />
             </shape>
         </scale>
     </item>

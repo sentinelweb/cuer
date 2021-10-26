@@ -52,7 +52,9 @@ data class NavigationModel constructor(
         PLAYLIST_ITEM, /* PlaylistItemDomain */
         FRAGMENT_NAV_EXTRAS, /* FragmentNavigator.Extras */
         SOURCE, /* uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source */
-        HEADLESS /*Boolean*/
+        HEADLESS /*Boolean*/,
+        PLAYLIST_PARENT, /* Long */
+        PASTE /* Boolean */
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)
@@ -66,6 +68,14 @@ data class NavigationModel constructor(
 
         inline fun <reified T : Enum<T>> getEnum(i: Intent?): T? =
             i?.getStringExtra(name)?.let { pref -> enumValues<T>().find { it.name == pref } }
+
+
+    }
+
+    companion object {
+        val BACK = NavigationModel(Target.NAV_BACK)
+        val DONE = NavigationModel(Target.NAV_DONE)
+        val FINISH = NavigationModel(Target.NAV_FINISH)
     }
 
 }

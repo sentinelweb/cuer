@@ -17,7 +17,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
 import uk.co.sentinelweb.cuer.app.util.extension.cropShapedBitmap
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import java.security.MessageDigest
@@ -25,8 +25,8 @@ import java.security.MessageDigest
 
 class ChipCreator(
     private val c: Context,
-    private val imageProvider: FirebaseDefaultImageProvider,
-    private val res: ResourceWrapper
+    private val imageProvider: FirebaseImageProvider,
+    private val res: ResourceWrapper,
 ) {
 
     fun create(model: ChipModel, parent: ViewGroup): Chip = when (model.type) {

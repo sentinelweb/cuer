@@ -8,7 +8,7 @@
 
     <!-- prefs -->
     <string name="prefs_root_remote_service_key">remote_service</string>
-    <string name="prefs_root_debug_send_reports_key">sendReports</string>
+    <string name="prefs_root_debug_send_reports_key">send_reports</string>
     <string name="prefs_backup_backup_key">backup</string>
     <string name="prefs_backup_restore_key">restore</string>
 </resources>

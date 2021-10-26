@@ -47,7 +47,7 @@ class PlaylistItemEditViewModel constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
-    private val prefsWrapper: GeneralPreferencesWrapper
+    private val prefsWrapper: GeneralPreferencesWrapper,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -55,7 +55,7 @@ class PlaylistItemEditViewModel constructor(
 
     data class UiEvent(
         val type: Type,
-        val data: Any?
+        val data: Any?,
     ) {
         enum class Type { REFRESHING, ERROR, UNPIN }
     }
@@ -80,17 +80,18 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun delayedSetData(item: PlaylistItemDomain, source: Source) {
+    fun delayedSetData(item: PlaylistItemDomain, source: Source, parentId: Long?) {
         viewModelScope.launch {
             delay(400)
-            setData(item, source) // loads data after delay
+            setData(item, source, parentId) // loads data after delay
         }
     }
 
-    fun setData(item: PlaylistItemDomain, source: Source) {
+    fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?) {
         item.let {
             state.editingPlaylistItem = it
             state.source = source
+            state.parentPlaylistId = parentId ?: -1
             it.media.let { setData(it, source) }
         }
     }
@@ -113,6 +114,11 @@ class PlaylistItemEditViewModel constructor(
                                         .also { state.selectedPlaylists.addAll(it) }
                                 }
                         }
+                }
+
+                if (state.parentPlaylistId > 0L) {
+                    playlistOrchestrator.load(state.parentPlaylistId, LOCAL.flatOptions())
+                        ?.also { state.selectedPlaylists.add(it) }
                 }
 
                 prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
@@ -165,15 +171,6 @@ class PlaylistItemEditViewModel constructor(
             }
         }
 
-//    private suspend fun getPlaylistsForMediaId(mediaId: Long): List<PlaylistDomain> =
-//
-//            //?.also { log.d("mediaId = $mediaId, items = ${it.map { "[${it.id} ${it.media.id}  ${it.media.platformId} ]" }}") }
-//            ?.map { it.playlistId }
-//            ?.distinct()
-//            ?.filterNotNull()
-//            ?.let { playlistOrchestrator.loadList(IdListFilter(it), Options(LOCAL)) }
-//            ?: listOf()
-
     fun onPlayVideo() {
         state.editingPlaylistItem?.let { item ->
             viewModelScope.launch {
@@ -185,13 +182,6 @@ class PlaylistItemEditViewModel constructor(
                 _dialogModelLiveData.value = DialogModel(DialogModel.Type.SELECT_ROUTE, R.string.select_route_dialog_title)
             }
         } ?: run { toast.show("Please save the item first ...") }
-
-// need different UX for local
-//        _navigateLiveData.value =
-//            NavigationModel(
-//                LOCAL_PLAYER,
-//                mapOf(MEDIA_ID to state.media!!.platformId)
-//            )
     }
 
     fun onStarClick() {

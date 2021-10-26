@@ -43,7 +43,7 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseDefaultImageProvider
+import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -76,11 +76,11 @@ class PlaylistFragment :
     private val itemTouchHelper: ItemTouchHelper by inject()
     private val log: LogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
-    private val imageProvider: FirebaseDefaultImageProvider by inject()
+    private val imageProvider: FirebaseImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navMapper: NavigationMapper by inject()
-
+    private val navigationProvider: NavigationProvider by inject()
 
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
@@ -116,7 +116,7 @@ class PlaylistFragment :
         var isShow: Boolean = false,
         var isPlayable: Boolean = false,
         var lastPlayModeIndex: Int = 0,
-        var reloadHeaderAfterMenuInit: Boolean = false
+        var reloadHeaderAfterMenuInit: Boolean = false,
     )
 
     private val menuState = MenuState()
@@ -248,12 +248,12 @@ class PlaylistFragment :
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         // todo clean up after im sure it works for all cases
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
-        ((activity as? NavigationProvider)?.checkForPendingNavigation(PLAYLIST_FRAGMENT)
+        (navigationProvider.checkForPendingNavigation(PLAYLIST_FRAGMENT)
             ?: let { makeNavFromArguments() })
             ?.apply {
                 log.d("onResume: apply nav args model = $this")
                 setPlaylistData()
-                (activity as? NavigationProvider)?.clearPendingNavigation(PLAYLIST_FRAGMENT)
+                navigationProvider.clearPendingNavigation(PLAYLIST_FRAGMENT)
             } ?: run {
             log.d("onResume: got no nav args")
             presenter.setPlaylistData()
@@ -278,6 +278,7 @@ class PlaylistFragment :
             params[PLAY_NOW] as Boolean? ?: false,
             params[SOURCE] as Source
         )
+        params[PLAYLIST_PARENT]?.apply { presenter.setAddPlaylistParent(this as Long) }
     }
 
     private fun makeNavFromArguments(): NavigationModel? {
@@ -285,15 +286,16 @@ class PlaylistFragment :
         val source: Source? = SOURCE.getEnum<Source>(arguments)
         val plItemId = PLAYLIST_ITEM_ID.getLong(arguments)
         val playNow = PLAY_NOW.getBoolean(arguments)
+        val addPlaylistParent =
+            PLAYLIST_PARENT.getLong(arguments)
+                ?.takeIf { it > 0 }
         arguments?.putBoolean(PLAY_NOW.name, false)
-        log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source")
+        log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source, addPlaylistParent=$addPlaylistParent")
         val onResumeGotArguments = plId?.let { it != -1L } ?: false
         return if (onResumeGotArguments) {
-            PlaylistContract.makeNav(plId, plItemId, playNow, source)
+            PlaylistContract.makeNav(plId, plItemId, playNow, source, addPlaylistParent)
         } else null
     }
-
-
     // endregion
 
     // region PlaylistContract.View
@@ -544,7 +546,7 @@ class PlaylistFragment :
     }
     // endregion
 
-    // region ItemContract.Interactions
+    // region ShareContract.Committer
     override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) {
         presenter.commitPlaylist(onCommit)
     }

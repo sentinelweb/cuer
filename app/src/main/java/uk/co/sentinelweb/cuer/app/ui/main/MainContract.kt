@@ -5,6 +5,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
@@ -30,10 +31,15 @@ interface MainContract {
         fun showMessage(msg: String)
     }
 
+    interface PlayerViewControl {
+        fun showPlayer()
+        fun hidePlayer()
+    }
+
     data class State constructor(
         var playServicesAvailable: Boolean = false,
         var playServiceCheckDone: Boolean = false,
-        var playControlsInit: Boolean = false
+        var playControlsInit: Boolean = false,
     ) : ViewModel()
 
     companion object {
@@ -41,6 +47,8 @@ interface MainContract {
         val activityModule = module {
             scope(named<MainActivity>()) {
                 scoped<View> { getSource() }
+                scoped<PlayerViewControl> { getSource() }
+                scoped<NavigationProvider> { getSource() }
                 scoped<Presenter> {
                     MainPresenter(
                         view = get(),

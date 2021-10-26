@@ -20,7 +20,7 @@
     <!--        />-->
 
     <item
-        android:id="@+id/settings"
+        android:id="@+id/menu_settings"
         android:icon="@drawable/ic_menu_settings_black"
         android:title="@string/menu_settings"
         app:iconTint="@color/menu_button_icon_tint"
@@ -30,7 +30,7 @@
         />
 
     <item
-        android:id="@+id/paste_add"
+        android:id="@+id/menu_paste_add"
         android:icon="@drawable/ic_menu_paste_add_black"
         android:title="@string/menu_paste"
         app:iconTint="@color/menu_button_icon_tint"

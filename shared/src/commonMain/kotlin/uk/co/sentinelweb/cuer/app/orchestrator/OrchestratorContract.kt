@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import kotlin.reflect.KClass
@@ -36,19 +37,20 @@ interface OrchestratorContract<Domain> {
     data class Options constructor(
         val source: Source,
         val flat: Boolean = true,
-        val emit: Boolean = true
+        val emit: Boolean = true,
     )
 
     enum class Operation { FLAT, FULL, DELETE }
 
     class IdListFilter(val ids: List<Long>) : Filter
     class MediaIdListFilter(val ids: List<Long>) : Filter
-    class PlatformIdListFilter(val ids: List<String>) : Filter
+    class PlatformIdListFilter(val ids: List<String>, platform: PlatformDomain = PlatformDomain.YOUTUBE) : Filter
     class DefaultFilter() : Filter
     class AllFilter() : Filter
     class ChannelPlatformIdFilter(val platformId: String) : Filter
     class NewMediaFilter() : Filter
     class RecentMediaFilter() : Filter
+    class TitleFilter(val title: String) : Filter
     class SearchFilter(val text: String, val isWatched: Boolean, val isNew: Boolean, val isLive: Boolean, val playlistIds: List<Long>?) :
         Filter
 
@@ -69,7 +71,7 @@ interface OrchestratorContract<Domain> {
     // @Serializable
     open class Identifier<IdType>(
         open val id: IdType,
-        val source: Source
+        val source: Source,
         // todo val type:ObjectType
     ) {
 
