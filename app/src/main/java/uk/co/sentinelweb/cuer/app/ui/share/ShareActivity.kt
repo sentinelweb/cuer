@@ -21,6 +21,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -42,6 +43,7 @@ class ShareActivity : AppCompatActivity(),
     ShareContract.View,
     ScanContract.Listener,
     PlaylistItemEditContract.DoneNavigation,
+    CommitHost,
     AndroidScopeComponent {
 
     override val scope: Scope by activityScopeWithSource()
@@ -195,6 +197,11 @@ class ShareActivity : AppCompatActivity(),
         navMapper.navigate(nav)
     }
 
+    // CommitHost
+    override fun isReady(ready: Boolean) {
+        presenter.onReady(ready)
+    }
+
     companion object {
 
         // todo add parent id if in playlist fragment (called form main atm)
@@ -220,6 +227,4 @@ class ShareActivity : AppCompatActivity(),
                 }
             }
     }
-
-
 }

@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistItemEditFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
+import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -55,6 +56,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val doneNavigation: PlaylistItemEditContract.DoneNavigation by inject()// from activity (see onAttach)
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+    private val commitHost: CommitHost by inject()
 
     private lateinit var binding: PlaylistItemEditFragmentBinding
 
@@ -196,6 +198,22 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         observeDialog()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(this, saveCallback)
+        linkScopeToActivity()
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        /* init */ viewModel
+    }
+
     override fun onResume() {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
@@ -212,7 +230,13 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             object : Observer<PlaylistItemEditViewModel.UiEvent> {
                 override fun onChanged(model: PlaylistItemEditViewModel.UiEvent) {
                     when (model.type) {
-                        REFRESHING -> binding.pleSwipe.isRefreshing = model.data as Boolean
+                        REFRESHING -> {
+                            val refreshing = model.data as Boolean
+                            binding.pleSwipe.isRefreshing = refreshing
+                            if (refreshing) {
+                                commitHost.isReady(false)
+                            }
+                        }
                         ERROR -> snackbarWrapper.makeError(model.data as String).show()
                         UNPIN -> snackbarWrapper
                             .make("Unpin playlist?", actionText = "UNPIN", action = { viewModel.onUnPin() })
@@ -220,22 +244,6 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                     }
                 }
             })
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        requireActivity().onBackPressedDispatcher.addCallback(this, saveCallback)
-        linkScopeToActivity()
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        /* init */ viewModel
     }
 
     private fun observeModel() {
@@ -263,6 +271,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                     binding.pleToolbar.title = model.description.title
                     menuState.modelEmpty = model.empty
                     binding.pleSwipe.isRefreshing = false
+                    commitHost.isReady(!model.empty)
                     if (model.empty) {
                         return
                     }

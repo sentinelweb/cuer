@@ -5,6 +5,8 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
@@ -71,6 +73,7 @@ interface MainContract {
                 scoped<PlaylistItemEditContract.DoneNavigation> { getSource() }
                 // fragment interactions
                 scoped<PlaylistContract.Interactions?> { null }
+                scoped<CommitHost> { EmptyCommitHost() }
             }
         }
     }

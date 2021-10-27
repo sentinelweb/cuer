@@ -624,6 +624,7 @@ class PlaylistPresenter(
 
     override fun refreshPlaylist() {
         state.viewModelScope.launch {
+            view.showRefresh()
             try {
                 state.playlist
                     ?.takeIf { playlistUpdateOrchestrator.checkToUpdate(it) }

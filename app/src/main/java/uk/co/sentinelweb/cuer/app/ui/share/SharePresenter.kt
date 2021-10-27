@@ -53,14 +53,19 @@ class SharePresenter constructor(
         state.parentPlaylistId = longExtra
     }
 
-    private fun mapDisplayModel() {
+    override fun onReady(ready: Boolean) {
+        state.ready = ready
+        mapModel()
+    }
+
+    private fun mapModel() {
         (state.scanResult
             ?.also {
                 if ((it.type == MEDIA && (!it.isNew || it.isOnPlaylist)) || (it.type == PLAYLIST && !it.isNew))
                     view.warning(shareStrings.errorExists(it.type.toString().toLowerCase().capitalize()))
             }
-            ?.let { mapper.mapShareModel(it, ::finish) }
-            ?: mapper.mapEmptyState(::finish)) // todo fail result
+            ?.let { mapper.mapShareModel(state, ::finish) }
+            ?: mapper.mapEmptyModel(::finish)) // todo fail result
             .apply {
                 state.model = this
                 view.setData(this)
@@ -71,10 +76,10 @@ class SharePresenter constructor(
         log.e("cannot add url : $clipText")
         clipText?.apply {
             view.warning("Cannot add : ${this.take(100)}")
-            view.setData(mapper.mapEmptyState(::finish))
+            view.setData(mapper.mapEmptyModel(::finish))
         } ?: run {
             view.warning("Nothing to add ...")
-            view.setData(mapper.mapEmptyState(::finish))
+            view.setData(mapper.mapEmptyModel(::finish))
         }
     }
 
@@ -84,12 +89,12 @@ class SharePresenter constructor(
             MEDIA -> (result.result as MediaDomain).let {
                 val itemDomain = PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null)
                 view.showMedia(itemDomain, if (result.isNew) MEMORY else LOCAL, state.parentPlaylistId)
-                mapDisplayModel()
+                mapModel()
             }
             PLAYLIST -> (result.result as PlaylistDomain).let {
                 it.id?.let {
                     view.showPlaylist(it.toIdentifier(if (result.isNew) MEMORY else LOCAL), state.parentPlaylistId)
-                    mapDisplayModel()
+                    mapModel()
                 } ?: throw IllegalStateException("Playlist needs an id (isNew = MEMORY)")
             }
         }

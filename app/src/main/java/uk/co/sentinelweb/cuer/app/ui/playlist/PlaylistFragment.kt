@@ -25,6 +25,7 @@ import uk.co.sentinelweb.cuer.app.databinding.PlaylistFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -81,6 +82,7 @@ class PlaylistFragment :
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navMapper: NavigationMapper by inject()
     private val navigationProvider: NavigationProvider by inject()
+    private val commitHost: CommitHost by inject()
 
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
@@ -300,8 +302,8 @@ class PlaylistFragment :
 
     // region PlaylistContract.View
     override fun setModel(model: PlaylistContract.Model, animate: Boolean) {
+        commitHost.isReady(true)
         setHeaderModel(model)
-
         // update list
         model.items?.apply { setList(this, animate) }
     }
@@ -326,10 +328,12 @@ class PlaylistFragment :
     }
 
     override fun hideRefresh() {
+        commitHost.isReady(true)
         binding.playlistSwipe.isRefreshing = false
     }
 
     override fun showRefresh() {
+        commitHost.isReady(false)
         binding.playlistSwipe.isRefreshing = true
     }
 
