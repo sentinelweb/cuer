@@ -8,6 +8,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.EmptyNavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -31,6 +32,7 @@ interface ShareContract {
         fun afterItemEditNavigation()
         fun isAlreadyScanned(urlOrText: String): Boolean
         fun setPlaylistParent(longExtra: Long)
+        fun onReady(ready: Boolean)
     }
 
     interface View {
@@ -74,6 +76,7 @@ interface ShareContract {
         var model: Model? = null,
         var parentPlaylistId: Long? = null,
         var scanResult: ScanContract.Result? = null,
+        var ready: Boolean = false,
     ) : ViewModel()
 
     interface ShareStrings {
@@ -120,6 +123,7 @@ interface ShareContract {
                 scoped { navigationMapper(false, getSource()) }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<ShareStrings> { AndroidShareStrings(get()) }
+                scoped<CommitHost> { getSource() }
             }
         }
     }

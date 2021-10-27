@@ -165,8 +165,9 @@ class PlaylistItemEditViewModel constructor(
                         ?: also { updateError() }
                 } catch (e: Exception) {
                     log.e("Caught Exception updating media", e)
-                    _uiLiveData.value = UiEvent(REFRESHING, false)
                     _uiLiveData.value = UiEvent(ERROR, "Error ${e.message}")
+                } finally {
+                    _uiLiveData.value = UiEvent(REFRESHING, false)
                 }
             }
         }
