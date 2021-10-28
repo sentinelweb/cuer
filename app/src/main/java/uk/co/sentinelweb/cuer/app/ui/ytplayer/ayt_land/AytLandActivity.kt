@@ -12,10 +12,6 @@ import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
@@ -48,7 +44,6 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
-import kotlin.math.abs
 
 class AytLandActivity : AppCompatActivity(),
     AndroidScopeComponent {
@@ -89,8 +84,8 @@ class AytLandActivity : AppCompatActivity(),
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        mviView = MviViewImpl(binding.fullscreenPlayerVideo)
-        getLifecycle().addObserver(binding.fullscreenPlayerVideo)
+        mviView = MviViewImpl(aytViewHolder)
+//        getLifecycle().addObserver(binding.fullscreenPlayerVideo)
         controller.onViewCreated(listOf(mviView), lifecycle.asMviLifecycle())
         showHideUi.showElements = {
             log.d("showElements")
@@ -154,76 +149,12 @@ class AytLandActivity : AppCompatActivity(),
     }
 
     // region MVI view
-    inner class MviViewImpl(playerView: YouTubePlayerView) :
+    inner class MviViewImpl(aytViewHolder: AytViewHolder) :
         BaseMviView<Model, Event>(),
         PlayerContract.View {
-        private var player: YouTubePlayer? = null
-        private var lastPositionSec: Float = -1f
-        private var lastPositionSend: Float = -1f
 
         init {
-            playerView.addYouTubePlayerListener(object : YouTubePlayerListener {
-                override fun onApiChange(youTubePlayer: YouTubePlayer) = Unit
-
-                override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
-                    player = youTubePlayer
-                    lastPositionSec = second
-                    if (abs(lastPositionSend - second) > 1) {
-                        lastPositionSend = second
-                        dispatch(PositionReceived((second * 1000).toLong()))
-                    }
-                }
-
-                override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
-                    player = youTubePlayer
-                    dispatch(PlayerStateChanged(ERROR))
-                }
-
-                override fun onPlaybackQualityChange(youTubePlayer: YouTubePlayer, playbackQuality: PlayerConstants.PlaybackQuality) {
-                    player = youTubePlayer
-                }
-
-                override fun onPlaybackRateChange(youTubePlayer: YouTubePlayer, playbackRate: PlayerConstants.PlaybackRate) {
-                    player = youTubePlayer
-                }
-
-                override fun onReady(youTubePlayer: YouTubePlayer) {
-                    player = youTubePlayer
-                    log.d("onReady")
-                    dispatch(PlayerStateChanged(VIDEO_CUED))
-                }
-
-                override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
-                    player = youTubePlayer
-                    val playStateDomain = when (state) {
-                        PlayerConstants.PlayerState.ENDED -> ENDED
-                        PlayerConstants.PlayerState.PAUSED -> PAUSED
-                        PlayerConstants.PlayerState.PLAYING -> PLAYING
-                        PlayerConstants.PlayerState.BUFFERING -> BUFFERING
-                        PlayerConstants.PlayerState.UNSTARTED -> UNSTARTED
-                        PlayerConstants.PlayerState.UNKNOWN -> UNKNOWN
-                        PlayerConstants.PlayerState.VIDEO_CUED -> VIDEO_CUED
-                    }
-                    dispatch(PlayerStateChanged(playStateDomain))
-                    //updateMediaSessionManagerPlaybackState()// todo ??
-                }
-
-                override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
-                    player = youTubePlayer
-                    dispatch(DurationReceived((duration * 1000).toLong()))
-                }
-
-                override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
-                    player = youTubePlayer
-                    dispatch(IdReceived(videoId))
-                    //dispatch(PlayerStateChanged(VIDEO_CUED))
-                }
-
-                override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {
-                    player = youTubePlayer
-                }
-
-            })
+            aytViewHolder.addView(this@AytLandActivity, binding.playerContainer, this)
         }
 
         override val renderer: ViewRenderer<Model> = diff {
@@ -290,19 +221,7 @@ class AytLandActivity : AppCompatActivity(),
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
             when (label) {
                 is Command -> label.command.let { command ->
-                    log.d(command.toString())
-                    when (command) {
-                        is Load -> player?.loadVideo(command.platformId, command.startPosition / 1000f)
-                        is Play -> player?.play()
-                        is Pause -> player?.pause()
-                        is SkipBack -> player?.seekTo(lastPositionSec - command.ms / 1000f)
-                        is SkipFwd -> player?.seekTo(lastPositionSec + command.ms / 1000f)
-                        is SeekTo -> {
-                            log.d(command.toString())
-                            player?.seekTo(command.ms.toFloat() / 1000f)
-                        }
-                        else -> Unit
-                    }
+                    aytViewHolder.processCommand(command)
                 }
                 is LinkOpen ->
                     navMapper.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
@@ -311,6 +230,7 @@ class AytLandActivity : AppCompatActivity(),
                 is FullScreenPlayerOpen -> toast.show("Already in protrait mode - shouldnt get here")
                 is PipPlayerOpen -> toast.show("PIP Open")
                 is PortraitPlayerOpen -> label.also {
+                    aytViewHolder.switchView()
                     navMapper.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))
                     finish()
                 }

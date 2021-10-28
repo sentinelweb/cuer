@@ -95,7 +95,7 @@ object Modules {
         factory { DatePickerCreator() }
         factory { IconMapper() }
         factory { BackgroundMapper(get()) }
-        single { AytViewHolder() }
+        single { AytViewHolder(get()) }
     }
 
     private val utilModule = module {
