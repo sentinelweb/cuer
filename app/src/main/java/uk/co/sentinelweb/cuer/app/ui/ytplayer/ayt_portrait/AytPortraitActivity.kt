@@ -37,6 +37,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
@@ -65,6 +66,7 @@ class AytPortraitActivity : AppCompatActivity(),
     private val toast: ToastWrapper by inject()
     private val castListener: LocalPlayerCastListener by inject()
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder by inject()
+    private val aytViewHolder: AytViewHolder by inject()
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl
     private lateinit var binding: ActivityAytPortraitBinding

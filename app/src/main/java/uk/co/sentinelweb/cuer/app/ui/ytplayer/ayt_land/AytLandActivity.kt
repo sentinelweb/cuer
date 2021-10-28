@@ -32,6 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ShowHideUi
@@ -64,6 +65,7 @@ class AytLandActivity : AppCompatActivity(),
     private val res: ResourceWrapper by inject()
     private val castListener: LocalPlayerCastListener by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
+    private val aytViewHolder: AytViewHolder by inject()
 
     private lateinit var mviView: AytLandActivity.MviViewImpl
     private lateinit var binding: ActivityAytFullsreenBinding
@@ -203,6 +205,7 @@ class AytLandActivity : AppCompatActivity(),
                         PlayerConstants.PlayerState.VIDEO_CUED -> VIDEO_CUED
                     }
                     dispatch(PlayerStateChanged(playStateDomain))
+                    //updateMediaSessionManagerPlaybackState()// todo ??
                 }
 
                 override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
@@ -221,7 +224,6 @@ class AytLandActivity : AppCompatActivity(),
                 }
 
             })
-
         }
 
         override val renderer: ViewRenderer<Model> = diff {

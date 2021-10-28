@@ -32,6 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitContract
@@ -94,6 +95,7 @@ object Modules {
         factory { DatePickerCreator() }
         factory { IconMapper() }
         factory { BackgroundMapper(get()) }
+        single { AytViewHolder() }
     }
 
     private val utilModule = module {
