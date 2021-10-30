@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.service.cast
+package uk.co.sentinelweb.cuer.app.ui.ytplayer.floating
 
 import android.app.Service
 import android.content.Intent
@@ -8,15 +8,22 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.CuerAppState
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.InitFromService
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
-class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, AndroidScopeComponent {
+class FloatingPlayerService : Service(), FloatingPlayerContract.Service, AndroidScopeComponent {
 
     override val scope: Scope by serviceScopeWithSource()
-    private val controller: YoutubeCastServiceContract.Controller by scope.inject()
+    private val controller: FloatingPlayerContract.Controller by scope.inject()
+    private val playerController: PlayerController by inject()
+    private val playerMviViw: FloatingWindowMviView by inject()
+    private val windowManagement: FloatingWindowManagement by inject()
     private val toastWrapper: ToastWrapper by inject()
     private val notificationWrapper: NotificationWrapper by inject()
     private val appState: CuerAppState by inject()
@@ -29,7 +36,9 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
         log.d("Service created")
         appState.castNotificationChannelId = notificationWrapper.createChannelId(CHANNEL_ID, CHANNEL_NAME)
         controller.initialise()
-
+        windowManagement.makeWindowWithView()
+        playerController.onViewCreated(listOf(playerMviViw))
+        playerController.onStart()
     }
 
     override fun onDestroy() {
@@ -37,6 +46,10 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
         log.d("Service destroyed")
         controller.destroy()
         scope.close()
+        playerMviViw.cleanup()
+        playerController.onStop()
+        playerController.onViewDestroyed()
+        playerController.onDestroy()
         _instance = null
     }
 
@@ -45,6 +58,11 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
         // this routes media buttons to the MediaSessionCompat
         if (intent?.action == Intent.ACTION_MEDIA_BUTTON) {
             MediaButtonReceiver.handleIntent(appState.mediaSession, intent)
+        } else if (intent?.action == ACTION_INIT) {
+            intent
+                .getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
+                ?.let { deserialisePlaylistItem(it) }
+                ?.also { playerMviViw.dispatch(InitFromService(it)) }
         } else {
             controller.handleAction(intent?.action)
         }
@@ -53,11 +71,16 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
 
     override fun onBind(p0: Intent?): IBinder? = null
 
-    companion object {
-        private const val CHANNEL_ID: String = "cuer_yt_service"
-        private const val CHANNEL_NAME: String = "Cuer Youtube Service"
+    fun cleanup() {
 
-        private var _instance: YoutubeCastService? = null
-        fun instance(): YoutubeCastService? = _instance
+    }
+
+    companion object {
+        const val ACTION_INIT: String = "init"
+        private const val CHANNEL_ID: String = "cuer_floating_service"
+        private const val CHANNEL_NAME: String = "Cuer floating Service"
+
+        private var _instance: FloatingPlayerService? = null
+        fun instance(): FloatingPlayerService? = _instance
     }
 }

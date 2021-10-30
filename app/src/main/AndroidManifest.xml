@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:name="uk.co.sentinelweb.cuer.app.CuerApp"
@@ -128,7 +129,13 @@
         <service
             android:name="uk.co.sentinelweb.cuer.app.service.remote.RemoteService"
             android:exported="false" />
-
+        <service
+            android:name=".ui.ytplayer.floating.FloatingPlayerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </service>
         <!-- media button receiver -->
         <receiver android:name="androidx.media.session.MediaButtonReceiver">
             <intent-filter>

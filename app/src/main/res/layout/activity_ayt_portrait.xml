@@ -6,16 +6,6 @@
     android:layout_height="match_parent"
     >
 
-    <!-- todo replace with frame layout -->
-    <!--    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView-->
-    <!--        android:id="@+id/portrait_player_video"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        app:showFullScreenButton="false"-->
-    <!--        app:showVideoCurrentTime="false"-->
-    <!--        app:showVideoDuration="false"-->
-    <!--        />-->
     <FrameLayout
         android:id="@+id/player_container"
         android:layout_width="match_parent"

@@ -121,20 +121,30 @@ class PlayerStoreFactory(
                 is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().item!!))
                 is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().item!!))
                 is Intent.SeekToPosition -> publish(Label.Command(SeekTo(ms = intent.ms)))
+                is Intent.InitFromService -> {
+                    loadItem(intent.item)
+                    queueConsumer.playlist
+                        ?.also { dispatch(Result.Playlist(it)) }
+                    Unit
+                }
             }
 
         private suspend fun init() {
             withContext(coroutines.Computation) {
                 itemLoader.load()?.also { item ->
-                    item.playlistId
-                        ?.toIdentifier(LOCAL)
-                        ?.apply { livePlaybackController.clear(item.media.platformId) }
-                        ?.apply { queueProducer.playNow(this, item.id) }
-                    coroutines.mainScope.launch {
-                        mediaSessionManager.checkCreateMediaSession(playerControls)
-                    }
                     log.d("itemLoader.load(${item.media.title}))")
+                    loadItem(item)
                 }
+            }
+        }
+
+        private suspend fun loadItem(item: PlaylistItemDomain) {
+            item.playlistId
+                ?.toIdentifier(LOCAL)
+                ?.apply { livePlaybackController.clear(item.media.platformId) }
+                ?.apply { queueProducer.playNow(this, item.id) }
+            coroutines.mainScope.launch {
+                mediaSessionManager.checkCreateMediaSession(playerControls)
             }
         }
 

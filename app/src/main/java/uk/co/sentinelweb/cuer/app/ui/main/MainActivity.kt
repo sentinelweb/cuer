@@ -86,6 +86,10 @@ class MainActivity :
             )
         }
         //intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
+
+        // todo save last tab
+        // todo for testing player
+        navController.navigate(R.id.navigation_playlist)
         presenter.initialise()
     }
 

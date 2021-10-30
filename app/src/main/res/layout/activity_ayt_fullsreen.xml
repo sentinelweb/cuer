@@ -16,15 +16,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         >
-        <!-- todo replace with frame layout -->
-        <!--        <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView-->
-        <!--            android:id="@+id/fullscreen_player_video"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="match_parent"-->
-        <!--            app:showFullScreenButton="false"-->
-        <!--            app:showVideoCurrentTime="false"-->
-        <!--            app:showVideoDuration="false"-->
-        <!--            />-->
         <FrameLayout
             android:id="@+id/player_container"
             android:layout_width="match_parent"

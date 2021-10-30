@@ -26,6 +26,7 @@ interface PlayerContract {
             object FullScreenPlayerOpen : Intent()
             object PortraitPlayerOpen : Intent()
             object PipPlayerOpen : Intent()
+            data class InitFromService(val item: PlaylistItemDomain) : Intent()
             data class PlayPause(val isPlaying: Boolean?) : Intent()
             data class Position(val ms: Long) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
@@ -115,6 +116,7 @@ interface PlayerContract {
             data class LinkClick(val url: String) : Event()
             data class DurationReceived(val ms: Long) : Event()
             data class IdReceived(val videoId: String) : Event()
+            data class InitFromService(val item: PlaylistItemDomain) : Event()
         }
     }
 

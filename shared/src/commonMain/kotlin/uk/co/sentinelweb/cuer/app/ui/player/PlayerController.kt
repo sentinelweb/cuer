@@ -77,6 +77,7 @@ class PlayerController constructor(
             is FullScreenClick -> FullScreenPlayerOpen
             is PortraitClick -> PortraitPlayerOpen
             is PipClick -> PipPlayerOpen
+            is PlayerContract.View.Event.InitFromService -> PlayerContract.MviStore.Intent.InitFromService(item)
         }
     }
 

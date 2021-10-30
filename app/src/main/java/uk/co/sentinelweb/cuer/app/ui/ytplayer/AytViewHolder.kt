@@ -1,9 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
-import androidx.appcompat.app.AppCompatActivity
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -34,13 +34,13 @@ class AytViewHolder(
 
     private var _isSwitching: Boolean = false
 
-    fun create(activity: AppCompatActivity) {
-        _playerView = LayoutInflater.from(activity).inflate(R.layout.view_ayt_video, null) as YouTubePlayerView
+    fun create(context: Context) {
+        _playerView = LayoutInflater.from(context).inflate(R.layout.view_ayt_video, null) as YouTubePlayerView
         addPlayerListener()
     }
 
-    fun addView(activity: AppCompatActivity, parent: FrameLayout, mviView: BaseMviView<Model, Event>) {
-        if (_playerView == null) create(activity)
+    fun addView(context: Context, parent: FrameLayout, mviView: BaseMviView<Model, Event>) {
+        if (_playerView == null) create(context)
         _mviView = mviView
         parent.addView(_playerView, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
     }
