@@ -368,7 +368,7 @@ class PlaylistItemEditViewModel constructor(
             state.isSaved = true
         } catch (e: Exception) {
             log.e("Error saving playlistItem", e)
-            throw IllegalStateException("Save failed")
+            throw IllegalStateException("Save failed", e)
         }
 
     fun onLaunchVideo() {

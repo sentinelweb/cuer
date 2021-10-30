@@ -56,7 +56,7 @@ class PlaylistsPresenter(
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val searchMapper: SearchMapper,
     private val merge: PlaylistMergeOrchestrator,
-    private val shareWrapper: ShareWrapper
+    private val shareWrapper: ShareWrapper,
 ) : PlaylistsContract.Presenter {
 
     init {
@@ -99,7 +99,7 @@ class PlaylistsPresenter(
                             PlaylistsDialogContract.Config(
                                 selectedPlaylists = setOf(),
                                 multi = true,
-                                itemClick = { p, _ -> setParent(p!!, delPlaylist) },
+                                itemClick = { p, _ -> p?.apply { setParent(this, delPlaylist) } },
                                 confirm = { },
                                 dismiss = { showCurrentNode() },
                                 suggestionsMedia = null,
@@ -329,7 +329,7 @@ class PlaylistsPresenter(
     }
 
     private fun mapModel(
-        it: Map<PlaylistDomain, PlaylistStatDomain?>
+        it: Map<PlaylistDomain, PlaylistStatDomain?>,
     ) = modelMapper.map(
         it,
         queue.playlistId,
