@@ -14,8 +14,8 @@ class FloatingWindowManagement(
     private val res: ResourceWrapper,
 ) {
     private var _binding: WindowAytFloatBinding? = null
-    private var floatWindowLayoutParam: WindowManager.LayoutParams? = null
-    private var windowManager: WindowManager? = null
+    private var _floatWindowLayoutParam: WindowManager.LayoutParams? = null
+    private var _windowManager: WindowManager? = null
 
     val binding: WindowAytFloatBinding?
         get() = _binding
@@ -29,7 +29,7 @@ class FloatingWindowManagement(
 
         //To obtain a WindowManager of a different Display,
         //we need a Context for that display, so WINDOW_SERVICE is used
-        windowManager = service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        _windowManager = service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
         val layoutInflater = service.baseContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         _binding = WindowAytFloatBinding.inflate(layoutInflater)
@@ -44,7 +44,7 @@ class FloatingWindowManagement(
         // 5) Next parameter is Layout_Format. System chooses a format that supports translucency by PixelFormat.TRANSLUCENT
         val width = (displayWidth * 0.55f).toInt()
         val height = (width * 3f / 4).toInt()
-        floatWindowLayoutParam = WindowManager.LayoutParams(
+        _floatWindowLayoutParam = WindowManager.LayoutParams(
             width,
             height,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
@@ -59,14 +59,14 @@ class FloatingWindowManagement(
 
         // The ViewGroup that inflates the floating_layout.xml is
         // added to the WindowManager with all the parameters
-        windowManager?.addView(_binding!!.root, floatWindowLayoutParam)
+        _windowManager?.addView(_binding!!.root, _floatWindowLayoutParam)
 
         addTouchListener()
     }
 
     private fun addTouchListener() {
         _binding?.playerContainer?.setOnTouchListener(object : OnTouchListener {
-            val floatWindowLayoutUpdateParam = floatWindowLayoutParam!!
+            val floatWindowLayoutUpdateParam = _floatWindowLayoutParam!!
             var x = 0.0
             var y = 0.0
             var px = 0.0
@@ -83,7 +83,7 @@ class FloatingWindowManagement(
                         floatWindowLayoutUpdateParam.x = (x + event.rawX - px).toInt()
                         floatWindowLayoutUpdateParam.y = (y + event.rawY - py).toInt()
 
-                        windowManager!!.updateViewLayout(_binding?.root, floatWindowLayoutUpdateParam)
+                        _windowManager!!.updateViewLayout(_binding?.root, floatWindowLayoutUpdateParam)
                     }
                 }
                 return true
@@ -91,5 +91,7 @@ class FloatingWindowManagement(
         })
     }
 
-
+    fun cleanup() {
+        _windowManager?.removeView(_binding!!.root)
+    }
 }

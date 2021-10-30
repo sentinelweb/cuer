@@ -96,8 +96,8 @@ class PlayerStoreFactory(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-                is Intent.Play -> dispatch(Result.State(PLAYING))
-                is Intent.Pause -> dispatch(Result.State(PAUSED))
+//                is Intent.Play -> dispatch(Result.State(PLAYING))
+//                is Intent.Pause -> dispatch(Result.State(PAUSED))
                 is Intent.PlayState -> playStateChange(intent.state, getState().item)
                 is Intent.TrackChange -> trackChange(intent)
                 is Intent.PlaylistChange -> dispatch(Result.Playlist(intent.item))

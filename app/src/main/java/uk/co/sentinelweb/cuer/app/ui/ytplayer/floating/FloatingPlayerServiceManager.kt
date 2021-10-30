@@ -18,7 +18,7 @@ class FloatingPlayerServiceManager(
             overlayPermission.requestOverlayDisplayPermission(a)
         } else {
             if (!isRunning()) {
-                //app.startForegroundService(startIntent(load))
+//                app.startForegroundService(startIntent(load))
                 app.startService(startIntent(load))
                 return true
             }

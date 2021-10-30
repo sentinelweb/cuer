@@ -8,22 +8,15 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.CuerAppState
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.InitFromService
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
 class FloatingPlayerService : Service(), FloatingPlayerContract.Service, AndroidScopeComponent {
 
     override val scope: Scope by serviceScopeWithSource()
     private val controller: FloatingPlayerContract.Controller by scope.inject()
-    private val playerController: PlayerController by inject()
-    private val playerMviViw: FloatingWindowMviView by inject()
-    private val windowManagement: FloatingWindowManagement by inject()
     private val toastWrapper: ToastWrapper by inject()
     private val notificationWrapper: NotificationWrapper by inject()
     private val appState: CuerAppState by inject()
@@ -36,9 +29,6 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         log.d("Service created")
         appState.castNotificationChannelId = notificationWrapper.createChannelId(CHANNEL_ID, CHANNEL_NAME)
         controller.initialise()
-        windowManagement.makeWindowWithView()
-        playerController.onViewCreated(listOf(playerMviViw))
-        playerController.onStart()
     }
 
     override fun onDestroy() {
@@ -46,10 +36,6 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         log.d("Service destroyed")
         controller.destroy()
         scope.close()
-        playerMviViw.cleanup()
-        playerController.onStop()
-        playerController.onViewDestroyed()
-        playerController.onDestroy()
         _instance = null
     }
 
@@ -58,13 +44,8 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         // this routes media buttons to the MediaSessionCompat
         if (intent?.action == Intent.ACTION_MEDIA_BUTTON) {
             MediaButtonReceiver.handleIntent(appState.mediaSession, intent)
-        } else if (intent?.action == ACTION_INIT) {
-            intent
-                .getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
-                ?.let { deserialisePlaylistItem(it) }
-                ?.also { playerMviViw.dispatch(InitFromService(it)) }
         } else {
-            controller.handleAction(intent?.action)
+            intent?.apply { controller.handleAction(intent) }
         }
         return START_NOT_STICKY
     }

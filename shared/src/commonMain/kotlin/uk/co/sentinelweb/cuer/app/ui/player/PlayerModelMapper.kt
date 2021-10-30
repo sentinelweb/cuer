@@ -37,7 +37,8 @@ class PlayerModelMapper constructor(
                         item.media.duration?.let { pos.toFloat() / it }
                     } ?: 0f
                 ),
-                screen = screen
+                screen = screen,
+                playlistItem = state.item
             )
         }
 

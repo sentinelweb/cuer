@@ -12,9 +12,9 @@ interface PlayerContract {
 
     interface MviStore : Store<Intent, State, Label> {
         sealed class Intent {
-            object Play : Intent()
-            object Pause : Intent()
-            object SkipFwd : Intent()
+//            object Play : Intent()
+//            object Pause : Intent()
+object SkipFwd : Intent()
             object SkipBack : Intent()
             object TrackFwd : Intent()
             object TrackBack : Intent()
@@ -72,7 +72,8 @@ interface PlayerContract {
             val times: Times,
             val itemImage: String?,
             val description: DescriptionModel,
-            val screen: Screen
+            val screen: Screen,
+            val playlistItem: PlaylistItemDomain?,
         ) {
             data class Texts(
                 val title: String?,
@@ -93,8 +94,8 @@ interface PlayerContract {
         }
 
         sealed class Event {
-            object PlayClicked : Event()
-            object PauseClicked : Event()
+            //            object PlayClicked : Event()
+//            object PauseClicked : Event()
             object TrackFwdClicked : Event()
             object TrackBackClicked : Event()
             object SkipFwdClicked : Event()
