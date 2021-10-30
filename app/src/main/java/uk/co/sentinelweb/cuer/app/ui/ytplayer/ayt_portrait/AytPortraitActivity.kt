@@ -82,6 +82,7 @@ class AytPortraitActivity : AppCompatActivity(),
     override fun onDestroy() {
         super.onDestroy()
         castListener.release()
+        aytViewHolder.cleanupIfNotSwitching()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {

@@ -144,7 +144,6 @@ class MainActivity :
         presenter.onStart()
         //checkIntent(intent)
         checkForPendingNavigation(null)?.apply { navMapper.navigate(this) }
-        aytViewHolder.cleanupIfNotSwitching()
     }
 
     override fun onStop() {

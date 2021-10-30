@@ -32,17 +32,7 @@ class AytViewHolder(
     private var _lastPositionSend: Float = -1f
     private var _currentVideoId: String? = null
 
-    //private var isSwitching = false
-
-    val isHolding: Boolean
-        get() = _playerView != null
-
-    val view: YouTubePlayerView?
-        get() = _playerView
-
-    fun release() {
-        _playerView = null
-    }
+    private var _isSwitching: Boolean = false
 
     fun create(activity: AppCompatActivity) {
         _playerView = LayoutInflater.from(activity).inflate(R.layout.view_ayt_video, null) as YouTubePlayerView
@@ -50,33 +40,31 @@ class AytViewHolder(
     }
 
     fun addView(activity: AppCompatActivity, parent: FrameLayout, mviView: BaseMviView<Model, Event>) {
-        //isSwitching = false
         if (_playerView == null) create(activity)
         _mviView = mviView
         parent.addView(_playerView, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
-        //log.d("addView: $isSwitching")
     }
 
     fun switchView() {
-        //isSwitching = true
-        // todo block double tap
-        (_playerView?.parent as FrameLayout?)?.removeView(_playerView)
-        _mviView = null
-        //log.d("switchView: $isSwitching")
+        if (!_isSwitching) {
+            (_playerView?.parent as FrameLayout?)?.removeView(_playerView)
+            _mviView = null
+            _isSwitching = true
+        }
     }
 
     fun cleanupIfNotSwitching() {
-        //log.d("cleanupIfNotSwitching: $isSwitching")
-        //if (!isSwitching) {
-        _playerView?.release()
-        _playerView = null
-        _mviView = null
-//        _player.removeListener() //?
-        _player = null
-        _currentVideoId = null
-        _lastPositionSec = -1f
-        _lastPositionSend = -1f
-        // }
+        if (!_isSwitching) {
+            log.d("cleanup player")
+            _playerView?.release()
+            _playerView = null
+            _mviView = null
+            _player = null
+            _currentVideoId = null
+            _lastPositionSec = -1f
+            _lastPositionSend = -1f
+        }
+        _isSwitching = false
     }
 
     private fun addPlayerListener() {

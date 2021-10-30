@@ -79,6 +79,7 @@ class AytLandActivity : AppCompatActivity(),
 
     override fun onDestroy() {
         castListener.release()
+        aytViewHolder.cleanupIfNotSwitching()
         super.onDestroy()
     }
 
@@ -158,22 +159,6 @@ class AytLandActivity : AppCompatActivity(),
         }
 
         override val renderer: ViewRenderer<Model> = diff {
-//            diff(get = Model::description, set = {
-//                log.d("set description")
-//                binding.portraitPlayerDescription.setModel(it)
-//            })
-//            diff(get = Model::screen, set = {
-//                when (it) {
-//                    DESCRIPTION -> {
-//                        binding.portraitPlayerDescription.isVisible = true
-//                        binding.portraitPlayerPlaylist.isVisible = false
-//                    }
-//                    PLAYLIST -> {
-//                        binding.portraitPlayerDescription.isVisible = false
-//                        binding.portraitPlayerPlaylist.isVisible = true
-//                    }
-//                }
-//            })
             diff(get = Model::playState, set = {
                 when (it) {
                     BUFFERING -> binding.controls.controlsPlayFab.showProgress(true)
