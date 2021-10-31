@@ -153,7 +153,7 @@ class PlayerStoreFactory(
         }
 
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {
-            publish(Label.Command(if (intent.isPlaying ?: playerState == PLAYING) Pause else Play))
+            publish(Label.Command(if (intent.isPlaying ?: (playerState == PLAYING)) Pause else Play))
         }
 
         private fun seekTo(fraction: Float, item: PlaylistItemDomain?) {
