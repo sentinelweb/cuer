@@ -6,14 +6,19 @@ import android.graphics.PixelFormat
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.View.OnTouchListener
+import androidx.core.view.isVisible
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.WindowAytFloatBinding
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
+import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
+import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.FLOATING_PLAYER_RECT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import kotlin.math.max
 
 class FloatingWindowManagement(
     private val service: Service,
@@ -50,7 +55,6 @@ class FloatingWindowManagement(
         // problem with this flag is key inputs can't be given to the EditText.
         // This problem is solved later.
         // 5) Next parameter is Layout_Format. System chooses a format that supports translucency by PixelFormat.TRANSLUCENT
-        prefs.remove(FLOATING_PLAYER_RECT)
         _floatWindowLayoutParam = loadWindowParams() ?: defaultWindowParams(displayWidth, displayHeight)
 
         // The ViewGroup that inflates the floating_layout.xml is
@@ -113,6 +117,7 @@ class FloatingWindowManagement(
             var h = 0.0
             var sx = 0.0
             var sy = 0.0
+            var minSize = res.getDimensionPixelSize(R.dimen.min_floating_window_size).toDouble()
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
@@ -122,8 +127,8 @@ class FloatingWindowManagement(
                         sy = event.rawY.toDouble()
                     }
                     MotionEvent.ACTION_MOVE -> {
-                        floatWindowLayoutUpdateParam.width = (w + event.rawX - sx).toInt()
-                        floatWindowLayoutUpdateParam.height = (h - (event.rawY - sy)).toInt()
+                        floatWindowLayoutUpdateParam.width = max(w + (event.rawX - sx), minSize).toInt()
+                        floatWindowLayoutUpdateParam.height = max(h - (event.rawY - sy), minSize).toInt()
 
                         _windowManager!!.updateViewLayout(_binding?.root, floatWindowLayoutUpdateParam)
                     }

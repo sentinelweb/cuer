@@ -8,4 +8,5 @@
     app:showFullScreenButton="false"
     app:showVideoCurrentTime="false"
     app:showVideoDuration="false"
+    app:showYouTubeButton="false"
     />
