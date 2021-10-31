@@ -56,6 +56,7 @@ class PlayerController constructor(
             is PortraitClick -> PortraitPlayerOpen
             is PipClick -> PipPlayerOpen
             is PlayerContract.View.Event.InitFromService -> PlayerContract.MviStore.Intent.InitFromService(item)
+            is PlayerContract.View.Event.PlayItemFromService -> PlayerContract.MviStore.Intent.PlayItemFromService(item)
         }
     }
 

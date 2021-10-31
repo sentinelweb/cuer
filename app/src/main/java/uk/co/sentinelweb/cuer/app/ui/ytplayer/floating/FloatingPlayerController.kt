@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService.Companion.ACTION_INIT
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService.Companion.ACTION_PLAY_ITEM
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
@@ -32,7 +33,7 @@ class FloatingPlayerController constructor(
     override fun initialise() {
         windowManagement.makeWindowWithView()
         windowManagement.callbacks = object : FloatingWindowManagement.Callbacks {
-            override fun onClose() = destroy()
+            override fun onClose() = service.stopSelf()
         }
         playerMviViw.init()
         playerController.onViewCreated(listOf(playerMviViw))
@@ -62,6 +63,12 @@ class FloatingPlayerController constructor(
                     ?.let { deserialisePlaylistItem(it) }
                     ?.also { playerMviViw.dispatch(PlayerContract.View.Event.InitFromService(it)) }
             }
+            ACTION_PLAY_ITEM -> {
+                intent
+                    .getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
+                    ?.let { deserialisePlaylistItem(it) }
+                    ?.also { playerMviViw.dispatch(PlayerContract.View.Event.InitFromService(it)) }
+            }
             ACTION_SKIPF ->
                 playerMviViw.dispatch(PlayerContract.View.Event.SkipFwdClicked)
             ACTION_SKIPB ->
@@ -75,7 +82,6 @@ class FloatingPlayerController constructor(
             ACTION_TRACKF ->
                 playerMviViw.dispatch(PlayerContract.View.Event.TrackFwdClicked)
             else -> {
-                //notification.handleAction(intent.action)
                 log.d("intent.action = ${intent.action}")
             }
         }

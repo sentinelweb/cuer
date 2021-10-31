@@ -58,6 +58,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
 
     companion object {
         const val ACTION_INIT: String = "init"
+        const val ACTION_PLAY_ITEM: String = "playitem"
         private const val CHANNEL_ID: String = "cuer_floating_service"
         private const val CHANNEL_NAME: String = "Cuer floating Service"
 

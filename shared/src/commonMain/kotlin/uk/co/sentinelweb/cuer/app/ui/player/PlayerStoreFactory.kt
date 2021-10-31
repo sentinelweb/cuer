@@ -132,6 +132,12 @@ class PlayerStoreFactory(
                         ?.also { dispatch(Result.Playlist(it)) }
                     Unit
                 }
+                is Intent.PlayItemFromService -> {
+                    loadItem(intent.item)
+                    queueConsumer.playlist
+                        ?.also { dispatch(Result.Playlist(it)) }
+                    Unit
+                }
             }
 
         private suspend fun init() {

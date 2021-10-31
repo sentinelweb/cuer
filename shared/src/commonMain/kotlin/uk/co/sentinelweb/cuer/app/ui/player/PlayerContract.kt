@@ -12,9 +12,9 @@ interface PlayerContract {
 
     interface MviStore : Store<Intent, State, Label> {
         sealed class Intent {
-//            object Play : Intent()
+            //            object Play : Intent()
 //            object Pause : Intent()
-object SkipFwd : Intent()
+            object SkipFwd : Intent()
             object SkipBack : Intent()
             object TrackFwd : Intent()
             object TrackBack : Intent()
@@ -27,6 +27,7 @@ object SkipFwd : Intent()
             object PortraitPlayerOpen : Intent()
             object PipPlayerOpen : Intent()
             data class InitFromService(val item: PlaylistItemDomain) : Intent()
+            data class PlayItemFromService(val item: PlaylistItemDomain) : Intent()
             data class PlayPause(val isPlaying: Boolean?) : Intent()
             data class Position(val ms: Long) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
@@ -58,7 +59,7 @@ object SkipFwd : Intent()
             val skipFwdText: String = "-",
             val skipBackText: String = "-",
             val screen: Screen = Screen.DESCRIPTION,
-            val position: Long = -1
+            val position: Long = -1,
         )
     }
 
@@ -89,7 +90,7 @@ object SkipFwd : Intent()
                 val positionText: String,
                 val durationText: String,
                 val isLive: Boolean,
-                val seekBarFraction: Float
+                val seekBarFraction: Float,
             )
         }
 
@@ -118,6 +119,7 @@ object SkipFwd : Intent()
             data class DurationReceived(val ms: Long) : Event()
             data class IdReceived(val videoId: String) : Event()
             data class InitFromService(val item: PlaylistItemDomain) : Event()
+            data class PlayItemFromService(val item: PlaylistItemDomain) : Event()
         }
     }
 

@@ -193,7 +193,8 @@ interface PlaylistContract {
                         playlistMediaLookupOrchestrator = get(),
                         playlistUpdateOrchestrator = get(),
                         playlistOrDefaultOrchestrator = get(),
-                        dbInit = get()
+                        dbInit = get(),
+                        floatingService = get()
                     )
                 }
                 scoped { get<Presenter>() as External }

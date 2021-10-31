@@ -36,9 +36,16 @@ class FloatingPlayerServiceManager(
 
     fun isRunning(): Boolean = FloatingPlayerService.instance() != null
 
+    fun playItem(item: PlaylistItemDomain) = app.startService(playIntent(item))
+
     private fun startIntent(load: PlaylistItemDomain) =
         Intent(app, FloatingPlayerService::class.java)
             .setAction(FloatingPlayerService.ACTION_INIT)
+            .putExtra(PLAYLIST_ITEM.toString(), load.serialise())
+
+    private fun playIntent(load: PlaylistItemDomain) =
+        Intent(app, FloatingPlayerService::class.java)
+            .setAction(FloatingPlayerService.ACTION_PLAY_ITEM)
             .putExtra(PLAYLIST_ITEM.toString(), load.serialise())
 
     private fun stopIntent() = Intent(app, FloatingPlayerService::class.java)
