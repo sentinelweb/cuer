@@ -3,8 +3,6 @@ package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.MotionEvent
-import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -32,6 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ShowHideUi
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
@@ -60,6 +59,7 @@ class AytLandActivity : AppCompatActivity(),
     private val res: ResourceWrapper by inject()
     private val castListener: LocalPlayerCastListener by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
+    private val floatingService: FloatingPlayerServiceManager by inject()
     private val aytViewHolder: AytViewHolder by inject()
 
     private lateinit var mviView: AytLandActivity.MviViewImpl
@@ -97,6 +97,16 @@ class AytLandActivity : AppCompatActivity(),
             log.d("hideElements")
             binding.controls.root.fadeOut()
         }
+        binding.fullscreenVideoWrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
+            override fun touched() {
+                log.d("fullscreenVideoWrapper -  touched visible:${binding.controls.root.isVisible}")
+                if (!binding.controls.root.isVisible) {
+                    showHideUi.showUiIfNotVisible()
+                }
+            }
+        }
+        showHideUi.hide()
+
         binding.controls.controlsTrackNext.setOnClickListener { mviView.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
         binding.controls.controlsTrackLast.setOnClickListener { mviView.dispatch(TrackBackClicked);showHideUi.delayedHide() }
         binding.controls.controlsSeekBack.setOnClickListener {
@@ -125,26 +135,17 @@ class AytLandActivity : AppCompatActivity(),
             }
         })
 
-
-        binding.fullscreenVideoWrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
-            override fun touched() {
-                log.d("fullscreenVideoWrapper -  touched visible:${binding.controls.root.isVisible}")
-                if (!binding.controls.root.isVisible) {
-                    showHideUi.showUiIfNotVisible()
-                }
-            }
-        }
-        binding.controls.root.setOnTouchListener(object : View.OnTouchListener {
-            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                log.d("binding.controls.root.onTouch")
-                return false
-            }
-
-        })
+//
+//        binding.controls.root.setOnTouchListener(object : View.OnTouchListener {
+//            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+//                log.d("binding.controls.root.onTouch")
+//                return false
+//            }
+//
+//        })
 
         chromeCastWrapper.initMediaRouteButton(binding.controls.controlsMediaRouteButton)
         // defaults
-        showHideUi.hide()
         binding.controls.controlsPlayFab.isVisible = false
         binding.controls.controlsSeek.isVisible = false
     }
@@ -213,7 +214,16 @@ class AytLandActivity : AppCompatActivity(),
                 is ChannelOpen ->
                     label.channel.platformId?.let { id -> navMapper.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
                 is FullScreenPlayerOpen -> toast.show("Already in protrait mode - shouldnt get here")
-                is PipPlayerOpen -> toast.show("PIP Open")
+                is PipPlayerOpen -> {
+                    val hasPermission = floatingService.hasPermission(this@AytLandActivity)
+                    if (hasPermission) {
+                        aytViewHolder.switchView()
+                    }
+                    floatingService.start(this@AytLandActivity, label.item)
+                    if (hasPermission) {
+                        finishAffinity()
+                    }
+                }
                 is PortraitPlayerOpen -> label.also {
                     aytViewHolder.switchView()
                     navMapper.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))

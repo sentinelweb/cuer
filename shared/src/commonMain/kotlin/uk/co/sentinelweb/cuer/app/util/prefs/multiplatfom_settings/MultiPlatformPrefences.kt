@@ -7,7 +7,8 @@ enum class MultiPlatformPrefences constructor(
     override val fname: String,
 ) : Field {
     BROWSE_CAT_TITLE("brosweNodeId"),
-    BROWSE_RECENT_TITLES("brosweRecent")
+    BROWSE_RECENT_TITLES("brosweRecent"),
+    FLOATING_PLAYER_RECT("floatingPlayerRect")
 }
 
 interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPrefences>

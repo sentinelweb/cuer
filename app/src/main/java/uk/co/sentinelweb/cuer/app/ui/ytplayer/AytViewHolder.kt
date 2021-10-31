@@ -1,14 +1,15 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
-import androidx.appcompat.app.AppCompatActivity
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.ui.utils.FadeViewHelper
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
@@ -34,13 +35,15 @@ class AytViewHolder(
 
     private var _isSwitching: Boolean = false
 
-    fun create(activity: AppCompatActivity) {
-        _playerView = LayoutInflater.from(activity).inflate(R.layout.view_ayt_video, null) as YouTubePlayerView
+    private var _fadeViewHelper: FadeViewHelper? = null
+
+    fun create(context: Context) {
+        _playerView = LayoutInflater.from(context).inflate(R.layout.view_ayt_video, null) as YouTubePlayerView
         addPlayerListener()
     }
 
-    fun addView(activity: AppCompatActivity, parent: FrameLayout, mviView: BaseMviView<Model, Event>) {
-        if (_playerView == null) create(activity)
+    fun addView(context: Context, parent: FrameLayout, mviView: BaseMviView<Model, Event>) {
+        if (_playerView == null) create(context)
         _mviView = mviView
         parent.addView(_playerView, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
     }
@@ -49,6 +52,7 @@ class AytViewHolder(
         if (!_isSwitching) {
             (_playerView?.parent as FrameLayout?)?.removeView(_playerView)
             _mviView = null
+            _fadeViewHelper?.apply { _player?.removeListener(this) }
             _isSwitching = true
         }
     }
@@ -60,6 +64,7 @@ class AytViewHolder(
             _playerView = null
             _mviView = null
             _player = null
+            _fadeViewHelper?.apply { _player?.removeListener(this) }
             _currentVideoId = null
             _lastPositionSec = -1f
             _lastPositionSend = -1f
@@ -69,6 +74,12 @@ class AytViewHolder(
 
     private fun addPlayerListener() {
         _playerView?.addYouTubePlayerListener(object : YouTubePlayerListener {
+            override fun onReady(youTubePlayer: YouTubePlayer) {
+                _player = youTubePlayer
+                log.d("onReady")
+                _mviView?.dispatch(Event.PlayerStateChanged(PlayerStateDomain.VIDEO_CUED))
+            }
+
             override fun onApiChange(youTubePlayer: YouTubePlayer) = Unit
 
             override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
@@ -91,12 +102,6 @@ class AytViewHolder(
 
             override fun onPlaybackRateChange(youTubePlayer: YouTubePlayer, playbackRate: PlayerConstants.PlaybackRate) {
                 _player = youTubePlayer
-            }
-
-            override fun onReady(youTubePlayer: YouTubePlayer) {
-                _player = youTubePlayer
-                log.d("onReady")
-                _mviView?.dispatch(Event.PlayerStateChanged(PlayerStateDomain.VIDEO_CUED))
             }
 
             override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
@@ -148,7 +153,10 @@ class AytViewHolder(
             is PlayerContract.PlayerCommand.Pause -> _player?.pause()
             is PlayerContract.PlayerCommand.SkipBack -> _player?.seekTo(_lastPositionSec - command.ms / 1000f)
             is PlayerContract.PlayerCommand.SkipFwd -> _player?.seekTo(_lastPositionSec + command.ms / 1000f)
-            is PlayerContract.PlayerCommand.SeekTo -> _player?.seekTo(command.ms.toFloat() / 1000f)
+            is PlayerContract.PlayerCommand.SeekTo -> {
+                log.d("seekTo:${command.ms}")
+                _player?.seekTo(command.ms.toFloat() / 1000f)
+            }
 
             else -> Unit
         }

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait
 
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
@@ -18,6 +19,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerListener
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
@@ -26,27 +29,38 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 interface AytPortraitContract {
     companion object {
 
+        @ExperimentalCoroutinesApi
         @JvmStatic
         val activityModule = module {
             scope(named<AytPortraitActivity>()) {
                 scoped {
                     PlayerController(
-                        itemLoader = get(),
-//                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        storeFactory = DefaultStoreFactory,
                         queueConsumer = get(),
-                        queueProducer = get(),
                         modelMapper = get(),
                         coroutines = get(),
                         lifecycle = getSource<AytPortraitActivity>().lifecycle.asMviLifecycle(),
-                        skip = get(),
                         log = get(),
-                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
-                        mediaSessionManager = get()
+                        playControls = PlayerListener(get(), get()),
+                        store = get()
                     )
                 }
+                scoped {
+                    PlayerStoreFactory(
+                        // storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+                        storeFactory = DefaultStoreFactory,
+                        itemLoader = get(),
+                        queueConsumer = get(),
+                        queueProducer = get(),
+                        skip = get(),
+                        coroutines = get(),
+                        log = get(),
+                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
+                        mediaSessionManager = get(),
+                        playerControls = get(),
+                    ).create()
+                }
+                scoped { PlayerListener(get(), get()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
-
                 scoped {
                     (getSource<AytPortraitActivity>()
                         .supportFragmentManager

@@ -34,7 +34,7 @@ class PlayerStoreFactory(
     private val log: LogWrapper,
     private val livePlaybackController: LivePlaybackContract.Controller,
     private val mediaSessionManager: MediaSessionContract.Manager,
-    private val playerControls: PlayerContract.PlayerControls.Listener,
+    private val playerControls: PlayerListener,
 
     ) {
 
@@ -96,8 +96,8 @@ class PlayerStoreFactory(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-                is Intent.Play -> dispatch(Result.State(PLAYING))
-                is Intent.Pause -> dispatch(Result.State(PAUSED))
+//                is Intent.Play -> dispatch(Result.State(PLAYING))
+//                is Intent.Pause -> dispatch(Result.State(PAUSED))
                 is Intent.PlayState -> playStateChange(intent.state, getState().item)
                 is Intent.TrackChange -> trackChange(intent)
                 is Intent.PlaylistChange -> dispatch(Result.Playlist(intent.item))
@@ -105,7 +105,7 @@ class PlayerStoreFactory(
                 is Intent.TrackBack -> queueConsumer.previousItem()
                 is Intent.SkipBack -> skip.skipBack()
                 is Intent.SkipFwd -> skip.skipFwd()
-                is Intent.Position -> updatePosition(intent.ms, getState().item)
+                is Intent.Position -> updatePosition(intent.ms, getState().item, getState().playerState)
                 is Intent.SkipFwdSelect -> skip.onSelectSkipTime(true)
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> playPause(intent, getState().playerState)
@@ -113,28 +113,49 @@ class PlayerStoreFactory(
                 is Intent.PlaylistView -> dispatch(Result.Screen(Screen.PLAYLIST))
                 is Intent.PlaylistItemView -> dispatch(Result.Screen(Screen.DESCRIPTION))
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.url))
-                is Intent.ChannelOpen -> getState().item?.media?.channelData?.let { publish(Label.ChannelOpen(it)) } ?: Unit
+                is Intent.ChannelOpen ->
+                    getState().item?.media?.channelData
+                        ?.let { publish(Label.ChannelOpen(it)) } ?: Unit
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
                 is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
                 is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
                 is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().item!!))
                 is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().item!!))
                 is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().item!!))
-                is Intent.SeekToPosition -> publish(Label.Command(SeekTo(ms = intent.ms)))
+                is Intent.SeekToPosition -> {
+                    log.d("SeekToPosition:${intent.ms}")
+                    publish(Label.Command(SeekTo(ms = intent.ms)))
+                }
+                is Intent.InitFromService -> {
+                    loadItem(intent.item)
+                    queueConsumer.playlist
+                        ?.also { dispatch(Result.Playlist(it)) }
+                    Unit
+                }
+                is Intent.PlayItemFromService -> {
+                    loadItem(intent.item)
+                    queueConsumer.playlist
+                        ?.also { dispatch(Result.Playlist(it)) }
+                    Unit
+                }
             }
 
         private suspend fun init() {
             withContext(coroutines.Computation) {
                 itemLoader.load()?.also { item ->
-                    item.playlistId
-                        ?.toIdentifier(LOCAL)
-                        ?.apply { livePlaybackController.clear(item.media.platformId) }
-                        ?.apply { queueProducer.playNow(this, item.id) }
-                    coroutines.mainScope.launch {
-                        mediaSessionManager.checkCreateMediaSession(playerControls)
-                    }
                     log.d("itemLoader.load(${item.media.title}))")
+                    loadItem(item)
                 }
+            }
+        }
+
+        private suspend fun loadItem(item: PlaylistItemDomain) {
+            item.playlistId
+                ?.toIdentifier(LOCAL)
+                ?.apply { livePlaybackController.clear(item.media.platformId) }
+                ?.apply { queueProducer.playNow(this, item.id) }
+            coroutines.mainScope.launch {
+                mediaSessionManager.checkCreateMediaSession(playerControls)
             }
         }
 
@@ -143,7 +164,7 @@ class PlayerStoreFactory(
         }
 
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {
-            publish(Label.Command(if (intent.isPlaying ?: playerState == PLAYING) Pause else Play))
+            publish(Label.Command(if (intent.isPlaying ?: (playerState == PLAYING)) Pause else Play))
         }
 
         private fun seekTo(fraction: Float, item: PlaylistItemDomain?) {
@@ -162,15 +183,15 @@ class PlayerStoreFactory(
             log.d("trackChange(${intent.item.media.title}))")
         }
 
-        private fun updatePosition(ms: Long, item: PlaylistItemDomain?) {
+        private fun updatePosition(ms: Long, item: PlaylistItemDomain?, playerState: PlayerStateDomain) {
             item
                 ?.run { copy(media = media.copy(positon = ms)) }
                 ?.apply { queueConsumer.updateCurrentMediaItem(media) }
                 ?.apply { skip.updatePosition(ms) }
                 ?.apply { livePlaybackController.setCurrentPosition(ms) }
-                ?.run { dispatch(Result.SetVideo(this)) }
-
-                ?.run {
+                ?.apply { updatePlaybackState(playerState) }
+                ?.apply { dispatch(Result.SetVideo(this)) }
+                ?.apply {
                     dispatch(
                         Result.Position(
                             if (item.media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else ms
@@ -196,19 +217,21 @@ class PlayerStoreFactory(
                 else -> Unit
             }.also {
                 item?.apply {
-                    //coroutines.mainScope.launch {
-                    mediaSessionManager.updatePlaybackState(
-                        media,
-                        playState,
-                        if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
-                        queueConsumer.playlist
-                    )
-                    // }
+                    updatePlaybackState(playState)
                 }
 
                 skip.stateChange(playState)
                 dispatch(Result.State(playState))
             }
+
+        private fun PlaylistItemDomain.updatePlaybackState(playState: PlayerStateDomain) {
+            mediaSessionManager.updatePlaybackState(
+                media,
+                playState,
+                if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
+                queueConsumer.playlist
+            )
+        }
 
         private suspend fun trackSelected(item: PlaylistItemDomain, resetPosition: Boolean) {
             withContext(coroutines.Computation) {
@@ -222,6 +245,7 @@ class PlayerStoreFactory(
         }
 
         override fun skipSeekTo(target: Long) {
+            log.d("skip presenter seekTo:${target}")
             publish(Label.Command(SeekTo(target)))
         }
 

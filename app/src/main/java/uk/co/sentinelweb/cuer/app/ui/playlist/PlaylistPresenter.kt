@@ -31,6 +31,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
@@ -75,6 +76,7 @@ class PlaylistPresenter(
     private val coroutines: CoroutineContextProvider,
     private val res: ResourceWrapper,
     private val dbInit: DatabaseInitializer,
+    private val floatingService: FloatingPlayerServiceManager,
 ) : PlaylistContract.Presenter, PlaylistContract.External {
 
     override var interactions: PlaylistContract.Interactions? = null
@@ -362,6 +364,8 @@ class PlaylistPresenter(
             ?.let { itemDomain ->
                 if (interactions != null) {
                     interactions?.onPlay(itemDomain)
+                } else if (floatingService.isRunning()) {
+                    floatingService.playItem(itemDomain)
                 } else if (!(ytCastContextHolder.isConnected())) {
                     view.navigate(NavigationModel(localPlayerTarget, mapOf(PLAYLIST_ITEM to itemDomain)))
                 } else {
@@ -380,6 +384,8 @@ class PlaylistPresenter(
             ?.let { itemDomain ->
                 if (interactions != null) {
                     interactions?.onPlayStartClick(itemDomain)
+                } else if (floatingService.isRunning()) {
+                    floatingService.playItem(itemDomain)
                 } else if (!ytCastContextHolder.isConnected()) {
                     view.navigate(NavigationModel(localPlayerTarget, mapOf(PLAYLIST_ITEM to itemDomain)))
                 } else {
