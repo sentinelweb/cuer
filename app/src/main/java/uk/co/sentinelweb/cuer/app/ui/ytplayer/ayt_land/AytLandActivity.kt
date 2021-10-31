@@ -30,6 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ShowHideUi
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
@@ -58,6 +59,7 @@ class AytLandActivity : AppCompatActivity(),
     private val res: ResourceWrapper by inject()
     private val castListener: LocalPlayerCastListener by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
+    private val floatingService: FloatingPlayerServiceManager by inject()
     private val aytViewHolder: AytViewHolder by inject()
 
     private lateinit var mviView: AytLandActivity.MviViewImpl
@@ -212,7 +214,16 @@ class AytLandActivity : AppCompatActivity(),
                 is ChannelOpen ->
                     label.channel.platformId?.let { id -> navMapper.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
                 is FullScreenPlayerOpen -> toast.show("Already in protrait mode - shouldnt get here")
-                is PipPlayerOpen -> toast.show("PIP Open")
+                is PipPlayerOpen -> {
+                    val hasPermission = floatingService.hasPermission(this@AytLandActivity)
+                    if (hasPermission) {
+                        aytViewHolder.switchView()
+                    }
+                    floatingService.start(this@AytLandActivity, label.item)
+                    if (hasPermission) {
+                        finishAffinity()
+                    }
+                }
                 is PortraitPlayerOpen -> label.also {
                     aytViewHolder.switchView()
                     navMapper.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))

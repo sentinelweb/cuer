@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
@@ -14,6 +15,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.ActivityAytPortraitBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -35,7 +37,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
-import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -60,9 +61,10 @@ class AytPortraitActivity : AppCompatActivity(),
     private val itemLoader: PlayerContract.PlaylistItemLoader by inject()
     private val toast: ToastWrapper by inject()
     private val castListener: LocalPlayerCastListener by inject()
-    private val ytContextHolder: ChromecastYouTubePlayerContextHolder by inject()
     private val aytViewHolder: AytViewHolder by inject()
     private val floatingService: FloatingPlayerServiceManager by inject()
+    private val queueConsumer: QueueMediatorContract.Consumer by inject()
+
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl
     private lateinit var binding: ActivityAytPortraitBinding
@@ -88,6 +90,10 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
+        if (floatingService.isRunning()) {
+            aytViewHolder.switchView()
+            floatingService.stop()
+        }
         mviView = MviViewImpl(aytViewHolder)
 //        getLifecycle().addObserver(binding.portraitPlayerVideo)
         playerFragment.initMediaRouteButton()
@@ -108,11 +114,13 @@ class AytPortraitActivity : AppCompatActivity(),
 
         }
         val playlistItem = itemLoader.load()
+            ?: queueConsumer.currentItem
+            ?: throw IllegalArgumentException("Could not get playlist item")
         playlistFragment.arguments = bundleOf(
             HEADLESS.name to true,
             SOURCE.name to OrchestratorContract.Source.LOCAL.toString(),
-            PLAYLIST_ID.name to (playlistItem?.playlistId ?: throw IllegalArgumentException("Playlist ID is null")),
-            PLAYLIST_ITEM_ID.name to (playlistItem.id ?: throw IllegalArgumentException("Playlist item is null")),
+            PLAYLIST_ID.name to (playlistItem.playlistId),
+            PLAYLIST_ITEM_ID.name to (playlistItem.id),
         )
         playlistFragment.external.interactions = playlistInteractions
         binding.portraitPlayerFullscreen.setOnClickListener { mviView.dispatch(FullScreenClick) }
@@ -169,7 +177,7 @@ class AytPortraitActivity : AppCompatActivity(),
                         finishAffinity()
                     }
                 }
-                is PortraitPlayerOpen -> toast.show("Already in portrait mode - shouldnt get here")
+                is PortraitPlayerOpen -> toast.show("Already in portrait mode - shouldn't get here")
             }
         }
     }

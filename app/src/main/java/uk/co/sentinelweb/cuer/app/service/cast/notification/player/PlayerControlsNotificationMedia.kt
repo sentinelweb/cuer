@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
+import android.app.Activity
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
@@ -17,7 +18,6 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_STAR
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKB
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKF
-import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -30,6 +30,7 @@ class PlayerControlsNotificationMedia constructor(
     private val appState: CuerAppState,
     private val timeProvider: TimeProvider,
     private val log: LogWrapper,
+    private val launchClass: Class<out Activity>,
 ) : PlayerControlsNotificationContract.View {
 
     override fun showNotification(
@@ -58,7 +59,7 @@ class PlayerControlsNotificationMedia constructor(
         val disconnectPendingIntent: PendingIntent = pendingIntent(ACTION_DISCONNECT)
         val starPendingIntent: PendingIntent = pendingIntent(ACTION_STAR)
 
-        val contentIntent = Intent(service, MainActivity::class.java) // todo inject to launch player class
+        val contentIntent = Intent(service, launchClass) // todo inject to launch player class
         val contentPendingIntent: PendingIntent =
             PendingIntent.getActivity(service, 0, contentIntent, 0)
 

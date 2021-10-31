@@ -6,11 +6,14 @@ import android.graphics.PixelFormat
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.View.OnTouchListener
+import androidx.core.view.isVisible
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.WindowAytFloatBinding
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
+import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
+import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.FLOATING_PLAYER_RECT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper

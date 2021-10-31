@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 
 interface FloatingPlayerContract {
 
@@ -106,7 +107,8 @@ interface FloatingPlayerContract {
                         service = getSource(),
                         appState = get(),
                         timeProvider = get(),
-                        log = get()
+                        log = get(),
+                        launchClass = AytPortraitActivity::class.java
                     )
                 }
                 scoped { PlayerControlsNotificationContract.State() }
