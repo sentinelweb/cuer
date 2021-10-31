@@ -74,7 +74,7 @@ interface FloatingPlayerContract {
                 }
                 scoped { PlayerListener(get(), get()) }
                 scoped { FloatingWindowMviView(getSource(), get(), get(), get()) }
-                scoped { FloatingWindowManagement(getSource(), get()) }
+                scoped { FloatingWindowManagement(getSource(), get(), get(), get()) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = EmptySkipView(),

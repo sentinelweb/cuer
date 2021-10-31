@@ -23,6 +23,7 @@ class FloatingWindowMviView(
 
     fun init() {
         aytViewHolder.addView(service.baseContext, windowManagement.binding!!.playerContainer, this)
+//        aytViewHolder.addFadeViewHelper(windowManagement.getFadeViewHelper())
     }
 
     override val renderer: ViewRenderer<Model> = diff {

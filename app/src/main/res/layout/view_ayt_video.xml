@@ -2,11 +2,10 @@
 <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ayt_player"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:showFullScreenButton="false"
     app:showVideoCurrentTime="false"
     app:showVideoDuration="false"
-    >
-
-</com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView>
+    />

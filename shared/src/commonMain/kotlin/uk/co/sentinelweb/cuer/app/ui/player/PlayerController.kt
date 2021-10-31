@@ -102,7 +102,6 @@ class PlayerController constructor(
         queueConsumer.currentPlaylistFlow
             .filterNotNull()
             .mapNotNull { playlistChangeToIntent(it) } bindTo store
-
     }
 
     fun onStart() {

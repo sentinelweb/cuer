@@ -6,16 +6,64 @@
     android:layout_height="match_parent"
     >
 
-    <FrameLayout
-        android:id="@+id/player_container"
+    <uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
+        android:id="@+id/fullscreen_video_wrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
-    <!-- todo play controls? -->
+        >
+
+        <FrameLayout
+            android:id="@+id/player_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+    </uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout>
+
+    <FrameLayout
+        android:id="@+id/floating_player_controls"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+
+        <ImageView
+            android:id="@+id/floating_player_resize"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="top"
+            android:background="@drawable/circle_gradient_top_right"
+            android:contentDescription="Resize"
+            android:paddingStart="32dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="32dp"
+            android:src="@drawable/ic_resize_24"
+            app:tint="@color/white"
+            />
+
+        <ImageView
+            android:id="@+id/floating_player_move"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/circle_gradient_bottom_right"
+            android:contentDescription="Move"
+            android:paddingStart="32dp"
+            android:paddingTop="32dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="4dp"
+            android:src="@drawable/ic_move_24"
+            app:tint="@color/white"
+            />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,6 +9,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstan
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.ui.utils.FadeViewHelper
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
@@ -34,6 +35,8 @@ class AytViewHolder(
 
     private var _isSwitching: Boolean = false
 
+    private var _fadeViewHelper: FadeViewHelper? = null
+
     fun create(context: Context) {
         _playerView = LayoutInflater.from(context).inflate(R.layout.view_ayt_video, null) as YouTubePlayerView
         addPlayerListener()
@@ -49,6 +52,7 @@ class AytViewHolder(
         if (!_isSwitching) {
             (_playerView?.parent as FrameLayout?)?.removeView(_playerView)
             _mviView = null
+            _fadeViewHelper?.apply { _player?.removeListener(this) }
             _isSwitching = true
         }
     }
@@ -60,6 +64,7 @@ class AytViewHolder(
             _playerView = null
             _mviView = null
             _player = null
+            _fadeViewHelper?.apply { _player?.removeListener(this) }
             _currentVideoId = null
             _lastPositionSec = -1f
             _lastPositionSend = -1f
@@ -69,6 +74,12 @@ class AytViewHolder(
 
     private fun addPlayerListener() {
         _playerView?.addYouTubePlayerListener(object : YouTubePlayerListener {
+            override fun onReady(youTubePlayer: YouTubePlayer) {
+                _player = youTubePlayer
+                log.d("onReady")
+                _mviView?.dispatch(Event.PlayerStateChanged(PlayerStateDomain.VIDEO_CUED))
+            }
+
             override fun onApiChange(youTubePlayer: YouTubePlayer) = Unit
 
             override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
@@ -91,12 +102,6 @@ class AytViewHolder(
 
             override fun onPlaybackRateChange(youTubePlayer: YouTubePlayer, playbackRate: PlayerConstants.PlaybackRate) {
                 _player = youTubePlayer
-            }
-
-            override fun onReady(youTubePlayer: YouTubePlayer) {
-                _player = youTubePlayer
-                log.d("onReady")
-                _mviView?.dispatch(Event.PlayerStateChanged(PlayerStateDomain.VIDEO_CUED))
             }
 
             override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
