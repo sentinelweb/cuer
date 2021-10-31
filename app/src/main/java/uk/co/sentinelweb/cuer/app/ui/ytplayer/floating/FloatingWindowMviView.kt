@@ -29,16 +29,9 @@ class FloatingWindowMviView(
         diff(get = Model::playState, set = {
             notification.setPlayerState(it)
         })
-        diff(get = Model::times, set = { times ->
-//            controlsSeek.progress = (times.seekBarFraction * controlsSeek.max).toInt()
-//            controlsCurrentTime.text = times.positionText
-            // notification.setDuration(times.)
-
-        })
         diff(get = Model::playlistItem, set = {
             notification.setPlaylistItem(it, OrchestratorContract.Source.LOCAL)
         })
-
     }
 
     override suspend fun processLabel(label: PlayerContract.MviStore.Label) {

@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land
 
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
@@ -11,6 +12,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerListener
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ShowHideUi
@@ -19,25 +22,37 @@ interface YoutubeFullScreenContract {
 
     companion object {
 
+        @ExperimentalCoroutinesApi
         @JvmStatic
         val activityModule = module {
             scope(named<YoutubeFullScreenActivity>()) {
                 scoped {
                     PlayerController(
-                        itemLoader = get(),
-//                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        storeFactory = DefaultStoreFactory,
                         queueConsumer = get(),
-                        queueProducer = get(),
                         modelMapper = get(),
                         coroutines = get(),
                         lifecycle = null,
-                        skip = get(),
                         log = get(),
-                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
-                        mediaSessionManager = get()
+                        playControls = PlayerListener(get(), get()),
+                        store = get()
                     )
                 }
+                scoped {
+                    PlayerStoreFactory(
+                        // storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+                        storeFactory = DefaultStoreFactory,
+                        itemLoader = get(),
+                        queueConsumer = get(),
+                        queueProducer = get(),
+                        skip = get(),
+                        coroutines = get(),
+                        log = get(),
+                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
+                        mediaSessionManager = get(),
+                        playerControls = get(),
+                    ).create()
+                }
+                scoped { PlayerListener(get(), get()) }
                 scoped { navigationMapper(false, getSource(), withNavHost = false) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { ShowHideUi(getSource()) }

@@ -148,7 +148,10 @@ class AytViewHolder(
             is PlayerContract.PlayerCommand.Pause -> _player?.pause()
             is PlayerContract.PlayerCommand.SkipBack -> _player?.seekTo(_lastPositionSec - command.ms / 1000f)
             is PlayerContract.PlayerCommand.SkipFwd -> _player?.seekTo(_lastPositionSec + command.ms / 1000f)
-            is PlayerContract.PlayerCommand.SeekTo -> _player?.seekTo(command.ms.toFloat() / 1000f)
+            is PlayerContract.PlayerCommand.SeekTo -> {
+                log.d("seekTo:${command.ms}")
+                _player?.seekTo(command.ms.toFloat() / 1000f)
+            }
 
             else -> Unit
         }

@@ -46,6 +46,7 @@ class FloatingPlayerController constructor(
     }
 
     override fun handleAction(intent: Intent) {
+        log.d("intent.action = ${intent.action}")
         when (intent.action) {
             ACTION_DISCONNECT -> {
                 service.stopSelf()
