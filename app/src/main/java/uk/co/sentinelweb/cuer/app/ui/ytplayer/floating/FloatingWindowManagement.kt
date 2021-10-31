@@ -6,14 +6,11 @@ import android.graphics.PixelFormat
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.View.OnTouchListener
-import androidx.core.view.isVisible
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.WindowAytFloatBinding
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
-import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
-import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.FLOATING_PLAYER_RECT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -26,9 +23,15 @@ class FloatingWindowManagement(
     private val coroutineContextProvider: CoroutineContextProvider,
     private val prefs: MultiPlatformPreferencesWrapper,
 ) {
+
+    interface Callbacks {
+        fun onClose()
+    }
+
     private var _binding: WindowAytFloatBinding? = null
     private var _floatWindowLayoutParam: WindowManager.LayoutParams? = null
     private var _windowManager: WindowManager? = null
+    lateinit var callbacks: Callbacks
 
     val binding: WindowAytFloatBinding?
         get() = _binding
@@ -63,6 +66,9 @@ class FloatingWindowManagement(
 
         addMoveTouchListener()
         addResizeTouchListener()
+        binding?.floatingPlayerClose?.setOnClickListener {
+            callbacks.onClose()
+        }
 
         binding?.fullscreenVideoWrapper?.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
             override fun touched() {
@@ -80,7 +86,7 @@ class FloatingWindowManagement(
     }
 
     private fun addMoveTouchListener() {
-        _binding?.floatingPlayerMove?.setOnTouchListener(object : OnTouchListener {
+        binding?.floatingPlayerMove?.setOnTouchListener(object : OnTouchListener {
             val floatWindowLayoutUpdateParam = _floatWindowLayoutParam!!
             var x = 0.0
             var y = 0.0

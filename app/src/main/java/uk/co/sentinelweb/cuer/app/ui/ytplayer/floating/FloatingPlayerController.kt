@@ -31,6 +31,9 @@ class FloatingPlayerController constructor(
 
     override fun initialise() {
         windowManagement.makeWindowWithView()
+        windowManagement.callbacks = object : FloatingWindowManagement.Callbacks {
+            override fun onClose() = destroy()
+        }
         playerMviViw.init()
         playerController.onViewCreated(listOf(playerMviViw))
         playerController.onStart()

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
@@ -167,7 +166,7 @@ class AytPortraitActivity : AppCompatActivity(),
                     }
                     floatingService.start(this@AytPortraitActivity, label.item)
                     if (hasPermission) {
-                        finish()
+                        finishAffinity()
                     }
                 }
                 is PortraitPlayerOpen -> toast.show("Already in portrait mode - shouldnt get here")
