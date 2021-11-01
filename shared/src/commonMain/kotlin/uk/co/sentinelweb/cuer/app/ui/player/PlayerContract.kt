@@ -120,6 +120,7 @@ interface PlayerContract {
             data class IdReceived(val videoId: String) : Event()
             data class InitFromService(val item: PlaylistItemDomain) : Event()
             data class PlayItemFromService(val item: PlaylistItemDomain) : Event()
+            data class SeekToPosition(val ms: Long) : Event()
         }
     }
 

@@ -20,17 +20,22 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 interface FloatingPlayerContract {
 
     interface Service {
+        val external: External
         fun stopSelf()
     }
 
     interface Controller {
+        val external: External
         fun initialise()
         fun destroy()
         fun handleAction(intent: Intent)
     }
 
-    companion object {
+    interface External {
+        var mainPlayerControls: PlayerContract.PlayerControls?
+    }
 
+    companion object {
         @ExperimentalCoroutinesApi
         val serviceModule = module {
             factory { FloatingPlayerServiceManager(androidApplication(), get()) }

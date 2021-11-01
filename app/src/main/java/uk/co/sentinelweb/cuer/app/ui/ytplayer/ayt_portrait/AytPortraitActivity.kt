@@ -78,14 +78,15 @@ class AytPortraitActivity : AppCompatActivity(),
         binding = ActivityAytPortraitBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
-        //ytContextHolder.create()
         castListener.listen()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         castListener.release()
         aytViewHolder.cleanupIfNotSwitching()
+        controller.onViewDestroyed()
+        controller.onDestroy()
+        super.onDestroy()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -95,7 +96,6 @@ class AytPortraitActivity : AppCompatActivity(),
             floatingService.stop()
         }
         mviView = MviViewImpl(aytViewHolder)
-//        getLifecycle().addObserver(binding.portraitPlayerVideo)
         playerFragment.initMediaRouteButton()
         controller.onViewCreated(listOf(mviView, playerFragment.mviView), lifecycle.asMviLifecycle())
 

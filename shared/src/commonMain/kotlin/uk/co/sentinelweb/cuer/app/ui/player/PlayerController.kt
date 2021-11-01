@@ -57,6 +57,7 @@ class PlayerController constructor(
             is PipClick -> PipPlayerOpen
             is PlayerContract.View.Event.InitFromService -> PlayerContract.MviStore.Intent.InitFromService(item)
             is PlayerContract.View.Event.PlayItemFromService -> PlayerContract.MviStore.Intent.PlayItemFromService(item)
+            is PlayerContract.View.Event.SeekToPosition -> PlayerContract.MviStore.Intent.SeekToPosition(ms)
         }
     }
 

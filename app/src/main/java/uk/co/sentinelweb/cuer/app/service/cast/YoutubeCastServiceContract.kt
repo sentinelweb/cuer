@@ -19,7 +19,6 @@ interface YoutubeCastServiceContract {
     }
 
     interface Controller {
-
         fun initialise()
         fun handleAction(action: String?)
         fun destroy()

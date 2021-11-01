@@ -80,13 +80,17 @@ class AytLandActivity : AppCompatActivity(),
     override fun onDestroy() {
         castListener.release()
         aytViewHolder.cleanupIfNotSwitching()
+        controller.onViewDestroyed()
+        controller.onDestroy()
         super.onDestroy()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         mviView = MviViewImpl(aytViewHolder)
-//        getLifecycle().addObserver(binding.fullscreenPlayerVideo)
+        aytViewHolder.playerView
+            ?.apply { getLifecycle().addObserver(this) }
+            ?: throw IllegalStateException("Player is not created")
         controller.onViewCreated(listOf(mviView), lifecycle.asMviLifecycle())
         showHideUi.showElements = {
             log.d("showElements")
@@ -134,16 +138,6 @@ class AytLandActivity : AppCompatActivity(),
                 mviView.dispatch(SeekBarChanged(seekBar.progress / seekBar.max.toFloat()));showHideUi.delayedHide()
             }
         })
-
-//
-//        binding.controls.root.setOnTouchListener(object : View.OnTouchListener {
-//            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-//                log.d("binding.controls.root.onTouch")
-//                return false
-//            }
-//
-//        })
-
         chromeCastWrapper.initMediaRouteButton(binding.controls.controlsMediaRouteButton)
         // defaults
         binding.controls.controlsPlayFab.isVisible = false

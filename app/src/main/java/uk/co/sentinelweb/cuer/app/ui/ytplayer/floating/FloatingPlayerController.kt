@@ -25,10 +25,20 @@ class FloatingPlayerController constructor(
     private val windowManagement: FloatingWindowManagement,
     private val aytViewHolder: AytViewHolder,
     private val log: LogWrapper,
-) : FloatingPlayerContract.Controller {
+) : FloatingPlayerContract.Controller, FloatingPlayerContract.External {
+
     init {
         log.tag(this)
     }
+
+    override val external: FloatingPlayerContract.External
+        get() = this
+
+    override var mainPlayerControls: PlayerContract.PlayerControls?
+        get() = playerMviViw.mainPlayControls
+        set(value) {
+            playerMviViw.mainPlayControls = value
+        }
 
     override fun initialise() {
         windowManagement.makeWindowWithView()

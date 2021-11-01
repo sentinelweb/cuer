@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.main
 
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -11,9 +12,11 @@ class MainPresenter(
     private val playerControls: PlayerContract.PlayerControls,
     private val ytServiceManager: YoutubeCastServiceManager,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val floatingPlayerServiceManager: FloatingPlayerServiceManager,
+    private val castListener: FloatingPlayerCastListener,
     private val log: LogWrapper,
 ) : MainContract.Presenter {
-
+    // todo add connection listener and close floating player if connectioned
     init {
         log.tag(this)
     }
@@ -23,6 +26,7 @@ class MainPresenter(
             view.checkPlayServices()
             state.playServiceCheckDone = true
         }
+        castListener.observeConnection()
     }
 
     override fun onPlayServicesOk() {
@@ -53,9 +57,11 @@ class MainPresenter(
             state.playControlsInit = true
         }
         ytContextHolder.playerUi = playerControls
+        floatingPlayerServiceManager.get()?.external?.mainPlayerControls = playerControls
     }
 
     override fun onStop() {
+        floatingPlayerServiceManager.get()?.external?.mainPlayerControls = null
         ytContextHolder.playerUi = null
         if (!view.isRecreating()) {
             if (ytContextHolder.isCreated() && !ytContextHolder.isConnected()) {

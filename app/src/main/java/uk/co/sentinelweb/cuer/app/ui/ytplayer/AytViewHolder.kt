@@ -37,6 +37,9 @@ class AytViewHolder(
 
     private var _fadeViewHelper: FadeViewHelper? = null
 
+    val playerView: YouTubePlayerView?
+        get() = _playerView
+
     fun create(context: Context) {
         _playerView = LayoutInflater.from(context).inflate(R.layout.view_ayt_video, null) as YouTubePlayerView
         addPlayerListener()

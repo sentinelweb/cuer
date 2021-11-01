@@ -22,6 +22,9 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
     private val appState: CuerAppState by inject()
     private val log: LogWrapper by inject()
 
+    override val external: FloatingPlayerContract.External
+        get() = controller.external
+
     override fun onCreate() {
         super.onCreate()
         log.tag(this)
