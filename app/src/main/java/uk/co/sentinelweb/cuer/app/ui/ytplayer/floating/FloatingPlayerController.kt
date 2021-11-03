@@ -54,7 +54,7 @@ class FloatingPlayerController constructor(
         playerMviViw.cleanup()
         playerController.onStop()
         playerController.onViewDestroyed()
-        playerController.onDestroy()
+        playerController.onDestroy(aytViewHolder.willFinish())
         windowManagement.cleanup()
         aytViewHolder.cleanupIfNotSwitching()
     }
@@ -71,13 +71,13 @@ class FloatingPlayerController constructor(
                 intent
                     .getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
                     ?.let { deserialisePlaylistItem(it) }
-                    ?.also { playerMviViw.dispatch(PlayerContract.View.Event.InitFromService(it)) }
+                    ?.also { playerMviViw.dispatch(PlayerContract.View.Event.OnInitFromService(it)) }
             }
             ACTION_PLAY_ITEM -> {
                 intent
                     .getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
                     ?.let { deserialisePlaylistItem(it) }
-                    ?.also { playerMviViw.dispatch(PlayerContract.View.Event.InitFromService(it)) }
+                    ?.also { playerMviViw.dispatch(PlayerContract.View.Event.OnInitFromService(it)) }
             }
             ACTION_SKIPF ->
                 playerMviViw.dispatch(PlayerContract.View.Event.SkipFwdClicked)

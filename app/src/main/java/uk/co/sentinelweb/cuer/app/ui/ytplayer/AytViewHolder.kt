@@ -60,6 +60,8 @@ class AytViewHolder(
         }
     }
 
+    fun willFinish() = !_isSwitching
+
     fun cleanupIfNotSwitching() {
         if (!_isSwitching) {
             log.d("cleanup player")

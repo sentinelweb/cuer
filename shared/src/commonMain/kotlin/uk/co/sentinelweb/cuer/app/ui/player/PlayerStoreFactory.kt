@@ -41,7 +41,9 @@ class PlayerStoreFactory(
     private sealed class Result {
         object NoVideo : Result()
         class State(val state: PlayerStateDomain) : Result()
-        class SetVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) : Result()
+        class SetVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) :
+            Result()
+
         class Playlist(val playlist: PlaylistDomain) : Result()
         class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
         class Screen(val screen: PlayerContract.MviStore.Screen) : Result()
@@ -58,7 +60,10 @@ class PlayerStoreFactory(
         override fun State.reduce(result: Result): State =
             when (result) {
                 is Result.State -> copy(playerState = result.state)
-                is Result.SetVideo -> copy(item = result.item, playlist = result.playlist ?: playlist)
+                is Result.SetVideo -> copy(
+                    item = result.item,
+                    playlist = result.playlist ?: playlist
+                )
                 is Result.Playlist -> copy(playlist = result.playlist)
                 is Result.NoVideo -> copy(item = null)
                 is Result.Screen -> copy(screen = result.screen)
@@ -70,7 +75,8 @@ class PlayerStoreFactory(
             }
     }
 
-    private class BootstrapperImpl(private val queueConsumer: QueueMediatorContract.Consumer) : SuspendBootstrapper<Action>() {
+    private class BootstrapperImpl(private val queueConsumer: QueueMediatorContract.Consumer) :
+        SuspendBootstrapper<Action>() {
         override suspend fun bootstrap() {
             dispatch(Init)
             queueConsumer.playlist?.apply { dispatch(Playlist(this)) }
@@ -103,7 +109,11 @@ class PlayerStoreFactory(
                 is Intent.TrackBack -> queueConsumer.previousItem()
                 is Intent.SkipBack -> skip.skipBack()
                 is Intent.SkipFwd -> skip.skipFwd()
-                is Intent.Position -> updatePosition(intent.ms, getState().item, getState().playerState)
+                is Intent.Position -> updatePosition(
+                    intent.ms,
+                    getState().item,
+                    getState().playerState
+                )
                 is Intent.SkipFwdSelect -> skip.onSelectSkipTime(true)
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> playPause(intent, getState().playerState)
@@ -155,12 +165,12 @@ class PlayerStoreFactory(
                 ?.apply { queueProducer.playNow(this, item.id) }
         }
 
-        private fun destroy() {
-            mediaSessionManager.destroyMediaSession()
-        }
-
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {
-            publish(Label.Command(if (intent.isPlaying ?: (playerState == PLAYING)) Pause else Play))
+            publish(
+                Label.Command(
+                    if (intent.isPlaying ?: (playerState == PLAYING)) Pause else Play
+                )
+            )
         }
 
         private fun seekTo(fraction: Float, item: PlaylistItemDomain?) {
@@ -172,14 +182,25 @@ class PlayerStoreFactory(
             intent.item.media.duration?.apply { skip.duration = this }
             livePlaybackController.clear(intent.item.media.platformId)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
-            publish(Label.Command(Load(intent.item.media.platformId, intent.item.media.positon ?: 0)))
+            publish(
+                Label.Command(
+                    Load(
+                        intent.item.media.platformId,
+                        intent.item.media.positon ?: 0
+                    )
+                )
+            )
             //coroutines.mainScope.launch {
             mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
             //}
             log.d("trackChange(${intent.item.media.title}))")
         }
 
-        private fun updatePosition(ms: Long, item: PlaylistItemDomain?, playerState: PlayerStateDomain) {
+        private fun updatePosition(
+            ms: Long,
+            item: PlaylistItemDomain?,
+            playerState: PlayerStateDomain
+        ) {
             item
                 ?.run { copy(media = media.copy(positon = ms)) }
                 ?.apply { queueConsumer.updateCurrentMediaItem(media) }
@@ -275,5 +296,9 @@ class PlayerStoreFactory(
             executorFactory = { ExecutorImpl(itemLoader, skip) },
             reducer = ReducerImpl
         ) {
+            override fun endSession() {
+                log.d("endSession")
+                mediaSessionManager.destroyMediaSession()
+            }
         }
 }

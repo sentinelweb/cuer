@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait
 
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
+import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
@@ -46,8 +47,8 @@ interface AytPortraitContract {
                 }
                 scoped {
                     PlayerStoreFactory(
-                        // storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        storeFactory = DefaultStoreFactory,
+                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+                        //storeFactory = DefaultStoreFactory,
                         itemLoader = get(),
                         queueConsumer = get(),
                         queueProducer = get(),

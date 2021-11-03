@@ -136,7 +136,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
     override fun onDestroy() {
         mviView.release()
         controller.onViewDestroyed()
-        controller.onDestroy()
+        controller.onDestroy(true)
         scope.close()
         super.onDestroy()
     }

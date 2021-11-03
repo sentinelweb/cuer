@@ -11,6 +11,8 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
 interface PlayerContract {
 
     interface MviStore : Store<Intent, State, Label> {
+        fun endSession()
+
         sealed class Intent {
             object SkipFwd : Intent()
             object SkipBack : Intent()
@@ -24,6 +26,8 @@ interface PlayerContract {
             object FullScreenPlayerOpen : Intent()
             object PortraitPlayerOpen : Intent()
             object PipPlayerOpen : Intent()
+//            object EndSession : Intent()
+
             data class InitFromService(val item: PlaylistItemDomain) : Intent()
             data class PlayItemFromService(val item: PlaylistItemDomain) : Intent()
             data class PlayPause(val isPlaying: Boolean?) : Intent()
@@ -105,6 +109,7 @@ interface PlayerContract {
             object PortraitClick : Event()
             object PipClick : Event()
             object ChannelClick : Event()
+            //object OnDestroy : Event()
 
             data class SeekBarChanged(val fraction: Float) : Event()
             data class PlayPauseClicked(val isPlaying: Boolean? = null) : Event()
@@ -114,9 +119,9 @@ interface PlayerContract {
             data class LinkClick(val url: String) : Event()
             data class DurationReceived(val ms: Long) : Event()
             data class IdReceived(val videoId: String) : Event()
-            data class InitFromService(val item: PlaylistItemDomain) : Event()
-            data class PlayItemFromService(val item: PlaylistItemDomain) : Event()
-            data class SeekToPosition(val ms: Long) : Event()
+            data class OnInitFromService(val item: PlaylistItemDomain) : Event()
+            data class OnPlayItemFromService(val item: PlaylistItemDomain) : Event()
+            data class OnSeekToPosition(val ms: Long) : Event()
         }
     }
 

@@ -54,9 +54,10 @@ class PlayerController constructor(
             is FullScreenClick -> FullScreenPlayerOpen
             is PortraitClick -> PortraitPlayerOpen
             is PipClick -> PipPlayerOpen
-            is PlayerContract.View.Event.InitFromService -> PlayerContract.MviStore.Intent.InitFromService(item)
-            is PlayerContract.View.Event.PlayItemFromService -> PlayerContract.MviStore.Intent.PlayItemFromService(item)
-            is PlayerContract.View.Event.SeekToPosition -> PlayerContract.MviStore.Intent.SeekToPosition(ms)
+            //is OnDestroy -> {log.d("map destroy");Destroy}
+            is OnInitFromService -> InitFromService(item)
+            is OnPlayItemFromService -> PlayItemFromService(item)
+            is OnSeekToPosition -> SeekToPosition(ms)
         }
     }
 
@@ -118,7 +119,10 @@ class PlayerController constructor(
         binder = null
     }
 
-    fun onDestroy() {
+    fun onDestroy(endSession:Boolean) {
+        if (endSession) {
+            store.endSession()
+        }
         store.dispose()
     }
 }

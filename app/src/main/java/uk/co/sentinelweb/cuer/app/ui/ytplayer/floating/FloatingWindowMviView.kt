@@ -63,7 +63,6 @@ class FloatingWindowMviView(
     }
 
     fun cleanup() {
-        aytViewHolder.switchView()
         mainPlayControls = null
     }
 
@@ -85,7 +84,7 @@ class FloatingWindowMviView(
         }
 
         override fun seekTo(positionMs: Long) {
-            dispatch(Event.SeekToPosition(positionMs))
+            dispatch(Event.OnSeekToPosition(positionMs))
         }
 
         override fun getLiveOffsetMs(): Long = 0

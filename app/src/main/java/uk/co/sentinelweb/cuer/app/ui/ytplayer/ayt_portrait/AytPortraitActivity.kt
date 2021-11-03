@@ -83,9 +83,9 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onDestroy() {
         castListener.release()
-        aytViewHolder.cleanupIfNotSwitching()
         controller.onViewDestroyed()
-        controller.onDestroy()
+        controller.onDestroy(aytViewHolder.willFinish())
+        aytViewHolder.cleanupIfNotSwitching()
         super.onDestroy()
     }
 
@@ -174,7 +174,7 @@ class AytPortraitActivity : AppCompatActivity(),
                     }
                     floatingService.start(this@AytPortraitActivity, label.item)
                     if (hasPermission) {
-                        finishAffinity()
+                        finish()
                     }
                 }
                 is PortraitPlayerOpen -> toast.show("Already in portrait mode - shouldn't get here")

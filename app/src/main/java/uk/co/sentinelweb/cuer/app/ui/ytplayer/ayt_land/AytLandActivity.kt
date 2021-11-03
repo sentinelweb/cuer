@@ -79,14 +79,18 @@ class AytLandActivity : AppCompatActivity(),
 
     override fun onDestroy() {
         castListener.release()
-        aytViewHolder.cleanupIfNotSwitching()
         controller.onViewDestroyed()
-        controller.onDestroy()
+        controller.onDestroy(aytViewHolder.willFinish())
+        aytViewHolder.cleanupIfNotSwitching()
         super.onDestroy()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
+        if (floatingService.isRunning()) {
+            aytViewHolder.switchView()
+            floatingService.stop()
+        }
         mviView = MviViewImpl(aytViewHolder)
         aytViewHolder.playerView
             ?.apply { getLifecycle().addObserver(this) }
