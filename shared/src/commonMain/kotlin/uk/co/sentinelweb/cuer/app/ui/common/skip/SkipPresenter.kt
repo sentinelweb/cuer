@@ -88,7 +88,6 @@ class SkipPresenter constructor(
     }
 
     override fun stateChange(playState: PlayerStateDomain) {
-        log.d(playState.toString())
         if (playState == UNSTARTED) {
             state.videoReady = false
         }
