@@ -49,29 +49,26 @@ class SkipPresenter constructor(
     override fun skipFwd() {
         updateSkipTimes()
         state.accumulator += skipForwardInterval
-        //log.d("skipFwd: accum=$accumulator isSeeking=$isSeeking")
         if (!isSeeking) {
             sendAccumulation()
         } else {
-            sendAccumChange()
+            sendAccumTextChange()
         }
     }
 
     override fun skipBack() {
         updateSkipTimes()
         state.accumulator -= skipBackInterval
-        //log.d("skipBack: accum=$accumulator isSeeking=$isSeeking")
         if (!isSeeking) {
             sendAccumulation()
         } else {
-            sendAccumChange()
+            sendAccumTextChange()
         }
     }
 
-    private fun sendAccumChange() {
+    private fun sendAccumTextChange() {
         val value = mapper.mapAccumulationTime(state.accumulator)
-        //log.d("sendAccumChange: accum=$accumulator time=$value")
-        onSkipAccumulationChange(
+        onSkipAccumulationTextChange(
             value,
             if (state.accumulator == 0L) null else state.accumulator > 0
         )
@@ -91,6 +88,13 @@ class SkipPresenter constructor(
     }
 
     override fun stateChange(playState: PlayerStateDomain) {
+        log.d(playState.toString())
+        if (playState == UNSTARTED) {
+            state.videoReady = false
+        }
+        if (playState == PLAYING) {
+            state.videoReady = true
+        }
         if ((state.currentPlayState == BUFFERING || state.currentPlayState == PAUSED) && playState == PLAYING) {
             state.targetPosition = null
         }
@@ -108,13 +112,12 @@ class SkipPresenter constructor(
     }
 
     private fun sendAccumulation() {
-        //log.d("sendAccumulation: accum=$accumulator targetPosition=$targetPosition")
-        if (state.accumulator != 0L && state.targetPosition == null) {
+        if (state.videoReady && state.accumulator != 0L && state.targetPosition == null) {
             state.targetPosition = (state.position + state.accumulator).apply {
                 onSkipAvailable(this)
             }
             state.accumulator = 0
-            onSkipAccumulationChange("", null)
+            onSkipAccumulationTextChange("", null)
         }
     }
 
@@ -128,7 +131,7 @@ class SkipPresenter constructor(
         }
     }
 
-    private fun onSkipAccumulationChange(value: String, fwd: Boolean?) {
+    private fun onSkipAccumulationTextChange(value: String, fwd: Boolean?) {
         if (fwd == null) {
             listener.skipSetBackText(skipBackText)
             listener.skipSetFwdText(skipForwardText)
