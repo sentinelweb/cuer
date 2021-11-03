@@ -57,7 +57,9 @@ class MainPresenter(
             state.playControlsInit = true
         }
         ytContextHolder.playerUi = playerControls
-        floatingPlayerServiceManager.get()?.external?.mainPlayerControls = playerControls
+        if (!ytContextHolder.isConnected()) {
+            floatingPlayerServiceManager.get()?.external?.mainPlayerControls = playerControls
+        }
     }
 
     override fun onStop() {

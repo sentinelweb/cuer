@@ -78,7 +78,6 @@ interface FloatingPlayerContract {
                         playerControls = get(),
                     ).create()
                 }
-                scoped { PlayerListener(get(), get()) }
                 scoped { FloatingWindowMviView(getSource(), get(), get(), get()) }
                 scoped { FloatingWindowManagement(getSource(), get(), get(), get()) }
                 scoped<SkipContract.External> {

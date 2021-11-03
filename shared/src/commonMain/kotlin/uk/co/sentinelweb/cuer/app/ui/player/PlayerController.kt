@@ -8,6 +8,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
@@ -33,8 +34,6 @@ class PlayerController constructor(
 
     private val eventToIntent: suspend PlayerContract.View.Event.() -> PlayerContract.MviStore.Intent = {
         when (this) {
-//            is PlayClicked -> Play
-//            is PauseClicked -> Pause
             is PlayerStateChanged -> PlayState(state)
             is TrackFwdClicked -> TrackFwd
             is TrackBackClicked -> TrackBack
@@ -96,8 +95,9 @@ class PlayerController constructor(
             // view -> store
             view.events.mapNotNull(eventToIntent) bindTo store
         }
+        playControls.intentFlow
+            .onEach { log.d("playctls: $it") } bindTo store
         // queue -> store
-        playControls.intentFlow bindTo store // fixme bind is not working - no media events (watch, notif)
         queueConsumer.currentItemFlow
             .filterNotNull()
             .mapNotNull { trackChangeToIntent(it) } bindTo store

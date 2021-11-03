@@ -18,7 +18,8 @@ class PlayerListener constructor(
     }
 
     private val _intentFlow = MutableSharedFlow<Intent>()
-    val intentFlow: Flow<Intent> = _intentFlow
+    val intentFlow: Flow<Intent>
+        get() = _intentFlow
 
     override fun play() {
         coroutines.mainScope.launch {

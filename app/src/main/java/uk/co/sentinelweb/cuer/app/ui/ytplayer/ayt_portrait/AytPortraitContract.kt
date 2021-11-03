@@ -59,7 +59,6 @@ interface AytPortraitContract {
                         playerControls = get(),
                     ).create()
                 }
-                scoped { PlayerListener(get(), get()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped {
                     (getSource<AytPortraitActivity>()

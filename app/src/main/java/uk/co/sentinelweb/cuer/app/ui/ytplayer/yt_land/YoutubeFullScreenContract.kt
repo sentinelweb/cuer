@@ -52,7 +52,6 @@ interface YoutubeFullScreenContract {
                         playerControls = get(),
                     ).create()
                 }
-                scoped { PlayerListener(get(), get()) }
                 scoped { navigationMapper(false, getSource(), withNavHost = false) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { ShowHideUi(getSource()) }

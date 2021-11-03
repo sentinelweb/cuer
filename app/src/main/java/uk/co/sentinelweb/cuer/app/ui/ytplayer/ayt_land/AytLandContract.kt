@@ -53,7 +53,6 @@ interface AytLandContract {
                         playerControls = get(),
                     ).create()
                 }
-                scoped { PlayerListener(get(), get()) }
                 scoped { ShowHideUi(getSource()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
                 scoped { navigationMapper(false, getSource(), withNavHost = false) }

@@ -96,8 +96,6 @@ class PlayerStoreFactory(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-//                is Intent.Play -> dispatch(Result.State(PLAYING))
-//                is Intent.Pause -> dispatch(Result.State(PAUSED))
                 is Intent.PlayState -> playStateChange(intent.state, getState().item)
                 is Intent.TrackChange -> trackChange(intent)
                 is Intent.PlaylistChange -> dispatch(Result.Playlist(intent.item))
@@ -123,7 +121,7 @@ class PlayerStoreFactory(
                 is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().item!!))
                 is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().item!!))
                 is Intent.SeekToPosition -> {
-                    log.d("SeekToPosition:${intent.ms}")
+                    log.d("SeekToPosition: ${intent.ms}")
                     publish(Label.Command(SeekTo(ms = intent.ms)))
                 }
                 is Intent.InitFromService -> {
@@ -149,14 +147,12 @@ class PlayerStoreFactory(
             }
         }
 
-        private suspend fun loadItem(item: PlaylistItemDomain) {
+        private suspend fun loadItem(item: PlaylistItemDomain) = coroutines.mainScope.launch {
             item.playlistId
                 ?.toIdentifier(LOCAL)
+                ?.apply { mediaSessionManager.checkCreateMediaSession(playerControls) }
                 ?.apply { livePlaybackController.clear(item.media.platformId) }
                 ?.apply { queueProducer.playNow(this, item.id) }
-            coroutines.mainScope.launch {
-                mediaSessionManager.checkCreateMediaSession(playerControls)
-            }
         }
 
         private fun destroy() {
