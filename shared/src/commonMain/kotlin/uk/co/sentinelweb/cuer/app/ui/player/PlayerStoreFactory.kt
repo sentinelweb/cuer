@@ -297,7 +297,6 @@ class PlayerStoreFactory(
             reducer = ReducerImpl
         ) {
             override fun endSession() {
-                log.d("endSession")
                 mediaSessionManager.destroyMediaSession()
             }
         }

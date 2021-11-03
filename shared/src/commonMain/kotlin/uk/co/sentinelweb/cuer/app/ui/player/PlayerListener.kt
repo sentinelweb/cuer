@@ -23,14 +23,12 @@ class PlayerListener constructor(
 
     override fun play() {
         coroutines.mainScope.launch {
-            log.d("play: ")
             _intentFlow.emit(PlayPause(null))
         }
     }
 
     override fun pause() {
         coroutines.mainScope.launch {
-            log.d("pause: ")
             _intentFlow.emit(PlayPause(null))
         }
     }

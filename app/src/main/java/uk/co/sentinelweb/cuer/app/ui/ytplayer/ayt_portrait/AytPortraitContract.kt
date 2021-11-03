@@ -41,14 +41,14 @@ interface AytPortraitContract {
                         coroutines = get(),
                         lifecycle = getSource<AytPortraitActivity>().lifecycle.asMviLifecycle(),
                         log = get(),
-                        playControls = PlayerListener(get(), get()),
+                        playControls = get(),
                         store = get()
                     )
                 }
                 scoped {
                     PlayerStoreFactory(
-                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        //storeFactory = DefaultStoreFactory,
+                        //storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+                        storeFactory = DefaultStoreFactory,
                         itemLoader = get(),
                         queueConsumer = get(),
                         queueProducer = get(),

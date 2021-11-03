@@ -34,7 +34,7 @@ interface AytLandContract {
                         coroutines = get(),
                         lifecycle = getSource<AytLandActivity>().lifecycle.asMviLifecycle(),
                         log = get(),
-                        playControls = PlayerListener(get(), get()),
+                        playControls = get(),
                         store = get()
                     )
                 }

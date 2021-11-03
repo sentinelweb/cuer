@@ -68,11 +68,11 @@ class FloatingWindowMviView(
 
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {
         override fun play() {
-            dispatch(Event.PlayPauseClicked(true))
+            dispatch(Event.PlayPauseClicked(null))
         }
 
         override fun pause() {
-            dispatch(Event.PlayPauseClicked(false))
+            dispatch(Event.PlayPauseClicked(null))
         }
 
         override fun trackBack() {

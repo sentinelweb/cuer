@@ -33,7 +33,7 @@ interface YoutubeFullScreenContract {
                         coroutines = get(),
                         lifecycle = null,
                         log = get(),
-                        playControls = PlayerListener(get(), get()),
+                        playControls = get(),
                         store = get()
                     )
                 }

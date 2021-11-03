@@ -26,7 +26,6 @@ interface PlayerContract {
             object FullScreenPlayerOpen : Intent()
             object PortraitPlayerOpen : Intent()
             object PipPlayerOpen : Intent()
-//            object EndSession : Intent()
 
             data class InitFromService(val item: PlaylistItemDomain) : Intent()
             data class PlayItemFromService(val item: PlaylistItemDomain) : Intent()

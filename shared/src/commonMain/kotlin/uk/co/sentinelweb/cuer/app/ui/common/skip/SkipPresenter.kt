@@ -29,7 +29,7 @@ class SkipPresenter constructor(
     override lateinit var listener: SkipContract.Listener
 
     private val isSeeking: Boolean
-        get() = state.targetPosition != null && state.currentPlayState == BUFFERING // todo check
+        get() = state.targetPosition != null && state.currentPlayState == BUFFERING
     override val skipForwardInterval: Int
         get() = state.forwardJumpInterval
     override val skipBackInterval: Int
@@ -47,6 +47,7 @@ class SkipPresenter constructor(
     }
 
     override fun skipFwd() {
+        updateSkipTimes()
         state.accumulator += skipForwardInterval
         //log.d("skipFwd: accum=$accumulator isSeeking=$isSeeking")
         if (!isSeeking) {
@@ -57,6 +58,7 @@ class SkipPresenter constructor(
     }
 
     override fun skipBack() {
+        updateSkipTimes()
         state.accumulator -= skipBackInterval
         //log.d("skipBack: accum=$accumulator isSeeking=$isSeeking")
         if (!isSeeking) {
