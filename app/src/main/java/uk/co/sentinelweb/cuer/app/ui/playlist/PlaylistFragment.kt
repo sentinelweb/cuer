@@ -469,16 +469,13 @@ class PlaylistFragment :
                 binding.playlistFabPlay.setImageResource(R.drawable.ic_baseline_playlist_close_24)
                 playMenuItem?.setIcon(R.drawable.ic_baseline_playlist_close_24)
                 adapter.notifyDataSetChanged()
-                //binding.playlistFabPlay.showProgress(false)
             }
             NOT_CONNECTED -> {
                 binding.playlistFabPlay.setImageResource(R.drawable.ic_baseline_playlist_play_24)
                 playMenuItem?.setIcon(R.drawable.ic_baseline_playlist_play_24)
-                //binding.playlistFabPlay.showProgress(false)
                 adapter.notifyDataSetChanged()
             }
             CONNECTING -> {
-                //binding.playlistFabPlay.showProgress(true)
                 playMenuItem?.setIcon(R.drawable.ic_notif_buffer_black)
             }
         }

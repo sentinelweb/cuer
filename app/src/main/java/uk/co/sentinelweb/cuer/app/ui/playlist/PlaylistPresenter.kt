@@ -25,8 +25,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLISTS_FRAGMENT
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
@@ -286,7 +285,6 @@ class PlaylistPresenter(
         if (isPlaylistPlaying()) {
             chromeCastWrapper.killCurrentSession()
         } else {
-            // todo local play option?
             state.playlist?.let {
                 coroutines.computationScope.launch {
                     it.id?.apply { queue.switchToPlaylist(state.playlistIdentifier) }
@@ -367,7 +365,7 @@ class PlaylistPresenter(
                 } else if (floatingService.isRunning()) {
                     floatingService.playItem(itemDomain)
                 } else if (!(ytCastContextHolder.isConnected())) {
-                    view.navigate(NavigationModel(localPlayerTarget, mapOf(PLAYLIST_ITEM to itemDomain)))
+                    view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to itemDomain)))
                 } else {
                     itemDomain.playlistId?.let {
                         playItem(itemModel.id, itemDomain, false)
@@ -387,7 +385,7 @@ class PlaylistPresenter(
                 } else if (floatingService.isRunning()) {
                     floatingService.playItem(itemDomain)
                 } else if (!ytCastContextHolder.isConnected()) {
-                    view.navigate(NavigationModel(localPlayerTarget, mapOf(PLAYLIST_ITEM to itemDomain)))
+                    view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to itemDomain)))
                 } else {
                     playItem(itemModel.id, itemDomain, true)
                 }
@@ -524,7 +522,7 @@ class PlaylistPresenter(
                     if (interactions != null) {
                         interactions?.onPlay(it)
                     } else {
-                        view.navigate(NavigationModel(localPlayerTarget, mapOf(PLAYLIST_ITEM to it)))
+                        view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it)))
                     }
                 }
             }
@@ -802,10 +800,6 @@ class PlaylistPresenter(
         mappedItem
             .takeIf { coroutines.mainScopeActive }
             ?.apply { view.updateItemModel(this) }
-    }
-
-    companion object {
-        private val localPlayerTarget = NavigationModel.Target.LOCAL_PLAYER
     }
 
 }
