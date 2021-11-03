@@ -65,7 +65,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         _binding = ViewPlaylistItemBinding.bind(this)
         binding.listitem.setOnClickListener { presenter.doClick() }
         binding.listitemOverflowClick.setOnClickListener { showContextualMenu() }
-        binding.listitemIcon.setOnClickListener { presenter.doView() }
+        binding.listitemIcon.setOnClickListener { presenter.doIconClick() }
     }
 
     override fun onDetachedFromWindow() {
@@ -88,7 +88,7 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem): Boolean {
                 when (item.itemId) {
-                    R.id.playlist_context_view -> presenter.doView()
+                    R.id.playlist_context_view -> presenter.doIconClick()
                     R.id.playlist_context_play -> presenter.doPlay(false)
                     R.id.playlist_context_play_start -> presenter.doPlayStartClick()
                     R.id.playlist_context_play_external -> presenter.doPlay(true)
@@ -158,6 +158,10 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
 
     override fun setDurationBackground(@ColorRes infoTextBackgroundColor: Int) {
         binding.listitemDuration.setBackgroundColor(res.getColor(infoTextBackgroundColor))
+    }
+
+    override fun setPlayIcon(icon: Int) {
+        binding.listitemPlayIcon.setImageResource(icon)
     }
 
     override fun setDuration(text: String) {

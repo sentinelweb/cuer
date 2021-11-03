@@ -40,7 +40,7 @@ interface PlaylistContract {
         fun refreshPlaylist()
         fun onItemSwipeRight(itemModel: ItemContract.Model)
         fun onItemSwipeLeft(itemModel: ItemContract.Model)
-        fun onItemClicked(itemModel: ItemContract.Model)
+        fun onItemPlayClicked(itemModel: ItemContract.Model)
         fun onItemPlay(itemModel: ItemContract.Model, external: Boolean)
         fun onItemShowChannel(itemModel: ItemContract.Model)
         fun onItemStar(itemModel: ItemContract.Model)
@@ -94,7 +94,7 @@ interface PlaylistContract {
         fun showItemDescription(modelId: Long, item: PlaylistItemDomain, source: Source)
         fun gotoEdit(id: Long, source: Source)
         fun showCastRouteSelectorDialog()
-        fun setPlayState(state: PlayState)
+        fun setCastState(state: CastState)
         fun exit()
         fun hideRefresh()
         fun showRefresh()
@@ -108,7 +108,7 @@ interface PlaylistContract {
     }
 
     enum class ScrollDirection { Up, Down, Top, Bottom }
-    enum class PlayState { PLAYING, CONNECTING, NOT_CONNECTED }
+    enum class CastState { PLAYING, CONNECTING, NOT_CONNECTED }
 
     data class State(
         var playlistIdentifier: Identifier<*> = NO_PLAYLIST,
@@ -213,7 +213,7 @@ interface PlaylistContract {
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ItemFactory(get(), get()) }
+                scoped { ItemFactory(get(), get(), get()) }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
                 scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
                 viewModel { State() }

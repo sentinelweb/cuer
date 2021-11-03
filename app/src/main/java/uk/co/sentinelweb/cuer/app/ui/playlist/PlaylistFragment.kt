@@ -32,7 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.PlayState.*
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.CastState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
@@ -439,10 +439,6 @@ class PlaylistFragment :
         dialogFragment?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
     }
 
-    override fun onView(item: ItemContract.Model) {
-        presenter.onItemViewClick(item)
-    }
-
     override fun showItemDescription(modelId: Long, item: PlaylistItemDomain, source: Source) {
         adapter.getItemViewForId(modelId)?.let { view ->
             PlaylistFragmentDirections.actionGotoPlaylistItem(item.serialise(), source.toString())
@@ -467,17 +463,19 @@ class PlaylistFragment :
         castDialogWrapper.showRouteSelector(childFragmentManager)
     }
 
-    override fun setPlayState(state: PlaylistContract.PlayState) {
+    override fun setCastState(state: PlaylistContract.CastState) {
         when (state) {
             PLAYING -> {
                 binding.playlistFabPlay.setImageResource(R.drawable.ic_baseline_playlist_close_24)
                 playMenuItem?.setIcon(R.drawable.ic_baseline_playlist_close_24)
+                adapter.notifyDataSetChanged()
                 //binding.playlistFabPlay.showProgress(false)
             }
             NOT_CONNECTED -> {
                 binding.playlistFabPlay.setImageResource(R.drawable.ic_baseline_playlist_play_24)
                 playMenuItem?.setIcon(R.drawable.ic_baseline_playlist_play_24)
                 //binding.playlistFabPlay.showProgress(false)
+                adapter.notifyDataSetChanged()
             }
             CONNECTING -> {
                 //binding.playlistFabPlay.showProgress(true)
@@ -507,8 +505,12 @@ class PlaylistFragment :
     //endregion
 
     // region ItemContract.Interactions
+    override fun onItemIconClick(item: ItemContract.Model) {
+        presenter.onItemPlayClicked(item)
+    }
+
     override fun onClick(item: ItemContract.Model) {
-        presenter.onItemClicked(item)
+        presenter.onItemViewClick(item)
     }
 
     override fun onPlayStartClick(item: ItemContract.Model) {

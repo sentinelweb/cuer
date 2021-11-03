@@ -24,6 +24,7 @@ interface ItemContract {
         fun showProgress(live: Boolean)
         fun makeTransitionExtras(): FragmentNavigator.Extras
         fun setDurationBackground(@ColorRes infoTextBackgroundColor: Int)
+        fun setPlayIcon(@DrawableRes icon: Int)
         fun dismissMenu()
     }
 
@@ -34,7 +35,7 @@ interface ItemContract {
         fun doStar()
         fun doShare()
         fun doRelated()
-        fun doView()
+        fun doIconClick()
         fun doPlayStartClick()
         fun doGotoPlaylist()
         fun updateProgress()
@@ -58,7 +59,7 @@ interface ItemContract {
         fun onStar(item: Model)
         fun onRelated(item: Model)
         fun onShare(item: Model)
-        fun onView(item: Model)
+        fun onItemIconClick(item: Model)
         fun onPlayStartClick(item: Model)
         fun onGotoPlaylist(item: Model)
     }

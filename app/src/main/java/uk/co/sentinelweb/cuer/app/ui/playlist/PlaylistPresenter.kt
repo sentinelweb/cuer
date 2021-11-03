@@ -94,19 +94,19 @@ class PlaylistPresenter(
     private val castConnectionListener = object : ChromecastConnectionListener {
         override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
             if (isQueuedPlaylist) {
-                view.setPlayState(PlaylistContract.PlayState.PLAYING)
+                view.setCastState(PlaylistContract.CastState.PLAYING)
             }
         }
 
         override fun onChromecastConnecting() {
             if (isQueuedPlaylist) {
-                view.setPlayState(PlaylistContract.PlayState.CONNECTING)
+                view.setCastState(PlaylistContract.CastState.CONNECTING)
             }
         }
 
         override fun onChromecastDisconnected() {
             if (isQueuedPlaylist) {
-                view.setPlayState(PlaylistContract.PlayState.NOT_CONNECTED)
+                view.setCastState(PlaylistContract.CastState.NOT_CONNECTED)
             }
         }
     }
@@ -359,7 +359,7 @@ class PlaylistPresenter(
             } // todo pass identifier?
     }
 
-    override fun onItemClicked(itemModel: ItemContract.Model) {
+    override fun onItemPlayClicked(itemModel: ItemContract.Model) {
         playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 if (interactions != null) {
