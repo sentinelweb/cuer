@@ -3,9 +3,12 @@ package uk.co.sentinelweb.cuer.app.ui.ytplayer.floating
 import android.app.Service
 import android.content.Context
 import android.graphics.PixelFormat
+import android.graphics.Rect
+import android.os.Build
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.View.OnTouchListener
+import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -86,6 +89,7 @@ class FloatingWindowManagement(
                 }
             }
         }
+        updateGestureExclusion()
     }
 
     private fun addMoveTouchListener() {
@@ -112,6 +116,7 @@ class FloatingWindowManagement(
                     MotionEvent.ACTION_UP -> {
                         _floatWindowLayoutParam = floatWindowLayoutUpdateParam
                         saveWindowParams()
+                        updateGestureExclusion()
                     }
                 }
                 return true
@@ -144,11 +149,18 @@ class FloatingWindowManagement(
                     MotionEvent.ACTION_UP -> {
                         _floatWindowLayoutParam = floatWindowLayoutUpdateParam
                         saveWindowParams()
+                        updateGestureExclusion()
                     }
                 }
                 return true
             }
         })
+    }
+
+    private fun updateGestureExclusion() {
+        if (Build.VERSION.SDK_INT < 29) return
+        val rect = _floatWindowLayoutParam!!.run{Rect(x, y, x + width, y + height)}
+        ViewCompat.setSystemGestureExclusionRects(binding!!.root, listOf(rect))
     }
 
     fun saveWindowParams() {
