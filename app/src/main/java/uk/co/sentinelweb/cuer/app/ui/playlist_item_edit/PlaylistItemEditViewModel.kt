@@ -19,9 +19,11 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistPresenter
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
@@ -48,6 +50,7 @@ class PlaylistItemEditViewModel constructor(
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
     private val prefsWrapper: GeneralPreferencesWrapper,
+    private val floatingService: FloatingPlayerServiceManager,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -175,13 +178,21 @@ class PlaylistItemEditViewModel constructor(
     fun onPlayVideo() {
         state.editingPlaylistItem?.let { item ->
             viewModelScope.launch {
-                item.playlistId?.let {
-                    queue.playNow(it.toIdentifier(LOCAL), item.id) // todo store source
+                if (floatingService.isRunning()) {
+                    floatingService.playItem(item)
+                } else if (!(ytContextHolder.isConnected())) {
+                    _navigateLiveData.value = NavigationModel(
+                        LOCAL_PLAYER, mapOf(
+                            NavigationModel.Param.PLAYLIST_ITEM to item))
+                } else {
+                    item.playlistId?.let {
+                        queue.playNow(it.toIdentifier(LOCAL), item.id) // todo store source
+                    }
                 }
             }
-            if (!ytContextHolder.isConnected()) {
-                _dialogModelLiveData.value = DialogModel(DialogModel.Type.SELECT_ROUTE, R.string.select_route_dialog_title)
-            }
+//            if (!ytContextHolder.isConnected()) {
+//                _dialogModelLiveData.value = DialogModel(DialogModel.Type.SELECT_ROUTE, R.string.select_route_dialog_title)
+//            }
         } ?: run { toast.show("Please save the item first ...") }
     }
 
@@ -368,7 +379,7 @@ class PlaylistItemEditViewModel constructor(
             state.isSaved = true
         } catch (e: Exception) {
             log.e("Error saving playlistItem", e)
-            throw IllegalStateException("Save failed")
+            throw IllegalStateException("Save failed", e)
         }
 
     fun onLaunchVideo() {

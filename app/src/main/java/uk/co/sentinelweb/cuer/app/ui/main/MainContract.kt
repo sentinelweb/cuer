@@ -58,7 +58,9 @@ interface MainContract {
                         playerControls = get(),
                         ytServiceManager = get(),
                         ytContextHolder = get(),
-                        log = get()
+                        log = get(),
+                        floatingPlayerServiceManager = get(),
+                        castListener = get()
                     )
                 }
                 scoped {
@@ -71,9 +73,9 @@ interface MainContract {
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
                 scoped<PlaylistItemEditContract.DoneNavigation> { getSource() }
-                // fragment interactions
                 scoped<PlaylistContract.Interactions?> { null }
                 scoped<CommitHost> { EmptyCommitHost() }
+                scoped { FloatingPlayerCastListener(getSource(), get(), get()) }
             }
         }
     }

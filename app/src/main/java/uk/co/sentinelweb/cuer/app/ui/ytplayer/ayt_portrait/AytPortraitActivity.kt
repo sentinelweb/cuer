@@ -10,15 +10,12 @@ import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.ActivityAytPortraitBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -37,8 +34,9 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
-import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -47,7 +45,6 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
-import kotlin.math.abs
 
 class AytPortraitActivity : AppCompatActivity(),
     AndroidScopeComponent {
@@ -64,7 +61,10 @@ class AytPortraitActivity : AppCompatActivity(),
     private val itemLoader: PlayerContract.PlaylistItemLoader by inject()
     private val toast: ToastWrapper by inject()
     private val castListener: LocalPlayerCastListener by inject()
-    private val ytContextHolder: ChromecastYouTubePlayerContextHolder by inject()
+    private val aytViewHolder: AytViewHolder by inject()
+    private val floatingService: FloatingPlayerServiceManager by inject()
+    private val queueConsumer: QueueMediatorContract.Consumer by inject()
+
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl
     private lateinit var binding: ActivityAytPortraitBinding
@@ -78,19 +78,24 @@ class AytPortraitActivity : AppCompatActivity(),
         binding = ActivityAytPortraitBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
-        //ytContextHolder.create()
         castListener.listen()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         castListener.release()
+        controller.onViewDestroyed()
+        controller.onDestroy(aytViewHolder.willFinish())
+        aytViewHolder.cleanupIfNotSwitching()
+        super.onDestroy()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        mviView = MviViewImpl(binding.portraitPlayerVideo)
-        getLifecycle().addObserver(binding.portraitPlayerVideo)
+        if (floatingService.isRunning()) {
+            aytViewHolder.switchView()
+            floatingService.stop()
+        }
+        mviView = MviViewImpl(aytViewHolder)
         playerFragment.initMediaRouteButton()
         controller.onViewCreated(listOf(mviView, playerFragment.mviView), lifecycle.asMviLifecycle())
 
@@ -109,11 +114,13 @@ class AytPortraitActivity : AppCompatActivity(),
 
         }
         val playlistItem = itemLoader.load()
+            ?: queueConsumer.currentItem
+            ?: throw IllegalArgumentException("Could not get playlist item")
         playlistFragment.arguments = bundleOf(
             HEADLESS.name to true,
             SOURCE.name to OrchestratorContract.Source.LOCAL.toString(),
-            PLAYLIST_ID.name to (playlistItem?.playlistId ?: throw IllegalArgumentException("Playlist ID is null")),
-            PLAYLIST_ITEM_ID.name to (playlistItem.id ?: throw IllegalArgumentException("Playlist item is null")),
+            PLAYLIST_ID.name to (playlistItem.playlistId),
+            PLAYLIST_ITEM_ID.name to (playlistItem.id),
         )
         playlistFragment.external.interactions = playlistInteractions
         binding.portraitPlayerFullscreen.setOnClickListener { mviView.dispatch(FullScreenClick) }
@@ -121,77 +128,12 @@ class AytPortraitActivity : AppCompatActivity(),
     }
 
     // region MVI view
-    inner class MviViewImpl(playerView: YouTubePlayerView) :
+    inner class MviViewImpl(aytViewHolder: AytViewHolder) :
         BaseMviView<Model, Event>(),
         PlayerContract.View {
-        private var player: YouTubePlayer? = null
-        private var lastPositionSec: Float = -1f
-        private var lastPositionSend: Float = -1f
 
         init {
-            playerView.addYouTubePlayerListener(object : YouTubePlayerListener {
-                override fun onApiChange(youTubePlayer: YouTubePlayer) = Unit
-
-                override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
-                    player = youTubePlayer
-                    lastPositionSec = second
-                    if (abs(lastPositionSend - second) > 1) {
-                        lastPositionSend = second
-                        dispatch(PositionReceived((second * 1000).toLong()))
-                    }
-                }
-
-                override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
-                    player = youTubePlayer
-                    dispatch(PlayerStateChanged(ERROR))
-                }
-
-                override fun onPlaybackQualityChange(youTubePlayer: YouTubePlayer, playbackQuality: PlayerConstants.PlaybackQuality) {
-                    player = youTubePlayer
-                }
-
-                override fun onPlaybackRateChange(youTubePlayer: YouTubePlayer, playbackRate: PlayerConstants.PlaybackRate) {
-                    player = youTubePlayer
-                }
-
-                override fun onReady(youTubePlayer: YouTubePlayer) {
-                    player = youTubePlayer
-                    log.d("onReady")
-                    dispatch(PlayerStateChanged(VIDEO_CUED))
-                }
-
-                override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
-                    player = youTubePlayer
-                    val playStateDomain = when (state) {
-                        PlayerConstants.PlayerState.ENDED -> ENDED
-                        PlayerConstants.PlayerState.PAUSED -> PAUSED
-                        PlayerConstants.PlayerState.PLAYING -> PLAYING
-                        PlayerConstants.PlayerState.BUFFERING -> BUFFERING
-                        PlayerConstants.PlayerState.UNSTARTED -> UNSTARTED
-                        PlayerConstants.PlayerState.UNKNOWN -> UNKNOWN
-                        PlayerConstants.PlayerState.VIDEO_CUED -> VIDEO_CUED
-                    }
-                    dispatch(PlayerStateChanged(playStateDomain))
-                    //updateMediaSessionManagerPlaybackState()// todo ??
-                }
-
-                override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
-                    player = youTubePlayer
-                    dispatch(DurationReceived((duration * 1000).toLong()))
-                }
-
-                override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {
-                    player = youTubePlayer
-                    dispatch(IdReceived(videoId))
-                    //dispatch(PlayerStateChanged(VIDEO_CUED))
-                }
-
-                override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {
-                    player = youTubePlayer
-                }
-
-            })
-
+            aytViewHolder.addView(this@AytPortraitActivity, binding.playerContainer, this)
         }
 
         override val renderer: ViewRenderer<Model> = diff {
@@ -215,31 +157,27 @@ class AytPortraitActivity : AppCompatActivity(),
 
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
             when (label) {
-                is Command -> label.command.let { command ->
-                    log.d(command.toString())
-                    when (command) {
-                        is Load -> player?.loadVideo(command.platformId, command.startPosition / 1000f)
-                        is Play -> player?.play()
-                        is Pause -> player?.pause()
-                        is SkipBack -> player?.seekTo(lastPositionSec - command.ms / 1000f)
-                        is SkipFwd -> player?.seekTo(lastPositionSec + command.ms / 1000f)
-                        is SeekTo -> {
-                            log.d(command.toString())
-                            player?.seekTo(command.ms.toFloat() / 1000f)
-                        }
-                        else -> Unit
-                    }
-                }
+                is Command -> label.command.let { aytViewHolder.processCommand(it) }
                 is LinkOpen ->
                     navMapper.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
                 is ChannelOpen ->
                     label.channel.platformId?.let { id -> navMapper.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
                 is FullScreenPlayerOpen -> label.also {
+                    aytViewHolder.switchView()
                     navMapper.navigate(NavigationModel(LOCAL_PLAYER_FULL, mapOf(PLAYLIST_ITEM to it.item)))
                     finish()
                 }
-                is PipPlayerOpen -> toast.show("PIP Open")
-                is PortraitPlayerOpen -> toast.show("Already in protrait mode - shouldnt get here")
+                is PipPlayerOpen -> {
+                    val hasPermission = floatingService.hasPermission(this@AytPortraitActivity)
+                    if (hasPermission) {
+                        aytViewHolder.switchView()
+                    }
+                    floatingService.start(this@AytPortraitActivity, label.item)
+                    if (hasPermission) {
+                        finish()
+                    }
+                }
+                is PortraitPlayerOpen -> toast.show("Already in portrait mode - shouldn't get here")
             }
         }
     }

@@ -53,6 +53,7 @@ interface SkipContract {
         var accumulator: Long = 0,
         var targetPosition: Long? = null,
         var position: Long = 0,
-        var currentPlayState: PlayerStateDomain? = null
+        var currentPlayState: PlayerStateDomain? = null,
+        var videoReady:Boolean = false
     )
 }

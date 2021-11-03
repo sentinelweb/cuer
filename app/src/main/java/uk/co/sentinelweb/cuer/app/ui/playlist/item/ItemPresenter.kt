@@ -1,12 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 
 class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
     val state: ItemContract.State,
-    private val modelMapper: ItemModelMapper
+    private val modelMapper: ItemModelMapper,
+    private val ytContext: ChromecastYouTubePlayerContextHolder
 ) : ItemContract.Presenter, ItemContract.External {
 
     override fun update(
@@ -25,6 +27,13 @@ class ItemPresenter(
         if (!item.isLive) {
             view.setProgress(item.progress)
         }
+        view.setPlayIcon(
+            if (ytContext.isConnected()) {
+                R.drawable.ic_notif_status_cast_conn_white
+            } else {
+                R.drawable.ic_play_black
+            }
+        )
         view.dismissMenu()
         state.item = item
     }
@@ -81,8 +90,8 @@ class ItemPresenter(
         interactions.onRelated(state.item!!)
     }
 
-    override fun doView() {
-        interactions.onView(state.item!!)
+    override fun doIconClick() {
+        interactions.onItemIconClick(state.item!!)
     }
 
     override fun doPlayStartClick() {

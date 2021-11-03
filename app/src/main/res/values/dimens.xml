@@ -43,4 +43,5 @@
     <dimen name="itemview_icon_height">72dp</dimen>
     <dimen name="itemview_icon_width">128dp</dimen>
     <dimen name="main_navhost_bottom_padding_player">104dp</dimen>
+    <dimen name="min_floating_window_size">128dp</dimen>
 </resources>

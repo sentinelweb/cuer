@@ -72,7 +72,8 @@ interface PlaylistItemEditContract {
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         playlistOrchestrator = get(),
-                        prefsWrapper = get()
+                        prefsWrapper = get(),
+                        floatingService = get()
                     )
                 }
                 scoped { State() }

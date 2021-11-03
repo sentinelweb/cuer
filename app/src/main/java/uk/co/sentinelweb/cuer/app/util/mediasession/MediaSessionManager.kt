@@ -27,11 +27,12 @@ class MediaSessionManager constructor(
         var bitmap: Bitmap? = null,
     )
 
-
     init {
         log.tag(this)
     }
 
+    // fixme: might ned two media sessions if local and rmote id needed? not really sure it is tbh
+    // the last playerlistener sent here is the one that gets the events - so if i do a preview function then i should not create a media session
     override fun checkCreateMediaSession(controls: PlayerContract.PlayerControls.Listener) {
         if (appState.mediaSession == null) {
             appState.mediaSession = MediaSessionCompat(context, "CuerCastService")
@@ -39,6 +40,8 @@ class MediaSessionManager constructor(
                     setCallback(CuerMediaSessionCallback(controls))
                     isActive = true
                 }
+        } else {
+            appState.mediaSession?.setCallback(CuerMediaSessionCallback(controls))
         }
     }
 

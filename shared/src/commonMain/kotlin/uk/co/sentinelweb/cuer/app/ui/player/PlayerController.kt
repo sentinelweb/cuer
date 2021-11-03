@@ -4,50 +4,29 @@ import com.arkivanov.mvikotlin.core.binder.Binder
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
 import com.arkivanov.mvikotlin.core.lifecycle.Lifecycle
 import com.arkivanov.mvikotlin.core.lifecycle.doOnDestroy
-import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.*
-import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
-import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
-import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
+@ExperimentalCoroutinesApi
 class PlayerController constructor(
-    itemLoader: PlayerContract.PlaylistItemLoader,
-    storeFactory: StoreFactory = DefaultStoreFactory,
     private val queueConsumer: QueueMediatorContract.Consumer,
     private val modelMapper: PlayerModelMapper,
     private val coroutines: CoroutineContextProvider,
-    queueProducer: QueueMediatorContract.Producer,
-    mediaSessionManager: MediaSessionContract.Manager,
+    private val playControls: PlayerListener,
+    private val log: LogWrapper,
+    private val store: PlayerContract.MviStore,
     lifecycle: Lifecycle?,
-    livePlaybackController: LivePlaybackContract.Controller,
-    skip: SkipContract.External,
-    log: LogWrapper,
 ) {
-    private val playControls = PlayerListener(coroutines)
-    private val store = PlayerStoreFactory(
-        storeFactory,
-        itemLoader,
-        queueConsumer,
-        queueProducer,
-        skip,
-        coroutines,
-        log,
-        livePlaybackController,
-        mediaSessionManager,
-        playControls
-    ).create()
-
     init {
         log.tag(this)
         lifecycle?.doOnDestroy(store::dispose)
@@ -55,8 +34,6 @@ class PlayerController constructor(
 
     private val eventToIntent: suspend PlayerContract.View.Event.() -> PlayerContract.MviStore.Intent = {
         when (this) {
-            is PlayClicked -> Play
-            is PauseClicked -> Pause
             is PlayerStateChanged -> PlayState(state)
             is TrackFwdClicked -> TrackFwd
             is TrackBackClicked -> TrackBack
@@ -77,6 +54,10 @@ class PlayerController constructor(
             is FullScreenClick -> FullScreenPlayerOpen
             is PortraitClick -> PortraitPlayerOpen
             is PipClick -> PipPlayerOpen
+            //is OnDestroy -> {log.d("map destroy");Destroy}
+            is OnInitFromService -> InitFromService(item)
+            is OnPlayItemFromService -> PlayItemFromService(item)
+            is OnSeekToPosition -> SeekToPosition(ms)
         }
     }
 
@@ -115,10 +96,15 @@ class PlayerController constructor(
             // view -> store
             view.events.mapNotNull(eventToIntent) bindTo store
         }
+        playControls.intentFlow
+            .onEach { log.d("playctls: $it") } bindTo store
         // queue -> store
-        queueConsumer.currentItemFlow.filterNotNull().mapNotNull { trackChangeToIntent(it) } bindTo store
-        queueConsumer.currentPlaylistFlow.filterNotNull().mapNotNull { playlistChangeToIntent(it) } bindTo store
-        playControls.intentFlow bindTo store
+        queueConsumer.currentItemFlow
+            .filterNotNull()
+            .mapNotNull { trackChangeToIntent(it) } bindTo store
+        queueConsumer.currentPlaylistFlow
+            .filterNotNull()
+            .mapNotNull { playlistChangeToIntent(it) } bindTo store
     }
 
     fun onStart() {
@@ -133,7 +119,10 @@ class PlayerController constructor(
         binder = null
     }
 
-    fun onDestroy() {
+    fun onDestroy(endSession:Boolean) {
+        if (endSession) {
+            store.endSession()
+        }
         store.dispose()
     }
 }

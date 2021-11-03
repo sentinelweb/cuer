@@ -1,14 +1,15 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
+import android.app.Activity
 import android.app.Notification
 import android.app.PendingIntent
+import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_DISCONNECT
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PAUSE
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PLAY
@@ -17,7 +18,6 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_STAR
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKB
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKF
-import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -26,10 +26,11 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import androidx.media.app.NotificationCompat as MediaNotificationCompat
 
 class PlayerControlsNotificationMedia constructor(
-    private val service: YoutubeCastService,
+    private val service: Service,
     private val appState: CuerAppState,
     private val timeProvider: TimeProvider,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val launchClass: Class<out Activity>,
 ) : PlayerControlsNotificationContract.View {
 
     override fun showNotification(
@@ -58,7 +59,7 @@ class PlayerControlsNotificationMedia constructor(
         val disconnectPendingIntent: PendingIntent = pendingIntent(ACTION_DISCONNECT)
         val starPendingIntent: PendingIntent = pendingIntent(ACTION_STAR)
 
-        val contentIntent = Intent(service, MainActivity::class.java)
+        val contentIntent = Intent(service, launchClass) // todo inject to launch player class
         val contentPendingIntent: PendingIntent =
             PendingIntent.getActivity(service, 0, contentIntent, 0)
 
@@ -114,7 +115,7 @@ class PlayerControlsNotificationMedia constructor(
     }
 
     private fun pendingIntent(action: String): PendingIntent {
-        val intent = Intent(service, YoutubeCastService::class.java).apply {
+        val intent = Intent(service, service::class.java).apply {
             this.action = action
             putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
         }

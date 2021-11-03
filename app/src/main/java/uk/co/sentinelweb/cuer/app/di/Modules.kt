@@ -32,9 +32,11 @@ import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
@@ -87,6 +89,7 @@ object Modules {
         CastPlayerMviFragment.fragmentModule,
         DescriptionView.viewModule,
         BrowseFragment.fragmentModule,
+        FloatingPlayerContract.serviceModule,
     )
 
     private val uiModule = module {
@@ -94,6 +97,7 @@ object Modules {
         factory { DatePickerCreator() }
         factory { IconMapper() }
         factory { BackgroundMapper(get()) }
+        single { AytViewHolder(get()) }
     }
 
     private val utilModule = module {

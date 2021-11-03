@@ -13,17 +13,13 @@ class SeekBarGestureExclude @JvmOverloads constructor(
     defStyle: Int = android.R.attr.seekBarStyle
 ) : androidx.appcompat.widget.AppCompatSeekBar(context, attrs, defStyle) {
 
-    private val gestureExclusionRects = mutableListOf<Rect>()
-
     private fun updateGestureExclusion() {
         // Skip this call if we're not running on Android 10+
         if (Build.VERSION.SDK_INT < 29) return
-
-        thumb?.also { t ->
-            gestureExclusionRects += t.copyBounds()
-        }
+        val rect = Rect()
+        this.getGlobalVisibleRect(rect)
         // Finally pass our updated list of rectangles to the system
-        ViewCompat.setSystemGestureExclusionRects(this, gestureExclusionRects)
+        ViewCompat.setSystemGestureExclusionRects(this, listOf(rect))
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

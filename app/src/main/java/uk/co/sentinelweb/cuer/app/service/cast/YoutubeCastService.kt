@@ -40,8 +40,7 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
         _instance = null
     }
 
-    // Note 1: intent can be null with start sticky - it might make sense to handle this and the wrapper
-    // can be re-created when a null intent is received (and doesn't exist already)
+    // media events are configured in manifest
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // this routes media buttons to the MediaSessionCompat
         if (intent?.action == Intent.ACTION_MEDIA_BUTTON) {

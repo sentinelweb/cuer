@@ -14,8 +14,11 @@ class YoutubeCastServiceController constructor(
     private val notification: PlayerControlsNotificationContract.External,
     private val chromeCastWrapper: ChromeCastWrapper,
     private val log: LogWrapper,
-    private val serviceWrapper: ServiceWrapper
+    private val serviceWrapper: ServiceWrapper,
 ) : YoutubeCastServiceContract.Controller {
+    init {
+        log.tag(this)
+    }
 
     override fun initialise() {
         ytContextHolder.playerUi = notification
@@ -32,7 +35,6 @@ class YoutubeCastServiceController constructor(
             else ->
                 notification.handleAction(action)
         }
-
     }
 
     override fun destroy() {

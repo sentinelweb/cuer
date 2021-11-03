@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer
 
 import android.app.Activity
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -14,7 +14,7 @@ class ItemLoader(
 
     override fun load(): PlaylistItemDomain? =
         activity.intent
-            ?.getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
+            ?.getStringExtra(PLAYLIST_ITEM.toString())
             //?.apply {log.d("item: "+this)}
             ?.let { deserialisePlaylistItem(it) }
 }

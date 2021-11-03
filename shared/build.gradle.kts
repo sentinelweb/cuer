@@ -18,6 +18,7 @@ val ver_truth: String by project
 val ver_mvikotlin: String by project
 val ver_kotlinx_coroutines_test: String by project
 val ver_multiplatform_settings: String by project
+val ver_turbine: String by project
 
 version = "1.0"
 
@@ -75,6 +76,7 @@ kotlin {
                 implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
                 implementation("com.google.truth:truth:$ver_truth")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test")
+                implementation("app.cash.turbine:turbine:$ver_turbine")
             }
         }
         val androidMain by getting {

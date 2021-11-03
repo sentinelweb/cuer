@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 
 interface YoutubeCastServiceContract {
 
@@ -18,7 +19,6 @@ interface YoutubeCastServiceContract {
     }
 
     interface Controller {
-
         fun initialise()
         fun handleAction(action: String?)
         fun destroy()
@@ -63,7 +63,8 @@ interface YoutubeCastServiceContract {
                         service = getSource(),
                         appState = get(),
                         timeProvider = get(),
-                        log = get()
+                        log = get(),
+                        launchClass = MainActivity::class.java
                     )
                 }
                 scoped { PlayerControlsNotificationContract.State() }

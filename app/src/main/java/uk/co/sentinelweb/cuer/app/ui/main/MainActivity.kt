@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
@@ -56,6 +57,7 @@ class MainActivity :
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val res: ResourceWrapper by inject()
     private lateinit var navController: NavController
+    private val aytViewHolder: AytViewHolder by inject()
 
     private var _binding: MainActivityBinding? = null
     private val binding: MainActivityBinding
@@ -84,6 +86,10 @@ class MainActivity :
             )
         }
         //intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
+
+        // todo save last tab
+        // todo for testing player
+        navController.navigate(R.id.navigation_playlist)
         presenter.initialise()
     }
 
