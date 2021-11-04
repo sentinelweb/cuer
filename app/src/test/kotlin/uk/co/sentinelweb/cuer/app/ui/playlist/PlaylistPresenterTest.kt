@@ -17,15 +17,19 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.State
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingWindowManagement
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
@@ -99,6 +103,15 @@ class PlaylistPresenterTest {
     @MockK
     lateinit var mockResources: ResourceWrapper
 
+    @MockK
+    lateinit var mockDbInit: DatabaseInitializer
+
+    @MockK
+    lateinit var mockFloatingWindow: FloatingPlayerServiceManager
+
+    @MockK
+    lateinit var mockPlaylistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator
+
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())
 
@@ -149,7 +162,7 @@ class PlaylistPresenterTest {
             .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(10))
         fixtCurrentIdentifier = Identifier(fixtCurrentPlaylist.id!!, fixtCurrentSource)
         coEvery {
-            mockPlaylistOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id, fixtCurrentIdentifier.source.flatOptions())
+            mockPlaylistOrDefaultOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id, fixtCurrentIdentifier.source.flatOptions())
         } returns (fixtCurrentPlaylist to fixtCurrentSource)
         log.d("cuurrent: id:${fixtCurrentIdentifier.id} opts:${fixtCurrentIdentifier.source.flatOptions()}")
         every { mockModelMapper.map(any(), any(), true, fixtCurrentIdentifier, any(), any()) } returns fixtCurrentPlaylistMapped
@@ -166,7 +179,7 @@ class PlaylistPresenterTest {
         fixtNextPlaylistMapped = fixture.build<PlaylistContract.Model>()
             .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(12))
         coEvery {
-            mockPlaylistOrchestrator.getPlaylistOrDefault(fixtNextIdentifier.id, fixtNextIdentifier.source.flatOptions())
+            mockPlaylistOrDefaultOrchestrator.getPlaylistOrDefault(fixtNextIdentifier.id, fixtNextIdentifier.source.flatOptions())
         } returns (fixtNextPlaylist to fixtNextSource)
         every { mockModelMapper.map(any(), any(), true, fixtNextIdentifier, any(), any()) } returns fixtNextPlaylistMapped
 
@@ -200,26 +213,29 @@ class PlaylistPresenterTest {
             fixtState = createDefaultState()
         }
         sut = PlaylistPresenter(
-            mockView,
-            fixtState!!,
-            mockMediaOrchestrator,
-            mockPlaylistMediaLookupOrchestrator,
-            mockPlaylistOrchestrator,
-            mockPlaylistItemOrchestrator,
-            mockPlaylistUpdateOrchestrator,
-            mockModelMapper,
-            mockQueue,
-            mockToastWrapper,
-            mockYtContextHolder,
-            mockChromeCastWrapper,
-            mockYtJavaApi,
-            mockShareWrapper,
-            playlistMutator,
-            mockPrefsWrapper,
-            log,
-            mockTimeProvider,
-            coroutines,
-            mockResources
+            view = mockView,
+            state = fixtState!!,
+            mediaOrchestrator = mockMediaOrchestrator,
+            playlistMediaLookupOrchestrator = mockPlaylistMediaLookupOrchestrator,
+            playlistOrchestrator = mockPlaylistOrchestrator,
+            playlistItemOrchestrator = mockPlaylistItemOrchestrator,
+            playlistUpdateOrchestrator = mockPlaylistUpdateOrchestrator,
+            modelMapper = mockModelMapper,
+            queue = mockQueue,
+            toastWrapper = mockToastWrapper,
+            ytCastContextHolder = mockYtContextHolder,
+            chromeCastWrapper = mockChromeCastWrapper,
+            ytJavaApi = mockYtJavaApi,
+            shareWrapper = mockShareWrapper,
+            playlistMutator = playlistMutator,
+            prefsWrapper = mockPrefsWrapper,
+            log = log,
+            timeProvider = mockTimeProvider,
+            coroutines = coroutines,
+            res = mockResources,
+            dbInit = mockDbInit,
+            floatingService = mockFloatingWindow,
+            playlistOrDefaultOrchestrator = mockPlaylistOrDefaultOrchestrator
         )
         sut.onResume()
     }
@@ -706,6 +722,7 @@ class PlaylistPresenterTest {
     fun `setPlaylistData no playlist id - no item - no playNow - is current queued `() {
         testCoroutineScope.runBlockingTest {
             fixtState = State()
+            coEvery { mockDbInit.isInitialized() } returns true
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
 

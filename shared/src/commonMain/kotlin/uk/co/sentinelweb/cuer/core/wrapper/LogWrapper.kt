@@ -9,4 +9,4 @@ interface LogWrapper {
     fun e(msg: String, t: Throwable? = null)
 }
 
-expect class SystemLogWrapper : LogWrapper
+expect class SystemLogWrapper() : LogWrapper

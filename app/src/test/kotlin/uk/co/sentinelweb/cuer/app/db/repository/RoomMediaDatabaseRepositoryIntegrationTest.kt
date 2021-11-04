@@ -40,8 +40,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 class RoomMediaDatabaseRepositoryIntegrationTest {
     private lateinit var database: AppDatabase
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
-    private val coCxtProvider: CoroutineContextProvider =
-        CoroutineContextTestProvider(testCoroutineDispatcher)
+    private val coCxtProvider = CoroutineContextTestProvider(testCoroutineDispatcher)
 
     @Fixture
     private lateinit var fixtMedia: MediaDomain
@@ -53,6 +52,7 @@ class RoomMediaDatabaseRepositoryIntegrationTest {
     private val channelMapper = ChannelMapper(imageMapper)
     private val mediaMapper = MediaMapper(imageMapper, channelMapper)
     private val mediaUpdateMapper = MediaUpdateMapper(InstantTypeConverter())
+    private lateinit var channelReopsitory: RoomChannelDatabaseRepository
 
     private lateinit var sut: RoomMediaDatabaseRepository
 
@@ -69,16 +69,21 @@ class RoomMediaDatabaseRepositoryIntegrationTest {
             Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
                 .allowMainThreadQueries()
                 .build()
-
+        channelReopsitory = RoomChannelDatabaseRepository(
+            channelDao = database.channelDao(),
+            channelMapper = channelMapper,
+            coProvider = coCxtProvider,
+            log = log,
+            database = database
+        )
         sut = RoomMediaDatabaseRepository(
             mediaDao = database.mediaDao(),
             mediaMapper = mediaMapper,
-            channelDao = database.channelDao(),
-            channelMapper = channelMapper,
             log = log,
             coProvider = coCxtProvider,
             database = database,
-            mediaUpdateMapper = mediaUpdateMapper
+            mediaUpdateMapper = mediaUpdateMapper,
+            channelDatabaseRepository = channelReopsitory
         )
 
         fixtMedia = fixtMedia.copy(
@@ -190,19 +195,6 @@ class RoomMediaDatabaseRepositoryIntegrationTest {
             val resultCount1 = sut.count(IdListFilter(listOf(resultSave.data!!.id!!.toLong())))
             // verify
             assertTrue(resultCount1.isSuccessful && resultCount1.data!! == 2)
-        }
-    }
-
-    @Test
-    fun loadChannel() {
-        runBlocking {
-            val insertId =
-                database.channelDao().insert(channelMapper.map(fixtChannel.copy(id = null)))
-
-            val result = sut.loadChannel(insertId)
-            assertTrue(result.isSuccessful)
-
-            assertEquals(fixtChannel.copy(id = insertId), result.data)
         }
     }
 
