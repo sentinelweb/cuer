@@ -24,20 +24,19 @@ class SharedPrefsWrapperRoboTest {
 
     private val fixture = JFixture()
 
-    enum class TestPreferencesType(override val fname: String) : Field { X1("x1"), X2("x2"), X3("x3") }
+//    enum class TestPreferencesType(override val fname: String) : Field { X1("x1"), X2("x2"), X3("x3") }
 
-    private lateinit var sut: SharedPrefsWrapper<TestPreferencesType>
+    private lateinit var sut: SharedPrefsWrapper
 
     @Before
     fun setUp() {
 
         sut = SharedPrefsWrapper(
-            TestPreferencesType::class,
             ApplicationProvider.getApplicationContext(),
             SystemLogWrapper()
         )
         prefs = ApplicationProvider.getApplicationContext<CuerTestApp>()
-            .getSharedPreferences(TestPreferencesType::class.simpleName, 0)
+            .getSharedPreferences(GeneralPreferences::class.simpleName, 0)
     }
 
     @Test
@@ -98,7 +97,7 @@ class SharedPrefsWrapperRoboTest {
 
     @Test
     fun putPair() {
-        sut.putPair(TestPreferencesType.X1, 1L to MEMORY)
+        sut.putPair(GeneralPreferences.CURRENT_PLAYLIST, 1L to MEMORY)
 
         assertThat(prefs.getLong(X1_FIRST, 0L)).isEqualTo(1L)
         assertThat(prefs.getString(X1_SECOND, null)).isEqualTo(MEMORY.toString())
@@ -111,7 +110,7 @@ class SharedPrefsWrapperRoboTest {
         prefs.edit().putLong(X1_FIRST, fixtFirst).commit()
         prefs.edit().putString(X1_SECOND, fixtSecond.toString()).commit()
 
-        sut.putPair(TestPreferencesType.X1, (null as String?) to (null as Source?))
+        sut.putPair(GeneralPreferences.CURRENT_PLAYLIST, (null as String?) to (null as Source?))
 
         assertThat(prefs.contains(X1_FIRST)).isFalse()
         assertThat(prefs.contains(X1_SECOND)).isFalse()
@@ -126,7 +125,7 @@ class SharedPrefsWrapperRoboTest {
         prefs.edit().putString(X1_FIRST, fixtFirst).commit()
         prefs.edit().putString(X1_SECOND, fixtSecond.toString()).commit()
 
-        val pair = sut.getPair(TestPreferencesType.X1, fixtFirstDefault to fixtSecondDefault)
+        val pair = sut.getPair(GeneralPreferences.CURRENT_PLAYLIST, fixtFirstDefault to fixtSecondDefault)
 
         assertThat(pair.first).isEqualTo(fixtFirst)
         assertThat(pair.second).isEqualTo(fixtSecond)
@@ -137,14 +136,14 @@ class SharedPrefsWrapperRoboTest {
         val fixtFirstDefault: String = fixture.build()
         val fixtSecondDefault: Source = fixture.build()
 
-        val pair = sut.getPair(TestPreferencesType.X1, fixtFirstDefault to fixtSecondDefault)
+        val pair = sut.getPair(GeneralPreferences.CURRENT_PLAYLIST, fixtFirstDefault to fixtSecondDefault)
 
         assertThat(pair.first).isEqualTo(fixtFirstDefault)
         assertThat(pair.second).isEqualTo(fixtSecondDefault)
     }
 
     companion object {
-        private val X1_FIRST = "x1.first"
-        private val X1_SECOND = "x1.second"
+        private val X1_FIRST = "currentPlaylist.first"
+        private val X1_SECOND = "currentPlaylist.second"
     }
 }
