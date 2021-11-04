@@ -26,7 +26,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     override val scope: Scope by fragmentScopeWithSource()
     private val presenter: PlaylistsDialogContract.Presenter by inject()
-    private val adapter: PlaylistsAdapter by inject()
+    private val adapter: PlaylistsDialogAdapter by inject()
     private val itemTouchHelper: ItemTouchHelper by inject()
     private val log: LogWrapper by inject()
 

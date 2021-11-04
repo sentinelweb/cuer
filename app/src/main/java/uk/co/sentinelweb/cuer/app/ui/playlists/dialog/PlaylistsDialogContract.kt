@@ -97,7 +97,7 @@ interface PlaylistsDialogContract {
                 }
                 scoped { PlaylistsModelMapper(get()) }
                 scoped { PlaylistsDialogModelMapper() }
-                scoped { PlaylistsAdapter(get(), getSource()) }
+                scoped { PlaylistsDialogAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
