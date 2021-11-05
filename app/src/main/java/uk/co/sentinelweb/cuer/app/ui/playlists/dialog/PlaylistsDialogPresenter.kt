@@ -87,7 +87,7 @@ class PlaylistsDialogPresenter(
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
             .let {
-                state.playlistsModel = modelMapper.map(it, null, false, pinnedId, null, state.treeLookup)
+                state.playlistsModel = modelMapper.map(it, null,  pinnedId, null, state.treeLookup)
                 dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
             }
             .takeIf { coroutines.mainScopeActive }

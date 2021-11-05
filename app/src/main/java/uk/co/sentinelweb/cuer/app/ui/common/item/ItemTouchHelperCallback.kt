@@ -109,8 +109,8 @@ class ItemTouchHelperCallback(
                 val outSideTolerance = Math.abs(dX) > 20
                 val left = dX < 0
                 if (outSideTolerance) {
-                    rightSwipeView.fade(!left)
-                    leftSwipeView.fade(left)
+                    rightSwipeView?.fade(!left)
+                    leftSwipeView?.fade(left)
                     swipingLeft = left
                 }
             }

@@ -7,13 +7,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemViewHolder
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.row.ItemRowViewHolder
 
 
 class PlaylistsDialogAdapter constructor(
     private val itemFactory: ItemFactory,
     private val interactions: ItemContract.Interactions
-) : RecyclerView.Adapter<ItemViewHolder>() {
+) : RecyclerView.Adapter<ItemRowViewHolder>() {
 
     private lateinit var recyclerView: RecyclerView
 
@@ -49,14 +49,14 @@ class PlaylistsDialogAdapter constructor(
         this.recyclerView = recyclerView
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemRowViewHolder {
         return itemFactory.createItemViewHolder(parent, interactions)
     }
 
     @Override
-    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holderRow: ItemRowViewHolder, position: Int) {
         _data.get(position).apply {
-            holder.itemPresenter.update(this, this.id == currentPlaylistId?.id)// todo add identifier to model
+            holderRow.itemPresenter.update(this as ItemContract.Model.ItemModel, this.id == currentPlaylistId?.id)
         }
     }
 

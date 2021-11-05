@@ -1,24 +1,24 @@
-package uk.co.sentinelweb.cuer.app.ui.playlists.item
+package uk.co.sentinelweb.cuer.app.ui.playlists.item.row
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 
-class ItemViewHolder(
+class ItemRowViewHolder(
     val itemPresenter: ItemContract.External,
-    private val view: ItemView
-) : RecyclerView.ViewHolder(view),
+    private val rowView: ItemRowView
+) : RecyclerView.ViewHolder(rowView.root),
     ItemBaseContract.ItemTouchHelperViewHolder {
 
-    // region ItemTouchHelperViewHolder
     override val contentView: View
-        get() = view.itemView
+        get() = rowView.itemView
 
     override val rightSwipeView: View
-        get() = view.rightSwipeView
+        get() = rowView.rightSwipeView
 
     override val leftSwipeView: View
-        get() = view.leftSwipeView
+        get() = rowView.leftSwipeView
 
     override fun onItemSwiped(left: Boolean) {
         if (left) {
@@ -34,12 +34,10 @@ class ItemViewHolder(
 
     override fun canReorder(): Boolean = itemPresenter.canReorder()
 
-    override fun onItemSelected() {
-        // itemPresenter.doClick()
-    }
+    override fun onItemSelected() {}
 
     override fun onItemClear() {
-        view.resetBackground()
+        rowView.resetBackground()
     }
     // endregion
 }

@@ -9,7 +9,7 @@ class ItemPresenter(
     val modelMapper: ItemModelMapper
 ) : ItemContract.Presenter, ItemContract.External {
 
-    override fun update(item: ItemContract.Model, current: Boolean) {
+    override fun update(item: ItemContract.Model.ItemModel, current: Boolean) {
         view.setTopText(modelMapper.mapTopText(item, current))
         view.setBottomText(modelMapper.mapBottomText(item))
         view.setCheckedVisible(item.checkIcon)

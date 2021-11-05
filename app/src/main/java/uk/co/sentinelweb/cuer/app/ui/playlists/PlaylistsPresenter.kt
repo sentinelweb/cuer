@@ -153,7 +153,9 @@ class PlaylistsPresenter(
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        view.navigate(PlaylistContract.makeNav(item.id, null, false, item.source))
+        if (item is ItemContract.Model.ItemModel) {
+            view.navigate(PlaylistContract.makeNav(item.id, null, false, item.source))
+        }
     }
 
     override fun onItemImageClicked(item: ItemContract.Model) {
@@ -164,7 +166,9 @@ class PlaylistsPresenter(
                 showCurrentNode()
             }
             ?: findPlaylist(item)?.id?.apply {
-                view.navigate(PlaylistContract.makeNav(this, null, false, item.source))
+                if (item is ItemContract.Model.ItemModel) {
+                    view.navigate(PlaylistContract.makeNav(this, null, false, item.source))
+                }
             }
     }
 
@@ -177,7 +181,9 @@ class PlaylistsPresenter(
 
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
         if (!external) {
-            view.navigate(PlaylistContract.makeNav(item.id, null, true, item.source))
+            if (item is ItemContract.Model.ItemModel) {
+                view.navigate(PlaylistContract.makeNav(item.id, null, true, item.source))
+            }
         } else {
             findPlaylist(item)
                 ?.takeIf { it.type == PLATFORM }
@@ -333,7 +339,6 @@ class PlaylistsPresenter(
     ) = modelMapper.map(
         it,
         queue.playlistId,
-        true,
         prefsWrapper.getLong(PINNED_PLAYLIST),
         state.treeCurrentNodeId,
         state.treeLookup

@@ -67,7 +67,11 @@ class PlaylistsFragment :
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = PlaylistsFragmentBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -204,7 +208,7 @@ class PlaylistsFragment :
     }
 
     override fun onLeftSwipe(item: ItemContract.Model) {
-        adapter.notifyItemRemoved(item.index)
+        adapter.notifyItemRemoved(adapter.data.indexOf(item))
         presenter.onItemSwipeLeft(item) // delays for animation
     }
 

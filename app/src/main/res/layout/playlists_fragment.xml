@@ -94,7 +94,7 @@
             android:layout_height="match_parent"
             app:layoutManager="LinearLayoutManager"
             tools:context=".ui.playlists.PlaylistsFragment"
-            tools:listitem="@layout/view_playlists_item"
+            tools:listitem="@layout/view_playlists_item_row"
             />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

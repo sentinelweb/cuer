@@ -10,6 +10,10 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 interface ItemContract {
 
+    enum class ItemType {
+        ROW, HEADER, LIST, TILE
+    }
+
     interface View {
         fun setTopText(text: Spannable)
         fun setBottomText(text: Spannable)
@@ -33,11 +37,10 @@ interface ItemContract {
         fun doImageClick()
         fun doEdit()
         fun isStarred(): Boolean
-
     }
 
     interface External : ItemBaseContract.ItemPresenterBase {
-        fun update(item: Model, current: Boolean)
+        fun update(item: Model.ItemModel, current: Boolean)
         fun doLeft()
         fun doRight()
     }
@@ -54,31 +57,43 @@ interface ItemContract {
         fun onEdit(item: Model)
     }
 
-    data class State constructor(var item: Model? = null)
+    data class State constructor(var item: Model.ItemModel? = null)
 
-    data class Model(
-        override val id: Long,// todo OrchestratorContract.Identifier
-        val index: Int,
-        val title: String,
-        val checkIcon: Boolean,
-        val thumbNailUrl: String?,
-        val starred: Boolean,
-        val count: Int,
-        val newItems: Int,
-        val loopMode: PlaylistDomain.PlaylistModeDomain,
-        val type: PlaylistDomain.PlaylistTypeDomain,
-        val platform: PlatformDomain?,
-        val showOverflow: Boolean,
-        val source: OrchestratorContract.Source,
-        val canPlay: Boolean,
-        val canEdit: Boolean,
-        val canDelete: Boolean,
-        val canLaunch: Boolean,
-        val canShare: Boolean,
-        val watched: Boolean,
-        val pinned: Boolean,
-        val default: Boolean,
-        val descendents: Int
-    ) : ItemBaseModel(id)
+    sealed class Model(override val id: Long) : ItemBaseModel(id) {
+
+        data class HeaderModel(
+            override val id: Long,
+            val title: String,
+        ):Model(id)
+
+        data class ListModel(
+            override val id: Long,
+            val items: List<ItemModel>,
+        ):Model(id)
+
+        data class ItemModel(
+            override val id: Long,// todo OrchestratorContract.Identifier
+            val title: String,
+            val checkIcon: Boolean,
+            val thumbNailUrl: String?,
+            val starred: Boolean,
+            val count: Int,
+            val newItems: Int,
+            val loopMode: PlaylistDomain.PlaylistModeDomain,
+            val type: PlaylistDomain.PlaylistTypeDomain,
+            val platform: PlatformDomain?,
+            val showOverflow: Boolean,
+            val source: OrchestratorContract.Source,
+            val canPlay: Boolean,
+            val canEdit: Boolean,
+            val canDelete: Boolean,
+            val canLaunch: Boolean,
+            val canShare: Boolean,
+            val watched: Boolean,
+            val pinned: Boolean,
+            val default: Boolean,
+            val descendents: Int
+        ) : Model(id)
+    }
 
 }

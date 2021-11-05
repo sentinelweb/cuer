@@ -20,7 +20,6 @@ class PlaylistsModelMapper constructor(
     fun map(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         current: OrchestratorContract.Identifier<*>?,
-        showOverflow: Boolean,
         pinnedId: Long?,
         nodeId: Long?,
         treeLookup: Map<Long, PlaylistTreeDomain>
@@ -31,10 +30,9 @@ class PlaylistsModelMapper constructor(
             treeLookup[nodeId]?.node?.image?.url ?: PLAYLISTS_HEADER_IMAGE,
             current,
             nodeId != null,
-            domains.keys.mapIndexed { index, pl ->
-                ItemContract.Model(
+            domains.keys.map { pl ->
+                ItemContract.Model.ItemModel(
                     pl.id ?: throw Exception("Playlist must have an id"),
-                    index,
                     pl.title,
                     false,
                     (pl.thumb ?: pl.image)?.url,
@@ -44,7 +42,7 @@ class PlaylistsModelMapper constructor(
                     loopMode = pl.mode,
                     type = pl.type,
                     platform = pl.platform,
-                    showOverflow = showOverflow,
+                    showOverflow = true,
                     source = if (pl.type == APP) MEMORY else LOCAL,
                     canEdit = pl.config.editable,
                     canPlay = pl.config.playable,

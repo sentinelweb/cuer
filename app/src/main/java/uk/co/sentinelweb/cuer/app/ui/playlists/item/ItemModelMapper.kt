@@ -59,7 +59,7 @@ class ItemModelMapper constructor(
         }
     }
 
-    fun mapTopText(model: ItemContract.Model, playing: Boolean): SpannableString {
+    fun mapTopText(model: ItemContract.Model.ItemModel, playing: Boolean): SpannableString {
         return if (!playing) {
             SpannableString(model.title)
         } else {
@@ -73,7 +73,7 @@ class ItemModelMapper constructor(
         }
     }
 
-    fun mapBottomText(model: ItemContract.Model): Spannable {
+    fun mapBottomText(model: ItemContract.Model.ItemModel): Spannable {
         val countText = if (model.count > 0) model.run { "$newItems / $count " } else ""
         val base = SpannableString("          $countText").let {
             res.replaceSpannableIcon(
@@ -135,7 +135,6 @@ class ItemModelMapper constructor(
     }
 
     companion object {
-
         private val SCALING = 1.1f
     }
 }
