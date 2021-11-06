@@ -105,13 +105,29 @@ class ShareActivity : AppCompatActivity(),
         }
     }
 
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        finish()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        checkIntent(intent)
+    }
+
     override fun onStart() {
         super.onStart()
+        checkIntent(intent)
+    }
+
+    private fun checkIntent(intent: Intent) {
         if (!intent.getBooleanExtra(PASTE.toString(), false)) {
             checkForPlaylistParentInIntent()
-            (shareWrapper.getLinkFromIntent(intent) ?: shareWrapper.getTextFromIntent(intent))?.apply {
+            (shareWrapper.getLinkFromIntent(intent)
+                ?: shareWrapper.getTextFromIntent(intent))?.apply {
                 if (!presenter.isAlreadyScanned(this)) {
-                    scanFragment?.fromShareUrl(this) ?: throw IllegalStateException("Scan fragment not visible")
+                    scanFragment?.fromShareUrl(this)
+                        ?: throw IllegalStateException("Scan fragment not visible")
                 }
             } ?: presenter.linkError(getString(R.string.share_error_no_link))
         }
