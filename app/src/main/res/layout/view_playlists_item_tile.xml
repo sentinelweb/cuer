@@ -1,46 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<uk.co.sentinelweb.cuer.app.ui.common.views.MaskedCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/list_item_height"
+    style="@style/ItemTile.Root"
     >
-
-    <TextView
-        android:id="@+id/swipe_label_right"
-        style="@style/ItemView.Background.Right"
-        android:background="?colorMove"
-        android:text="@string/pl_item_move"
-        app:drawableLeftCompat="@drawable/ic_item_playlist_move_white"
-        android:layout_marginBottom="2dp"
-        tools:ignore="RtlHardcoded,RtlSymmetry"
-        />
-
-    <TextView
-        android:id="@+id/swipe_label_left"
-        style="@style/ItemView.Background.Left"
-        android:background="?colorDelete"
-        android:text="@string/pls_item_delete"
-        app:drawableRightCompat="@drawable/ic_item_delete_white"
-        android:layout_marginBottom="2dp"
-        tools:ignore="RtlHardcoded,RtlSymmetry"
-        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/listitem"
-        style="@style/ItemView.Container"
+        style="@style/ItemTile.Container"
         >
 
-        <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
+        <ImageView
             android:id="@+id/listitem_icon"
-            style="@style/ItemView.Thumb.Row"
+            style="@style/ItemTile.Thumb"
             android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_playlist_default_black"
-
+            android:scaleType="centerCrop"
             />
 
         <ImageView
@@ -53,22 +32,20 @@
 
         <View
             android:id="@+id/listitem_overflow_click"
-            style="@style/ItemView.OverflowButtonClick"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            style="@style/ItemTile.OverflowButtonClick"
+            android:layout_height="48dp"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             android:contentDescription="@string/cd_overflow"
             />
 
         <TextView
             android:id="@+id/listitem_top"
-            style="@style/ItemView.TopText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toRightOf="@id/listitem_icon"
-            app:layout_constraintRight_toLeftOf="@id/listitem_overflow_img"
-            app:layout_constraintTop_toTopOf="parent"
+            style="@style/ItemTile.Title"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="Playlist"
             />
 
         <TextView
@@ -79,17 +56,17 @@
             app:layout_constraintLeft_toRightOf="@id/listitem_icon"
             app:layout_constraintRight_toLeftOf="@id/listitem_overflow_img"
             app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="gone"
             />
 
         <ImageView
             android:id="@+id/listitem_overflow_img"
             style="@style/ItemView.OverflowButton"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            android:layout_height="48dp"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             android:contentDescription="@null"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</FrameLayout>
+</uk.co.sentinelweb.cuer.app.ui.common.views.MaskedCardView>

@@ -7,9 +7,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 
 class ListViewHolder(
     private val listView: ListView,
-    val listPresenter: ListPresenter
-) : RecyclerView.ViewHolder(listView.root),
-    ItemBaseContract.ItemTouchHelperViewHolder {
+    val listPresenter: ItemContract.External<ItemContract.Model.ListModel>
+) : RecyclerView.ViewHolder(listView.root), ItemBaseContract.ItemTouchHelperViewHolder {
 
     override val contentView: View
         get() = listView.root
@@ -22,11 +21,11 @@ class ListViewHolder(
 
     override fun onItemSwiped(left: Boolean) {}
 
-    override fun canDragLeft(): Boolean = false
+    override fun canDragLeft(): Boolean = listPresenter.canDragLeft()
 
-    override fun canDragRight(): Boolean = false
+    override fun canDragRight(): Boolean = listPresenter.canDragRight()
 
-    override fun canReorder(): Boolean = false
+    override fun canReorder(): Boolean = listPresenter.canReorder()
 
     override fun onItemClear() {}
 

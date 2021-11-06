@@ -89,7 +89,7 @@ class MainActivity :
 
         // todo save last tab
         // todo for testing player
-        navController.navigate(R.id.navigation_playlist)
+        navController.navigate(R.id.navigation_playlists)
         presenter.initialise()
     }
 

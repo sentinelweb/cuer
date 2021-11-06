@@ -18,7 +18,6 @@ import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistsItemTileBinding
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
-import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 
@@ -34,22 +33,21 @@ class ItemTileView() :
         get() = _binding.root
     val itemView: View
         get() = _binding.listitem
-    val rightSwipeView: View
-        get() = _binding.swipeLabelRight
-    val leftSwipeView: View
-        get() = _binding.swipeLabelLeft
+    val rightSwipeView: View?
+        get() = null
+    val leftSwipeView: View?
+        get() = null
 
     fun init(parent: ViewGroup) {
         _binding =
             ViewPlaylistsItemTileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        _binding.listitem.setOnClickListener { presenter.doClick() }
+        _binding.root.setOnClickListener { presenter.doClick() }
         _binding.listitemOverflowClick.setOnClickListener { showContextualMenu() }
-        _binding.listitemIcon.setOnClickListener { presenter.doImageClick() }
+//        _binding.listitemIcon.setOnClickListener { presenter.doImageClick() }
     }
 
     @SuppressLint("RestrictedApi")
     private fun showContextualMenu() {
-
         val wrapper = ContextThemeWrapper(_binding.root.context, R.style.ContextMenu)
         val popup = PopupMenu(wrapper, _binding.listitemOverflowClick)
         popup.inflate(R.menu.playlists_context)
@@ -84,8 +82,6 @@ class ItemTileView() :
     }
 
     fun resetBackground() {
-        _binding.swipeLabelRight.fade(false)
-        _binding.swipeLabelLeft.fade(false)
         _binding.listitem.translationX = 0f
         _binding.listitem.alpha = 1f
     }

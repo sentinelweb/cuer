@@ -42,7 +42,6 @@ class PlaylistsDialogAdapter constructor(
             this@PlaylistsDialogAdapter._data = data
             notifyDataSetChanged()
         }
-
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -56,7 +55,7 @@ class PlaylistsDialogAdapter constructor(
     @Override
     override fun onBindViewHolder(holderRow: ItemRowViewHolder, position: Int) {
         _data.get(position).apply {
-            holderRow.itemPresenter.update(this as ItemContract.Model.ItemModel, this.id == currentPlaylistId?.id)
+            holderRow.itemPresenter.update(this as ItemContract.Model.ItemModel,  currentPlaylistId)
         }
     }
 

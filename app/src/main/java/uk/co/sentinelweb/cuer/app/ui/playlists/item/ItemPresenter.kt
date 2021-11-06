@@ -1,16 +1,21 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Model.ItemModel
 
 class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
     val state: ItemContract.State,
     val modelMapper: ItemModelMapper
-) : ItemContract.Presenter, ItemContract.External {
+) : ItemContract.Presenter, ItemContract.External<ItemModel> {
 
-    override fun update(item: ItemContract.Model.ItemModel, current: Boolean) {
-        view.setTopText(modelMapper.mapTopText(item, current))
+    override fun update(
+        item: ItemModel,
+        current: OrchestratorContract.Identifier<*>?
+    ) {
+        view.setTopText(modelMapper.mapTopText(item, current?.id == item.id))
         view.setBottomText(modelMapper.mapBottomText(item))
         view.setCheckedVisible(item.checkIcon)
         item.thumbNailUrl
@@ -57,10 +62,6 @@ class ItemPresenter(
         interactions.onPlay(state.item!!, external)
     }
 
-//    override fun doShowChannel() {
-//        interactions.onShowChannel(state.item!!)
-//    }
-
     override fun doStar() {
         interactions.onStar(state.item!!)
     }
@@ -76,5 +77,6 @@ class ItemPresenter(
     override fun canPlay(): Boolean = state.item?.canPlay ?: false
 
     override fun canLaunch(): Boolean = state.item?.canLaunch ?: false
+
 
 }

@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.ItemType.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.header.HeaderViewHolder
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.list.ListViewHolder
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.row.ItemRowViewHolder
 
 
@@ -60,27 +61,31 @@ class PlaylistsAdapter constructor(
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
+    override fun getItemViewType(position: Int): Int =
         when (data[position]) {
             is ItemContract.Model.ItemModel -> ROW.ordinal
             is ItemContract.Model.HeaderModel -> HEADER.ordinal
             is ItemContract.Model.ListModel -> LIST.ordinal
         }
-        return super.getItemViewType(position)
-    }
 
     @Override
     override fun onBindViewHolder(holderRow: RecyclerView.ViewHolder, position: Int) {
         when (holderRow) {
-            is ItemRowViewHolder -> _data.get(position).apply {
+            is ItemRowViewHolder -> _data[position].apply {
                 holderRow.itemPresenter.update(
                     this as ItemContract.Model.ItemModel,
-                    this.id == currentPlaylistId?.id
+                    currentPlaylistId
                 )
             }
-            is HeaderViewHolder -> _data.get(position).apply {
+            is HeaderViewHolder -> _data[position].apply {
                 holderRow.update(
                     this as ItemContract.Model.HeaderModel
+                )
+            }
+            is ListViewHolder -> _data[position].apply {
+                holderRow.listPresenter.update(
+                    this as ItemContract.Model.ListModel,
+                    currentPlaylistId
                 )
             }
         }

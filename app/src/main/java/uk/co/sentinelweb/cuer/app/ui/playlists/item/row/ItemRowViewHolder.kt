@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 
 class ItemRowViewHolder(
-    val itemPresenter: ItemContract.External,
+    val itemPresenter: ItemContract.External<ItemContract.Model.ItemModel>,
     private val rowView: ItemRowView
 ) : RecyclerView.ViewHolder(rowView.root),
     ItemBaseContract.ItemTouchHelperViewHolder {

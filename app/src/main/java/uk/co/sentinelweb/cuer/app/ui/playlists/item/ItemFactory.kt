@@ -28,7 +28,7 @@ class ItemFactory constructor(
     fun createPresenter(
         view: ItemContract.View,
         interactions: ItemContract.Interactions
-    ): ItemContract.External {
+    ): ItemContract.External<ItemContract.Model.ItemModel> {
         val itemPresenter = ItemPresenter(view, interactions, ItemContract.State(), modelMapper)
         view.setPresenter(itemPresenter)
         return itemPresenter
@@ -53,10 +53,11 @@ class ItemFactory constructor(
 
     fun createListViewHolder(parent: ViewGroup, interactions: ItemContract.Interactions):ListViewHolder {
         val listView = ListView().apply { init(parent) }
+        val listPresenter = ListPresenter(listView, this, interactions)
+        listView.setPresenter(listPresenter)
         return ListViewHolder(
             listView,
-            ListPresenter(listView,this, interactions)
+            listPresenter
         )
     }
-
 }

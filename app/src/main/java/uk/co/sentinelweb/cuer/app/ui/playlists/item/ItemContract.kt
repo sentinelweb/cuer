@@ -39,10 +39,18 @@ interface ItemContract {
         fun isStarred(): Boolean
     }
 
-    interface External : ItemBaseContract.ItemPresenterBase {
-        fun update(item: Model.ItemModel, current: Boolean)
+    interface External<in T : Model> : ItemBaseContract.ItemPresenterBase {
+        fun update(item: T, current: OrchestratorContract.Identifier<*>?)
         fun doLeft()
         fun doRight()
+    }
+
+    interface ListView {
+        fun setPresenter(listPresenter: ListPresenter)
+    }
+
+    interface ListPresenter {
+
     }
 
     interface Interactions {
@@ -64,12 +72,12 @@ interface ItemContract {
         data class HeaderModel(
             override val id: Long,
             val title: String,
-        ):Model(id)
+        ) : Model(id)
 
         data class ListModel(
             override val id: Long,
             val items: List<ItemModel>,
-        ):Model(id)
+        ) : Model(id)
 
         data class ItemModel(
             override val id: Long,// todo OrchestratorContract.Identifier

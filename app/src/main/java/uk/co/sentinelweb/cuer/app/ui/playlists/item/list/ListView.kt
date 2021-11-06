@@ -3,15 +3,14 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item.list
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import uk.co.sentinelweb.cuer.app.databinding.ViewItemHeaderBinding
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistsItemListBinding
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.tile.ItemTileView
 
-class ListView() {
+class ListView:ItemContract.ListView {
 
     private lateinit var _binding: ViewPlaylistsItemListBinding
-    private lateinit var presenter: ItemContract.Presenter
+    private lateinit var presenter: ItemContract.ListPresenter
 
     val root: View
         get() = _binding.root
@@ -22,10 +21,14 @@ class ListView() {
     }
 
     fun clear() {
-        _binding.root.removeAllViews()
+        _binding.list.removeAllViews()
     }
 
     fun addView(view: ItemTileView) {
-        _binding.root.addView(view.root)
+        _binding.list.addView(view.root)
+    }
+
+    override fun setPresenter(listPresenter:ItemContract.ListPresenter) {
+        presenter = listPresenter
     }
 }

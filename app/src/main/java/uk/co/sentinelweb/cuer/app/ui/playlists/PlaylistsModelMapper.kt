@@ -17,6 +17,38 @@ class PlaylistsModelMapper constructor(
     private val res: ResourceWrapper
 ) {
 
+    fun map2(
+        domains: Map<PlaylistDomain, PlaylistStatDomain?>,
+        current: OrchestratorContract.Identifier<*>?,
+        appPlaylists:Map<PlaylistDomain, PlaylistStatDomain?>,
+        pinnedId: Long?,
+        treeLookup: Map<Long, PlaylistTreeDomain>
+    ):PlaylistsContract.Model {
+        return PlaylistsContract.Model(
+            res.getString(R.string.playlists_title),
+            PLAYLISTS_HEADER_IMAGE,
+            current,
+            false,// show up
+            buildItems(domains, appPlaylists, pinnedId, treeLookup)
+        )
+    }
+
+    private fun buildItems(
+        domains: Map<PlaylistDomain, PlaylistStatDomain?>,
+        appPlaylists: Map<PlaylistDomain, PlaylistStatDomain?>,
+        pinnedId: Long?,
+        treeLookup: Map<Long, PlaylistTreeDomain>
+    ): List<ItemContract.Model> {
+        return listOf(
+            ItemContract.Model.HeaderModel(0, "App playlists"),
+            ItemContract.Model.ListModel(0, appPlaylists.keys.map {
+                itemModel(it, treeLookup, it.id == pinnedId, domains[it])
+            }),
+        ).plus(domains.keys.map { pl ->
+            itemModel(pl, treeLookup, pl.id == pinnedId, domains[pl])
+        })
+    }
+
     fun map(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         current: OrchestratorContract.Identifier<*>?,
@@ -31,32 +63,38 @@ class PlaylistsModelMapper constructor(
             current,
             nodeId != null,
             domains.keys.map { pl ->
-                ItemContract.Model.ItemModel(
-                    pl.id ?: throw Exception("Playlist must have an id"),
-                    pl.title,
-                    false,
-                    (pl.thumb ?: pl.image)?.url,
-                    count = domains[pl]?.itemCount ?: -1,
-                    newItems = domains[pl]?.let { it.itemCount - it.watchedItemCount } ?: -1,
-                    starred = pl.starred,
-                    loopMode = pl.mode,
-                    type = pl.type,
-                    platform = pl.platform,
-                    showOverflow = true,
-                    source = if (pl.type == APP) MEMORY else LOCAL,
-                    canEdit = pl.config.editable,
-                    canPlay = pl.config.playable,
-                    canDelete = pl.config.deletable,
-                    canLaunch = pl.type == PLATFORM,
-                    canShare = pl.type != APP,
-                    watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false,
-                    pinned = pl.id == pinnedId,
-                    default = pl.default,
-                    descendents = treeLookup.get(pl.id)?.descendents() ?: 0
-                )
+                itemModel(pl, treeLookup, pl.id == pinnedId, domains[pl])
             }
         )
     }
+
+    private fun itemModel(
+        pl: PlaylistDomain,
+        treeLookup: Map<Long, PlaylistTreeDomain>,
+        pinned: Boolean, playlistStatDomain: PlaylistStatDomain?
+    ) = ItemContract.Model.ItemModel(
+        pl.id ?: throw Exception("Playlist must have an id"),
+        pl.title,
+        false,
+        (pl.thumb ?: pl.image)?.url,
+        count = playlistStatDomain?.itemCount ?: -1,
+        newItems = playlistStatDomain?.let { it.itemCount - it.watchedItemCount } ?: -1,
+        starred = pl.starred,
+        loopMode = pl.mode,
+        type = pl.type,
+        platform = pl.platform,
+        showOverflow = true,
+        source = if (pl.type == APP) MEMORY else LOCAL,
+        canEdit = pl.config.editable,
+        canPlay = pl.config.playable,
+        canDelete = pl.config.deletable,
+        canLaunch = pl.type == PLATFORM,
+        canShare = pl.type != APP,
+        watched = playlistStatDomain?.let { it.watchedItemCount == it.itemCount } ?: false,
+        pinned = pinned,
+        default = pl.default,
+        descendents = treeLookup.get(pl.id)?.descendents() ?: 0
+    )
 
     companion object {
         const val PLAYLISTS_HEADER_IMAGE = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg"
