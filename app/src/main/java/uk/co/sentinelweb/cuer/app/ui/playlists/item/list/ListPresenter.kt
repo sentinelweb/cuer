@@ -8,22 +8,26 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.tile.ItemTileView
 
 class ListPresenter(
-    private val listView: ListView,
+    private val state: ItemContract.ListState,
+    private val listView: ItemContract.ListView,
     private val itemFactory: ItemFactory,
     private val interactions: ItemContract.Interactions
 ) : ItemContract.ListPresenter, ItemContract.External<ListModel> {
 
     override fun update(item: ListModel, current: OrchestratorContract.Identifier<*>?) {
         listView.clear()
-        item.items
-            .map { itemFactory.createTileView(listView.root as ViewGroup) to it }
-            .onEach { listView.addView(it.first as ItemTileView) }
-            .onEach {
-                val itemPresenter =
-                    itemFactory.createPresenter(it.first, interactions)
-                it.first.setPresenter(itemPresenter as ItemContract.Presenter)
-                itemPresenter.update(it.second, current)
+        item.items.forEachIndexed { i, itemModel ->
+            val itemPresenter = if (state.presenters.size <= i) {
+                itemFactory.createTileView(listView.parent)
+                    .let { itemFactory.createPresenter(it, interactions) to it }
+                    .also { it.second.setPresenter(it.first as ItemContract.Presenter)}
+                    .also { state.presenters.add(it.first) }
+                    .first
+            } else {
+                state.presenters[i]
             }
+            itemPresenter.update(itemModel, current)
+        }
     }
 
     override fun doLeft() {}

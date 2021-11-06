@@ -37,6 +37,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:contentDescription="@string/cd_overflow"
+            android:background="@drawable/circle_gradient_top_right_tile"
             />
 
         <TextView
@@ -62,10 +63,11 @@
         <ImageView
             android:id="@+id/listitem_overflow_img"
             style="@style/ItemView.OverflowButton"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:contentDescription="@null"
+
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

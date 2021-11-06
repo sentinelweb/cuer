@@ -1,10 +1,13 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import android.text.Spannable
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.tile.ItemTileView
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
@@ -15,6 +18,7 @@ interface ItemContract {
     }
 
     interface View {
+        val type:ItemType
         fun setTopText(text: Spannable)
         fun setBottomText(text: Spannable)
         fun setIconResource(@DrawableRes iconRes: Int)
@@ -22,6 +26,7 @@ interface ItemContract {
         fun setPresenter(itemPresenter: Presenter)
         fun setIconUrl(url: String)
         fun showOverflow(showOverflow: Boolean)
+        fun setVisible(b: Boolean)
     }
 
     interface Presenter {
@@ -47,6 +52,9 @@ interface ItemContract {
 
     interface ListView {
         fun setPresenter(listPresenter: ListPresenter)
+        fun clear()
+        val parent: ViewGroup
+        val root: android.view.View
     }
 
     interface ListPresenter {
@@ -65,7 +73,13 @@ interface ItemContract {
         fun onEdit(item: Model)
     }
 
-    data class State constructor(var item: Model.ItemModel? = null)
+    data class State constructor(
+        var item: Model.ItemModel? = null
+    )
+
+    data class ListState constructor(
+        var presenters: MutableList<External<Model.ItemModel>> = mutableListOf()
+    )
 
     sealed class Model(override val id: Long) : ItemBaseModel(id) {
 

@@ -53,7 +53,7 @@ class ItemFactory constructor(
 
     fun createListViewHolder(parent: ViewGroup, interactions: ItemContract.Interactions):ListViewHolder {
         val listView = ListView().apply { init(parent) }
-        val listPresenter = ListPresenter(listView, this, interactions)
+        val listPresenter = ListPresenter(ItemContract.ListState(),listView, this, interactions)
         listView.setPresenter(listPresenter)
         return ListViewHolder(
             listView,

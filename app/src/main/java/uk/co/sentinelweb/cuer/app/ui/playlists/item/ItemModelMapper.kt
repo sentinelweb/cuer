@@ -4,28 +4,28 @@ import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.text.toSpannable
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.ItemType.ROW
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-
+// todo ditch this and just add the icons to the views
 class ItemModelMapper constructor(
     private val res: ResourceWrapper,
     private val iconMapper: IconMapper
 ) {
 
-    private val playDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_player_play_black, R.color.text_primary, R.dimen.list_item_top_text_size, SCALING)
-    }
+    private fun playDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
+        res.getDrawable(R.drawable.ic_player_play_black, color, R.dimen.list_item_top_text_size, SCALING)
 
-    private val starDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_button_starred_white, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-    }
+    private fun starDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
+        res.getDrawable(R.drawable.ic_button_starred_white, color, R.dimen.list_item_bottom_text_size, SCALING)
 
-    private val unstarDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_button_unstarred_white, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-    }
+
+    private fun unstarDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
+        res.getDrawable(R.drawable.ic_button_unstarred_white, color, R.dimen.list_item_bottom_text_size, SCALING)
 
     private val unwatchDrawable: Drawable by lazy {
         res.getDrawable(R.drawable.ic_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
@@ -35,16 +35,20 @@ class ItemModelMapper constructor(
         res.getDrawable(R.drawable.ic_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
-    private val pinDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_push_pin_on_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-    }
+    private fun pinDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
+        res.getDrawable(R.drawable.ic_push_pin_on_24, color, R.dimen.list_item_bottom_text_size, SCALING)
 
-    private val defaultDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_playlist_default_black, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-    }
+    private fun defaultDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
+        res.getDrawable(R.drawable.ic_playlist_default_black,color, R.dimen.list_item_bottom_text_size, SCALING)
 
     private val tree: Drawable by lazy {
         res.getDrawable(R.drawable.ic_tree_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+    }
+
+    private fun textColor(type:ItemContract.ItemType) = if (type==ItemContract.ItemType.TILE) {
+        R.color.white
+    } else {
+        R.color.text_primary
     }
 
     private val _bottomDrawables: MutableMap<Int, Drawable> = mutableMapOf()
@@ -59,18 +63,26 @@ class ItemModelMapper constructor(
         }
     }
 
-    fun mapTopText(model: ItemContract.Model.ItemModel, playing: Boolean): SpannableString {
-        return if (!playing) {
-            SpannableString(model.title)
-        } else {
-            SpannableString("  " + model.title).apply {
-                res.replaceSpannableIcon(
-                    this,
-                    playDrawable,
-                    0, 2
-                )
+    fun mapTopText(model: ItemContract.Model.ItemModel, playing: Boolean, type:ItemContract.ItemType): Spannable {
+        val builder = SpannableStringBuilder(model.title)
+        if (type == ItemContract.ItemType.TILE) {
+            if (model.pinned) {
+                addIconToStart(builder, pinDrawable(textColor(type)))
+            }
+            if (model.default) {
+                addIconToStart(builder, defaultDrawable(textColor(type)))
             }
         }
+        if (playing) {
+            addIconToStart(builder, playDrawable(textColor(type)))
+        }
+        return builder.toSpannable()
+    }
+
+    private fun addIconToStart(builder: SpannableStringBuilder, drawable: Drawable) {
+        val str = SpannableString("  ")
+        res.replaceSpannableIcon(str, drawable, 0, 1)
+        builder.insert(0, str)
     }
 
     fun mapBottomText(model: ItemContract.Model.ItemModel): Spannable {
@@ -84,7 +96,7 @@ class ItemModelMapper constructor(
 
             res.replaceSpannableIcon(
                 it,
-                if (model.starred) starDrawable else unstarDrawable,
+                if (model.starred) starDrawable(textColor(ROW)) else unstarDrawable(textColor(ROW)),
                 2, 3
             )
 
@@ -107,7 +119,7 @@ class ItemModelMapper constructor(
             val str = SpannableString("  ")
             res.replaceSpannableIcon(
                 str,
-                pinDrawable,
+                pinDrawable(textColor(ROW)),
                 0, 1
             )
             builder.append(str)
@@ -117,7 +129,7 @@ class ItemModelMapper constructor(
             val str = SpannableString("  ")
             res.replaceSpannableIcon(
                 str,
-                defaultDrawable,
+                defaultDrawable(textColor(ROW)),
                 0, 1
             )
             builder.append(str)

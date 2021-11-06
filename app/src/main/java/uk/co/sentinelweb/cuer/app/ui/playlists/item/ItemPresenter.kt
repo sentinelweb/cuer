@@ -15,7 +15,9 @@ class ItemPresenter(
         item: ItemModel,
         current: OrchestratorContract.Identifier<*>?
     ) {
-        view.setTopText(modelMapper.mapTopText(item, current?.id == item.id))
+        view.setVisible(true)
+        if (state.item == item) return
+        view.setTopText(modelMapper.mapTopText(item, current?.id == item.id, view.type))
         view.setBottomText(modelMapper.mapBottomText(item))
         view.setCheckedVisible(item.checkIcon)
         item.thumbNailUrl

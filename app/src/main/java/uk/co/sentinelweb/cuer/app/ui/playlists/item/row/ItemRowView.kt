@@ -22,7 +22,6 @@ import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 
-
 class ItemRowView() :
     ItemContract.View, KoinComponent {
 
@@ -38,6 +37,9 @@ class ItemRowView() :
         get() = _binding.swipeLabelRight
     val leftSwipeView: View
         get() = _binding.swipeLabelLeft
+
+    override val type: ItemContract.ItemType
+        get() = ItemContract.ItemType.ROW
 
     fun init(parent: ViewGroup) {
         _binding =
@@ -108,6 +110,10 @@ class ItemRowView() :
 
     override fun setPresenter(itemPresenter: ItemContract.Presenter) {
         presenter = itemPresenter
+    }
+
+    override fun setVisible(b: Boolean) {
+        _binding.root.isVisible = true
     }
 
     override fun setIconUrl(url: String) {

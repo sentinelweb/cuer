@@ -21,7 +21,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 
-
 class ItemTileView() :
     ItemContract.View, KoinComponent {
 
@@ -33,17 +32,15 @@ class ItemTileView() :
         get() = _binding.root
     val itemView: View
         get() = _binding.listitem
-    val rightSwipeView: View?
-        get() = null
-    val leftSwipeView: View?
-        get() = null
+
+    override val type: ItemContract.ItemType
+        get() = ItemContract.ItemType.TILE
 
     fun init(parent: ViewGroup) {
         _binding =
-            ViewPlaylistsItemTileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ViewPlaylistsItemTileBinding.inflate(LayoutInflater.from(parent.context), parent, true)
         _binding.root.setOnClickListener { presenter.doClick() }
         _binding.listitemOverflowClick.setOnClickListener { showContextualMenu() }
-//        _binding.listitemIcon.setOnClickListener { presenter.doImageClick() }
     }
 
     @SuppressLint("RestrictedApi")
@@ -94,6 +91,7 @@ class ItemTileView() :
         _binding.listitemIconCheck.visibility = if (checked) View.VISIBLE else View.GONE
     }
 
+
     override fun setTopText(text: Spannable) {
         _binding.listitemTop.setText(text)
     }
@@ -104,6 +102,10 @@ class ItemTileView() :
 
     override fun setPresenter(itemPresenter: ItemContract.Presenter) {
         presenter = itemPresenter
+    }
+
+    override fun setVisible(b: Boolean) {
+        _binding.root.isVisible = true
     }
 
     override fun setIconUrl(url: String) {
