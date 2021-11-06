@@ -87,7 +87,6 @@ class PlaylistsFragment :
         binding.playlistsList.adapter = adapter
         itemTouchHelper.attachToRecyclerView(binding.playlistsList)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
-        binding.playlistsUp.setOnClickListener { presenter.onUpClicked() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -125,11 +124,14 @@ class PlaylistsFragment :
             .into(binding.playlistsHeaderImage)
         binding.playlistsSwipe.isRefreshing = false
         binding.playlistsItems.text = "${model.items.size}"
-        binding.playlistsUp.isVisible = model.showUp
         adapter.currentPlaylistId = model.currentPlaylistId
         adapter.setData(model.items, animate)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
         binding.playlistsCollapsingToolbar.title = model.title
+    }
+
+    override fun repaint() {
+        adapter.notifyDataSetChanged()
     }
 
     override fun showUndo(msg: String, undo: () -> Unit) {

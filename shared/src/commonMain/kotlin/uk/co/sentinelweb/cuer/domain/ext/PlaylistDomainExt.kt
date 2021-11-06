@@ -1,13 +1,11 @@
 package uk.co.sentinelweb.cuer.domain.ext
 
-import uk.co.sentinelweb.cuer.domain.MutablePlaylistTreeDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
+import uk.co.sentinelweb.cuer.domain.*
 
-fun PlaylistDomain.currentItem() = if (currentIndex > -1 && items.size > 0 && currentIndex < items.size) {
-    items[currentIndex]
-} else null
+fun PlaylistDomain.currentItem() =
+    if (currentIndex > -1 && items.size > 0 && currentIndex < items.size) {
+        items[currentIndex]
+    } else null
 
 fun PlaylistDomain.currentItemOrStart() = if (currentIndex > -1 && currentIndex < items.size) {
     items[currentIndex]
@@ -35,7 +33,8 @@ fun PlaylistDomain.matchesHeader(playlist: PlaylistDomain?): Boolean =
 
 fun PlaylistDomain.replaceHeader(header: PlaylistDomain) = header.copy(items = items)
 
-fun PlaylistDomain.replaceHeaderKeepIndex(header: PlaylistDomain) = header.copy(items = items, currentIndex = currentIndex)
+fun PlaylistDomain.replaceHeaderKeepIndex(header: PlaylistDomain) =
+    header.copy(items = items, currentIndex = currentIndex)
 
 fun PlaylistDomain.removeItem(item: PlaylistItemDomain): PlaylistDomain? =
     this.items
@@ -120,12 +119,17 @@ fun MutablePlaylistTreeDomain.toImmutableTree(): PlaylistTreeDomain =
         .also { t -> t.chidren.forEach { it.parent = t } }
 
 fun PlaylistTreeDomain.toMutableTree(): MutablePlaylistTreeDomain =
-    MutablePlaylistTreeDomain(this.node, null, this.chidren.map { it.toMutableTree() }.toMutableList())
+    MutablePlaylistTreeDomain(
+        this.node,
+        null,
+        this.chidren.map { it.toMutableTree() }.toMutableList()
+    )
         .also { t -> t.chidren.forEach { it.parent = t } }
 
 fun PlaylistTreeDomain.depth(): Int = (this.parent?.depth()?.inc() ?: 0)
 
-fun PlaylistTreeDomain.descendents(): Int = this.chidren.size + this.chidren.sumOf { it.descendents() }
+fun PlaylistTreeDomain.descendents(): Int =
+    this.chidren.size + this.chidren.sumOf { it.descendents() }
 
 fun PlaylistTreeDomain.buildLookup(): Map<Long, PlaylistTreeDomain> =
     this.chidren.associateBy { it.node?.id!! }.toMutableMap()
@@ -135,7 +139,18 @@ fun PlaylistTreeDomain.dumpTree(pfx: String = "") {
     chidren.forEach { it.dumpTree("-$pfx") }
 }
 
-fun PlaylistTreeDomain.iterate(depth:Int = 0, cb:(pl:PlaylistTreeDomain, Int)->Unit) {
+fun PlaylistTreeDomain.iterate(depth: Int = 0, cb: (pl: PlaylistTreeDomain, Int) -> Unit) {
     cb(this, depth)
-    chidren.forEach { it.iterate(depth+1, cb) }
+    chidren.forEach { it.iterate(depth + 1, cb) }
 }
+
+fun PlaylistTreeDomain.sort(comp:Comparator<PlaylistTreeDomain>): PlaylistTreeDomain {
+    return copy(chidren = chidren
+        .sortedWith(comp)
+        .map { td -> td.sort(comp) })
+}
+
+//fun PlaylistTreeDomain.sort() {
+//    chidren.sortedBy { it.node?.title?.lowercase()}
+//    chidren.forEach { it.sort()}
+//}

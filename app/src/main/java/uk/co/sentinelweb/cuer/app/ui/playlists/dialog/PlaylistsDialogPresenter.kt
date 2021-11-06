@@ -15,8 +15,10 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.ext.buildLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildTree
+import uk.co.sentinelweb.cuer.domain.ext.sort
 import java.util.Locale.getDefault
 
 class PlaylistsDialogPresenter(
@@ -44,7 +46,8 @@ class PlaylistsDialogPresenter(
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        state.playlists.find { it.id == item.id }
+        val findId = if (item.id >= 0) item.id else null // find top level node
+        state.playlists.find { it.id == findId }
             ?.apply {
                 if (state.pinWhenSelected) {
                     prefsWrapper.putLong(GeneralPreferences.PINNED_PLAYLIST, id!!)
@@ -62,7 +65,10 @@ class PlaylistsDialogPresenter(
         dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
         if (!state.channelSearchApplied) {
             state.config.suggestionsMedia?.apply {
-                playlistOrchestrator.loadList(ChannelPlatformIdFilter(this.channelData.platformId!!), LOCAL.flatOptions())
+                playlistOrchestrator.loadList(
+                    ChannelPlatformIdFilter(this.channelData.platformId!!),
+                    LOCAL.flatOptions()
+                )
                     .apply { state.priorityPlaylistIds.addAll(this.map { it.id!! }) }
             }
             state.channelSearchApplied = true
@@ -71,27 +77,36 @@ class PlaylistsDialogPresenter(
         val pinnedId = prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
         state.playlists = playlistOrchestrator.loadList(AllFilter(), LOCAL.flatOptions())
             .filter { it.config.editableItems }
-            .sortedWith(compareBy(
-                { it.id != pinnedId },
-                { !state.priorityPlaylistIds.contains(it.id) },
-                { !it.starred },
-                { it.title.toLowerCase(getDefault()) })
-            )
-            .apply { state.treeRoot = buildTree() }
-            .apply { state.treeLookup = state.treeRoot.buildLookup() }
+            .apply { state.treeRoot = buildTree().sort(compareBy{it.node?.title?.lowercase()}) }
+            .let { if (state.config.showRoot) it.plus(makeRootPlaylist()) else it }
 
-        state.playlistStats = playlistStatsOrchestrator
+        val priorityPlaylists = state.playlists.filter { state.priorityPlaylistIds.contains(it.id) }
+            .sortedWith(
+                compareBy(
+                    { it.id != pinnedId },
+                    { !it.starred },
+                    { it.title.lowercase() })
+            ).toMutableList()
+            .apply { if (state.config.showRoot) add(0, makeRootPlaylist()) else this }
+
+        val playlistStats = playlistStatsOrchestrator
             .loadList(IdListFilter(state.playlists.mapNotNull { it.id }), LOCAL.flatOptions())
 
-        state.playlists
-            .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
+        state.playlists.map { it.id }
+            .associateWith { id -> playlistStats.find { it.playlistId == id } }
             .let {
-                state.playlistsModel = modelMapper.map(it, null,  false, pinnedId, null, state.treeLookup)
+                state.playlistsModel =
+                    modelMapper.map(priorityPlaylists, null, pinnedId, state.treeRoot, it)
                 dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
             }
             .takeIf { coroutines.mainScopeActive }
             ?.also { view.setList(it, animate) }
     }
+
+    private fun makeRootPlaylist(): PlaylistDomain = PlaylistDomain(
+        id = null,
+        title = "Top level"
+    )
 
     private fun updateDialogModel() {
         dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)

@@ -30,7 +30,6 @@ class PlaylistsModelMapper constructor(
             res.getString(R.string.playlists_title),
             PLAYLISTS_HEADER_IMAGE,
             current,
-            false,// show up
             buildItems(domains, current, appPlaylists, pinnedId, root)
         )
     }

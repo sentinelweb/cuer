@@ -140,7 +140,8 @@ class ItemRowView() :
             .applyDefaultRequestOptions(
                 RequestOptions()
                 .placeholder(R.drawable.image_load_error_drawable)
-                .error(R.drawable.image_load_error_drawable))
+                .error(R.drawable.image_load_error_drawable)
+            )
             .loadFirebaseOrOtherUrl(url, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(_binding.listitemIcon)

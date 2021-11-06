@@ -59,7 +59,7 @@ class ItemPresenter(
 
     override fun canDragRight(): Boolean = state.item?.canEdit ?: false
 
-    override fun canReorder(): Boolean = state.item?.canEdit ?: false
+    override fun canReorder(): Boolean = false
 
     override fun doPlay(external: Boolean) {
         interactions.onPlay(state.item!!, external)

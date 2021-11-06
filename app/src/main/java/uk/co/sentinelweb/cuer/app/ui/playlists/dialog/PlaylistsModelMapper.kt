@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
+import android.util.Log
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
@@ -13,55 +14,61 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 import uk.co.sentinelweb.cuer.domain.ext.descendents
+import uk.co.sentinelweb.cuer.domain.ext.iterate
 
 class PlaylistsModelMapper constructor(
     private val res: ResourceWrapper
 ) {
 
     fun map(
-        domains: Map<PlaylistDomain, PlaylistStatDomain?>,
+        priorityPlaylists: List<PlaylistDomain>,
         current: OrchestratorContract.Identifier<*>?,
-        showOverflow: Boolean,
         pinnedId: Long?,
-        nodeId: Long?,
-        treeLookup: Map<Long, PlaylistTreeDomain>
-    ): PlaylistsContract.Model {
-        return PlaylistsContract.Model(
-            treeLookup[nodeId]?.node?.title?.let { it + ": " + res.getString(R.string.playlists_title) }
-                ?: res.getString(R.string.playlists_title),
-            treeLookup[nodeId]?.node?.image?.url ?: PLAYLISTS_HEADER_IMAGE,
-            current,
-            nodeId != null,
-            domains.keys.mapIndexed { index, pl ->
-                ItemContract.Model.ItemModel(
-                    pl.id ?: throw Exception("Playlist must have an id"),
-                    pl.title,
-                    false,
-                    (pl.thumb ?: pl.image)?.url,
-                    count = domains[pl]?.itemCount ?: -1,
-                    newItems = domains[pl]?.let { it.itemCount - it.watchedItemCount } ?: -1,
-                    starred = pl.starred,
-                    loopMode = pl.mode,
-                    type = pl.type,
-                    platform = pl.platform,
-                    showOverflow = showOverflow,
-                    source = if (pl.type == APP) MEMORY else LOCAL,
-                    canEdit = pl.config.editable,
-                    canPlay = pl.config.playable,
-                    canDelete = pl.config.deletable,
-                    canLaunch = pl.type == PLATFORM,
-                    canShare = pl.type != APP,
-                    watched = domains[pl]?.let { it.watchedItemCount == it.itemCount } ?: false,
-                    pinned = pl.id == pinnedId,
-                    default = pl.default,
-                    depth =0
-                )
+        tree: PlaylistTreeDomain,
+        playlistStats: Map<Long?, PlaylistStatDomain?>,
+        ): PlaylistsContract.Model {
+        val items = priorityPlaylists.mapIndexed { index, pl ->
+            itemModel(pl, playlistStats[pl.id], pinnedId, 0)
+        }.toMutableList()
+        tree.iterate { treeNode, depth ->
+            treeNode.node?.also {
+                items.add(itemModel(it, playlistStats[it.id], pinnedId, depth - 1))
             }
+        }
+        return PlaylistsContract.Model(
+            title = res.getString(R.string.playlists_title),
+            currentPlaylistId = current,
+            items = items
         )
     }
 
-    companion object {
-        const val PLAYLISTS_HEADER_IMAGE = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg"
-    }
+    private fun itemModel(
+        pl: PlaylistDomain,
+        stats:PlaylistStatDomain?,
+        pinnedId: Long?,
+        depth: Int
+    ) = ItemContract.Model.ItemModel(
+        pl.id ?: -1L,
+        pl.title,
+        false,
+        (pl.thumb ?: pl.image)?.url,
+        count = stats?.itemCount ?: -1,
+        newItems = stats?.let { it.itemCount - it.watchedItemCount } ?: -1,
+        starred = pl.starred,
+        loopMode = pl.mode,
+        type = pl.type,
+        platform = pl.platform,
+        showOverflow = false,
+        source = if (pl.type == APP) MEMORY else LOCAL,
+        canEdit = false,
+        canPlay = false,
+        canDelete = false,
+        canLaunch = pl.type == PLATFORM,
+        canShare = pl.type != APP,
+        watched = stats?.let { it.watchedItemCount == it.itemCount } ?: false,
+        pinned = pl.id == pinnedId,
+        default = pl.default,
+        depth = depth
+    )
 
 }

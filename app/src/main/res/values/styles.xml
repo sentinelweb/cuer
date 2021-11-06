@@ -176,7 +176,7 @@
         <item name="android:background">@drawable/ic_ripple_item_background</item>
         <item name="android:elevation">@dimen/list_item_elevation</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/playlist_row_height</item>
+        <item name="android:layout_height">@dimen/playlist_row_icon_height</item>
     </style>
 
     <style name="ItemView.Background">
@@ -207,7 +207,7 @@
 
     <style name="ItemView.Thumb.Row">
         <item name="android:layout_width">@dimen/itemview_icon_width</item>
-        <item name="android:layout_height">@dimen/playlist_row_height</item>
+        <item name="android:layout_height">@dimen/itemview_icon_height</item>
         <item name="android:background">@color/surface</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
     </style>

@@ -201,7 +201,8 @@ class PlaylistEditViewModel constructor(
                 this::onPlaylistDialogClose,
                 null,
                 showAdd = false,
-                showPin = false
+                showPin = false,
+                showRoot = true
             )
     }
 
