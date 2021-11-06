@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item.row
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.text.Spannable
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -25,10 +24,7 @@ import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import android.content.Context.WINDOW_SERVICE
 
-import androidx.core.content.ContextCompat.getSystemService
-
 import android.view.WindowManager
-import androidx.core.content.ContextCompat
 import com.bumptech.glide.request.RequestOptions
 
 
@@ -139,8 +135,8 @@ class ItemRowView() :
         Glide.with(_binding.listitemIcon.context)
             .applyDefaultRequestOptions(
                 RequestOptions()
-                .placeholder(R.drawable.image_load_error_drawable)
-                .error(R.drawable.image_load_error_drawable)
+                .placeholder(R.drawable.ic_load_placeholder_drawable)
+                .error(R.drawable.ic_load_error_drawable)
             )
             .loadFirebaseOrOtherUrl(url, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
