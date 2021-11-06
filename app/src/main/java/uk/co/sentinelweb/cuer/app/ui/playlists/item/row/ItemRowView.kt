@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item.row
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.text.Spannable
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -21,6 +22,15 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import android.content.Context.WINDOW_SERVICE
+
+import androidx.core.content.ContextCompat.getSystemService
+
+import android.view.WindowManager
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.request.RequestOptions
+
 
 class ItemRowView() :
     ItemContract.View, KoinComponent {
@@ -28,6 +38,8 @@ class ItemRowView() :
     private lateinit var _binding: ViewPlaylistsItemRowBinding
     private lateinit var presenter: ItemContract.Presenter
     private val imageProvider: FirebaseImageProvider by inject()
+    private val res: ResourceWrapper by inject()
+    private lateinit var wm: WindowManager
 
     val root: View
         get() = _binding.root
@@ -47,6 +59,7 @@ class ItemRowView() :
         _binding.listitem.setOnClickListener { presenter.doClick() }
         _binding.listitemOverflowClick.setOnClickListener { showContextualMenu() }
         _binding.listitemIcon.setOnClickListener { presenter.doImageClick() }
+        wm = parent.context.getSystemService(WINDOW_SERVICE) as WindowManager
     }
 
     @SuppressLint("RestrictedApi")
@@ -116,8 +129,18 @@ class ItemRowView() :
         _binding.root.isVisible = true
     }
 
+    override fun setDepth(depth: Int) {
+        val layoutParams = _binding.depthSpacer.layoutParams
+        layoutParams.width = depth * res.getDimensionPixelSize(R.dimen.tree_node_depth) + 1
+        _binding.depthSpacer.setLayoutParams(layoutParams)
+    }
+
     override fun setIconUrl(url: String) {
         Glide.with(_binding.listitemIcon.context)
+            .applyDefaultRequestOptions(
+                RequestOptions()
+                .placeholder(R.drawable.image_load_error_drawable)
+                .error(R.drawable.image_load_error_drawable))
             .loadFirebaseOrOtherUrl(url, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(_binding.listitemIcon)

@@ -26,6 +26,7 @@ class ItemPresenter(
                 .apply { view.setIconResource(this) }
         state.item = item
         view.showOverflow(item.showOverflow && (canPlay() || canLaunch() || canEdit() || canShare()))
+        view.setDepth(item.depth)
     }
 
     override fun doImageClick() {

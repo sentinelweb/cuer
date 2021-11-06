@@ -323,10 +323,9 @@ class PlaylistsPresenter(
                 queue.playlistId,
                 appLists,
                 prefsWrapper.getLong(PINNED_PLAYLIST),
-                state.treeLookup
+                state.treeRoot
             ).takeIf { coroutines.mainScopeActive }
             ?.also { view.setList(it, false) }
-
         } catch (e: Exception) {
             log.e("Load failed", e)
             view.showMessage("Load failed: ${e::class.java.simpleName}")

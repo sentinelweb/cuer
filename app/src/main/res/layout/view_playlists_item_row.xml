@@ -1,65 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_item_height"
-    >
+    android:layout_height="@dimen/playlist_row_height">
 
     <TextView
         android:id="@+id/swipe_label_right"
         style="@style/ItemView.Background.Right"
+        android:layout_marginBottom="2dp"
         android:background="?colorMove"
         android:text="@string/pl_item_move"
         app:drawableLeftCompat="@drawable/ic_item_playlist_move_white"
-        android:layout_marginBottom="2dp"
-        tools:ignore="RtlHardcoded,RtlSymmetry"
-        />
+        tools:ignore="RtlHardcoded,RtlSymmetry" />
 
     <TextView
         android:id="@+id/swipe_label_left"
         style="@style/ItemView.Background.Left"
+        android:layout_marginBottom="2dp"
         android:background="?colorDelete"
         android:text="@string/pls_item_delete"
         app:drawableRightCompat="@drawable/ic_item_delete_white"
-        android:layout_marginBottom="2dp"
-        tools:ignore="RtlHardcoded,RtlSymmetry"
-        />
+        tools:ignore="RtlHardcoded,RtlSymmetry" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/listitem"
-        style="@style/ItemView.Container"
-        >
+        style="@style/ItemView.Container.Playlist">
+
+        <View
+            android:id="@+id/depth_spacer"
+            android:layout_width="16dp"
+            android:layout_height="match_parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
             android:id="@+id/listitem_icon"
-            style="@style/ItemView.Thumb.Row"
+            style="@style/ItemView.Thumb.Playlist"
             android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/depth_spacer"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_playlist_default_black"
-
-            />
+            tools:src="@drawable/ic_playlist_default_black"/>
 
         <ImageView
             android:id="@+id/listitem_icon_check"
             style="@style/ItemView.CheckIcon.Row"
-            app:layout_constraintBottom_toBottomOf="@id/listitem_icon"
-            app:layout_constraintLeft_toLeftOf="@id/listitem_icon"
             android:contentDescription="@string/cd_check"
-            />
+            app:layout_constraintBottom_toBottomOf="@id/listitem_icon"
+            app:layout_constraintLeft_toLeftOf="@id/listitem_icon" />
 
         <View
             android:id="@+id/listitem_overflow_click"
             style="@style/ItemView.OverflowButtonClick"
             android:layout_height="0dp"
+            android:contentDescription="@string/cd_overflow"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/cd_overflow"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/listitem_top"
@@ -68,28 +66,25 @@
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toRightOf="@id/listitem_icon"
             app:layout_constraintRight_toLeftOf="@id/listitem_overflow_img"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/listitem_bottom"
             style="@style/ItemView.BottomText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toRightOf="@id/listitem_icon"
-            app:layout_constraintRight_toLeftOf="@id/listitem_overflow_img"
             app:layout_constraintBottom_toBottomOf="parent"
-            />
+            app:layout_constraintLeft_toRightOf="@id/listitem_icon"
+            app:layout_constraintRight_toLeftOf="@id/listitem_overflow_img" />
 
         <ImageView
             android:id="@+id/listitem_overflow_img"
             style="@style/ItemView.OverflowButton"
             android:layout_height="0dp"
+            android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@null"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

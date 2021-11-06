@@ -27,6 +27,7 @@ interface ItemContract {
         fun setIconUrl(url: String)
         fun showOverflow(showOverflow: Boolean)
         fun setVisible(b: Boolean)
+        fun setDepth(depth: Int)
     }
 
     interface Presenter {
@@ -114,7 +115,7 @@ interface ItemContract {
             val watched: Boolean,
             val pinned: Boolean,
             val default: Boolean,
-            val descendents: Int
+            val depth: Int
         ) : Model(id)
     }
 

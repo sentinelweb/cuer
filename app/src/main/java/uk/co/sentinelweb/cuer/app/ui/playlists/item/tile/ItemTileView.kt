@@ -119,4 +119,8 @@ class ItemTileView() :
         _binding.listitemOverflowImg.isVisible = showOverflow
         _binding.listitemOverflowClick.isVisible = showOverflow
     }
+
+    override fun setDepth(depth: Int) {
+
+    }
 }

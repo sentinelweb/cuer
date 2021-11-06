@@ -171,6 +171,13 @@
         <item name="android:layout_height">@dimen/itemview_icon_height</item>
     </style>
 
+    <style name="ItemView.Container.Playlist">
+        <item name="android:layout_margin">@dimen/list_item_margin</item>
+        <item name="android:background">@drawable/ic_ripple_item_background</item>
+        <item name="android:elevation">@dimen/list_item_elevation</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/playlist_row_height</item>
+    </style>
 
     <style name="ItemView.Background">
         <item name="android:layout_width">match_parent</item>
@@ -200,7 +207,14 @@
 
     <style name="ItemView.Thumb.Row">
         <item name="android:layout_width">@dimen/itemview_icon_width</item>
-        <item name="android:layout_height">@dimen/itemview_icon_height</item>
+        <item name="android:layout_height">@dimen/playlist_row_height</item>
+        <item name="android:background">@color/surface</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
+    </style>
+
+    <style name="ItemView.Thumb.Playlist">
+        <item name="android:layout_width">@dimen/playlist_row_icon_width</item>
+        <item name="android:layout_height">@dimen/playlist_row_icon_height</item>
         <item name="android:background">@color/surface</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
     </style>

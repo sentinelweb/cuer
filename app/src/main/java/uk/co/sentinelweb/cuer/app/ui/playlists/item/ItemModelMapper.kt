@@ -41,9 +41,9 @@ class ItemModelMapper constructor(
     private fun defaultDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
         res.getDrawable(R.drawable.ic_playlist_default_black,color, R.dimen.list_item_bottom_text_size, SCALING)
 
-    private val tree: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_tree_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-    }
+//    private val tree: Drawable by lazy {
+//        res.getDrawable(R.drawable.ic_tree_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+//    }
 
     private fun textColor(type:ItemContract.ItemType) = if (type==ItemContract.ItemType.TILE) {
         R.color.white
@@ -134,15 +134,15 @@ class ItemModelMapper constructor(
             )
             builder.append(str)
         }
-        if (model.descendents > 0) {
-            val str = SpannableString("  ${model.descendents}")
-            res.replaceSpannableIcon(
-                str,
-                tree,
-                0, 1
-            )
-            builder.append(str)
-        }
+//        if (model.descendents > 0) {
+//            val str = SpannableString("  ${model.descendents}")
+//            res.replaceSpannableIcon(
+//                str,
+//                tree,
+//                0, 1
+//            )
+//            builder.append(str)
+//        }
         return builder.toSpannable()
     }
 

@@ -7,7 +7,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
@@ -87,7 +86,7 @@ class PlaylistsDialogPresenter(
         state.playlists
             .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
             .let {
-                state.playlistsModel = modelMapper.map(it, null,  pinnedId, null, state.treeLookup)
+                state.playlistsModel = modelMapper.map(it, null,  false, pinnedId, null, state.treeLookup)
                 dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
             }
             .takeIf { coroutines.mainScopeActive }
