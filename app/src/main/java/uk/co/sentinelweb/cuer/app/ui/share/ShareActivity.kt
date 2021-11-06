@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
@@ -144,7 +146,7 @@ class ShareActivity : AppCompatActivity(),
         presenter.onStop()
     }
 
-    override fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean) {//playlistItemDomain: PlaylistItemDomain?,
+    override fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean) {
         startActivity( // todo map in NavigationMapper
             Intent(this, MainActivity::class.java).apply {
                 putExtra(Target.KEY, PLAYLIST_FRAGMENT.name)
@@ -224,7 +226,7 @@ class ShareActivity : AppCompatActivity(),
         fun intent(c: Context, paste: Boolean = false, parentId: Long? = null) =
             Intent(c, ShareActivity::class.java).apply {
                 action = Intent.ACTION_VIEW
-                if (c is Application) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
                 if (paste) {
                     putExtra(PASTE.toString(), true)
                 }
@@ -236,7 +238,7 @@ class ShareActivity : AppCompatActivity(),
         fun urlIntent(c: Context, url: String, parentId: Long? = null) =
             Intent(c, ShareActivity::class.java).apply {
                 action = Intent.ACTION_VIEW
-                if (c is Application) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
                 data = Uri.parse(url)
                 if (parentId != null) {
                     this.putExtra(PLAYLIST_PARENT.toString(), parentId)

@@ -87,13 +87,14 @@ class NavigationMapper constructor(
                 nav.navOpts,
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+            // todo maybe remove these and use directions: if they are used from different places the back stack might be messed up
             PLAYLIST_ITEM_FRAGMENT -> navController?.navigate(
                 R.id.navigation_playlist_item_edit,
                 bundleOf(
                     PLAYLIST_ITEM.name to (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain).serialise(),
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                nav.navOpts ?: navOptions(optionsBuilder = {// todo remove
+                nav.navOpts ?: navOptions(optionsBuilder = {
                     launchSingleTop = true
                     popUpTo(R.id.navigation_playlist_edit, { inclusive = true })
                 }),
@@ -105,9 +106,9 @@ class NavigationMapper constructor(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                nav.navOpts ?: navOptions(optionsBuilder = {// todo remove
+                nav.navOpts ?: navOptions(optionsBuilder = {
                     launchSingleTop = true
-                    popUpTo(R.id.navigation_playlists, { inclusive = true })
+                    popUpTo(R.id.navigation_playlists, { inclusive = false })
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
