@@ -80,7 +80,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/playlists_swipe"
         android:layout_width="match_parent"
@@ -95,6 +94,8 @@
             app:layoutManager="LinearLayoutManager"
             tools:context=".ui.playlists.PlaylistsFragment"
             tools:listitem="@layout/view_playlists_item_row"
+            android:scrollbars="vertical"
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
             />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
