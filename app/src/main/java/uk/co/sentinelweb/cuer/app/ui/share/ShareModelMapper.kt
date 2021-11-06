@@ -15,7 +15,7 @@ class ShareModelMapper constructor(
     ): ShareContract.Model {
         val isConnected = ytContextHolder.isConnected()
         val isMedia = state.scanResult?.let { it.type == MEDIA } ?: false
-        val isNew = state.scanResult?.let { it.isNew || (isMedia && !!it.isOnPlaylist) } ?: false
+        val isNew = state.scanResult?.let { it.isNew || (isMedia && !it.isOnPlaylist) } ?: false
         return if (isNew) {
             ShareContract.Model(
                 isNew = isNew,
