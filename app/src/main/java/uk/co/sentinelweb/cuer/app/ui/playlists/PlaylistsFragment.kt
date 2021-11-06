@@ -149,6 +149,12 @@ class PlaylistsFragment :
             .apply { show() }
     }
 
+    override fun showError(msg: String) {
+        snackbar?.dismiss()
+        snackbar = snackbarWrapper.makeError(msg)
+        snackbar?.show()
+    }
+
 //    override fun gotoPlaylist(id: Long, play: Boolean, source: Source) {
 //        PlaylistsFragmentDirections.actionGotoPlaylist(id, play, source.toString())
 //            .apply { findNavController().navigate(this) }

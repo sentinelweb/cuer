@@ -123,21 +123,26 @@ class PlaylistsPresenter(
         state.viewModelScope.launch {
             delay(400)
             findPlaylist(item)
-                ?.let { playlist ->
+                ?.also { playlist ->
                     if (playlist.type != APP) {
-                        state.deletedPlaylist = playlist.id
-                            ?.let { playlistOrchestrator.load(it, LOCAL.deepOptions()) }
-                            ?.apply {
-                                playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
-                                view.showUndo(
-                                    "Deleted playlist: ${playlist.title}",
-                                    this@PlaylistsPresenter::undoDelete
-                                )
-                            }
-                            ?: let {
-                                view.showMessage("Cannot load playlist backup")
-                                null
-                            }
+                        val node = state.treeLookup[playlist.id]!!
+                        if (node.chidren.size==0) {
+                            state.deletedPlaylist = playlist.id
+                                ?.let { playlistOrchestrator.load(it, LOCAL.deepOptions()) }
+                                ?.apply {
+                                    playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
+                                    view.showUndo(
+                                        "Deleted playlist: ${playlist.title}",
+                                        this@PlaylistsPresenter::undoDelete
+                                    )
+                                }
+                                ?: let {
+                                    view.showError("Cannot load playlist backup")
+                                    null
+                                }
+                        } else {
+                            view.showError("Please delete the children first")
+                        }
                     } else if (playlist.id == LOCAL_SEARCH_PLAYLIST || playlist.id == REMOTE_SEARCH_PLAYLIST) {
                         val isLocal = playlist.id == LOCAL_SEARCH_PLAYLIST
                         val type = searchMapper.searchTypeText(isLocal)
@@ -153,7 +158,7 @@ class PlaylistsPresenter(
                         }
                         executeRefresh()
                     }
-                } ?: let { view.showMessage("Cannot delete playlist") }
+                } ?: let { view.showError("Cannot delete playlist") }
 
         }
     }
@@ -181,7 +186,7 @@ class PlaylistsPresenter(
             findPlaylist(item)
                 ?.takeIf { it.type == PLATFORM }
                 ?.apply { ytJavaApi.launchPlaylist(platformId!!) }
-                ?: let { view.showMessage("Cannot launch playlist") }
+                ?: let { view.showError("Cannot launch playlist") }
         }
     }
 
@@ -201,7 +206,7 @@ class PlaylistsPresenter(
                 coroutines.mainScope.launch {
                     playlistOrchestrator.load(itemDomain.id!!, LOCAL.deepOptions())
                         ?.also { shareWrapper.share(it) }
-                        ?: view.showMessage("Couldn't load playlist ...")
+                        ?: view.showError("Couldn't load playlist ...")
                 }
             }
     }
@@ -235,7 +240,7 @@ class PlaylistsPresenter(
             if (merge.checkMerge(thisPlaylist, delPlaylist)) {
                 merge.merge(thisPlaylist, delPlaylist)
             } else {
-                view.showMessage("Cannot merge this playlist")
+                view.showError("Cannot merge this playlist")
             }
         }
     }
@@ -261,7 +266,7 @@ class PlaylistsPresenter(
     override fun undoDelete() {
         state.deletedPlaylist?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistOrchestrator.save(itemDomain, LOCAL.flatOptions())
+                playlistOrchestrator.save(itemDomain, LOCAL.deepOptions())
                 state.deletedPlaylist = null
                 executeRefresh()
             }
@@ -316,7 +321,7 @@ class PlaylistsPresenter(
                 ?.also { view.setList(it, false) }
         } catch (e: Exception) {
             log.e("Load failed", e)
-            view.showMessage("Load failed: ${e::class.java.simpleName}")
+            view.showError("Load failed: ${e::class.java.simpleName}")
             view.hideRefresh()
         }
     }

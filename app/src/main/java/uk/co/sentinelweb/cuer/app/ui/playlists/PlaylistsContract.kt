@@ -51,6 +51,7 @@ interface PlaylistsContract {
         fun hideRefresh()
         fun showUndo(msg: String, undo: () -> Unit)
         fun showMessage(msg: String)
+        fun showError(msg: String)
         fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
         fun navigate(nav: NavigationModel)
         fun repaint()
