@@ -623,16 +623,13 @@ class PlaylistPresenter(
                     }
                 }
                 ?: run {
-                    log.d("is db init; ${dbInit.isInitialized()}")
                     if (dbInit.isInitialized()) {
                         state.playlistIdentifier =
                             prefsWrapper.getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair())
                                 .toIdentifier()
-                        log.d("id; ${state.playlistIdentifier.id}")
                         executeRefresh(scrollToCurrent = true)
                     } else {
                         dbInit.addListener({ b: Boolean ->
-                            log.d("got db init: $b")
                             if (b) {
                                 state.playlistIdentifier = 3L.toIdentifier(LOCAL) // philosophy
                                 refreshPlaylist()
@@ -772,7 +769,6 @@ class PlaylistPresenter(
             ?.also { state.model = it }
             ?.also { view.setModel(it, animate) }
             .also {
-                log.d("state.focusIndex=${state.focusIndex}")
                 state.focusIndex?.apply {
                     view.scrollToItem(this)
                     state.focusIndex = null
