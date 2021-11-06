@@ -42,7 +42,6 @@ interface PlaylistsContract {
         fun onResume(parentId: Long?)
         fun onPause()
         fun onItemImageClicked(item: ItemContract.Model)
-        fun onUpClicked()
         fun onEdit(item: ItemContract.Model)
     }
 
@@ -52,8 +51,10 @@ interface PlaylistsContract {
         fun hideRefresh()
         fun showUndo(msg: String, undo: () -> Unit)
         fun showMessage(msg: String)
+        fun showError(msg: String)
         fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
         fun navigate(nav: NavigationModel)
+        fun repaint()
     }
 
     data class State constructor(
@@ -63,8 +64,6 @@ interface PlaylistsContract {
         var dragTo: Int? = null,
         var playlistStats: List<PlaylistStatDomain> = listOf(),
         var treeRoot: PlaylistTreeDomain = PlaylistTreeDomain(),
-        var treeCurrentNodeId: Long? = null,
-        var playlistsDisplay: List<PlaylistDomain> = listOf(),
         var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf()
     ) : ViewModel()
 
@@ -72,7 +71,6 @@ interface PlaylistsContract {
         val title: String,
         val imageUrl: String = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         val currentPlaylistId: Identifier<*>?, // todo non null?
-        val showUp: Boolean,
         val items: List<ItemContract.Model>
     )
 

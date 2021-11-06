@@ -1,16 +1,23 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Model.ItemModel
 
 class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
     val state: ItemContract.State,
     val modelMapper: ItemModelMapper
-) : ItemContract.Presenter, ItemContract.External {
+) : ItemContract.Presenter, ItemContract.External<ItemModel> {
 
-    override fun update(item: ItemContract.Model, current: Boolean) {
-        view.setTopText(modelMapper.mapTopText(item, current))
+    override fun update(
+        item: ItemModel,
+        current: OrchestratorContract.Identifier<*>?
+    ) {
+        view.setVisible(true)
+        if (state.item == item) return
+        view.setTopText(modelMapper.mapTopText(item, current?.id == item.id, view.type))
         view.setBottomText(modelMapper.mapBottomText(item))
         view.setCheckedVisible(item.checkIcon)
         item.thumbNailUrl
@@ -19,6 +26,7 @@ class ItemPresenter(
                 .apply { view.setIconResource(this) }
         state.item = item
         view.showOverflow(item.showOverflow && (canPlay() || canLaunch() || canEdit() || canShare()))
+        view.setDepth(item.depth)
     }
 
     override fun doImageClick() {
@@ -51,15 +59,11 @@ class ItemPresenter(
 
     override fun canDragRight(): Boolean = state.item?.canEdit ?: false
 
-    override fun canReorder(): Boolean = state.item?.canEdit ?: false
+    override fun canReorder(): Boolean = false
 
     override fun doPlay(external: Boolean) {
         interactions.onPlay(state.item!!, external)
     }
-
-//    override fun doShowChannel() {
-//        interactions.onShowChannel(state.item!!)
-//    }
 
     override fun doStar() {
         interactions.onStar(state.item!!)
@@ -76,5 +80,6 @@ class ItemPresenter(
     override fun canPlay(): Boolean = state.item?.canPlay ?: false
 
     override fun canLaunch(): Boolean = state.item?.canLaunch ?: false
+
 
 }

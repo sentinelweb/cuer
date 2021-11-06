@@ -14,7 +14,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.validator.ValidatorModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
 interface PlaylistEditContract {
 
@@ -42,7 +44,8 @@ interface PlaylistEditContract {
         var model: Model? = null,
         var isAllWatched: Boolean? = null,
         var playlistParent: PlaylistDomain? = null,
-        var defaultInitial: Boolean = false
+        var defaultInitial: Boolean = false,
+        var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf()
     ) {
         lateinit var source: OrchestratorContract.Source
         lateinit var playlistEdit: PlaylistDomain
@@ -74,7 +77,7 @@ interface PlaylistEditContract {
                 factory { PlaylistEditModelMapper(res = get(), validator = get()) }
                 scoped { ChipCreator((getSource() as Fragment).requireActivity(), get(), get()) }
                 factory { PlaylistValidator(get()) }
-                scoped { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
                 scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
             }
         }

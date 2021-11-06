@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
@@ -67,7 +68,11 @@ class PlaylistsFragment :
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = PlaylistsFragmentBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -81,9 +86,11 @@ class PlaylistsFragment :
 
         binding.playlistsList.layoutManager = LinearLayoutManager(context)
         binding.playlistsList.adapter = adapter
+        binding.playlistsList.addItemDecoration(
+            HeaderFooterDecoration(0, resources.getDimensionPixelSize(R.dimen.recyclerview_footer))
+        )
         itemTouchHelper.attachToRecyclerView(binding.playlistsList)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
-        binding.playlistsUp.setOnClickListener { presenter.onUpClicked() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -121,11 +128,14 @@ class PlaylistsFragment :
             .into(binding.playlistsHeaderImage)
         binding.playlistsSwipe.isRefreshing = false
         binding.playlistsItems.text = "${model.items.size}"
-        binding.playlistsUp.isVisible = model.showUp
         adapter.currentPlaylistId = model.currentPlaylistId
         adapter.setData(model.items, animate)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
         binding.playlistsCollapsingToolbar.title = model.title
+    }
+
+    override fun repaint() {
+        adapter.notifyDataSetChanged()
     }
 
     override fun showUndo(msg: String, undo: () -> Unit) {
@@ -141,6 +151,12 @@ class PlaylistsFragment :
         snackbar?.dismiss()
         snackbar = snackbarWrapper.make(msg, length = Snackbar.LENGTH_LONG)
             .apply { show() }
+    }
+
+    override fun showError(msg: String) {
+        snackbar?.dismiss()
+        snackbar = snackbarWrapper.makeError(msg)
+        snackbar?.show()
     }
 
 //    override fun gotoPlaylist(id: Long, play: Boolean, source: Source) {
@@ -204,7 +220,7 @@ class PlaylistsFragment :
     }
 
     override fun onLeftSwipe(item: ItemContract.Model) {
-        adapter.notifyItemRemoved(item.index)
+        adapter.notifyItemRemoved(adapter.data.indexOf(item))
         presenter.onItemSwipeLeft(item) // delays for animation
     }
 

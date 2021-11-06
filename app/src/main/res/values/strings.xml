@@ -9,7 +9,7 @@
     <string name="nav_title_backup_settings">Backup settings</string>
     <string name="nav_playlist_item_edit_title">View Item</string>
 
-    <string name="sharenav_title_scan">Scaning ...</string>
+    <string name="sharenav_title_scan">Scaning …</string>
     <string name="sharenav_title_playlist">New Playlist</string>
     <string name="sharenav_playlist_iten">New playlist item</string>
     <string name="sharenav_title_playlist_edit">Playlist settings</string>
@@ -117,6 +117,9 @@
     <string name="pls_item_delete">Delete</string>
     <string name="playlists_up_contentdesc">Up</string>
     <string name="playlists_title">Playlists</string>
+    <string name="playlists_section_app">App playlists</string>
+    <string name="playlists_section_starred">Current / Pinned / Starred</string>
+    <string name="playlists_section_all">All playlists</string>
 
     <!-- dialogs -->
     <string name="playlist_dialog_add_playlist">Add playlist …</string>

@@ -8,8 +8,8 @@ interface ItemBaseContract {
 
     interface ItemTouchHelperViewHolder {
         val contentView: android.view.View
-        val rightSwipeView: android.view.View
-        val leftSwipeView: android.view.View
+        val rightSwipeView: android.view.View?
+        val leftSwipeView: android.view.View?
         fun onItemSelected()
         fun onItemClear()
         fun onItemSwiped(left: Boolean)

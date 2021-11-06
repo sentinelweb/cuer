@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
@@ -32,11 +31,8 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.*
-import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
-import uk.co.sentinelweb.cuer.domain.ext.buildLookup
-import uk.co.sentinelweb.cuer.domain.ext.buildTree
+import uk.co.sentinelweb.cuer.domain.ext.*
 import java.util.*
-import java.util.Locale.getDefault
 
 class PlaylistsPresenter(
     private val view: PlaylistsContract.View,
@@ -72,8 +68,7 @@ class PlaylistsPresenter(
     }
 
     override fun onResume(parentId: Long?) {
-        state.treeCurrentNodeId = parentId
-        state.viewModelScope.launch { executeRefresh(true) }
+        state.viewModelScope.launch { executeRefresh() }
 
         // todo a better job - might refresh too much
         // todo listen for stat changes
@@ -94,16 +89,17 @@ class PlaylistsPresenter(
             ?.takeIf { it.type != APP }
             ?.apply {
                 findPlaylist(item)
-                    ?.also { delPlaylist ->
+                    ?.also { movePlaylist ->
                         view.showPlaylistSelector(
                             PlaylistsDialogContract.Config(
                                 selectedPlaylists = setOf(),
                                 multi = true,
-                                itemClick = { p, _ -> p?.apply { setParent(this, delPlaylist) } },
+                                itemClick = { p, _ -> p?.apply { setParent(this, movePlaylist) } },
                                 confirm = { },
-                                dismiss = { showCurrentNode() },
+                                dismiss = {view.repaint()},
                                 suggestionsMedia = null,
                                 showPin = false,
+                                showRoot = true
                             )
                         )
                     }
@@ -111,8 +107,15 @@ class PlaylistsPresenter(
     }
 
     private fun setParent(parent: PlaylistDomain, child: PlaylistDomain) {
-        state.viewModelScope.launch {
-            playlistOrchestrator.save(child.copy(parentId = parent.id), LOCAL.flatOptions())
+        val childNode = state.treeLookup[child.id]!!
+        val parentNode = state.treeLookup[parent.id]
+        if (parent.id == null || !childNode.isAncestor(parentNode!!)) {
+            state.viewModelScope.launch {
+                playlistOrchestrator.save(child.copy(parentId = parent.id), LOCAL.flatOptions())
+            }
+        } else {
+            view.repaint()
+            toastWrapper.show("That's a circular reference ...")
         }
     }
 
@@ -120,18 +123,26 @@ class PlaylistsPresenter(
         state.viewModelScope.launch {
             delay(400)
             findPlaylist(item)
-                ?.let { playlist ->
+                ?.also { playlist ->
                     if (playlist.type != APP) {
-                        state.deletedPlaylist = playlist.id
-                            ?.let { playlistOrchestrator.load(it, LOCAL.deepOptions()) }
-                            ?.apply {
-                                playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
-                                view.showUndo("Deleted playlist: ${playlist.title}", this@PlaylistsPresenter::undoDelete)
-                            }
-                            ?: let {
-                                view.showMessage("Cannot load playlist backup")
-                                null
-                            }
+                        val node = state.treeLookup[playlist.id]!!
+                        if (node.chidren.size==0) {
+                            state.deletedPlaylist = playlist.id
+                                ?.let { playlistOrchestrator.load(it, LOCAL.deepOptions()) }
+                                ?.apply {
+                                    playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
+                                    view.showUndo(
+                                        "Deleted playlist: ${playlist.title}",
+                                        this@PlaylistsPresenter::undoDelete
+                                    )
+                                }
+                                ?: let {
+                                    view.showError("Cannot load playlist backup")
+                                    null
+                                }
+                        } else {
+                            view.showError("Please delete the children first")
+                        }
                     } else if (playlist.id == LOCAL_SEARCH_PLAYLIST || playlist.id == REMOTE_SEARCH_PLAYLIST) {
                         val isLocal = playlist.id == LOCAL_SEARCH_PLAYLIST
                         val type = searchMapper.searchTypeText(isLocal)
@@ -142,47 +153,40 @@ class PlaylistsPresenter(
                         view.showUndo("Deleted $type search") {
                             prefsWrapper.putString(key, lastSearch!!)
                             state.viewModelScope.launch {
-                                executeRefresh(false)
+                                executeRefresh()
                             }
                         }
-                        executeRefresh(false)
+                        executeRefresh()
                     }
-                } ?: let { view.showMessage("Cannot delete playlist") }
+                } ?: let { view.showError("Cannot delete playlist") }
 
         }
     }
 
     override fun onItemClicked(item: ItemContract.Model) {
-        view.navigate(PlaylistContract.makeNav(item.id, null, false, item.source))
+        if (item is ItemContract.Model.ItemModel) {
+            view.navigate(PlaylistContract.makeNav(item.id, null, false, item.source))
+        }
     }
 
     override fun onItemImageClicked(item: ItemContract.Model) {
-        findPlaylist(item)
-            ?.takeIf { state.treeLookup[it.id]?.chidren?.size ?: 0 > 0 }
-            ?.also {
-                state.treeCurrentNodeId = it.id
-                showCurrentNode()
-            }
-            ?: findPlaylist(item)?.id?.apply {
+        findPlaylist(item)?.id?.apply {
+            if (item is ItemContract.Model.ItemModel) {
                 view.navigate(PlaylistContract.makeNav(this, null, false, item.source))
             }
-    }
-
-    override fun onUpClicked() {
-        if (state.treeCurrentNodeId != null) {
-            state.treeCurrentNodeId = state.treeLookup[state.treeCurrentNodeId]?.let { it.parent?.node?.id }
-            showCurrentNode()
         }
     }
 
     override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
         if (!external) {
-            view.navigate(PlaylistContract.makeNav(item.id, null, true, item.source))
+            if (item is ItemContract.Model.ItemModel) {
+                view.navigate(PlaylistContract.makeNav(item.id, null, true, item.source))
+            }
         } else {
             findPlaylist(item)
                 ?.takeIf { it.type == PLATFORM }
                 ?.apply { ytJavaApi.launchPlaylist(platformId!!) }
-                ?: let { view.showMessage("Cannot launch playlist") }
+                ?: let { view.showError("Cannot launch playlist") }
         }
     }
 
@@ -202,7 +206,7 @@ class PlaylistsPresenter(
                 coroutines.mainScope.launch {
                     playlistOrchestrator.load(itemDomain.id!!, LOCAL.deepOptions())
                         ?.also { shareWrapper.share(it) }
-                        ?: view.showMessage("Couldn't load playlist ...")
+                        ?: view.showError("Couldn't load playlist ...")
                 }
             }
     }
@@ -236,7 +240,7 @@ class PlaylistsPresenter(
             if (merge.checkMerge(thisPlaylist, delPlaylist)) {
                 merge.merge(thisPlaylist, delPlaylist)
             } else {
-                view.showMessage("Cannot merge this playlist")
+                view.showError("Cannot merge this playlist")
             }
         }
     }
@@ -250,9 +254,9 @@ class PlaylistsPresenter(
 
     override fun commitMove() {
         if (state.dragFrom != null && state.dragTo != null) {
-            toastWrapper.show("todo save move ..")
+            //toastWrapper.show("todo save move ..")
         } else {
-            toastWrapper.show("Move failed ..")
+            //toastWrapper.show("Move failed ..")
             refreshPlaylists()
         }
         state.dragFrom = null
@@ -262,117 +266,66 @@ class PlaylistsPresenter(
     override fun undoDelete() {
         state.deletedPlaylist?.let { itemDomain ->
             state.viewModelScope.launch {
-                playlistOrchestrator.save(itemDomain, LOCAL.flatOptions())
+                playlistOrchestrator.save(itemDomain, LOCAL.deepOptions())
                 state.deletedPlaylist = null
-                executeRefresh(false)
+                executeRefresh()
             }
         }
     }
 
     private fun refreshPlaylists() {
-        state.viewModelScope.launch { executeRefresh(false) }
+        state.viewModelScope.launch { executeRefresh() }
     }
 
-    private suspend fun executeRefresh(focusCurrent: Boolean) {
+    private suspend fun executeRefresh() {
         try {
-            state.playlists = playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
-                .also {
-                    state.treeRoot = it.buildTree()
-                    state.treeLookup = state.treeRoot.buildLookup()
-                }
-                .toMutableList()
-                .apply { add(0, newMedia.makeNewItemsHeader()) }
-                .apply { add(1, recentItems.makeRecentItemsHeader()) }
-                .apply {
-                    if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
-                        add(2, localSearch.makeSearchHeader())
+            state.playlists =
+                playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
+                    .also {
+                        state.treeRoot = it.buildTree()
+                            .sort(compareBy{it.node?.title?.lowercase()})
+                        state.treeLookup = state.treeRoot.buildLookup()
                     }
-                }
-                .apply {
-                    if (prefsWrapper.has(LAST_REMOTE_SEARCH)) {
-                        add(2, remoteSearch.makeSearchHeader())
-                    }
-                }
+                    .toMutableList()
 
             state.playlistStats = playlistStatsOrchestrator
-                .loadList(IdListFilter(state.playlists.mapNotNull { if (it.type != APP) it.id else null }), LOCAL.flatOptions())
+                .loadList(
+                    IdListFilter(state.playlists.mapNotNull { if (it.type != APP) it.id else null }),
+                    LOCAL.flatOptions()
+                )
                 .toMutableList()
-                .apply { add(newMedia.makeNewItemsStats()) }
-                .apply { add(recentItems.makeRecentItemsStats()) }
+
+            val appLists = mutableMapOf(
+                newMedia.makeNewItemsHeader() to newMedia.makeNewItemsStats(),
+                recentItems.makeRecentItemsHeader() to recentItems.makeRecentItemsStats()
+            )
                 .apply {
                     if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
-                        add(2, localSearch.makeSearchItemsStats())
+                        put(localSearch.makeSearchHeader(), localSearch.makeSearchItemsStats())
                     }
                 }
                 .apply {
                     if (prefsWrapper.has(LAST_REMOTE_SEARCH)) {
-                        add(3, remoteSearch.makeSearchItemsStats())
+                        put(remoteSearch.makeSearchHeader(), remoteSearch.makeSearchItemsStats())
                     }
                 }
 
-            state.playlistsDisplay = buildDisplayList()
-
-            showCurrentNode()
-                .takeIf { focusCurrent }
-                ?.let {
-                    state.playlists.apply {
-                        prefsWrapper.getPairNonNull(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair())
-                            ?.toIdentifier()
-                            ?.let { focusId -> view.scrollToItem(indexOf(find { it.id == focusId.id })) }
-                    }
-                }
+            modelMapper.map2(
+                state.playlists
+                    .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } },
+                queue.playlistId,
+                appLists,
+                prefsWrapper.getLong(PINNED_PLAYLIST),
+                state.treeRoot
+            ).takeIf { coroutines.mainScopeActive }
+                ?.also { view.setList(it, false) }
         } catch (e: Exception) {
             log.e("Load failed", e)
-            view.showMessage("Load failed: ${e::class.java.simpleName}")
+            view.showError("Load failed: ${e::class.java.simpleName}")
             view.hideRefresh()
         }
     }
 
-    private fun mapModel(
-        it: Map<PlaylistDomain, PlaylistStatDomain?>,
-    ) = modelMapper.map(
-        it,
-        queue.playlistId,
-        true,
-        prefsWrapper.getLong(PINNED_PLAYLIST),
-        state.treeCurrentNodeId,
-        state.treeLookup
-    )
-
-    private fun buildDisplayList(): List<PlaylistDomain> =
-        if (state.treeCurrentNodeId == null) {
-            val pinnedId = prefsWrapper.getLong(PINNED_PLAYLIST)
-            state.playlists
-                .filter { it.type == APP || it.starred || it.id == pinnedId }
-                .sortedWith(compareBy({ it.id != pinnedId }, { it.type != APP }, { !it.starred }, { it.title.toLowerCase(getDefault()) }))
-                .toMutableList()
-                .let { list -> list to (list.map { it.id }.toSet()) }
-                .let { (list, idset) ->
-                    list.addAll(
-                        state.treeRoot.chidren
-                            .filter { !idset.contains(it.node!!.id) }
-                            .map { it.node!! }
-                            .sortedBy { it.title.toLowerCase(getDefault()) }
-                    )
-                    list
-                }
-        } else {
-            state.treeLookup[state.treeCurrentNodeId]?.chidren
-                ?.map { it.node!! }
-                ?.sortedBy { it.title.toLowerCase(getDefault()) }
-                ?: listOf()
-        }
-
-    private fun showCurrentNode() {
-        state.playlistsDisplay = buildDisplayList()
-        state.playlistsDisplay
-            .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } }
-            .let { mapModel(it) }
-            .takeIf { coroutines.mainScopeActive }
-            ?.also { view.setList(it, false) }
-    }
-
     private fun findPlaylist(item: ItemContract.Model) = state.playlists.find { it.id == item.id }
-
 
 }

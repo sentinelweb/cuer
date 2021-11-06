@@ -9,6 +9,14 @@
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
+    <style name="ShapeAppearance.Item.TileText" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">@dimen/medium_corner_cut</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
     <style name="ShapeAppearance.Button" parent="ShapeAppearance.MaterialComponents">
         <item name="cornerFamily">cut</item>
         <item name="cornerSizeTopLeft">@dimen/small_corner_cut</item>

@@ -9,9 +9,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsAdapter
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
@@ -50,7 +48,8 @@ interface PlaylistsDialogContract {
         val dismiss: () -> Unit,
         val suggestionsMedia: MediaDomain? = null,
         val showAdd: Boolean = true,
-        val showPin: Boolean = true
+        val showPin: Boolean = true,
+        val showRoot: Boolean = false
     ) : DialogModel(Type.PLAYLIST_FULL, R.string.playlist_dialog_title)
 
     data class State(
@@ -65,7 +64,6 @@ interface PlaylistsDialogContract {
     ) : ViewModel() {
         lateinit var config: Config
         lateinit var treeRoot: PlaylistTreeDomain
-        lateinit var treeLookup: Map<Long, PlaylistTreeDomain>
     }
 
     data class Model(
@@ -97,7 +95,7 @@ interface PlaylistsDialogContract {
                 }
                 scoped { PlaylistsModelMapper(get()) }
                 scoped { PlaylistsDialogModelMapper() }
-                scoped { PlaylistsAdapter(get(), getSource()) }
+                scoped { PlaylistsDialogAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
@@ -106,6 +104,5 @@ interface PlaylistsDialogContract {
                 viewModel { State() }
             }
         }
-
     }
 }

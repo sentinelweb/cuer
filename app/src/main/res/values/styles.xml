@@ -171,6 +171,14 @@
         <item name="android:layout_height">@dimen/itemview_icon_height</item>
     </style>
 
+    <style name="ItemView.Container.Playlist">
+        <item name="android:layout_margin">@dimen/list_item_margin</item>
+        <item name="android:background">@drawable/ic_ripple_item_background</item>
+        <item name="android:elevation">@dimen/list_item_elevation</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/playlist_row_icon_height</item>
+    </style>
+
     <style name="ItemView.Background">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
@@ -200,6 +208,13 @@
     <style name="ItemView.Thumb.Row">
         <item name="android:layout_width">@dimen/itemview_icon_width</item>
         <item name="android:layout_height">@dimen/itemview_icon_height</item>
+        <item name="android:background">@color/surface</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
+    </style>
+
+    <style name="ItemView.Thumb.Playlist">
+        <item name="android:layout_width">@dimen/playlist_row_icon_width</item>
+        <item name="android:layout_height">@dimen/playlist_row_icon_height</item>
         <item name="android:background">@color/surface</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
     </style>
@@ -238,7 +253,7 @@
     </style>
 
     <style name="ItemView.OverflowButtonClick">
-        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_width">64dp</item>
         <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
 
@@ -266,6 +281,54 @@
     </style>
     <!-- end ItemView =========================== -->
 
+    <!-- ItemTile =========================== -->
+
+    <style name="ItemTile" />
+
+    <style name="ItemTile.Root" >
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
+        <item name="android:layout_width">@dimen/playlist_tile_size</item>
+        <item name="android:layout_height">@dimen/playlist_tile_size</item>
+    </style>
+
+    <style name="ItemTile.Container">
+        <item name="android:background">@drawable/ic_ripple_item_background</item>
+        <item name="android:elevation">@dimen/list_item_elevation</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="ItemTile.Thumb">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/surface</item>
+    </style>
+
+    <style name="ItemTile.Title" parent="@style/TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">@dimen/list_item_top_text_size</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Subtitle2</item>
+        <item name="android:paddingStart">2dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:paddingEnd">2dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingExtra">-4dp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@color/black_transparent_background</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="ItemTile.OverflowButtonClick">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+    </style>
+    <!-- end ItemTile =========================== -->
     <!-- CompactPlayer =========================== -->
     <style name="CompactPlayer" />
 

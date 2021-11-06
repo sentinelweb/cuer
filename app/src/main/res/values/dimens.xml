@@ -22,6 +22,7 @@
     <dimen name="list_item_swipe_dismiss_dist">100dp</dimen>
     <dimen name="list_item_swipe_dismiss_tolerance">4dp</dimen>
     <dimen name="list_item_height">76dp</dimen>
+    <dimen name="playlist_tile_size">108dp</dimen>
     <dimen name="list_item_top_text_size">15sp</dimen>
     <dimen name="list_item_bottom_text_size">13sp</dimen>
     <dimen name="list_item_progress_height">4dp</dimen>
@@ -42,6 +43,13 @@
 
     <dimen name="itemview_icon_height">72dp</dimen>
     <dimen name="itemview_icon_width">128dp</dimen>
-    <dimen name="main_navhost_bottom_padding_player">104dp</dimen>
+    <dimen name="main_navhost_bottom_padding_player">64dp</dimen>
     <dimen name="min_floating_window_size">128dp</dimen>
+    <dimen name="tree_node_depth">16dp</dimen>
+
+    <dimen name="playlist_row_height">64dp</dimen>
+    <dimen name="playlist_row_icon_height">60dp</dimen>
+    <dimen name="playlist_row_icon_width">106dp</dimen>
+    <dimen name="recyclerview_footer">96dp</dimen>
+
 </resources>

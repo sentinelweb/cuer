@@ -116,7 +116,6 @@ interface PlaylistContract {
         var deletedPlaylistItem: PlaylistItemDomain? = null,
         var movedPlaylistItem: PlaylistItemDomain? = null,
         var focusIndex: Int? = null,
-        var lastFocusIndex: Int? = null, // used for undo
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
         var selectedPlaylistItem: PlaylistItemDomain? = null,

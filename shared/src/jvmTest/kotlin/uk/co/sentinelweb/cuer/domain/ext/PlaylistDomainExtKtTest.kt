@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.domain.ext
 
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Test
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
@@ -36,4 +36,15 @@ class PlaylistDomainExtKtTest {
         assertEquals(3, treeLookup[6]!!.descendents())
     }
 
+    @Test
+    fun isAncestor() {
+        assertTrue( treeLookup[2]!!.isAncestor(treeLookup[4]!!))
+        assertTrue( tree.isAncestor(treeLookup[2]!!))
+    }
+
+    @Test
+    fun isDescendent() {
+        assertTrue( treeLookup[4]!!.isDescendent(treeLookup[2]!!))
+        assertFalse( tree.isDescendent(treeLookup[2]!!))
+    }
 }
