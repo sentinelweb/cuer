@@ -9,6 +9,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
@@ -56,6 +57,10 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
 
+    init {
+        log.tag(this)
+    }
+
     // saves the data on back press (enabled in onResume)
     private val upCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -70,7 +75,11 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
 
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentComposeBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -118,13 +127,20 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         TopReached -> navMapper.navigate(NavigationModel.FINISH)
                         ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
                         is AddPlaylist -> {
-                            startActivity(ShareActivity.urlIntent(
-                                requireContext(),
-                                YoutubeJavaApiWrapper.playlistUrl(label.platformId),
-                                label.parentId
-                            ))
+                            startActivity(
+                                ShareActivity.urlIntent(
+                                    requireContext(),
+                                    YoutubeJavaApiWrapper.playlistUrl(label.platformId),
+                                    label.parentId
+                                )
+                            )
                         }
-                        is OpenLocalPlaylist -> navMapper.navigate(PlaylistContract.makeNav(label.id, play = label.play))
+                        is OpenLocalPlaylist -> navMapper.navigate(
+                            PlaylistContract.makeNav(
+                                label.id,
+                                play = label.play
+                            )
+                        )
                         None -> Unit
                     }
                 }
@@ -135,7 +151,8 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
         override val recent: String
             get() = res.getString(R.string.browse_recent)
         override val errorNoPlaylistConfigured = res.getString(R.string.browse_error_no_playlist)
-        override fun errorNoCatWithID(id: Long) = res.getString(R.string.browse_error_no_category, id)
+        override fun errorNoCatWithID(id: Long) =
+            res.getString(R.string.browse_error_no_category, id)
     }
 
     companion object {
@@ -165,7 +182,12 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                 scoped { BrowseRepository(BrowseJsonLoader(get())) }
                 scoped { BrowseModelMapper(get(), get()) }
                 scoped { BrowseMviView(get(), get()) }
-                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
+                scoped {
+                    navigationMapper(
+                        true,
+                        getSource<Fragment>().requireActivity() as AppCompatActivity
+                    )
+                }
             }
         }
     }

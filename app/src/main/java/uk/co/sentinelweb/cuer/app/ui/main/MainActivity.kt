@@ -57,7 +57,6 @@ class MainActivity :
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val res: ResourceWrapper by inject()
     private lateinit var navController: NavController
-    private val aytViewHolder: AytViewHolder by inject()
 
     private var _binding: MainActivityBinding? = null
     private val binding: MainActivityBinding
@@ -88,8 +87,6 @@ class MainActivity :
         //intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
 
         // todo save last tab
-        // todo for testing player
-        navController.navigate(R.id.navigation_playlists)
         presenter.initialise()
     }
 

@@ -30,6 +30,7 @@ class BrowseMviView constructor(
 
     override suspend fun processLabel(label: Label) {
         _labelData.value = label
+        _labelData.value = Label.None // stops clears state
         log.d("Got label: $label")
     }
 
