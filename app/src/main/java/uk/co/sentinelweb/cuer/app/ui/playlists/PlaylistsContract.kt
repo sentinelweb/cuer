@@ -62,7 +62,8 @@ interface PlaylistsContract {
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
         var playlistStats: List<PlaylistStatDomain> = listOf(),
-        var treeRoot: PlaylistTreeDomain = PlaylistTreeDomain()
+        var treeRoot: PlaylistTreeDomain = PlaylistTreeDomain(),
+        var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf()
     ) : ViewModel()
 
     data class Model(

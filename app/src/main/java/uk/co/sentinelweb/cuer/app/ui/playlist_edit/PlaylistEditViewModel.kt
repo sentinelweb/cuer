@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.PLAY_START
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
@@ -20,7 +21,10 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.ext.buildLookup
+import uk.co.sentinelweb.cuer.domain.ext.buildTree
 import uk.co.sentinelweb.cuer.domain.ext.isAllWatched
+import uk.co.sentinelweb.cuer.domain.ext.isAncestor
 
 
 class PlaylistEditViewModel constructor(
@@ -64,11 +68,15 @@ class PlaylistEditViewModel constructor(
             state.source = source
             playlistId?.let {
                 playlistOrchestrator.load(it, source.deepOptions())
-                    ?.let {
+                    ?.also {
                         state.isAllWatched = it.isAllWatched()
                         state.defaultInitial = it.default
                         state.playlistEdit = it.copy(items = listOf())
+                        it.parentId?.also {
+                            state.playlistParent = playlistOrchestrator.load(it, source.deepOptions())
+                        }
                     } ?: makeCreateModel()
+
             } ?: makeCreateModel()
             update()
         }
@@ -206,11 +214,22 @@ class PlaylistEditViewModel constructor(
             )
     }
 
-    fun onParentSelected(playlist: PlaylistDomain?, checked: Boolean) {
-        // todo check for circular refs!! while parent.parent.id != -1 ..
-        state.playlistParent = playlist
-        state.playlistEdit = state.playlistEdit.copy(parentId = playlist?.id)
-        update()
+    fun onParentSelected(parent: PlaylistDomain?, checked: Boolean) = viewModelScope.launch{
+        if (state.treeLookup.isEmpty()) {
+            state.treeLookup = playlistOrchestrator
+                .loadList(OrchestratorContract.AllFilter(), state.source.flatOptions())
+                .buildTree()
+                .buildLookup()
+        }
+        val childNode = state.treeLookup[state.playlistEdit.id]!!
+        val parentNode = state.treeLookup[parent?.id]
+        if (parent?.id==null || !childNode.isAncestor(parentNode!!)) {
+            state.playlistParent = parent?.id?.let { parent }
+            state.playlistEdit = state.playlistEdit.copy(parentId = parent?.id)
+            update()
+        } else {
+            _uiLiveData.value = UiEvent(ERROR,"That's a circular reference ..")
+        }
     }
 
     fun onPlaylistDialogClose() {

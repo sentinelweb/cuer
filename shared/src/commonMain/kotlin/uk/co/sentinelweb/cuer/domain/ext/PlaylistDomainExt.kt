@@ -144,13 +144,32 @@ fun PlaylistTreeDomain.iterate(depth: Int = 0, cb: (pl: PlaylistTreeDomain, Int)
     chidren.forEach { it.iterate(depth + 1, cb) }
 }
 
-fun PlaylistTreeDomain.sort(comp:Comparator<PlaylistTreeDomain>): PlaylistTreeDomain {
+fun PlaylistTreeDomain.sort(comp: Comparator<PlaylistTreeDomain>): PlaylistTreeDomain {
     return copy(chidren = chidren
         .sortedWith(comp)
         .map { td -> td.sort(comp) })
 }
 
-//fun PlaylistTreeDomain.sort() {
-//    chidren.sortedBy { it.node?.title?.lowercase()}
-//    chidren.forEach { it.sort()}
-//}
+fun PlaylistTreeDomain.isAncestor(check: PlaylistTreeDomain): Boolean {
+    if (node == null) return true // root node
+    var start = check
+    while (start.node != null) {
+        if (start.node?.id == this.node.id) {
+            return true
+        }
+        start = start.parent!!
+    }
+    return false
+}
+
+fun PlaylistTreeDomain.isDescendent(check: PlaylistTreeDomain): Boolean {
+    if (node == null) return false
+    var start = this
+    while (start.node != null) {
+        if (start.node?.id == check.node?.id) {
+            return true
+        }
+        start = start.parent!!
+    }
+    return false
+}

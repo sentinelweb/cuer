@@ -31,8 +31,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.*
-import uk.co.sentinelweb.cuer.domain.ext.buildTree
-import uk.co.sentinelweb.cuer.domain.ext.sort
+import uk.co.sentinelweb.cuer.domain.ext.*
 import java.util.*
 
 class PlaylistsPresenter(
@@ -90,12 +89,12 @@ class PlaylistsPresenter(
             ?.takeIf { it.type != APP }
             ?.apply {
                 findPlaylist(item)
-                    ?.also { delPlaylist ->
+                    ?.also { movePlaylist ->
                         view.showPlaylistSelector(
                             PlaylistsDialogContract.Config(
                                 selectedPlaylists = setOf(),
                                 multi = true,
-                                itemClick = { p, _ -> p?.apply { setParent(this, delPlaylist) } },
+                                itemClick = { p, _ -> p?.apply { setParent(this, movePlaylist) } },
                                 confirm = { },
                                 dismiss = {view.repaint()},
                                 suggestionsMedia = null,
@@ -108,9 +107,15 @@ class PlaylistsPresenter(
     }
 
     private fun setParent(parent: PlaylistDomain, child: PlaylistDomain) {
-        // todo check for circular refs!! while parent.parent.id != -1 .
-        state.viewModelScope.launch {
-            playlistOrchestrator.save(child.copy(parentId = parent.id), LOCAL.flatOptions())
+        val childNode = state.treeLookup[child.id]!!
+        val parentNode = state.treeLookup[parent.id]
+        if (parent.id == null || !childNode.isAncestor(parentNode!!)) {
+            state.viewModelScope.launch {
+                playlistOrchestrator.save(child.copy(parentId = parent.id), LOCAL.flatOptions())
+            }
+        } else {
+            view.repaint()
+            toastWrapper.show("That's a circular reference ...")
         }
     }
 
@@ -274,6 +279,7 @@ class PlaylistsPresenter(
                     .also {
                         state.treeRoot = it.buildTree()
                             .sort(compareBy{it.node?.title?.lowercase()})
+                        state.treeLookup = state.treeRoot.buildLookup()
                     }
                     .toMutableList()
 
