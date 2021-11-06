@@ -85,7 +85,8 @@ class PlaylistPresenter(
     }
 
     private fun isPlaylistPlaying() = isQueuedPlaylist && ytCastContextHolder.isConnected()
-    private fun isPlaylistPinned() = state.playlist?.let { prefsWrapper.getLong(PINNED_PLAYLIST, 0) == it.id } ?: false
+    private fun isPlaylistPinned() =
+        state.playlist?.let { prefsWrapper.getLong(PINNED_PLAYLIST, 0) == it.id } ?: false
 
     private val isQueuedPlaylist: Boolean
         get() = state.playlistIdentifier == queue.playlistId
@@ -145,7 +146,7 @@ class PlaylistPresenter(
                             }
                         DELETE -> {
                             toastWrapper.show(res.getString(R.string.playlist_msg_deleted))
-                            view.exit()// todo exit or back
+                            view.exit() // todo exit or back
                         }
                     }
                 }
@@ -187,7 +188,10 @@ class PlaylistPresenter(
                 }.takeIf { !isQueuedPlaylist && currentIndexBefore != state.playlist?.currentIndex }
                     ?.apply {
                         state.playlist?.apply {
-                            playlistOrDefaultOrchestrator.updateCurrentIndex(this, state.playlistIdentifier.flatOptions())
+                            playlistOrDefaultOrchestrator.updateCurrentIndex(
+                                this,
+                                state.playlistIdentifier.flatOptions()
+                            )
                         }
                     }
             }
@@ -200,7 +204,8 @@ class PlaylistPresenter(
                     FLAT,
                     FULL,
                     -> {
-                        val containsMedia = state.playlist?.items?.find { it.media.platformId == media.platformId } != null
+                        val containsMedia =
+                            state.playlist?.items?.find { it.media.platformId == media.platformId } != null
                         if (containsMedia) {
                             updatePlaylistItemByMediaId(null, media)
                         }
@@ -220,7 +225,8 @@ class PlaylistPresenter(
     }
 
     override fun initialise() {
-        state.playlistIdentifier = prefsWrapper.getPair(CURRENT_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
+        state.playlistIdentifier =
+            prefsWrapper.getPair(CURRENT_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
 
     }
 
@@ -320,7 +326,12 @@ class PlaylistPresenter(
         state.viewModelScope.launch {
             state.movedPlaylistItem
                 ?.copy(playlistId = state.playlistIdentifier.id!! as Long)
-                ?.apply { playlistItemOrchestrator.save(this, state.playlistIdentifier.flatOptions()) }
+                ?.apply {
+                    playlistItemOrchestrator.save(
+                        this,
+                        state.playlistIdentifier.flatOptions()
+                    )
+                }
                 ?.apply { state.movedPlaylistItem = null }
         }
     }
@@ -340,7 +351,10 @@ class PlaylistPresenter(
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
                     playlistItemOrchestrator.delete(deleteItem, LOCAL.flatOptions())
-                    view.showUndo("Deleted: ${deleteItem.media.title}", ::undoDelete) // todo extract
+                    view.showUndo(
+                        "Deleted: ${deleteItem.media.title}",
+                        ::undoDelete
+                    ) // todo extract
                 }
         }
     }
@@ -351,7 +365,8 @@ class PlaylistPresenter(
                 interactions
                     ?.onView(this)
                     ?: run {
-                        val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
+                        val source =
+                            if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
                         view.showItemDescription(itemModel.id, this, source)
                     }
             } // todo pass identifier?
@@ -370,7 +385,8 @@ class PlaylistPresenter(
                     itemDomain.playlistId?.let {
                         playItem(itemModel.id, itemDomain, false)
                     } ?: run {
-                        val source = if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
+                        val source =
+                            if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
                         view.showItemDescription(itemModel.id, itemDomain, source)
                     }
                 }
@@ -543,11 +559,20 @@ class PlaylistPresenter(
     override fun commitMove() {
         if (state.dragFrom != null && state.dragTo != null) {
             state.playlist
-                ?.let { playlist -> playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!) }
+                ?.let { playlist ->
+                    playlistMutator.moveItem(
+                        playlist,
+                        state.dragFrom!!,
+                        state.dragTo!!
+                    )
+                }
                 ?.also { state.playlist = it }
                 ?.also {
                     modelMapper.map(
-                        it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsTreeLookup,
+                        it,
+                        isPlaylistPlaying(),
+                        id = state.playlistIdentifier,
+                        playlists = state.playlistsTreeLookup,
                         pinned = isPlaylistPinned()
                     )
                         .also { view.setModel(it, false) }
@@ -558,7 +583,8 @@ class PlaylistPresenter(
                         state.dragTo
                             ?.let { playlistModified.items[it] }
                             ?.let { item ->
-                                item to (item.id ?: throw java.lang.IllegalStateException("Moved item has no ID"))
+                                item to (item.id
+                                    ?: throw java.lang.IllegalStateException("Moved item has no ID"))
                                     .toIdentifier(state.playlistIdentifier.source)
                                     .flatOptions()
                             }
@@ -585,11 +611,11 @@ class PlaylistPresenter(
                 ?.apply {
                     state.playlistIdentifier = this
                 }
-                ?.apply { executeRefresh() }
+                ?.apply { executeRefresh(scrollToCurrent = true) }
                 ?.apply {
                     state.playlist
                         ?.indexOfItemId(plItemId)
-                        ?.also { view.scrollToItem(it) }
+                        ?.also { state.focusIndex = it }
                 }
                 ?.apply {
                     if (playNow) {
@@ -599,9 +625,11 @@ class PlaylistPresenter(
                 ?: run {
                     log.d("is db init; ${dbInit.isInitialized()}")
                     if (dbInit.isInitialized()) {
-                        state.playlistIdentifier = prefsWrapper.getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair()).toIdentifier()
+                        state.playlistIdentifier =
+                            prefsWrapper.getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair())
+                                .toIdentifier()
                         log.d("id; ${state.playlistIdentifier.id}")
-                        executeRefresh()
+                        executeRefresh(scrollToCurrent = true)
                     } else {
                         dbInit.addListener({ b: Boolean ->
                             log.d("got db init: $b")
@@ -650,7 +678,11 @@ class PlaylistPresenter(
                     it.copy(
                         items = it.items.map { it.copy(id = null) },
                         config = it.config.copy(
-                            playable = true, editable = true, deletable = true, deletableItems = true, editableItems = true
+                            playable = true,
+                            editable = true,
+                            deletable = true,
+                            deletableItems = true,
+                            editableItems = true
                         )
                     )
                 }
@@ -664,7 +696,10 @@ class PlaylistPresenter(
                         ?: playlist
                 }
                 ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
-                ?.also { state.playlistIdentifier = it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure") }
+                ?.also {
+                    state.playlistIdentifier =
+                        it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")
+                }
                 ?.also { state.playlist = it }
                 ?.also { updateView() }
                 ?.also { onCommit.onCommit(PLAYLIST, listOf(it)) }
@@ -678,12 +713,15 @@ class PlaylistPresenter(
         coroutines.mainScope.launch { updateHeader() }
     }
 
-    private suspend fun executeRefresh(animate: Boolean = true, scrollToItem: Boolean = false) {
+    private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false) {
         view.showRefresh()
         try {
             log.d("executeRefresh: ${state.playlistIdentifier.id}")
             playlistOrDefaultOrchestrator
-                .getPlaylistOrDefault(state.playlistIdentifier.id as Long, state.playlistIdentifier.source.flatOptions())
+                .getPlaylistOrDefault(
+                    state.playlistIdentifier.id as Long,
+                    state.playlistIdentifier.source.flatOptions()
+                )
                 .also { state.playlist = it?.first }
                 ?.also { (playlist, source) ->
                     playlist.id
@@ -700,10 +738,18 @@ class PlaylistPresenter(
                 }
                 ?.also {
                     if (it.second == LOCAL || it.first.type == APP) {
-                        prefsWrapper.putPair(LAST_PLAYLIST_VIEWED, state.playlistIdentifier.toPairType<Long>())
+                        prefsWrapper.putPair(
+                            LAST_PLAYLIST_VIEWED,
+                            state.playlistIdentifier.toPairType<Long>()
+                        )
                     }
                 }
-                .also { updateView(animate) }
+                .also {
+                    if (scrollToCurrent && state.focusIndex == null) {
+                        state.focusIndex = state.playlist?.currentIndex
+                    }
+                    updateView(animate)
+                }
         } catch (e: Throwable) {
             log.e("Error loading playlist", e)
             view.showError("Load failed: ${e::class.java.simpleName}")
@@ -716,25 +762,28 @@ class PlaylistPresenter(
             .takeIf { coroutines.mainScopeActive }
             ?.let {
                 modelMapper.map(
-                    it, isPlaylistPlaying(), id = state.playlistIdentifier, playlists = state.playlistsTreeLookup,
+                    it,
+                    isPlaylistPlaying(),
+                    id = state.playlistIdentifier,
+                    playlists = state.playlistsTreeLookup,
                     pinned = isPlaylistPinned()
                 )
             }
             ?.also { state.model = it }
             ?.also { view.setModel(it, animate) }
             .also {
-                state.focusIndex
-                    ?.apply {
-                        view.scrollToItem(this)
-                        state.lastFocusIndex = state.focusIndex
-                        state.focusIndex = null
-                    }
-                    ?: run {
-                        state.playlist?.currentIndex
-                            ?.also { view.highlightPlayingItem(it) }
-                    }
+                log.d("state.focusIndex=${state.focusIndex}")
+                state.focusIndex?.apply {
+                    view.scrollToItem(this)
+                    state.focusIndex = null
+                }
+            }.also {
+                state.playlist
+                    ?.currentIndex
+                    ?.also { view.highlightPlayingItem(it) }
             }
     }
+
 
     private suspend fun updateHeader() = withContext(coroutines.Main) {
         state.playlist
@@ -761,7 +810,8 @@ class PlaylistPresenter(
                     ?.let { index ->
                         state.model?.let { model ->
                             val originalItemDomain = get(index)
-                            val changedItemDomain = plistItem ?: originalItemDomain.copy(media = media)
+                            val changedItemDomain =
+                                plistItem ?: originalItemDomain.copy(media = media)
                             //model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
                             model.itemsIdMap.entries.firstOrNull {
                                 if (originalItemDomain.id != null) {

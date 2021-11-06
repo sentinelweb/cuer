@@ -32,6 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.CastState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -130,10 +131,15 @@ class PlaylistFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        sharedElementReturnTransition =
+            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         _binding = PlaylistFragmentBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -147,13 +153,17 @@ class PlaylistFragment :
         presenter.initialise()
         binding.playlistList.layoutManager = LinearLayoutManager(context)
         binding.playlistList.adapter = adapter
+        binding.playlistList.addItemDecoration(
+            HeaderFooterDecoration(0, resources.getDimensionPixelSize(R.dimen.recyclerview_footer))
+        )
         itemTouchHelper.attachToRecyclerView(binding.playlistList)
         binding.playlistFabUp.setOnClickListener { presenter.scroll(Up) }
         binding.playlistFabUp.setOnLongClickListener { presenter.scroll(Top);true }
         binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }
         binding.playlistFabDown.setOnLongClickListener { presenter.scroll(Bottom);true }
         binding.playlistFabRefresh.setOnClickListener { presenter.refreshPlaylist() }
-        binding.playlistAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+        binding.playlistAppbar.addOnOffsetChangedListener(object :
+            AppBarLayout.OnOffsetChangedListener {
 
             //var isShow = false
             var scrollRange = -1
@@ -194,7 +204,9 @@ class PlaylistFragment :
 
     private fun updatePlayModeMenuItems() {
         val shouldShow = menuState.isShow && menuState.isPlayable
-        modeMenuItems.forEachIndexed { i, item -> item.isVisible = (shouldShow && i == menuState.lastPlayModeIndex) }
+        modeMenuItems.forEachIndexed { i, item ->
+            item.isVisible = (shouldShow && i == menuState.lastPlayModeIndex)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -349,11 +361,14 @@ class PlaylistFragment :
         binding.playlistFabPlaymode.isVisible = model.canPlay
         playMenuItem?.setIcon(model.playIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
         playMenuItem?.setEnabled(model.canPlay)
-        starMenuItem?.setIcon(model.starredIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
+        starMenuItem?.setIcon(model.starredIcon) ?: run {
+            menuState.reloadHeaderAfterMenuInit = false
+        }
         editMenuItem?.isVisible = model.canEdit
         starMenuItem?.isVisible = model.canEdit
         childrenMenuItem?.isVisible = model.hasChildren > 0
-        binding.playlistFlags.isVisible = model.isDefault || model.isPlayFromStart || model.isPinned || model.hasChildren > 0
+        binding.playlistFlags.isVisible =
+            model.isDefault || model.isPlayFromStart || model.isPinned || model.hasChildren > 0
         binding.playlistFlagDefault.isVisible = model.isDefault
         binding.playlistFlagPlayStart.isVisible = model.isPlayFromStart
         binding.playlistFlagPinned.isVisible = model.isPinned
@@ -422,7 +437,8 @@ class PlaylistFragment :
     override fun showPlaylistSelector(model: PlaylistsDialogContract.Config) {
         //selectDialogCreator.createSingle(model).apply { show() }
         dialogFragment?.dismissAllowingStateLoss()
-        dialogFragment = PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+        dialogFragment =
+            PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
         dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
     }
 

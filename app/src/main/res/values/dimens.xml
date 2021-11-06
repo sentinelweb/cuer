@@ -43,12 +43,13 @@
 
     <dimen name="itemview_icon_height">72dp</dimen>
     <dimen name="itemview_icon_width">128dp</dimen>
-    <dimen name="main_navhost_bottom_padding_player">104dp</dimen>
+    <dimen name="main_navhost_bottom_padding_player">64dp</dimen>
     <dimen name="min_floating_window_size">128dp</dimen>
     <dimen name="tree_node_depth">16dp</dimen>
 
     <dimen name="playlist_row_height">64dp</dimen>
     <dimen name="playlist_row_icon_height">60dp</dimen>
     <dimen name="playlist_row_icon_width">106dp</dimen>
+    <dimen name="recyclerview_footer">96dp</dimen>
 
 </resources>

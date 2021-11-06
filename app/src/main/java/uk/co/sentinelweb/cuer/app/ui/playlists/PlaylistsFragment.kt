@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
@@ -85,6 +86,9 @@ class PlaylistsFragment :
 
         binding.playlistsList.layoutManager = LinearLayoutManager(context)
         binding.playlistsList.adapter = adapter
+        binding.playlistsList.addItemDecoration(
+            HeaderFooterDecoration(0, resources.getDimensionPixelSize(R.dimen.recyclerview_footer))
+        )
         itemTouchHelper.attachToRecyclerView(binding.playlistsList)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
     }
