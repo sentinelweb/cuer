@@ -107,6 +107,10 @@ class ShareActivity : AppCompatActivity(),
         }
     }
 
+    // fixme: this was added as the intent was delivered via onNewIntent if the user use the home ation
+    // but the nave was in the previous state - so crash trying to get scan fragment
+    // probably onNewIntent isnt needed now
+    // but if finish causes problems here then play with getting the nav in the right state
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         finish()

@@ -28,6 +28,7 @@
 -dontnote kotlinx.serialization.SerializationKt
 -keep class uk.co.sentinelweb.cuer.domain.**
 -keep class uk.co.sentinelweb.cuer.net.youtube.videos.dto.**
+-keep class uk.co.sentinelweb.cuer.net.pixabay.dto.**
 -keep,includedescriptorclasses class uk.co.sentinelweb.cuer.domain.**$$serializer { *; }
 -keepclassmembers class uk.co.sentinelweb.cuer.domain.** {
     *** Companion;

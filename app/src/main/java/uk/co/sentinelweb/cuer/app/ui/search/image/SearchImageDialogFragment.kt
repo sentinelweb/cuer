@@ -10,6 +10,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageViewModel.UiEvent.Type.CLOSE
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
@@ -52,6 +53,7 @@ class SearchImageDialogFragment(private val config: SearchImageContract.Config) 
                 override fun onChanged(model: SearchImageViewModel.UiEvent) {
                     when (model.type) {
                         ERROR -> toastWrapper.show(model.data as String)
+                        CLOSE -> dismiss()
                         else -> Unit
                     }
                 }

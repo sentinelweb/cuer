@@ -342,7 +342,7 @@ fun SearchInputText(
     onTextChange: (String) -> Unit,
     onImeAction: () -> Unit = {}
 ) {
-    Box() {
+    Box {
         val keyboardController = LocalSoftwareKeyboardController.current
         TextField(
             value = text ?: "",
