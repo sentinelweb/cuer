@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapperImpl
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 object SharedAppModule {
@@ -31,7 +32,8 @@ object SharedAppModule {
                 log = get(),
                 prefsWrapper = get(),
                 mediaUpdate = get(),
-                playlistOrDefaultOrchestrator = get()
+                playlistOrDefaultOrchestrator = get(),
+                recentLocalPlaylists = get()
             )
         }
         single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }
@@ -62,6 +64,7 @@ object SharedAppModule {
         single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperImpl() }
         factory { BrowseRecentCategories(get(), get()) }
+        factory { RecentLocalPlaylists(get(), get()) }
     }
 
     val modules = listOf(objectModule)

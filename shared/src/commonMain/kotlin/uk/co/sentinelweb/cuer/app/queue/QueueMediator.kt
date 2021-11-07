@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaUpdateOrchestra
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -28,7 +29,8 @@ class QueueMediator constructor(
     private val mediaUpdate: PlaylistMediaUpdateOrchestrator,
     private val playlistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator,
     private val prefsWrapper: GeneralPreferencesWrapper,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val recentLocalPlaylists:RecentLocalPlaylists
 ) : QueueMediatorContract.Producer, QueueMediatorContract.Consumer {
 
     override val currentItem: PlaylistItemDomain?
@@ -271,10 +273,10 @@ class QueueMediator constructor(
         } else {
             state.currentItem = playlistDomain.currentItem()
         }
+        if (state.playlist?.id != playlistDomain.id) {
+            recentLocalPlaylists.addRecent(playlistDomain)
+        }
         state.playlist = playlistDomain
-//        state.currentItem?.apply {
-//            mediaSessionManager.setMedia(media)
-//        }
         log.d("playlist: ${state.playlist?.scanOrder()}")
         //if (this::_currentItemFlow.isInitialized) {
             _currentItemFlow.emit(currentItem)

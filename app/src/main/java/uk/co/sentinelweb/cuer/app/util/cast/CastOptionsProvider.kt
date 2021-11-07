@@ -14,8 +14,7 @@ class CastOptionsProvider : OptionsProvider {
 
     override fun getCastOptions(appContext: Context): CastOptions {
 
-        // Register your receiver on Cast Developer Console to get this ID: https://cast.google.com/publish
-        val receiverId = "C5CBE8CA" // todo change this
+        val receiverId = "24471AF3"
         val buttonActions: MutableList<String> = ArrayList()
 
         buttonActions.add(MediaIntentReceiver.ACTION_TOGGLE_PLAYBACK)

@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="./css/styles.css">
+
+        <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>        
+        <script type="module" src="./js/main.js"></script>
+
+        <script>
+            // hack!
+            // unfortunately when using a custom channel for communication the Cast Receiver always remains IDLE and disconnects after 5 minutes.
+            // hopefully the Google Cast team will solve the issue someday. 
+            // https://stackoverflow.com/questions/46673152/google-cast-custom-receiver-timing-out
+            window._setTimeout = window.setTimeout
+            window.setTimeout = () => { }
+
+            // called automatically by the IFrame APIs
+            function onYouTubeIframeAPIReady() {
+                window.main_onYouTubeIframeAPIReady()
+            }
+        </script>
+
+        <title>chromecast-youtube-player-receiver</title>
+        <style>
+            .circle {
+      width: 192px;
+      height: 192px;
+      -webkit-border-radius: 96px;
+      -moz-border-radius: 96px;
+      border-radius: 96px;
+      background: white;
+      text-align: center;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .center-text{
+        color: white;
+        font-size: 40px;
+        font-family: Arial, Helvetica, sans-serif;
+        width: 100%;
+        text-align: center;
+        display: inline-block;
+        vertical-align: middle;
+        LINE-HEIGHT:256px
+    }
+        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    </head>
+    <body>
+        <div id="youTubePlayerDOM"></div>
+        <div class="center-text">
+            <div class="circle" style="margin-top:128px;">
+                <img style="width:128px;height:128px;padding-top:32px;" src="./img/cuer_icon.svg"/>
+            </div>
+            <div>WELCOME TO CUER<div>
+        </div>
+        
+    </body>
+</html>
