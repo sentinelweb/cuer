@@ -99,7 +99,8 @@ interface PlaylistsContract {
                         ytJavaApi = get(),
                         searchMapper = get(),
                         merge = get(),
-                        shareWrapper = get()
+                        shareWrapper = get(),
+                        recentLocalPlaylists = get()
                     )
                 }
                 scoped { PlaylistsModelMapper(get()) }
