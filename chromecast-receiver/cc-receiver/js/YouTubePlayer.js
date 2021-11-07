@@ -39,7 +39,9 @@ function YouTubePlayer(communicationConstants, communicationChannel) {
                 origin: 'https://www.youtube.com',
                 rel: 0,
                 showinfo: 0,
-                iv_load_policy: 3
+                iv_load_policy: 3,
+                modestbranding:0,
+                color:"#3949ab"
             }            
         })
     }
