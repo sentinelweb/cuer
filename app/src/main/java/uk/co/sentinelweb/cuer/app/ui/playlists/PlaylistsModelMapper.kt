@@ -23,6 +23,7 @@ class PlaylistsModelMapper constructor(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         current: OrchestratorContract.Identifier<*>?,
         appPlaylists: Map<PlaylistDomain, PlaylistStatDomain?>,
+        recentPlaylists: List<OrchestratorContract.Identifier<Long>>,
         pinnedId: Long?,
         root: PlaylistTreeDomain
     ): PlaylistsContract.Model {
@@ -30,35 +31,27 @@ class PlaylistsModelMapper constructor(
             res.getString(R.string.playlists_title),
             PLAYLISTS_HEADER_IMAGE,
             current,
-            buildItems(domains, current, appPlaylists, pinnedId, root)
+            buildItems(domains, appPlaylists, recentPlaylists, pinnedId, root)
         )
     }
 
     private fun buildItems(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
-        current: OrchestratorContract.Identifier<*>?,
         appPlaylists: Map<PlaylistDomain, PlaylistStatDomain?>,
+        recentPlaylists: List<OrchestratorContract.Identifier<Long>>,
         pinnedId: Long?,
         root: PlaylistTreeDomain
     ): List<ItemContract.Model> {
-        val starred = domains.keys.filter { it.starred }
-            .sortedBy { it.title.lowercase() }
-            .toMutableList()
-        (starred.find { it.id == pinnedId }
-            ?.also { starred.remove(it) }
-            ?: let { domains.keys.find { it.id == pinnedId } })
-            ?.also { starred.add(0, it) }
-        // add default if not in list
-        starred.find { it.default }
-            ?: run { starred.add(0, domains.keys.find { it.default }!!) }
-        // add current at start
-        starred.removeIf { it.id == current?.id }
-        domains.keys.find { it.id == current?.id }
-            ?.also { starred.add(0, it) }
+        val starred = buildStarredList(domains)
+        val recent = buildRecentList(domains, recentPlaylists)
         val list = mutableListOf(
             ItemContract.Model.HeaderModel(0, res.getString(R.string.playlists_section_app)),
             ItemContract.Model.ListModel(0, appPlaylists.keys.map {
                 itemModel(it, it.id == pinnedId, appPlaylists[it], 0)
+            }),
+            ItemContract.Model.HeaderModel(0, res.getString(R.string.playlists_section_recent)),
+            ItemContract.Model.ListModel(0, recent.map {
+                itemModel(it, it.id == pinnedId, domains[it], 0)
             }),
             ItemContract.Model.HeaderModel(0, res.getString(R.string.playlists_section_starred)),
             ItemContract.Model.ListModel(0, starred.map {
@@ -73,6 +66,24 @@ class PlaylistsModelMapper constructor(
             }
         }
         return list
+    }
+
+    private fun buildRecentList(
+        domains: Map<PlaylistDomain, PlaylistStatDomain?>,
+        recentPlaylists: List<OrchestratorContract.Identifier<Long>>,
+    ): List<PlaylistDomain> =
+        recentPlaylists
+            .mapNotNull { identifier -> domains.keys.find { it.id == identifier.id } }
+
+    private fun buildStarredList(
+        domains: Map<PlaylistDomain, PlaylistStatDomain?>
+    ): List<PlaylistDomain> {
+        val starred = domains.keys.filter { it.starred }
+            .sortedBy { it.title.lowercase() }
+            .toMutableList()
+        starred.find { it.default }
+            ?: run { starred.add(0, domains.keys.find { it.default }!!) }
+        return starred
     }
 
     private fun itemModel(

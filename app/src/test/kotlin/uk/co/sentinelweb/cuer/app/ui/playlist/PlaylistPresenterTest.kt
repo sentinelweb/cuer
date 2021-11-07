@@ -35,6 +35,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerCont
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_VIEWED
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -111,6 +112,9 @@ class PlaylistPresenterTest {
 
     @MockK
     lateinit var mockPlaylistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator
+
+    @MockK
+    lateinit var mockRecentLocalPlaylists: RecentLocalPlaylists
 
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())
@@ -235,7 +239,8 @@ class PlaylistPresenterTest {
             res = mockResources,
             dbInit = mockDbInit,
             floatingService = mockFloatingWindow,
-            playlistOrDefaultOrchestrator = mockPlaylistOrDefaultOrchestrator
+            playlistOrDefaultOrchestrator = mockPlaylistOrDefaultOrchestrator,
+            recentLocalPlaylists = mockRecentLocalPlaylists
         )
         sut.onResume()
     }
@@ -737,6 +742,7 @@ class PlaylistPresenterTest {
             verify { mockView.scrollToItem(fixtCurrentPlaylist.currentIndex) }
             verify { mockView.highlightPlayingItem(fixtCurrentPlaylist.currentIndex) }
             verify { mockPrefsWrapper.getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair()) }
+            verify(exactly = 0) { mockRecentLocalPlaylists.addRecent(any()) }
         }
 
     }
@@ -759,6 +765,7 @@ class PlaylistPresenterTest {
             verify { mockView.scrollToItem(fixtNextPlaylist.currentIndex) }
             verify { mockView.highlightPlayingItem(fixtNextPlaylist.currentIndex) }
             verify { mockPrefsWrapper.putPair(LAST_PLAYLIST_VIEWED, fixtNextIdentifier.toPair()) }
+            verify() { mockRecentLocalPlaylists.addRecent(fixtNextPlaylist) }
         }
     }
 
@@ -782,6 +789,7 @@ class PlaylistPresenterTest {
             verify { mockView.scrollToItem(fixtNextPlaylist.currentIndex) }
             verify { mockView.highlightPlayingItem(fixtNextPlaylist.currentIndex) }
             verify { mockPrefsWrapper.putPair(LAST_PLAYLIST_VIEWED, fixtNextIdentifier.toPair()) }
+            verify { mockRecentLocalPlaylists.addRecent(fixtNextPlaylist) }
         }
     }
 
@@ -809,6 +817,7 @@ class PlaylistPresenterTest {
             verify { mockView.scrollToItem(fixtNextPlaylist.currentIndex) }
             verify { mockView.highlightPlayingItem(selectedItemIndex) } // comes from emitter
             verify { mockPrefsWrapper.putPair(LAST_PLAYLIST_VIEWED, fixtNextIdentifier.toPair()) }
+            verify { mockRecentLocalPlaylists.addRecent(fixtNextPlaylist) }
         }
     }
 

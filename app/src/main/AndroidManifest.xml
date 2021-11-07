@@ -1,148 +1,154 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="uk.co.sentinelweb.cuer.app">
+<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+package="uk.co.sentinelweb.cuer.app">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <application
-        android:name="uk.co.sentinelweb.cuer.app.CuerApp"
-        android:allowBackup="true"
-        android:fullBackupContent="false"
-        android:icon="@mipmap/ic_launcher"
+<application
+    android:name="uk.co.sentinelweb.cuer.app.CuerApp"
+    android:allowBackup="true"
+    android:fullBackupContent="false"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:supportsRtl="true"
+    android:theme="@style/AppTheme">
+
+    <meta-data
+        android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+        android:value="uk.co.sentinelweb.cuer.app.util.cast.CastOptionsProvider" />
+    <meta-data
+        android:name="preloaded_fonts"
+        android:resource="@array/preloaded_fonts" />
+
+    <activity
+        android:name="uk.co.sentinelweb.cuer.app.ui.main.MainActivity"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:launchMode="singleInstance"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
 
-        <meta-data
-            android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="uk.co.sentinelweb.cuer.app.util.cast.CastOptionsProvider" />
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
 
-        <activity
-            android:name="uk.co.sentinelweb.cuer.app.ui.main.MainActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleInstance">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+    <activity
+        android:name="uk.co.sentinelweb.cuer.app.ui.share.ShareActivity"
+        android:label="@string/app_name"
+        android:launchMode="standard"
+        android:exported="true">
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <nav-graph android:value="@navigation/deeplink" />
 
-        <activity
-            android:name="uk.co.sentinelweb.cuer.app.ui.share.ShareActivity"
-            android:label="@string/app_name"
-            android:launchMode="standard">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
 
-            <nav-graph android:value="@navigation/deeplink" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <category android:name="android.intent.category.DEFAULT" />
 
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="text/plain" />
 
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
+            <data android:scheme="http" />
+            <data android:scheme="https" />
+            <data android:host="youtu.be" />
+            <data android:pathPattern="/" />
+        </intent-filter>
 
-                <data android:mimeType="text/plain" />
+        <intent-filter>
+            <action android:name="android.intent.action.SEND" />
+            <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="youtu.be" />
-                <data android:pathPattern="/" />
-            </intent-filter>
+            <data android:mimeType="text/plain" />
 
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
+            <data android:host="youtu.be" />
+            <data android:path="/" />
+        </intent-filter>
 
-                <data android:mimeType="text/plain" />
+        <intent-filter>
+            <action android:name="android.intent.action.SEND" />
+            <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:host="youtu.be" />
-                <data android:path="/" />
-            </intent-filter>
+            <data android:mimeType="text/plain" />
 
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
+            <data android:host="youtube.com" />
+            <data android:host="www.youtube.com" />
+            <data android:host="m.youtube.com" />
 
-                <data android:mimeType="text/plain" />
+            <data android:path="/watch" />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.SEND" />
+            <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:host="youtube.com" />
-                <data android:host="www.youtube.com" />
-                <data android:host="m.youtube.com" />
+            <data android:mimeType="text/plain" />
 
-                <data android:path="/watch" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
+            <data android:host="youtube.com" />
+            <data android:host="www.youtube.com" />
+            <data android:host="m.youtube.com" />
 
-                <data android:mimeType="text/plain" />
+            <data android:path="/playlist" />
+        </intent-filter>
 
-                <data android:host="youtube.com" />
-                <data android:host="www.youtube.com" />
-                <data android:host="m.youtube.com" />
+    </activity>
 
-                <data android:path="/playlist" />
-            </intent-filter>
+    <activity
+        android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenActivity"
+        android:label="@string/title_activity_fullscreen"
+        android:screenOrientation="landscape"
+        android:theme="@style/FullscreenTheme"
+        tools:ignore="LockedOrientationActivity" />
 
-        </activity>
+    <activity
+        android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity"
+        android:label="@string/title_activity_fullscreen"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity" />
 
-        <activity
-            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenActivity"
-            android:label="@string/title_activity_fullscreen"
-            android:screenOrientation="landscape"
-            android:theme="@style/FullscreenTheme"
-            tools:ignore="LockedOrientationActivity" />
+    <activity
+        android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandActivity"
+        android:label="@string/title_activity_fullscreen"
+        android:screenOrientation="landscape"
+        tools:ignore="LockedOrientationActivity" />
 
-        <activity
-            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity"
-            android:label="@string/title_activity_fullscreen"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
+    <service
+        android:name="uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService"
+        android:exported="false">
 
-        <activity
-            android:name="uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandActivity"
-            android:label="@string/title_activity_fullscreen"
-            android:screenOrientation="landscape"
-            tools:ignore="LockedOrientationActivity" />
-
-        <service
-            android:name="uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService"
-            android:exported="false">
-
-            <!--            android:foregroundServiceType="mediaPlayback"-->
-            <!--
+        <!--            android:foregroundServiceType="mediaPlayback"-->
+        <!--
             might need to make another broadcast receiver to receive events this will
             start the service while the activity is running
             -->
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </service>
+        <intent-filter>
+            <action android:name="android.intent.action.MEDIA_BUTTON" />
+        </intent-filter>
+    </service>
 
-        <service
-            android:name="uk.co.sentinelweb.cuer.app.service.remote.RemoteService"
-            android:exported="false" />
-        <service
-            android:name=".ui.ytplayer.floating.FloatingPlayerService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </service>
-        <!-- media button receiver -->
-        <receiver android:name="androidx.media.session.MediaButtonReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
-
-    </application>
+    <service
+        android:name="uk.co.sentinelweb.cuer.app.service.remote.RemoteService"
+        android:exported="false" />
+    <service
+        android:name=".ui.ytplayer.floating.FloatingPlayerService"
+        android:exported="false">
+        <intent-filter>
+            <action android:name="android.intent.action.MEDIA_BUTTON" />
+        </intent-filter>
+    </service>
+    <!-- media button receiver -->
+    <receiver android:name="androidx.media.session.MediaButtonReceiver"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MEDIA_BUTTON" />
+        </intent-filter>
+    </receiver>
+    <provider
+        android:name="uk.co.sentinelweb.cuer.app.provider.ImageContentProvider"
+        android:authorities="uk.co.sentinelweb.cuer.app.provider.image"
+        android:exported="true"
+        android:enabled="true"/>
+</application>
 
 </manifest>

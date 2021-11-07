@@ -11,7 +11,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/playlists_appbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_header_height"
+        android:layout_height="@dimen/app_bar_header_height_playlists"
         >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
