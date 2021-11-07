@@ -25,6 +25,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrato
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
@@ -57,6 +58,8 @@ class QueueMediatorTest {
 
     @MockK
     lateinit var playlistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator
+    @MockK
+    lateinit var mockRecentLocalPlaylists: RecentLocalPlaylists
 
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())
@@ -128,7 +131,8 @@ class QueueMediatorTest {
             mediaUpdate,
             playlistOrDefaultOrchestrator,
             mockPrefsWrapper,
-            log
+            log,
+            mockRecentLocalPlaylists
         )
         sut.currentItemFlow
             .onEach {
@@ -528,6 +532,7 @@ class QueueMediatorTest {
             assertThat(captureItemFlow.last()).isEqualTo(expectedCurrentItem)
             assertThat(capturePlaylistFlow.last()).isEqualTo(fixtSwitchPlaylist)
             verify { mockPrefsWrapper.putPair(CURRENT_PLAYLIST, switchIdentifier.toPair()) }
+            verify { mockRecentLocalPlaylists.addRecent(sut.playlist!!) }
         }
     }
 
