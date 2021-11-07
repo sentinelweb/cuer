@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.net.pixabay.dto
 
 import kotlinx.serialization.Serializable
 
+@Serializable
 internal data class PixabayImageListDto constructor(
     val total: Int,
     val totalHits: Int,

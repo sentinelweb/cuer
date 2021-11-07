@@ -27,7 +27,7 @@ class SearchImageViewModel(
         val type: Type,
         val data: Any?
     ) {
-        enum class Type { ERROR }
+        enum class Type { ERROR, CLOSE }
     }
 
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
@@ -78,6 +78,10 @@ class SearchImageViewModel(
 
     fun onImageSelected(image: ImageDomain) {
         state.config?.let { it.itemClick(image) }
+    }
+
+    fun onClose() {
+        _uiLiveData.value = UiEvent(UiEvent.Type.CLOSE, null)
     }
 
     fun setConfig(config: SearchImageContract.Config) {
