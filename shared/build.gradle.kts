@@ -78,17 +78,10 @@ kotlin {
                 implementation("io.mockk:mockk:$ver_mockk")
             }
         }
-//        val jvmAndroidSharedMain = create("jvmAndroidSharedMain") {
-//            dependsOn(commonMain)
-//            dependencies {
-//                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
-//            }
-//        }
-
         val jvmMain by getting {
-//            dependsOn(jvmAndroidSharedMain)
             kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
+                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
                 implementation("com.soywiz.korlibs.korio:korio-jvm:$ver_korio")
             }
         }
@@ -106,6 +99,7 @@ kotlin {
             //dependsOn(jvmAndroidSharedMain)
             kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
+                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
                 implementation("com.soywiz.korlibs.korio:korio-android:$ver_korio")
             }
         }
