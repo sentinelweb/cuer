@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 @JsExport
-class Playlist : RComponent<PlaylistProps, RState>() {
+class Playlist : RComponent<PlaylistProps, State>() {
     override fun RBuilder.render() {
         styledDiv {
             css {
@@ -36,15 +36,15 @@ class Playlist : RComponent<PlaylistProps, RState>() {
     }
 }
 
-external interface PlaylistProps : RProps {
+external interface PlaylistProps : Props {
     var title: String
     var playlist: PlaylistDomain?
     var selectedItem: PlaylistItemDomain?
     var onSelectItem: (PlaylistItemDomain) -> Unit
 }
 
-fun RBuilder.playlist(handler: PlaylistProps.() -> Unit): ReactElement {
-    return child(Playlist::class) {
+fun RBuilder.playlist(handler: PlaylistProps.() -> Unit) {
+     child(Playlist::class) {
         this.attrs(handler)
     }
 }

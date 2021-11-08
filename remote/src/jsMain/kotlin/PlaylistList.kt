@@ -10,7 +10,7 @@ import styled.styledImg
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 @JsExport
-class PlaylistList : RComponent<PlaylistListProps, RState>() {
+class PlaylistList : RComponent<PlaylistListProps, State>() {
     override fun RBuilder.render() {
         styledDiv {
             css {
@@ -39,14 +39,14 @@ class PlaylistList : RComponent<PlaylistListProps, RState>() {
     }
 }
 
-external interface PlaylistListProps : RProps {
+external interface PlaylistListProps : Props {
     var playlists: List<PlaylistDomain>
     var selectedPlaylist: PlaylistDomain?
     var onSelectPlaylist: (PlaylistDomain) -> Unit
 }
 
-fun RBuilder.playlistList(handler: PlaylistListProps.() -> Unit): ReactElement {
-    return child(PlaylistList::class) {
+fun RBuilder.playlistList(handler: PlaylistListProps.() -> Unit) {
+    child(PlaylistList::class) {
         this.attrs(handler)
     }
 }

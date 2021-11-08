@@ -12,13 +12,13 @@ import styled.styledDiv
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.remote.util.WebLink
 
-external interface PlaylistItemProps : RProps {
+external interface PlaylistItemProps : Props {
     var video: MediaDomain
     var onWatchedButtonPressed: (MediaDomain) -> Unit
     var unwatchedVideo: Boolean
 }
 
-external interface PlaylistItemState : RState {
+external interface PlaylistItemState : State {
     var itemDescription: String
 }
 
@@ -130,8 +130,8 @@ class PlaylistItem : RComponent<PlaylistItemProps, PlaylistItemState>() {
     }
 }
 
-fun RBuilder.playlistItem(handler: PlaylistItemProps.() -> Unit): ReactElement {
-    return child(PlaylistItem::class) {
+fun RBuilder.playlistItem(handler: PlaylistItemProps.() -> Unit) {
+    child(PlaylistItem::class) {
         this.attrs(handler)
     }
 }

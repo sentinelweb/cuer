@@ -1,7 +1,7 @@
 @file:JsModule("react-youtube-lite")
 @file:JsNonModule
 
-import react.RClass
+import react.ComponentClass
 
 @JsName("ReactYouTubeLite")
-external val reactPlayerLite: RClass<dynamic>
+external val reactPlayerLite: ComponentClass<dynamic>
