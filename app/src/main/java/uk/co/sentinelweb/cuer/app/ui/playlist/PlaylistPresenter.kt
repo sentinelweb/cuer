@@ -35,6 +35,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -76,6 +77,7 @@ class PlaylistPresenter(
     private val res: ResourceWrapper,
     private val dbInit: DatabaseInitializer,
     private val floatingService: FloatingPlayerServiceManager,
+    private val recentLocalPlaylists: RecentLocalPlaylists
 ) : PlaylistContract.Presenter, PlaylistContract.External {
 
     override var interactions: PlaylistContract.Interactions? = null
@@ -621,6 +623,9 @@ class PlaylistPresenter(
                     if (playNow) {
                         queue.playNow(state.playlistIdentifier, plItemId)
                     }
+                }
+                ?.apply {
+                    state.playlist?.also { recentLocalPlaylists.addRecent(it) }
                 }
                 ?: run {
                     if (dbInit.isInitialized()) {

@@ -67,10 +67,10 @@ android {
         useIR = true
         // bypass compose kotlin version compatability check
         // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
-        freeCompilerArgs += [
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
-        ]
+//        freeCompilerArgs += [
+//                "-P",
+//                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+//        ]
     }
 
     composeOptions {

@@ -8,14 +8,14 @@ import com.ccfraser.muirwik.components.mRadioWithLabel
 import react.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
-external interface PlaylistListDialogProps : RProps {
+external interface PlaylistListDialogProps : Props {
     var isOpen: Boolean
     var playlists: List<PlaylistDomain>
     var close: () -> Unit
     var onPlayListSelected: (PlaylistDomain?) -> Unit
 }
 
-external interface PlaylistListDialogState : RState {
+external interface PlaylistListDialogState : State {
     var selectedValue: String
 }
 
@@ -50,4 +50,6 @@ class PlaylistListDialog : RComponent<PlaylistListDialogProps, PlaylistListDialo
     }
 }
 
-fun RBuilder.playlistListDialog(handler: PlaylistListDialogProps.() -> Unit) = child(PlaylistListDialog::class) { attrs(handler) }
+fun RBuilder.playlistListDialog(handler: PlaylistListDialogProps.() -> Unit) {
+    child(PlaylistListDialog::class) { attrs(handler) }
+}

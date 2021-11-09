@@ -1,6 +1,7 @@
 package dialog
 
 import com.ccfraser.muirwik.components.*
+import com.ccfraser.muirwik.components.button.MButtonSize
 import com.ccfraser.muirwik.components.button.MButtonVariant
 import com.ccfraser.muirwik.components.button.mButton
 import com.ccfraser.muirwik.components.button.mIconButton
@@ -35,7 +36,7 @@ import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseResponse
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-external interface AddPlaylistDialogProps : RProps {
+external interface AddPlaylistDialogProps : Props {
     var isOpen: Boolean
     var close: () -> Unit
     var onConfirm: (PlaylistItemDomain) -> Unit
@@ -43,7 +44,7 @@ external interface AddPlaylistDialogProps : RProps {
 
 }
 
-external interface AddPlaylistDialogState : RState {
+external interface AddPlaylistDialogState : State {
     var url: String?
     var scanned: MediaDomain?
     var selectedPlaylist: PlaylistDomain?
@@ -89,7 +90,7 @@ class AddPlaylistDialog : RComponent<AddPlaylistDialogProps, AddPlaylistDialogSt
                         disabled = state.item?.id != null
                     ) {
                         css(buttonMargin)
-                        attrs.startIcon = mIcon("playlist_add_check", fontSize = MIconFontSize.small, addAsChild = false)
+                        mIcon("playlist_add_check", fontSize = MIconFontSize.small)
                     }
                     playlistItem {
                         video = it.media
@@ -141,11 +142,16 @@ class AddPlaylistDialog : RComponent<AddPlaylistDialogProps, AddPlaylistDialogSt
             vertAnchor = MSnackbarVertAnchor.top,
             autoHideDuration = 4000,
             onClose = { _, reason: MSnackbarOnCloseReason -> /* ?? */ }) {
-            attrs.action = altBuilder.div {
-                mIconButton("close", onClick = { setState { snackBarMessage = null } }, color = MColor.inherit)
-            }
+            attrs.action = buildCloseAction()
         }
 
+    }
+
+    fun buildCloseAction() = buildElement {
+        div {
+            mButton("UNDO", color = MColor.secondary, variant = MButtonVariant.text, size = MButtonSize.small, onClick = { setState { snackBarMessage = null } })
+            mIconButton("close", onClick = { setState { snackBarMessage = null } }, color = MColor.inherit)
+        }
     }
 
     private fun onClose() {
@@ -213,7 +219,9 @@ class AddPlaylistDialog : RComponent<AddPlaylistDialogProps, AddPlaylistDialogSt
     }
 }
 
-fun RBuilder.addPlaylistDialog(handler: AddPlaylistDialogProps.() -> Unit) = child(AddPlaylistDialog::class) { attrs(handler) }
+fun RBuilder.addPlaylistDialog(handler: AddPlaylistDialogProps.() -> Unit) {
+    child(AddPlaylistDialog::class) { attrs(handler) }
+}
 
 suspend fun checkLink(url: String): Domain = coroutineScope {
     val response = window.fetch(

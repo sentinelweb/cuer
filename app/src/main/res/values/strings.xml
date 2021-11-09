@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cuer Dbg</string>
+    <string name="app_name" translatable="false">Cuer Dbg</string>
 
     <!-- nav -->
     <string name="bottomnav_title_browse">Browse</string>
@@ -117,9 +117,10 @@
     <string name="pls_item_delete">Delete</string>
     <string name="playlists_up_contentdesc">Up</string>
     <string name="playlists_title">Playlists</string>
-    <string name="playlists_section_app">App playlists</string>
-    <string name="playlists_section_starred">Current / Pinned / Starred</string>
-    <string name="playlists_section_all">All playlists</string>
+    <string name="playlists_section_app">App</string>
+    <string name="playlists_section_starred">Starred</string>
+    <string name="playlists_section_recent">Recent</string>
+    <string name="playlists_section_all">All</string>
 
     <!-- dialogs -->
     <string name="playlist_dialog_add_playlist">Add playlist …</string>

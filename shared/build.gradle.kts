@@ -19,11 +19,14 @@ val ver_mvikotlin: String by project
 val ver_kotlinx_coroutines_test: String by project
 val ver_multiplatform_settings: String by project
 val ver_turbine: String by project
+val ver_ktor: String by project
+//val ver_korio: String by project
+val app_compileSdkVersion: String by project
 
 version = "1.0"
 
 android {
-    compileSdkVersion(30)
+    compileSdkVersion(app_compileSdkVersion.toInt())
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdkVersion(26)
@@ -60,6 +63,8 @@ kotlin {
                 implementation("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$ver_mvikotlin")
                 implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:$ver_multiplatform_settings")
+                implementation("io.ktor:ktor-client-core:$ver_ktor")
+//                implementation("com.soywiz.korlibs.korio:korio:$ver_korio")
             }
         }
         val commonTest by getting {
@@ -68,7 +73,12 @@ kotlin {
                 implementation("io.mockk:mockk:$ver_mockk")
             }
         }
-        val jvmMain by getting
+        val jvmMain by getting {
+            kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
+            dependencies {
+//                implementation("com.soywiz.korlibs.korio:korio-jvm:$ver_korio")
+            }
+        }
         val jvmTest by getting {
             dependencies {
                 // Koin for JUnit 4
@@ -80,9 +90,9 @@ kotlin {
             }
         }
         val androidMain by getting {
-            // todo consider having a folder called something like androidAndJvmMain/Test and add it to both sourcesets
-            dependsOn(jvmMain)
+            kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
+//                implementation("com.soywiz.korlibs.korio:korio-android:$ver_korio")
             }
         }
         val androidTest by getting {
@@ -91,6 +101,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
+//                implementation("com.soywiz.korlibs.korio:korio-js:$ver_korio")
             }
         }
         val jsTest by getting
