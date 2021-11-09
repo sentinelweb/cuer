@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseResponse
 
 @JsExport
-class App : RComponent<RProps, AppState>() {
+class App : RComponent<Props, AppState>() {
 
     override fun AppState.init() {
         playlists = listOf()
@@ -59,7 +59,7 @@ class App : RComponent<RProps, AppState>() {
     }
 }
 
-external interface AppState : RState {
+external interface AppState : State {
     var playlists: List<PlaylistDomain>
     var currentItem: PlaylistItemDomain?
     var currentPlaylist: PlaylistDomain?

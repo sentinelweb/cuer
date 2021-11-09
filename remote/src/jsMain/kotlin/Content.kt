@@ -16,7 +16,7 @@ import styled.styledDiv
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-external interface ContentProps : RProps {
+external interface ContentProps : Props {
     var title: String
     var loading: Visibility
     var playlists: List<PlaylistDomain>
@@ -24,7 +24,7 @@ external interface ContentProps : RProps {
     var currentPlaylist: PlaylistDomain?
 }
 
-external interface ContentState : RState {
+external interface ContentState : State {
     var checkBoxChecked: Boolean
     var currentItem: PlaylistItemDomain?
 }

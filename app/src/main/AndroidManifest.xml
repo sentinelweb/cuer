@@ -144,11 +144,6 @@ package="uk.co.sentinelweb.cuer.app">
             <action android:name="android.intent.action.MEDIA_BUTTON" />
         </intent-filter>
     </receiver>
-    <provider
-        android:name="uk.co.sentinelweb.cuer.app.provider.ImageContentProvider"
-        android:authorities="uk.co.sentinelweb.cuer.app.provider.image"
-        android:exported="true"
-        android:enabled="true"/>
 </application>
 
 </manifest>

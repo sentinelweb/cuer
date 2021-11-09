@@ -1,62 +1,62 @@
 @file:JsModule("react-share")
 @file:JsNonModule
 
-import react.RClass
-import react.RProps
+import react.ComponentClass
+import react.Props
 
 @JsName("EmailIcon")
-external val emailIcon: RClass<IconProps>
+external val emailIcon: ComponentClass<IconProps>
 
 @JsName("EmailShareButton")
-external val emailShareButton: RClass<ShareButtonProps>
+external val emailShareButton: ComponentClass<ShareButtonProps>
 
 @JsName("TelegramIcon")
-external val telegramIcon: RClass<IconProps>
+external val telegramIcon: ComponentClass<IconProps>
 
 @JsName("TelegramShareButton")
-external val telegramShareButton: RClass<ShareButtonProps>
+external val telegramShareButton: ComponentClass<ShareButtonProps>
 
 @JsName("TwitterIcon")
-external val twitterIcon: RClass<IconProps>
+external val twitterIcon: ComponentClass<IconProps>
 
 @JsName("TwitterShareButton")
-external val twitterShareButton: RClass<ShareButtonProps>
+external val twitterShareButton: ComponentClass<ShareButtonProps>
 
 @JsName("WhatsappIcon")
-external val whatsappIcon: RClass<IconProps>
+external val whatsappIcon: ComponentClass<IconProps>
 
 @JsName("WhatsappShareButton")
-external val whatsappShareButton: RClass<ShareButtonProps>
+external val whatsappShareButton: ComponentClass<ShareButtonProps>
 
 @JsName("FacebookIcon")
-external val facebookIcon: RClass<IconProps>
+external val facebookIcon: ComponentClass<IconProps>
 
 @JsName("FacebookShareButton")
-external val facebookShareButton: RClass<ShareButtonProps>
+external val facebookShareButton: ComponentClass<ShareButtonProps>
 
 @JsName("LinkedinIcon")
-external val linkedinIcon: RClass<IconProps>
+external val linkedinIcon: ComponentClass<IconProps>
 
 @JsName("LinkedinShareButton")
-external val linkedinShareButton: RClass<ShareButtonProps>
+external val linkedinShareButton: ComponentClass<ShareButtonProps>
 
 @JsName("PinterestIcon")
-external val pinterestIcon: RClass<IconProps>
+external val pinterestIcon: ComponentClass<IconProps>
 
 @JsName("PinterestShareButton")
-external val pinterestShareButton: RClass<ShareButtonProps>
+external val pinterestShareButton: ComponentClass<ShareButtonProps>
 
 @JsName("RedditIcon")
-external val redditIcon: RClass<IconProps>
+external val redditIcon: ComponentClass<IconProps>
 
 @JsName("RedditShareButton")
-external val redditShareButton: RClass<ShareButtonProps>
+external val redditShareButton: ComponentClass<ShareButtonProps>
 
-external interface ShareButtonProps : RProps {
+external interface ShareButtonProps : Props {
     var url: String
 }
 
-external interface IconProps : RProps {
+external interface IconProps : Props {
     var size: Int
     var round: Boolean
 }

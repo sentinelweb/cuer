@@ -20,7 +20,7 @@ val ver_kotlinx_coroutines_test: String by project
 val ver_multiplatform_settings: String by project
 val ver_turbine: String by project
 val ver_ktor: String by project
-val ver_korio: String by project
+//val ver_korio: String by project
 val app_compileSdkVersion: String by project
 
 version = "1.0"
@@ -64,7 +64,7 @@ kotlin {
                 implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:$ver_multiplatform_settings")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
-                implementation("com.soywiz.korlibs.korio:korio:$ver_korio")
+//                implementation("com.soywiz.korlibs.korio:korio:$ver_korio")
             }
         }
         val commonTest by getting {
@@ -76,7 +76,7 @@ kotlin {
         val jvmMain by getting {
             kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
-                implementation("com.soywiz.korlibs.korio:korio-jvm:$ver_korio")
+//                implementation("com.soywiz.korlibs.korio:korio-jvm:$ver_korio")
             }
         }
         val jvmTest by getting {
@@ -92,7 +92,7 @@ kotlin {
         val androidMain by getting {
             kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
-                implementation("com.soywiz.korlibs.korio:korio-android:$ver_korio")
+//                implementation("com.soywiz.korlibs.korio:korio-android:$ver_korio")
             }
         }
         val androidTest by getting {
@@ -101,7 +101,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("com.soywiz.korlibs.korio:korio-js:$ver_korio")
+//                implementation("com.soywiz.korlibs.korio:korio-js:$ver_korio")
             }
         }
         val jsTest by getting

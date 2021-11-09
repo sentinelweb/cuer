@@ -18,11 +18,11 @@ val ver_jvm: String by project
 val ver_koin: String by project
 val ver_kotlin_react: String by project
 val ver_kotlin_styled: String by project
-val ver_react: String by project
-val ver_styled_cmp: String by project
 val ver_jfixture: String by project
 val ver_truth: String by project
 val isProduction: String by project
+//val ver_kotlin_css: String by project
+//val ver_kotlin_styled_next: String by project
 val ver_logback = "1.2.3"
 
 val outputJsLibName = "cuer_remote.js"
@@ -88,10 +88,12 @@ kotlin {
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-react:$ver_kotlin_react")
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:$ver_kotlin_react")
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$ver_kotlin_styled")
-                implementation(npm("react-youtube-lite", "1.0.1"))
-                implementation(npm("react-share", "~4.2.1"))
+//                implementation("org.jetbrains.kotlin-wrappers:kotlin-css:$ver_kotlin_css")
+//                implementation("org.jetbrains.kotlin-wrappers:kotlin-styled-next:$ver_kotlin_styled_next")
+                implementation(npm("react-youtube-lite", "1.1.0"))
+                implementation(npm("react-share", "~4.4.0"))
 
-                implementation("com.ccfraser.muirwik:muirwik-components:0.8.2") {
+                implementation("com.ccfraser.muirwik:muirwik-components:0.9.0") {
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-styled")
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react")
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react-dom")
