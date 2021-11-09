@@ -64,7 +64,6 @@ kotlin {
                 implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:$ver_multiplatform_settings")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
-//                implementation("com.soywiz.korlibs.korio:korio:$ver_korio")
             }
         }
         val commonTest by getting {
@@ -76,7 +75,7 @@ kotlin {
         val jvmMain by getting {
             kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
-//                implementation("com.soywiz.korlibs.korio:korio-jvm:$ver_korio")
+                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
             }
         }
         val jvmTest by getting {
@@ -92,7 +91,7 @@ kotlin {
         val androidMain by getting {
             kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
-//                implementation("com.soywiz.korlibs.korio:korio-android:$ver_korio")
+                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
             }
         }
         val androidTest by getting {
@@ -101,7 +100,6 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-//                implementation("com.soywiz.korlibs.korio:korio-js:$ver_korio")
             }
         }
         val jsTest by getting
