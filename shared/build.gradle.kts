@@ -42,11 +42,6 @@ android {
         create("testReleaseApi")
     }
 }
-// For JVM only
-
-// For Android only
-
-// For JS only
 
 kotlin {
     jvm()

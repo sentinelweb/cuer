@@ -88,8 +88,8 @@ kotlin {
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-react:$ver_kotlin_react")
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:$ver_kotlin_react")
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$ver_kotlin_styled")
-                implementation(npm("react-youtube-lite", "1.0.1"))
-                implementation(npm("react-share", "~4.2.1"))
+//                implementation(npm("react-youtube-lite", "1.1.0"))
+//                implementation(npm("react-share", "~4.4.0"))
 
                 implementation("com.ccfraser.muirwik:muirwik-components:0.9.0") {
                     exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-styled")
@@ -98,6 +98,23 @@ kotlin {
                 }
                 //https://github.com/CookPete/react-player
                 //implementation(npm("react-player", "2.9.0"))
+
+                // imports related to webpack fallback issue
+//                implementation(npm("crypto-browserify", "~3.12.0"))
+//                implementation(npm("console-browserify", "~1.2.0"))
+//                implementation(npm("constants-browserify", "~1.0.0"))
+//                implementation(npm("domain-browser", "~4.22.0"))
+//                implementation(npm("stream-http", "~3.2.0"))
+//                implementation(npm("https-browserify", "~1.0.0"))
+//                implementation(npm("os-browserify", "~0.3.0"))
+//                implementation(npm("path-browserify", "~1.0.1"))
+//                implementation(npm("process", "~0.11.10"))
+//                implementation(npm("querystring-es3", "~0.2.1"))
+//                implementation(npm("stream-browserify", "~3.0.0"))
+//                implementation(npm("timers-browserify", "~2.0.12"))
+//                implementation(npm("tty-browserify", "~0.0.1"))
+//                implementation(npm("vm-browserify", "~1.1.2"))
+//                implementation(npm("browserify-zlib", "~0.2.0"))
             }
         }
     }
