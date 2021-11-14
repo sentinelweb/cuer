@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.di
 
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.backup.version.ParserFactory
+import uk.co.sentinelweb.cuer.app.db.repository.file.PlatformOperation
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
@@ -65,6 +66,7 @@ object SharedAppModule {
         single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperImpl() }
         factory { BrowseRecentCategories(get(), get()) }
         factory { RecentLocalPlaylists(get(), get()) }
+        factory { PlatformOperation() }
     }
 
     val modules = listOf(objectModule)

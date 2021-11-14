@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
@@ -39,6 +40,7 @@ class SharePresenter constructor(
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val timeProvider: TimeProvider,
     private val shareStrings: ShareContract.ShareStrings,
+    private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : ShareContract.Presenter {
 
     init {
@@ -62,7 +64,11 @@ class SharePresenter constructor(
         (state.scanResult
             ?.also {
                 if ((it.type == MEDIA && (!it.isNew || it.isOnPlaylist)) || (it.type == PLAYLIST && !it.isNew))
-                    view.warning(shareStrings.errorExists(it.type.toString().toLowerCase().capitalize()))
+                    view.warning(
+                        shareStrings.errorExists(
+                            it.type.toString().lowercase()
+                                .replaceFirstChar { char -> char.uppercase() })
+                    )
             }
             ?.let { mapper.mapShareModel(state, ::finish) }
             ?: mapper.mapEmptyModel(::finish)) // todo fail result
@@ -87,16 +93,25 @@ class SharePresenter constructor(
         state.scanResult = result
         when (result.type) {
             MEDIA -> (result.result as MediaDomain).let {
-                val itemDomain = PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null)
-                view.showMedia(itemDomain, if (result.isNew) MEMORY else LOCAL, state.parentPlaylistId)
+                val itemDomain =
+                    PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null)
+                view.showMedia(
+                    itemDomain,
+                    if (result.isNew) MEMORY else LOCAL,
+                    state.parentPlaylistId
+                )
                 mapModel()
             }
             PLAYLIST -> (result.result as PlaylistDomain).let {
                 it.id?.let {
-                    view.showPlaylist(it.toIdentifier(if (result.isNew) MEMORY else LOCAL), state.parentPlaylistId)
+                    view.showPlaylist(
+                        it.toIdentifier(if (result.isNew) MEMORY else LOCAL),
+                        state.parentPlaylistId
+                    )
                     mapModel()
                 } ?: throw IllegalStateException("Playlist needs an id (isNew = MEMORY)")
             }
+            else -> throw IllegalArgumentException("unsupported type: ${result.type}")
         }
     }
 
@@ -133,18 +148,34 @@ class SharePresenter constructor(
                 when (state.scanResult?.type) {
                     MEDIA ->
                         (state.scanResult?.result as MediaDomain)
-                            .let { playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it.id!!)), Options(LOCAL)) }
+                            .let {
+                                playlistItemOrchestrator.loadList(
+                                    MediaIdListFilter(listOf(it.id!!)),
+                                    Options(LOCAL)
+                                )
+                            }
                             .let {
                                 afterCommit(PLAYLIST_ITEM, it, play, forward)
                             }
-                    PLAYLIST -> afterCommit(PLAYLIST, listOf(state.scanResult?.result as PlaylistDomain), play, forward)
+                    PLAYLIST -> afterCommit(
+                        PLAYLIST,
+                        listOf(state.scanResult?.result as PlaylistDomain),
+                        play,
+                        forward
+                    )
+                    else -> throw IllegalArgumentException("unsupported type: ${state.scanResult?.type}")
                 }
             }
         }
 
     }
 
-    private suspend fun afterCommit(type: ObjectTypeDomain, data: List<*>, play: Boolean, forward: Boolean) {
+    private suspend fun afterCommit(
+        type: ObjectTypeDomain,
+        data: List<*>,
+        play: Boolean,
+        forward: Boolean
+    ) {
         try {
             val isConnected = ytContextHolder.isConnected()
             val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYLIST)
@@ -156,13 +187,15 @@ class SharePresenter constructor(
                 }
                 PLAYLIST_ITEM -> (data as List<PlaylistItemDomain>)
                     .let { playlistItemList ->
-                        val playlistItem: PlaylistItemDomain? = chooseItem(playlistItemList, currentPlaylistId)
+                        val playlistItem: PlaylistItemDomain? =
+                            chooseItem(playlistItemList, currentPlaylistId)
                         playlistItem
                             ?.let { it.playlistId!! to it.id }
                             ?: let { currentPlaylistId!! to (null as Long?) }
                     }
                 else -> throw java.lang.IllegalStateException("Unsupported type")
             }
+            recentLocalPlaylists.addRecentId(playId.first)
             if (forward) {
                 log.d("finish:play = $play, playlistItemId=${playId.second}, itemId = $playId")
                 view.gotoMain(playId.first, plItemId = playId.second, LOCAL, play)

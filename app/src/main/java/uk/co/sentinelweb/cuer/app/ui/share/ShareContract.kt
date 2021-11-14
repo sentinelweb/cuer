@@ -107,7 +107,8 @@ interface ShareContract {
                         prefsWrapper = get(),
                         timeProvider = get(),
                         playlistItemOrchestrator = get(),
-                        shareStrings = get()
+                        shareStrings = get(),
+                        recentLocalPlaylists = get()
                     )
                 }
                 scoped { ShareWrapper(getSource()) }

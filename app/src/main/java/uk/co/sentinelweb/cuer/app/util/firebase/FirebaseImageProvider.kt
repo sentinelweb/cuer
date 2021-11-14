@@ -98,14 +98,4 @@ class FirebaseImageProvider constructor(
     }
 }
 
-inline fun RequestManager.loadFirebaseOrOtherUrl(url: String, imageProvider: FirebaseImageProvider) = this.run {
-    if (url.startsWith("gs://")) load(imageProvider.makeRef(url))
-    else load(url)
-}
-
-inline fun RequestBuilder<Bitmap>.loadFirebaseOrOtherUrl(url: String, imageProvider: FirebaseImageProvider) = this.run {
-    if (url.startsWith("gs://")) load(imageProvider.makeRef(url))
-    else load(url)
-}
-
 

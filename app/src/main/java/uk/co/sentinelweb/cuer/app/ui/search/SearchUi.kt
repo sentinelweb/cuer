@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -326,15 +327,6 @@ fun SearchTextEntryInput(
     }
 }
 
-
-/**
- * Styled [TextField] for inputting search text
- *
- * @param text (state) current text to display
- * @param onTextChange (event) request the text change state
- * @param modifier the modifier for this element
- * @param onImeAction (event) notify caller of [ImeAction.Done] events
- */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchInputText(
@@ -352,14 +344,14 @@ fun SearchInputText(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
                 onImeAction()
-                keyboardController?.hideSoftwareKeyboard()
+                keyboardController?.hide()
             }),
             textStyle = MaterialTheme.typography.body1,
             modifier = Modifier.fillMaxWidth()
         )
         if (text.isNullOrEmpty().not()) {
             Icon(
-                imageVector = Icons.Default.Clear,
+                painterResource(R.drawable.ic_backspace_24),
                 tint = MaterialTheme.colors.onSurface,
                 contentDescription = stringResource(id = R.string.clear),
                 modifier = Modifier

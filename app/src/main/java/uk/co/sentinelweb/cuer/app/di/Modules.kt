@@ -1,6 +1,9 @@
 package uk.co.sentinelweb.cuer.app.di
 
 import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -8,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.db.DatabaseModule
+import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
@@ -40,6 +44,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
+import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
@@ -61,11 +66,15 @@ import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
+import uk.co.sentinelweb.cuer.net.di.SharedNetModule
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
 import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
+@ExperimentalCoroutinesApi
 object Modules {
+
+    val IMAGES_REPO_NAME = "images"
 
     private val scopedModules = listOf(
         PlaylistContract.fragmentModule,
@@ -124,6 +133,15 @@ object Modules {
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
         factory { BackupFileManager(get(), get(), get(), get(), get(), get(), get(), get()) }
+        factory {ImageProvider(get(),get())}
+        single {ImageFileRepository(
+            androidApplication().filesDir.absolutePath,
+            HttpClient(CIO),
+            get(),
+            get(),
+            get(),
+            IMAGES_REPO_NAME
+        )}
     }
 
     private val wrapperModule = module {
@@ -137,7 +155,7 @@ object Modules {
         factory { FileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
         single {
-            SharedPrefsWrapper(androidApplication(), get()) as GeneralPreferencesWrapper
+            SharedPrefsWrapper(androidApplication(), get())
         }
         factory { ServiceWrapper(androidApplication(), get()) }
         factory { EdgeToEdgeWrapper() }
@@ -158,9 +176,11 @@ object Modules {
         .plus(NetModule.netModule)
         .plus(SharedCoreModule.objectModule)
         .plus(SharedDomainModule.objectModule)
+        .plus(SharedNetModule.objectModule)
         .plus(SharedAppModule.modules)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
         .plus(RemoteModule.objectModule)
         .plus(PlayerModule.localPlayerModule)
+
 }

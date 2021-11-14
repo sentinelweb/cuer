@@ -18,15 +18,15 @@ import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistsItemTileBinding
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
-import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 
 class ItemTileView() :
     ItemContract.View, KoinComponent {
 
     private lateinit var _binding: ViewPlaylistsItemTileBinding
     private lateinit var presenter: ItemContract.Presenter
-    private val imageProvider: FirebaseImageProvider by inject()
+    private val imageProvider: ImageProvider by inject()
 
     val root: View
         get() = _binding.root

@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ImageDomain
 
 class ImageFileRepository(
     private val pathParent: String,
@@ -16,7 +17,7 @@ class ImageFileRepository(
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,
     private val platformOperation: PlatformOperation,
-    private val directoryName:String = DIRECTORY_NAME_DEFAULT
+    directoryName: String = DIRECTORY_NAME_DEFAULT
 ) {
     var _dir: AFile
         private set
@@ -30,47 +31,51 @@ class ImageFileRepository(
         }
     }
 
-    suspend fun saveImage(uri: String): String = withContext(coroutines.IO) {
-        if (uri.startsWith("http")) {
-            val url = Url(uri)
+    suspend fun saveImage(input: ImageDomain): ImageDomain = withContext(coroutines.IO) {
+        if (input.url.startsWith("http")) {
+            val url = Url(input.url)
             log.d("get url:$url")
             val httpResponse: HttpResponse = client.get(url)
             val byteArrayBody: ByteArray = httpResponse.receive()
             val fullPath = url.fullPath
             val fileName = getFileName(fullPath)
-            // todo might be a problem if theres duplicate files
             val targetFile = makeUniqueFileName(fileName, byteArrayBody)
             platformOperation.writeBytes(targetFile, byteArrayBody)
             log.d("got url:${targetFile.path}")
-            SCHEME_PREFIX + targetFile.path
-        } else if (uri.startsWith("file")) {
-            val strippedFilePath = stripFileScheme(uri)
+            input.copy(url = REPO_SCHEME_PREFIX + getFileName(targetFile.path))
+        } else if (input.url.startsWith("file")) {
+            val strippedFilePath = stripFileScheme(input.url)
             val file = AFile(strippedFilePath)
             val targetFile = makeUniqueFileName(file.path, platformOperation.readBytes(file))
             platformOperation.copyTo(file, targetFile)
             log.d("create file: ${targetFile.path}")
-            SCHEME_PREFIX + targetFile.path
-        } else throw IllegalArgumentException("uri not supported: $uri")
+            input.copy(url = REPO_SCHEME_PREFIX + getFileName(targetFile.path))
+        } else throw IllegalArgumentException("uri not supported: ${input.url}")
     }
 
-    suspend fun loadImage(uri: String): ByteArray? = withContext(coroutines.IO) {
-        if (uri.startsWith(SCHEME)) {
-            val strippedFilePath = stripFileScheme(uri)
-            val file = AFile(strippedFilePath)
-            if (platformOperation.exists(file)) {
-                platformOperation.readBytes(file)
-            } else null
+    suspend fun loadImage(input: ImageDomain): ByteArray? = withContext(coroutines.IO) {
+        if (input.url.startsWith(REPO_SCHEME)) {
+            val strippedFilePath = stripRepoScheme(input.url)
+            val file = AFile(filePathToRepoFile(strippedFilePath))
+            getBytes(file)
         } else null
     }
 
-//    suspend fun toLocalUri(uri: String): String? = withContext(coroutines.IO) {
-//        if (uri.startsWith(SCHEME_PREFIX)) {
-//            val file = _dir.child(uri.substring(SCHEME_PREFIX.length))
-//            if (platformOperation.exists(file)) {
-//                "$SCHEME_PREFIX${file.path}"
-//            } else null
-//        } else null
-//    }
+    private fun getBytes(file: AFile) =
+        if (platformOperation.exists(file)) {
+            platformOperation.readBytes(file)
+        } else null
+
+    fun toLocalUri(uri: String): String? =
+        toLocalPath(uri)?.let { FILE_SCHEME_PREFIX + it }
+
+    fun toLocalPath(uri: String): String? =
+        if (uri.startsWith(REPO_SCHEME_PREFIX)) {
+            val file = _dir.child(stripRepoScheme(uri))
+            if (platformOperation.exists(file)) {
+                file.path
+            } else null
+        } else null
 
     suspend fun remove() = withContext(coroutines.IO) {
         platformOperation.list(_dir)?.onEach {
@@ -79,15 +84,18 @@ class ImageFileRepository(
         platformOperation.delete(_dir)
     }
 
-    private fun stripFileScheme(fullPath: String) = if (fullPath.startsWith(SCHEME_PREFIX)) {
-        fullPath.substring(SCHEME_PREFIX.length)
-    } else if (fullPath.startsWith(SCHEME_PREFIX_JAVA)){
-        fullPath.substring(SCHEME_PREFIX_JAVA.length)
+    private fun stripFileScheme(fullPath: String) = if (fullPath.startsWith(FILE_SCHEME_PREFIX)) {
+        fullPath.substring(FILE_SCHEME_PREFIX.length)
+    } else if (fullPath.startsWith(FILE_SCHEME_PREFIX_JAVA)) {
+        fullPath.substring(FILE_SCHEME_PREFIX_JAVA.length)
     } else throw IllegalArgumentException(fullPath)
 
-    private fun getFileName(fullPath: String) = fullPath.substring(fullPath.lastIndexOf("/") + 1)
+    private fun stripRepoScheme(fullPath: String) = fullPath.substring(REPO_SCHEME_PREFIX.length)
 
-    private suspend fun makeUniqueFileName(fileName: String, byteArray: ByteArray): AFile {
+    private fun getFileName(fullPath: String) = fullPath.substring(fullPath.lastIndexOf("/") + 1)
+    private fun filePathToRepoFile(fileName: String) = _dir.path + "/" + fileName
+
+    private fun makeUniqueFileName(fileName: String, byteArray: ByteArray): AFile {
         val fileNameStripped = getFileName(fileName)
         var targetFile = _dir.child(fileNameStripped)
         var ctr = 0
@@ -107,10 +115,13 @@ class ImageFileRepository(
         return targetFile
     }
 
+
     companion object {
-        val SCHEME = "file"
-        val SCHEME_PREFIX = SCHEME + "://"
-        val SCHEME_PREFIX_JAVA = SCHEME + ":"
+        val REPO_SCHEME = "cuerimage"
+        val REPO_SCHEME_PREFIX = REPO_SCHEME + "://"
+        val FILE_SCHEME = "file"
+        val FILE_SCHEME_PREFIX = FILE_SCHEME + "://"
+        val FILE_SCHEME_PREFIX_JAVA = FILE_SCHEME + ":"
         val DIRECTORY_NAME_DEFAULT = "ImageRepository"
     }
 

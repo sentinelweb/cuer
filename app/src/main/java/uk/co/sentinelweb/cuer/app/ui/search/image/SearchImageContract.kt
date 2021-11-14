@@ -54,7 +54,8 @@ interface SearchImageContract {
                         state = get(),
                         log = get(),
                         mapper = get(),
-                        pixabayInteractor = get()
+                        pixabayInteractor = get(),
+                        imageFileRepository = get()
                     )
                 }
                 scoped { State() }

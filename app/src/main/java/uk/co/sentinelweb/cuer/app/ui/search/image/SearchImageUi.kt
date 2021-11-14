@@ -63,7 +63,6 @@ fun SearchImageParametersUi(
                     )
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        tint = MaterialTheme.colors.primary,
                         contentDescription = stringResource(id = R.string.clear),
                         modifier = Modifier
                             .width(48.dp)

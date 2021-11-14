@@ -19,13 +19,13 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistsItemRowBinding
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.extension.view.fade
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
-import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import android.content.Context.WINDOW_SERVICE
 
 import android.view.WindowManager
 import com.bumptech.glide.request.RequestOptions
+import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 
 
 class ItemRowView() :
@@ -33,7 +33,7 @@ class ItemRowView() :
 
     private lateinit var _binding: ViewPlaylistsItemRowBinding
     private lateinit var presenter: ItemContract.Presenter
-    private val imageProvider: FirebaseImageProvider by inject()
+    private val imageProvider: ImageProvider by inject()
     private val res: ResourceWrapper by inject()
     private lateinit var wm: WindowManager
 

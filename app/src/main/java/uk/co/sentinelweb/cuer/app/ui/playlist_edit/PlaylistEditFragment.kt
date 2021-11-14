@@ -38,8 +38,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageDialogFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
-import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -52,7 +52,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val viewModel: PlaylistEditViewModel by inject()
     private val chipCreator: ChipCreator by inject()
     private val log: LogWrapper by inject()
-    private val imageProvider: FirebaseImageProvider by inject()
+    private val imageProvider: ImageProvider by inject()
     private val softKeyboard: SoftKeyboardWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
@@ -89,6 +89,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         return binding.root
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.peStarFab.setOnClickListener { viewModel.onStarClick() }
@@ -109,7 +110,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
             }
         }
 
-        binding.peImage.setOnTouchListener @SuppressLint("ClickableViewAccessibility") { iv, e ->
+        binding.peImage.setOnTouchListener { iv, e ->
             when (e.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     viewModel.onImageClick(e.x > iv.width / 2)

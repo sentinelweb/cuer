@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
@@ -27,8 +28,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
-import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -45,7 +46,7 @@ class PlaylistsFragment :
     private val adapter: PlaylistsAdapter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val itemTouchHelper: ItemTouchHelper by inject()
-    private val imageProvider: FirebaseImageProvider by inject()
+    private val imageProvider: ImageProvider by inject()
     private val log: LogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navMapper: NavigationMapper by inject()
@@ -134,6 +135,7 @@ class PlaylistsFragment :
         binding.playlistsCollapsingToolbar.title = model.title
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun repaint() {
         adapter.notifyDataSetChanged()
     }

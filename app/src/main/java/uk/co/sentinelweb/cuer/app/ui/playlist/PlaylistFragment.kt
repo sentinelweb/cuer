@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 //import kotlinx.android.synthetic.main.view_playlist_item.view.*
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.transition.TransitionInflater
@@ -45,8 +46,8 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
-import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -78,7 +79,7 @@ class PlaylistFragment :
     private val itemTouchHelper: ItemTouchHelper by inject()
     private val log: LogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
-    private val imageProvider: FirebaseImageProvider by inject()
+    private val imageProvider: ImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navMapper: NavigationMapper by inject()
@@ -139,7 +140,7 @@ class PlaylistFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = PlaylistFragmentBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -366,7 +367,7 @@ class PlaylistFragment :
         }
         editMenuItem?.isVisible = model.canEdit
         starMenuItem?.isVisible = model.canEdit
-        childrenMenuItem?.isVisible = model.hasChildren > 0
+        childrenMenuItem.isVisible = model.hasChildren > 0
         binding.playlistFlags.isVisible =
             model.isDefault || model.isPlayFromStart || model.isPinned || model.hasChildren > 0
         binding.playlistFlagDefault.isVisible = model.isDefault
@@ -435,10 +436,9 @@ class PlaylistFragment :
     }
 
     override fun showPlaylistSelector(model: PlaylistsDialogContract.Config) {
-        //selectDialogCreator.createSingle(model).apply { show() }
         dialogFragment?.dismissAllowingStateLoss()
         dialogFragment =
-            PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+            PlaylistsDialogFragment.newInstance(model)
         dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
     }
 
@@ -471,6 +471,7 @@ class PlaylistFragment :
         alertDialogCreator.create(model).show()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun resetItemsState() {
         adapter.notifyDataSetChanged()
     }
@@ -479,6 +480,7 @@ class PlaylistFragment :
         castDialogWrapper.showRouteSelector(childFragmentManager)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun setCastState(state: PlaylistContract.CastState) {
         when (state) {
             PLAYING -> {
