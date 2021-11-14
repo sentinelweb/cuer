@@ -8,6 +8,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.image.ImageSelectIntentCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 
@@ -59,8 +60,18 @@ interface SearchImageContract {
                     )
                 }
                 scoped { State() }
-                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
+                scoped {
+                    navigationMapper(
+                        true,
+                        getSource<Fragment>().requireActivity() as AppCompatActivity
+                    )
+                }
                 scoped { EnumValuesDialogCreator(getSource<Fragment>().requireContext()) }
+                scoped {
+                    ImageSelectIntentCreator(
+                        getSource<Fragment>().requireActivity() as AppCompatActivity
+                    )
+                }
             }
             factory { Mapper() }
         }

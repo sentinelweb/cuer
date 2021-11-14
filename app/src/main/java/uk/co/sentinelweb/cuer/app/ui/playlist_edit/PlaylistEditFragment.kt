@@ -185,7 +185,9 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
     override fun onStop() {
         super.onStop()
-        dialogFragment?.dismissAllowingStateLoss()
+        if (!(dialogFragment is SearchImageDialogFragment)) {
+            dialogFragment?.dismissAllowingStateLoss()
+        }
     }
 
     private fun observeUi() {

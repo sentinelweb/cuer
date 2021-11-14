@@ -113,6 +113,7 @@
                     android:background="?textEditBackground"
                     tools:text="Edit input"
                     android:maxLines="1"
+                    android:singleLine="true"
                     />
 
             </com.google.android.material.textfield.TextInputLayout>

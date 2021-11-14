@@ -154,7 +154,7 @@ object Modules {
         factory { AndroidLogWrapper() }
         factory { FileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
-        single {
+        single<GeneralPreferencesWrapper> {
             SharedPrefsWrapper(androidApplication(), get())
         }
         factory { ServiceWrapper(androidApplication(), get()) }

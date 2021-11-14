@@ -29,7 +29,7 @@ class SearchImageViewModel(
         val type: Type,
         val data: Any?
     ) {
-        enum class Type { ERROR, CLOSE }
+        enum class Type { ERROR, CLOSE, GOTO_LIBRARY }
     }
 
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
@@ -81,6 +81,10 @@ class SearchImageViewModel(
     fun onImageSelected(image: ImageDomain) = viewModelScope.launch {
         val savedImage = imageFileRepository.saveImage(image)
         state.config?.let { it.itemClick(savedImage) }
+    }
+
+    fun onLibraryClick() {
+        _uiLiveData.value = UiEvent(UiEvent.Type.GOTO_LIBRARY, null)
     }
 
     fun onClose() {
