@@ -20,6 +20,7 @@ val ver_kotlinx_coroutines_test: String by project
 val ver_multiplatform_settings: String by project
 val ver_turbine: String by project
 val ver_ktor: String by project
+val ver_mockserver: String by project
 //val ver_korio: String by project
 val app_compileSdkVersion: String by project
 
@@ -86,6 +87,8 @@ kotlin {
                 implementation("com.google.truth:truth:$ver_truth")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test")
                 implementation("app.cash.turbine:turbine:$ver_turbine")
+                implementation("org.mock-server:mockserver-netty:$ver_mockserver")
+                implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
             }
         }
         val androidMain by getting {
