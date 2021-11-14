@@ -19,7 +19,6 @@ import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import java.io.File
 import java.net.URL
 
-
 // todo use mock web server
 class ImageFileRepositoryIntegrationTest {
 

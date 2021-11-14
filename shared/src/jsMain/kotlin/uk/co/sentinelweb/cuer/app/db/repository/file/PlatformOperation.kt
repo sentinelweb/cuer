@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.db.repository.file
 
 actual class PlatformOperation {
     actual fun delete(file: AFile) {
+        TODO("Not yet implemented")
     }
 
     actual fun currentDir(): AFile {
@@ -23,11 +24,11 @@ actual class PlatformOperation {
         TODO("Not yet implemented")
     }
 
-    actual fun copyTo(from: AFile, to: AFile): ByteArray {
+    actual fun copyTo(from: AFile, to: AFile) {
         TODO("Not yet implemented")
     }
 
-    actual fun list(dir: AFile): List<AFile> {
+    actual fun list(dir: AFile): List<AFile>? {
         TODO("Not yet implemented")
     }
 }
