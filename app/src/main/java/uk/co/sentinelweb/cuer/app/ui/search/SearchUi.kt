@@ -72,7 +72,7 @@ fun SearchParametersUi(
                     .padding(dimensionResource(R.dimen.page_margin))
             ) {
 
-            Box(modifier = Modifier.fillMaxWidth()) {
+                Box(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = model.type + " " + stringResource(id = R.string.search_title),
                         style = MaterialTheme.typography.h5
@@ -341,6 +341,7 @@ fun SearchInputText(
             onValueChange = onTextChange,
             colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
             maxLines = 1,
+            singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
                 onImeAction()

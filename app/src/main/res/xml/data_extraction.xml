@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup disableIfNoEncryptionCapabilities="false">
+        <include
+            domain="sharedpref"
+            path="GeneralPreferences.xml" />
+        <include
+            domain="sharedpref"
+            path="uk.co.sentinelweb.cuer.app.debug_preferences.xml" />
+        <include domain="file" />
+        <include
+            domain="database"
+            path="cuer_database" />
+    </cloud-backup>
+    <device-transfer disableIfNoEncryptionCapabilities="false">
+        <include
+            domain="sharedpref"
+            path="GeneralPreferences.xml" />
+        <include
+            domain="sharedpref"
+            path="uk.co.sentinelweb.cuer.app.debug_preferences.xml" />
+        <include domain="file" />
+        <include
+            domain="database"
+            path="cuer_database" />
+    </device-transfer>
+</data-extraction-rules>
