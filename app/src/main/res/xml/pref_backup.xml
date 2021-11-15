@@ -4,16 +4,14 @@
 
     <Preference
         app:key="@string/prefs_backup_backup_key"
-        app:summary="Back up the DB to a JSON file"
-        app:title="Backup database"
-        app:icon="@drawable/ic_pref_backup_normal"
-        />
+        app:summary="@string/pref_backup_backup_summary"
+        app:title="@string/pref_backup_backup_title"
+        app:icon="@drawable/ic_pref_backup_normal" />
 
     <Preference
         app:key="@string/prefs_backup_restore_key"
-        app:summary="Restore the DB from a JSON file"
-        app:title="Restore database"
-        app:icon="@drawable/ic_pref_restore_normal"
-        />
+        app:summary="@string/pref_backup_restore_summary"
+        app:title="@string/pref_backup_restore_title"
+        app:icon="@drawable/ic_pref_restore_normal" />
 
 </PreferenceScreen>

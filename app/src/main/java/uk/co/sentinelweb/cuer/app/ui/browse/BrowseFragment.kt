@@ -169,7 +169,8 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                 }
                 scoped {
                     BrowseStoreFactory(
-                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+//                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+                        storeFactory = DefaultStoreFactory,
                         repository = get(),
                         playlistOrchestrator = get(),
                         browseStrings = get(),

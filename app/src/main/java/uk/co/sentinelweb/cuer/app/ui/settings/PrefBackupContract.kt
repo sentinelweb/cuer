@@ -7,6 +7,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import java.io.File
 import java.time.Instant
 
 interface PrefBackupContract {
@@ -27,7 +28,7 @@ interface PrefBackupContract {
 
     data class State constructor(
         var lastBackedUp: Instant? = null,
-        var writeData: String? = null
+        var zipFile: File? = null
     ) : ViewModel()
 
     companion object {
@@ -43,8 +44,8 @@ interface PrefBackupContract {
                         backupManager = get(),
                         timeProvider = get(),
                         fileWrapper = get(),
-                        timeStampMapper = get(),
-                        log = get()
+                        log = get(),
+                        contentUriUtil = get()
                     )
                 }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }

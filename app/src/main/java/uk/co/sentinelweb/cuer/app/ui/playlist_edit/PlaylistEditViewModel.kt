@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.PINNED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -35,6 +36,7 @@ class PlaylistEditViewModel constructor(
     private val log: LogWrapper,
     private val imageProvider: FirebaseImageProvider,
     private val prefsWrapper: GeneralPreferencesWrapper,
+    private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : ViewModel() {
 
     data class UiEvent(
@@ -65,20 +67,23 @@ class PlaylistEditViewModel constructor(
 
     fun setData(playlistId: Long?, source: Source) {
         viewModelScope.launch {
-            state.source = source
-            playlistId?.let {
-                playlistOrchestrator.load(it, source.deepOptions())
-                    ?.also {
-                        state.isAllWatched = it.isAllWatched()
-                        state.defaultInitial = it.default
-                        state.playlistEdit = it.copy(items = listOf())
-                        it.parentId?.also {
-                            state.playlistParent = playlistOrchestrator.load(it, source.deepOptions())
-                        }
-                    } ?: makeCreateModel()
-
-            } ?: makeCreateModel()
-            update()
+            if (!state.isLoaded) {
+                state.source = source
+                playlistId?.let {
+                    playlistOrchestrator.load(it, source.deepOptions())
+                        ?.also {
+                            state.isAllWatched = it.isAllWatched()
+                            state.defaultInitial = it.default
+                            state.playlistEdit = it.copy(items = listOf())
+                            it.parentId?.also {
+                                state.playlistParent =
+                                    playlistOrchestrator.load(it, source.deepOptions())
+                            }
+                        } ?: makeCreateModel()
+                } ?: makeCreateModel()
+                update()
+                state.isLoaded = true
+            }
         }
     }
 
@@ -107,13 +112,16 @@ class PlaylistEditViewModel constructor(
 //                update()
 //            }
 //        }
-        _dialogModelLiveData.value = SearchImageContract.Config(
-            state.playlistEdit.title,
-            this::onImageSelected
-        )
+        if (!state.isDialog) {
+            _dialogModelLiveData.value = SearchImageContract.Config(
+                state.playlistEdit.title,
+                this::onImageSelected
+            )
+        }
     }
 
     fun onImageSelected(image: ImageDomain) {
+        log.d(image.toString())
         state.playlistEdit = state.playlistEdit.copy(image = image, thumb = image)
         update()
         _dialogModelLiveData.value = DialogModel.DismissDialogModel()
@@ -131,7 +139,10 @@ class PlaylistEditViewModel constructor(
         if (state.model?.validation?.valid ?: false) {
             viewModelScope.launch {
                 if (state.playlistEdit.default && state.source == Source.LOCAL) {
-                    playlistOrchestrator.loadList(OrchestratorContract.DefaultFilter(), state.source.flatOptions())
+                    playlistOrchestrator.loadList(
+                        OrchestratorContract.DefaultFilter(),
+                        state.source.flatOptions()
+                    )
                         .takeIf { it.size > 0 }
                         ?.map { it.copy(default = false) }
                         ?.apply {
@@ -142,6 +153,7 @@ class PlaylistEditViewModel constructor(
                     .also {
                         it.apply { state.playlistEdit = this }
                         _domainLiveData.value = it
+                        recentLocalPlaylists.addRecent(it)
                     }.takeIf { state.isCreate }
                     ?.also {
                         prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!)
@@ -153,8 +165,12 @@ class PlaylistEditViewModel constructor(
     private fun update() {
         val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlistEdit.id
         _modelLiveData.value = mapper.mapModel(
-            state.playlistEdit, pinned, parent = state.playlistParent,
-            showAllWatched = state.isAllWatched == true, showDefault = !state.defaultInitial
+            domain = state.playlistEdit,
+            pinned = pinned,
+            parent = state.playlistParent,
+            showAllWatched = state.isAllWatched == true,
+            showDefault = !state.defaultInitial,
+            isDialog = state.isDialog
         ).apply { state.model = this }
     }
 
@@ -177,7 +193,10 @@ class PlaylistEditViewModel constructor(
             playlistOrchestrator.load(state.playlistEdit.id!!, state.source.deepOptions())
                 ?.apply {
                     val watched = state.isAllWatched == true
-                    mediaOrchestrator.save(items.map { it.media.copy(watched = !watched) }, state.source.deepOptions())
+                    mediaOrchestrator.save(
+                        items.map { it.media.copy(watched = !watched) },
+                        state.source.deepOptions()
+                    )
                     state.isAllWatched = !watched
                     update()
                 }
@@ -190,11 +209,31 @@ class PlaylistEditViewModel constructor(
         state.playlistEdit = when (f) {
             PLAY_START -> state.playlistEdit.copy(playItemsFromStart = b)
             Flag.DEFAULT -> state.playlistEdit.copy(default = b)
-            Flag.DELETABLE -> state.playlistEdit.copy(config = state.playlistEdit.config.copy(deletable = b))
-            Flag.EDITABLE -> state.playlistEdit.copy(config = state.playlistEdit.config.copy(editable = b))
-            Flag.PLAYABLE -> state.playlistEdit.copy(config = state.playlistEdit.config.copy(playable = b))
-            Flag.DELETE_ITEMS -> state.playlistEdit.copy(config = state.playlistEdit.config.copy(deletableItems = b))
-            Flag.EDIT_ITEMS -> state.playlistEdit.copy(config = state.playlistEdit.config.copy(editableItems = b))
+            Flag.DELETABLE -> state.playlistEdit.copy(
+                config = state.playlistEdit.config.copy(
+                    deletable = b
+                )
+            )
+            Flag.EDITABLE -> state.playlistEdit.copy(
+                config = state.playlistEdit.config.copy(
+                    editable = b
+                )
+            )
+            Flag.PLAYABLE -> state.playlistEdit.copy(
+                config = state.playlistEdit.config.copy(
+                    playable = b
+                )
+            )
+            Flag.DELETE_ITEMS -> state.playlistEdit.copy(
+                config = state.playlistEdit.config.copy(
+                    deletableItems = b
+                )
+            )
+            Flag.EDIT_ITEMS -> state.playlistEdit.copy(
+                config = state.playlistEdit.config.copy(
+                    editableItems = b
+                )
+            )
         }
         update()
     }
@@ -214,7 +253,7 @@ class PlaylistEditViewModel constructor(
             )
     }
 
-    fun onParentSelected(parent: PlaylistDomain?, checked: Boolean) = viewModelScope.launch{
+    fun onParentSelected(parent: PlaylistDomain?, checked: Boolean) = viewModelScope.launch {
         if (state.treeLookup.isEmpty()) {
             state.treeLookup = playlistOrchestrator
                 .loadList(OrchestratorContract.AllFilter(), state.source.flatOptions())
@@ -223,12 +262,12 @@ class PlaylistEditViewModel constructor(
         }
         val childNode = state.treeLookup[state.playlistEdit.id]!!
         val parentNode = state.treeLookup[parent?.id]
-        if (parent?.id==null || !childNode.isAncestor(parentNode!!)) {
+        if (parent?.id == null || !childNode.isAncestor(parentNode!!)) {
             state.playlistParent = parent?.id?.let { parent }
             state.playlistEdit = state.playlistEdit.copy(parentId = parent?.id)
             update()
         } else {
-            _uiLiveData.value = UiEvent(ERROR,"That's a circular reference ..")
+            _uiLiveData.value = UiEvent(ERROR, "That's a circular reference ..")
         }
     }
 
@@ -250,5 +289,7 @@ class PlaylistEditViewModel constructor(
             )
     }
 
-
+    fun setIsDialog(b: Boolean) {
+        state.isDialog = b
+    }
 }

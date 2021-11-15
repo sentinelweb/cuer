@@ -1,17 +1,15 @@
 package uk.co.sentinelweb.cuer.app.ui.settings
 
-import android.os.Build
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.toJavaInstant
-import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
-import uk.co.sentinelweb.cuer.app.backup.BackupFileManager.Companion.VERSION
+import uk.co.sentinelweb.cuer.app.util.wrapper.ContentUriUtil
 import uk.co.sentinelweb.cuer.app.util.wrapper.FileWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
+import uk.co.sentinelweb.cuer.core.ext.getFileName
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -22,25 +20,18 @@ class PrefBackupPresenter constructor(
     private val backupManager: BackupFileManager,
     private val timeProvider: TimeProvider,
     private val fileWrapper: FileWrapper,
-    private val timeStampMapper: TimeStampMapper,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val contentUriUtil: ContentUriUtil,
 ) : PrefBackupContract.Presenter {
 
     override fun backupDatabaseToJson() {
         state.viewModelScope.launch {
             view.showProgress(true)
             backupManager
-                .backupData()
+                .makeBackupZipFile()
                 .also {
-                    state.writeData = it
-                    val device = Build.MODEL.replace(" ", "_")
-                    view.promptForSaveLocation(
-                        "v$VERSION-${
-                            timeStampMapper.mapDateTimeSimple(
-                                timeProvider.localDateTime().toJavaLocalDateTime()
-                            )
-                        }-cuer_backup-$device.json"
-                    )
+                    state.zipFile = it
+                    view.promptForSaveLocation(it.name)
                     view.showProgress(false)
                 }
             state.lastBackedUp = timeProvider.instant().toJavaInstant()
@@ -51,11 +42,22 @@ class PrefBackupPresenter constructor(
         view.showProgress(true)
         state.viewModelScope.launch {
             try {
-                fileWrapper.readDataFromUri(uriString)
-                    ?.let { backupManager.restoreData(it) }
-                    .let { success ->
-                        showResult(success)
-                    }
+                val name = contentUriUtil.getFileName(uriString)
+                    ?: throw IllegalArgumentException("invalid file chosen: url = $uriString")
+                if (name.endsWith(".json")) {
+                    fileWrapper.readDataFromUri(uriString)
+                        ?.let { backupManager.restoreData(it) }
+                        ?.let { success -> showResult(success) }
+                } else if (name.endsWith(".zip")) {
+                    fileWrapper.copyFileFromUri(uriString)
+                        .takeIf { it.exists() }
+                        ?.let { backupManager.restoreDataZip(it) }
+                        ?.let { success -> showResult(success) }
+                } else {
+                    log.e("invalid file chosen: url = $uriString")
+                    view.showMessage("Invalid file chosen:" + uriString.getFileName())
+                    view.showProgress(false)
+                }
             } catch (e: Exception) {
                 log.e("Restore failed: url = $uriString", e)
                 showResult(false, e.message ?: e::class.java.simpleName)
@@ -82,8 +84,9 @@ class PrefBackupPresenter constructor(
     }
 
     override fun saveWriteData(uri: String) {
-        state.writeData
-            ?.apply { fileWrapper.writeDataToUri(uri, this) }
+        state.zipFile
+            ?.apply { fileWrapper.copyFileToUri(this, uri) }
+            ?.apply { state.zipFile?.delete() }
             ?: toastWrapper.show("No Data!!!")
     }
 }

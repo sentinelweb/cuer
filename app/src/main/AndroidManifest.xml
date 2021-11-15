@@ -5,11 +5,11 @@ package="uk.co.sentinelweb.cuer.app">
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
+<!--android:dataExtractionRules="@xml/data_extraction"-->
 <application
     android:name="uk.co.sentinelweb.cuer.app.CuerApp"
     android:allowBackup="true"
-    android:fullBackupContent="false"
+    android:fullBackupContent="@xml/full_backup"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
     android:supportsRtl="true"

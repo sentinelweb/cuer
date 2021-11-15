@@ -12,8 +12,12 @@ class PlaylistEditModelMapper constructor(
     private val validator: PlaylistValidator
 ) {
     fun mapModel(
-        domain: PlaylistDomain, pinned: Boolean = false, parent: PlaylistDomain? = null,
-        showAllWatched: Boolean, showDefault: Boolean
+        domain: PlaylistDomain,
+        pinned: Boolean = false,
+        parent: PlaylistDomain? = null,
+        showAllWatched: Boolean,
+        showDefault: Boolean,
+        isDialog: Boolean
     ) =
         PlaylistEditContract.Model(
             titleDisplay = if (domain.title.isBlank()) res.getString(R.string.pe_default_display_title) else domain.title,
@@ -32,7 +36,8 @@ class PlaylistEditModelMapper constructor(
             watchAllIIcon = if (!showAllWatched) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24,
             info = buildInfo(domain),
             config = domain.config,
-            showDefault = showDefault
+            showDefault = showDefault,
+            isDialog = isDialog
         )
 
     private fun buildInfo(domain: PlaylistDomain): String = "<b>Type</b>: ${domain.type}" +
@@ -40,11 +45,14 @@ class PlaylistEditModelMapper constructor(
                     (domain.config.platformUrl?.let { "<br/><b>Platform URL</b>: ${domain.config.platformUrl}" }
                         ?: YoutubeJavaApiWrapper.playlistUrl(domain))
             else "") +
-            (domain.config.updateUrl?.let { "<br/><b>Update URL</b>: ${domain.config.updateUrl}" } ?: "") +
-            (domain.config.description?.let { "<br/><br/><b>Description</b>:<br/> ${domain.config.description}" } ?: "") +
+            (domain.config.updateUrl?.let { "<br/><b>Update URL</b>: ${domain.config.updateUrl}" }
+                ?: "") +
+            (domain.config.description?.let { "<br/><br/><b>Description</b>:<br/> ${domain.config.description}" }
+                ?: "") +
             (domain.channelData?.let {
                 ("<br/><br/><b>Channel</b>: ${it.title}") +
-                        ("<br/><b>Channel URL</b>: " + (it.customUrl ?: YoutubeJavaApiWrapper.channelUrl(it))) +
+                        ("<br/><b>Channel URL</b>: " + (it.customUrl
+                            ?: YoutubeJavaApiWrapper.channelUrl(it))) +
                         (it.description?.let { "<br/><br/><b>Description</b>:<br/> ${it}" } ?: "")
             } ?: "")
 

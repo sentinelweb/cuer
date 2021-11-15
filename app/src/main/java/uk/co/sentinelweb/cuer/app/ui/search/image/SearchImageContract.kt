@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.util.image.ImageSelectIntentHandler
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 
 interface SearchImageContract {
@@ -54,12 +55,25 @@ interface SearchImageContract {
                         state = get(),
                         log = get(),
                         mapper = get(),
-                        pixabayInteractor = get()
+                        pixabayInteractor = get(),
+                        imageFileRepository = get()
                     )
                 }
                 scoped { State() }
-                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
+                scoped {
+                    navigationMapper(
+                        true,
+                        getSource<Fragment>().requireActivity() as AppCompatActivity
+                    )
+                }
                 scoped { EnumValuesDialogCreator(getSource<Fragment>().requireContext()) }
+                scoped {
+                    ImageSelectIntentHandler(
+                        a = getSource<Fragment>().requireActivity() as AppCompatActivity,
+                        res = get(),
+                        bitmapSizer = get()
+                    )
+                }
             }
             factory { Mapper() }
         }

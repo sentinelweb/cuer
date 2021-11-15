@@ -38,8 +38,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageDialogFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
-import uk.co.sentinelweb.cuer.app.util.firebase.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -52,7 +52,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val viewModel: PlaylistEditViewModel by inject()
     private val chipCreator: ChipCreator by inject()
     private val log: LogWrapper by inject()
-    private val imageProvider: FirebaseImageProvider by inject()
+    private val imageProvider: ImageProvider by inject()
     private val softKeyboard: SoftKeyboardWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
@@ -84,17 +84,25 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        parent: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = PlaylistEditFragmentBinding.inflate(layoutInflater)
         return binding.root
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.peStarFab.setOnClickListener { viewModel.onStarClick() }
         binding.pePinFab.setOnClickListener { viewModel.onPinClick() }
         starMenuItem.isVisible = false
         pinMenuItem.isVisible = false
+        val isDialog = this.dialog != null
+        viewModel.setIsDialog(isDialog)
+        binding.peClickPrompt.isVisible = !isDialog
         binding.peToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.pe_star -> {
@@ -109,7 +117,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
             }
         }
 
-        binding.peImage.setOnTouchListener @SuppressLint("ClickableViewAccessibility") { iv, e ->
+        binding.peImage.setOnTouchListener { iv, e ->
             when (e.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     viewModel.onImageClick(e.x > iv.width / 2)
@@ -120,12 +128,37 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         }
         binding.peCommitButton.setOnClickListener { viewModel.onCommitClick() }
         binding.peWatchAll.setOnClickListener { viewModel.onWatchAllClick() }
-        binding.pePlayStart.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, PLAY_START) }
+        binding.pePlayStart.setOnCheckedChangeListener { v, b ->
+            viewModel.onFlagChanged(
+                b,
+                PLAY_START
+            )
+        }
         binding.peDefault.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, DEFAULT) }
-        binding.pePlayable.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, PLAYABLE) }
-        binding.peDeletable.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, DELETABLE) }
-        binding.peEditableItems.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, EDIT_ITEMS) }
-        binding.peDeletableItems.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, DELETE_ITEMS) }
+        binding.pePlayable.setOnCheckedChangeListener { v, b ->
+            viewModel.onFlagChanged(
+                b,
+                PLAYABLE
+            )
+        }
+        binding.peDeletable.setOnCheckedChangeListener { v, b ->
+            viewModel.onFlagChanged(
+                b,
+                DELETABLE
+            )
+        }
+        binding.peEditableItems.setOnCheckedChangeListener { v, b ->
+            viewModel.onFlagChanged(
+                b,
+                EDIT_ITEMS
+            )
+        }
+        binding.peDeletableItems.setOnCheckedChangeListener { v, b ->
+            viewModel.onFlagChanged(
+                b,
+                DELETE_ITEMS
+            )
+        }
         binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
         binding.peAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
@@ -162,6 +195,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                 return true
             }
         })
+
         observeUi()
         observeModel()
         observeDomain()
@@ -184,7 +218,9 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
     override fun onStop() {
         super.onStop()
-        dialogFragment?.dismissAllowingStateLoss()
+        if (!(dialogFragment is SearchImageDialogFragment)) {
+            dialogFragment?.dismissAllowingStateLoss()
+        }
     }
 
     private fun observeUi() {
@@ -210,7 +246,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                         binding.peTitleEdit.setSelection(model.titleEdit.length)
                     }
                     binding.peCollapsingToolbar.title = model.titleDisplay
-
+                    binding.peClickPrompt.isVisible = !model.isDialog
                     val starIconResource =
                         if (model.starred) R.drawable.ic_button_starred_white
                         else R.drawable.ic_button_unstarred_white

@@ -37,16 +37,24 @@
                 android:background="@color/background"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7"
-                tools:src="@drawable/im_test_nietzche"
-                />
+                tools:src="@drawable/im_test_nietzche" />
+
+            <TextView
+                android:id="@+id/pe_click_prompt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pe_click_image_to_change"
+                android:textColor="@color/white"
+                android:layout_gravity="top"
+                android:padding="8dp"
+                android:background="@color/black_text_secondary" />
 
             <View
                 android:id="@+id/pe_action_bg"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_gravity="top"
-                android:background="@drawable/actionbar_gradient"
-                />
+                android:background="@drawable/actionbar_gradient" />
 
             <View
                 android:id="@+id/pe_title_bg"
@@ -113,6 +121,7 @@
                     android:background="?textEditBackground"
                     tools:text="Edit input"
                     android:maxLines="1"
+                    android:singleLine="true"
                     />
 
             </com.google.android.material.textfield.TextInputLayout>

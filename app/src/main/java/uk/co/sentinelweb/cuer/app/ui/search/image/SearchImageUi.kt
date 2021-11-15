@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ fun SearchImageView(viewModel: SearchImageViewModel) {
         textChange = viewModel::onSearchTextChange,
         onSearch = viewModel::onSearch,
         onSelectImage = viewModel::onImageSelected,
+        onLibraryClick = viewModel::onLibraryClick,
         onClose = viewModel::onClose
     )
 }
@@ -45,6 +47,7 @@ fun SearchImageParametersUi(
     textChange: (String) -> Unit,
     onSearch: () -> Unit,
     onSelectImage: (ImageDomain) -> Unit,
+    onLibraryClick: () -> Unit,
     onClose: () -> Unit
 ) {
     CuerTheme {
@@ -61,16 +64,24 @@ fun SearchImageParametersUi(
                             .padding(12.dp)
                             .align(Alignment.TopStart)
                     )
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        tint = MaterialTheme.colors.primary,
-                        contentDescription = stringResource(id = R.string.clear),
-                        modifier = Modifier
-                            .width(48.dp)
-                            .clickable { onClose() }
-                            .padding(12.dp)
-                            .align(Alignment.TopEnd)
-                    )
+                    Row(modifier = Modifier.align(Alignment.TopEnd)) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_photo_library_24),
+                            contentDescription = stringResource(id = R.string.clear),
+                            modifier = Modifier
+                                .width(48.dp)
+                                .clickable { onLibraryClick() }
+                                .padding(12.dp)
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = stringResource(id = R.string.clear),
+                            modifier = Modifier
+                                .width(48.dp)
+                                .clickable { onClose() }
+                                .padding(12.dp)
+                        )
+                    }
                 }
                 LazyColumn(
                     modifier = Modifier.fillMaxHeight(0.6f),
@@ -118,7 +129,7 @@ fun SearchWindow() {
         SearchImageParametersUi(
             SearchImageContract.SearchModel(term = "Search Term", loading = false),
             SearchImageContract.ResultsModel(listOf()),
-            {}, {}, {}, {}
+            {}, {}, {}, {}, {}
         )
     }
 }

@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class RecentLocalPlaylists constructor(
     private val prefs: MultiPlatformPreferencesWrapper,
-    private val log: LogWrapper,
+    @Suppress("CanBeParameter") private val log: LogWrapper,
 ) {
     init {
         log.tag(this)
@@ -20,10 +20,19 @@ class RecentLocalPlaylists constructor(
         ?: mutableListOf())
 
     fun addRecent(pl: PlaylistDomain) {
+        val id = pl.id
+        addPlaylistId(id)
+    }
+
+    fun addRecentId(id: Long) {
+        addPlaylistId(id)
+    }
+
+    private fun addPlaylistId(id: Long?) {
         val current = getRecent().toMutableList()
-        if (pl.id != null) {
-            current.remove(pl.id)
-            current.add(pl.id)
+        if (id != null) {
+            current.remove(id)
+            current.add(id)
             while (current.size > MAX_RECENT) current.removeAt(0)
             prefs.putString(RECENT_PLAYLISTS, current.toTypedArray().joinToString(","))
         }

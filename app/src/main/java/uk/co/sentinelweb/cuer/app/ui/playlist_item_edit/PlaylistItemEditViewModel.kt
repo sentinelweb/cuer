@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
@@ -301,6 +302,12 @@ class PlaylistItemEditViewModel constructor(
         }
     }
 
+    fun onLaunchVideo() {
+        state.media?.platformId?.let { platformId ->
+            _navigateLiveData.value = NavigationModel(YOUTUBE_VIDEO, mapOf(NavigationModel.Param.PLATFORM_ID to platformId))
+        }
+    }
+
     private fun update() {
         state.model = modelMapper.map(state.media!!, state.selectedPlaylists)
         _modelLiveData.value = state.model
@@ -381,11 +388,5 @@ class PlaylistItemEditViewModel constructor(
             log.e("Error saving playlistItem", e)
             throw IllegalStateException("Save failed", e)
         }
-
-    fun onLaunchVideo() {
-        state.media?.platformId?.let { platformId ->
-            _navigateLiveData.value = NavigationModel(YOUTUBE_VIDEO, mapOf(NavigationModel.Param.PLATFORM_ID to platformId))
-        }
-    }
 
 }

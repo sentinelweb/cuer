@@ -36,7 +36,8 @@ interface PlaylistEditContract {
         @DrawableRes val watchAllIIcon: Int,
         val info: String,
         val config: PlaylistDomain.PlaylistConfigDomain,
-        val showDefault: Boolean
+        val showDefault: Boolean,
+        var isDialog: Boolean
     )
 
     data class State constructor(
@@ -45,7 +46,9 @@ interface PlaylistEditContract {
         var isAllWatched: Boolean? = null,
         var playlistParent: PlaylistDomain? = null,
         var defaultInitial: Boolean = false,
-        var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf()
+        var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf(),
+        var isLoaded: Boolean = false,
+        var isDialog: Boolean = false
     ) {
         lateinit var source: OrchestratorContract.Source
         lateinit var playlistEdit: PlaylistDomain
@@ -70,7 +73,8 @@ interface PlaylistEditContract {
                         mediaOrchestrator = get(),
                         log = get(),
                         imageProvider = get(),
-                        prefsWrapper = get()
+                        prefsWrapper = get(),
+                        recentLocalPlaylists = get()
                     )
                 }
                 scoped { State() }

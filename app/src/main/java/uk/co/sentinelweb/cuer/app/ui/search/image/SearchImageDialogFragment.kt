@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.search.image
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +11,9 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
-import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageViewModel.UiEvent.Type.CLOSE
-import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageViewModel.UiEvent.Type.ERROR
+import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.ImageSelectIntentHandler
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -23,7 +23,7 @@ class SearchImageDialogFragment(private val config: SearchImageContract.Config) 
     private val viewModel: SearchImageViewModel by inject()
     private val log: LogWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
-    private val imageProvider: FirebaseImageProvider by inject()
+    private val imageSelectIntentHandler: ImageSelectIntentHandler by inject()
 
     init {
         log.tag(this)
@@ -54,18 +54,23 @@ class SearchImageDialogFragment(private val config: SearchImageContract.Config) 
                     when (model.type) {
                         ERROR -> toastWrapper.show(model.data as String)
                         CLOSE -> dismiss()
+                        GOTO_LIBRARY -> imageSelectIntentHandler.launchImageChooser(this@SearchImageDialogFragment)
                         else -> Unit
                     }
                 }
             })
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        imageSelectIntentHandler.onResultReceived(requestCode, resultCode, data!!) {
+            viewModel.onImageSelected(it)
+        }
+    }
 
     companion object {
-
         fun newInstance(config: SearchImageContract.Config): SearchImageDialogFragment {
             return SearchImageDialogFragment(config)
         }
-
     }
 }

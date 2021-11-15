@@ -20,6 +20,7 @@ val ver_kotlinx_coroutines_test: String by project
 val ver_multiplatform_settings: String by project
 val ver_turbine: String by project
 val ver_ktor: String by project
+val ver_mockserver: String by project
 //val ver_korio: String by project
 val app_compileSdkVersion: String by project
 
@@ -64,7 +65,6 @@ kotlin {
                 implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:$ver_multiplatform_settings")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
-//                implementation("com.soywiz.korlibs.korio:korio:$ver_korio")
             }
         }
         val commonTest by getting {
@@ -76,7 +76,7 @@ kotlin {
         val jvmMain by getting {
             kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
-//                implementation("com.soywiz.korlibs.korio:korio-jvm:$ver_korio")
+                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
             }
         }
         val jvmTest by getting {
@@ -87,12 +87,14 @@ kotlin {
                 implementation("com.google.truth:truth:$ver_truth")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test")
                 implementation("app.cash.turbine:turbine:$ver_turbine")
+                implementation("org.mock-server:mockserver-netty:$ver_mockserver")
+                implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
             }
         }
         val androidMain by getting {
             kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
-//                implementation("com.soywiz.korlibs.korio:korio-android:$ver_korio")
+                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
             }
         }
         val androidTest by getting {
@@ -101,7 +103,6 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-//                implementation("com.soywiz.korlibs.korio:korio-js:$ver_korio")
             }
         }
         val jsTest by getting
