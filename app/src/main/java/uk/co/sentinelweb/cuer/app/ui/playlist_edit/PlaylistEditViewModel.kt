@@ -110,10 +110,12 @@ class PlaylistEditViewModel constructor(
 //                update()
 //            }
 //        }
-        _dialogModelLiveData.value = SearchImageContract.Config(
-            state.playlistEdit.title,
-            this::onImageSelected
-        )
+        if (!state.isDialog) {
+            _dialogModelLiveData.value = SearchImageContract.Config(
+                state.playlistEdit.title,
+                this::onImageSelected
+            )
+        }
     }
 
     fun onImageSelected(image: ImageDomain) {
@@ -280,5 +282,7 @@ class PlaylistEditViewModel constructor(
             )
     }
 
-
+    fun setIsDialog(b: Boolean) {
+        state.isDialog = b
+    }
 }

@@ -84,7 +84,11 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        parent: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = PlaylistEditFragmentBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -121,12 +125,37 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         }
         binding.peCommitButton.setOnClickListener { viewModel.onCommitClick() }
         binding.peWatchAll.setOnClickListener { viewModel.onWatchAllClick() }
-        binding.pePlayStart.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, PLAY_START) }
+        binding.pePlayStart.setOnCheckedChangeListener { v, b ->
+            viewModel.onFlagChanged(
+                b,
+                PLAY_START
+            )
+        }
         binding.peDefault.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, DEFAULT) }
-        binding.pePlayable.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, PLAYABLE) }
-        binding.peDeletable.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, DELETABLE) }
-        binding.peEditableItems.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, EDIT_ITEMS) }
-        binding.peDeletableItems.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, DELETE_ITEMS) }
+        binding.pePlayable.setOnCheckedChangeListener { v, b ->
+            viewModel.onFlagChanged(
+                b,
+                PLAYABLE
+            )
+        }
+        binding.peDeletable.setOnCheckedChangeListener { v, b ->
+            viewModel.onFlagChanged(
+                b,
+                DELETABLE
+            )
+        }
+        binding.peEditableItems.setOnCheckedChangeListener { v, b ->
+            viewModel.onFlagChanged(
+                b,
+                EDIT_ITEMS
+            )
+        }
+        binding.peDeletableItems.setOnCheckedChangeListener { v, b ->
+            viewModel.onFlagChanged(
+                b,
+                DELETE_ITEMS
+            )
+        }
         binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
         binding.peAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
@@ -163,6 +192,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                 return true
             }
         })
+        viewModel.setIsDialog(this.dialog != null)
         observeUi()
         observeModel()
         observeDomain()

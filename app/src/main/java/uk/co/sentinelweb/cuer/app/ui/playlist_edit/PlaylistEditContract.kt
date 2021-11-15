@@ -46,7 +46,8 @@ interface PlaylistEditContract {
         var playlistParent: PlaylistDomain? = null,
         var defaultInitial: Boolean = false,
         var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf(),
-        var isLoaded: Boolean = false
+        var isLoaded: Boolean = false,
+        var isDialog: Boolean = false
     ) {
         lateinit var source: OrchestratorContract.Source
         lateinit var playlistEdit: PlaylistDomain
