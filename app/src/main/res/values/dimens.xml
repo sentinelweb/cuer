@@ -52,5 +52,5 @@
     <dimen name="playlist_row_icon_height">60dp</dimen>
     <dimen name="playlist_row_icon_width">106dp</dimen>
     <dimen name="recyclerview_footer">96dp</dimen>
-
+    <dimen name="max_cache_image_size">100dp</dimen>
 </resources>

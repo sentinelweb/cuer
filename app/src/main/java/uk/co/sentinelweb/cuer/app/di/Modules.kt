@@ -44,6 +44,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
+import uk.co.sentinelweb.cuer.app.util.image.BitmapSizer
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
@@ -159,6 +160,8 @@ object Modules {
                 IMAGES_REPO_NAME
             )
         }
+        factory { ContentUriUtil(androidApplication()) }
+        factory { BitmapSizer() }
     }
 
     private val wrapperModule = module {
@@ -176,7 +179,6 @@ object Modules {
         }
         factory { ServiceWrapper(androidApplication(), get()) }
         factory { EdgeToEdgeWrapper() }
-        factory { ContentUriUtil(androidApplication()) }
     }
 
     private val appNetModule = module {
