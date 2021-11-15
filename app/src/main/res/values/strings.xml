@@ -45,6 +45,9 @@
     <string name="share_button_goto_item">Go to item</string>
     <string name="share_button_return">Return</string>
     <string name="share_button_goto_app">Go to app</string>
+    <string name="share_error_no_link">Could not find a link to process</string>
+    <string name="share_error_already_exists">%1$s already exists …</string>
+    <string name="share_error_no_default_playlist">No default playlist - select a playlist to save the item</string>
 
     <!-- playlist_item_edit -->
     <string name="pie_empty_desc">We can only add youtube video links at the moment</string>
@@ -87,6 +90,7 @@
     <string name="pe_editable_items">Editable items</string>
     <string name="pe_deletable_items">Deletable items</string>
     <string name="pe_other_actions">Other actions</string>
+    <string name="pe_click_image_to_change">Click image to change</string>
 
     <!-- local player -->
     <string name="title_activity_fullscreen">Video Player</string>
@@ -100,13 +104,16 @@
     <string name="prefs_root_backup_cat_title">Backup/Restore</string>
     <string name="prefs_root_backup_summary">Data backup options</string>
     <string name="prefs_root_debug_cat_title">Debug</string>
-    <string
-        name="prefs_root_debug_send_reports_summary">Trigger unsent crash report to crashlytics</string>
+    <string name="prefs_root_debug_send_reports_summary">Trigger unsent crash report to crashlytics</string>
     <string name="prefs_root_debug_send_reports_title">Send unsent reports</string>
     <string name="prefs_root_remote_service_not_running">Not running</string>
     <string name="prefs_root_remote_service_running">Running</string>
     <string name="prefs_root_remote_service_title">Remote service</string>
 
+    <string name="pref_backup_backup_summary">Back up data to a ZIP file</string>
+    <string name="pref_backup_backup_title">Backup database</string>
+    <string name="pref_backup_restore_summary">Restore the DB from a ZIP/JSON file</string>
+    <string name="pref_backup_restore_title">Restore database</string>
 
     <!-- playlist edit -->
     <string name="pe_default_display_title">Enter a title …</string>
@@ -143,6 +150,15 @@
     <string name="search_live">Live</string>
     <string name="search_select_dates">Select Dates …</string>
 
+    <!-- browse -->
+    <string name="browse_error_no_playlist">No playlist configured</string>
+    <string name="browse_error_no_category">No category with that id = %1$s</string>
+    <string name="browse_recent">Recently viewed</string>
+
+    <!-- player -->
+    <string name="player_fab_fullscreen">Fullscreen</string>
+    <string name="player_fab_pip">Picture in Picture</string>
+
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -158,15 +174,6 @@
     <string name="menu_show_children">Show children</string>
     <string name="playlist_item_menu_goto_playlist">Goto playlist</string>
     <string name="menu_launch">Launch</string>
-    <string name="player_fab_fullscreen">Fullscreen</string>
-    <string name="player_fab_pip">Picutre in Picture</string>
-    <string name="browse_error_no_playlist">No playlist configured</string>
-    <string name="browse_error_no_category">No category with that id = %1$s</string>
-    <string name="share_error_no_link">Could not find a link to process</string>
-    <string name="share_error_already_exists">%1$s already exists …</string>
-    <string name="share_error_no_default_playlist">No default playlist - select a playlist to save the item</string>
-    <string name="browse_recent">Recently viewed</string>
     <string name="title_select_picture">Select Picture</string>
-    <string name="pe_click_image_to_change">Click image to change</string>
 
 </resources>

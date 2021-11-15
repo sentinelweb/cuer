@@ -158,7 +158,6 @@ class PlaylistEditViewModel constructor(
                     ?.also {
                         prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!)
                     }
-
             }
         }
     }
