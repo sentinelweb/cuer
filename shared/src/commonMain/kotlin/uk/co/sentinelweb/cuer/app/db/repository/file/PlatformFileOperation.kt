@@ -6,7 +6,7 @@ data class AFile(
     fun child(name: String): AFile = AFile(this.path + "/" + name)
 }
 
-expect class PlatformOperation() {
+expect class PlatformFileOperation() {
     fun delete(file: AFile)
 
     fun currentDir(): AFile

@@ -61,7 +61,6 @@ class PlaylistsModelMapper constructor(
         )
         root.iterate { tree, depth ->
             tree.node?.also {
-                Log.d("PlaylistsModelMapper", "depth:$depth")
                 list.add(itemModel(it, it.id == pinnedId, domains[it], depth - 1))
             }
         }

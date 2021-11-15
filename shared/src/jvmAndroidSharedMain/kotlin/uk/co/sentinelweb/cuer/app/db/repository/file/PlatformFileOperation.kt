@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.db.repository.file
 
 import java.io.File
 
-actual class PlatformOperation {
+actual class PlatformFileOperation {
 
     actual fun delete(file: AFile) {
         val platformFile = File(file.path)

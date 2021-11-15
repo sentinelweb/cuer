@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
+import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayInteractor
@@ -75,20 +76,24 @@ class SearchImageViewModel(
 
     private fun showError(msg: String) {
         log.e(msg)
-        _uiLiveData.value = UiEvent(UiEvent.Type.ERROR, msg)
+        _uiLiveData.value = UiEvent(ERROR, msg)
     }
 
     fun onImageSelected(image: ImageDomain) = viewModelScope.launch {
-        val savedImage = imageFileRepository.saveImage(image)
+        val nameBase =
+            if (!state.term.isNullOrBlank() && !image.url.startsWith("file")) state.term
+            else null
+        val savedImage = imageFileRepository.saveImage(image, nameBase)
+        log.d("saved image: $savedImage")
         state.config?.let { it.itemClick(savedImage) }
     }
 
     fun onLibraryClick() {
-        _uiLiveData.value = UiEvent(UiEvent.Type.GOTO_LIBRARY, null)
+        _uiLiveData.value = UiEvent(GOTO_LIBRARY, null)
     }
 
     fun onClose() {
-        _uiLiveData.value = UiEvent(UiEvent.Type.CLOSE, null)
+        _uiLiveData.value = UiEvent(CLOSE, null)
     }
 
     fun setConfig(config: SearchImageContract.Config) {

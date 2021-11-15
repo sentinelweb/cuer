@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.repository.file
 
-actual class PlatformOperation {
+actual class PlatformFileOperation {
     actual fun delete(file: AFile) {
         TODO("Not yet implemented")
     }
