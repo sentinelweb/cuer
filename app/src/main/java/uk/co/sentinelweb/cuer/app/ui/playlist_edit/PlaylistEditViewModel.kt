@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.PINNED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -35,6 +36,7 @@ class PlaylistEditViewModel constructor(
     private val log: LogWrapper,
     private val imageProvider: FirebaseImageProvider,
     private val prefsWrapper: GeneralPreferencesWrapper,
+    private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : ViewModel() {
 
     data class UiEvent(
@@ -151,10 +153,12 @@ class PlaylistEditViewModel constructor(
                     .also {
                         it.apply { state.playlistEdit = this }
                         _domainLiveData.value = it
+                        recentLocalPlaylists.addRecent(it)
                     }.takeIf { state.isCreate }
                     ?.also {
                         prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!)
                     }
+
             }
         }
     }
