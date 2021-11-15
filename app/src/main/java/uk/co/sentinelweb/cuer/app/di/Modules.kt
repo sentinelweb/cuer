@@ -132,16 +132,33 @@ object Modules {
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
-        factory { BackupFileManager(get(), get(), get(), get(), get(), get(), get(), get()) }
-        factory {ImageProvider(get(),get())}
-        single {ImageFileRepository(
-            androidApplication().filesDir.absolutePath,
-            HttpClient(CIO),
-            get(),
-            get(),
-            get(),
-            IMAGES_REPO_NAME
-        )}
+        factory {
+            BackupFileManager(
+                channelRepository = get(),
+                mediaRepository = get(),
+                playlistRepository = get(),
+                playlistItemRepository = get(),
+                contextProvider = get(),
+                parserFactory = get(),
+                playlistItemCreator = get(),
+                timeProvider = get(),
+                timeStampMapper = get(),
+                imageFileRepository = get(),
+                context = androidApplication(),
+                log = get()
+            )
+        }
+        factory { ImageProvider(get(), get()) }
+        single {
+            ImageFileRepository(
+                androidApplication().filesDir.absolutePath,
+                HttpClient(CIO),
+                get(),
+                get(),
+                get(),
+                IMAGES_REPO_NAME
+            )
+        }
     }
 
     private val wrapperModule = module {
@@ -159,6 +176,7 @@ object Modules {
         }
         factory { ServiceWrapper(androidApplication(), get()) }
         factory { EdgeToEdgeWrapper() }
+        factory { ContentUriUtil(androidApplication()) }
     }
 
     private val appNetModule = module {

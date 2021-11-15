@@ -7,6 +7,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.core.ext.fileExt
+import uk.co.sentinelweb.cuer.core.ext.getFileName
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -41,14 +43,14 @@ class ImageFileRepository(
                 val fileName = buildFileName(fullPath, nameBase)
                 val targetFile = makeUniqueFileName(fileName, byteArrayBody)
                 platformOperation.writeBytes(targetFile, byteArrayBody)
-                input.copy(url = REPO_SCHEME_PREFIX + getFileName(targetFile.path))
+                input.copy(url = REPO_SCHEME_PREFIX + targetFile.path.getFileName())
             } else if (input.url.startsWith("file")) {
                 val strippedFilePath = stripFileScheme(input.url)
                 val inputFile = AFile(strippedFilePath)
                 val fileName = buildFileName(strippedFilePath, nameBase)
                 val targetFile = makeUniqueFileName(fileName, platformOperation.readBytes(inputFile))
                 platformOperation.copyTo(inputFile, targetFile)
-                input.copy(url = REPO_SCHEME_PREFIX + getFileName(targetFile.path))
+                input.copy(url = REPO_SCHEME_PREFIX + targetFile.path.getFileName())
             } else throw IllegalArgumentException("uri not supported: ${input.url}")
         }
 
@@ -71,17 +73,19 @@ class ImageFileRepository(
             } else null
         } else null
 
-    suspend fun removeAll() = withContext(coroutines.IO) {
+    suspend fun removeAll(removeRoot: Boolean = true) = withContext(coroutines.IO) {
         platformOperation.list(_dir)?.onEach {
             platformOperation.delete(it)
         }
-        platformOperation.delete(_dir)
+        if (removeRoot) {
+            platformOperation.delete(_dir)
+        }
     }
 
     private fun buildFileName(fullPath: String, nameBase: String?) = (nameBase
-        ?.replace("\\s".toRegex(),"_")
-        ?.let { it + (fileExt(fullPath)?.let { "." + it } ?: ".jpg") }
-        ?: getFileName(fullPath))
+        ?.replace("\\s".toRegex(), "_")
+        ?.let { it + (fullPath.fileExt()?.let { "." + it } ?: ".jpg") }
+        ?: fullPath.getFileName())
 
     private fun getBytes(file: AFile) =
         if (platformOperation.exists(file)) {
@@ -96,16 +100,10 @@ class ImageFileRepository(
 
     private fun stripRepoScheme(fullPath: String) = fullPath.substring(REPO_SCHEME_PREFIX.length)
 
-    private fun getFileName(fullPath: String) = fullPath.substring(fullPath.lastIndexOf("/") + 1)
-
-    private fun fileExt(fullPath: String): String? = fullPath
-        .takeIf { fullPath.lastIndexOf(".") > -1 }
-        ?.substring(fullPath.lastIndexOf(".") + 1)
-
     private fun filePathToRepoFile(fileName: String) = _dir.path + "/" + fileName
 
     private fun makeUniqueFileName(fileName: String, byteArray: ByteArray): AFile {
-        val fileNameStripped = getFileName(fileName)
+        val fileNameStripped = fileName.getFileName()
         var targetFile = _dir.child(fileNameStripped)
         var ctr = 0
         while (platformOperation.exists(targetFile) &&
