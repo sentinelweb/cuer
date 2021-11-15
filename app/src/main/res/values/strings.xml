@@ -167,5 +167,6 @@
     <string name="share_error_no_default_playlist">No default playlist - select a playlist to save the item</string>
     <string name="browse_recent">Recently viewed</string>
     <string name="title_select_picture">Select Picture</string>
+    <string name="pe_click_image_to_change">Click image to change</string>
 
 </resources>

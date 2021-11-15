@@ -100,6 +100,9 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         binding.pePinFab.setOnClickListener { viewModel.onPinClick() }
         starMenuItem.isVisible = false
         pinMenuItem.isVisible = false
+        val isDialog = this.dialog != null
+        viewModel.setIsDialog(isDialog)
+        binding.peClickPrompt.isVisible = !isDialog
         binding.peToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.pe_star -> {
@@ -192,7 +195,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                 return true
             }
         })
-        viewModel.setIsDialog(this.dialog != null)
+
         observeUi()
         observeModel()
         observeDomain()
@@ -243,7 +246,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                         binding.peTitleEdit.setSelection(model.titleEdit.length)
                     }
                     binding.peCollapsingToolbar.title = model.titleDisplay
-
+                    binding.peClickPrompt.isVisible = !model.isDialog
                     val starIconResource =
                         if (model.starred) R.drawable.ic_button_starred_white
                         else R.drawable.ic_button_unstarred_white

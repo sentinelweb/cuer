@@ -80,12 +80,16 @@ class SearchImageViewModel(
     }
 
     fun onImageSelected(image: ImageDomain) = viewModelScope.launch {
+        state.loading = true
+        searchState = mapper.mapSearch(state)
         val nameBase =
             if (!state.term.isNullOrBlank() && !image.url.startsWith("file")) state.term?.trim()
             else null
         val savedImage = imageFileRepository.saveImage(image, nameBase)
         log.d("saved image: $savedImage")
         state.config?.let { it.itemClick(savedImage) }
+        state.loading = false
+        searchState = mapper.mapSearch(state)
     }
 
     fun onLibraryClick() {

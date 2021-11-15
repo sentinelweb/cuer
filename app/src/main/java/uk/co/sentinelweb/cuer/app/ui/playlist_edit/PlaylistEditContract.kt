@@ -36,7 +36,8 @@ interface PlaylistEditContract {
         @DrawableRes val watchAllIIcon: Int,
         val info: String,
         val config: PlaylistDomain.PlaylistConfigDomain,
-        val showDefault: Boolean
+        val showDefault: Boolean,
+        var isDialog: Boolean
     )
 
     data class State constructor(
