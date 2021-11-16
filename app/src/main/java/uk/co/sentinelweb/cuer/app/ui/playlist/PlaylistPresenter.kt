@@ -621,18 +621,14 @@ class PlaylistPresenter(
 
     override fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean, source: Source) {
         coroutines.mainScope.launch {
+            val notLoaded = state.playlist == null
             plId
                 ?.takeIf { it != -1L }
                 ?.toIdentifier(source)
                 ?.apply {
                     state.playlistIdentifier = this
                 }
-                ?.apply { executeRefresh(scrollToCurrent = true) }
-                ?.apply {
-                    state.playlist
-                        ?.indexOfItemId(plItemId)
-                        ?.also { state.focusIndex = it }
-                }
+                ?.apply { executeRefresh(scrollToCurrent = notLoaded) }
                 ?.apply {
                     if (playNow) {
                         queue.playNow(state.playlistIdentifier, plItemId)
@@ -646,7 +642,7 @@ class PlaylistPresenter(
                         state.playlistIdentifier =
                             prefsWrapper.getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair())
                                 .toIdentifier()
-                        executeRefresh(scrollToCurrent = true)
+                        executeRefresh(scrollToCurrent = notLoaded)
                     } else {
                         dbInit.addListener({ b: Boolean ->
                             if (b) {
