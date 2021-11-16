@@ -93,6 +93,7 @@ class PlaylistsFragment :
         )
         itemTouchHelper.attachToRecyclerView(binding.playlistsList)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
+        binding.playlistsSwipe.isRefreshing = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
