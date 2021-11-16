@@ -651,7 +651,6 @@ class PlaylistPresenter(
                             }
                         })
                     }
-
                 }
         }
     }

@@ -31,6 +31,8 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_BOTTOM_TAB
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -55,6 +57,7 @@ class MainActivity :
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val res: ResourceWrapper by inject()
+    private val prefs: GeneralPreferencesWrapper by inject()
     private lateinit var navController: NavController
 
     private var _binding: MainActivityBinding? = null
@@ -74,18 +77,36 @@ class MainActivity :
         _binding = MainActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         binding.bottomNavView.setupWithNavController(navController)
+        binding.bottomNavView.setOnNavigationItemSelectedListener {
+            val value = when (it.itemId) {
+                R.id.navigation_browse -> 0
+                R.id.navigation_playlists -> 1
+                R.id.navigation_playlist -> 2
+                else -> 0
+            }
+            prefs.putInt(LAST_BOTTOM_TAB, value)
+            navController.navigate(it.itemId)
+            true
+        }
 
         edgeToEdgeWrapper.doOnApplyWindowInsets(binding.bottomNavView) { view, insets, padding ->
             view.updatePadding(
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
         }
-        //intent.getStringExtra(Target.KEY) ?: run { navController.navigate(R.id.navigation_playlist) }
 
-        // todo save last tab
+        prefs.getInt(LAST_BOTTOM_TAB, 0)
+            .takeIf { it > 0 }
+            .apply {
+                when (this) {
+                    1 -> navController.navigate(R.id.navigation_playlists)
+                    2 -> navController.navigate(R.id.navigation_playlist)
+                }
+            }
         presenter.initialise()
     }
 
@@ -210,7 +231,12 @@ class MainActivity :
             //.show(binding.castPlayerFragment.findFragment())
             .show(playerFragment)
             .commitAllowingStateLoss()
-        binding.navHostFragment.setPadding(0, 0, 0, res.getDimensionPixelSize(R.dimen.main_navhost_bottom_padding_player))
+        binding.navHostFragment.setPadding(
+            0,
+            0,
+            0,
+            res.getDimensionPixelSize(R.dimen.main_navhost_bottom_padding_player)
+        )
     }
 
     override fun hidePlayer() {
@@ -227,6 +253,4 @@ class MainActivity :
             setOf(R.id.navigation_browse, R.id.navigation_playlists, R.id.navigation_playlist)
         private const val SERVICES_REQUEST_CODE = 1
     }
-
-
 }
