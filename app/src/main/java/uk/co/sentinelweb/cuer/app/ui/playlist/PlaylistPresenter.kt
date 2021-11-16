@@ -489,9 +489,7 @@ class PlaylistPresenter(
 
     override fun onItemShare(itemModel: ItemContract.Model) {
         playlistItemDomain(itemModel)
-            ?.let { itemDomain ->
-                shareWrapper.share(itemDomain.media)
-            }
+            ?.let { itemDomain -> shareWrapper.share(itemDomain.media) }
     }
 
     override fun onItemGotoPlaylist(item: ItemContract.Model) {

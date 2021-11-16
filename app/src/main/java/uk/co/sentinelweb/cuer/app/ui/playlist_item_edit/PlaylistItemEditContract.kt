@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -73,7 +74,8 @@ interface PlaylistItemEditContract {
                         playlistItemOrchestrator = get(),
                         playlistOrchestrator = get(),
                         prefsWrapper = get(),
-                        floatingService = get()
+                        floatingService = get(),
+                        shareWrapper = get()
                     )
                 }
                 scoped { State() }
@@ -82,7 +84,13 @@ interface PlaylistItemEditContract {
                 scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
                 scoped { getSource<Fragment>().requireActivity() }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
-                scoped { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
+                scoped {
+                    AndroidSnackbarWrapper(
+                        (getSource() as Fragment).requireActivity(),
+                        get()
+                    )
+                }
+                scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
             }
         }
 

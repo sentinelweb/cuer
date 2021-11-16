@@ -26,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerCont
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -49,6 +50,7 @@ class PlaylistItemEditViewModel constructor(
     private val mediaOrchestrator: MediaOrchestrator,
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val floatingService: FloatingPlayerServiceManager,
+    private val shareWrapper: ShareWrapper,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -180,7 +182,9 @@ class PlaylistItemEditViewModel constructor(
                 } else if (!(ytContextHolder.isConnected())) {
                     _navigateLiveData.value = NavigationModel(
                         LOCAL_PLAYER, mapOf(
-                            NavigationModel.Param.PLAYLIST_ITEM to item))
+                            NavigationModel.Param.PLAYLIST_ITEM to item
+                        )
+                    )
                 } else {
                     item.playlistId?.let {
                         queue.playNow(it.toIdentifier(LOCAL), item.id) // todo store source
@@ -271,8 +275,10 @@ class PlaylistItemEditViewModel constructor(
                 {
                     state.media = state.media?.copy(
                         watched = state.editSettings.watched ?: originalMedia.watched,
-                        positon = state.editSettings.watched?.takeIf { it.not() }?.let { 0 } ?: originalMedia.positon,
-                        playFromStart = state.editSettings.playFromStart ?: originalMedia.playFromStart
+                        positon = state.editSettings.watched?.takeIf { it.not() }?.let { 0 }
+                            ?: originalMedia.positon,
+                        playFromStart = state.editSettings.playFromStart
+                            ?: originalMedia.playFromStart
                     )
                     state.isMediaChanged = true
                 }
@@ -294,14 +300,26 @@ class PlaylistItemEditViewModel constructor(
 
     override fun onChannelClick() {
         state.media?.channelData?.platformId?.let { channelId ->
-            _navigateLiveData.value = NavigationModel(YOUTUBE_CHANNEL, mapOf(NavigationModel.Param.CHANNEL_ID to channelId))
+            _navigateLiveData.value = NavigationModel(
+                YOUTUBE_CHANNEL,
+                mapOf(NavigationModel.Param.CHANNEL_ID to channelId)
+            )
         }
     }
 
     fun onLaunchVideo() {
         state.media?.platformId?.let { platformId ->
-            _navigateLiveData.value = NavigationModel(YOUTUBE_VIDEO, mapOf(NavigationModel.Param.PLATFORM_ID to platformId))
+            _navigateLiveData.value = NavigationModel(
+                YOUTUBE_VIDEO,
+                mapOf(NavigationModel.Param.PLATFORM_ID to platformId)
+            )
         }
+    }
+
+    fun onShare() {
+        state.media
+            ?.apply { shareWrapper.share(this) }
+            ?: toast.show("No item to share ...")
     }
 
     private fun update() {
@@ -332,7 +350,8 @@ class PlaylistItemEditViewModel constructor(
                         _navigateLiveData.value = NavigationModel(NAV_DONE)
                     }
                 } else {
-                    _uiLiveData.value = UiEvent(ERROR, "Please select a playlist (or delete the item)")
+                    _uiLiveData.value =
+                        UiEvent(ERROR, "Please select a playlist (or delete the item)")
                 }
             }
         } else {
@@ -371,9 +390,15 @@ class PlaylistItemEditViewModel constructor(
                                 .filter { it.id != state.editingPlaylistItem?.playlistId } // todo need original playlists (not editingPlaylistItem)
                                 .mapNotNull { playlist ->
                                     playlistItemOrchestrator.save(
-                                        itemCreator.buildPlayListItem(savedMedia, playlist), Options(saveSource)
+                                        itemCreator.buildPlayListItem(savedMedia, playlist),
+                                        Options(saveSource)
                                     ).takeIf { saveSource == LOCAL && isNew }
-                                        ?.also { prefsWrapper.putLong(LAST_PLAYLIST_ADDED_TO, it.playlistId!!) }
+                                        ?.also {
+                                            prefsWrapper.putLong(
+                                                LAST_PLAYLIST_ADDED_TO,
+                                                it.playlistId!!
+                                            )
+                                        }
                                 }
                         }
                         ?: listOf()

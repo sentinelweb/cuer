@@ -68,6 +68,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         get() = binding.pleToolbar.menu.findItem(R.id.plie_play)
     private val launchMenuItem: MenuItem
         get() = binding.pleToolbar.menu.findItem(R.id.plie_launch)
+    private val shareMenuItem: MenuItem
+        get() = binding.pleToolbar.menu.findItem(R.id.plie_share)
 
     private var dialog: AppCompatDialog? = null
     private var dialogFragment: DialogFragment? = null
@@ -146,6 +148,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 }
                 R.id.plie_launch -> {
                     viewModel.onLaunchVideo()
+                    true
+                }
+                R.id.plie_share -> {
+                    viewModel.onShare()
                     true
                 }
                 else -> false
