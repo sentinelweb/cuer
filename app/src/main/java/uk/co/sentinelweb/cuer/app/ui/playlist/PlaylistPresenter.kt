@@ -25,7 +25,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLISTS
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
@@ -382,7 +383,12 @@ class PlaylistPresenter(
                 } else if (floatingService.isRunning()) {
                     floatingService.playItem(itemDomain)
                 } else if (!(ytCastContextHolder.isConnected())) {
-                    view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to itemDomain)))
+                    view.navigate(
+                        NavigationModel(
+                            LOCAL_PLAYER,
+                            mapOf(PLAYLIST_ITEM to itemDomain)
+                        )
+                    )
                 } else {
                     itemDomain.playlistId?.let {
                         playItem(itemModel.id, itemDomain, false)
@@ -403,7 +409,12 @@ class PlaylistPresenter(
                 } else if (floatingService.isRunning()) {
                     floatingService.playItem(itemDomain)
                 } else if (!ytCastContextHolder.isConnected()) {
-                    view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to itemDomain)))
+                    view.navigate(
+                        NavigationModel(
+                            LOCAL_PLAYER,
+                            mapOf(PLAYLIST_ITEM to itemDomain)
+                        )
+                    )
                 } else {
                     playItem(itemModel.id, itemDomain, true)
                 }
@@ -436,7 +447,7 @@ class PlaylistPresenter(
         state.playlist?.id?.also {
             view.navigate(
                 NavigationModel(
-                    PLAYLISTS_FRAGMENT, mapOf(PLAYLIST_ID to it)
+                    PLAYLISTS, mapOf(PLAYLIST_ID to it)
                 )
             )
         }
@@ -489,7 +500,7 @@ class PlaylistPresenter(
             ?.let {
                 view.navigate(
                     NavigationModel(
-                        PLAYLIST_FRAGMENT,
+                        NavigationModel.Target.PLAYLIST,
                         mapOf(PLAYLIST_ID to it, PLAY_NOW to false, SOURCE to LOCAL)
                     )
                 )
@@ -540,7 +551,12 @@ class PlaylistPresenter(
                     if (interactions != null) {
                         interactions?.onPlay(it)
                     } else {
-                        view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it)))
+                        view.navigate(
+                            NavigationModel(
+                                LOCAL_PLAYER,
+                                mapOf(PLAYLIST_ITEM to it)
+                            )
+                        )
                     }
                 }
             }

@@ -212,7 +212,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         (PLAYLIST_ID.getLong(arguments) to (SOURCE.getEnum(arguments) ?: Source.LOCAL)).apply {
-            viewModel.setData(first, second)
+            viewModel.setData(first?.takeIf { it > 0 }, second)
         }
     }
 

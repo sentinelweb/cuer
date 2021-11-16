@@ -175,5 +175,7 @@
     <string name="playlist_item_menu_goto_playlist">Goto playlist</string>
     <string name="menu_launch">Launch</string>
     <string name="title_select_picture">Select Picture</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_playlist_add">Create playlist</string>
 
 </resources>

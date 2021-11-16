@@ -9,9 +9,11 @@ class NavigationFragmentMapper constructor(
 ) {
     // todo args
     fun makeFragment(@IdRes itemId: Int): NavigationModel.Target = when (itemId) {
-        R.id.navigation_browse -> NavigationModel.Target.BROWSE_FRAGMENT
-        R.id.navigation_playlists -> NavigationModel.Target.PLAYLISTS_FRAGMENT
-        R.id.navigation_playlist -> NavigationModel.Target.PLAYLIST_FRAGMENT
-        else -> throw IllegalArgumentException("No model for ID :" + activity.resources.getResourceName(itemId))
+        R.id.navigation_browse -> NavigationModel.Target.BROWSE
+        R.id.navigation_playlists -> NavigationModel.Target.PLAYLISTS
+        R.id.navigation_playlist -> NavigationModel.Target.PLAYLIST
+        else -> throw IllegalArgumentException(
+            "No model for ID :" + activity.resources.getResourceName(itemId)
+        )
     }
 }

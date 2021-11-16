@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -56,6 +55,8 @@ class PlaylistsFragment :
 
     private val searchMenuItem: MenuItem
         get() = binding.playlistsToolbar.menu.findItem(R.id.playlists_search)
+    private val addMenuItem: MenuItem
+        get() = binding.playlistsToolbar.menu.findItem(R.id.playlists_add)
 
     private var snackbar: Snackbar? = null
     private var dialogFragment: DialogFragment? = null
@@ -100,6 +101,10 @@ class PlaylistsFragment :
         searchMenuItem.setOnMenuItemClickListener {
             val bottomSheetFragment = SearchBottomSheetFragment()
             bottomSheetFragment.show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
+            true
+        }
+        addMenuItem.setOnMenuItemClickListener {
+            presenter.onCreatePlaylist()
             true
         }
     }
@@ -249,6 +254,5 @@ class PlaylistsFragment :
     override fun onEdit(item: ItemContract.Model) {
         presenter.onEdit(item)
     }
-
     //endregion
 }

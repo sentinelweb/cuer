@@ -31,7 +31,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.CastState.*
@@ -263,12 +263,12 @@ class PlaylistFragment :
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         // todo clean up after im sure it works for all cases
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
-        (navigationProvider.checkForPendingNavigation(PLAYLIST_FRAGMENT)
+        (navigationProvider.checkForPendingNavigation(PLAYLIST)
             ?: let { makeNavFromArguments() })
             ?.apply {
                 log.d("onResume: apply nav args model = $this")
                 setPlaylistData()
-                navigationProvider.clearPendingNavigation(PLAYLIST_FRAGMENT)
+                navigationProvider.clearPendingNavigation(PLAYLIST)
             } ?: run {
             log.d("onResume: got no nav args")
             presenter.setPlaylistData()

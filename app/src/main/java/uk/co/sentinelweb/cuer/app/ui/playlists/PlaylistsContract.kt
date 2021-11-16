@@ -43,6 +43,7 @@ interface PlaylistsContract {
         fun onPause()
         fun onItemImageClicked(item: ItemContract.Model)
         fun onEdit(item: ItemContract.Model)
+        fun onCreatePlaylist()
     }
 
     interface View {

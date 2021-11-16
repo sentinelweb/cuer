@@ -23,12 +23,11 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
@@ -182,9 +181,10 @@ class MainActivity :
             ?.takeIf { target == null || it == target.name }
             ?.let {
                 return when (it) {
-                    PLAYLIST_FRAGMENT.name ->
+                    PLAYLIST.name ->
                         PlaylistContract.makeNav(
-                            PLAYLIST_ID.getLong(intent) ?: throw IllegalArgumentException("Playlist ID is required"),
+                            PLAYLIST_ID.getLong(intent)
+                                ?: throw IllegalArgumentException("Playlist ID is required"),
                             PLAYLIST_ITEM_ID.getLong(intent),
                             PLAY_NOW.getBoolean(intent),
                             SOURCE.getEnum<Source>(intent)

@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
@@ -216,6 +215,10 @@ class PlaylistsPresenter(
 
     override fun onEdit(item: ItemContract.Model) {
         view.navigate(PlaylistEditContract.makeNav(item.id, LOCAL))
+    }
+
+    override fun onCreatePlaylist() {
+        view.navigate(PlaylistEditContract.makeCreateNav(LOCAL))
     }
 
     override fun onMerge(item: ItemContract.Model) {

@@ -21,16 +21,17 @@ data class NavigationModel constructor(
         val requiredParams: List<Param> = listOf(),
         @Suppress("unused") val optionalParams: List<Param> = listOf()
     ) {
-        LOCAL_PLAYER_FULL(listOf(PLAYLIST_ITEM)),
-        LOCAL_PLAYER(listOf(PLAYLIST_ITEM)),
+        LOCAL_PLAYER_FULL(listOf(Param.PLAYLIST_ITEM)),
+        LOCAL_PLAYER(listOf(Param.PLAYLIST_ITEM)),
         WEB_LINK(listOf(LINK)),
         YOUTUBE_VIDEO(listOf(PLATFORM_ID)),
         YOUTUBE_CHANNEL(listOf(CHANNEL_ID)),
-        PLAYLIST_FRAGMENT(listOf(PLAYLIST_ID, SOURCE), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
-        PLAYLIST_ITEM_FRAGMENT(listOf(PLAYLIST_ITEM, SOURCE), listOf(FRAGMENT_NAV_EXTRAS)),
-        PLAYLISTS_FRAGMENT(listOf(), listOf(PLAYLIST_ID)),
-        PLAYLIST_EDIT_FRAGMENT(listOf(PLAYLIST_ID, SOURCE), listOf()),
-        BROWSE_FRAGMENT,
+        PLAYLIST(listOf(PLAYLIST_ID, SOURCE), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
+        PLAYLIST_ITEM(listOf(Param.PLAYLIST_ITEM, SOURCE), listOf(FRAGMENT_NAV_EXTRAS)),
+        PLAYLISTS(listOf(), listOf(PLAYLIST_ID)),
+        PLAYLIST_EDIT(listOf(PLAYLIST_ID, SOURCE), listOf()),
+        PLAYLIST_CREATE(listOf(SOURCE), listOf()),
+        BROWSE,
         NAV_BACK, // use navigation to go back
         NAV_FINISH, // use navigation to finish activity
         NAV_DONE, // nav after operation is finished

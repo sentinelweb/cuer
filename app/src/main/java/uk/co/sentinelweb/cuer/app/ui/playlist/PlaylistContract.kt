@@ -18,7 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
@@ -161,7 +161,7 @@ interface PlaylistContract {
                 addPlaylistParent?.also { put(NavigationModel.Param.PLAYLIST_PARENT, it) }
             }
             return NavigationModel(
-                PLAYLIST_FRAGMENT, params
+                PLAYLIST, params
             )
         }
 
