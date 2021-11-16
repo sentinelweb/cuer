@@ -165,24 +165,43 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onItemClicked(item: ItemContract.Model) {
+    override fun onItemClicked(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
         if (item is ItemContract.Model.ItemModel) {
-            view.navigate(PlaylistContract.makeNav(item.id, null, false, item.source))
+            view.navigate(
+                PlaylistContract.makeNav(
+                    item.id, null, false, item.source,
+                    imageUrl = item.thumbNailUrl
+                ), sourceView
+            )
         }
     }
 
-    override fun onItemImageClicked(item: ItemContract.Model) {
+    override fun onItemImageClicked(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
         findPlaylist(item)?.id?.apply {
             if (item is ItemContract.Model.ItemModel) {
-                view.navigate(PlaylistContract.makeNav(this, null, false, item.source))
+                view.navigate(
+                    PlaylistContract.makeNav(
+                        this, null, false, item.source,
+                        imageUrl = item.thumbNailUrl
+                    ), sourceView
+                )
             }
         }
     }
 
-    override fun onItemPlay(item: ItemContract.Model, external: Boolean) {
+    override fun onItemPlay(
+        item: ItemContract.Model,
+        external: Boolean,
+        sourceView: ItemContract.ItemView
+    ) {
         if (!external) {
             if (item is ItemContract.Model.ItemModel) {
-                view.navigate(PlaylistContract.makeNav(item.id, null, true, item.source))
+                view.navigate(
+                    PlaylistContract.makeNav(
+                        item.id, null, true, item.source,
+                        imageUrl = item.thumbNailUrl
+                    ), sourceView
+                )
             }
         } else {
             findPlaylist(item)
@@ -213,12 +232,18 @@ class PlaylistsPresenter(
             }
     }
 
-    override fun onEdit(item: ItemContract.Model) {
-        view.navigate(PlaylistEditContract.makeNav(item.id, LOCAL))
+    override fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+        view.navigate(
+            PlaylistEditContract.makeNav(
+                item.id,
+                LOCAL,
+                (item as ItemContract.Model.ItemModel).thumbNailUrl
+            ), sourceView
+        )
     }
 
     override fun onCreatePlaylist() {
-        view.navigate(PlaylistEditContract.makeCreateNav(LOCAL))
+        view.navigate(PlaylistEditContract.makeCreateNav(LOCAL), null)
     }
 
     override fun onMerge(item: ItemContract.Model) {

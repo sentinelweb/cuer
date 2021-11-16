@@ -4,11 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
@@ -20,7 +18,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistPresenter
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
@@ -84,29 +81,25 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun delayedSetData(item: PlaylistItemDomain, source: Source, parentId: Long?) {
-        viewModelScope.launch {
-            delay(400)
-            setData(item, source, parentId) // loads data after delay
-        }
-    }
-
     fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?) {
         item.let {
             state.editingPlaylistItem = it
             state.source = source
             state.parentPlaylistId = parentId ?: -1
-            it.media.let { setData(it, source) }
+            it.media.let { setData(it) }
         }
     }
 
-    private fun setData(media: MediaDomain?, source: Source) {
+    private fun setData(media: MediaDomain?) {
         viewModelScope.launch {
             state.isMediaChanged = media?.id == null
             media?.let { originalMedia ->
                 state.media = originalMedia
                 originalMedia.id?.let {
-                    playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it)), Options(state.source))
+                    playlistItemOrchestrator.loadList(
+                        MediaIdListFilter(listOf(it)),
+                        Options(state.source)
+                    )
                         .takeIf { it.size > 0 }
                         ?.also { if (isNew) state.editingPlaylistItem = it[0] }
                         ?.also {
@@ -114,7 +107,10 @@ class PlaylistItemEditViewModel constructor(
                                 .distinct()
                                 .filterNotNull()
                                 .also {
-                                    playlistOrchestrator.loadList(IdListFilter(it), Options(state.source))
+                                    playlistOrchestrator.loadList(
+                                        IdListFilter(it),
+                                        Options(state.source)
+                                    )
                                         .also { state.selectedPlaylists.addAll(it) }
                                 }
                         }

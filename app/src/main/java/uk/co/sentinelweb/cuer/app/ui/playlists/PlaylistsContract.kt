@@ -5,8 +5,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.context.GlobalContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -17,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -31,8 +34,13 @@ interface PlaylistsContract {
         fun setFocusMedia(mediaDomain: MediaDomain)
         fun onItemSwipeRight(item: ItemContract.Model)
         fun onItemSwipeLeft(item: ItemContract.Model)
-        fun onItemClicked(item: ItemContract.Model)
-        fun onItemPlay(item: ItemContract.Model, external: Boolean)
+        fun onItemClicked(item: ItemContract.Model, sourceView: ItemContract.ItemView)
+        fun onItemPlay(
+            item: ItemContract.Model,
+            external: Boolean,
+            sourceView: ItemContract.ItemView
+        )
+
         fun onItemStar(item: ItemContract.Model)
         fun onItemShare(item: ItemContract.Model)
         fun onMerge(item: ItemContract.Model)
@@ -41,8 +49,8 @@ interface PlaylistsContract {
         fun commitMove()
         fun onResume(parentId: Long?)
         fun onPause()
-        fun onItemImageClicked(item: ItemContract.Model)
-        fun onEdit(item: ItemContract.Model)
+        fun onItemImageClicked(item: ItemContract.Model, sourceView: ItemContract.ItemView)
+        fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView)
         fun onCreatePlaylist()
     }
 
@@ -54,8 +62,8 @@ interface PlaylistsContract {
         fun showMessage(msg: String)
         fun showError(msg: String)
         fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
-        fun navigate(nav: NavigationModel)
         fun repaint()
+        fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?)
     }
 
     data class State constructor(
@@ -76,6 +84,12 @@ interface PlaylistsContract {
     )
 
     companion object {
+        val PLAYLIST_TRANS_IMAGE by lazy {
+            GlobalContext.get().get<ResourceWrapper>().getString(R.string.playlist_trans_image)
+        }
+        val PLAYLIST_TRANS_TITLE by lazy {
+            GlobalContext.get().get<ResourceWrapper>().getString(R.string.playlist_trans_title)
+        }
 
         @JvmStatic
         val fragmentModule = module {

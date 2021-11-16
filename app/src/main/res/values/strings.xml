@@ -177,5 +177,6 @@
     <string name="title_select_picture">Select Picture</string>
     <string name="menu_search">Search</string>
     <string name="menu_playlist_add">Create playlist</string>
+    <string name="playlist_empty">No Items</string>
 
 </resources>

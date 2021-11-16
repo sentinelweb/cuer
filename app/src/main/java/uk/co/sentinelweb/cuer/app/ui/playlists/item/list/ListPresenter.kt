@@ -1,11 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item.list
 
-import android.view.ViewGroup
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Model.ListModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.tile.ItemTileView
 
 class ListPresenter(
     private val state: ItemContract.ListState,
@@ -14,14 +12,17 @@ class ListPresenter(
     private val interactions: ItemContract.Interactions
 ) : ItemContract.ListPresenter, ItemContract.External<ListModel> {
 
+    override var parentId: Long? = null
+
     override fun update(item: ListModel, current: OrchestratorContract.Identifier<*>?) {
         listView.clear()
         item.items.forEachIndexed { i, itemModel ->
             val itemPresenter = if (state.presenters.size <= i) {
                 itemFactory.createTileView(listView.parent)
                     .let { itemFactory.createPresenter(it, interactions) to it }
-                    .also { it.second.setPresenter(it.first as ItemContract.Presenter)}
+                    .also { it.second.setPresenter(it.first as ItemContract.Presenter) }
                     .also { state.presenters.add(it.first) }
+                    .also { it.first.parentId = item.id }
                     .first
             } else {
                 state.presenters[i]

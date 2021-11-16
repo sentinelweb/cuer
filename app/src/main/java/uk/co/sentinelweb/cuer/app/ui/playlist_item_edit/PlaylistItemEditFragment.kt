@@ -111,12 +111,16 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        //postponeEnterTransition()
         binding = PlaylistItemEditFragmentBinding.inflate(inflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+//        binding.pleScroll.doOnPreDraw {
+//            startPostponedEnterTransition()
+//        }
         binding.pleToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
@@ -186,12 +190,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 binding.pleTitlePos.isVisible = false
                 binding.pleTitleBg.isVisible = false
                 playMenuItem.isVisible = false
-
-                viewModel.delayedSetData(this, sourceArg, parentArg)
-            } else {
-                viewModel.setData(this, sourceArg, parentArg)
             }
+            viewModel.setData(this, sourceArg, parentArg)
         }
+
         observeUi()
         observeModel()
         observeNavigation()
@@ -262,10 +264,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                         //starMenuItem.isVisible = false
                         playMenuItem.isVisible = false
                     }
-                    Glide.with(requireContext())
-                        .load(model.imageUrl)
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .into(binding.pleImage)
+                    val imageUrl = model.imageUrl
+                    setImage(imageUrl)
 
                     binding.pleCollapsingToolbar.title = model.description.title
                     binding.pleToolbar.title = model.description.title
@@ -281,7 +281,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                     binding.pleDuration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
 
                     model.position?.let { ratio ->
-                        binding.pleTitlePos.layoutParams.width = (ratio * binding.pleTitleBg.width).toInt()
+                        binding.pleTitlePos.layoutParams.width =
+                            (ratio * binding.pleTitleBg.width).toInt()
                     } ?: binding.pleTitlePos.apply { isVisible = false }
                     val starIconResource =
                         if (model.starred) R.drawable.ic_button_starred_white
@@ -291,8 +292,16 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             })
     }
 
+    private fun setImage(imageUrl: String?) {
+        Glide.with(requireContext())
+            .load(imageUrl)
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(binding.pleImage)
+    }
+
     private fun observeNavigation() {
-        viewModel.getNavigationObservable().observe(this.viewLifecycleOwner,
+        viewModel.getNavigationObservable().observe(
+            this.viewLifecycleOwner,
             object : Observer<NavigationModel> {
                 override fun onChanged(nav: NavigationModel) {
                     when (nav.target) {

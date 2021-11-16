@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 
 class HeaderViewHolder(
-    private val headerView: HeaderView
+    private val headerView: ItemContract.HeaderView
 ) : RecyclerView.ViewHolder(headerView.root),
     ItemBaseContract.ItemTouchHelperViewHolder {
 

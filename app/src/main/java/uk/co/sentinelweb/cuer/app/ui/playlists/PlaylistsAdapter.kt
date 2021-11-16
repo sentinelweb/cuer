@@ -92,4 +92,21 @@ class PlaylistsAdapter constructor(
     }
 
     override fun getItemCount(): Int = _data.size
+
+//    fun getItemViewForId(playlistId: Long?, parentId: Long?): Any {
+//        recyclerView.children.forEach { childView ->
+//            when (childView.tag) {
+//                LIST -> if (parentId != null) {
+//
+//                }
+//                ROW ->
+//            }
+////            if (childView is ItemRowView) {
+////                if (childView.isViewForId(playlistId)) {
+////                    return@getItemViewForId childView
+////                }
+////            }
+//        }
+//        return null
+//    }
 }

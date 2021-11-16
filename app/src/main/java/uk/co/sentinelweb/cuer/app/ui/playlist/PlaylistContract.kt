@@ -150,6 +150,7 @@ interface PlaylistContract {
             play: Boolean,
             source: Source? = LOCAL,
             addPlaylistParent: Long? = null,
+            imageUrl: String? = null
         ): NavigationModel {
             val params = mutableMapOf(
                 PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
@@ -159,6 +160,8 @@ interface PlaylistContract {
                 plItemId?.also { put(NavigationModel.Param.PLAYLIST_ITEM_ID, it) }
             }.apply {
                 addPlaylistParent?.also { put(NavigationModel.Param.PLAYLIST_PARENT, it) }
+            }.apply {
+                imageUrl?.also { put(NavigationModel.Param.IMAGE_URL, it) }
             }
             return NavigationModel(
                 PLAYLIST, params

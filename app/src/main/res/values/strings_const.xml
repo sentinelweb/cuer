@@ -5,6 +5,8 @@
     <string name="cast_player_trans_title">castPlayerTitle</string>
     <string name="playlist_item_trans_image">playlistItemHeaderImage</string>
     <string name="playlist_item_trans_title">playlistItemHeaderTitle</string>
+    <string name="playlist_trans_image">playlistHeaderImage</string>
+    <string name="playlist_trans_title">playlistHeaderTitle</string>
 
     <!-- prefs -->
     <string name="prefs_root_remote_service_key">remote_service</string>

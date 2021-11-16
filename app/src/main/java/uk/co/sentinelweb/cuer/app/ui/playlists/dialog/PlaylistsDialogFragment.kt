@@ -12,7 +12,6 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistsDialogFragmentBinding
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsAdapter
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -98,8 +97,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
         binding.pdfPinSelectedButton.isVisible = model.showPin
         binding.pdfPinUnselectedButton.isVisible = model.showUnPin
     }
-
-//endregion
+    //endregion
 
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
@@ -112,7 +110,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemContract.Model) {
+    override fun onClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
         presenter.onItemClicked(item)
     }
 
@@ -124,7 +122,11 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     }
 
-    override fun onPlay(item: ItemContract.Model, external: Boolean) {
+    override fun onPlay(
+        item: ItemContract.Model,
+        external: Boolean,
+        sourceView: ItemContract.ItemView
+    ) {
 
     }
 
@@ -144,11 +146,11 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     }
 
-    override fun onImageClick(item: ItemContract.Model) {
+    override fun onImageClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
         presenter.onItemClicked(item)
     }
 
-    override fun onEdit(item: ItemContract.Model) {
+    override fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
 
     }
 

@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 
 data class NavigationModel constructor(
     val target: Target,
-    val params: Map<Param, Any> = mapOf(),
+    val params: Map<Param, Any?> = mapOf(),
     val navOpts: NavOptions? = null
 ) {
     init {
@@ -55,11 +55,14 @@ data class NavigationModel constructor(
         SOURCE, /* uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source */
         HEADLESS /*Boolean*/,
         PLAYLIST_PARENT, /* Long */
-        PASTE /* Boolean */
+        PASTE, /* Boolean */
+        IMAGE_URL, /*String*/
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)
-        fun getLong(i: Intent?) = i?.let { if (it.hasExtra(name)) it.getLongExtra(name, -1) else null }
+        fun getLong(i: Intent?) =
+            i?.let { if (it.hasExtra(name)) it.getLongExtra(name, -1) else null }
+
         fun getBoolean(b: Bundle?, def: Boolean = false) = b?.getBoolean(name, def) ?: def
         fun getBoolean(i: Intent?) = i?.getBooleanExtra(name, false) ?: false
         fun getString(b: Bundle?) = b?.getString(name)

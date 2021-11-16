@@ -12,6 +12,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
@@ -28,11 +29,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.*
-import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.ERROR
-import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
@@ -71,6 +70,14 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
     private var dialogFragment: DialogFragment? = null
 
+    private val playlistIdArg: Long? by lazy {
+        PLAYLIST_ID.getLong(arguments)?.takeIf { it > 0 }
+    }
+
+    private val imageUrlArg: String? by lazy {
+        IMAGE_URL.getString(arguments)
+    }
+
     interface Listener {
         fun onPlaylistCommit(domain: PlaylistDomain?)
     }
@@ -82,6 +89,10 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        playlistIdArg?.apply {
+            sharedElementEnterTransition =
+                TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        }
     }
 
     override fun onCreateView(
@@ -89,6 +100,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         parent: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        //postponeEnterTransition()
         _binding = PlaylistEditFragmentBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -96,6 +108,9 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+//        binding.peScroll.doOnPreDraw {
+//            startPostponedEnterTransition()
+//        }
         binding.peStarFab.setOnClickListener { viewModel.onStarClick() }
         binding.pePinFab.setOnClickListener { viewModel.onPinClick() }
         starMenuItem.isVisible = false
@@ -201,6 +216,11 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         observeDomain()
         observeDialog()
         observeNavigation()
+
+        imageUrlArg?.also { setImage(it) }
+        (playlistIdArg to (SOURCE.getEnum(arguments) ?: Source.LOCAL)).apply {
+            viewModel.setData(first, second)
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -211,9 +231,6 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     override fun onResume() {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-        (PLAYLIST_ID.getLong(arguments) to (SOURCE.getEnum(arguments) ?: Source.LOCAL)).apply {
-            viewModel.setData(first?.takeIf { it > 0 }, second)
-        }
     }
 
     override fun onStop() {
@@ -231,6 +248,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                     when (model.type) {
                         ERROR -> snackbarWrapper.makeError(model.data as String).show()
                         MESSAGE -> toastWrapper.show(model.data as String)
+                        IMAGE -> setImage(model.data as String?)
                     }
                 }
             })
@@ -260,12 +278,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                     binding.pePinFab.setImageResource(pinIconResource)
 
                     model.buttonText?.apply { binding.peCommitButton.text = this }
-                    model.imageUrl?.let {
-                        Glide.with(binding.peImage.context)
-                            .loadFirebaseOrOtherUrl(it, imageProvider)
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .into(binding.peImage)
-                    }
+                    model.imageUrl?.also { setImage(it) }
                     binding.peWatchAll.setText(model.watchAllText)
                     binding.peWatchAll.setIconResource(model.watchAllIIcon)
                     binding.peDefault.isChecked = model.default
@@ -304,6 +317,15 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                     }
                 }
             })
+    }
+
+    private fun setImage(url: String?) {
+        url?.let {
+            Glide.with(binding.peImage.context)
+                .loadFirebaseOrOtherUrl(it, imageProvider)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(binding.peImage)
+        }
     }
 
     private fun observeDialog() =

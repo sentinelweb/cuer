@@ -11,8 +11,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_CREATE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_EDIT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
@@ -52,17 +51,21 @@ interface PlaylistEditContract {
         var defaultInitial: Boolean = false,
         var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf(),
         var isLoaded: Boolean = false,
-        var isDialog: Boolean = false
+        var isDialog: Boolean = false,
+        var transitionFinished: Boolean = false
     ) {
+        fun isInitialized(): Boolean = this::playlistEdit.isInitialized
+
         lateinit var source: OrchestratorContract.Source
         lateinit var playlistEdit: PlaylistDomain
     }
 
     companion object {
-        fun makeNav(id: Long, source: OrchestratorContract.Source) = NavigationModel(
-            PLAYLIST_EDIT,
-            mapOf(PLAYLIST_ID to id, SOURCE to source)
-        )
+        fun makeNav(id: Long, source: OrchestratorContract.Source, thumbNailUrl: String?) =
+            NavigationModel(
+                PLAYLIST_EDIT,
+                mapOf(PLAYLIST_ID to id, SOURCE to source, IMAGE_URL to thumbNailUrl)
+            )
 
         fun makeCreateNav(source: OrchestratorContract.Source) = NavigationModel(
             PLAYLIST_CREATE,
