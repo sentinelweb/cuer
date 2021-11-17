@@ -12,10 +12,9 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
@@ -315,12 +314,23 @@ class PlaylistPresenter(
             ?.let { moveItem ->
                 state.viewModelScope.launch {
                     moveItem
-                        .copy(playlistId = playlist.id!!)
-                        .apply { state.movedPlaylistItem = this }
-                        .copy(order = timeProvider.currentTimeMillis())
-                        .apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
-                        .apply { view.showUndo("Moved to : ${playlist.title}", ::undoMoveItem) }
-                        .also { state.selectedPlaylistItem = null }
+                        .takeIf {
+                            playlistItemOrchestrator
+                                .loadList(
+                                    PlatformIdListFilter(listOf(it.media.platformId)),
+                                    LOCAL.flatOptions()
+                                )
+                                .filter { it.playlistId == playlist.id }.isEmpty()
+                        }
+                        ?.copy(playlistId = playlist.id!!)
+                        ?.apply { state.movedPlaylistItem = this }
+                        ?.copy(order = timeProvider.currentTimeMillis())
+                        ?.apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
+                        ?.apply { view.showUndo("Moved to : ${playlist.title}", ::undoMoveItem) }
+                        ?.also { state.selectedPlaylistItem = null }
+                        ?: apply {
+                            view.showError(res.getString(R.string.playlist_error_moveitem_already_exists))
+                        }
                 }
             }
     }

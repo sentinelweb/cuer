@@ -178,5 +178,6 @@
     <string name="menu_search">Search</string>
     <string name="menu_playlist_add">Create playlist</string>
     <string name="playlist_empty">No Items</string>
+    <string name="playlist_error_moveitem_already_exists">Item already exists on this playlist ...</string>
 
 </resources>

@@ -185,8 +185,16 @@ class RoomPlaylistItemDatabaseRepository constructor(
                             playlistItemDao.search(filter.text.toLowerCase(), playlistIds, 200)
                         }.map { playlistItemMapper.map(it) }
                     }
+                    is OrchestratorContract.PlatformIdListFilter ->
+                        playlistItemDao.loadByPlatformIds(filter.ids)
+                            .map { playlistItemMapper.map(it) }
                     else -> playlistItemDao.loadAllItems()
-                        .map { playlistItemMapper.map(it, roomMediaRepository.load(it.mediaId).data!!) }
+                        .map {
+                            playlistItemMapper.map(
+                                it,
+                                roomMediaRepository.load(it.mediaId).data!!
+                            )
+                        }
                 }.let { RepoResult.Data(it) }
             } catch (e: Throwable) {
                 val msg = "couldn't load playlist item list for: $filter"
