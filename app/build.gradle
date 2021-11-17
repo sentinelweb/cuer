@@ -218,6 +218,9 @@ dependencies {
     implementation "io.ktor:ktor-client-core:$ver_ktor"
     implementation "io.ktor:ktor-client-cio:$ver_ktor"
 
+    // splash screen
+    implementation "androidx.core:core-splashscreen:$ver_splash"
+
     debugImplementation ("androidx.fragment:fragment-testing:$ver_androidx_fragment_test"){// hack
         exclude group:"androidx.test"
     }

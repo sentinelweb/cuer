@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="build_primary">@color/primary</color>
+    <color name="build_primary_variant">@color/primary_variant</color>
+    <color name="build_secondary">@color/secondary</color>
+    <color name="build_secondary_variant">@color/secondary_variant</color>
+</resources>
