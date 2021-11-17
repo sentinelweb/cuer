@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.databinding.PlaylistItemEditFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -53,7 +54,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val res: ResourceWrapper by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
-    private val doneNavigation: PlaylistItemEditContract.DoneNavigation by inject()// from activity (see onAttach)
+    private val doneNavigation: DoneNavigation by inject()// from activity (see onAttach)
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val commitHost: CommitHost by inject()
@@ -115,8 +116,11 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        //postponeEnterTransition()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = PlaylistItemEditFragmentBinding.inflate(inflater)
         return binding.root
     }
@@ -314,7 +318,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             object : Observer<NavigationModel> {
                 override fun onChanged(nav: NavigationModel) {
                     when (nav.target) {
-                        NAV_DONE -> doneNavigation.navigateDone()//navigateDone()
+                        NAV_DONE -> doneNavigation.navigateDone()
                         else -> navMapper.navigate(nav)
                     }
                 }

@@ -23,13 +23,14 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
@@ -43,7 +44,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 class ShareActivity : AppCompatActivity(),
     ShareContract.View,
     ScanContract.Listener,
-    PlaylistItemEditContract.DoneNavigation,
+    DoneNavigation,
     CommitHost,
     AndroidScopeComponent {
 
@@ -85,7 +86,6 @@ class ShareActivity : AppCompatActivity(),
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
         }
-        // todo fix with https://github.com/sentinelweb/cuer/issues/158
         scanFragment?.listener = this
     }
 
@@ -136,7 +136,6 @@ class ShareActivity : AppCompatActivity(),
             (shareWrapper.getLinkFromIntent(intent)
                 ?: shareWrapper.getTextFromIntent(intent))?.apply {
                 if (!presenter.isAlreadyScanned(this)) {
-
                     scanFragment?.fromShareUrl(this)
                         ?: throw IllegalStateException("Scan fragment not visible")
                 }
@@ -230,7 +229,11 @@ class ShareActivity : AppCompatActivity(),
 
     // PlaylistItemEditContract.DoneNavigation
     override fun navigateDone() {
-        presenter.afterItemEditNavigation()
+        if (commitFragment is PlaylistItemEditFragment) {
+            presenter.afterItemEditNavigation()
+        } else {
+            navigate(NavigationModel(Target.NAV_FINISH))
+        }
     }
 
     override fun navigate(nav: NavigationModel) {

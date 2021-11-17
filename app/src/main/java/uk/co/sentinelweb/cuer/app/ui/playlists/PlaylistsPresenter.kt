@@ -86,7 +86,7 @@ class PlaylistsPresenter(
         coroutines.cancel()
     }
 
-    override fun onItemSwipeRight(item: ItemContract.Model) {
+    override fun performMove(item: ItemContract.Model) {
         findPlaylist(item)
             ?.takeIf { it.type != APP }
             ?.apply {
@@ -125,7 +125,7 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onItemSwipeLeft(item: ItemContract.Model) {
+    override fun performDelete(item: ItemContract.Model) {
         state.viewModelScope.launch {
             delay(400)
             findPlaylist(item)
@@ -169,7 +169,7 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onItemClicked(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun performOpen(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
         if (item is ItemContract.Model.ItemModel) {
             view.navigate(
                 PlaylistContract.makeNav(
@@ -193,7 +193,7 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onItemPlay(
+    override fun performPlay(
         item: ItemContract.Model,
         external: Boolean,
         sourceView: ItemContract.ItemView
@@ -215,7 +215,7 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onItemStar(item: ItemContract.Model) {
+    override fun performStar(item: ItemContract.Model) {
         state.viewModelScope.launch {
             findPlaylist(item)
                 ?.takeIf { it.id != null && it.id ?: 0 > 0 }
@@ -224,7 +224,7 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onItemShare(item: ItemContract.Model) {
+    override fun performShare(item: ItemContract.Model) {
         findPlaylist(item)
             ?.takeIf { it.id != null && it.id ?: 0 > 0 && it.type != APP }
             ?.let { itemDomain ->
@@ -236,7 +236,7 @@ class PlaylistsPresenter(
             }
     }
 
-    override fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun performEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
         view.navigate(
             PlaylistEditContract.makeNav(
                 item.id,
@@ -250,7 +250,7 @@ class PlaylistsPresenter(
         view.navigate(PlaylistEditContract.makeCreateNav(LOCAL), null)
     }
 
-    override fun onMerge(item: ItemContract.Model) {
+    override fun performMerge(item: ItemContract.Model) {
         findPlaylist(item)
             ?.takeIf { it.type != APP }
             ?.apply {

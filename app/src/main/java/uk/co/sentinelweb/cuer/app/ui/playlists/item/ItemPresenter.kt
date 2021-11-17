@@ -43,6 +43,10 @@ class ItemPresenter(
         interactions.onEdit(state.item!!, view)
     }
 
+    override fun doDelete() {
+        interactions.onDelete(state.item!!, view)
+    }
+
     override fun isStarred(): Boolean = state.item!!.starred
 
     override fun doMerge() {

@@ -72,6 +72,7 @@ class ItemRowView() :
                     R.id.playlists_context_star -> presenter.doStar()
                     R.id.playlists_context_share -> presenter.doShare()
                     R.id.playlists_context_merge -> presenter.doMerge()
+                    R.id.playlists_context_delete -> presenter.doDelete()
                 }
                 return true
             }

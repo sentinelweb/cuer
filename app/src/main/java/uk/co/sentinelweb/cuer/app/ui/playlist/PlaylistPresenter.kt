@@ -24,8 +24,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLISTS
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
@@ -338,6 +338,22 @@ class PlaylistPresenter(
                         view.showError(res.getString(R.string.playlist_error_moveitem_already_exists))
                     }
             }
+        }
+    }
+
+    override fun checkToSave() {
+        if (state.playlist?.id ?: 0 <= 0) {
+            view.showAlertDialog(modelMapper.mapSaveConfirmAlert(
+                {
+                    coroutines.mainScope.launch {
+                        commitPlaylist()
+                        view.navigate(NavigationModel(NAV_DONE))
+                    }
+                },
+                { view.navigate(NavigationModel(NAV_DONE)) }
+            ))
+        } else {
+            view.navigate(NavigationModel(NAV_DONE))
         }
     }
 
@@ -697,7 +713,7 @@ class PlaylistPresenter(
         }
     }
 
-    override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit) {
+    override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit?) {
         if (state.playlistIdentifier.source == MEMORY) {
             state.playlist
                 ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it, LOCAL) }
@@ -729,7 +745,7 @@ class PlaylistPresenter(
                 }
                 ?.also { state.playlist = it }
                 ?.also { updateView() }
-                ?.also { onCommit.onCommit(PLAYLIST, listOf(it)) }
+                ?.also { onCommit?.onCommit(PLAYLIST, listOf(it)) }
                 ?.also { prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!) }
         } else {
             throw IllegalStateException("Can't save non Memory playlist")
@@ -757,7 +773,7 @@ class PlaylistPresenter(
                 }
                 ?.also {
                     state.playlistsTree = playlistOrchestrator
-                        .loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
+                        .loadList(AllFilter(), LOCAL.flatOptions())
                         .buildTree()
                         .also {
                             state.playlistsTreeLookup = it.buildLookup()

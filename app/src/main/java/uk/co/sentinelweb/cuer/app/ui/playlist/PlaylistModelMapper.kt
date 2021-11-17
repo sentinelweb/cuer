@@ -9,8 +9,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.Format.SECS
+import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -131,11 +131,20 @@ class PlaylistModelMapper constructor(
         )
     }
 
-    fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel = AlertDialogModel(
-        R.string.playlist_change_dialog_title,
-        R.string.playlist_change_dialog_message,
-        AlertDialogModel.Button(R.string.ok, confirm),
-        AlertDialogModel.Button(R.string.dialog_button_view_info, info)
-    )
+    fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel =
+        AlertDialogModel(
+            R.string.playlist_change_dialog_title,
+            R.string.playlist_change_dialog_message,
+            AlertDialogModel.Button(R.string.ok, confirm),
+            AlertDialogModel.Button(R.string.dialog_button_view_info, info)
+        )
+
+    fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel =
+        AlertDialogModel(
+            R.string.dialog_title_save_check,
+            R.string.dialog_message_save_item_check,
+            AlertDialogModel.Button(R.string.dialog_button_save, confirm),
+            cancel = AlertDialogModel.Button(R.string.dialog_button_dont_save, cancel),
+        )
 
 }

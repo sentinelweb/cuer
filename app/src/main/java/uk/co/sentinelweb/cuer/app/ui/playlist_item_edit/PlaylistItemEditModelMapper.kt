@@ -59,7 +59,7 @@ class PlaylistItemEditModelMapper(
 
     fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel = AlertDialogModel(
         R.string.dialog_title_save_check,
-        R.string.dialog_message_save_check,
+        R.string.dialog_message_save_item_check,
         AlertDialogModel.Button(R.string.dialog_button_save, confirm),
         cancel = AlertDialogModel.Button(R.string.dialog_button_dont_save, cancel),
     )

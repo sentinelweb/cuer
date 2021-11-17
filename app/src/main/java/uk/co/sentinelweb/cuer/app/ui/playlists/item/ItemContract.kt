@@ -47,6 +47,7 @@ interface ItemContract {
         fun doMerge()
         fun doImageClick()
         fun doEdit()
+        fun doDelete()
         fun isStarred(): Boolean
     }
 
@@ -83,6 +84,7 @@ interface ItemContract {
         fun onMerge(item: Model)
         fun onImageClick(item: Model, sourceView: ItemView)
         fun onEdit(item: Model, sourceView: ItemView)
+        fun onDelete(item: Model, sourceView: ItemView)
     }
 
     data class State constructor(

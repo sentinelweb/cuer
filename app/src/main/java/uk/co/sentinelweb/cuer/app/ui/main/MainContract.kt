@@ -7,11 +7,11 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -72,7 +72,7 @@ interface MainContract {
                 scoped { YoutubeJavaApiWrapper(getSource()) }
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
-                scoped<PlaylistItemEditContract.DoneNavigation> { getSource() }
+                scoped<DoneNavigation> { getSource() }
                 scoped<PlaylistContract.Interactions?> { null }
                 scoped<CommitHost> { EmptyCommitHost() }
                 scoped { FloatingPlayerCastListener(getSource(), get(), get()) }

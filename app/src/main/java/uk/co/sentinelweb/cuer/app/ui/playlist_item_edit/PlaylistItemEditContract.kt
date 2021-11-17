@@ -20,10 +20,6 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface PlaylistItemEditContract {
 
-    interface DoneNavigation {
-        fun navigateDone()
-    }
-
     data class Model constructor(
         val description: DescriptionModel,
         val imageUrl: String?,
