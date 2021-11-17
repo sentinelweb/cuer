@@ -60,16 +60,17 @@ class ShareActivity : AppCompatActivity(),
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
     private var snackbar: Snackbar? = null
 
-    private val scanFragment: ScanContract.View? by lazy {
-        supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            ?.run { (getChildFragmentManager().getFragments().get(0) as? ScanContract.View?) }
-    }
+    private val scanFragment: ScanContract.View
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.run { (getChildFragmentManager().getFragments().get(0) as? ScanContract.View) }
+            ?: throw IllegalStateException("Not a scan fragment")
 
-    private val commitFragment: ShareContract.Committer? by lazy {
-        supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+
+    private val commitFragment: ShareContract.Committer
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.run { (getChildFragmentManager().getFragments().get(0) as? ShareContract.Committer?) }
             ?: throw IllegalStateException("Not a commit fragment")
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +87,7 @@ class ShareActivity : AppCompatActivity(),
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
         }
-        scanFragment?.listener = this
+        scanFragment.listener = this
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
@@ -100,7 +101,7 @@ class ShareActivity : AppCompatActivity(),
                 ?.text
                 ?.apply {
                     if (!presenter.isAlreadyScanned(this.toString())) {
-                        scanFragment?.fromShareUrl(this.toString())
+                        scanFragment.fromShareUrl(this.toString())
                             ?: throw IllegalStateException("Scan fragment not visible")
                     }
                 }
@@ -112,9 +113,9 @@ class ShareActivity : AppCompatActivity(),
     }
 
     // fixme: this was added as the intent was delivered via onNewIntent if the user use the home ation
-    // but the nave was in the previous state - so crash trying to get scan fragment
-    // probably onNewIntent isnt needed now
-    // but if finish causes problems here then play with getting the nav in the right state
+// but the nave was in the previous state - so crash trying to get scan fragment
+// probably onNewIntent isnt needed now
+// but if finish causes problems here then play with getting the nav in the right state
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         finish()
@@ -136,8 +137,7 @@ class ShareActivity : AppCompatActivity(),
             (shareWrapper.getLinkFromIntent(intent)
                 ?: shareWrapper.getTextFromIntent(intent))?.apply {
                 if (!presenter.isAlreadyScanned(this)) {
-                    scanFragment?.fromShareUrl(this)
-                        ?: throw IllegalStateException("Scan fragment not visible")
+                    scanFragment.fromShareUrl(this)
                 }
             } ?: presenter.linkError(getString(R.string.share_error_no_link))
         }
@@ -208,8 +208,7 @@ class ShareActivity : AppCompatActivity(),
     }
 
     override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) =
-        commitFragment?.commit(onCommit)
-            ?: throw IllegalStateException("Commit fragment not visible")
+        commitFragment.commit(onCommit)
 
     override fun error(msg: String) {
         snackbar?.dismiss()
