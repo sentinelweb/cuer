@@ -11,10 +11,16 @@ class ItemPresenter(
     val modelMapper: ItemModelMapper
 ) : ItemContract.Presenter, ItemContract.External<ItemModel> {
 
+    override var parentId: Long? = null
+
     override fun update(
         item: ItemModel,
         current: OrchestratorContract.Identifier<*>?
     ) {
+        view.setTransitionData(
+            "${item.id}_${view.type}_${parentId}_HEADER",
+            "${item.id}_${view.type}_${parentId}_IMAGE"
+        )
         view.setVisible(true)
         if (state.item == item) return
         view.setTopText(modelMapper.mapTopText(item, current?.id == item.id, view.type))
@@ -30,11 +36,11 @@ class ItemPresenter(
     }
 
     override fun doImageClick() {
-        interactions.onImageClick(state.item!!)
+        interactions.onImageClick(state.item!!, view)
     }
 
     override fun doEdit() {
-        interactions.onEdit(state.item!!)
+        interactions.onEdit(state.item!!, view)
     }
 
     override fun isStarred(): Boolean = state.item!!.starred
@@ -44,7 +50,7 @@ class ItemPresenter(
     }
 
     override fun doClick() {
-        interactions.onClick(state.item!!)
+        interactions.onClick(state.item!!, view)
     }
 
     override fun doLeft() {
@@ -62,7 +68,7 @@ class ItemPresenter(
     override fun canReorder(): Boolean = false
 
     override fun doPlay(external: Boolean) {
-        interactions.onPlay(state.item!!, external)
+        interactions.onPlay(state.item!!, external, view)
     }
 
     override fun doStar() {

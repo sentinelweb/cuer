@@ -36,6 +36,7 @@
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
                 android:background="@color/background"
+                android:transitionName="@string/playlist_trans_image"
                 tools:src="@drawable/im_test_nietzche"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7"
@@ -137,6 +138,7 @@
                 android:background="@android:color/transparent"
                 android:elevation="0dp"
                 app:layout_collapseMode="pin"
+                android:transitionName="@string/playlist_trans_title"
                 app:menu="@menu/playlist_actionbar"
                 />
 
@@ -169,7 +171,7 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:gravity="center"
-        android:text="No Items"
+        android:text="@string/playlist_empty"
         android:textAppearance="@style/TextAppearance.App.Headline3"
         android:textColor="@color/grey_500"
         android:visibility="gone"

@@ -11,6 +11,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_CREATE
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_EDIT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.validator.ValidatorModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -48,18 +51,25 @@ interface PlaylistEditContract {
         var defaultInitial: Boolean = false,
         var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf(),
         var isLoaded: Boolean = false,
-        var isDialog: Boolean = false
+        var isDialog: Boolean = false,
+        var transitionFinished: Boolean = false
     ) {
+        fun isInitialized(): Boolean = this::playlistEdit.isInitialized
+
         lateinit var source: OrchestratorContract.Source
         lateinit var playlistEdit: PlaylistDomain
     }
 
     companion object {
-        fun makeNav(id: Long, source: OrchestratorContract.Source) = NavigationModel(
-            NavigationModel.Target.PLAYLIST_EDIT_FRAGMENT, mapOf(
-                NavigationModel.Param.PLAYLIST_ID to id,
-                NavigationModel.Param.SOURCE to source
+        fun makeNav(id: Long, source: OrchestratorContract.Source, thumbNailUrl: String?) =
+            NavigationModel(
+                PLAYLIST_EDIT,
+                mapOf(PLAYLIST_ID to id, SOURCE to source, IMAGE_URL to thumbNailUrl)
             )
+
+        fun makeCreateNav(source: OrchestratorContract.Source) = NavigationModel(
+            PLAYLIST_CREATE,
+            mapOf(SOURCE to source)
         )
 
         @JvmStatic
@@ -81,8 +91,18 @@ interface PlaylistEditContract {
                 factory { PlaylistEditModelMapper(res = get(), validator = get()) }
                 scoped { ChipCreator((getSource() as Fragment).requireActivity(), get(), get()) }
                 factory { PlaylistValidator(get()) }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
-                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
+                scoped<SnackbarWrapper> {
+                    AndroidSnackbarWrapper(
+                        (getSource() as Fragment).requireActivity(),
+                        get()
+                    )
+                }
+                scoped {
+                    navigationMapper(
+                        true,
+                        getSource<Fragment>().requireActivity() as AppCompatActivity
+                    )
+                }
             }
         }
     }

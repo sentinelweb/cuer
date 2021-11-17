@@ -25,7 +25,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLISTS
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
@@ -382,7 +383,12 @@ class PlaylistPresenter(
                 } else if (floatingService.isRunning()) {
                     floatingService.playItem(itemDomain)
                 } else if (!(ytCastContextHolder.isConnected())) {
-                    view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to itemDomain)))
+                    view.navigate(
+                        NavigationModel(
+                            LOCAL_PLAYER,
+                            mapOf(PLAYLIST_ITEM to itemDomain)
+                        )
+                    )
                 } else {
                     itemDomain.playlistId?.let {
                         playItem(itemModel.id, itemDomain, false)
@@ -403,7 +409,12 @@ class PlaylistPresenter(
                 } else if (floatingService.isRunning()) {
                     floatingService.playItem(itemDomain)
                 } else if (!ytCastContextHolder.isConnected()) {
-                    view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to itemDomain)))
+                    view.navigate(
+                        NavigationModel(
+                            LOCAL_PLAYER,
+                            mapOf(PLAYLIST_ITEM to itemDomain)
+                        )
+                    )
                 } else {
                     playItem(itemModel.id, itemDomain, true)
                 }
@@ -436,7 +447,7 @@ class PlaylistPresenter(
         state.playlist?.id?.also {
             view.navigate(
                 NavigationModel(
-                    PLAYLISTS_FRAGMENT, mapOf(PLAYLIST_ID to it)
+                    PLAYLISTS, mapOf(PLAYLIST_ID to it)
                 )
             )
         }
@@ -478,9 +489,7 @@ class PlaylistPresenter(
 
     override fun onItemShare(itemModel: ItemContract.Model) {
         playlistItemDomain(itemModel)
-            ?.let { itemDomain ->
-                shareWrapper.share(itemDomain.media)
-            }
+            ?.let { itemDomain -> shareWrapper.share(itemDomain.media) }
     }
 
     override fun onItemGotoPlaylist(item: ItemContract.Model) {
@@ -489,7 +498,7 @@ class PlaylistPresenter(
             ?.let {
                 view.navigate(
                     NavigationModel(
-                        PLAYLIST_FRAGMENT,
+                        NavigationModel.Target.PLAYLIST,
                         mapOf(PLAYLIST_ID to it, PLAY_NOW to false, SOURCE to LOCAL)
                     )
                 )
@@ -540,7 +549,12 @@ class PlaylistPresenter(
                     if (interactions != null) {
                         interactions?.onPlay(it)
                     } else {
-                        view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it)))
+                        view.navigate(
+                            NavigationModel(
+                                LOCAL_PLAYER,
+                                mapOf(PLAYLIST_ITEM to it)
+                            )
+                        )
                     }
                 }
             }
@@ -607,18 +621,14 @@ class PlaylistPresenter(
 
     override fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean, source: Source) {
         coroutines.mainScope.launch {
+            val notLoaded = state.playlist == null
             plId
                 ?.takeIf { it != -1L }
                 ?.toIdentifier(source)
                 ?.apply {
                     state.playlistIdentifier = this
                 }
-                ?.apply { executeRefresh(scrollToCurrent = true) }
-                ?.apply {
-                    state.playlist
-                        ?.indexOfItemId(plItemId)
-                        ?.also { state.focusIndex = it }
-                }
+                ?.apply { executeRefresh(scrollToCurrent = notLoaded) }
                 ?.apply {
                     if (playNow) {
                         queue.playNow(state.playlistIdentifier, plItemId)
@@ -632,7 +642,7 @@ class PlaylistPresenter(
                         state.playlistIdentifier =
                             prefsWrapper.getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair())
                                 .toIdentifier()
-                        executeRefresh(scrollToCurrent = true)
+                        executeRefresh(scrollToCurrent = notLoaded)
                     } else {
                         dbInit.addListener({ b: Boolean ->
                             if (b) {
@@ -641,7 +651,6 @@ class PlaylistPresenter(
                             }
                         })
                     }
-
                 }
         }
     }

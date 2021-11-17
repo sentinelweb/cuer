@@ -4,8 +4,8 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
@@ -71,7 +71,7 @@ class CastPlayerPresenter(
 
     override fun removeListener(l: PlayerControls.Listener) {
         if (listener == l) {
-            listener = null;
+            listener = null
         }
     }
 
@@ -224,7 +224,12 @@ class CastPlayerPresenter(
 
     override fun onPlaylistClick() {// todo get source
         state.playlistItem?.playlistId?.let {
-            view.navigate(NavigationModel(PLAYLIST_FRAGMENT, mapOf(PLAYLIST_ID to it, PLAY_NOW to false, SOURCE to state.source)))
+            view.navigate(
+                NavigationModel(
+                    PLAYLIST,
+                    mapOf(PLAYLIST_ID to it, PLAY_NOW to false, SOURCE to state.source)
+                )
+            )
         }
     }
 
@@ -232,9 +237,9 @@ class CastPlayerPresenter(
         state.playlistItem?.let {
             view.navigate(
                 NavigationModel(
-                    PLAYLIST_ITEM_FRAGMENT,
+                    PLAYLIST_ITEM,
                     mapOf(
-                        PLAYLIST_ITEM to it,
+                        NavigationModel.Param.PLAYLIST_ITEM to it,
                         FRAGMENT_NAV_EXTRAS to view.makeItemTransitionExtras(),
                         SOURCE to state.source
                     )

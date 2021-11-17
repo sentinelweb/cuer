@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.TransitionInflater.from
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
@@ -31,7 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.CastState.*
@@ -125,6 +126,10 @@ class PlaylistFragment :
 
     private val menuState = MenuState()
 
+    private val imageUrlArg: String? by lazy {
+        IMAGE_URL.getString(arguments)
+    }
+
     init {
         log.tag(this)
     }
@@ -134,6 +139,7 @@ class PlaylistFragment :
         setHasOptionsMenu(true)
         sharedElementReturnTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        sharedElementEnterTransition = from(context).inflateTransition(android.R.transition.move)
     }
 
     override fun onCreateView(
@@ -141,6 +147,7 @@ class PlaylistFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        postponeEnterTransition()
         _binding = PlaylistFragmentBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -148,6 +155,9 @@ class PlaylistFragment :
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.playlistList.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
         binding.playlistToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
@@ -192,15 +202,13 @@ class PlaylistFragment :
         //playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
         binding.playlistFabPlay.setOnClickListener { presenter.onPlayPlaylist() }
         binding.playlistSwipe.setOnRefreshListener { presenter.refreshPlaylist() }
-        postponeEnterTransition()
-        binding.playlistList.doOnPreDraw {
-            startPostponedEnterTransition()
-        }
         if (isHeadless) {
             binding.playlistAppbar.isVisible = false
             binding.playlistFabPlay.isVisible = false
             binding.playlistFabPlaymode.isVisible = false
         }
+
+        imageUrlArg?.also { setImage(it) }
     }
 
     private fun updatePlayModeMenuItems() {
@@ -263,12 +271,12 @@ class PlaylistFragment :
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         // todo clean up after im sure it works for all cases
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
-        (navigationProvider.checkForPendingNavigation(PLAYLIST_FRAGMENT)
+        (navigationProvider.checkForPendingNavigation(PLAYLIST)
             ?: let { makeNavFromArguments() })
             ?.apply {
                 log.d("onResume: apply nav args model = $this")
                 setPlaylistData()
-                navigationProvider.clearPendingNavigation(PLAYLIST_FRAGMENT)
+                navigationProvider.clearPendingNavigation(PLAYLIST)
             } ?: run {
             log.d("onResume: got no nav args")
             presenter.setPlaylistData()
@@ -351,11 +359,7 @@ class PlaylistFragment :
     }
 
     override fun setHeaderModel(model: PlaylistContract.Model) {
-
-        Glide.with(requireContext())
-            .loadFirebaseOrOtherUrl(model.imageUrl, imageProvider)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .into(binding.playlistHeaderImage)
+        setImage(model.imageUrl)
         binding.playlistCollapsingToolbar.title = model.title
         binding.playlistFabPlay.setImageResource(model.playIcon)
         binding.playlistFabPlay.isVisible = model.canPlay
@@ -379,6 +383,13 @@ class PlaylistFragment :
         menuState.lastPlayModeIndex = model.loopModeIndex
         menuState.isPlayable = model.canPlay
         updatePlayModeMenuItems()
+    }
+
+    private fun setImage(url: String) {
+        Glide.with(requireContext())
+            .loadFirebaseOrOtherUrl(url, imageProvider)
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(binding.playlistHeaderImage)
     }
 
     override fun showUndo(msg: String, undoFunction: () -> Unit) {
@@ -427,7 +438,8 @@ class PlaylistFragment :
     override fun highlightPlayingItem(currentItemIndex: Int?) {
         adapter.highlightItem = currentItemIndex
         // todo map it properly
-        _binding?.playlistItems?.setText("${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}")
+        val text = "${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}"
+        _binding?.playlistItems?.setText(text)
     }
 
     override fun setSubTitle(subtitle: String) {
@@ -463,7 +475,11 @@ class PlaylistFragment :
     }
 
     override fun gotoEdit(id: Long, source: Source) {
-        PlaylistFragmentDirections.actionGotoEditPlaylist(id, source.toString())
+        PlaylistFragmentDirections.actionGotoEditPlaylist(
+            id,
+            source.toString(),
+            null
+        )// only in main_nav - weird errro
             .apply { findNavController().navigate(this) }
     }
 

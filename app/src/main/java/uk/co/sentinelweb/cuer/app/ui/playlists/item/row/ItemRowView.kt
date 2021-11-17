@@ -1,31 +1,30 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item.row
 
 import android.annotation.SuppressLint
+import android.content.Context.WINDOW_SERVICE
 import android.text.Spannable
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.FragmentNavigator
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistsItemRowBinding
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract.Companion.PLAYLIST_TRANS_IMAGE
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract.Companion.PLAYLIST_TRANS_TITLE
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.extension.view.fade
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import android.content.Context.WINDOW_SERVICE
-
-import android.view.WindowManager
-import com.bumptech.glide.request.RequestOptions
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 
 class ItemRowView() :
@@ -135,16 +134,28 @@ class ItemRowView() :
         Glide.with(_binding.listitemIcon.context)
             .applyDefaultRequestOptions(
                 RequestOptions()
-                .placeholder(R.drawable.ic_load_placeholder_drawable)
-                .error(R.drawable.ic_load_error_drawable)
+                    .placeholder(R.drawable.ic_load_placeholder_drawable)
+                    .error(R.drawable.ic_load_error_drawable)
             )
             .loadFirebaseOrOtherUrl(url, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(_binding.listitemIcon)
+
     }
 
     override fun showOverflow(showOverflow: Boolean) {
         _binding.listitemOverflowImg.isVisible = showOverflow
         _binding.listitemOverflowClick.isVisible = showOverflow
     }
+
+    override fun setTransitionData(s: String, s1: String) {
+        _binding.listitemTop.transitionName = s
+        _binding.listitemIcon.transitionName = s1
+    }
+
+    override fun makeTransitionExtras(): FragmentNavigator.Extras =
+        FragmentNavigatorExtras(
+            _binding.listitemTop to PLAYLIST_TRANS_TITLE,
+            _binding.listitemIcon to PLAYLIST_TRANS_IMAGE
+        )
 }

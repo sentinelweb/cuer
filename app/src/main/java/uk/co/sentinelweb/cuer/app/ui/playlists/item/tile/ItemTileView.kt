@@ -11,12 +11,15 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.FragmentNavigator
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistsItemTileBinding
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
@@ -94,6 +97,7 @@ class ItemTileView() :
 
     override fun setTopText(text: Spannable) {
         _binding.listitemTop.setText(text)
+
     }
 
     override fun setBottomText(text: Spannable) {
@@ -123,4 +127,16 @@ class ItemTileView() :
     override fun setDepth(depth: Int) {
 
     }
+
+    override fun setTransitionData(s: String, s1: String) {
+        _binding.listitemTop.transitionName = s
+        _binding.listitemIcon.transitionName = s1
+    }
+
+    override fun makeTransitionExtras(): FragmentNavigator.Extras =
+        FragmentNavigatorExtras(
+            _binding.listitemTop to PlaylistsContract.PLAYLIST_TRANS_TITLE,
+            _binding.listitemIcon to PlaylistsContract.PLAYLIST_TRANS_IMAGE
+        )
+
 }

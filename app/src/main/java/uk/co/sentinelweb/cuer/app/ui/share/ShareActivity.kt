@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import android.os.Bundle
@@ -28,7 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_FRAGMENT
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
@@ -153,7 +152,7 @@ class ShareActivity : AppCompatActivity(),
     override fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean) {
         startActivity( // todo map in NavigationMapper
             Intent(this, MainActivity::class.java).apply {
-                putExtra(Target.KEY, PLAYLIST_FRAGMENT.name)
+                putExtra(Target.KEY, PLAYLIST.name)
                 putExtra(PLAYLIST_ID.name, plId)
                 plItemId?.also { putExtra(PLAYLIST_ITEM_ID.name, it) }
                 putExtra(PLAY_NOW.name, play)

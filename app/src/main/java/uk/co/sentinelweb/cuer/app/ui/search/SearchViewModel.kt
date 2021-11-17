@@ -24,7 +24,6 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -33,6 +32,7 @@ import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
 import uk.co.sentinelweb.cuer.domain.ext.serialise
+import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 
 class SearchViewModel(
     private val state: SearchContract.State,
@@ -161,7 +161,7 @@ class SearchViewModel(
         }
 
         _navigateLiveData.value = NavigationModel(
-            NavigationModel.Target.PLAYLIST_FRAGMENT,
+            NavigationModel.Target.PLAYLIST,
             mapOf(
                 NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LOCAL_SEARCH_PLAYLIST else REMOTE_SEARCH_PLAYLIST,
                 NavigationModel.Param.PLAY_NOW to false,

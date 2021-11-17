@@ -19,5 +19,6 @@ enum class GeneralPreferences constructor(
     LAST_LOCAL_SEARCH("lastLocalSearch"),
     LAST_REMOTE_SEARCH("lastRemoteSearch"),
     LAST_SEARCH_TYPE("lastSearchType"),
-    PINNED_PLAYLIST("pinnedPlaylist")
+    PINNED_PLAYLIST("pinnedPlaylist"),
+    LAST_BOTTOM_TAB("lastBottomNavTab"),
 }

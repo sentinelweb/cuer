@@ -2,11 +2,13 @@ package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -17,10 +19,11 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.PlaylistsFragmentBinding
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
@@ -56,6 +59,8 @@ class PlaylistsFragment :
 
     private val searchMenuItem: MenuItem
         get() = binding.playlistsToolbar.menu.findItem(R.id.playlists_search)
+    private val addMenuItem: MenuItem
+        get() = binding.playlistsToolbar.menu.findItem(R.id.playlists_add)
 
     private var snackbar: Snackbar? = null
     private var dialogFragment: DialogFragment? = null
@@ -67,6 +72,8 @@ class PlaylistsFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        sharedElementReturnTransition =
+            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
     }
 
     override fun onCreateView(
@@ -92,6 +99,11 @@ class PlaylistsFragment :
         )
         itemTouchHelper.attachToRecyclerView(binding.playlistsList)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
+        binding.playlistsSwipe.isRefreshing = true
+        postponeEnterTransition()
+        binding.playlistsList.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -100,6 +112,10 @@ class PlaylistsFragment :
         searchMenuItem.setOnMenuItemClickListener {
             val bottomSheetFragment = SearchBottomSheetFragment()
             bottomSheetFragment.show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
+            true
+        }
+        addMenuItem.setOnMenuItemClickListener {
+            presenter.onCreatePlaylist()
             true
         }
     }
@@ -194,8 +210,30 @@ class PlaylistsFragment :
         dialogFragment?.show(childFragmentManager, "PlaylistsSelector")
     }
 
-    override fun navigate(nav: NavigationModel) {
-        navMapper.navigate(nav)
+    override fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?) {
+        when (nav.target) {
+            NavigationModel.Target.PLAYLIST ->
+                sourceView?.let { view ->
+                    PlaylistsFragmentDirections.actionGotoPlaylist(
+                        nav.params[PLAYLIST_ID] as Long,
+                        nav.params[PLAY_NOW] as Boolean,
+                        (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
+                        nav.params[IMAGE_URL] as String?,
+                    )
+                        .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
+                }
+            NavigationModel.Target.PLAYLIST_EDIT ->
+                sourceView?.let { view ->
+                    PlaylistsFragmentDirections.actionEditPlaylist(
+                        nav.params[PLAYLIST_ID] as Long,
+                        (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
+                        nav.params[IMAGE_URL] as String?,
+                    )
+                        .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
+                }
+            else -> navMapper.navigate(nav)
+        }
+
     }
     //endregion
 
@@ -213,8 +251,8 @@ class PlaylistsFragment :
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemContract.Model) {
-        presenter.onItemClicked(item)
+    override fun onClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+        presenter.onItemClicked(item, sourceView)
     }
 
     override fun onRightSwipe(item: ItemContract.Model) {
@@ -226,8 +264,12 @@ class PlaylistsFragment :
         presenter.onItemSwipeLeft(item) // delays for animation
     }
 
-    override fun onPlay(item: ItemContract.Model, external: Boolean) {
-        presenter.onItemPlay(item, external)
+    override fun onPlay(
+        item: ItemContract.Model,
+        external: Boolean,
+        sourceView: ItemContract.ItemView
+    ) {
+        presenter.onItemPlay(item, external, sourceView)
     }
 
     override fun onStar(item: ItemContract.Model) {
@@ -242,13 +284,12 @@ class PlaylistsFragment :
         presenter.onMerge(item)
     }
 
-    override fun onImageClick(item: ItemContract.Model) {
-        presenter.onItemImageClicked(item)
+    override fun onImageClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+        presenter.onItemImageClicked(item, sourceView)
     }
 
-    override fun onEdit(item: ItemContract.Model) {
-        presenter.onEdit(item)
+    override fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+        presenter.onEdit(item, sourceView)
     }
-
     //endregion
 }

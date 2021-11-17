@@ -43,7 +43,7 @@ class PlaylistEditViewModel constructor(
         val type: Type,
         val data: Any?
     ) {
-        enum class Type { MESSAGE, ERROR }
+        enum class Type { MESSAGE, ERROR, IMAGE }
     }
 
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
@@ -86,6 +86,19 @@ class PlaylistEditViewModel constructor(
             }
         }
     }
+
+    private fun update() {
+        val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlistEdit.id
+        _modelLiveData.value = mapper.mapModel(
+            domain = state.playlistEdit,
+            pinned = pinned,
+            parent = state.playlistParent,
+            showAllWatched = state.isAllWatched == true,
+            showDefault = !state.defaultInitial,
+            isDialog = state.isDialog
+        ).apply { state.model = this }
+    }
+
 
     fun onStarClick() {
         state.playlistEdit = state.playlistEdit.copy(starred = !state.playlistEdit.starred)
@@ -160,18 +173,6 @@ class PlaylistEditViewModel constructor(
                     }
             }
         }
-    }
-
-    private fun update() {
-        val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlistEdit.id
-        _modelLiveData.value = mapper.mapModel(
-            domain = state.playlistEdit,
-            pinned = pinned,
-            parent = state.playlistParent,
-            showAllWatched = state.isAllWatched == true,
-            showDefault = !state.defaultInitial,
-            isDialog = state.isDialog
-        ).apply { state.model = this }
     }
 
     fun onPinClick() {

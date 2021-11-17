@@ -14,6 +14,7 @@ import androidx.navigation.navOptions
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.Companion.KEY
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandActivity
@@ -65,7 +66,7 @@ class NavigationMapper constructor(
             YOUTUBE_VIDEO -> if (!ytJavaApi.launchVideo(nav.params[PLATFORM_ID] as String)) {
                 toastWrapper.show("can't launch channel")
             }
-            PLAYLIST_FRAGMENT -> navController?.navigate(
+            PLAYLIST -> navController?.navigate(
                 R.id.navigation_playlist,
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
@@ -79,7 +80,7 @@ class NavigationMapper constructor(
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
-            PLAYLISTS_FRAGMENT -> navController?.navigate(
+            PLAYLISTS -> navController?.navigate(
                 R.id.navigation_playlists,
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID]
@@ -88,7 +89,7 @@ class NavigationMapper constructor(
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
             // todo maybe remove these and use directions: if they are used from different places the back stack might be messed up
-            PLAYLIST_ITEM_FRAGMENT -> navController?.navigate(
+            NavigationModel.Target.PLAYLIST_ITEM -> navController?.navigate(
                 R.id.navigation_playlist_item_edit,
                 bundleOf(
                     PLAYLIST_ITEM.name to (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain).serialise(),
@@ -100,10 +101,21 @@ class NavigationMapper constructor(
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
-            PLAYLIST_EDIT_FRAGMENT -> navController?.navigate(
+            PLAYLIST_EDIT -> navController?.navigate(
                 R.id.navigation_playlist_edit,
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
+                    SOURCE.name to nav.params[SOURCE].toString()
+                ),
+                nav.navOpts ?: navOptions(optionsBuilder = {
+                    launchSingleTop = true
+                    popUpTo(R.id.navigation_playlists, { inclusive = false })
+                }),
+                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
+            )
+            PLAYLIST_CREATE -> navController?.navigate(
+                R.id.navigation_playlist_edit,
+                bundleOf(
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
                 nav.navOpts ?: navOptions(optionsBuilder = {
@@ -122,7 +134,7 @@ class NavigationMapper constructor(
             ?.takeIf { it == target.name }
             ?.also {
                 when (target) {
-                    PLAYLIST_FRAGMENT -> {
+                    PLAYLIST -> {
                         intent.removeExtra(KEY)
                         intent.removeExtra(PLAYLIST_ID.name)
                         intent.removeExtra(PLAYLIST_ITEM_ID.name)

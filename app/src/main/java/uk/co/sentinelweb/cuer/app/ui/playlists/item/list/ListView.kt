@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.FragmentNavigator
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistsItemListBinding
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.tile.ItemTileView
 
 class ListView : ItemContract.ListView {
 
@@ -24,7 +24,7 @@ class ListView : ItemContract.ListView {
     }
 
     override fun clear() {
-        (0 .. _binding.list.childCount - 1).forEach {
+        (0.._binding.list.childCount - 1).forEach {
             _binding.list.getChildAt(it).isVisible = false
         }
     }
@@ -32,4 +32,9 @@ class ListView : ItemContract.ListView {
     override fun setPresenter(listPresenter: ItemContract.ListPresenter) {
         presenter = listPresenter
     }
+
+    override fun makeTransitionExtras(): FragmentNavigator.Extras {
+        throw IllegalStateException("should not be called")
+    }
+
 }

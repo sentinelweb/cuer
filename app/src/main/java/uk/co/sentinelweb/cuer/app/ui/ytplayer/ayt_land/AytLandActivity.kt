@@ -10,6 +10,7 @@ import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
@@ -18,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.databinding.ActivityAytFullsreenBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
@@ -44,6 +46,7 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
+@ExperimentalCoroutinesApi
 class AytLandActivity : AppCompatActivity(),
     AndroidScopeComponent {
 
@@ -118,11 +121,11 @@ class AytLandActivity : AppCompatActivity(),
         binding.controls.controlsTrackNext.setOnClickListener { mviView.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
         binding.controls.controlsTrackLast.setOnClickListener { mviView.dispatch(TrackBackClicked);showHideUi.delayedHide() }
         binding.controls.controlsSeekBack.setOnClickListener {
-            mviView.dispatch(SkipBackClicked);
+            mviView.dispatch(SkipBackClicked)
             showHideUi.delayedHide()
         }
         binding.controls.controlsSeekForward.setOnClickListener {
-            mviView.dispatch(SkipFwdClicked);
+            mviView.dispatch(SkipFwdClicked)
             showHideUi.delayedHide()
         }
         binding.controls.controlsSeekBack.setOnLongClickListener { mviView.dispatch(SkipBackSelectClicked);true }
@@ -169,6 +172,7 @@ class AytLandActivity : AppCompatActivity(),
                         updatePlayingIcon(false)
                         binding.controls.controlsPlayFab.showProgress(false)
                     }
+                    else -> Unit
                 }
             })
             diff(get = Model::texts, set = { texts ->

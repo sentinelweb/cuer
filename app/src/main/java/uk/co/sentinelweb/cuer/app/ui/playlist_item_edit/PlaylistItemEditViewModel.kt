@@ -4,11 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
@@ -20,7 +18,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistPresenter
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
@@ -29,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerCont
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -52,6 +50,7 @@ class PlaylistItemEditViewModel constructor(
     private val mediaOrchestrator: MediaOrchestrator,
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val floatingService: FloatingPlayerServiceManager,
+    private val shareWrapper: ShareWrapper,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -84,29 +83,25 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun delayedSetData(item: PlaylistItemDomain, source: Source, parentId: Long?) {
-        viewModelScope.launch {
-            delay(400)
-            setData(item, source, parentId) // loads data after delay
-        }
-    }
-
     fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?) {
         item.let {
             state.editingPlaylistItem = it
             state.source = source
             state.parentPlaylistId = parentId ?: -1
-            it.media.let { setData(it, source) }
+            it.media.let { setData(it) }
         }
     }
 
-    private fun setData(media: MediaDomain?, source: Source) {
+    private fun setData(media: MediaDomain?) {
         viewModelScope.launch {
             state.isMediaChanged = media?.id == null
             media?.let { originalMedia ->
                 state.media = originalMedia
                 originalMedia.id?.let {
-                    playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it)), Options(state.source))
+                    playlistItemOrchestrator.loadList(
+                        MediaIdListFilter(listOf(it)),
+                        Options(state.source)
+                    )
                         .takeIf { it.size > 0 }
                         ?.also { if (isNew) state.editingPlaylistItem = it[0] }
                         ?.also {
@@ -114,7 +109,10 @@ class PlaylistItemEditViewModel constructor(
                                 .distinct()
                                 .filterNotNull()
                                 .also {
-                                    playlistOrchestrator.loadList(IdListFilter(it), Options(state.source))
+                                    playlistOrchestrator.loadList(
+                                        IdListFilter(it),
+                                        Options(state.source)
+                                    )
                                         .also { state.selectedPlaylists.addAll(it) }
                                 }
                         }
@@ -184,7 +182,9 @@ class PlaylistItemEditViewModel constructor(
                 } else if (!(ytContextHolder.isConnected())) {
                     _navigateLiveData.value = NavigationModel(
                         LOCAL_PLAYER, mapOf(
-                            NavigationModel.Param.PLAYLIST_ITEM to item))
+                            NavigationModel.Param.PLAYLIST_ITEM to item
+                        )
+                    )
                 } else {
                     item.playlistId?.let {
                         queue.playNow(it.toIdentifier(LOCAL), item.id) // todo store source
@@ -275,8 +275,10 @@ class PlaylistItemEditViewModel constructor(
                 {
                     state.media = state.media?.copy(
                         watched = state.editSettings.watched ?: originalMedia.watched,
-                        positon = state.editSettings.watched?.takeIf { it.not() }?.let { 0 } ?: originalMedia.positon,
-                        playFromStart = state.editSettings.playFromStart ?: originalMedia.playFromStart
+                        positon = state.editSettings.watched?.takeIf { it.not() }?.let { 0 }
+                            ?: originalMedia.positon,
+                        playFromStart = state.editSettings.playFromStart
+                            ?: originalMedia.playFromStart
                     )
                     state.isMediaChanged = true
                 }
@@ -298,14 +300,26 @@ class PlaylistItemEditViewModel constructor(
 
     override fun onChannelClick() {
         state.media?.channelData?.platformId?.let { channelId ->
-            _navigateLiveData.value = NavigationModel(YOUTUBE_CHANNEL, mapOf(NavigationModel.Param.CHANNEL_ID to channelId))
+            _navigateLiveData.value = NavigationModel(
+                YOUTUBE_CHANNEL,
+                mapOf(NavigationModel.Param.CHANNEL_ID to channelId)
+            )
         }
     }
 
     fun onLaunchVideo() {
         state.media?.platformId?.let { platformId ->
-            _navigateLiveData.value = NavigationModel(YOUTUBE_VIDEO, mapOf(NavigationModel.Param.PLATFORM_ID to platformId))
+            _navigateLiveData.value = NavigationModel(
+                YOUTUBE_VIDEO,
+                mapOf(NavigationModel.Param.PLATFORM_ID to platformId)
+            )
         }
+    }
+
+    fun onShare() {
+        state.media
+            ?.apply { shareWrapper.share(this) }
+            ?: toast.show("No item to share ...")
     }
 
     private fun update() {
@@ -336,7 +350,8 @@ class PlaylistItemEditViewModel constructor(
                         _navigateLiveData.value = NavigationModel(NAV_DONE)
                     }
                 } else {
-                    _uiLiveData.value = UiEvent(ERROR, "Please select a playlist (or delete the item)")
+                    _uiLiveData.value =
+                        UiEvent(ERROR, "Please select a playlist (or delete the item)")
                 }
             }
         } else {
@@ -375,9 +390,15 @@ class PlaylistItemEditViewModel constructor(
                                 .filter { it.id != state.editingPlaylistItem?.playlistId } // todo need original playlists (not editingPlaylistItem)
                                 .mapNotNull { playlist ->
                                     playlistItemOrchestrator.save(
-                                        itemCreator.buildPlayListItem(savedMedia, playlist), Options(saveSource)
+                                        itemCreator.buildPlayListItem(savedMedia, playlist),
+                                        Options(saveSource)
                                     ).takeIf { saveSource == LOCAL && isNew }
-                                        ?.also { prefsWrapper.putLong(LAST_PLAYLIST_ADDED_TO, it.playlistId!!) }
+                                        ?.also {
+                                            prefsWrapper.putLong(
+                                                LAST_PLAYLIST_ADDED_TO,
+                                                it.playlistId!!
+                                            )
+                                        }
                                 }
                         }
                         ?: listOf()
