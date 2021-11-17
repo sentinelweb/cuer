@@ -494,7 +494,7 @@ class PlaylistFragment :
             id,
             source.toString(),
             null
-        )// only in main_nav - weird errro
+        )
             .apply { findNavController().navigate(this) }
     }
 

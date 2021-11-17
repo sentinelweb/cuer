@@ -39,7 +39,8 @@ interface CastPlayerContract {
     interface View {
         val playerControls: PlayerContract.PlayerControls
         fun initMediaRouteButton()
-        fun setCurrentSecond(second: String)
+        fun setPosition(second: String)
+        fun setLiveTime(second: String)
         fun setDuration(duration: String)
         fun setPlaying()
         fun setPaused()
@@ -107,7 +108,7 @@ interface CastPlayerContract {
                         )
                     )
                 }
-                scoped { CastPlayerUiMapper(get(), get()) }
+                scoped { CastPlayerUiMapper(get(), get(), get()) }
                 viewModel { State() }
             }
         }

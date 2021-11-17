@@ -100,8 +100,12 @@ class CastPlayerFragment() :
         chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
     }
 
-    override fun setCurrentSecond(second: String) {
-        binding.castPlayerCurrentTime.text = second
+    override fun setPosition(second: String) {
+        binding.castPlayerPosition.text = second
+    }
+
+    override fun setLiveTime(second: String) {
+        binding.castPlayerLiveTime.text = second
     }
 
     override fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int) {

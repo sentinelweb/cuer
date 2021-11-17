@@ -13,7 +13,7 @@ package="uk.co.sentinelweb.cuer.app">
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
     android:supportsRtl="true"
-    android:theme="@style/AppSplash">
+    android:theme="@style/AppTheme">
 
     <meta-data
         android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
@@ -26,7 +26,8 @@ package="uk.co.sentinelweb.cuer.app">
         android:name="uk.co.sentinelweb.cuer.app.ui.main.MainActivity"
         android:label="@string/app_name"
         android:launchMode="singleInstance"
-        android:exported="true">
+        android:exported="true"
+        android:theme="@style/AppSplash">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
 

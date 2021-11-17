@@ -73,15 +73,15 @@ class CastPlayerMviFragment() :
         binding.castPlayerImage.setOnClickListener { _mviView.dispatch(Event.ItemClicked) }
         binding.castPlayerSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    // todo update time ui
-                }
+//                if (fromUser) {
+//                    // todo update time ui
+//                }
             }
 
             override fun onStartTrackingTouch(view: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 //presenter.onSeekFinished()
-                _mviView.dispatch(Event.SeekBarChanged(seekBar.progress / seekBar.max.toFloat()));
+                _mviView.dispatch(Event.SeekBarChanged(seekBar.progress / seekBar.max.toFloat()))
             }
         })
     }
@@ -104,8 +104,12 @@ class CastPlayerMviFragment() :
         chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
     }
 
-    fun setCurrentSecond(second: String) {
-        binding.castPlayerCurrentTime.text = second
+    fun setPosition(second: String) {
+        binding.castPlayerPosition.text = second
+    }
+
+    fun setLiveTime(second: String) {
+        binding.castPlayerLiveTime.text = second
     }
 
     fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int) {
@@ -200,6 +204,7 @@ class CastPlayerMviFragment() :
                     PlayerStateDomain.BUFFERING -> showBuffering()
                     PlayerStateDomain.PLAYING -> setPlaying()
                     PlayerStateDomain.PAUSED -> setPaused()
+                    else -> Unit
                 }
             })
             diff(get = Model::itemImage, set = { url ->
@@ -214,7 +219,8 @@ class CastPlayerMviFragment() :
             })
             diff(get = Model::times, set = { times ->
                 updateSeekPosition(times.seekBarFraction)
-                setCurrentSecond(times.positionText)
+                setPosition(times.positionText)
+                setLiveTime(times.liveTime)
                 if (times.isLive) {
                     setDurationColors(R.color.white, R.color.live_background)
                     setDuration(res.getString(R.string.live))
