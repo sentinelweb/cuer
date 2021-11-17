@@ -96,7 +96,11 @@ class PlaylistsPresenter(
                             PlaylistsDialogContract.Config(
                                 selectedPlaylists = setOf(),
                                 multi = true,
-                                itemClick = { p, _ -> p?.apply { setParent(this, movePlaylist) } },
+                                itemClick = { playlistSelected, _ ->
+                                    playlistSelected
+                                        ?.apply { setParent(this, movePlaylist) }
+                                        ?: onCreatePlaylist()
+                                },
                                 confirm = { },
                                 dismiss = { view.repaint() },
                                 suggestionsMedia = null,

@@ -310,29 +310,35 @@ class PlaylistPresenter(
     }
 
     private fun moveItemToPlaylist(playlist: PlaylistDomain) {
-        state.selectedPlaylistItem
-            ?.let { moveItem ->
-                state.viewModelScope.launch {
-                    moveItem
-                        .takeIf {
-                            playlistItemOrchestrator
-                                .loadList(
-                                    PlatformIdListFilter(listOf(it.media.platformId)),
-                                    LOCAL.flatOptions()
-                                )
-                                .filter { it.playlistId == playlist.id }.isEmpty()
-                        }
-                        ?.copy(playlistId = playlist.id!!)
-                        ?.apply { state.movedPlaylistItem = this }
-                        ?.copy(order = timeProvider.currentTimeMillis())
-                        ?.apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
-                        ?.apply { view.showUndo("Moved to : ${playlist.title}", ::undoMoveItem) }
-                        ?.also { state.selectedPlaylistItem = null }
-                        ?: apply {
-                            view.showError(res.getString(R.string.playlist_error_moveitem_already_exists))
-                        }
-                }
+        state.selectedPlaylistItem?.let { moveItem ->
+            state.viewModelScope.launch {
+                moveItem
+                    .takeIf {
+                        playlistItemOrchestrator
+                            .loadList(
+                                PlatformIdListFilter(listOf(it.media.platformId)),
+                                LOCAL.flatOptions()
+                            )
+                            .filter { it.playlistId == playlist.id }.isEmpty()
+                    }
+                    ?.copy(playlistId = playlist.id!!)
+                    ?.apply { state.movedPlaylistItem = this }
+                    ?.copy(order = timeProvider.currentTimeMillis())
+                    ?.apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
+                    ?.apply {
+                        view.showUndo(
+                            res.getString(
+                                R.string.playlist_item_moved_undo_message,
+                                playlist.title
+                            ), ::undoMoveItem
+                        )
+                    }
+                    ?.also { state.selectedPlaylistItem = null }
+                    ?: apply {
+                        view.showError(res.getString(R.string.playlist_error_moveitem_already_exists))
+                    }
             }
+        }
     }
 
     override fun undoMoveItem() {

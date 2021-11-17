@@ -73,6 +73,8 @@
     <string name="playlist_item_menu_related">Related</string>
     <string name="playlist_msg_deleted">This playlist was deleted</string>
     <string name="playlist_play_items_from_start">Play items from start</string>
+    <string name="playlist_error_moveitem_already_exists">Item already exists on this playlist …</string>
+    <string name="playlist_item_moved_undo_message">Moved to %1$s</string>
 
     <!-- playlist edit fragemnt -->
     <string name="pe_fragment_title">Edit playlist</string>
@@ -178,6 +180,5 @@
     <string name="menu_search">Search</string>
     <string name="menu_playlist_add">Create playlist</string>
     <string name="playlist_empty">No Items</string>
-    <string name="playlist_error_moveitem_already_exists">Item already exists on this playlist ...</string>
 
 </resources>
