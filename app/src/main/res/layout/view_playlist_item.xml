@@ -42,11 +42,10 @@
             android:id="@+id/listitem_play_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:padding="4dp"
             android:src="@drawable/ic_play_black"
             app:layout_constraintBottom_toBottomOf="@+id/listitem_icon"
             app:layout_constraintLeft_toLeftOf="@+id/listitem_icon"
-            app:layout_constraintRight_toRightOf="@+id/listitem_icon"
-            app:layout_constraintTop_toTopOf="@+id/listitem_icon"
             app:tint="@color/white"
             android:contentDescription="@null" />
 
