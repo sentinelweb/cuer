@@ -162,6 +162,7 @@ class YouTubePlayerListener(
     override fun onError(youTubePlayer: YouTubePlayer, error: PlayerError) {
         this.youTubePlayer = youTubePlayer
         playerUi?.error(error.toString()) // todo map errors
+
     }
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")

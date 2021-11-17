@@ -47,6 +47,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType
+import kotlin.time.ExperimentalTime
 import android.R as RA
 
 /**
@@ -56,6 +57,7 @@ import android.R as RA
  *
  * Other players exist which are used here - this is just one option for playback
  */
+@ExperimentalTime
 class YoutubeFullScreenActivity : YouTubeBaseActivity(),
     YouTubePlayer.OnInitializedListener,
     AndroidScopeComponent {
