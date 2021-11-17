@@ -154,6 +154,10 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     }
 
+    override fun onDelete(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+
+    }
+
     //endregion
 
     companion object {

@@ -20,7 +20,7 @@
         android:layout_marginBottom="4dp"
         android:background="?colorDelete"
         android:text="@string/pl_item_delete"
-        app:drawableRightCompat="@drawable/ic_item_delete_white"
+        app:drawableRightCompat="@drawable/ic_delete_white"
         tools:ignore="RtlHardcoded,RtlSymmetry" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -47,7 +47,8 @@
             app:layout_constraintLeft_toLeftOf="@+id/listitem_icon"
             app:layout_constraintRight_toRightOf="@+id/listitem_icon"
             app:layout_constraintTop_toTopOf="@+id/listitem_icon"
-            app:tint="@color/white" />
+            app:tint="@color/white"
+            android:contentDescription="@null" />
 
         <TextView
             android:id="@+id/listitem_duration"

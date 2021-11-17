@@ -51,6 +51,7 @@ class ScanFragmentTest : FragmentScenarioProvider<ScanFragment> {
                 }
             })
         }
+        sharedTest.setup()
     }
 
     @After

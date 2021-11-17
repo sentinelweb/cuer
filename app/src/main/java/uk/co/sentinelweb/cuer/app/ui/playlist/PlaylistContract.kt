@@ -64,10 +64,11 @@ interface PlaylistContract {
         fun onShowChildren(): Boolean
         fun onResume()
         fun onPause()
-        suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit)
+        suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit? = null)
         fun reloadHeader()
         fun undoMoveItem()
         fun setAddPlaylistParent(id: Long)
+        fun checkToSave()
     }
 
     interface Interactions {

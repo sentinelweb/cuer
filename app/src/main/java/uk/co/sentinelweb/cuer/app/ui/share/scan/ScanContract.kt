@@ -2,11 +2,13 @@ package uk.co.sentinelweb.cuer.app.ui.share.scan
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
+import kotlinx.serialization.Serializable
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
@@ -34,12 +36,13 @@ interface ScanContract {
     ) : ViewModel()
 
 
+    @Serializable
     data class Result constructor(
         val url: String,
         val isNew: Boolean,
         val isOnPlaylist: Boolean,
         val type: ObjectTypeDomain,
-        val result: Any
+        val result: Domain
     )
 
     data class Model constructor(

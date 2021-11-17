@@ -23,13 +23,14 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
@@ -43,7 +44,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 class ShareActivity : AppCompatActivity(),
     ShareContract.View,
     ScanContract.Listener,
-    PlaylistItemEditContract.DoneNavigation,
+    DoneNavigation,
     CommitHost,
     AndroidScopeComponent {
 
@@ -59,30 +60,34 @@ class ShareActivity : AppCompatActivity(),
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
     private var snackbar: Snackbar? = null
 
-    private val scanFragment: ScanContract.View? by lazy {
-        supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            ?.run { (getChildFragmentManager().getFragments().get(0) as? ScanContract.View?) }
-    }
+    private val scanFragment: ScanContract.View
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.run { (getChildFragmentManager().getFragments().get(0) as? ScanContract.View) }
+            ?: throw IllegalStateException("Not a scan fragment")
 
-    private val commitFragment: ShareContract.Committer? by lazy {
-        supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+
+    private val commitFragment: ShareContract.Committer
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.run { (getChildFragmentManager().getFragments().get(0) as? ShareContract.Committer?) }
             ?: throw IllegalStateException("Not a commit fragment")
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        savedInstanceState
+            ?.getString(STATE_KEY)
+            ?.apply { presenter.restoreState(this) }
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         setContentView(R.layout.activity_share)
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         edgeToEdgeWrapper.doOnApplyWindowInsets(share_root) { view, insets, padding ->
             view.updatePadding(
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
         }
-        // todo fix with https://github.com/sentinelweb/cuer/issues/158
-        scanFragment?.listener = this
+        scanFragment.listener = this
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
@@ -96,7 +101,8 @@ class ShareActivity : AppCompatActivity(),
                 ?.text
                 ?.apply {
                     if (!presenter.isAlreadyScanned(this.toString())) {
-                        scanFragment?.fromShareUrl(this.toString()) ?: throw IllegalStateException("Scan fragment not visible")
+                        scanFragment.fromShareUrl(this.toString())
+                            ?: throw IllegalStateException("Scan fragment not visible")
                     }
                 }
                 ?: presenter.linkError(
@@ -107,9 +113,9 @@ class ShareActivity : AppCompatActivity(),
     }
 
     // fixme: this was added as the intent was delivered via onNewIntent if the user use the home ation
-    // but the nave was in the previous state - so crash trying to get scan fragment
-    // probably onNewIntent isnt needed now
-    // but if finish causes problems here then play with getting the nav in the right state
+// but the nave was in the previous state - so crash trying to get scan fragment
+// probably onNewIntent isnt needed now
+// but if finish causes problems here then play with getting the nav in the right state
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         finish()
@@ -131,8 +137,7 @@ class ShareActivity : AppCompatActivity(),
             (shareWrapper.getLinkFromIntent(intent)
                 ?: shareWrapper.getTextFromIntent(intent))?.apply {
                 if (!presenter.isAlreadyScanned(this)) {
-                    scanFragment?.fromShareUrl(this)
-                        ?: throw IllegalStateException("Scan fragment not visible")
+                    scanFragment.fromShareUrl(this)
                 }
             } ?: presenter.linkError(getString(R.string.share_error_no_link))
         }
@@ -175,14 +180,26 @@ class ShareActivity : AppCompatActivity(),
         setEnabled(model.enabled)
     }
 
-    override fun showMedia(itemDomain: PlaylistItemDomain, source: Source, playlistParentId: Long?) {
-        ScanFragmentDirections.actionGotoPlaylistItem(itemDomain.serialise(), source.toString(), playlistParentId ?: -1)
+    override fun showMedia(
+        itemDomain: PlaylistItemDomain,
+        source: Source,
+        playlistParentId: Long?
+    ) {
+        ScanFragmentDirections.actionGotoPlaylistItem(
+            itemDomain.serialise(),
+            source.toString(),
+            playlistParentId ?: -1
+        )
             .apply { navController.navigate(this) }
         //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
     }
 
     override fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?) {
-        ScanFragmentDirections.actionGotoPlaylist(id.id, id.source.toString(), playlistParentId ?: -1)
+        ScanFragmentDirections.actionGotoPlaylist(
+            id.id,
+            id.source.toString(),
+            playlistParentId ?: -1
+        )
             .apply { navController.navigate(this) }
     }
 
@@ -191,7 +208,7 @@ class ShareActivity : AppCompatActivity(),
     }
 
     override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) =
-        commitFragment?.commit(onCommit) ?: throw IllegalStateException("Commit fragment not visible")
+        commitFragment.commit(onCommit)
 
     override fun error(msg: String) {
         snackbar?.dismiss()
@@ -211,7 +228,11 @@ class ShareActivity : AppCompatActivity(),
 
     // PlaylistItemEditContract.DoneNavigation
     override fun navigateDone() {
-        presenter.afterItemEditNavigation()
+        if (commitFragment is PlaylistItemEditFragment) {
+            presenter.afterItemEditNavigation()
+        } else {
+            navigate(NavigationModel(Target.NAV_FINISH))
+        }
     }
 
     override fun navigate(nav: NavigationModel) {
@@ -223,7 +244,13 @@ class ShareActivity : AppCompatActivity(),
         presenter.onReady(ready)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE_KEY, presenter.serializeState())
+    }
+
     companion object {
+        private const val STATE_KEY = "share_state"
 
         // todo add parent id if in playlist fragment (called form main atm)
         fun intent(c: Context, paste: Boolean = false, parentId: Long? = null) =

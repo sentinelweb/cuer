@@ -10,9 +10,10 @@ import org.hamcrest.CoreMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.verify
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.domain.Domain
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.tools.provider.FragmentScenarioProvider
 import uk.co.sentinelweb.cuer.tools.test.matchers.drawableMatches
-
 
 class ScanFragmentSharedTest constructor(
     val scenario: FragmentScenarioProvider<ScanFragment>,
@@ -20,7 +21,13 @@ class ScanFragmentSharedTest constructor(
 ) {
     private val fixture = JFixture()
 
+    fun setup() {
+        fixture.customise()
+            .lazyInstance(Domain::class.java, { fixture.create(MediaDomain::class.java) })
+    }
+
     fun fromShareUrl() {
+
         val fixtUrl = fixture.create(String::class.java)
 
         scenario.get().onFragment { it.fromShareUrl(fixtUrl) }

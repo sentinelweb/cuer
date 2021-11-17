@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.share
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
+import kotlinx.serialization.Serializable
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -9,11 +10,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.EmptyNavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -33,6 +30,8 @@ interface ShareContract {
         fun isAlreadyScanned(urlOrText: String): Boolean
         fun setPlaylistParent(longExtra: Long)
         fun onReady(ready: Boolean)
+        fun serializeState(): String?
+        fun restoreState(s: String)
     }
 
     interface View {
@@ -72,7 +71,9 @@ interface ShareContract {
         }
     }
 
+    @Serializable
     data class State(
+        @kotlinx.serialization.Transient
         var model: Model? = null,
         var parentPlaylistId: Long? = null,
         var scanResult: ScanContract.Result? = null,
@@ -120,7 +121,7 @@ interface ShareContract {
                         res = get()
                     )
                 }
-                scoped<PlaylistItemEditContract.DoneNavigation> { getSource() }
+                scoped<DoneNavigation> { getSource() }
                 scoped { navigationMapper(false, getSource()) }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<ShareStrings> { AndroidShareStrings(get()) }

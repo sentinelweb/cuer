@@ -71,7 +71,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private var dialogFragment: DialogFragment? = null
 
     private val playlistIdArg: Long? by lazy {
-        PLAYLIST_ID.getLong(arguments)?.takeIf { it > 0 }
+        PLAYLIST_ID.getLong(arguments)?.takeIf { it > 0 || it < -1 }
     }
 
     private val imageUrlArg: String? by lazy {

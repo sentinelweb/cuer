@@ -23,6 +23,7 @@
     <string name="menu_unstar">UnStar</string>
     <string name="menu_pin">Pin</string>
     <string name="menu_share">Share</string>
+    <string name="menu_delete">Delete</string>
     <string name="menu_paste">Paste &amp; add</string>
     <string name="menu_restart">Restart</string>
     <string name="menu_settings">Settings</string>
@@ -73,6 +74,8 @@
     <string name="playlist_item_menu_related">Related</string>
     <string name="playlist_msg_deleted">This playlist was deleted</string>
     <string name="playlist_play_items_from_start">Play items from start</string>
+    <string name="playlist_error_moveitem_already_exists">Item already exists on this playlist …</string>
+    <string name="playlist_item_moved_undo_message">Moved to %1$s</string>
 
     <!-- playlist edit fragemnt -->
     <string name="pe_fragment_title">Edit playlist</string>
@@ -137,7 +140,8 @@
     <string name="dialog_title_select_fwd_skip_time">Forward skip time</string>
     <string name="dialog_title_select_back_skip_time">Back skip time</string>
     <string name="dialog_title_save_check">Save check</string>
-    <string name="dialog_message_save_check">Do you want to save the item?</string>
+    <string name="dialog_message_save_item_check">Do you want to save the item?</string>
+    <string name="dialog_message_save_playlist_check">Do you want to save the item?</string>
     <string name="dialog_button_save">Save</string>
     <string name="dialog_button_dont_save">Don\'t save</string>
 

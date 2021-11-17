@@ -26,6 +26,7 @@ import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
 
 class SharePresenter constructor(
     private val view: ShareContract.View,
@@ -126,6 +127,21 @@ class SharePresenter constructor(
             }
             ?.let { url -> urlOrText.contains(url) }
             ?: false
+    }
+
+    override fun serializeState(): String =
+        domainJsonSerializer.encodeToString(ShareContract.State.serializer(), state)
+
+    override fun restoreState(s: String) {
+        domainJsonSerializer.decodeFromString(ShareContract.State.serializer(), s)
+            .apply {
+                state.parentPlaylistId = parentPlaylistId
+                state.ready = ready
+                state.scanResult = scanResult
+                state.model = state.scanResult
+                    ?.let { mapper.mapShareModel(state, ::finish) }
+                    ?: mapper.mapEmptyModel(::finish)
+            }
     }
 
     override fun afterItemEditNavigation() {

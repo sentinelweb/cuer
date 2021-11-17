@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Bundle
 import android.transition.TransitionInflater
 import android.view.*
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
@@ -28,10 +29,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
@@ -86,6 +90,7 @@ class PlaylistFragment :
     private val navMapper: NavigationMapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val commitHost: CommitHost by inject()
+    private val doneNavigation: DoneNavigation by inject()// from activity (see onAttach)
 
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
@@ -130,6 +135,12 @@ class PlaylistFragment :
         IMAGE_URL.getString(arguments)
     }
 
+    private val saveCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            presenter.checkToSave()
+        }
+    }
+
     init {
         log.tag(this)
     }
@@ -155,6 +166,7 @@ class PlaylistFragment :
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        saveCallback.isEnabled = (commitHost !is EmptyCommitHost)
         binding.playlistList.doOnPreDraw {
             startPostponedEnterTransition()
         }
@@ -207,7 +219,6 @@ class PlaylistFragment :
             binding.playlistFabPlay.isVisible = false
             binding.playlistFabPlaymode.isVisible = false
         }
-
         imageUrlArg?.also { setImage(it) }
     }
 
@@ -243,6 +254,7 @@ class PlaylistFragment :
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(this, saveCallback)
         linkScopeToActivity()
     }
 
@@ -345,7 +357,10 @@ class PlaylistFragment :
     }
 
     override fun navigate(nav: NavigationModel) {
-        navMapper.navigate(nav)
+        when (nav.target) {
+            NAV_DONE -> doneNavigation.navigateDone()
+            else -> navMapper.navigate(nav)
+        }
     }
 
     override fun hideRefresh() {

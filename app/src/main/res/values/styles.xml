@@ -282,17 +282,16 @@
     <!-- end ItemView =========================== -->
 
     <!-- ItemTile =========================== -->
-
     <style name="ItemTile" />
 
     <style name="ItemTile.Root" >
+        <item name="cardBackgroundColor">@color/surface</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
         <item name="android:layout_width">@dimen/playlist_tile_size</item>
         <item name="android:layout_height">@dimen/playlist_tile_size</item>
     </style>
 
     <style name="ItemTile.Container">
-        <item name="android:background">@drawable/ic_ripple_item_background</item>
         <item name="android:elevation">@dimen/list_item_elevation</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
@@ -301,7 +300,6 @@
     <style name="ItemTile.Thumb">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:background">@color/surface</item>
     </style>
 
     <style name="ItemTile.Title" parent="@style/TextAppearance.MaterialComponents.Body1">

@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.databinding.PlaylistItemEditFragmentBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -53,7 +54,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val res: ResourceWrapper by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
-    private val doneNavigation: PlaylistItemEditContract.DoneNavigation by inject()// from activity (see onAttach)
+    private val doneNavigation: DoneNavigation by inject()// from activity (see onAttach)
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val commitHost: CommitHost by inject()
@@ -102,18 +103,24 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         }
     }
 
-    // todo something gone wrong with transition - so check to move this to on start or something - check values send in intenet
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        savedInstanceState
+            ?.getString(STATE_KEY)
+            ?.apply { viewModel.restoreState(this) }
         log.d("onCreate id = ${itemArg?.id}")
         itemArg?.id?.apply {
-            sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+            sharedElementEnterTransition =
+                TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        //postponeEnterTransition()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = PlaylistItemEditFragmentBinding.inflate(inflater)
         return binding.root
     }
@@ -311,7 +318,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             object : Observer<NavigationModel> {
                 override fun onChanged(nav: NavigationModel) {
                     when (nav.target) {
-                        NAV_DONE -> doneNavigation.navigateDone()//navigateDone()
+                        NAV_DONE -> doneNavigation.navigateDone()
                         else -> navMapper.navigate(nav)
                     }
                 }
@@ -383,11 +390,22 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         viewModel.commitPlaylistItems(onCommit)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE_KEY, viewModel.serializeState())
+    }
+
     companion object {
+
+        private val STATE_KEY = "playlist_item_edit_state"
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
         private val SELECT_PLAYLIST_TAG = "pdf_dialog"
 
-        val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
-        val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
+        val TRANS_IMAGE by lazy {
+            get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image)
+        }
+        val TRANS_TITLE by lazy {
+            get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title)
+        }
     }
 }

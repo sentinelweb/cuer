@@ -32,25 +32,25 @@ interface PlaylistsContract {
     interface Presenter {
         fun refreshList()
         fun setFocusMedia(mediaDomain: MediaDomain)
-        fun onItemSwipeRight(item: ItemContract.Model)
-        fun onItemSwipeLeft(item: ItemContract.Model)
-        fun onItemClicked(item: ItemContract.Model, sourceView: ItemContract.ItemView)
-        fun onItemPlay(
+        fun performMove(item: ItemContract.Model)
+        fun performDelete(item: ItemContract.Model)
+        fun performOpen(item: ItemContract.Model, sourceView: ItemContract.ItemView)
+        fun performPlay(
             item: ItemContract.Model,
             external: Boolean,
             sourceView: ItemContract.ItemView
         )
 
-        fun onItemStar(item: ItemContract.Model)
-        fun onItemShare(item: ItemContract.Model)
-        fun onMerge(item: ItemContract.Model)
+        fun performStar(item: ItemContract.Model)
+        fun performShare(item: ItemContract.Model)
+        fun performMerge(item: ItemContract.Model)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun undoDelete()
         fun commitMove()
         fun onResume(parentId: Long?)
         fun onPause()
         fun onItemImageClicked(item: ItemContract.Model, sourceView: ItemContract.ItemView)
-        fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView)
+        fun performEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView)
         fun onCreatePlaylist()
     }
 

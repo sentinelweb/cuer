@@ -10,7 +10,7 @@
     <!--    <color name="secondary_dark">@color/dark_indigo</color>-->
     <color name="text_primary">@color/grey_50</color>
     <color name="text_secondary">@color/grey_300</color>
-    <color name="surface">@color/grey_900</color>
+    <color name="surface">#111111</color>
     <color name="background">@color/black</color>
     <color name="accent">@color/light_green_300</color><!-- links, etc -->
     <color name="control_control_normal">@color/grey_600</color>

@@ -252,16 +252,16 @@ class PlaylistsFragment :
 
     // region ItemContract.Interactions
     override fun onClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
-        presenter.onItemClicked(item, sourceView)
+        presenter.performOpen(item, sourceView)
     }
 
     override fun onRightSwipe(item: ItemContract.Model) {
-        presenter.onItemSwipeRight(item)
+        presenter.performMove(item)
     }
 
     override fun onLeftSwipe(item: ItemContract.Model) {
         adapter.notifyItemRemoved(adapter.data.indexOf(item))
-        presenter.onItemSwipeLeft(item) // delays for animation
+        presenter.performDelete(item) // delays for animation
     }
 
     override fun onPlay(
@@ -269,19 +269,19 @@ class PlaylistsFragment :
         external: Boolean,
         sourceView: ItemContract.ItemView
     ) {
-        presenter.onItemPlay(item, external, sourceView)
+        presenter.performPlay(item, external, sourceView)
     }
 
     override fun onStar(item: ItemContract.Model) {
-        presenter.onItemStar(item)
+        presenter.performStar(item)
     }
 
     override fun onShare(item: ItemContract.Model) {
-        presenter.onItemShare(item)
+        presenter.performShare(item)
     }
 
     override fun onMerge(item: ItemContract.Model) {
-        presenter.onMerge(item)
+        presenter.performMerge(item)
     }
 
     override fun onImageClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
@@ -289,7 +289,12 @@ class PlaylistsFragment :
     }
 
     override fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
-        presenter.onEdit(item, sourceView)
+        presenter.performEdit(item, sourceView)
+    }
+
+    override fun onDelete(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+        adapter.notifyItemRemoved(adapter.data.indexOf(item))
+        presenter.performDelete(item) // delays for animation
     }
     //endregion
 }

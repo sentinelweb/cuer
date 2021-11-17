@@ -19,6 +19,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.MainActivityBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -26,7 +27,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
-import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
@@ -43,7 +43,7 @@ class MainActivity :
     MainContract.View,
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     NavigationProvider,
-    PlaylistItemEditContract.DoneNavigation,
+    DoneNavigation,
     AndroidScopeComponent,
     MainContract.PlayerViewControl {
 
@@ -82,13 +82,14 @@ class MainActivity :
         navController = navHostFragment.navController
         binding.bottomNavView.setupWithNavController(navController)
         binding.bottomNavView.setOnNavigationItemSelectedListener {
-            val value = when (it.itemId) {
-                R.id.navigation_browse -> 0
-                R.id.navigation_playlists -> 1
-                R.id.navigation_playlist -> 2
-                else -> 0
-            }
-            prefs.putInt(LAST_BOTTOM_TAB, value)
+            prefs.putInt(
+                LAST_BOTTOM_TAB, when (it.itemId) {
+                    R.id.navigation_browse -> 0
+                    R.id.navigation_playlists -> 1
+                    R.id.navigation_playlist -> 2
+                    else -> 0
+                }
+            )
             navController.navigate(it.itemId)
             true
         }
