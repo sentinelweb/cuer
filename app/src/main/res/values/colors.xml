@@ -19,7 +19,6 @@
     <color name="info_text_overlay_background">@color/black_transparent_background</color>
     <color name="controls_overlay_background">#33000000</color>
 
-
     <color name="default_tint">@color/white</color>
     <color name="fab_button_icon_tint">@color/default_tint</color>
     <color name="button_fg_tint">@color/default_tint</color>
@@ -43,4 +42,10 @@
     <color name="transparent">#00000000</color>
     <color name="error_image_load_color">@color/grey_300</color>
     <color name="placeholder_image_load_color">@color/grey_100</color>
+
+    <color name="build_primary">@color/secondary</color>
+    <color name="build_primary_variant">@color/secondary_variant</color>
+    <color name="build_secondary">@color/primary</color>
+    <color name="build_secondary_variant">@color/primary_variant</color>
+
 </resources>
