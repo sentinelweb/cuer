@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import kotlin.time.ExperimentalTime
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
@@ -94,7 +95,7 @@ class CastPlayerPresenter(
     override fun onSeekChanged(ratio: Float) {
         if (state.durationMs > 0) {
             state.seekPositionMs = (ratio * state.durationMs).toLong()
-            view.setCurrentSecond(mapper.formatTime(state.seekPositionMs))
+            view.setPosition(mapper.formatTime(state.seekPositionMs))
         }
     }
 
@@ -134,19 +135,24 @@ class CastPlayerPresenter(
         view.setState(playState)
     }
 
+    @ExperimentalTime
     override fun setCurrentSecond(second: Float) {
         state.positionMs = (second * 1000).toLong()
         skipControl.updatePosition(state.positionMs)
         if (state.durationMs > 0) {
             if (!state.isLiveStream) {
-                view.setCurrentSecond(mapper.formatTime(state.positionMs))
+                view.setPosition(mapper.formatTime(state.positionMs))
                 view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
+                view.setLiveTime("")
             } else {
                 listener
                     ?.getLiveOffsetMs()
+                    ?.apply { view.setLiveTime(mapper.formatLiveTime(this)) }
                     ?.takeIf { it > 9 * 1000 }
-                    ?.apply { view.setCurrentSecond("-" + mapper.formatTime(this)) }
-                    ?: view.setCurrentSecond("")
+                    ?.apply { view.setPosition("-" + mapper.formatTime(this)) }
+                    ?: run {
+                        view.setPosition("")
+                    }
             }
         }
     }
@@ -171,7 +177,7 @@ class CastPlayerPresenter(
     override fun reset() {
         if (!state.isDestroyed) {
             state.title = "No media".apply { view.setTitle(this) }
-            state.positionMs = 0L.apply { view.setCurrentSecond("") }
+            state.positionMs = 0L.apply { view.setPosition("") }
             state.durationMs = 0L.apply { view.setDuration("") }
             view.clearImage()
             view.setPaused()
@@ -190,7 +196,10 @@ class CastPlayerPresenter(
         view.setPlaylistName(name)
     }
 
-    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?, source: OrchestratorContract.Source) {
+    override fun setPlaylistItem(
+        playlistItem: PlaylistItemDomain?,
+        source: OrchestratorContract.Source
+    ) {
         state.source = source
         state.playlistItem = playlistItem?.apply {
             media.thumbNail?.url?.apply { view.setImage(this) }
@@ -200,7 +209,7 @@ class CastPlayerPresenter(
             state.isLiveStream = media.isLiveBroadcast
             state.isUpcoming = media.isLiveBroadcastUpcoming
             if (state.isLiveStream) {
-                view.setCurrentSecond("-")
+                view.setPosition("-")
                 if (state.isUpcoming) {
                     view.setDuration(res.getString(R.string.upcoming))
                     view.setDurationColors(R.color.white, R.color.upcoming_background)

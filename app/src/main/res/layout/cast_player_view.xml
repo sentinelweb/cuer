@@ -140,15 +140,26 @@
                 />
 
             <TextView
-                android:id="@+id/cast_player_current_time"
+                android:id="@+id/cast_player_position"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
+                android:minWidth="56dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cast_player_center"
                 tools:ignore="RtlHardcoded"
-                tools:text="11:22:33"
-                />
+                tools:text="11:22:33" />
+
+            <TextView
+                android:id="@+id/cast_player_live_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cast_player_position"
+                tools:ignore="RtlHardcoded"
+                tools:text="11:22:33" />
 
             <TextView
                 android:id="@+id/cast_player_current_state"
@@ -171,7 +182,7 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:singleLine="true"
-                app:layout_constraintLeft_toRightOf="@+id/cast_player_current_time"
+                app:layout_constraintLeft_toRightOf="@+id/cast_player_position"
                 app:layout_constraintRight_toLeftOf="@+id/cast_player_duration"
                 app:layout_constraintTop_toBottomOf="@id/cast_player_center"
                 tools:text="title"
