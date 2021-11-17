@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import kotlinx.serialization.Serializable
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -37,7 +38,9 @@ interface PlaylistItemEditContract {
         @ColorRes val infoTextBackgroundColor: Int
     )
 
+    @Serializable
     data class State(
+        @kotlinx.serialization.Transient
         var model: Model? = null,
         var media: MediaDomain? = null,
         val selectedPlaylists: MutableSet<PlaylistDomain> = mutableSetOf(),
@@ -51,6 +54,7 @@ interface PlaylistItemEditContract {
     ) {
         lateinit var source: OrchestratorContract.Source
 
+        @Serializable
         data class Edit constructor(
             var watched: Boolean? = null,
             var playFromStart: Boolean? = null

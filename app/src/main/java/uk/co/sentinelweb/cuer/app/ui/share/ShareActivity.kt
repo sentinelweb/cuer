@@ -72,9 +72,13 @@ class ShareActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        savedInstanceState
+            ?.getString(STATE_KEY)
+            ?.apply { presenter.restoreState(this) }
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         setContentView(R.layout.activity_share)
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         edgeToEdgeWrapper.doOnApplyWindowInsets(share_root) { view, insets, padding ->
             view.updatePadding(
@@ -96,7 +100,8 @@ class ShareActivity : AppCompatActivity(),
                 ?.text
                 ?.apply {
                     if (!presenter.isAlreadyScanned(this.toString())) {
-                        scanFragment?.fromShareUrl(this.toString()) ?: throw IllegalStateException("Scan fragment not visible")
+                        scanFragment?.fromShareUrl(this.toString())
+                            ?: throw IllegalStateException("Scan fragment not visible")
                     }
                 }
                 ?: presenter.linkError(
@@ -131,6 +136,7 @@ class ShareActivity : AppCompatActivity(),
             (shareWrapper.getLinkFromIntent(intent)
                 ?: shareWrapper.getTextFromIntent(intent))?.apply {
                 if (!presenter.isAlreadyScanned(this)) {
+
                     scanFragment?.fromShareUrl(this)
                         ?: throw IllegalStateException("Scan fragment not visible")
                 }
@@ -175,14 +181,26 @@ class ShareActivity : AppCompatActivity(),
         setEnabled(model.enabled)
     }
 
-    override fun showMedia(itemDomain: PlaylistItemDomain, source: Source, playlistParentId: Long?) {
-        ScanFragmentDirections.actionGotoPlaylistItem(itemDomain.serialise(), source.toString(), playlistParentId ?: -1)
+    override fun showMedia(
+        itemDomain: PlaylistItemDomain,
+        source: Source,
+        playlistParentId: Long?
+    ) {
+        ScanFragmentDirections.actionGotoPlaylistItem(
+            itemDomain.serialise(),
+            source.toString(),
+            playlistParentId ?: -1
+        )
             .apply { navController.navigate(this) }
         //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
     }
 
     override fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?) {
-        ScanFragmentDirections.actionGotoPlaylist(id.id, id.source.toString(), playlistParentId ?: -1)
+        ScanFragmentDirections.actionGotoPlaylist(
+            id.id,
+            id.source.toString(),
+            playlistParentId ?: -1
+        )
             .apply { navController.navigate(this) }
     }
 
@@ -191,7 +209,8 @@ class ShareActivity : AppCompatActivity(),
     }
 
     override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) =
-        commitFragment?.commit(onCommit) ?: throw IllegalStateException("Commit fragment not visible")
+        commitFragment?.commit(onCommit)
+            ?: throw IllegalStateException("Commit fragment not visible")
 
     override fun error(msg: String) {
         snackbar?.dismiss()
@@ -223,7 +242,13 @@ class ShareActivity : AppCompatActivity(),
         presenter.onReady(ready)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE_KEY, presenter.serializeState())
+    }
+
     companion object {
+        private const val STATE_KEY = "share_state"
 
         // todo add parent id if in playlist fragment (called form main atm)
         fun intent(c: Context, paste: Boolean = false, parentId: Long? = null) =

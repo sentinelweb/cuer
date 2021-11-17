@@ -102,13 +102,16 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         }
     }
 
-    // todo something gone wrong with transition - so check to move this to on start or something - check values send in intenet
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        savedInstanceState
+            ?.getString(STATE_KEY)
+            ?.apply { viewModel.restoreState(this) }
         log.d("onCreate id = ${itemArg?.id}")
         itemArg?.id?.apply {
-            sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+            sharedElementEnterTransition =
+                TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         }
     }
 
@@ -383,11 +386,22 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         viewModel.commitPlaylistItems(onCommit)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE_KEY, viewModel.serializeState())
+    }
+
     companion object {
+
+        private val STATE_KEY = "playlist_item_edit_state"
         private val CREATE_PLAYLIST_TAG = "pe_dialog"
         private val SELECT_PLAYLIST_TAG = "pdf_dialog"
 
-        val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
-        val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
+        val TRANS_IMAGE by lazy {
+            get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image)
+        }
+        val TRANS_TITLE by lazy {
+            get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title)
+        }
     }
 }

@@ -34,6 +34,7 @@ import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
+import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 
@@ -410,4 +411,26 @@ class PlaylistItemEditViewModel constructor(
             throw IllegalStateException("Save failed", e)
         }
 
+    fun serializeState(): String =
+        domainJsonSerializer.encodeToString(PlaylistItemEditContract.State.serializer(), state)
+
+    fun restoreState(s: String) {
+        domainJsonSerializer.decodeFromString(PlaylistItemEditContract.State.serializer(), s)
+            .also { restored ->
+                state.apply {
+                    media = restored.media
+                    selectedPlaylists.clear()
+                    selectedPlaylists.addAll(restored.selectedPlaylists)
+                    committedItems = restored.committedItems
+                    editingPlaylistItem = restored.editingPlaylistItem
+                    isPlaylistsChanged = restored.isPlaylistsChanged
+                    isMediaChanged = restored.isMediaChanged
+                    isSaved = restored.isSaved
+                    editSettings.playFromStart = restored.editSettings.playFromStart
+                    editSettings.watched = restored.editSettings.watched
+                    parentPlaylistId = restored.parentPlaylistId
+                    model = modelMapper.map(state.media!!, state.selectedPlaylists)
+                }
+            }
+    }
 }

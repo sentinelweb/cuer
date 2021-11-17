@@ -82,13 +82,14 @@ class MainActivity :
         navController = navHostFragment.navController
         binding.bottomNavView.setupWithNavController(navController)
         binding.bottomNavView.setOnNavigationItemSelectedListener {
-            val value = when (it.itemId) {
-                R.id.navigation_browse -> 0
-                R.id.navigation_playlists -> 1
-                R.id.navigation_playlist -> 2
-                else -> 0
-            }
-            prefs.putInt(LAST_BOTTOM_TAB, value)
+            prefs.putInt(
+                LAST_BOTTOM_TAB, when (it.itemId) {
+                    R.id.navigation_browse -> 0
+                    R.id.navigation_playlists -> 1
+                    R.id.navigation_playlist -> 2
+                    else -> 0
+                }
+            )
             navController.navigate(it.itemId)
             true
         }

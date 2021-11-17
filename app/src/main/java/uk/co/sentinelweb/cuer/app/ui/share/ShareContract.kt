@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.share
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
+import kotlinx.serialization.Serializable
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -33,6 +34,8 @@ interface ShareContract {
         fun isAlreadyScanned(urlOrText: String): Boolean
         fun setPlaylistParent(longExtra: Long)
         fun onReady(ready: Boolean)
+        fun serializeState(): String?
+        fun restoreState(s: String)
     }
 
     interface View {
@@ -72,7 +75,9 @@ interface ShareContract {
         }
     }
 
+    @Serializable
     data class State(
+        @kotlinx.serialization.Transient
         var model: Model? = null,
         var parentPlaylistId: Long? = null,
         var scanResult: ScanContract.Result? = null,

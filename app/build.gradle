@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-//apply plugin: 'kotlinx-serialization'
+apply plugin: 'kotlinx-serialization'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'com.google.firebase.crashlytics'
@@ -193,6 +193,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
 
     implementation "com.firebaseui:firebase-ui-storage:$ver_firebase_ui"
+
+    // korlin serialization
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core"
+
 
     // glide
     implementation "com.github.bumptech.glide:glide:$ver_glide"
