@@ -17,9 +17,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService.Com
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService.Companion.ACTION_PLAY_ITEM
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
-import kotlin.time.ExperimentalTime
 
-@ExperimentalTime
 class FloatingPlayerController constructor(
     private val service: FloatingPlayerContract.Service,
     private val playerController: PlayerController,

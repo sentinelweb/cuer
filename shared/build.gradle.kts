@@ -113,5 +113,7 @@ kotlin {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = ver_jvm
+        freeCompilerArgs = listOf("-Xopt-in=kotlin.time.ExperimentalTime")
+
     }
 }

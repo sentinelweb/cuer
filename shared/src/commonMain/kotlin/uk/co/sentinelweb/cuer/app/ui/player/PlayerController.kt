@@ -16,10 +16,8 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import kotlin.time.ExperimentalTime
 
 @ExperimentalCoroutinesApi
-@ExperimentalTime
 class PlayerController constructor(
     private val queueConsumer: QueueMediatorContract.Consumer,
     private val modelMapper: PlayerModelMapper,

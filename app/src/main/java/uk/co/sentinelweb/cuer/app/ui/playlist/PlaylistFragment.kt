@@ -492,10 +492,8 @@ class PlaylistFragment :
     override fun gotoEdit(id: Long, source: Source) {
         PlaylistFragmentDirections.actionGotoEditPlaylist(
             id,
-            source.toString(),
-            null
-        )// only in main_nav - weird errro
-            .apply { findNavController().navigate(this) }
+            source.toString()
+        ).apply { findNavController().navigate(this) }
     }
 
     override fun showAlertDialog(model: AlertDialogModel) {

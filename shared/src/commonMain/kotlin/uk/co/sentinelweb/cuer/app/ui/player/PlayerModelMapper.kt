@@ -7,7 +7,6 @@ import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SHUFFLE
-import kotlin.time.ExperimentalTime
 
 class PlayerModelMapper constructor(
     private val timeFormatter: TimeFormatter,
@@ -20,7 +19,6 @@ class PlayerModelMapper constructor(
         logWrapper.tag(this)
     }
 
-    @ExperimentalTime
     fun map(state: PlayerContract.MviStore.State): PlayerContract.View.Model =
         state.run {
             PlayerContract.View.Model(
@@ -69,7 +67,6 @@ class PlayerModelMapper constructor(
         }
     } ?: "-"
 
-    @ExperimentalTime
     private fun PlayerContract.MviStore.State.mapLiveTime() = item?.media?.let {
         if (it.isLiveBroadcast) {
             val liveTime = timeProvider.getOffsetTime(position)

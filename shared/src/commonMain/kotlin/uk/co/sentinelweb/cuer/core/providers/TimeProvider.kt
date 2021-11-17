@@ -18,7 +18,7 @@ class TimeProvider {
     fun timeZomeOffsetSecs() =
         TimeZone.currentSystemDefault().offsetAt(instant())// todo might be broken
 
-    @ExperimentalTime
+    @OptIn(ExperimentalTime::class)
     fun getOffsetTime(millis: Long): LocalDateTime {
         val timeZone = TimeZone.currentSystemDefault()
         val now = localDateTime().toInstant(timeZone)
