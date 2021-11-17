@@ -492,8 +492,10 @@ class PlaylistFragment :
     override fun gotoEdit(id: Long, source: Source) {
         PlaylistFragmentDirections.actionGotoEditPlaylist(
             id,
-            source.toString()
-        ).apply { findNavController().navigate(this) }
+            source.toString(),
+            null
+        )
+            .apply { findNavController().navigate(this) }
     }
 
     override fun showAlertDialog(model: AlertDialogModel) {

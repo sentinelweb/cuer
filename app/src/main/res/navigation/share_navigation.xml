@@ -110,13 +110,15 @@
             android:name="PLAYLIST_ID"
             android:defaultValue="-1L"
             app:argType="long"
-            app:nullable="false"
-            />
+            app:nullable="false" />
         <argument
             android:name="SOURCE"
             app:argType="string"
-            app:nullable="false"
-            />
+            app:nullable="false" />
+        <argument
+            android:name="IMAGE_URL"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 
     <activity
