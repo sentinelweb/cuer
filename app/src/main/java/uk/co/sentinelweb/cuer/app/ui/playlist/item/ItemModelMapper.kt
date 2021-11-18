@@ -1,87 +1,78 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
-import android.graphics.drawable.Drawable
-import android.text.SpannableString
-import androidx.annotation.DrawableRes
+import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.core.mappers.Format
+import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
+import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import java.time.OffsetDateTime
 
 class ItemModelMapper constructor(
     private val res: ResourceWrapper,
-    private val iconMapper: IconMapper
+    private val timeSinceFormatter: TimeSinceFormatter,
+    private val timeFormatter: TimeFormatter,
+    private val backgroundMapper: BackgroundMapper
 ) {
 
-    private val playDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_player_play_black, R.color.text_primary, R.dimen.list_item_top_text_size, SCALING)
-    }
-
-    private val starDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_button_starred_white, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-    }
-
-    private val unstarDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_button_unstarred_white, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-    }
-
-    private val unwatchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-    }
-
-    private val watchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-    }
-
-    private val _bottomDrawables: MutableMap<Int, Drawable> = mutableMapOf()
-    private fun bottomDrawable(@DrawableRes id: Int): Drawable {
-        return if (_bottomDrawables.containsKey(id)) {
-            _bottomDrawables[id] ?: throw IllegalArgumentException("no drawable for $id")
-        } else {
-            res.getDrawable(id, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING).apply {
-                _bottomDrawables.set(id, this)
-            }
-        }
-    }
-
-    fun mapTopText(model: ItemContract.Model, playing: Boolean): SpannableString {
-        return if (!playing) {
-            SpannableString(model.title)
-        } else {
-            SpannableString("  " + model.title).apply {
-                res.replaceSpannableIcon(
-                    this,
-                    playDrawable,
-                    0, 2
+    fun mapItem(
+        modelId: Long,
+        item: PlaylistItemDomain,
+        index: Int,
+        canEdit: Boolean,
+        canDelete: Boolean,
+        canReorder: Boolean,
+        playlistText: String?,
+        showOverflow: Boolean,
+    ): ItemContract.Model {
+        val top = item.media.title ?: "No title"
+        val pos = item.media.positon?.toFloat() ?: 0f
+        val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f
+        return ItemContract.Model(
+            modelId,
+            index = index,
+            url = item.media.url,
+            type = item.media.mediaType,
+            title = top,
+            duration = (
+                    if (item.media.isLiveBroadcast) {
+                        if (item.media.isLiveBroadcastUpcoming) res.getString(R.string.upcoming)
+                        else res.getString(R.string.live)
+                    } else (item.media.duration?.let {
+                        item.media.duration?.let {
+                            timeFormatter.formatMillis(
+                                it,
+                                Format.SECS
+                            )
+                        }
+                    } ?: "-")
+                    ),
+            positon = if (item.media.isLiveBroadcast) res.getString(R.string.live) else (progress * 100).toInt()
+                .toString() + "%",
+            thumbNailUrl = item.media.thumbNail?.url,
+            progress = progress,
+            starred = item.media.starred,
+            watchedSince = item.media.dateLastPlayed?.let { timeSinceFormatter.formatTimeSince(it.toEpochMilliseconds()) }
+                ?: "-",
+            isWatched = item.media.watched,
+            published = item.media.published?.let {
+                timeSinceFormatter.formatTimeSince(
+                    // todo shorten this
+                    it.toJavaLocalDateTime().toInstant(OffsetDateTime.now().getOffset())
+                        .toEpochMilli()
                 )
-            }
-        }
-    }
-
-    fun mapBottomText(model: ItemContract.Model): SpannableString {
-        return SpannableString(model.run { "  $positon   $WATCH $watchedSince   $PLAT $published  ${playlistName ?: ""}" }).apply {
-            res.replaceSpannableIcon(
-                this,
-                if (model.starred) starDrawable else unstarDrawable,
-                0, 1
-            )
-            val platPos = indexOf(PLAT)
-            res.replaceSpannableIcon(
-                this,
-                bottomDrawable(iconMapper.map(model.platform)),
-                platPos, platPos + PLAT.length
-            )
-            val watchPos = indexOf(WATCH)
-            res.replaceSpannableIcon(
-                this,
-                if (model.isWatched) watchDrawable else unwatchDrawable,
-                watchPos, watchPos + WATCH.length
-            )
-        }
-    }
-
-    companion object {
-        private val PLAT = "[plat]"
-        private val WATCH = "[watch]"
-        private val SCALING = 1.1f
+            } ?: "-",
+            platform = item.media.platform,
+            isLive = item.media.isLiveBroadcast,
+            isUpcoming = item.media.isLiveBroadcastUpcoming,
+            infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media),
+            canEdit = canEdit,
+            canDelete = canDelete,
+            playlistName = playlistText,
+            canReorder = canReorder,
+            showOverflow = showOverflow
+        )
     }
 }

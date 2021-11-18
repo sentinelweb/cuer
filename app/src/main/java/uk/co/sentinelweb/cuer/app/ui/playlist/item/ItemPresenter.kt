@@ -7,7 +7,7 @@ class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
     val state: ItemContract.State,
-    private val modelMapper: ItemModelMapper,
+    private val textMapper: ItemTextMapper,
     private val ytContext: ChromecastYouTubePlayerContextHolder
 ) : ItemContract.Presenter, ItemContract.External {
 
@@ -15,8 +15,8 @@ class ItemPresenter(
         item: ItemContract.Model,
         highlightPlaying: Boolean
     ) {
-        view.setTopText(modelMapper.mapTopText(item, highlightPlaying))
-        view.setBottomText(modelMapper.mapBottomText(item))
+        view.setTopText(textMapper.mapTopText(item, highlightPlaying))
+        view.setBottomText(textMapper.mapBottomText(item))
         view.setCheckedVisible(false)
         item.thumbNailUrl
             ?.apply { view.setIconUrl(this) }
@@ -35,6 +35,7 @@ class ItemPresenter(
             }
         )
         view.dismissMenu()
+        view.setShowOverflow(item.showOverflow)
         state.item = item
     }
 

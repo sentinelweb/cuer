@@ -8,12 +8,15 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -60,7 +63,7 @@ interface CastPlayerContract {
         fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int)
         fun setSeekEnabled(enabled: Boolean)
         fun setState(state: PlayerStateDomain?)
-        fun promptToPlay()
+        fun promptToPlay(item: PlaylistItemDomain?)
     }
 
     data class State(
@@ -82,6 +85,7 @@ interface CastPlayerContract {
         @JvmStatic
         val viewModule = module {
             scope(named<CastPlayerFragment>()) {
+                viewModel { State() }
                 scoped<View> { getSource() }
                 scoped<Presenter> {
                     CastPlayerPresenter(
@@ -112,7 +116,17 @@ interface CastPlayerContract {
                     )
                 }
                 scoped { CastPlayerUiMapper(get(), get(), get()) }
-                viewModel { State() }
+                // todo play dialog - extract
+                scoped { PlayDialog(getSource(), itemFactory = get(), itemModelMapper = get()) }
+                scoped { ItemFactory(get(), get(), get()) }
+                scoped {
+                    ItemModelMapper(
+                        res = get(),
+                        timeFormatter = get(),
+                        timeSinceFormatter = get(),
+                        backgroundMapper = get()
+                    )
+                }
             }
         }
     }

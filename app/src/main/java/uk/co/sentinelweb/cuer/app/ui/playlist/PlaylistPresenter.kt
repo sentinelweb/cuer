@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
@@ -63,6 +64,7 @@ class PlaylistPresenter(
     private val playlistUpdateOrchestrator: PlaylistUpdateOrchestrator,
     private val playlistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator,
     private val modelMapper: PlaylistModelMapper,
+    private val itemMapper: ItemModelMapper,
     private val queue: QueueMediatorContract.Producer,
     private val toastWrapper: ToastWrapper,
     private val ytCastContextHolder: ChromecastYouTubePlayerContextHolder,
@@ -877,13 +879,18 @@ class PlaylistPresenter(
         state.playlist = state.playlist?.let {
             it.copy(items = it.items.toMutableList().apply { set(index, changedItem) })
         }
-        val mappedItem = modelMapper.mapItem(
+
+        val mappedItem = itemMapper.mapItem(
             modelId, changedItem, index,
             state.playlist?.config?.editableItems ?: false,
             state.playlist?.config?.deletableItems ?: false,
             state.playlist?.config?.editable ?: false,
-            playlists = state.playlistsTreeLookup,
-            currentPlaylistId = state.playlist?.id
+            playlistText = modelMapper.mapPlaylistText(
+                changedItem,
+                state.playlist,
+                state.playlistsTreeLookup
+            ),
+            showOverflow = true
         )
         state.model = state.model?.let {
             it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })

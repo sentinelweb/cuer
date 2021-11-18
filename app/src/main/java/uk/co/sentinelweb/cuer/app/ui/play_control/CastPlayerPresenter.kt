@@ -66,7 +66,7 @@ class CastPlayerPresenter(
                 else -> Unit
             }
         } ?: run {
-            view.promptToPlay()
+            view.promptToPlay(state.playlistItem)
         }
     }
 

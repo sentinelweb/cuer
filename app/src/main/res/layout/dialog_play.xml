@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/dp_item_layout"
+        layout="@layout/view_playlist_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dp_chromecast"
+        style="@style/Cuer.MaterialAlertDialog.Item"
+        android:drawableStart="@drawable/ic_cast_24"
+        android:text="@string/dialog_play_chromecast"
+        android:textAppearance="@style/TextAppearance.App.Headline5" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dp_portrait"
+        style="@style/Cuer.MaterialAlertDialog.Item"
+        android:drawableStart="@drawable/ic_portrait_black_24"
+        android:text="@string/dialog_play_portrait"
+        android:textAppearance="@style/TextAppearance.App.Headline5" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dp_fullscreen"
+        style="@style/Cuer.MaterialAlertDialog.Item"
+        android:drawableStart="@drawable/ic_fullscreen_24"
+        android:text="@string/dialog_play_fullscreen"
+        android:textAppearance="@style/TextAppearance.App.Headline5" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dp_floating"
+        style="@style/Cuer.MaterialAlertDialog.Item"
+        android:drawableStart="@drawable/ic_picture_in_picture_24"
+        android:text="@string/dialog_play_floating"
+        android:textAppearance="@style/TextAppearance.App.Headline5" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/dp_remember"
+        style="@style/Cuer.MaterialAlertDialog.Item"
+        android:layout_marginStart="12dp"
+        android:text="@string/dialog_play_remember_my_decision"
+        android:textAppearance="@style/TextAppearance.App.Body1"
+        android:paddingStart="4dp" />
+
+</LinearLayout>

@@ -3,8 +3,10 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
@@ -108,16 +110,23 @@ class YoutubeCastConnectionListener constructor(
     }
 
     private fun updateFromQueue() {
-        playerUi?.apply {
-            if (youTubePlayerListener != null) {
-                queue.currentItem?.apply {
-                    setPlayerState(PlayerStateDomain.PAUSED)
-                    setCurrentSecond((media.positon?.toFloat() ?: 0f) / 1000f)
+        if (queue.currentItem != null) {
+            playerUi?.apply {
+                if (youTubePlayerListener != null) {
+                    queue.currentItem?.apply {
+                        setPlayerState(PlayerStateDomain.PAUSED)
+                        setCurrentSecond((media.positon?.toFloat() ?: 0f) / 1000f)
+                    }
                 }
+                queue.currentItem?.let { setPlaylistItem(it, queue.source) }
+                setPlaylistName(queue.playlist?.title ?: "none")
+                setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
             }
-            queue.currentItem?.let { setPlaylistItem(it, queue.source) }
-            setPlaylistName(queue.playlist?.title ?: "none")
-            setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
+        } else {
+            coroutines.mainScope.launch {
+                delay(100)
+                updateFromQueue()
+            }
         }
     }
 

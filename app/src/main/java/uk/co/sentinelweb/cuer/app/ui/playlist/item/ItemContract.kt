@@ -26,6 +26,7 @@ interface ItemContract {
         fun setDurationBackground(@ColorRes infoTextBackgroundColor: Int)
         fun setPlayIcon(@DrawableRes icon: Int)
         fun dismissMenu()
+        fun setShowOverflow(showOverflow: Boolean)
     }
 
     interface Presenter {
@@ -85,7 +86,8 @@ interface ItemContract {
         val canEdit: Boolean,
         val playlistName: String?,
         val canDelete: Boolean,
-        val canReorder: Boolean
+        val canReorder: Boolean,
+        val showOverflow: Boolean
     ) : ItemBaseModel(id)
 
     data class State constructor(var item: Model? = null)

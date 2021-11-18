@@ -18,6 +18,7 @@ import org.koin.core.context.GlobalContext.get
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -27,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class CastPlayerFragment() :
     Fragment(),
@@ -39,6 +41,7 @@ class CastPlayerFragment() :
     private val imageProvider: FirebaseImageProvider by inject()
     private val res: ResourceWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
+    private val playDialog: PlayDialog by inject()
 
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding!!
@@ -188,8 +191,8 @@ class CastPlayerFragment() :
         binding.castPlayerCurrentState.text = state?.toString()
     }
 
-    override fun promptToPlay() {
-
+    override fun promptToPlay(item: PlaylistItemDomain?) {
+        playDialog.showPlayDialog(item)
     }
 
     override fun updateSeekPosition(ratio: Float) {

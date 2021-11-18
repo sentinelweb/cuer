@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
@@ -53,7 +54,13 @@ interface PlaylistContract {
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
         fun commitMove()
-        fun setPlaylistData(plId: Long? = null, plItemId: Long? = null, playNow: Boolean = false, source: Source = LOCAL)
+        fun setPlaylistData(
+            plId: Long? = null,
+            plItemId: Long? = null,
+            playNow: Boolean = false,
+            source: Source = LOCAL
+        )
+
         fun onPlaylistSelected(playlist: PlaylistDomain, selected: Boolean)
         fun onPlayModeChange(): Boolean
         fun onPlayPlaylist(): Boolean
@@ -198,28 +205,44 @@ interface PlaylistContract {
                         playlistOrDefaultOrchestrator = get(),
                         dbInit = get(),
                         floatingService = get(),
-                        recentLocalPlaylists = get()
+                        recentLocalPlaylists = get(),
+                        itemMapper = get()
                     )
                 }
                 scoped { get<Presenter>() as External }
                 scoped {
                     PlaylistModelMapper(
-                        res = get(),
-                        timeFormatter = get(),
-                        timeSinceFormatter = get(),
+                        itemModelMapper = get(),
                         iconMapper = get(),
-                        backgroundMapper = get()
                     )
                 }
                 scoped { PlaylistAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
+                scoped {
+                    ItemModelMapper(
+                        res = get(),
+                        timeFormatter = get(),
+                        timeSinceFormatter = get(),
+                        backgroundMapper = get()
+                    )
+                }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
+                scoped<SnackbarWrapper> {
+                    AndroidSnackbarWrapper(
+                        (getSource() as Fragment).requireActivity(),
+                        get()
+                    )
+                }
                 scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
                 scoped { ItemFactory(get(), get(), get()) }
                 scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
-                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
+                scoped {
+                    navigationMapper(
+                        true,
+                        getSource<Fragment>().requireActivity() as AppCompatActivity
+                    )
+                }
                 viewModel { State() }
             }
 

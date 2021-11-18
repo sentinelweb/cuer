@@ -81,9 +81,11 @@
     </style>
 
     <style name="TextAppearance.App.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">24sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
     </style>
 
     <style name="TextAppearance.App.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
@@ -142,6 +144,39 @@
         <item name="android:minWidth">48dp</item>
         <item name="android:tint">@color/white</item>
         <item name="android:elevation">4dp</item>
+    </style>
+
+    <style name="Cuer.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/Cuer.MaterialAlertDialog.Window</item>
+        <item name="materialAlertDialogTitleTextStyle">
+            @style/Cuer.MaterialAlertDialog.App.Title.Text
+        </item>
+        <!--        <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button</item>-->
+        <!--        <item name="buttonBarNeutralButtonStyle">@style/Widget.App.Button</item>-->
+    </style>
+
+    <style name="Cuer.MaterialAlertDialog.Window" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="shapeAppearance">@style/ShapeAppearance.Medium</item>
+    </style>
+
+    <style name="Cuer.MaterialAlertDialog.App.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+    </style>
+
+
+    <style name="Cuer.MaterialAlertDialog.Item">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:drawableTint">@color/text_primary</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
     </style>
 
     <!-- Headers =========================== -->
@@ -406,5 +441,6 @@
         <item name="android:minWidth">48dp</item>
         <item name="android:minHeight">48dp</item>
     </style>
+
 
 </resources>
