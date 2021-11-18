@@ -66,7 +66,10 @@ class CastPlayerPresenter(
                 else -> Unit
             }
         } ?: run {
-            view.promptToPlay(state.playlistItem)
+            view.promptToPlay(
+                state.playlistItem ?: throw IllegalStateException("No playlist item"),
+                state.playlistName ?: ""
+            )
         }
     }
 
@@ -201,6 +204,7 @@ class CastPlayerPresenter(
     }
 
     override fun setPlaylistName(name: String) {
+        state.playlistName = name
         view.setPlaylistName(name)
     }
 

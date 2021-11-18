@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.Domain
@@ -74,7 +75,12 @@ interface ScanContract {
                     )
                 }
                 scoped { ScanMapper() }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource<ScanFragment>().requireActivity(), get()) }
+                scoped<SnackbarWrapper> {
+                    AndroidSnackbarWrapper(
+                        this.getFragmentActivity(),
+                        get()
+                    )
+                }
                 viewModel { State() }
             }
         }

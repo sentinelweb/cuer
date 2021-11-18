@@ -191,8 +191,8 @@ class CastPlayerFragment() :
         binding.castPlayerCurrentState.text = state?.toString()
     }
 
-    override fun promptToPlay(item: PlaylistItemDomain?) {
-        playDialog.showPlayDialog(item)
+    override fun promptToPlay(item: PlaylistItemDomain, playlistTitle: String) {
+        playDialog.showPlayDialog(item, playlistTitle)
     }
 
     override fun updateSeekPosition(ratio: Float) {

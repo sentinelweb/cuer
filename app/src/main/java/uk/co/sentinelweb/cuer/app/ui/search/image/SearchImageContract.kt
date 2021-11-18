@@ -1,7 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.search.image
 
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -9,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageSelectIntentHandler
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 
@@ -60,18 +59,11 @@ interface SearchImageContract {
                     )
                 }
                 scoped { State() }
-                scoped {
-                    navigationMapper(
-                        true,
-                        getSource<Fragment>().requireActivity() as AppCompatActivity
-                    )
-                }
-                scoped { EnumValuesDialogCreator(getSource<Fragment>().requireContext()) }
+                scoped { navigationMapper(true, this.getFragmentActivity()) }
+                scoped { EnumValuesDialogCreator(this.getFragmentActivity()) }
                 scoped {
                     ImageSelectIntentHandler(
-                        a = getSource<Fragment>().requireActivity() as AppCompatActivity,
-                        res = get(),
-                        bitmapSizer = get()
+                        a = this.getFragmentActivity(), res = get(), bitmapSizer = get()
                     )
                 }
             }

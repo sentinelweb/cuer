@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
@@ -17,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -63,7 +65,7 @@ interface CastPlayerContract {
         fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int)
         fun setSeekEnabled(enabled: Boolean)
         fun setState(state: PlayerStateDomain?)
-        fun promptToPlay(item: PlaylistItemDomain?)
+        fun promptToPlay(item: PlaylistItemDomain, playlistTitle: String)
     }
 
     data class State(
@@ -76,10 +78,9 @@ interface CastPlayerContract {
         var playlistItem: PlaylistItemDomain? = null,
         var isLiveStream: Boolean = false,
         var isUpcoming: Boolean = false,
-        var source: OrchestratorContract.Source = OrchestratorContract.Source.LOCAL
-    ) : ViewModel() {
-
-    }
+        var source: OrchestratorContract.Source = OrchestratorContract.Source.LOCAL,
+        var playlistName: String? = null
+    ) : ViewModel()
 
     companion object {
         @JvmStatic
@@ -110,14 +111,23 @@ interface CastPlayerContract {
                 }
                 scoped<SkipContract.View> {
                     SkipView(
-                        selectDialogCreator = SelectDialogCreator(
-                            context = getSource<CastPlayerFragment>().requireContext()
-                        )
+                        selectDialogCreator = SelectDialogCreator(context = this.getFragmentActivity())
                     )
                 }
                 scoped { CastPlayerUiMapper(get(), get(), get()) }
-                // todo play dialog - extract
-                scoped { PlayDialog(getSource(), itemFactory = get(), itemModelMapper = get()) }
+
+                // todo play usecase - extract
+                scoped { navigationMapper(true, this.getFragmentActivity()) }
+                scoped {
+                    PlayDialog(
+                        getSource(),
+                        itemFactory = get(),
+                        itemModelMapper = get(),
+                        navigationMapper = get(),
+                        toastWrapper = get(),
+                        castDialogWrapper = get()
+                    )
+                }
                 scoped { ItemFactory(get(), get(), get()) }
                 scoped {
                     ItemModelMapper(

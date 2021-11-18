@@ -83,14 +83,6 @@ class PlaylistModelMapper constructor(
         return playlistText
     }
 
-    fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel =
-        AlertDialogModel(
-            R.string.playlist_change_dialog_title,
-            R.string.playlist_change_dialog_message,
-            AlertDialogModel.Button(R.string.ok, confirm),
-            AlertDialogModel.Button(R.string.dialog_button_view_info, info)
-        )
-
     fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel =
         AlertDialogModel(
             R.string.dialog_title_save_check,

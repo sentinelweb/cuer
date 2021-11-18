@@ -216,6 +216,7 @@
         app:backgroundTint="@color/build_primary"
         app:layout_anchor="@id/bottom_bar"
         app:shapeAppearance="@null"
+        app:progressColor="@color/build_primary_variant"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait
 
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
-import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
@@ -20,7 +19,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
