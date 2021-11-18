@@ -89,29 +89,26 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout
         android:id="@+id/ple_swipe"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        >
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/ple_scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
-            >
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb">
 
             <uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
                 android:id="@+id/ple_description"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
+                android:layout_height="wrap_content" />
 
         </androidx.core.widget.NestedScrollView>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/ple_play_fab"

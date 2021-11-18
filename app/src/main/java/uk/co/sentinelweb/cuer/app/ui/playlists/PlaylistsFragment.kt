@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.transition.TransitionInflater
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -98,6 +99,12 @@ class PlaylistsFragment :
             HeaderFooterDecoration(0, resources.getDimensionPixelSize(R.dimen.recyclerview_footer))
         )
         itemTouchHelper.attachToRecyclerView(binding.playlistsList)
+        binding.playlistsSwipe.setColorSchemeColors(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.white
+            )
+        )
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
         binding.playlistsSwipe.isRefreshing = true
         postponeEnterTransition()
