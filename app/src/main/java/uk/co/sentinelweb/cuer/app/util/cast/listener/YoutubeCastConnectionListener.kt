@@ -4,6 +4,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsend
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
@@ -30,7 +31,7 @@ class YoutubeCastConnectionListener constructor(
 
     init {
         queue.currentPlaylistFlow
-            .onEach { pushUpdateFromQueue() }
+            .onEach { updateFromQueue() }
             .launchIn(coroutines.mainScope)
     }
 
@@ -39,7 +40,7 @@ class YoutubeCastConnectionListener constructor(
         if (state.connectionState == CC_CONNECTED) {
             setupPlayerListener()
             youTubePlayerListener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
-            pushUpdateFromQueue()
+            updateFromQueue()
         }
     }
 
@@ -70,7 +71,7 @@ class YoutubeCastConnectionListener constructor(
             context?.apply { setupPlayerListener() }
         }
 
-        pushUpdateFromQueue()
+        updateFromQueue()
     }
 
     private fun setupPlayerListener() {
@@ -92,6 +93,9 @@ class YoutubeCastConnectionListener constructor(
 
     private fun restoreState() {
         state.connectionState?.apply { playerUi?.setConnectionState(this) }
+        coroutines.mainScope.launch {
+            queue.emitState()
+        }
     }
 
     fun isConnected(): Boolean {
@@ -103,7 +107,7 @@ class YoutubeCastConnectionListener constructor(
         coroutines.cancel()
     }
 
-    private fun pushUpdateFromQueue() {
+    private fun updateFromQueue() {
         playerUi?.apply {
             if (youTubePlayerListener != null) {
                 queue.currentItem?.apply {

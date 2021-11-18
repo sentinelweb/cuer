@@ -30,7 +30,7 @@ class QueueMediator constructor(
     private val playlistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator,
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val log: LogWrapper,
-    private val recentLocalPlaylists:RecentLocalPlaylists
+    private val recentLocalPlaylists: RecentLocalPlaylists
 ) : QueueMediatorContract.Producer, QueueMediatorContract.Consumer {
 
     override val currentItem: PlaylistItemDomain?
@@ -53,11 +53,12 @@ class QueueMediator constructor(
 
     init {
         log.tag(this)
-        state.playlistIdentifier = prefsWrapper.getPair(GeneralPreferences.CURRENT_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
+        state.playlistIdentifier =
+            prefsWrapper.getPair(GeneralPreferences.CURRENT_PLAYLIST, NO_PLAYLIST.toPair())
+                .toIdentifier()
         _currentItemFlow = MutableStateFlow(state.currentItem)
         coroutines.computationScope.launch {
             refreshQueue(state.playlistIdentifier)
-            //_currentItemFlow = MutableStateFlow(state.currentItem)
         }
         listenToDb()
     }
@@ -115,7 +116,10 @@ class QueueMediator constructor(
                                 ?.apply { refreshQueueFrom(this, source) }
                     }
                 } catch (e: Exception) {
-                    log.e("Playlist item exception: $op (${plistItem.id}) ${plistItem.media.title}", e)
+                    log.e(
+                        "Playlist item exception: $op (${plistItem.id}) ${plistItem.media.title}",
+                        e
+                    )
                 }
             }.launchIn(coroutines.computationScope)
     }
@@ -124,16 +128,18 @@ class QueueMediator constructor(
         refreshQueue(identifier)
     }
 
-    override fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean, resetPosition: Boolean) {
-        coroutines.computationScope.launch {
-            state.playlist
-                ?.takeIf { playlistItem != state.currentItem || forcePlay }
-                ?.let {
-                    state.playlist = playlistMutator.playItem(it, playlistItem)
-                    updateCurrentItem(resetPosition)
-                }
-        }
-    }
+    override fun onItemSelected(
+        playlistItem: PlaylistItemDomain,
+        forcePlay: Boolean,
+        resetPosition: Boolean
+    ) = coroutines.computationScope.launch {
+        state.playlist
+            ?.takeIf { playlistItem != state.currentItem || forcePlay }
+            ?.let {
+                state.playlist = playlistMutator.playItem(it, playlistItem)
+                updateCurrentItem(resetPosition)
+            }
+    }.let { Unit }
 
     // todo refactor / consolidate the playNow's
     override suspend fun playNow(identifier: Identifier<*>, playlistItemId: Long?) {
@@ -157,28 +163,29 @@ class QueueMediator constructor(
             }
     }
 
-    private fun playNow() {
-        coroutines.computationScope.launch {
-            state.playlist?.apply {
-                val itemToPlay = if (currentIndex == -1) {
-                    items[0]
-                } else if (currentIndex >= items.size) {
-                    items[0]
-                } else {
-                    currentItem()
-                }
-                itemToPlay?.let {
-                    state.playlist = playlistMutator.playItem(this, it)
-                    updateCurrentItem(false)
-                }
+    private fun playNow() = coroutines.computationScope.launch {
+        state.playlist?.apply {
+            val itemToPlay = if (currentIndex == -1) {
+                items[0]
+            } else if (currentIndex >= items.size) {
+                items[0]
+            } else {
+                currentItem()
+            }
+            itemToPlay?.let {
+                state.playlist = playlistMutator.playItem(this, it)
+                updateCurrentItem(false)
             }
         }
-    }
+    }.let { Unit }
 
     private suspend fun updateCurrentItem(resetPosition: Boolean) {
         state.currentItem = state.playlist
             ?.let { playlist ->
-                playlistOrDefaultOrchestrator.updateCurrentIndex(playlist, state.playlistIdentifier.flatOptions(true))
+                playlistOrDefaultOrchestrator.updateCurrentIndex(
+                    playlist,
+                    state.playlistIdentifier.flatOptions(true)
+                )
                 playlist.currentIndex.let { playlist.items[it] }
             }
             ?: throw NullPointerException("playlist should not be null")
@@ -205,6 +212,11 @@ class QueueMediator constructor(
         }
     }
 
+    override suspend fun emitState() {
+        //_currentItemFlow.value = state.currentItem
+        state.playlist?.apply { _currentPlaylistFlow.emit(this) }
+    }
+
     private suspend fun updateCurrentItemFromMedia(updatedMedia: MediaDomain) {
         state.currentItem = state.currentItem
             ?.run {
@@ -219,7 +231,11 @@ class QueueMediator constructor(
                 }.let {
                     //log.d("updateCurrentMediaItem b4 sv: position=${state.currentItem?.media?.positon} target=${it.positon}")
 
-                    mediaUpdate.updateMedia(playlist!!, it, state.playlistIdentifier.flatOptions(true))
+                    mediaUpdate.updateMedia(
+                        playlist!!,
+                        it,
+                        state.playlistIdentifier.flatOptions(true)
+                    )
                         ?.let { copy(media = it) }
                 }
             }
@@ -227,7 +243,10 @@ class QueueMediator constructor(
         state.playlist = state.playlist
             ?.let {
                 it.copy(items = it.items.toMutableList().apply {
-                    set(currentItemIndex ?: throw IllegalStateException(), state.currentItem ?: throw IllegalStateException())
+                    set(
+                        currentItemIndex ?: throw IllegalStateException(),
+                        state.currentItem ?: throw IllegalStateException()
+                    )
                 })
             }
     }
@@ -238,25 +257,21 @@ class QueueMediator constructor(
         coroutines.cancel()
     }
 
-    override fun nextItem() {
-        coroutines.computationScope.launch {
-            state.playlist?.let { currentPlaylist ->
-                state.playlist = playlistMutator.gotoNextItem(currentPlaylist)
-                if (state.playlist?.currentIndex ?: 0 < currentPlaylist.items.size) {
-                    updateCurrentItem(false)
-                }
-            }
-        }
-    }
-
-    override fun previousItem() {
-        coroutines.computationScope.launch {
-            state.playlist?.let { currentPlaylist ->
-                state.playlist = playlistMutator.gotoPreviousItem(currentPlaylist)
+    override fun nextItem() = coroutines.computationScope.launch {
+        state.playlist?.let { currentPlaylist ->
+            state.playlist = playlistMutator.gotoNextItem(currentPlaylist)
+            if (state.playlist?.currentIndex ?: 0 < currentPlaylist.items.size) {
                 updateCurrentItem(false)
             }
         }
-    }
+    }.let { Unit }
+
+    override fun previousItem() = coroutines.computationScope.launch {
+        state.playlist?.let { currentPlaylist ->
+            state.playlist = playlistMutator.gotoPreviousItem(currentPlaylist)
+            updateCurrentItem(false)
+        }
+    }.let { Unit }
 
     override fun onTrackEnded() {
         nextItem()
@@ -269,7 +284,12 @@ class QueueMediator constructor(
             state.playlistIdentifier = playlistIdentifier
                 ?: throw IllegalStateException("No playlist ID")
             state.currentItem = playlistDomain.currentItemOrStart()
-            playlistIdentifier.apply { prefsWrapper.putPair(GeneralPreferences.CURRENT_PLAYLIST, this.toPair()) }
+            playlistIdentifier.apply {
+                prefsWrapper.putPair(
+                    GeneralPreferences.CURRENT_PLAYLIST,
+                    this.toPair()
+                )
+            }
         } else {
             state.currentItem = playlistDomain.currentItem()
         }
@@ -279,14 +299,19 @@ class QueueMediator constructor(
         state.playlist = playlistDomain
         log.d("playlist: ${state.playlist?.scanOrder()}")
         //if (this::_currentItemFlow.isInitialized) {
-            _currentItemFlow.emit(currentItem)
+        _currentItemFlow.emit(currentItem)
         //}
         state.playlist?.also { _currentPlaylistFlow.emit(it) }
     }
 
     private suspend fun refreshQueue(identifier: Identifier<*>) {
         identifier
-            .let { playlistOrDefaultOrchestrator.getPlaylistOrDefault(it.id as Long, Options(it.source, flat = false)) }
+            .let {
+                playlistOrDefaultOrchestrator.getPlaylistOrDefault(
+                    it.id as Long,
+                    Options(it.source, flat = false)
+                )
+            }
             ?.also { refreshQueueFrom(it.first, it.second) }
     }
 

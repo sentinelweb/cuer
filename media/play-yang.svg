@@ -11,14 +11,14 @@
       inkscape:cy="11.905929" inkscape:window-width="1779" inkscape:window-height="1066"
       inkscape:window-x="2061" inkscape:window-y="94" inkscape:window-maximized="0"
       inkscape:current-layer="svg51" />
-  <g id="g2332">
+  <g id="g2483">
     <path d="M 12,2 A 10,10 0 0 1 22,12 10,10 0 0 1 12,22 10,10 0 0 1 2,12 10,10 0 0 1 12,2"
-        id="path49" />
+        id="path49" style="fill:#e53935;fill-opacity:1;stroke:none" />
     <path
         d="m 12,4 a 8,8 0 0 0 -8,8 8,8 0 0 0 8,8 4,4 0 0 1 -4,-4 4,4 0 0 1 4,-4 4,4 0 0 0 4,-4 4,4 0 0 0 -4,-4"
-        id="path139" style="fill:#ffffff" />
+        id="path139" style="fill:#ffffff;stroke:none" />
     <path
-        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+        style="fill:#e53935;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
         d="M 10.687079,9.7965355 V 6.0172622 l 3.162317,1.8896367 z" id="path269"
         sodipodi:nodetypes="cccc" />
     <path

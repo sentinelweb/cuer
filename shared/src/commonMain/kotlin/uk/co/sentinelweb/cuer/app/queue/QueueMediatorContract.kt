@@ -30,6 +30,7 @@ interface QueueMediatorContract {
         fun nextItem()
         fun previousItem()
         fun updateCurrentMediaItem(updatedMedia: MediaDomain)
+        suspend fun emitState()
     }
 
 }
