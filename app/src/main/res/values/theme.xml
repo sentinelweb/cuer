@@ -73,7 +73,6 @@
         <item name="textAppearanceSubtitle1">@style/TextAppearance.App.Subtitle1</item>
         <item name="textAppearanceSubtitle2">@style/TextAppearance.App.Subtitle2</item>
         <item name="textAppearanceOverline">@style/TextAppearance.App.Overline</item>
-
     </style>
 
     <style name="AppSplash" parent="Theme.SplashScreen">

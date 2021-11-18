@@ -40,7 +40,7 @@ interface CastPlayerContract {
         val playerControls: PlayerContract.PlayerControls
         fun initMediaRouteButton()
         fun setPosition(second: String)
-        fun setLiveTime(second: String)
+        fun setLiveTime(second: String?)
         fun setDuration(duration: String)
         fun setPlaying()
         fun setPaused()
@@ -60,6 +60,7 @@ interface CastPlayerContract {
         fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int)
         fun setSeekEnabled(enabled: Boolean)
         fun setState(state: PlayerStateDomain?)
+        fun promptToPlay()
     }
 
     data class State(
@@ -89,7 +90,9 @@ interface CastPlayerContract {
                         state = get(),
                         log = get(),
                         skipControl = get(),
-                        res = get()
+                        res = get(),
+                        coroutines = get(),
+                        queue = get()
                     )
                 }
                 scoped<SkipContract.External> {

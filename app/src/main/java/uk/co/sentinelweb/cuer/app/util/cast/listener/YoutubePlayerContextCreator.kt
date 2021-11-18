@@ -31,7 +31,8 @@ class YoutubePlayerContextCreator constructor(
         mediaSessionManager,
         castWrapper,
         queue,
-        coroutines
+        coroutines,
+        log
     )
 
     fun createPlayerListener() =

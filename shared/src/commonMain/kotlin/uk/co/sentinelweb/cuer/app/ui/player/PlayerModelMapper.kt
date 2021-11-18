@@ -71,12 +71,11 @@ class PlayerModelMapper constructor(
         if (it.isLiveBroadcast) {
             val liveTime = timeProvider.getOffsetTime(position)
             val formatTime = timeFormatter.formatTime(liveTime)
-            logWrapper.d("liveTime: $liveTime - formatTime: $formatTime")
             formatTime
         } else {
-            ""
+            null
         }
-    } ?: ""
+    }
 
     private fun trackTitle(playlist: PlaylistDomain?, offset: Int): String =
         playlist

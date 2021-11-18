@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.annotation.ColorRes
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.bumptech.glide.Glide
@@ -104,8 +105,9 @@ class CastPlayerFragment() :
         binding.castPlayerPosition.text = second
     }
 
-    override fun setLiveTime(second: String) {
-        binding.castPlayerLiveTime.text = second
+    override fun setLiveTime(second: String?) {
+        binding.castPlayerLiveTime.isVisible = second != null
+        second?.apply { binding.castPlayerLiveTime.text = second }
     }
 
     override fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int) {
@@ -118,7 +120,12 @@ class CastPlayerFragment() :
     }
 
     override fun setPlaying() {
-        binding.castPlayerFab.setImageState(intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked), false)
+        binding.castPlayerFab.setImageState(
+            intArrayOf(
+                android.R.attr.state_enabled,
+                android.R.attr.state_checked
+            ), false
+        )
         binding.castPlayerFab.showProgress(false)
     }
 
@@ -181,6 +188,10 @@ class CastPlayerFragment() :
         binding.castPlayerCurrentState.text = state?.toString()
     }
 
+    override fun promptToPlay() {
+
+    }
+
     override fun updateSeekPosition(ratio: Float) {
         binding.castPlayerSeek.progress = (ratio * binding.castPlayerSeek.max).toInt()
     }
@@ -196,7 +207,11 @@ class CastPlayerFragment() :
         )
 
     companion object {
-        val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_image) }
-        val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title) }
+        val TRANS_IMAGE by lazy {
+            get().get<ResourceWrapper>().getString(R.string.cast_player_trans_image)
+        }
+        val TRANS_TITLE by lazy {
+            get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title)
+        }
     }
 }

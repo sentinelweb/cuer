@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.queue
 
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.*
@@ -139,7 +140,7 @@ class QueueMediator constructor(
                 state.playlist = playlistMutator.playItem(it, playlistItem)
                 updateCurrentItem(resetPosition)
             }
-    }.let { Unit }
+    }.ignoreJob()
 
     // todo refactor / consolidate the playNow's
     override suspend fun playNow(identifier: Identifier<*>, playlistItemId: Long?) {
@@ -177,7 +178,7 @@ class QueueMediator constructor(
                 updateCurrentItem(false)
             }
         }
-    }.let { Unit }
+    }.ignoreJob()
 
     private suspend fun updateCurrentItem(resetPosition: Boolean) {
         state.currentItem = state.playlist
@@ -210,11 +211,6 @@ class QueueMediator constructor(
                 updateCurrentItemFromMedia(updatedMedia)
             }
         }
-    }
-
-    override suspend fun emitState() {
-        //_currentItemFlow.value = state.currentItem
-        state.playlist?.apply { _currentPlaylistFlow.emit(this) }
     }
 
     private suspend fun updateCurrentItemFromMedia(updatedMedia: MediaDomain) {
@@ -264,14 +260,14 @@ class QueueMediator constructor(
                 updateCurrentItem(false)
             }
         }
-    }.let { Unit }
+    }.ignoreJob()
 
     override fun previousItem() = coroutines.computationScope.launch {
         state.playlist?.let { currentPlaylist ->
             state.playlist = playlistMutator.gotoPreviousItem(currentPlaylist)
             updateCurrentItem(false)
         }
-    }.let { Unit }
+    }.ignoreJob()
 
     override fun onTrackEnded() {
         nextItem()
@@ -315,4 +311,5 @@ class QueueMediator constructor(
             ?.also { refreshQueueFrom(it.first, it.second) }
     }
 
+    private fun Job.ignoreJob() = Unit
 }

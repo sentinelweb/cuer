@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
@@ -11,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -25,6 +27,8 @@ class CastPlayerPresenter(
     private val log: LogWrapper,
     private val skipControl: SkipContract.External,
     private val res: ResourceWrapper,
+    private val coroutines: CoroutineContextProvider,
+    private val queue: QueueMediatorContract.Consumer,
 ) : CastPlayerContract.Presenter, PlayerControls, SkipContract.Listener {
 
     init {
@@ -55,10 +59,14 @@ class CastPlayerPresenter(
     }
 
     override fun onPlayPausePressed() {
-        when (state.playState) {
-            PLAYING -> listener?.pause()
-            VIDEO_CUED, UNSTARTED, PAUSED, UNKNOWN -> listener?.play()
-            else -> Unit
+        listener?.apply {
+            when (state.playState) {
+                PLAYING -> listener?.pause()
+                VIDEO_CUED, UNSTARTED, PAUSED, UNKNOWN -> listener?.play()
+                else -> Unit
+            }
+        } ?: run {
+            view.promptToPlay()
         }
     }
 
@@ -143,7 +151,7 @@ class CastPlayerPresenter(
             if (!state.isLiveStream) {
                 view.setPosition(mapper.formatTime(state.positionMs))
                 view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
-                view.setLiveTime("")
+                view.setLiveTime(null)
             } else {
                 listener
                     ?.getLiveOffsetMs()

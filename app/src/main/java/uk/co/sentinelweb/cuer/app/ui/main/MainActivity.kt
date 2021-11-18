@@ -64,18 +64,21 @@ class MainActivity :
     private var _binding: MainActivityBinding? = null
     private val binding: MainActivityBinding
         get() = _binding ?: throw Exception("Main view not bound")
-    private val playerFragment: Fragment by lazy {
-        supportFragmentManager.findFragmentById(R.id.cast_player_fragment)
+    private val playerFragment: Fragment
+        get() = supportFragmentManager.findFragmentById(R.id.cast_player_fragment)
             ?: throw Exception("No player fragment")
-    }
 
     init {
         log.tag(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (!isChangingConfigurations) {
+            installSplashScreen()
+        } else {
+            setTheme(R.style.AppTheme)
+        }
         super.onCreate(savedInstanceState)
-        installSplashScreen()
         _binding = MainActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
@@ -106,8 +109,10 @@ class MainActivity :
             .takeIf { it > 0 }
             .apply {
                 when (this) {
-                    1 -> navController.navigate(R.id.navigation_playlists)
-                    2 -> navController.navigate(R.id.navigation_playlist)
+                    1 -> if (navController.currentDestination?.id != R.id.navigation_playlists)
+                        navController.navigate(R.id.navigation_playlists)
+                    2 -> if (navController.currentDestination?.id != R.id.navigation_playlist)
+                        navController.navigate(R.id.navigation_playlist)
                 }
             }
         presenter.initialise()

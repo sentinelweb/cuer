@@ -90,7 +90,7 @@ interface PlayerContract {
             data class Times constructor(
                 val positionText: String,
                 val durationText: String,
-                val liveTime: String,
+                val liveTime: String?,
                 val isLive: Boolean,
                 val seekBarFraction: Float,
             )
