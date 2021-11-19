@@ -265,8 +265,9 @@ class MainActivity :
     var isRaised = true
     override fun raisePlayer() {
         if (isRaised) {
+            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
             val transAnimation =
-                ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", 0f, 200f)
+                ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", 0f, lowerY)
             transAnimation.setDuration(200)
             transAnimation.start()
             isRaised = false
@@ -275,8 +276,9 @@ class MainActivity :
 
     override fun lowerPlayer() {
         if (!isRaised) {
+            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
             val transAnimation =
-                ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", 200f, 0f)
+                ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", lowerY, 0f)
             transAnimation.setDuration(200)
             transAnimation.start()
             isRaised = true
