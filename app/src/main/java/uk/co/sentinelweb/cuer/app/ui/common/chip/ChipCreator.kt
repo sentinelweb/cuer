@@ -95,8 +95,8 @@ class ChipCreator(
             return Bitmap
                 .createBitmap(toTransform, left, top, dimension, dimension)
                 //.getCircularBitmap()
-                .cropShapedBitmap(c)
                 .scale(targetSize, targetSize)
+                .cropShapedBitmap(c)
         }
     }
 }

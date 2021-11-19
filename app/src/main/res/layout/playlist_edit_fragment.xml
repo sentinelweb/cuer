@@ -309,7 +309,7 @@
         android:contentDescription="@null"
         app:layout_anchor="@id/pe_appbar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_button_unstarred_white"
+        app:srcCompat="@drawable/ic_starred_off"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -324,7 +324,7 @@
         app:fabSize="mini"
         app:layout_anchor="@id/pe_appbar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_push_pin_off_24"
+        app:srcCompat="@drawable/ic_push_pin_off"
         tools:ignore="RtlSymmetry"
         />
 

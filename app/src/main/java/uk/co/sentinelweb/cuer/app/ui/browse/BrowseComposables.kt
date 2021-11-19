@@ -140,7 +140,7 @@ object BrowseComposables {
                                 .aspectRatio(1f)
                         )
                     } ?: Icon(
-                        painter = painterResource(R.drawable.ic_baseline_category_24),
+                        painter = painterResource(R.drawable.ic_category),
                         contentDescription = null,
                         modifier = Modifier
                             .size(72.dp)

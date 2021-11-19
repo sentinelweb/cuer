@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 import android.app.Activity
 import android.app.Notification
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
@@ -61,7 +62,7 @@ class PlayerControlsNotificationMedia constructor(
 
         val contentIntent = Intent(service, launchClass) // todo inject to launch player class
         val contentPendingIntent: PendingIntent =
-            PendingIntent.getActivity(service, 0, contentIntent, 0)
+            PendingIntent.getActivity(service, 0, contentIntent, FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(
             service,
@@ -74,7 +75,10 @@ class PlayerControlsNotificationMedia constructor(
             .setWhen(timeProvider.currentTimeMillis())
             .setStyle(
                 MediaNotificationCompat.MediaStyle()
-                    .setMediaSession(appState.mediaSession?.sessionToken ?: throw IllegalArgumentException("No media session ID allocated"))
+                    .setMediaSession(
+                        appState.mediaSession?.sessionToken
+                            ?: throw IllegalArgumentException("No media session ID allocated")
+                    )
                     .setShowCancelButton(true)
                     .setCancelButtonIntent(disconnectPendingIntent)
                     .run {
@@ -104,7 +108,7 @@ class PlayerControlsNotificationMedia constructor(
             BUFFERING ->
                 builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", pausePendingIntent)
             ERROR ->
-                builder.addAction(R.drawable.ic_baseline_error_24, "Error", contentPendingIntent)
+                builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
             else -> Unit // todo if some other state change notif
         }
         builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent) // #3
@@ -119,7 +123,7 @@ class PlayerControlsNotificationMedia constructor(
             this.action = action
             putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
         }
-        return PendingIntent.getService(service, 0, intent, 0)
+        return PendingIntent.getService(service, 0, intent, FLAG_IMMUTABLE)
     }
 
     companion object {

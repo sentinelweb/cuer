@@ -352,7 +352,7 @@ fun SearchInputText(
         )
         if (text.isNullOrEmpty().not()) {
             Icon(
-                painterResource(R.drawable.ic_backspace_24),
+                painterResource(R.drawable.ic_backspace),
                 tint = MaterialTheme.colors.onSurface,
                 contentDescription = stringResource(id = R.string.clear),
                 modifier = Modifier

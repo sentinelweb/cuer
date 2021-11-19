@@ -18,15 +18,15 @@ class IconMapper {
     @DrawableRes
     fun map(mode: PlaylistDomain.PlaylistModeDomain): Int =
         when (mode) {
-            PlaylistDomain.PlaylistModeDomain.SINGLE -> R.drawable.ic_button_shuffle_disabled_24
+            PlaylistDomain.PlaylistModeDomain.SINGLE -> R.drawable.ic_playmode_straight
             PlaylistDomain.PlaylistModeDomain.LOOP -> R.drawable.ic_button_repeat_24
-            PlaylistDomain.PlaylistModeDomain.SHUFFLE -> R.drawable.ic_button_shuffle_24
+            PlaylistDomain.PlaylistModeDomain.SHUFFLE -> R.drawable.ic_playmode_shuffle
         }
 
     @DrawableRes
     fun map(type: PlaylistDomain.PlaylistTypeDomain, platform: PlatformDomain?): Int =
         when (type) {
-            PlaylistDomain.PlaylistTypeDomain.USER -> R.drawable.ic_baseline_person_black_24
+            PlaylistDomain.PlaylistTypeDomain.USER -> R.drawable.ic_person
             PlaylistDomain.PlaylistTypeDomain.PLATFORM -> map(platform)
             PlaylistDomain.PlaylistTypeDomain.APP -> R.drawable.ic_menu_settings_black
         }

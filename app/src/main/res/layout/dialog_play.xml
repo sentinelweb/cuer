@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <FrameLayout
         android:id="@+id/dp_item_layout"
-        layout="@layout/view_playlist_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp" />
@@ -21,7 +21,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/dp_portrait"
         style="@style/Cuer.MaterialAlertDialog.Item"
-        android:drawableStart="@drawable/ic_portrait_black_24"
+        android:drawableStart="@drawable/ic_portrait"
         android:text="@string/dialog_play_portrait"
         android:textAppearance="@style/TextAppearance.App.Headline5" />
 
@@ -45,6 +45,7 @@
         android:layout_marginStart="12dp"
         android:text="@string/dialog_play_remember_my_decision"
         android:textAppearance="@style/TextAppearance.App.Body1"
-        android:paddingStart="4dp" />
+        android:paddingStart="4dp"
+        tools:ignore="RtlSymmetry" />
 
 </LinearLayout>

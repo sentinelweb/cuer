@@ -5,7 +5,7 @@
     >
     <item
         android:id="@+id/pe_star"
-        android:icon="@drawable/ic_button_unstarred_white"
+        android:icon="@drawable/ic_starred_off"
         android:title="@string/menu_star"
         android:orderInCategory="200"
         app:iconTint="@color/menu_button_icon_tint"
@@ -14,7 +14,7 @@
 
     <item
         android:id="@+id/pe_pin"
-        android:icon="@drawable/ic_push_pin_off_24"
+        android:icon="@drawable/ic_push_pin_off"
         android:orderInCategory="100"
         android:title="@string/menu_pin"
         app:iconTint="@color/menu_button_icon_tint"

@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemView
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -32,12 +33,16 @@ class PlayDialog constructor(
     private val binding: DialogPlayBinding
         get() = _binding ?: throw Exception("DialogPlayBinding not bound")
 
+    lateinit var playUseCase: PlayUseCase
+
     private lateinit var dialog: AlertDialog
 
     fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?) {
         _binding = DialogPlayBinding.inflate(LayoutInflater.from(f.requireContext()))
         binding.dpChromecast.setOnClickListener {
             castDialogWrapper.showRouteSelector(f.childFragmentManager)
+            item?.apply { playUseCase.setQueueItem(this) }
+                ?: throw IllegalStateException("No item to play")
             dialog.dismiss()
         }
         binding.dpPortrait.setOnClickListener {

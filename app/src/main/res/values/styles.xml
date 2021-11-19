@@ -3,7 +3,7 @@
     <!-- TextAppearance -->
     <style name="TextAppearance.App.Headline1"
            parent="@style/TextAppearance.MaterialComponents.Headline1">
-        <item name="android:textSize">48sp</item>
+        <item name="android:textSize">36sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
@@ -12,7 +12,7 @@
 
     <style name="TextAppearance.App.Headline2"
            parent="@style/TextAppearance.MaterialComponents.Headline2">
-        <item name="android:textSize">36sp</item>
+        <item name="android:textSize">28sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
@@ -21,7 +21,7 @@
 
     <style name="TextAppearance.App.Headline3"
            parent="@style/TextAppearance.MaterialComponents.Headline3">
-        <item name="android:textSize">28sp</item>
+        <item name="android:textSize">24sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
@@ -30,7 +30,7 @@
 
     <style name="TextAppearance.App.Headline4"
            parent="@style/TextAppearance.MaterialComponents.Headline4">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
@@ -39,7 +39,7 @@
 
     <style name="TextAppearance.App.Headline5"
            parent="@style/TextAppearance.MaterialComponents.Headline5">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
@@ -81,7 +81,7 @@
     </style>
 
     <style name="TextAppearance.App.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
@@ -161,7 +161,6 @@
 
     <style name="Cuer.MaterialAlertDialog.App.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
         <item name="android:textSize">24sp</item>
-        <item name="android:textStyle">bold</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
     </style>

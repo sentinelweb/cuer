@@ -515,11 +515,13 @@ class PlaylistFragment :
     override fun setCastState(state: PlaylistContract.CastState) {
         when (state) {
             PLAYING -> {
-                playMenuItem?.setIcon(R.drawable.ic_baseline_playlist_play_24)
+                binding.playlistFabPlay.setImageResource(R.drawable.ic_playlist_close)
+                playMenuItem?.setIcon(R.drawable.ic_playlist_close)
                 adapter.notifyDataSetChanged()
             }
             NOT_CONNECTED -> {
-                playMenuItem?.setIcon(R.drawable.ic_baseline_playlist_play_24)
+                binding.playlistFabPlay.setImageResource(R.drawable.ic_playlist_play)
+                playMenuItem?.setIcon(R.drawable.ic_playlist_play)
                 adapter.notifyDataSetChanged()
             }
             CONNECTING -> {

@@ -23,7 +23,7 @@ class ItemTextMapper constructor(
 
     private val starDrawable: Drawable by lazy {
         res.getDrawable(
-            R.drawable.ic_button_starred_white,
+            R.drawable.ic_starred,
             R.color.text_secondary,
             R.dimen.list_item_bottom_text_size,
             SCALING
@@ -32,7 +32,7 @@ class ItemTextMapper constructor(
 
     private val unstarDrawable: Drawable by lazy {
         res.getDrawable(
-            R.drawable.ic_button_unstarred_white,
+            R.drawable.ic_starred_off,
             R.color.text_secondary,
             R.dimen.list_item_bottom_text_size,
             SCALING

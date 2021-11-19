@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
 import android.app.Notification
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Intent
 import android.graphics.Bitmap
 import androidx.core.app.NotificationCompat
@@ -55,7 +56,7 @@ class PlayerControlsNotificationBasic constructor(
 
         val contentIntent = Intent(service, MainActivity::class.java)
         val contentPendingIntent: PendingIntent =
-            PendingIntent.getActivity(service, 0, contentIntent, 0)
+            PendingIntent.getActivity(service, 0, contentIntent, FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(
             service,
@@ -83,7 +84,7 @@ class PlayerControlsNotificationBasic constructor(
             BUFFERING ->
                 builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", playPendingIntent)
             ERROR ->
-                builder.addAction(R.drawable.ic_baseline_error_24, "Error", contentPendingIntent)
+                builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
             else -> Unit
         }
         builder.addAction(R.drawable.ic_player_pause_black, "-30s", skipbPendingIntent)
@@ -96,7 +97,7 @@ class PlayerControlsNotificationBasic constructor(
             putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
         }
         val pendingIntent: PendingIntent =
-            PendingIntent.getService(service, 0, intent, 0)
+            PendingIntent.getService(service, 0, intent, FLAG_IMMUTABLE)
         return pendingIntent
     }
 

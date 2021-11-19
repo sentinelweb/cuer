@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.usecase
 
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPairType
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -26,6 +26,10 @@ class PlayUseCase constructor(
     private val alertDialogCreator: AlertDialogCreator,
     private val playDialog: PlayDialog
 ) {
+
+    init {
+        playDialog.playUseCase = this
+    }
 
     fun playLogic(
         itemDomain: PlaylistItemDomain?,
@@ -51,12 +55,11 @@ class PlayUseCase constructor(
     }
 
     private fun playItem(itemDomain: PlaylistItemDomain, resetPos: Boolean) {
-        if (queue.playlistId == itemDomain.playlistId?.toIdentifier(OrchestratorContract.Source.LOCAL)) {
+        if (queue.playlistId == itemDomain.playlistId?.toIdentifier(LOCAL)) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
         } else {
             alertDialogCreator.create(mapChangePlaylistAlert({
-                val toIdentifier =
-                    itemDomain.playlistId!!.toIdentifier(OrchestratorContract.Source.LOCAL)
+                val toIdentifier = itemDomain.playlistId!!.toIdentifier(LOCAL)
 
                 prefsWrapper.putPair(
                     GeneralPreferences.CURRENT_PLAYLIST,
@@ -68,15 +71,24 @@ class PlayUseCase constructor(
                 }
             }, {// info
                 //view.showItemDescription(modelId, itemDomain, state.playlistIdentifier.source)
-            }))
+            })).show()
         }
     }
 
-    fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel =
+    private fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel =
         AlertDialogModel(
             R.string.playlist_change_dialog_title,
             R.string.playlist_change_dialog_message,
             AlertDialogModel.Button(R.string.ok, confirm),
             AlertDialogModel.Button(R.string.dialog_button_view_info, info)
         )
+
+    fun setQueueItem(item: PlaylistItemDomain) {
+        coroutines.computationScope.launch {
+            val toIdentifier = item.playlistId?.toIdentifier(LOCAL)
+                ?: throw IllegalArgumentException("item is not in a playlist")
+            queue.switchToPlaylist(toIdentifier)
+            queue.onItemSelected(item, forcePlay = true, resetPosition = false)
+        }
+    }
 }

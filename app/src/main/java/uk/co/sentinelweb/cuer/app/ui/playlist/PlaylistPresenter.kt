@@ -292,7 +292,11 @@ class PlaylistPresenter(
     }
 
     override fun onPlayPlaylist(): Boolean {
-        playUseCase.playLogic(state.playlist?.currentItemOrStart(), state.playlist, false)
+        if (isPlaylistPlaying()) {
+            chromeCastWrapper.killCurrentSession()
+        } else {
+            playUseCase.playLogic(state.playlist?.currentItemOrStart(), state.playlist, false)
+        }
         return true
     }
 
