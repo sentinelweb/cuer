@@ -89,12 +89,14 @@ class PlayerControlsNotificationController constructor(
         //log.d("updateNotification: state.media=${state.media?.stringMedia()}")
         listener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
         state.media?.apply {
-            state.bitmap?.let { view.showNotification(state.playState, state.media, it) }
+            state.bitmap
+                ?.let { view.showNotification(state.playState, state.media, it) }
                 ?: state.media?.image?.let { image ->
                     Glide.with(context).asBitmap()
                         .load(image.url)
                         .into(BitmapLoadTarget())
-                } ?: view.showNotification(state.playState, state.media, null)
+                }
+                ?: view.showNotification(state.playState, state.media, null)
         } ?: run {
             state.bitmap = null
             view.showNotification(state.playState, null, null)
@@ -104,14 +106,19 @@ class PlayerControlsNotificationController constructor(
     inner class BitmapLoadTarget : CustomTarget<Bitmap?>() {
         override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap?>?) {
             state.bitmap = if (Build.VERSION.SDK_INT >= 30) {
-                val targetSize = res.getDimensionPixelSize(R.dimen.notif_image_size_sdk_31)
-                bitmap
-                    .scale(targetSize, targetSize)
-                    .cropShapedBitmap(context)
+                try {
+                    val targetWidth = res.getDimensionPixelSize(R.dimen.notif_image_size_sdk_31)
+                    val aspect = bitmap.height / bitmap.width
+                    bitmap
+                        .scale(targetWidth, targetWidth * aspect)
+                        .cropShapedBitmap(res)
+                } catch (e: Exception) {
+                    log.e("Exception resizing bitmap", e)
+                    bitmap
+                }
             } else {
                 bitmap
             }
-
             view.showNotification(state.playState, state.media, bitmap)
         }
 

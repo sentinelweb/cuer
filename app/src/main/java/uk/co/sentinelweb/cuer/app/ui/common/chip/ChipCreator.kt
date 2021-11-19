@@ -46,9 +46,7 @@ class ChipCreator(
                     Glide.with(c)
                         .asBitmap()
                         .loadFirebaseOrOtherUrl(it.url, imageProvider)
-//                        .load(imageProvider.makeRef(it))
                         .transform(CropTransformation(it.url))
-                        //.circleCrop()
                         .into(ChipLoadTarget(this))
                 }
             }
@@ -96,7 +94,7 @@ class ChipCreator(
                 .createBitmap(toTransform, left, top, dimension, dimension)
                 //.getCircularBitmap()
                 .scale(targetSize, targetSize)
-                .cropShapedBitmap(c)
+                .cropShapedBitmap(res)
         }
     }
 }

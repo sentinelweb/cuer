@@ -41,7 +41,6 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.core.content.ContextCompat;
-import androidx.core.util.Preconditions;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 
 import java.lang.annotation.Retention;
@@ -70,9 +69,6 @@ public class CircularProgressDrawable extends Drawable implements Animatable {
     private static final Interpolator LINEAR_INTERPOLATOR = new LinearInterpolator();
     private static final Interpolator MATERIAL_INTERPOLATOR = new FastOutSlowInInterpolator();
 
-    /**
-     * @hide
-     */
     @RestrictTo(LIBRARY_GROUP_PREFIX)
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({LARGE, DEFAULT})
@@ -160,9 +156,9 @@ public class CircularProgressDrawable extends Drawable implements Animatable {
      * @param context application context
      */
     public CircularProgressDrawable(@NonNull Context context) {
-        mResources = Preconditions.checkNotNull(context).getResources();
+        mResources = context.getResources();
 
-        icon = ContextCompat.getDrawable(context, R.drawable.ic_loader_play_yang);
+        icon = ContextCompat.getDrawable(context, R.drawable.ic_play_yang_combined);
 
         mRing = new Ring(icon);
         mRing.setColors(COLORS);
@@ -457,8 +453,6 @@ public class CircularProgressDrawable extends Drawable implements Animatable {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    // Remove suppression was b/120985527 is addressed.
     public int getOpacity() {
         return PixelFormat.TRANSLUCENT;
     }
@@ -595,6 +589,7 @@ public class CircularProgressDrawable extends Drawable implements Animatable {
     private void setupAnimators() {
         final Ring ring = mRing;
         final ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
+        //noinspection Convert2Lambda
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {

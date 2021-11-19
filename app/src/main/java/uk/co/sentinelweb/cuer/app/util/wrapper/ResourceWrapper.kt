@@ -9,6 +9,7 @@ import android.text.style.ImageSpan
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import com.google.android.material.shape.ShapeAppearanceModel
 import java.io.InputStream
 
 class ResourceWrapper constructor(
@@ -84,4 +85,7 @@ class ResourceWrapper constructor(
             ex.printStackTrace()
             null
         }
+
+    fun getShapeModel(id: Int) = ShapeAppearanceModel.builder(context, 0, id).build()
+
 }
