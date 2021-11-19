@@ -14,7 +14,6 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 class YoutubeCastConnectionListener constructor(
     private val state: State,
@@ -114,7 +113,7 @@ class YoutubeCastConnectionListener constructor(
             playerUi?.apply {
                 if (youTubePlayerListener != null) {
                     queue.currentItem?.apply {
-                        setPlayerState(PlayerStateDomain.PAUSED)
+                        //setPlayerState(PlayerStateDomain.PAUSED)
                         setCurrentSecond((media.positon?.toFloat() ?: 0f) / 1000f)
                     }
                 }

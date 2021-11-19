@@ -19,9 +19,7 @@ class FloatingPlayerServiceManager(
             overlayPermission.requestOverlayDisplayPermission(a)
         } else {
             if (!isRunning()) {
-                // todo use foreground svc !!!
                 app.startForegroundService(startIntent(load))
-                //app.startService(startIntent(load))
                 return true
             }
         }
