@@ -47,6 +47,7 @@
     <dimen name="main_navhost_bottom_padding_player">32dp</dimen>
     <dimen name="recyclerview_footer">128dp</dimen>
     <dimen name="player_lower_y">64dp</dimen>
+    <dimen name="nav_fragment_fab_bottom_offset">88dp</dimen>
     <dimen name="min_floating_window_size">128dp</dimen>
     <dimen name="tree_node_depth">16dp</dimen>
 

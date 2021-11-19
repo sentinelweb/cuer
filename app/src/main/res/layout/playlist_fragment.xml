@@ -217,7 +217,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="@dimen/nav_fragment_fab_bottom_offset"
         android:contentDescription="@string/playlist_fab_refresh_contentdesc"
         app:fabSize="mini"
         app:layout_anchor="@+id/playlist_swipe"
