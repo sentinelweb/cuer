@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 class IconMapper {
     @DrawableRes
     fun map(platform: PlatformDomain?): Int = when (platform) {
-        PlatformDomain.YOUTUBE -> R.drawable.ic_platform_youtube_24_black
+        PlatformDomain.YOUTUBE -> R.drawable.ic_platform_youtube
         PlatformDomain.WEB -> R.drawable.ic_platfrom_web
         PlatformDomain.VIMEO -> R.drawable.ic_platform_vimeo_24_black
         PlatformDomain.PODCAST -> R.drawable.ic_platform_podcast

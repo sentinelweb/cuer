@@ -12,6 +12,13 @@
         android:layout_marginTop="8dp" />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dp_launch_youtube"
+        style="@style/Cuer.MaterialAlertDialog.Item"
+        android:drawableStart="@drawable/ic_platform_youtube"
+        android:text="@string/dialog_play_youtube"
+        android:textAppearance="@style/TextAppearance.App.Headline5" />
+
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/dp_chromecast"
         style="@style/Cuer.MaterialAlertDialog.Item"
         android:drawableStart="@drawable/ic_cast_24"
@@ -38,6 +45,7 @@
         android:drawableStart="@drawable/ic_picture_in_picture"
         android:text="@string/dialog_play_floating"
         android:textAppearance="@style/TextAppearance.App.Headline5" />
+
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/dp_remember"

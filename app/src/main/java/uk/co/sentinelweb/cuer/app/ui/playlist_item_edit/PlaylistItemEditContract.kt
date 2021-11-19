@@ -103,12 +103,11 @@ interface PlaylistItemEditContract {
                         itemFactory = get(),
                         itemModelMapper = get(),
                         navigationMapper = get(),
-                        toastWrapper = get(),
                         castDialogWrapper = get(),
                         floatingService = get(),
-                        aytViewHolder = get(),
                         log = get(),
                         alertDialogCreator = get(),
+                        youtubeApi = get(),
                     )
                 }
                 scoped { ItemFactory(get(), get(), get()) }

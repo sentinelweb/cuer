@@ -20,7 +20,7 @@ class ItemPresenter(
         view.setCheckedVisible(false)
         item.thumbNailUrl
             ?.apply { view.setIconUrl(this) }
-            ?: view.setIconResource(R.drawable.ic_platform_youtube_24_black)
+            ?: view.setIconResource(R.drawable.ic_platform_youtube)
         view.setDuration(item.duration)
         view.setDurationBackground(item.infoTextBackgroundColor)
         view.showProgress(!item.isLive)

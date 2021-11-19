@@ -15,11 +15,10 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemView
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -28,12 +27,11 @@ class PlayDialog constructor(
     private val itemFactory: ItemFactory,
     private val itemModelMapper: ItemModelMapper,
     private val navigationMapper: NavigationMapper,
-    private val toastWrapper: ToastWrapper,
     private val castDialogWrapper: CastDialogWrapper,
     private val floatingService: FloatingPlayerServiceManager,
-    private val aytViewHolder: AytViewHolder,
     private val log: LogWrapper,
     private val alertDialogCreator: AlertDialogCreator,
+    private val youtubeApi: YoutubeJavaApiWrapper,
 ) {
     init {
         log.tag(this)
@@ -50,6 +48,10 @@ class PlayDialog constructor(
     fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?) {
 
         _binding = DialogPlayBinding.inflate(LayoutInflater.from(f.requireContext()))
+        binding.dpLaunchYoutube.setOnClickListener {
+            item?.apply { youtubeApi.launchVideoSystem(media) }
+            dialog.dismiss()
+        }
         binding.dpChromecast.setOnClickListener {
             castDialogWrapper.showRouteSelector(f.childFragmentManager)
             item?.apply { playUseCase.setQueueItem(this) }

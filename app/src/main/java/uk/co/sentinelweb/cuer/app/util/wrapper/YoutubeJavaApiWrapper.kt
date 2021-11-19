@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.app.util.wrapper
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import com.google.android.youtube.player.YouTubeApiServiceUtil.isYouTubeApiServiceAvailable
 import com.google.android.youtube.player.YouTubeInitializationResult.SUCCESS
@@ -81,14 +83,27 @@ class YoutubeJavaApiWrapper(
         }
     }
 
+    fun launchVideoSystem(media: MediaDomain) = launchVideoSystem(media.platformId)
+
+    fun launchVideoSystem(platformId: String): Boolean = runCatching {
+        Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl(platformId)))
+            .apply { activity.startActivity(this) }
+    }.isSuccess
+
     companion object {
-        fun channelUrl(media: MediaDomain) = "https://youtube.com/channel/${media.channelData.let { it.customUrl ?: it.platformId }}"
-        fun channelUrl(channel: ChannelDomain) = "https://youtube.com/channel/${channel.let { it.customUrl ?: it.platformId }}"
+        fun channelUrl(media: MediaDomain) =
+            "https://youtube.com/channel/${media.channelData.let { it.customUrl ?: it.platformId }}"
+
+        fun channelUrl(channel: ChannelDomain) =
+            "https://youtube.com/channel/${channel.let { it.customUrl ?: it.platformId }}"
 
         fun videoUrl(media: MediaDomain) = "https://www.youtube.com/watch?v=${media.platformId}"
+        fun videoUrl(platformId: String) = "https://www.youtube.com/watch?v=$platformId"
         fun videoShortUrl(media: MediaDomain) = "https://youtu.be/${media.platformId}"
 
-        fun playlistUrl(playlist: PlaylistDomain) = "https://www.youtube.com/playlist?list=${playlist.platformId}"
+        fun playlistUrl(playlist: PlaylistDomain) =
+            "https://www.youtube.com/playlist?list=${playlist.platformId}"
+
         fun playlistUrl(platformId: String) = "https://www.youtube.com/playlist?list=${platformId}"
     }
 }

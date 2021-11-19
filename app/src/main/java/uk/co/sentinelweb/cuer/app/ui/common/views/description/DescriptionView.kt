@@ -43,7 +43,7 @@ class DescriptionView @JvmOverloads constructor(
     private val binding: PlaylistItemDescriptionBinding
 
     private val ytDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_platform_youtube_24_black, R.color.primary)
+        res.getDrawable(R.drawable.ic_platform_youtube, R.color.primary)
     }
 
     init {
@@ -102,7 +102,6 @@ class DescriptionView @JvmOverloads constructor(
                 }
             }
         }
-
     }
 
     fun channelImageVisible(b: Boolean) {

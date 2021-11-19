@@ -63,7 +63,7 @@ class NavigationMapper constructor(
             YOUTUBE_CHANNEL -> if (!ytJavaApi.launchChannel(nav.params[CHANNEL_ID] as String)) {
                 toastWrapper.show("can't launch channel")
             }
-            YOUTUBE_VIDEO -> if (!ytJavaApi.launchVideo(nav.params[PLATFORM_ID] as String)) {
+            YOUTUBE_VIDEO -> if (!ytJavaApi.launchVideoSystem(nav.params[PLATFORM_ID] as String)) {
                 toastWrapper.show("can't launch channel")
             }
             PLAYLIST -> navController?.navigate(

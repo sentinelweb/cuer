@@ -248,12 +248,11 @@ interface PlaylistContract {
                         itemFactory = get(),
                         itemModelMapper = get(),
                         navigationMapper = get(),
-                        toastWrapper = get(),
                         castDialogWrapper = get(),
                         floatingService = get(),
-                        aytViewHolder = get(),
                         log = get(),
                         alertDialogCreator = get(),
+                        youtubeApi = get()
                     )
                 }
                 viewModel { State() }
