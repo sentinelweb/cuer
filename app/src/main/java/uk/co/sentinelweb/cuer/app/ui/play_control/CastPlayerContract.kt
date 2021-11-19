@@ -97,8 +97,6 @@ interface CastPlayerContract {
                         log = get(),
                         skipControl = get(),
                         res = get(),
-                        coroutines = get(),
-                        queue = get(),
                         playUseCase = get()
                     )
                 }

@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
@@ -13,7 +12,6 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -28,8 +26,6 @@ class CastPlayerPresenter(
     private val log: LogWrapper,
     private val skipControl: SkipContract.External,
     private val res: ResourceWrapper,
-    private val coroutines: CoroutineContextProvider,
-    private val queue: QueueMediatorContract.Consumer,
     private val playUseCase: PlayUseCase
 ) : CastPlayerContract.Presenter, PlayerControls, SkipContract.Listener {
 
@@ -114,6 +110,7 @@ class CastPlayerPresenter(
     }
 
     override fun onSeekFinished() {
+        state.playState = BUFFERING
         listener?.seekTo(state.seekPositionMs)
         state.seekPositionMs = 0
     }
@@ -156,7 +153,9 @@ class CastPlayerPresenter(
         if (state.durationMs > 0) {
             if (!state.isLiveStream) {
                 view.setPosition(mapper.formatTime(state.positionMs))
-                view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
+                if (state.playState != BUFFERING) {
+                    view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
+                }
                 view.setLiveTime(null)
             } else {
                 listener
