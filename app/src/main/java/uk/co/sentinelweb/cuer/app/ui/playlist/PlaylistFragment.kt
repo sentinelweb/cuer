@@ -39,6 +39,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
+import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.CastState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -89,8 +90,9 @@ class PlaylistFragment :
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navMapper: NavigationMapper by inject()
     private val navigationProvider: NavigationProvider by inject()
-    private val commitHost: CommitHost by inject()
     private val doneNavigation: DoneNavigation by inject()// from activity (see onAttach)
+    private val commitHost: CommitHost by inject()
+    private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
     private var _binding: PlaylistFragmentBinding? = null
@@ -188,9 +190,7 @@ class PlaylistFragment :
         binding.playlistAppbar.addOnOffsetChangedListener(object :
             AppBarLayout.OnOffsetChangedListener {
 
-            //var isShow = false
             var scrollRange = -1
-
             override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
                 if (scrollRange == -1) {
                     scrollRange = appBarLayout.getTotalScrollRange()
@@ -210,6 +210,7 @@ class PlaylistFragment :
                 }
             }
         })
+        compactPlayerScroll.addScrollListener(binding.playlistList, this)
         binding.playlistFabPlaymode.setOnClickListener { presenter.onPlayModeChange() }
         //playlist_fab_shownew.setOnClickListener { presenter.onFilterNewItems() }
         binding.playlistFabPlay.setOnClickListener { presenter.onPlayPlaylist() }

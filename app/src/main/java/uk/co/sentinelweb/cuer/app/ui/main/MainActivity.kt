@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
@@ -27,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
@@ -40,12 +42,14 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
+
 class MainActivity :
     AppCompatActivity(),
     MainContract.View,
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     NavigationProvider,
     DoneNavigation,
+    CompactPlayerScroll.PlayerHost,
     AndroidScopeComponent,
     MainContract.PlayerViewControl {
 
@@ -65,6 +69,7 @@ class MainActivity :
     private var _binding: MainActivityBinding? = null
     private val binding: MainActivityBinding
         get() = _binding ?: throw Exception("Main view not bound")
+
     private val playerFragment: Fragment
         get() = supportFragmentManager.findFragmentById(R.id.cast_player_fragment)
             ?: throw Exception("No player fragment")
@@ -239,7 +244,6 @@ class MainActivity :
     override fun showPlayer() {
         supportFragmentManager
             .beginTransaction()
-            //.show(binding.castPlayerFragment.findFragment())
             .show(playerFragment)
             .commitAllowingStateLoss()
         binding.navHostFragment.setPadding(
@@ -253,10 +257,30 @@ class MainActivity :
     override fun hidePlayer() {
         supportFragmentManager
             .beginTransaction()
-            //.hide(binding.castPlayerFragment.findFragment())
             .hide(playerFragment)
             .commitAllowingStateLoss()
         binding.navHostFragment.setPadding(0, 0, 0, 0)
+    }
+
+    var isRaised = true
+    override fun raisePlayer() {
+        if (isRaised) {
+            val transAnimation =
+                ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", 0f, 200f)
+            transAnimation.setDuration(200)
+            transAnimation.start()
+            isRaised = false
+        }
+    }
+
+    override fun lowerPlayer() {
+        if (!isRaised) {
+            val transAnimation =
+                ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", 200f, 0f)
+            transAnimation.setDuration(200)
+            transAnimation.start()
+            isRaised = true
+        }
     }
 
     companion object {

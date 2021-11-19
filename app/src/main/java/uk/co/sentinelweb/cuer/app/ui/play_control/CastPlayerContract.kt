@@ -86,6 +86,7 @@ interface CastPlayerContract {
     companion object {
         @JvmStatic
         val viewModule = module {
+            factory { CompactPlayerScroll() }
             scope(named<CastPlayerFragment>()) {
                 viewModel { State() }
                 scoped<View> { getSource() }
