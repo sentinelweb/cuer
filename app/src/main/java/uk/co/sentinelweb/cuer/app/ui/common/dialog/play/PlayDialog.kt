@@ -87,6 +87,8 @@ class PlayDialog constructor(
                     (f.requireActivity() as? MainContract.View)?.playerControls
                 )
                 dialog.dismiss()
+            } else {
+                floatingService.requestPermission(f.requireActivity())
             }
         }
         item?.apply {

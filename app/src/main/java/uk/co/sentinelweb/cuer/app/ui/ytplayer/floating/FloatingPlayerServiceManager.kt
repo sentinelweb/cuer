@@ -12,6 +12,7 @@ class FloatingPlayerServiceManager(
     private val overlayPermission: DisplayOverlayPermissionCheck,
 ) {
     fun hasPermission(a: Activity) = overlayPermission.checkOverlayDisplayPermission(a)
+    fun requestPermission(a: Activity) = overlayPermission.requestOverlayDisplayPermission(a)
 
     fun start(a: Activity, load: PlaylistItemDomain): Boolean {
         if (!overlayPermission.checkOverlayDisplayPermission(a)) {
