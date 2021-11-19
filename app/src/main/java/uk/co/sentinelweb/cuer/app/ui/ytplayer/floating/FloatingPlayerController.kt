@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService.Companion.ACTION_INIT
@@ -71,26 +72,26 @@ class FloatingPlayerController constructor(
                 intent
                     .getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
                     ?.let { deserialisePlaylistItem(it) }
-                    ?.also { playerMviViw.dispatch(PlayerContract.View.Event.OnInitFromService(it)) }
+                    ?.also { playerMviViw.dispatch(OnInitFromService(it)) }
             }
             ACTION_PLAY_ITEM -> {
                 intent
                     .getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
                     ?.let { deserialisePlaylistItem(it) }
-                    ?.also { playerMviViw.dispatch(PlayerContract.View.Event.OnInitFromService(it)) }
+                    ?.also { playerMviViw.dispatch(OnInitFromService(it)) }
             }
             ACTION_SKIPF ->
-                playerMviViw.dispatch(PlayerContract.View.Event.SkipFwdClicked)
+                playerMviViw.dispatch(SkipFwdClicked)
             ACTION_SKIPB ->
-                playerMviViw.dispatch(PlayerContract.View.Event.SkipBackClicked)
+                playerMviViw.dispatch(SkipBackClicked)
             ACTION_PAUSE ->
-                playerMviViw.dispatch(PlayerContract.View.Event.PlayPauseClicked(true))
+                playerMviViw.dispatch(PlayPauseClicked(true))
             ACTION_PLAY ->
-                playerMviViw.dispatch(PlayerContract.View.Event.PlayPauseClicked(false))
+                playerMviViw.dispatch(PlayPauseClicked(false))
             ACTION_TRACKB ->
-                playerMviViw.dispatch(PlayerContract.View.Event.TrackBackClicked)
+                playerMviViw.dispatch(TrackBackClicked)
             ACTION_TRACKF ->
-                playerMviViw.dispatch(PlayerContract.View.Event.TrackFwdClicked)
+                playerMviViw.dispatch(TrackFwdClicked)
             else -> {
                 log.d("intent.action = ${intent.action}")
             }

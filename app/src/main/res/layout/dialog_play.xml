@@ -35,7 +35,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/dp_floating"
         style="@style/Cuer.MaterialAlertDialog.Item"
-        android:drawableStart="@drawable/ic_picture_in_picture_24"
+        android:drawableStart="@drawable/ic_picture_in_picture"
         android:text="@string/dialog_play_floating"
         android:textAppearance="@style/TextAppearance.App.Headline5" />
 

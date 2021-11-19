@@ -7,23 +7,11 @@
   <defs id="defs55" />
   <sodipodi:namedview id="namedview53" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0"
       inkscape:pageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0"
-      showgrid="false" inkscape:snap-global="true" inkscape:zoom="33.176748" inkscape:cx="8.4095043"
+      showgrid="false" inkscape:snap-global="true" inkscape:zoom="33.176748" inkscape:cx="8.3492211"
       inkscape:cy="11.905929" inkscape:window-width="1779" inkscape:window-height="1066"
       inkscape:window-x="2061" inkscape:window-y="94" inkscape:window-maximized="0"
       inkscape:current-layer="svg51" />
-  <g id="g2483">
-    <path d="M 12,2 A 10,10 0 0 1 22,12 10,10 0 0 1 12,22 10,10 0 0 1 2,12 10,10 0 0 1 12,2"
-        id="path49" style="fill:#e53935;fill-opacity:1;stroke:none" />
-    <path
-        d="m 12,4 a 8,8 0 0 0 -8,8 8,8 0 0 0 8,8 4,4 0 0 1 -4,-4 4,4 0 0 1 4,-4 4,4 0 0 0 4,-4 4,4 0 0 0 -4,-4"
-        id="path139" style="fill:#ffffff;stroke:none" />
-    <path
-        style="fill:#e53935;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-        d="M 10.687079,9.7965355 V 6.0172622 l 3.162317,1.8896367 z" id="path269"
-        sodipodi:nodetypes="cccc" />
-    <path
-        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.27;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-        d="m 13.424525,14.552853 v 3.401345 L 10.57844,16.253525 Z" id="path1846"
-        sodipodi:nodetypes="cccc" />
-  </g>
+  <path id="path269"
+      style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+      d="M 12 2 A 10 10 0 0 0 2 12 A 10 10 0 0 0 12 22 A 10 10 0 0 0 22 12 A 10 10 0 0 0 12 2 z M 12 4 A 4 4 0 0 1 16 8 A 4 4 0 0 1 12 12 A 4 4 0 0 0 8 16 A 4 4 0 0 0 12 20 A 8 8 0 0 1 4 12 A 8 8 0 0 1 12 4 z M 10.6875 6.0175781 L 10.6875 9.796875 L 13.849609 7.90625 L 10.6875 6.0175781 z M 13.423828 14.552734 L 13.423828 17.955078 L 10.578125 16.253906 L 13.423828 14.552734 z " />
 </svg>

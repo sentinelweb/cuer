@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.ytplayer.floating
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -30,6 +31,8 @@ class FloatingWindowMviView(
         }
 
     fun init() {
+//        notification.setIcon(R.drawable.ic_picture_in_picture)
+        notification.setIcon(R.drawable.ic_play_yang_combined)
         aytViewHolder.addView(service.baseContext, windowManagement.binding!!.playerContainer, this)
     }
 
@@ -61,6 +64,7 @@ class FloatingWindowMviView(
     }
 
     fun cleanup() {
+        mainPlayControls?.disconnectSource()
         mainPlayControls?.removeListener(controlsListener)
         mainPlayControls = null
     }

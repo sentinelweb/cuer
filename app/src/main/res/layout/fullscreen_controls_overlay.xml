@@ -220,7 +220,7 @@
         app:fabSize="mini"
         app:layout_constraintRight_toLeftOf="@id/controls_portrait_fab"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_picture_in_picture_24"
+        app:srcCompat="@drawable/ic_picture_in_picture"
         tools:ignore="RtlHardcoded" />
 
     <androidx.mediarouter.app.MediaRouteButton

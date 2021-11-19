@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -18,17 +19,16 @@ import org.koin.core.context.GlobalContext.get
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class CastPlayerFragment() :
     Fragment(),
@@ -38,10 +38,9 @@ class CastPlayerFragment() :
     override val scope: Scope by fragmentScopeWithSource()
     private val presenter: CastPlayerContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
-    private val imageProvider: FirebaseImageProvider by inject()
+    private val imageProvider: ImageProvider by inject()
     private val res: ResourceWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
-    private val playDialog: PlayDialog by inject()
 
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding!!
@@ -155,7 +154,8 @@ class CastPlayerFragment() :
 
     override fun setImage(url: String) {
         Glide.with(requireContext())
-            .load(url)
+            .loadFirebaseOrOtherUrl(url, imageProvider)
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.castPlayerImage)
     }
 
@@ -189,10 +189,6 @@ class CastPlayerFragment() :
 
     override fun setState(state: PlayerStateDomain?) {
         binding.castPlayerCurrentState.text = state?.toString()
-    }
-
-    override fun promptToPlay(item: PlaylistItemDomain, playlistTitle: String) {
-        playDialog.showPlayDialog(item, playlistTitle)
     }
 
     override fun updateSeekPosition(ratio: Float) {

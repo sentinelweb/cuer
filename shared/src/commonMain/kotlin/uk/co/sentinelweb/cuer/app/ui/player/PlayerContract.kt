@@ -158,6 +158,7 @@ interface PlayerContract {
         fun setPlaylistName(name: String)
         fun setPlaylistImage(image: ImageDomain?)
         fun setPlaylistItem(playlistItem: PlaylistItemDomain?, source: OrchestratorContract.Source)
+        fun disconnectSource()
 
         interface Listener {
             fun play()

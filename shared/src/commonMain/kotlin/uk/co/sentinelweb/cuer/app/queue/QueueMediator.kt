@@ -293,7 +293,7 @@ class QueueMediator constructor(
             recentLocalPlaylists.addRecent(playlistDomain)
         }
         state.playlist = playlistDomain
-        log.d("playlist: ${state.playlist?.scanOrder()}")
+        //log.d("playlist: ${state.playlist?.scanOrder()}")
         //if (this::_currentItemFlow.isInitialized) {
         _currentItemFlow.emit(currentItem)
         //}
@@ -311,5 +311,6 @@ class QueueMediator constructor(
             ?.also { refreshQueueFrom(it.first, it.second) }
     }
 
+    @Suppress("unused")
     private fun Job.ignoreJob() = Unit
 }

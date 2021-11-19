@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -29,6 +30,7 @@ class CastPlayerPresenter(
     private val res: ResourceWrapper,
     private val coroutines: CoroutineContextProvider,
     private val queue: QueueMediatorContract.Consumer,
+    private val playUseCase: PlayUseCase
 ) : CastPlayerContract.Presenter, PlayerControls, SkipContract.Listener {
 
     init {
@@ -66,9 +68,10 @@ class CastPlayerPresenter(
                 else -> Unit
             }
         } ?: run {
-            view.promptToPlay(
+            playUseCase.playLogic(
                 state.playlistItem ?: throw IllegalStateException("No playlist item"),
-                state.playlistName ?: ""
+                null,
+                false
             )
         }
     }
@@ -200,7 +203,12 @@ class CastPlayerPresenter(
 
     override fun restoreState() {
         view.setTitle(state.title)
-        // todo restore state
+    }
+
+    override fun disconnectSource() {
+        view.setPaused()
+        view.setSeekEnabled(false)
+        view.setLiveTime(null)
     }
 
     override fun setPlaylistName(name: String) {

@@ -94,7 +94,6 @@ interface PlaylistItemEditContract {
                         prefsWrapper = get(),
                         coroutines = get(),
                         floatingService = get(),
-                        alertDialogCreator = get(),
                         playDialog = get(),
                     )
                 }
@@ -107,7 +106,9 @@ interface PlaylistItemEditContract {
                         toastWrapper = get(),
                         castDialogWrapper = get(),
                         floatingService = get(),
-                        aytViewHolder = get()
+                        aytViewHolder = get(),
+                        log = get(),
+                        alertDialogCreator = get(),
                     )
                 }
                 scoped { ItemFactory(get(), get(), get()) }

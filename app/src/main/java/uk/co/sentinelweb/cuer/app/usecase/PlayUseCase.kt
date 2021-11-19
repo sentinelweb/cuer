@@ -1,14 +1,15 @@
 package uk.co.sentinelweb.cuer.app.usecase
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toPairType
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -23,7 +24,6 @@ class PlayUseCase constructor(
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
     private val floatingService: FloatingPlayerServiceManager,
-    private val alertDialogCreator: AlertDialogCreator,
     private val playDialog: PlayDialog
 ) {
 
@@ -44,13 +44,6 @@ class PlayUseCase constructor(
                 ?.let { playItem(it, resetPos) }
         } else {
             playDialog.showPlayDialog(itemDomain, playlist?.title)
-            // todo show dialog
-//            navigationMapper.navigate(
-//                NavigationModel(
-//                    NavigationModel.Target.LOCAL_PLAYER,
-//                    mapOf(NavigationModel.Param.PLAYLIST_ITEM to itemDomain)
-//                )
-//            )
         }
     }
 
@@ -58,7 +51,7 @@ class PlayUseCase constructor(
         if (queue.playlistId == itemDomain.playlistId?.toIdentifier(LOCAL)) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
         } else {
-            alertDialogCreator.create(mapChangePlaylistAlert({
+            playDialog.showDialog(mapChangePlaylistAlert({
                 val toIdentifier = itemDomain.playlistId!!.toIdentifier(LOCAL)
 
                 prefsWrapper.putPair(
@@ -69,9 +62,8 @@ class PlayUseCase constructor(
                     queue.switchToPlaylist(toIdentifier)
                     queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)
                 }
-            }, {// info
-                //view.showItemDescription(modelId, itemDomain, state.playlistIdentifier.source)
-            })).show()
+            }, {/*cancel*/ }
+            ))
         }
     }
 
@@ -89,6 +81,14 @@ class PlayUseCase constructor(
                 ?: throw IllegalArgumentException("item is not in a playlist")
             queue.switchToPlaylist(toIdentifier)
             queue.onItemSelected(item, forcePlay = true, resetPosition = false)
+        }
+    }
+
+    fun attachControls(playerControls: PlayerContract.PlayerControls?) {
+        // todo call after service starts !! :(
+        coroutines.mainScope.launch {
+            delay(500)
+            floatingService.get()?.external?.mainPlayerControls = playerControls
         }
     }
 }

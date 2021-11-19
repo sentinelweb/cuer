@@ -8,6 +8,7 @@ import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
@@ -34,6 +35,13 @@ class PlayerControlsNotificationMedia constructor(
     private val launchClass: Class<out Activity>,
 ) : PlayerControlsNotificationContract.View {
 
+    @DrawableRes
+    private var icon: Int = -1
+
+    override fun setIcon(@DrawableRes icon: Int) {
+        this.icon = icon
+    }
+
     override fun showNotification(
         state: PlayerStateDomain,
         media: MediaDomain?,
@@ -51,6 +59,9 @@ class PlayerControlsNotificationMedia constructor(
         media: MediaDomain?,
         bitmap: Bitmap?
     ): Notification {
+        if (icon == -1) {
+            throw IllegalStateException("Dont forget to set the icon")
+        }
         val pausePendingIntent: PendingIntent = pendingIntent(ACTION_PAUSE)
         val playPendingIntent: PendingIntent = pendingIntent(ACTION_PLAY)
         val skipfPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPF)
@@ -69,7 +80,7 @@ class PlayerControlsNotificationMedia constructor(
             appState.castNotificationChannelId!! // todo show error
         )
             .setDefaults(Notification.DEFAULT_ALL)
-            .setSmallIcon(R.drawable.ic_notif_status_cast_conn_white)
+            .setSmallIcon(icon)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(timeProvider.currentTimeMillis())

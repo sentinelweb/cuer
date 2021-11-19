@@ -7,6 +7,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -66,7 +67,6 @@ interface CastPlayerContract {
         fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int)
         fun setSeekEnabled(enabled: Boolean)
         fun setState(state: PlayerStateDomain?)
-        fun promptToPlay(item: PlaylistItemDomain, playlistTitle: String)
     }
 
     data class State(
@@ -98,7 +98,8 @@ interface CastPlayerContract {
                         skipControl = get(),
                         res = get(),
                         coroutines = get(),
-                        queue = get()
+                        queue = get(),
+                        playUseCase = get()
                     )
                 }
                 scoped<SkipContract.External> {
@@ -118,7 +119,8 @@ interface CastPlayerContract {
                 scoped { CastPlayerUiMapper(get(), get(), get()) }
 
                 // todo play usecase - extract
-                scoped { navigationMapper(true, this.getFragmentActivity()) }
+                scoped { AlertDialogCreator(this.getFragmentActivity()) }
+                scoped { navigationMapper(false, this.getFragmentActivity(), false) }
                 scoped {
                     PlayUseCase(
                         queue = get(),
@@ -126,7 +128,6 @@ interface CastPlayerContract {
                         prefsWrapper = get(),
                         coroutines = get(),
                         floatingService = get(),
-                        alertDialogCreator = get(),
                         playDialog = get(),
                     )
                 }
@@ -139,7 +140,9 @@ interface CastPlayerContract {
                         toastWrapper = get(),
                         castDialogWrapper = get(),
                         floatingService = get(),
-                        aytViewHolder = get()
+                        aytViewHolder = get(),
+                        log = get(),
+                        alertDialogCreator = get()
                     )
                 }
                 scoped { ItemFactory(get(), get(), get()) }

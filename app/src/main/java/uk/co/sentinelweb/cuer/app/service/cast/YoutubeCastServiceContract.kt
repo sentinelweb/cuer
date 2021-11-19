@@ -40,7 +40,8 @@ interface YoutubeCastServiceContract {
                         state = get(),
                         toastWrapper = get(),
                         skipControl = get(),
-                        mediaSessionManager = get()
+                        mediaSessionManager = get(),
+                        res = get()
                     )
                 }
                 scoped<SkipContract.External> {

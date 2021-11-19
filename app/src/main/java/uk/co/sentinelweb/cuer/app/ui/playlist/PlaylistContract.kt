@@ -239,7 +239,6 @@ interface PlaylistContract {
                         prefsWrapper = get(),
                         coroutines = get(),
                         floatingService = get(),
-                        alertDialogCreator = get(),
                         playDialog = get(),
                     )
                 }
@@ -252,7 +251,9 @@ interface PlaylistContract {
                         toastWrapper = get(),
                         castDialogWrapper = get(),
                         floatingService = get(),
-                        aytViewHolder = get()
+                        aytViewHolder = get(),
+                        log = get(),
+                        alertDialogCreator = get(),
                     )
                 }
                 viewModel { State() }

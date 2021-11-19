@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -40,6 +41,7 @@ class AytViewHolder(
     val playerView: YouTubePlayerView?
         get() = _playerView
 
+    @SuppressLint("InflateParams")
     fun create(context: Context) {
         _playerView = LayoutInflater.from(context).inflate(R.layout.view_ayt_video, null) as YouTubePlayerView
         addPlayerListener()
@@ -147,7 +149,7 @@ class AytViewHolder(
         log.d(command.toString())
         when (command) {
             is PlayerContract.PlayerCommand.Load -> {
-                log.d("PlayerCommand.Load: $_currentVideoId != ${command.platformId}")
+                log.d("PlayerCommand.Load: $_currentVideoId != ${command.platformId} start:${command.startPosition}")
                 if (_currentVideoId != command.platformId) {
                     _player?.loadVideo(command.platformId, command.startPosition / 1000f)
                 } else {

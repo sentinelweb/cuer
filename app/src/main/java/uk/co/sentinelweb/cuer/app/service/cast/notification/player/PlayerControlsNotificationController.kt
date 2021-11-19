@@ -3,9 +3,12 @@ package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.os.Build
+import androidx.core.graphics.scale
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Controller
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
@@ -13,7 +16,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.CC_DISCONNECTED
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls.Listener
+import uk.co.sentinelweb.cuer.app.util.extension.cropShapedBitmap
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -29,6 +34,7 @@ class PlayerControlsNotificationController constructor(
     private val context: Context,
     private val skipControl: SkipContract.External,
     private val mediaSessionManager: MediaSessionContract.Manager,
+    private val res: ResourceWrapper,
 ) : External, Controller, SkipContract.Listener {
 
     private var listener: Listener? = null
@@ -60,6 +66,10 @@ class PlayerControlsNotificationController constructor(
         state.bitmap = null
     }
 
+    override fun setIcon(icon: Int) {
+        view.setIcon(icon)
+    }
+
     override fun setPlayerState(playState: PlayerStateDomain) {
         state.playState = playState
         skipControl.stateChange(playState)
@@ -81,7 +91,9 @@ class PlayerControlsNotificationController constructor(
         state.media?.apply {
             state.bitmap?.let { view.showNotification(state.playState, state.media, it) }
                 ?: state.media?.image?.let { image ->
-                    Glide.with(context).asBitmap().load(image.url).into(BitmapLoadTarget())
+                    Glide.with(context).asBitmap()
+                        .load(image.url)
+                        .into(BitmapLoadTarget())
                 } ?: view.showNotification(state.playState, state.media, null)
         } ?: run {
             state.bitmap = null
@@ -91,7 +103,15 @@ class PlayerControlsNotificationController constructor(
 
     inner class BitmapLoadTarget : CustomTarget<Bitmap?>() {
         override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap?>?) {
-            state.bitmap = bitmap
+            state.bitmap = if (Build.VERSION.SDK_INT >= 30) {
+                val targetSize = res.getDimensionPixelSize(R.dimen.notif_image_size_sdk_31)
+                bitmap
+                    .scale(targetSize, targetSize)
+                    .cropShapedBitmap(context)
+            } else {
+                bitmap
+            }
+
             view.showNotification(state.playState, state.media, bitmap)
         }
 
@@ -104,7 +124,7 @@ class PlayerControlsNotificationController constructor(
 
     override fun removeListener(l: Listener) {
         if (listener == l) {
-            listener = null;
+            listener = null
         }
     }
 
@@ -140,12 +160,19 @@ class PlayerControlsNotificationController constructor(
         // not needed here
     }
 
-    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?, source: OrchestratorContract.Source) {
+    override fun setPlaylistItem(
+        playlistItem: PlaylistItemDomain?,
+        source: OrchestratorContract.Source
+    ) {
         if (state.media?.id != playlistItem?.media?.id) {
             state.bitmap = null
         }
         state.media = playlistItem?.media
         updateNotification()
+    }
+
+    override fun disconnectSource() {
+
     }
 
     override fun initMediaRouteButton() {

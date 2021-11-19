@@ -6,8 +6,11 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.DialogPlayBinding
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
@@ -17,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceMana
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlayDialog constructor(
@@ -27,8 +31,14 @@ class PlayDialog constructor(
     private val toastWrapper: ToastWrapper,
     private val castDialogWrapper: CastDialogWrapper,
     private val floatingService: FloatingPlayerServiceManager,
-    private val aytViewHolder: AytViewHolder
+    private val aytViewHolder: AytViewHolder,
+    private val log: LogWrapper,
+    private val alertDialogCreator: AlertDialogCreator,
 ) {
+    init {
+        log.tag(this)
+    }
+
     private var _binding: DialogPlayBinding? = null
     private val binding: DialogPlayBinding
         get() = _binding ?: throw Exception("DialogPlayBinding not bound")
@@ -38,6 +48,7 @@ class PlayDialog constructor(
     private lateinit var dialog: AlertDialog
 
     fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?) {
+
         _binding = DialogPlayBinding.inflate(LayoutInflater.from(f.requireContext()))
         binding.dpChromecast.setOnClickListener {
             castDialogWrapper.showRouteSelector(f.childFragmentManager)
@@ -53,7 +64,6 @@ class PlayDialog constructor(
                     mapOf(NavigationModel.Param.PLAYLIST_ITEM to item)
                 )
             )
-
         }
         binding.dpFullscreen.setOnClickListener {
             dialog.dismiss()
@@ -67,10 +77,15 @@ class PlayDialog constructor(
         binding.dpFloating.setOnClickListener {
             val hasPermission = floatingService.hasPermission(f.requireActivity())
             if (hasPermission) {
-                aytViewHolder.switchView()
+                item?.apply { playUseCase.setQueueItem(this) }
+                    ?: throw IllegalStateException("No item to play")
+                // fixme the item is not received by the player mvi binding not made yet?
+                floatingService.start(f.requireActivity(), item)
+                playUseCase.attachControls(
+                    (f.requireActivity() as? MainContract.View)?.playerControls
+                )
+                dialog.dismiss()
             }
-            floatingService.start(f.requireActivity(), item!!)
-            dialog.dismiss()
         }
         item?.apply {
             val createView = itemFactory.createView(binding.dpItemLayout)
@@ -97,6 +112,10 @@ class PlayDialog constructor(
             .setView(binding.root)
             .create()
         dialog.show()
+    }
+
+    fun showDialog(model: AlertDialogModel) {
+        alertDialogCreator.create(model).show()
     }
 
     private val emptyInteractions = object : ItemContract.Interactions {

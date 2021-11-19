@@ -18,8 +18,9 @@ class FloatingPlayerServiceManager(
             overlayPermission.requestOverlayDisplayPermission(a)
         } else {
             if (!isRunning()) {
-//                app.startForegroundService(startIntent(load))
-                app.startService(startIntent(load))
+                // todo use foreground svc !!!
+                app.startForegroundService(startIntent(load))
+                //app.startService(startIntent(load))
                 return true
             }
         }
@@ -38,6 +39,8 @@ class FloatingPlayerServiceManager(
 
     fun playItem(item: PlaylistItemDomain) = app.startService(playIntent(item))
 
+    // note this INIT intent doesnt get picked up by the MVI player for some reason
+    // video seems to come from queue trackchange
     private fun startIntent(load: PlaylistItemDomain) =
         Intent(app, FloatingPlayerService::class.java)
             .setAction(FloatingPlayerService.ACTION_INIT)

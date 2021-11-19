@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -9,7 +8,6 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 class MainPresenter(
     private val view: MainContract.View,
     private val state: MainContract.State,
-    private val playerControls: PlayerContract.PlayerControls,
     private val ytServiceManager: YoutubeCastServiceManager,
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val floatingPlayerServiceManager: FloatingPlayerServiceManager,
@@ -52,13 +50,13 @@ class MainPresenter(
             initialiseCastContext()
         }
         if (!state.playControlsInit) {
-            playerControls.initMediaRouteButton()
-            playerControls.reset()
+            view.playerControls.initMediaRouteButton()
+            view.playerControls.reset()
             state.playControlsInit = true
         }
-        ytContextHolder.playerUi = playerControls
+        ytContextHolder.playerUi = view.playerControls
         if (!ytContextHolder.isConnected()) {
-            floatingPlayerServiceManager.get()?.external?.mainPlayerControls = playerControls
+            floatingPlayerServiceManager.get()?.external?.mainPlayerControls = view.playerControls
         }
     }
 
