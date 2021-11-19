@@ -12,6 +12,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemView
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -22,7 +24,9 @@ class PlayDialog constructor(
     private val itemModelMapper: ItemModelMapper,
     private val navigationMapper: NavigationMapper,
     private val toastWrapper: ToastWrapper,
-    private val castDialogWrapper: CastDialogWrapper
+    private val castDialogWrapper: CastDialogWrapper,
+    private val floatingService: FloatingPlayerServiceManager,
+    private val aytViewHolder: AytViewHolder
 ) {
     private var _binding: DialogPlayBinding? = null
     private val binding: DialogPlayBinding
@@ -56,7 +60,11 @@ class PlayDialog constructor(
             )
         }
         binding.dpFloating.setOnClickListener {
-            toastWrapper.show("Floating player")
+            val hasPermission = floatingService.hasPermission(f.requireActivity())
+            if (hasPermission) {
+                aytViewHolder.switchView()
+            }
+            floatingService.start(f.requireActivity(), item!!)
             dialog.dismiss()
         }
         item?.apply {

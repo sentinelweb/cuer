@@ -11,7 +11,6 @@ import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
-import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
@@ -21,8 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContrac
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
-import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
@@ -43,15 +41,13 @@ class PlaylistItemEditViewModel constructor(
     private val modelMapper: PlaylistItemEditModelMapper,
     private val itemCreator: PlaylistItemCreator,
     private val log: LogWrapper,
-    private val queue: QueueMediatorContract.Producer,
-    private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val toast: ToastWrapper,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
     private val prefsWrapper: GeneralPreferencesWrapper,
-    private val floatingService: FloatingPlayerServiceManager,
     private val shareWrapper: ShareWrapper,
+    private val playUseCase: PlayUseCase
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -177,24 +173,7 @@ class PlaylistItemEditViewModel constructor(
 
     fun onPlayVideo() {
         state.editingPlaylistItem?.let { item ->
-            viewModelScope.launch {
-                if (floatingService.isRunning()) {
-                    floatingService.playItem(item)
-                } else if (!(ytContextHolder.isConnected())) {
-                    _navigateLiveData.value = NavigationModel(
-                        LOCAL_PLAYER, mapOf(
-                            NavigationModel.Param.PLAYLIST_ITEM to item
-                        )
-                    )
-                } else {
-                    item.playlistId?.let {
-                        queue.playNow(it.toIdentifier(LOCAL), item.id) // todo store source
-                    }
-                }
-            }
-//            if (!ytContextHolder.isConnected()) {
-//                _dialogModelLiveData.value = DialogModel(DialogModel.Type.SELECT_ROUTE, R.string.select_route_dialog_title)
-//            }
+            playUseCase.playLogic(item, state.selectedPlaylists.firstOrNull(), false)
         } ?: run { toast.show("Please save the item first ...") }
     }
 

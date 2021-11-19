@@ -31,7 +31,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -79,7 +78,6 @@ class PlaylistPresenter(
     private val coroutines: CoroutineContextProvider,
     private val res: ResourceWrapper,
     private val dbInit: DatabaseInitializer,
-    private val floatingService: FloatingPlayerServiceManager,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val playUseCase: PlayUseCase
 ) : PlaylistContract.Presenter, PlaylistContract.External {
@@ -294,22 +292,7 @@ class PlaylistPresenter(
     }
 
     override fun onPlayPlaylist(): Boolean {
-        if (isPlaylistPlaying()) {
-            chromeCastWrapper.killCurrentSession()
-        } else {
-            state.playlist?.let {
-                coroutines.computationScope.launch {
-                    it.id?.apply { queue.switchToPlaylist(state.playlistIdentifier) }
-                    it.currentItemOrStart()
-                        ?.let { queue.onItemSelected(it, forcePlay = true, resetPosition = false) }
-                        ?: toastWrapper.show("No items to play")
-                }
-            }
-            if (!ytCastContextHolder.isConnected()) {
-                view.showCastRouteSelectorDialog()
-            }
-        }
-
+        playUseCase.playLogic(state.playlist?.currentItemOrStart(), state.playlist, false)
         return true
     }
 

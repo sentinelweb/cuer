@@ -125,7 +125,9 @@ interface CastPlayerContract {
                         itemModelMapper = get(),
                         navigationMapper = get(),
                         toastWrapper = get(),
-                        castDialogWrapper = get()
+                        castDialogWrapper = get(),
+                        floatingService = get(),
+                        aytViewHolder = get()
                     )
                 }
                 scoped { ItemFactory(get(), get(), get()) }

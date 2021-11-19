@@ -8,8 +8,12 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -66,15 +70,13 @@ interface PlaylistItemEditContract {
                         modelMapper = get(),
                         itemCreator = get(),
                         log = get(),
-                        queue = get(),
-                        ytContextHolder = get(),
                         toast = get(),
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         playlistOrchestrator = get(),
                         prefsWrapper = get(),
-                        floatingService = get(),
-                        shareWrapper = get()
+                        shareWrapper = get(),
+                        playUseCase = get(),
                     )
                 }
                 scoped { State() }
@@ -85,6 +87,31 @@ interface PlaylistItemEditContract {
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 scoped { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
+                scoped {
+                    PlayUseCase(
+                        queue = get(),
+                        ytCastContextHolder = get(),
+                        prefsWrapper = get(),
+                        coroutines = get(),
+                        floatingService = get(),
+                        alertDialogCreator = get(),
+                        playDialog = get(),
+                    )
+                }
+                scoped {
+                    PlayDialog(
+                        getSource(),
+                        itemFactory = get(),
+                        itemModelMapper = get(),
+                        navigationMapper = get(),
+                        toastWrapper = get(),
+                        castDialogWrapper = get(),
+                        floatingService = get(),
+                        aytViewHolder = get()
+                    )
+                }
+                scoped { ItemFactory(get(), get(), get()) }
+                scoped { ItemModelMapper(get(), get(), get(), get()) }
             }
         }
 

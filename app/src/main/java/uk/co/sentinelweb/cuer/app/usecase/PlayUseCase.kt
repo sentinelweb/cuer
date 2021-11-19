@@ -17,11 +17,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-interface PlayUseCase {
-    fun playLogic(itemDomain: PlaylistItemDomain?, playlist: PlaylistDomain?, resetPos: Boolean)
-}
-
-class FullPlayUseCase constructor(
+class PlayUseCase constructor(
     private val queue: QueueMediatorContract.Producer,
     private val ytCastContextHolder: ChromecastYouTubePlayerContextHolder,
     private val prefsWrapper: GeneralPreferencesWrapper,
@@ -29,9 +25,9 @@ class FullPlayUseCase constructor(
     private val floatingService: FloatingPlayerServiceManager,
     private val alertDialogCreator: AlertDialogCreator,
     private val playDialog: PlayDialog
-) : PlayUseCase {
+) {
 
-    override fun playLogic(
+    fun playLogic(
         itemDomain: PlaylistItemDomain?,
         playlist: PlaylistDomain?,
         resetPos: Boolean
@@ -83,15 +79,4 @@ class FullPlayUseCase constructor(
             AlertDialogModel.Button(R.string.ok, confirm),
             AlertDialogModel.Button(R.string.dialog_button_view_info, info)
         )
-}
-
-class EmptyPlayUseCase : PlayUseCase {
-    override fun playLogic(
-        itemDomain: PlaylistItemDomain?,
-        playlist: PlaylistDomain?,
-        resetPos: Boolean
-    ) {
-        TODO("Not yet implemented")
-    }
-
 }

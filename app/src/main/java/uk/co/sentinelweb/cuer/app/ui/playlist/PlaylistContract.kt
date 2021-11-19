@@ -25,7 +25,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
-import uk.co.sentinelweb.cuer.app.usecase.FullPlayUseCase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
@@ -207,20 +206,15 @@ interface PlaylistContract {
                         playlistUpdateOrchestrator = get(),
                         playlistOrDefaultOrchestrator = get(),
                         dbInit = get(),
-                        floatingService = get(),
                         recentLocalPlaylists = get(),
                         itemMapper = get(),
                         playUseCase = get()
                     )
                 }
                 scoped { get<Presenter>() as External }
-                scoped {
-                    PlaylistModelMapper(
-                        itemModelMapper = get(),
-                        iconMapper = get(),
-                    )
-                }
+                scoped { PlaylistModelMapper(itemModelMapper = get(), iconMapper = get()) }
                 scoped { PlaylistAdapter(get(), getSource()) }
+                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemFactory(get(), get(), get()) }
                 scoped {
@@ -231,7 +225,6 @@ interface PlaylistContract {
                         backgroundMapper = get()
                     )
                 }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get())
                 }
@@ -239,8 +232,8 @@ interface PlaylistContract {
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 scoped { navigationMapper(true, this.getFragmentActivity(), false) }
-                scoped<PlayUseCase> {
-                    FullPlayUseCase(
+                scoped {
+                    PlayUseCase(
                         queue = get(),
                         ytCastContextHolder = get(),
                         prefsWrapper = get(),
@@ -257,7 +250,9 @@ interface PlaylistContract {
                         itemModelMapper = get(),
                         navigationMapper = get(),
                         toastWrapper = get(),
-                        castDialogWrapper = get()
+                        castDialogWrapper = get(),
+                        floatingService = get(),
+                        aytViewHolder = get()
                     )
                 }
                 viewModel { State() }
