@@ -5,7 +5,10 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.SeekBar
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
@@ -21,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import kotlin.math.abs
+import com.pierfrancescosoffritti.androidyoutubeplayer.R as aytR
 
 class AytViewHolder(
     private val res: ResourceWrapper,
@@ -59,9 +63,16 @@ class AytViewHolder(
         parent.addView(_playerView, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
 
         _progressBar = parent.getChildAt(0)
-            .findViewById(com.pierfrancescosoffritti.androidyoutubeplayer.R.id.progress)
-        _progressBar?.indeterminateDrawable =
-            res.getDrawable(R.drawable.ic_play_yang_combined_rotate)
+            .findViewById(aytR.id.progress)
+        val drawable = res.getDrawable(R.drawable.ic_play_yang_combined_rotate)
+        _progressBar?.indeterminateDrawable = drawable
+        parent.getChildAt(0)
+            .findViewById<LinearLayout>(aytR.id.youtube_player_seekbar)
+            ?.children
+            ?.filter { it is SeekBar }
+            ?.first()
+            ?.let { it as SeekBar }
+            ?.isEnabled = false
     }
 
     fun switchView() {
