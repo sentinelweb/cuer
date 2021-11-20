@@ -36,7 +36,7 @@ class PlayYangProgress(private val res: ResourceWrapper) {
 
     fun showLoading() {
         _progressBar?.isVisible = true
-        _progressAnim = ObjectAnimator.ofFloat(_progressBar, "rotation", 0f, 360f)
+        _progressAnim = ObjectAnimator.ofFloat(_progressBar, View.ROTATION, 0f, 360f)
             .apply {
                 setDuration(1000);
                 setRepeatCount(ValueAnimator.INFINITE);
