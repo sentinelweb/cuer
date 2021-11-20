@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -13,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -98,7 +98,12 @@ interface PlaylistsDialogContract {
                 scoped { PlaylistsDialogAdapter(get(), getSource()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
+                scoped<SnackbarWrapper> {
+                    AndroidSnackbarWrapper(
+                        this.getFragmentActivity(),
+                        get()
+                    )
+                }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }
                 viewModel { State() }

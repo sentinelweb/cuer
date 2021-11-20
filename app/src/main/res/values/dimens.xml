@@ -33,8 +33,8 @@
     <dimen name="share_button_width">250dp</dimen>
     <dimen name="pref_icon_size">36dp</dimen>
     <dimen name="small_corner_cut">8dp</dimen>
-    <dimen name="large_corner_cut">24dp</dimen>
     <dimen name="medium_corner_cut">16dp</dimen>
+    <dimen name="large_corner_cut">24dp</dimen>
 
     <dimen name="chip_thumb_icon_size">48dp</dimen>
     <dimen name="app_bar_header_height">200dp</dimen>
@@ -44,13 +44,17 @@
 
     <dimen name="itemview_icon_height">72dp</dimen>
     <dimen name="itemview_icon_width">128dp</dimen>
-    <dimen name="main_navhost_bottom_padding_player">64dp</dimen>
+    <dimen name="main_navhost_bottom_padding_player">32dp</dimen>
+    <dimen name="recyclerview_footer">128dp</dimen>
+    <dimen name="player_lower_y">64dp</dimen>
+    <dimen name="nav_fragment_fab_bottom_offset">88dp</dimen>
     <dimen name="min_floating_window_size">128dp</dimen>
     <dimen name="tree_node_depth">16dp</dimen>
 
     <dimen name="playlist_row_height">64dp</dimen>
     <dimen name="playlist_row_icon_height">60dp</dimen>
     <dimen name="playlist_row_icon_width">106dp</dimen>
-    <dimen name="recyclerview_footer">96dp</dimen>
     <dimen name="max_cache_image_size">100dp</dimen>
+    <dimen name="notif_image_size_sdk_31">96dp</dimen>
+
 </resources>

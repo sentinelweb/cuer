@@ -37,13 +37,13 @@ class ShareModelMapper constructor(
                     action = { finish(/*add = */true, /*play = */ false, /*forward = */ true) },
                     text = if (isMedia) res.getString(R.string.share_button_add_to_queue)
                     else res.getString(R.string.share_button_add_playlist),
-                    icon = R.drawable.ic_button_add_black,
+                    icon = R.drawable.ic_add,
                     enabled = state.ready
                 ),
                 bottomLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ false, /*forward = */ false) },
                     text = res.getString(R.string.share_button_add_return),
-                    icon = R.drawable.ic_button_back_black,
+                    icon = R.drawable.ic_back,
                     enabled = state.ready
                 )
             )
@@ -73,7 +73,7 @@ class ShareModelMapper constructor(
                 bottomLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */false, /*play = */ false, /*forward = */ false) },
                     text = res.getString(R.string.share_button_return),
-                    icon = R.drawable.ic_button_back_black,
+                    icon = R.drawable.ic_back,
                     enabled = state.ready
                 )
             )
@@ -92,7 +92,7 @@ class ShareModelMapper constructor(
             bottomLeft = ShareContract.Model.Button(
                 action = { finish(/*add = */false, /*play = */ false, /*forward = */ false) },
                 text = res.getString(R.string.share_button_return),
-                icon = R.drawable.ic_button_back_black
+                icon = R.drawable.ic_back
             ),
             isNew = false
         )

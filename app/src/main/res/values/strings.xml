@@ -182,5 +182,12 @@
     <string name="menu_search">Search</string>
     <string name="menu_playlist_add">Create playlist</string>
     <string name="playlist_empty">No Items</string>
+    <string name="dialog_play_chromecast">Chromecast</string>
+    <string name="dialog_play_portrait">Portrait</string>
+    <string name="dialog_play_fullscreen">Fullscreen</string>
+    <string name="dialog_play_floating">Floating</string>
+    <string name="dialog_play_remember_my_decision">Remember my decision</string>
+    <string name="play_dialog_title">Play Item</string>
+    <string name="dialog_play_youtube">Launch youtube</string>
 
 </resources>

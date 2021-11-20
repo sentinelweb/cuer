@@ -181,19 +181,16 @@ class PlayerStoreFactory(
         private fun trackChange(intent: Intent.TrackChange) {
             intent.item.media.duration?.apply { skip.duration = this }
             livePlaybackController.clear(intent.item.media.platformId)
+            mediaSessionManager.checkCreateMediaSession(playerControls)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
             publish(
                 Label.Command(
                     Load(
-                        intent.item.media.platformId,
-                        intent.item.media.positon ?: 0
+                        intent.item.media.platformId, intent.item.media.startPosition()
                     )
                 )
             )
-            //coroutines.mainScope.launch {
             mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
-            //}
-            log.d("trackChange(${intent.item.media.title}))")
         }
 
         private fun updatePosition(
@@ -222,9 +219,6 @@ class PlayerStoreFactory(
                 VIDEO_CUED -> {
                     item?.media?.apply {
                         publish(Label.Command(Load(platformId, startPosition())))
-                        //coroutines.mainScope.launch {
-                        //    mediaSessionManager.setMedia(item.media, queueConsumer.playlist)
-                        //}
                     }
                     Unit
                 }
@@ -277,9 +271,7 @@ class PlayerStoreFactory(
         fun MediaDomain.startPosition() = run {
             val position = positon ?: -1
             val duration = duration ?: -1
-            if (position > 0 &&
-                duration > 0 && position < duration - 10000
-            ) {
+            if (position > 0 && (duration > 0 && position < duration - 20000)) {
                 position
             } else {
                 0

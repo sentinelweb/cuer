@@ -71,10 +71,12 @@ class YouTubePlayerListener(
             playerUi?.setConnectionState(PlayerContract.ConnectionState.CC_DISCONNECTED)
             playerUi?.setPlayerState(PlayerStateDomain.PAUSED)
             playerUi?.setCurrentSecond(0f)
+
         } ?: run {
             playerUi?.reset()
             playerUi = null
         }
+        playerUi?.removeListener(this)
         coroutines.cancel()
     }
 

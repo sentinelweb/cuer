@@ -24,16 +24,22 @@ class ItemFactory constructor(
         )
     }
 
-    private fun createPresenter(
+    fun createPresenter(
         view: ItemContract.View,
         interactions: ItemContract.Interactions,
     ): ItemContract.External {
-        val itemPresenter = ItemPresenter(view, interactions, ItemContract.State(), ItemModelMapper(res, iconMapper), ytContext)
+        val itemPresenter = ItemPresenter(
+            view,
+            interactions,
+            ItemContract.State(),
+            ItemTextMapper(res, iconMapper),
+            ytContext
+        )
         view.setPresenter(itemPresenter)
         return itemPresenter
     }
 
-    private fun createView(parent: ViewGroup): ItemContract.View {
+    fun createView(parent: ViewGroup): ItemContract.View {
         val inflate = LayoutInflater.from(parent.context)
             .inflate(R.layout.view_playlist_item, parent, false)
         return inflate as ItemContract.View

@@ -28,13 +28,12 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.State
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingWindowManagement
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_VIEWED
-import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -108,18 +107,22 @@ class PlaylistPresenterTest {
     lateinit var mockDbInit: DatabaseInitializer
 
     @MockK
-    lateinit var mockFloatingWindow: FloatingPlayerServiceManager
-
-    @MockK
     lateinit var mockPlaylistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator
 
     @MockK
     lateinit var mockRecentLocalPlaylists: RecentLocalPlaylists
 
+    @MockK
+    lateinit var mockPlayUseCase: PlayUseCase
+
+    @MockK
+    lateinit var mockItemMapper: ItemModelMapper
+
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())
 
-    private val coroutines: CoroutineContextProvider = CoroutineContextTestProvider(testCoroutineDispatcher)
+    private val coroutines: CoroutineContextProvider =
+        CoroutineContextTestProvider(testCoroutineDispatcher)
     private val playlistMutator: PlaylistMutator = PlaylistMutator()
     private val log: LogWrapper = SystemLogWrapper()
 
@@ -238,9 +241,10 @@ class PlaylistPresenterTest {
             coroutines = coroutines,
             res = mockResources,
             dbInit = mockDbInit,
-            floatingService = mockFloatingWindow,
             playlistOrDefaultOrchestrator = mockPlaylistOrDefaultOrchestrator,
-            recentLocalPlaylists = mockRecentLocalPlaylists
+            recentLocalPlaylists = mockRecentLocalPlaylists,
+            playUseCase = mockPlayUseCase,
+            itemMapper = mockItemMapper
         )
         sut.onResume()
     }

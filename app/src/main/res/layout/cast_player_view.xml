@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cordinatorBottom"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:layout_constraintBottom_toBottomOf="parent"
-    >
+    app:layout_constraintBottom_toBottomOf="parent">
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottom_bar"
@@ -16,37 +14,26 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_marginTop="30dp"
-        android:paddingBottom="0dp"
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
         app:fabAlignmentMode="center"
         app:fabCradleMargin="10dp"
         app:fabCradleRoundedCornerRadius="25dp"
-        app:fabCradleVerticalOffset="0dp"
-        >
+        app:fabCradleVerticalOffset="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-
-            <!--            <View-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="2dp"-->
-            <!--                android:background="@color/primary_dark"-->
-            <!--                app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--                />-->
+            android:layout_height="wrap_content">
 
             <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
                 android:id="@+id/cast_player_image"
                 android:layout_width="64dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="8dp"
+                android:transitionName="@string/cast_player_trans_image"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:transitionName="@string/cast_player_trans_image"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.Player.Icon"
-                />
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Player.Icon" />
 
             <TextView
                 android:id="@+id/cast_player_playlist_text"
@@ -64,7 +51,7 @@
                 app:layout_constraintLeft_toLeftOf="@id/cast_player_image"
                 app:layout_constraintTop_toBottomOf="@+id/cast_player_image"
                 tools:text="playlist"
-                />
+                tools:ignore="RtlHardcoded,RtlSymmetry" />
 
             <View
                 android:id="@+id/cast_player_center"
@@ -72,16 +59,14 @@
                 android:layout_height="64dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/cast_player_seek_back"
                 style="@style/CompactPlayer.Button"
                 android:src="@drawable/ic_player_fast_rewind_black"
                 app:layout_constraintRight_toLeftOf="@id/cast_player_center"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/cast_player_skipback_text"
@@ -91,16 +76,14 @@
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@id/cast_player_seek_back"
                 app:layout_constraintLeft_toLeftOf="@+id/cast_player_seek_back"
-                tools:text="-30s"
-                />
+                tools:text="-30s" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/cast_player_seek_forward"
                 style="@style/CompactPlayer.Button"
                 android:src="@drawable/ic_player_fast_forward_black"
                 app:layout_constraintLeft_toRightOf="@id/cast_player_center"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/cast_player_skipfwd_text"
@@ -110,24 +93,21 @@
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@id/cast_player_seek_forward"
                 app:layout_constraintRight_toRightOf="@+id/cast_player_seek_forward"
-                tools:text="+30s"
-                />
+                tools:text="+30s" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/cast_player_track_last"
                 style="@style/CompactPlayer.Button"
                 android:src="@drawable/ic_player_track_b_black"
                 app:layout_constraintRight_toLeftOf="@id/cast_player_seek_back"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/cast_player_track_next"
                 style="@style/CompactPlayer.Button"
                 android:src="@drawable/ic_player_track_f_black"
                 app:layout_constraintLeft_toRightOf="@id/cast_player_seek_forward"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.mediarouter.app.MediaRouteButton
                 android:id="@+id/media_route_button"
@@ -136,8 +116,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/cast_player_position"
@@ -156,6 +135,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="16dp"
+                android:visibility="gone"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cast_player_position"
                 tools:ignore="RtlHardcoded"
@@ -165,13 +145,12 @@
                 android:id="@+id/cast_player_current_state"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:layout_constraintBottom_toTopOf="@id/cast_player_title"
                 app:layout_constraintLeft_toRightOf="@id/cast_player_seek_back"
                 app:layout_constraintRight_toLeftOf="@id/cast_player_seek_forward"
                 tools:ignore="RtlHardcoded"
-                tools:text="STATE"
-                android:visibility="gone"
-                />
+                tools:text="STATE" />
 
             <TextView
                 android:id="@+id/cast_player_title"
@@ -182,24 +161,29 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:singleLine="true"
-                app:layout_constraintLeft_toRightOf="@+id/cast_player_position"
-                app:layout_constraintRight_toLeftOf="@+id/cast_player_duration"
-                app:layout_constraintTop_toBottomOf="@id/cast_player_center"
-                tools:text="title"
                 android:transitionName="@string/cast_player_trans_title"
-                />
+                app:layout_constraintLeft_toRightOf="@+id/cast_player_position"
+                app:layout_constraintRight_toLeftOf="@+id/cast_player_duration_ctnr"
+                app:layout_constraintTop_toBottomOf="@id/cast_player_center"
+                tools:text="title" />
 
-            <TextView
-                android:id="@+id/cast_player_duration"
+            <FrameLayout
+                android:id="@+id/cast_player_duration_ctnr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:paddingHorizontal="4dp"
+                android:minWidth="56dp"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cast_player_center"
-                tools:ignore="RtlHardcoded"
-                tools:text="44:44:44"
-                />
+                app:layout_constraintTop_toBottomOf="@id/cast_player_center">
+
+                <TextView
+                    android:id="@+id/cast_player_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="4dp"
+                    android:paddingHorizontal="4dp"
+                    tools:ignore="RtlHardcoded"
+                    tools:text="44:44:44" />
+            </FrameLayout>
 
             <uk.co.sentinelweb.cuer.app.ui.common.views.SeekBarGestureExclude
                 android:id="@+id/cast_player_seek"
@@ -208,8 +192,7 @@
                 android:max="1000"
                 android:progressTint="?colorProgress"
                 android:thumbTint="?colorProgress"
-                app:layout_constraintTop_toBottomOf="@id/cast_player_title"
-                />
+                app:layout_constraintTop_toBottomOf="@id/cast_player_title" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.bottomappbar.BottomAppBar>
 
@@ -221,7 +204,7 @@
         android:tint="@color/white"
         app:backgroundTint="@color/build_primary"
         app:layout_anchor="@id/bottom_bar"
-        app:shapeAppearance="@null"
-        />
+        app:progressColor="@color/build_primary_variant"
+        app:shapeAppearance="@null" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

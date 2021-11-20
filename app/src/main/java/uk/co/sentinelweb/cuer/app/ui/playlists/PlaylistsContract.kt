@@ -1,7 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -17,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -120,18 +119,19 @@ interface PlaylistsContract {
                 }
                 scoped { PlaylistsModelMapper(get()) }
                 scoped { PlaylistsAdapter(get(), getSource()) }
-                scoped {
-                    ItemTouchHelperCallback(
-                        getSource()
+                scoped { ItemTouchHelperCallback(getSource()) }
+                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
+                scoped<SnackbarWrapper> {
+                    AndroidSnackbarWrapper(
+                        this.getFragmentActivity(),
+                        get()
                     )
                 }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
-                scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
+                scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }
-                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
+                scoped { navigationMapper(true, this.getFragmentActivity()) }
                 viewModel { State() }
             }
         }

@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
 import android.graphics.Bitmap
+import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -10,6 +11,7 @@ interface PlayerControlsNotificationContract {
     interface External : PlayerContract.PlayerControls {
         fun handleAction(action: String?)
         fun destroy()
+        fun setIcon(@DrawableRes icon: Int)
     }
 
     interface Controller {
@@ -24,6 +26,7 @@ interface PlayerControlsNotificationContract {
         )
 
         fun stopSelf()
+        fun setIcon(@DrawableRes icon: Int)
     }
 
     data class State(

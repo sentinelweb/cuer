@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -25,6 +26,7 @@ class CastPlayerPresenter(
     private val log: LogWrapper,
     private val skipControl: SkipContract.External,
     private val res: ResourceWrapper,
+    private val playUseCase: PlayUseCase
 ) : CastPlayerContract.Presenter, PlayerControls, SkipContract.Listener {
 
     init {
@@ -55,10 +57,18 @@ class CastPlayerPresenter(
     }
 
     override fun onPlayPausePressed() {
-        when (state.playState) {
-            PLAYING -> listener?.pause()
-            VIDEO_CUED, UNSTARTED, PAUSED, UNKNOWN -> listener?.play()
-            else -> Unit
+        listener?.apply {
+            when (state.playState) {
+                PLAYING -> listener?.pause()
+                VIDEO_CUED, UNSTARTED, PAUSED, UNKNOWN -> listener?.play()
+                else -> Unit
+            }
+        } ?: run {
+            playUseCase.playLogic(
+                state.playlistItem ?: throw IllegalStateException("No playlist item"),
+                null,
+                false
+            )
         }
     }
 
@@ -100,6 +110,7 @@ class CastPlayerPresenter(
     }
 
     override fun onSeekFinished() {
+        state.playState = BUFFERING
         listener?.seekTo(state.seekPositionMs)
         state.seekPositionMs = 0
     }
@@ -142,8 +153,10 @@ class CastPlayerPresenter(
         if (state.durationMs > 0) {
             if (!state.isLiveStream) {
                 view.setPosition(mapper.formatTime(state.positionMs))
-                view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
-                view.setLiveTime("")
+                if (state.playState != BUFFERING) {
+                    view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
+                }
+                view.setLiveTime(null)
             } else {
                 listener
                     ?.getLiveOffsetMs()
@@ -189,10 +202,16 @@ class CastPlayerPresenter(
 
     override fun restoreState() {
         view.setTitle(state.title)
-        // todo restore state
+    }
+
+    override fun disconnectSource() {
+        view.setPaused()
+        view.setSeekEnabled(false)
+        view.setLiveTime(null)
     }
 
     override fun setPlaylistName(name: String) {
+        state.playlistName = name
         view.setPlaylistName(name)
     }
 

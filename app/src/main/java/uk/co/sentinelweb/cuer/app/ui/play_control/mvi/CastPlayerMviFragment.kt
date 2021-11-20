@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.annotation.ColorRes
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
@@ -108,8 +109,9 @@ class CastPlayerMviFragment() :
         binding.castPlayerPosition.text = second
     }
 
-    fun setLiveTime(second: String) {
-        binding.castPlayerLiveTime.text = second
+    fun setLiveTime(second: String?) {
+        binding.castPlayerLiveTime.isVisible = second != null
+        second?.apply { binding.castPlayerLiveTime.text = second }
     }
 
     fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int) {

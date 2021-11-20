@@ -1,8 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
 import androidx.annotation.ColorRes
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import kotlinx.serialization.Serializable
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -10,8 +8,13 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -67,30 +70,48 @@ interface PlaylistItemEditContract {
                         modelMapper = get(),
                         itemCreator = get(),
                         log = get(),
-                        queue = get(),
-                        ytContextHolder = get(),
                         toast = get(),
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         playlistOrchestrator = get(),
                         prefsWrapper = get(),
-                        floatingService = get(),
-                        shareWrapper = get()
+                        shareWrapper = get(),
+                        playUseCase = get(),
                     )
                 }
                 scoped { State() }
                 scoped { PlaylistItemEditModelMapper(get(), get(), get(), get()) }
-                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
-                scoped { SelectDialogCreator((getSource() as Fragment).requireActivity()) }
-                scoped { getSource<Fragment>().requireActivity() }
-                scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
+                scoped { navigationMapper(true, this.getFragmentActivity()) }
+                scoped { SelectDialogCreator(this.getFragmentActivity()) }
+                scoped { this.getFragmentActivity() }
+                scoped { AlertDialogCreator(this.getFragmentActivity()) }
+                scoped { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
+                scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped {
-                    AndroidSnackbarWrapper(
-                        (getSource() as Fragment).requireActivity(),
-                        get()
+                    PlayUseCase(
+                        queue = get(),
+                        ytCastContextHolder = get(),
+                        prefsWrapper = get(),
+                        coroutines = get(),
+                        floatingService = get(),
+                        playDialog = get(),
                     )
                 }
-                scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
+                scoped {
+                    PlayDialog(
+                        getSource(),
+                        itemFactory = get(),
+                        itemModelMapper = get(),
+                        navigationMapper = get(),
+                        castDialogWrapper = get(),
+                        floatingService = get(),
+                        log = get(),
+                        alertDialogCreator = get(),
+                        youtubeApi = get(),
+                    )
+                }
+                scoped { ItemFactory(get(), get(), get()) }
+                scoped { ItemModelMapper(get(), get(), get(), get()) }
             }
         }
 

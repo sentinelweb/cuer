@@ -27,10 +27,11 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
@@ -63,6 +64,7 @@ class PlaylistPresenter(
     private val playlistUpdateOrchestrator: PlaylistUpdateOrchestrator,
     private val playlistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator,
     private val modelMapper: PlaylistModelMapper,
+    private val itemMapper: ItemModelMapper,
     private val queue: QueueMediatorContract.Producer,
     private val toastWrapper: ToastWrapper,
     private val ytCastContextHolder: ChromecastYouTubePlayerContextHolder,
@@ -76,8 +78,8 @@ class PlaylistPresenter(
     private val coroutines: CoroutineContextProvider,
     private val res: ResourceWrapper,
     private val dbInit: DatabaseInitializer,
-    private val floatingService: FloatingPlayerServiceManager,
-    private val recentLocalPlaylists: RecentLocalPlaylists
+    private val recentLocalPlaylists: RecentLocalPlaylists,
+    private val playUseCase: PlayUseCase
 ) : PlaylistContract.Presenter, PlaylistContract.External {
 
     override var interactions: PlaylistContract.Interactions? = null
@@ -293,19 +295,8 @@ class PlaylistPresenter(
         if (isPlaylistPlaying()) {
             chromeCastWrapper.killCurrentSession()
         } else {
-            state.playlist?.let {
-                coroutines.computationScope.launch {
-                    it.id?.apply { queue.switchToPlaylist(state.playlistIdentifier) }
-                    it.currentItemOrStart()
-                        ?.let { queue.onItemSelected(it, forcePlay = true, resetPosition = false) }
-                        ?: toastWrapper.show("No items to play")
-                }
-            }
-            if (!ytCastContextHolder.isConnected()) {
-                view.showCastRouteSelectorDialog()
-            }
+            playUseCase.playLogic(state.playlist?.currentItemOrStart(), state.playlist, false)
         }
-
         return true
     }
 
@@ -412,23 +403,8 @@ class PlaylistPresenter(
             ?.let { itemDomain ->
                 if (interactions != null) {
                     interactions?.onPlay(itemDomain)
-                } else if (floatingService.isRunning()) {
-                    floatingService.playItem(itemDomain)
-                } else if (!(ytCastContextHolder.isConnected())) {
-                    view.navigate(
-                        NavigationModel(
-                            LOCAL_PLAYER,
-                            mapOf(PLAYLIST_ITEM to itemDomain)
-                        )
-                    )
                 } else {
-                    itemDomain.playlistId?.let {
-                        playItem(itemModel.id, itemDomain, false)
-                    } ?: run {
-                        val source =
-                            if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
-                        view.showItemDescription(itemModel.id, itemDomain, source)
-                    }
+                    playUseCase.playLogic(itemDomain, state.playlist, false)
                 }
             } // todo error
     }
@@ -438,20 +414,9 @@ class PlaylistPresenter(
             ?.let { itemDomain ->
                 if (interactions != null) {
                     interactions?.onPlayStartClick(itemDomain)
-                } else if (floatingService.isRunning()) {
-                    floatingService.playItem(itemDomain)
-                } else if (!ytCastContextHolder.isConnected()) {
-                    view.navigate(
-                        NavigationModel(
-                            LOCAL_PLAYER,
-                            mapOf(PLAYLIST_ITEM to itemDomain)
-                        )
-                    )
-                } else {
-                    playItem(itemModel.id, itemDomain, true)
-                }
-            } // todo error
-    }
+                } else playUseCase.playLogic(itemDomain, state.playlist, false)
+            }
+    } // todo error
 
     override fun onStarPlaylist(): Boolean {
         state.playlist
@@ -535,29 +500,6 @@ class PlaylistPresenter(
                     )
                 )
             }
-    }
-
-    private fun playItem(modelId: Long, itemDomain: PlaylistItemDomain, resetPos: Boolean) {
-        if (queue.playlistId == itemDomain.playlistId?.toIdentifier(LOCAL)) {
-            queue.onItemSelected(itemDomain, resetPosition = resetPos)
-        } else {
-            view.showAlertDialog(modelMapper.mapChangePlaylistAlert({
-                state.playlist?.let {
-                    val toIdentifier = if (it.config.playable) {
-                        state.playlistIdentifier
-                    } else {
-                        itemDomain.playlistId!!.toIdentifier(LOCAL)
-                    }
-                    prefsWrapper.putPair(CURRENT_PLAYLIST, toIdentifier.toPairType<Long>())
-                    coroutines.computationScope.launch {
-                        it.id?.apply { queue.switchToPlaylist(toIdentifier) }
-                        queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)
-                    }
-                }
-            }, {// info
-                view.showItemDescription(modelId, itemDomain, state.playlistIdentifier.source)
-            }))
-        }
     }
 
     private fun commitHeaderChange(plist: PlaylistDomain) {
@@ -877,13 +819,18 @@ class PlaylistPresenter(
         state.playlist = state.playlist?.let {
             it.copy(items = it.items.toMutableList().apply { set(index, changedItem) })
         }
-        val mappedItem = modelMapper.mapItem(
+
+        val mappedItem = itemMapper.mapItem(
             modelId, changedItem, index,
             state.playlist?.config?.editableItems ?: false,
             state.playlist?.config?.deletableItems ?: false,
             state.playlist?.config?.editable ?: false,
-            playlists = state.playlistsTreeLookup,
-            currentPlaylistId = state.playlist?.id
+            playlistText = modelMapper.mapPlaylistText(
+                changedItem,
+                state.playlist,
+                state.playlistsTreeLookup
+            ),
+            showOverflow = true
         )
         state.model = state.model?.let {
             it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })

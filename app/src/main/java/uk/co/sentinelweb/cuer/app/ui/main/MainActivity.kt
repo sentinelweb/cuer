@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
@@ -27,6 +28,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
@@ -39,12 +42,14 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
+
 class MainActivity :
     AppCompatActivity(),
     MainContract.View,
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     NavigationProvider,
     DoneNavigation,
+    CompactPlayerScroll.PlayerHost,
     AndroidScopeComponent,
     MainContract.PlayerViewControl {
 
@@ -64,18 +69,24 @@ class MainActivity :
     private var _binding: MainActivityBinding? = null
     private val binding: MainActivityBinding
         get() = _binding ?: throw Exception("Main view not bound")
-    private val playerFragment: Fragment by lazy {
-        supportFragmentManager.findFragmentById(R.id.cast_player_fragment)
+
+    private val playerFragment: Fragment
+        get() = supportFragmentManager.findFragmentById(R.id.cast_player_fragment)
             ?: throw Exception("No player fragment")
-    }
 
     init {
         log.tag(this)
     }
 
+    override val playerControls: PlayerContract.PlayerControls by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (!isChangingConfigurations) {
+            installSplashScreen()
+        } else {
+            setTheme(R.style.AppTheme)
+        }
         super.onCreate(savedInstanceState)
-        installSplashScreen()
         _binding = MainActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
@@ -106,8 +117,10 @@ class MainActivity :
             .takeIf { it > 0 }
             .apply {
                 when (this) {
-                    1 -> navController.navigate(R.id.navigation_playlists)
-                    2 -> navController.navigate(R.id.navigation_playlist)
+                    1 -> if (navController.currentDestination?.id != R.id.navigation_playlists)
+                        navController.navigate(R.id.navigation_playlists)
+                    2 -> if (navController.currentDestination?.id != R.id.navigation_playlist)
+                        navController.navigate(R.id.navigation_playlist)
                 }
             }
         presenter.initialise()
@@ -231,7 +244,6 @@ class MainActivity :
     override fun showPlayer() {
         supportFragmentManager
             .beginTransaction()
-            //.show(binding.castPlayerFragment.findFragment())
             .show(playerFragment)
             .commitAllowingStateLoss()
         binding.navHostFragment.setPadding(
@@ -245,10 +257,32 @@ class MainActivity :
     override fun hidePlayer() {
         supportFragmentManager
             .beginTransaction()
-            //.hide(binding.castPlayerFragment.findFragment())
             .hide(playerFragment)
             .commitAllowingStateLoss()
         binding.navHostFragment.setPadding(0, 0, 0, 0)
+    }
+
+    var isRaised = true
+    override fun raisePlayer() {
+        if (isRaised) {
+            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
+            val transAnimation =
+                ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", 0f, lowerY)
+            transAnimation.setDuration(200)
+            transAnimation.start()
+            isRaised = false
+        }
+    }
+
+    override fun lowerPlayer() {
+        if (!isRaised) {
+            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
+            val transAnimation =
+                ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", lowerY, 0f)
+            transAnimation.setDuration(200)
+            transAnimation.start()
+            isRaised = true
+        }
     }
 
     companion object {

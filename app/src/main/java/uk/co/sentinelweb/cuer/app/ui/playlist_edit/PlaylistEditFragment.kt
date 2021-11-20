@@ -266,14 +266,14 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                     binding.peCollapsingToolbar.title = model.titleDisplay
                     binding.peClickPrompt.isVisible = !model.isDialog
                     val starIconResource =
-                        if (model.starred) R.drawable.ic_button_starred_white
-                        else R.drawable.ic_button_unstarred_white
+                        if (model.starred) R.drawable.ic_starred
+                        else R.drawable.ic_starred_off
                     starMenuItem.setIcon(starIconResource)
                     binding.peStarFab.setImageResource(starIconResource)
 
                     val pinIconResource =
-                        if (model.pinned) R.drawable.ic_push_pin_on_24
-                        else R.drawable.ic_push_pin_off_24
+                        if (model.pinned) R.drawable.ic_push_pin_on
+                        else R.drawable.ic_push_pin_off
                     pinMenuItem.setIcon(pinIconResource)
                     binding.pePinFab.setImageResource(pinIconResource)
 

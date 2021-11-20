@@ -26,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
+import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
@@ -54,6 +55,7 @@ class PlaylistsFragment :
     private val log: LogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navMapper: NavigationMapper by inject()
+    private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     private var _binding: PlaylistsFragmentBinding? = null
     private val binding get() = _binding!!
@@ -105,6 +107,7 @@ class PlaylistsFragment :
                 R.color.white
             )
         )
+        compactPlayerScroll.addScrollListener(binding.playlistsList, this)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
         binding.playlistsSwipe.isRefreshing = true
         postponeEnterTransition()

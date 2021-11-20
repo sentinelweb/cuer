@@ -7,13 +7,20 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -40,7 +47,7 @@ interface CastPlayerContract {
         val playerControls: PlayerContract.PlayerControls
         fun initMediaRouteButton()
         fun setPosition(second: String)
-        fun setLiveTime(second: String)
+        fun setLiveTime(second: String?)
         fun setDuration(duration: String)
         fun setPlaying()
         fun setPaused()
@@ -72,15 +79,16 @@ interface CastPlayerContract {
         var playlistItem: PlaylistItemDomain? = null,
         var isLiveStream: Boolean = false,
         var isUpcoming: Boolean = false,
-        var source: OrchestratorContract.Source = OrchestratorContract.Source.LOCAL
-    ) : ViewModel() {
-
-    }
+        var source: OrchestratorContract.Source = OrchestratorContract.Source.LOCAL,
+        var playlistName: String? = null
+    ) : ViewModel()
 
     companion object {
         @JvmStatic
         val viewModule = module {
+            factory { CompactPlayerScroll() }
             scope(named<CastPlayerFragment>()) {
+                viewModel { State() }
                 scoped<View> { getSource() }
                 scoped<Presenter> {
                     CastPlayerPresenter(
@@ -89,7 +97,8 @@ interface CastPlayerContract {
                         state = get(),
                         log = get(),
                         skipControl = get(),
-                        res = get()
+                        res = get(),
+                        playUseCase = get()
                     )
                 }
                 scoped<SkipContract.External> {
@@ -103,13 +112,46 @@ interface CastPlayerContract {
                 }
                 scoped<SkipContract.View> {
                     SkipView(
-                        selectDialogCreator = SelectDialogCreator(
-                            context = getSource<CastPlayerFragment>().requireContext()
-                        )
+                        selectDialogCreator = SelectDialogCreator(context = this.getFragmentActivity())
                     )
                 }
                 scoped { CastPlayerUiMapper(get(), get(), get()) }
-                viewModel { State() }
+
+                // todo play usecase - extract
+                scoped { AlertDialogCreator(this.getFragmentActivity()) }
+                scoped { navigationMapper(false, this.getFragmentActivity(), false) }
+                scoped {
+                    PlayUseCase(
+                        queue = get(),
+                        ytCastContextHolder = get(),
+                        prefsWrapper = get(),
+                        coroutines = get(),
+                        floatingService = get(),
+                        playDialog = get(),
+                    )
+                }
+                scoped {
+                    PlayDialog(
+                        getSource(),
+                        itemFactory = get(),
+                        itemModelMapper = get(),
+                        navigationMapper = get(),
+                        castDialogWrapper = get(),
+                        floatingService = get(),
+                        log = get(),
+                        alertDialogCreator = get(),
+                        youtubeApi = get(),
+                    )
+                }
+                scoped { ItemFactory(get(), get(), get()) }
+                scoped {
+                    ItemModelMapper(
+                        res = get(),
+                        timeFormatter = get(),
+                        timeSinceFormatter = get(),
+                        backgroundMapper = get()
+                    )
+                }
             }
         }
     }

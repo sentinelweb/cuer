@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.service.remote
 
 import android.app.Notification
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
@@ -42,7 +43,7 @@ class RemoteNotification constructor(
 
         val contentIntent = Intent(service, MainActivity::class.java)
         val contentPendingIntent: PendingIntent =
-            PendingIntent.getActivity(service, 0, contentIntent, 0)
+            PendingIntent.getActivity(service, 0, contentIntent, FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(
             service,
@@ -69,7 +70,7 @@ class RemoteNotification constructor(
             putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
         }
         val pendingIntent: PendingIntent =
-            PendingIntent.getService(service, 0, intent, 0)
+            PendingIntent.getService(service, 0, intent, FLAG_IMMUTABLE)
         return pendingIntent
     }
 

@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.util.extension
 import android.app.Activity
 import android.app.Service
 import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import org.koin.android.scope.AndroidScopeComponent
@@ -50,9 +51,13 @@ class LifecycleScopeWithSourceDelegate(
     },
 ) : ReadOnlyProperty<LifecycleOwner, Scope> {
 
-    private val _lifecycleDelegate = LifecycleScopeDelegate(lifecycleOwner, koinContext, createScope)
+    private val _lifecycleDelegate =
+        LifecycleScopeDelegate(lifecycleOwner, koinContext, createScope)
 
     override fun getValue(thisRef: LifecycleOwner, property: KProperty<*>): Scope {
         return _lifecycleDelegate.getValue(thisRef, property)
     }
 }
+
+fun Scope.getFragmentActivity(): AppCompatActivity =
+    (this.getSource() as Fragment).requireActivity() as AppCompatActivity

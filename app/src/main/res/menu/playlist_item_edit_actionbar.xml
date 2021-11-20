@@ -33,7 +33,7 @@
 
     <item
         android:id="@+id/plie_star"
-        android:icon="@drawable/ic_button_unstarred_white"
+        android:icon="@drawable/ic_starred_off"
         android:title="@string/menu_star"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="ifRoom"

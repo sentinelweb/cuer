@@ -120,6 +120,11 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         popupMenu?.dismiss()
     }
 
+    override fun setShowOverflow(showOverflow: Boolean) {
+        binding.listitemOverflowClick.isVisible = showOverflow
+        binding.listitemOverflowImg.isVisible = showOverflow
+    }
+
     fun resetBackground() {
         binding.swipeLabelRight.fade(false)
         binding.swipeLabelLeft.fade(false)

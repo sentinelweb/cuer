@@ -1,9 +1,15 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.SeekBar
+import androidx.core.view.children
+import androidx.core.view.isVisible
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -14,11 +20,14 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import kotlin.math.abs
+import com.pierfrancescosoffritti.androidyoutubeplayer.R as aytR
 
 class AytViewHolder(
+    private val res: ResourceWrapper,
     private val log: LogWrapper,
 ) {
     init {
@@ -27,6 +36,7 @@ class AytViewHolder(
 
     private var _playerView: YouTubePlayerView? = null
     private var _mviView: BaseMviView<Model, Event>? = null
+    private var _progressBar: ProgressBar? = null
 
     private var _player: YouTubePlayer? = null
     private var _lastPositionSec: Float = -1f
@@ -40,8 +50,10 @@ class AytViewHolder(
     val playerView: YouTubePlayerView?
         get() = _playerView
 
+    @SuppressLint("InflateParams")
     fun create(context: Context) {
-        _playerView = LayoutInflater.from(context).inflate(R.layout.view_ayt_video, null) as YouTubePlayerView
+        _playerView =
+            LayoutInflater.from(context).inflate(R.layout.view_ayt_video, null) as YouTubePlayerView
         addPlayerListener()
     }
 
@@ -49,6 +61,18 @@ class AytViewHolder(
         if (_playerView == null) create(context)
         _mviView = mviView
         parent.addView(_playerView, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+
+        _progressBar = parent.getChildAt(0)
+            .findViewById(aytR.id.progress)
+        val drawable = res.getDrawable(R.drawable.ic_play_yang_combined_rotate)
+        _progressBar?.indeterminateDrawable = drawable
+        parent.getChildAt(0)
+            .findViewById<LinearLayout>(aytR.id.youtube_player_seekbar)
+            ?.children
+            ?.filter { it is SeekBar }
+            ?.first()
+            ?.let { it as SeekBar }
+            ?.isEnabled = false
     }
 
     fun switchView() {
@@ -69,6 +93,7 @@ class AytViewHolder(
             _playerView = null
             _mviView = null
             _player = null
+            _progressBar = null
             _fadeViewHelper?.apply { _player?.removeListener(this) }
             _currentVideoId = null
             _lastPositionSec = -1f
@@ -82,7 +107,7 @@ class AytViewHolder(
             override fun onReady(youTubePlayer: YouTubePlayer) {
                 _player = youTubePlayer
                 log.d("onReady")
-                _mviView?.dispatch(Event.PlayerStateChanged(PlayerStateDomain.VIDEO_CUED))
+                _mviView?.dispatch(Event.PlayerStateChanged(VIDEO_CUED))
             }
 
             override fun onApiChange(youTubePlayer: YouTubePlayer) = Unit
@@ -98,30 +123,40 @@ class AytViewHolder(
 
             override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
                 _player = youTubePlayer
-                _mviView?.dispatch(Event.PlayerStateChanged(PlayerStateDomain.ERROR))
+                _mviView?.dispatch(Event.PlayerStateChanged(ERROR))
             }
 
-            override fun onPlaybackQualityChange(youTubePlayer: YouTubePlayer, playbackQuality: PlayerConstants.PlaybackQuality) {
+            override fun onPlaybackQualityChange(
+                youTubePlayer: YouTubePlayer,
+                playbackQuality: PlayerConstants.PlaybackQuality
+            ) {
                 _player = youTubePlayer
             }
 
-            override fun onPlaybackRateChange(youTubePlayer: YouTubePlayer, playbackRate: PlayerConstants.PlaybackRate) {
+            override fun onPlaybackRateChange(
+                youTubePlayer: YouTubePlayer,
+                playbackRate: PlayerConstants.PlaybackRate
+            ) {
                 _player = youTubePlayer
             }
 
-            override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
+            override fun onStateChange(
+                youTubePlayer: YouTubePlayer,
+                state: PlayerConstants.PlayerState
+            ) {
                 _player = youTubePlayer
                 val playStateDomain = when (state) {
-                    PlayerConstants.PlayerState.ENDED -> PlayerStateDomain.ENDED
-                    PlayerConstants.PlayerState.PAUSED -> PlayerStateDomain.PAUSED
-                    PlayerConstants.PlayerState.PLAYING -> PlayerStateDomain.PLAYING
-                    PlayerConstants.PlayerState.BUFFERING -> PlayerStateDomain.BUFFERING
-                    PlayerConstants.PlayerState.UNSTARTED -> PlayerStateDomain.UNSTARTED
-                    PlayerConstants.PlayerState.UNKNOWN -> PlayerStateDomain.UNKNOWN
-                    PlayerConstants.PlayerState.VIDEO_CUED -> PlayerStateDomain.VIDEO_CUED
+                    PlayerConstants.PlayerState.ENDED -> ENDED
+                    PlayerConstants.PlayerState.PAUSED -> PAUSED
+                    PlayerConstants.PlayerState.PLAYING -> PLAYING
+                    PlayerConstants.PlayerState.BUFFERING -> BUFFERING
+                    PlayerConstants.PlayerState.UNSTARTED -> UNSTARTED
+                    PlayerConstants.PlayerState.UNKNOWN -> UNKNOWN
+                    PlayerConstants.PlayerState.VIDEO_CUED -> VIDEO_CUED
                 }
                 _mviView?.dispatch(Event.PlayerStateChanged(playStateDomain))
-                //updateMediaSessionManagerPlaybackState()// todo ??
+                _progressBar?.isVisible =
+                    playStateDomain == BUFFERING || playStateDomain == UNSTARTED
             }
 
             override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
@@ -136,7 +171,10 @@ class AytViewHolder(
                 //dispatch(PlayerStateChanged(VIDEO_CUED))
             }
 
-            override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {
+            override fun onVideoLoadedFraction(
+                youTubePlayer: YouTubePlayer,
+                loadedFraction: Float
+            ) {
                 _player = youTubePlayer
             }
 
@@ -147,7 +185,7 @@ class AytViewHolder(
         log.d(command.toString())
         when (command) {
             is PlayerContract.PlayerCommand.Load -> {
-                log.d("PlayerCommand.Load: $_currentVideoId != ${command.platformId}")
+                log.d("PlayerCommand.Load: $_currentVideoId != ${command.platformId} start:${command.startPosition}")
                 if (_currentVideoId != command.platformId) {
                     _player?.loadVideo(command.platformId, command.startPosition / 1000f)
                 } else {

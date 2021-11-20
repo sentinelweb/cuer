@@ -78,7 +78,7 @@
                     android:layout_height="@dimen/flag_size"
                     android:contentDescription="@string/default_playlist"
                     android:padding="2dp"
-                    android:src="@drawable/ic_playlist_default_black"
+                    android:src="@drawable/ic_playlist_default"
                     android:visibility="gone"
                     app:tint="@color/white"
                     />
@@ -100,7 +100,7 @@
                     android:layout_height="@dimen/flag_size"
                     android:contentDescription="@string/menu_pin"
                     android:padding="2dp"
-                    android:src="@drawable/ic_push_pin_on_24"
+                    android:src="@drawable/ic_push_pin_on"
                     android:visibility="gone"
                     app:tint="@color/white"
                     />
@@ -170,7 +170,7 @@
         android:layout_height="300dp"
         android:gravity="center"
         android:text="@string/playlist_empty"
-        android:textAppearance="@style/TextAppearance.App.Headline3"
+        android:textAppearance="@style/TextAppearance.App.Headline2"
         android:textColor="@color/grey_500"
         android:visibility="gone"
         app:layoutManager="LinearLayoutManager"
@@ -217,13 +217,13 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="@dimen/nav_fragment_fab_bottom_offset"
         android:contentDescription="@string/playlist_fab_refresh_contentdesc"
         app:fabSize="mini"
         app:layout_anchor="@+id/playlist_swipe"
         app:layout_anchorGravity="bottom|right"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
-        app:srcCompat="@drawable/ic_baseline_refresh_24"
+        app:srcCompat="@drawable/ic_refresh"
         android:visibility="gone"
         />
 
@@ -254,7 +254,7 @@
         app:fabSize="mini"
         app:layout_anchor="@id/playlist_appbar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_button_shuffle_24"
+        app:srcCompat="@drawable/ic_playmode_shuffle"
         tools:ignore="RtlSymmetry"
         android:visibility="gone"
         />

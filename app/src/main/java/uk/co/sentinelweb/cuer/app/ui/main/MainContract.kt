@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -28,6 +29,7 @@ interface MainContract {
     }
 
     interface View {
+        val playerControls: PlayerContract.PlayerControls
         fun checkPlayServices()
         fun isRecreating(): Boolean
         fun showMessage(msg: String)
@@ -55,7 +57,6 @@ interface MainContract {
                     MainPresenter(
                         view = get(),
                         state = get(),
-                        playerControls = get(),
                         ytServiceManager = get(),
                         ytContextHolder = get(),
                         log = get(),

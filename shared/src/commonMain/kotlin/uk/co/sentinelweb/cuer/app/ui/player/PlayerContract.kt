@@ -90,7 +90,7 @@ interface PlayerContract {
             data class Times constructor(
                 val positionText: String,
                 val durationText: String,
-                val liveTime: String,
+                val liveTime: String?,
                 val isLive: Boolean,
                 val seekBarFraction: Float,
             )
@@ -158,6 +158,7 @@ interface PlayerContract {
         fun setPlaylistName(name: String)
         fun setPlaylistImage(image: ImageDomain?)
         fun setPlaylistItem(playlistItem: PlaylistItemDomain?, source: OrchestratorContract.Source)
+        fun disconnectSource()
 
         interface Listener {
             fun play()

@@ -2,8 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_edit
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -16,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_EDIT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.validator.ValidatorModel
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -89,19 +88,13 @@ interface PlaylistEditContract {
                 }
                 scoped { State() }
                 factory { PlaylistEditModelMapper(res = get(), validator = get()) }
-                scoped { ChipCreator((getSource() as Fragment).requireActivity(), get(), get()) }
+                scoped { ChipCreator(this.getFragmentActivity(), get(), get()) }
                 factory { PlaylistValidator(get()) }
                 scoped<SnackbarWrapper> {
-                    AndroidSnackbarWrapper(
-                        (getSource() as Fragment).requireActivity(),
-                        get()
-                    )
+                    AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }
                 scoped {
-                    navigationMapper(
-                        true,
-                        getSource<Fragment>().requireActivity() as AppCompatActivity
-                    )
+                    navigationMapper(true, this.getFragmentActivity())
                 }
             }
         }

@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.ytplayer.floating
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -30,19 +31,19 @@ class FloatingWindowMviView(
         }
 
     fun init() {
+//        notification.setIcon(R.drawable.ic_picture_in_picture)
+        notification.setIcon(R.drawable.ic_play_yang_combined)
         aytViewHolder.addView(service.baseContext, windowManagement.binding!!.playerContainer, this)
     }
 
     override val renderer: ViewRenderer<Model> = diff {
         diff(get = Model::playState, set = {
             notification.setPlayerState(it)
-            mainPlayControls?.apply {
-                setPlayerState(it)
-            }
+            mainPlayControls
+                ?.apply { setPlayerState(it) }
         })
         diff(get = Model::playlistItem, set = { item ->
             notification.setPlaylistItem(item, LOCAL)
-            // fixme: actually a better way would be to just route the queue currentItem through the ytCastConneionListenr then all this data get updated automatically
             mainPlayControls?.apply {
                 item?.also { item ->
                     item.media.duration?.let { setDuration(it / 1000f) }
@@ -63,6 +64,8 @@ class FloatingWindowMviView(
     }
 
     fun cleanup() {
+        mainPlayControls?.disconnectSource()
+        mainPlayControls?.removeListener(controlsListener)
         mainPlayControls = null
     }
 

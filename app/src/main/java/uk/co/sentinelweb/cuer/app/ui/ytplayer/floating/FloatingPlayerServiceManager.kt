@@ -12,14 +12,14 @@ class FloatingPlayerServiceManager(
     private val overlayPermission: DisplayOverlayPermissionCheck,
 ) {
     fun hasPermission(a: Activity) = overlayPermission.checkOverlayDisplayPermission(a)
+    fun requestPermission(a: Activity) = overlayPermission.requestOverlayDisplayPermission(a)
 
     fun start(a: Activity, load: PlaylistItemDomain): Boolean {
         if (!overlayPermission.checkOverlayDisplayPermission(a)) {
             overlayPermission.requestOverlayDisplayPermission(a)
         } else {
             if (!isRunning()) {
-//                app.startForegroundService(startIntent(load))
-                app.startService(startIntent(load))
+                app.startForegroundService(startIntent(load))
                 return true
             }
         }
@@ -38,6 +38,8 @@ class FloatingPlayerServiceManager(
 
     fun playItem(item: PlaylistItemDomain) = app.startService(playIntent(item))
 
+    // note this INIT intent doesnt get picked up by the MVI player for some reason
+    // video seems to come from queue trackchange
     private fun startIntent(load: PlaylistItemDomain) =
         Intent(app, FloatingPlayerService::class.java)
             .setAction(FloatingPlayerService.ACTION_INIT)

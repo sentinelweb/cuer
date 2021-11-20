@@ -1,29 +1,19 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.core.mappers.Format.SECS
-import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
-import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
-import java.time.OffsetDateTime
 
 
 class PlaylistModelMapper constructor(
-    private val res: ResourceWrapper,
-    private val timeSinceFormatter: TimeSinceFormatter,
-    private val timeFormatter: TimeFormatter,
-    private val iconMapper: IconMapper,
-    private val backgroundMapper: BackgroundMapper
+    private val itemModelMapper: ItemModelMapper,
+    private val iconMapper: IconMapper
 ) {
     private var _modelIdGenerator = 0L
     var modelIdGenerator: Long = 0
@@ -47,11 +37,12 @@ class PlaylistModelMapper constructor(
         val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
         return PlaylistContract.Model(
             title = domain.title,
-            imageUrl = domain.image?.url ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
+            imageUrl = domain.image?.url
+                ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
             loopModeIndex = domain.mode.ordinal,
             loopModeIcon = iconMapper.map(domain.mode),
-            playIcon = if (isPlaying) R.drawable.ic_baseline_playlist_close_24 else R.drawable.ic_baseline_playlist_play_24,
-            starredIcon = if (domain.starred) R.drawable.ic_button_starred_white else R.drawable.ic_button_unstarred_white,
+            playIcon = if (isPlaying) R.drawable.ic_playlist_close else R.drawable.ic_playlist_play,
+            starredIcon = if (domain.starred) R.drawable.ic_starred else R.drawable.ic_starred_off,
             isDefault = domain.default,
             isSaved = id.source == LOCAL,
             isPlayFromStart = domain.playItemsFromStart,
@@ -62,15 +53,15 @@ class PlaylistModelMapper constructor(
                 domain.items.mapIndexed { index, item ->
                     val modelId = item.id ?: modelIdGenerator
                     itemsIdMap[modelId] = item
-                    mapItem(
+                    itemModelMapper.mapItem(
                         modelId,
                         item,
                         index,
                         domain.config.editableItems,
                         domain.config.deletableItems,
                         domain.config.editable,
-                        playlists,
-                        domain.id
+                        mapPlaylistText(item, domain, playlists),
+                        true
                     )
                 }
             } else {
@@ -81,63 +72,16 @@ class PlaylistModelMapper constructor(
         )
     }
 
-    fun mapItem(
-        modelId: Long,
+    fun mapPlaylistText(
         item: PlaylistItemDomain,
-        index: Int,
-        canEdit: Boolean,
-        canDelete: Boolean,
-        canReorder: Boolean,
-        playlists: Map<Long, PlaylistTreeDomain>?,
-        currentPlaylistId: Long?
-    ): ItemContract.Model {
-        val top = item.media.title ?: "No title"
-        val pos = item.media.positon?.toFloat() ?: 0f
-        val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f
-        return ItemContract.Model(
-            modelId,
-            index = index,
-            url = item.media.url,
-            type = item.media.mediaType,
-            title = top,
-            duration = (
-                    if (item.media.isLiveBroadcast) {
-                        if (item.media.isLiveBroadcastUpcoming) res.getString(R.string.upcoming)
-                        else res.getString(R.string.live)
-                    } else (item.media.duration?.let { item.media.duration?.let { timeFormatter.formatMillis(it, SECS) } } ?: "-")
-                    ),
-            positon = if (item.media.isLiveBroadcast) res.getString(R.string.live) else (progress * 100).toInt().toString() + "%",
-            thumbNailUrl = item.media.thumbNail?.url,
-            progress = progress,
-            starred = item.media.starred,
-            watchedSince = item.media.dateLastPlayed?.let { timeSinceFormatter.formatTimeSince(it.toEpochMilliseconds()) } ?: "-",
-            isWatched = item.media.watched,
-            published = item.media.published?.let {
-                timeSinceFormatter.formatTimeSince(
-                    // todo shorten this
-                    it.toJavaLocalDateTime().toInstant(OffsetDateTime.now().getOffset()).toEpochMilli()
-                )
-            } ?: "-",
-            platform = item.media.platform,
-            isLive = item.media.isLiveBroadcast,
-            isUpcoming = item.media.isLiveBroadcastUpcoming,
-            infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media),
-            canEdit = canEdit,
-            canDelete = canDelete,
-            playlistName = item.playlistId?.let {
-                if (it != currentPlaylistId) playlists?.get(it)?.node?.title else null
-            },
-            canReorder = canReorder
-        )
+        domain: PlaylistDomain?,
+        playlists: Map<Long, PlaylistTreeDomain>?
+    ): String? {
+        val playlistText = item.playlistId?.let { itemPlaylistId ->
+            if (itemPlaylistId != domain?.id) playlists?.get(itemPlaylistId)?.node?.title else null
+        }
+        return playlistText
     }
-
-    fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel =
-        AlertDialogModel(
-            R.string.playlist_change_dialog_title,
-            R.string.playlist_change_dialog_message,
-            AlertDialogModel.Button(R.string.ok, confirm),
-            AlertDialogModel.Button(R.string.dialog_button_view_info, info)
-        )
 
     fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel =
         AlertDialogModel(

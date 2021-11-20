@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.service.cast
 
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_DISCONNECT
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_STAR
@@ -21,6 +22,8 @@ class YoutubeCastServiceController constructor(
     }
 
     override fun initialise() {
+//        notification.setIcon(R.drawable.ic_notif_status_cast_conn_white)
+        notification.setIcon(R.drawable.ic_play_yang_combined)
         ytContextHolder.playerUi = notification
     }
 

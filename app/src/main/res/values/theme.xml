@@ -74,6 +74,7 @@
         <item name="textAppearanceSubtitle2">@style/TextAppearance.App.Subtitle2</item>
         <item name="textAppearanceOverline">@style/TextAppearance.App.Overline</item>
 
+        <item name="materialAlertDialogTheme">@style/Cuer.MaterialAlertDialog</item>
     </style>
 
     <style name="AppSplash" parent="Theme.SplashScreen">

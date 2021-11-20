@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import androidx.annotation.DrawableRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -14,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
@@ -22,8 +22,11 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -53,7 +56,13 @@ interface PlaylistContract {
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
         fun commitMove()
-        fun setPlaylistData(plId: Long? = null, plItemId: Long? = null, playNow: Boolean = false, source: Source = LOCAL)
+        fun setPlaylistData(
+            plId: Long? = null,
+            plItemId: Long? = null,
+            playNow: Boolean = false,
+            source: Source = LOCAL
+        )
+
         fun onPlaylistSelected(playlist: PlaylistDomain, selected: Boolean)
         fun onPlayModeChange(): Boolean
         fun onPlayPlaylist(): Boolean
@@ -197,29 +206,55 @@ interface PlaylistContract {
                         playlistUpdateOrchestrator = get(),
                         playlistOrDefaultOrchestrator = get(),
                         dbInit = get(),
-                        floatingService = get(),
-                        recentLocalPlaylists = get()
+                        recentLocalPlaylists = get(),
+                        itemMapper = get(),
+                        playUseCase = get()
                     )
                 }
                 scoped { get<Presenter>() as External }
+                scoped { PlaylistModelMapper(itemModelMapper = get(), iconMapper = get()) }
+                scoped { PlaylistAdapter(get(), getSource()) }
+                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
+                scoped { ItemTouchHelperCallback(getSource()) }
+                scoped { ItemFactory(get(), get(), get()) }
                 scoped {
-                    PlaylistModelMapper(
+                    ItemModelMapper(
                         res = get(),
                         timeFormatter = get(),
                         timeSinceFormatter = get(),
-                        iconMapper = get(),
                         backgroundMapper = get()
                     )
                 }
-                scoped { PlaylistAdapter(get(), getSource()) }
-                scoped { ItemTouchHelperCallback(getSource()) }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get()) }
-                scoped { YoutubeJavaApiWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ShareWrapper((getSource() as Fragment).requireActivity() as AppCompatActivity) }
-                scoped { ItemFactory(get(), get(), get()) }
-                scoped { AlertDialogCreator((getSource() as Fragment).requireActivity()) }
-                scoped { navigationMapper(true, getSource<Fragment>().requireActivity() as AppCompatActivity) }
+                scoped<SnackbarWrapper> {
+                    AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get())
+                }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
+                scoped { ShareWrapper(this.getFragmentActivity()) }
+                scoped { AlertDialogCreator(this.getFragmentActivity()) }
+                scoped { navigationMapper(true, this.getFragmentActivity(), false) }
+                scoped {
+                    PlayUseCase(
+                        queue = get(),
+                        ytCastContextHolder = get(),
+                        prefsWrapper = get(),
+                        coroutines = get(),
+                        floatingService = get(),
+                        playDialog = get(),
+                    )
+                }
+                scoped {
+                    PlayDialog(
+                        getSource(),
+                        itemFactory = get(),
+                        itemModelMapper = get(),
+                        navigationMapper = get(),
+                        castDialogWrapper = get(),
+                        floatingService = get(),
+                        log = get(),
+                        alertDialogCreator = get(),
+                        youtubeApi = get()
+                    )
+                }
                 viewModel { State() }
             }
 

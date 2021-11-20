@@ -107,7 +107,7 @@ object Modules {
         factory { DatePickerCreator() }
         factory { IconMapper() }
         factory { BackgroundMapper(get()) }
-        single { AytViewHolder(get()) }
+        single { AytViewHolder(get(), get()) }
     }
 
     private val utilModule = module {
@@ -129,7 +129,7 @@ object Modules {
                 get()
             )
         }
-        factory { MediaMetadataMapper(get()) }
+        factory { MediaMetadataMapper(get(), get()) }
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }

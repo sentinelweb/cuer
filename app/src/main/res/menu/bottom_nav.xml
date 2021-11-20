@@ -10,7 +10,7 @@
 
     <item
         android:id="@id/navigation_playlists"
-        android:icon="@drawable/ic_playlists_black"
+        android:icon="@drawable/ic_playlists"
         android:title="@string/bottomnav_title_playlists"
         />
 

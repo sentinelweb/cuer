@@ -2,15 +2,18 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class YoutubeCastConnectionListener constructor(
     private val state: State,
@@ -19,6 +22,7 @@ class YoutubeCastConnectionListener constructor(
     private val castWrapper: ChromeCastWrapper,
     private val queue: QueueMediatorContract.Consumer,
     private val coroutines: CoroutineContextProvider,
+    private val log: LogWrapper,
 ) : ChromecastConnectionListener {
 
     data class State constructor(
@@ -28,18 +32,17 @@ class YoutubeCastConnectionListener constructor(
     private var context: ChromecastYouTubePlayerContext? = null
     private var youTubePlayerListener: YouTubePlayerListener? = null
 
-    init {
-        queue.currentPlaylistFlow
-            .onEach { pushUpdateFromQueue() }
-            .launchIn(coroutines.mainScope)
-    }
+    private lateinit var playlistFlowJob: Job
 
     fun setContext(context: ChromecastYouTubePlayerContext) {
         this.context = context
+        playlistFlowJob = queue.currentPlaylistFlow
+            .onEach { updateFromQueue() }
+            .launchIn(coroutines.mainScope)
         if (state.connectionState == CC_CONNECTED) {
             setupPlayerListener()
             youTubePlayerListener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
-            pushUpdateFromQueue()
+            updateFromQueue()
         }
     }
 
@@ -70,7 +73,7 @@ class YoutubeCastConnectionListener constructor(
             context?.apply { setupPlayerListener() }
         }
 
-        pushUpdateFromQueue()
+        updateFromQueue()
     }
 
     private fun setupPlayerListener() {
@@ -92,6 +95,7 @@ class YoutubeCastConnectionListener constructor(
 
     private fun restoreState() {
         state.connectionState?.apply { playerUi?.setConnectionState(this) }
+        updateFromQueue()
     }
 
     fun isConnected(): Boolean {
@@ -99,21 +103,29 @@ class YoutubeCastConnectionListener constructor(
     }
 
     fun destroy() {
+        playlistFlowJob.cancel()
         castWrapper.killCurrentSession()
         coroutines.cancel()
     }
 
-    private fun pushUpdateFromQueue() {
-        playerUi?.apply {
-            if (youTubePlayerListener != null) {
-                queue.currentItem?.apply {
-                    setPlayerState(PlayerStateDomain.PAUSED)
-                    setCurrentSecond((media.positon?.toFloat() ?: 0f) / 1000f)
+    private fun updateFromQueue() {
+        if (queue.currentItem != null) {
+            playerUi?.apply {
+                if (youTubePlayerListener != null) {
+                    queue.currentItem?.apply {
+                        //setPlayerState(PlayerStateDomain.PAUSED)
+                        setCurrentSecond((media.positon?.toFloat() ?: 0f) / 1000f)
+                    }
                 }
+                queue.currentItem?.let { setPlaylistItem(it, queue.source) }
+                setPlaylistName(queue.playlist?.title ?: "none")
+                setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
             }
-            queue.currentItem?.let { setPlaylistItem(it, queue.source) }
-            setPlaylistName(queue.playlist?.title ?: "none")
-            setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
+        } else {
+            coroutines.mainScope.launch {
+                delay(100)
+                updateFromQueue()
+            }
         }
     }
 

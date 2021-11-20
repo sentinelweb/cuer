@@ -298,8 +298,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                             (ratio * binding.pleTitleBg.width).toInt()
                     } ?: binding.pleTitlePos.apply { isVisible = false }
                     val starIconResource =
-                        if (model.starred) R.drawable.ic_button_starred_white
-                        else R.drawable.ic_button_unstarred_white
+                        if (model.starred) R.drawable.ic_starred
+                        else R.drawable.ic_starred_off
                     starMenuItem.setIcon(starIconResource)
                 }
             })

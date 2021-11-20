@@ -115,7 +115,7 @@ class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupC
     companion object {
         private const val CREATE_FILE = 2
         private const val READ_FILE = 3
-        private const val BACKUP_MIME_TYPE = "application/json"
+        private const val BACKUP_MIME_TYPE = "application/zip"
 
     }
 }

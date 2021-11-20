@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.annotation.ColorRes
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -23,7 +25,8 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
+import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
@@ -35,7 +38,7 @@ class CastPlayerFragment() :
     override val scope: Scope by fragmentScopeWithSource()
     private val presenter: CastPlayerContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
-    private val imageProvider: FirebaseImageProvider by inject()
+    private val imageProvider: ImageProvider by inject()
     private val res: ResourceWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
 
@@ -104,8 +107,9 @@ class CastPlayerFragment() :
         binding.castPlayerPosition.text = second
     }
 
-    override fun setLiveTime(second: String) {
-        binding.castPlayerLiveTime.text = second
+    override fun setLiveTime(second: String?) {
+        binding.castPlayerLiveTime.isVisible = second != null
+        second?.apply { binding.castPlayerLiveTime.text = second }
     }
 
     override fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int) {
@@ -118,7 +122,12 @@ class CastPlayerFragment() :
     }
 
     override fun setPlaying() {
-        binding.castPlayerFab.setImageState(intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked), false)
+        binding.castPlayerFab.setImageState(
+            intArrayOf(
+                android.R.attr.state_enabled,
+                android.R.attr.state_checked
+            ), false
+        )
         binding.castPlayerFab.showProgress(false)
     }
 
@@ -145,7 +154,8 @@ class CastPlayerFragment() :
 
     override fun setImage(url: String) {
         Glide.with(requireContext())
-            .load(url)
+            .loadFirebaseOrOtherUrl(url, imageProvider)
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.castPlayerImage)
     }
 
@@ -196,7 +206,11 @@ class CastPlayerFragment() :
         )
 
     companion object {
-        val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_image) }
-        val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title) }
+        val TRANS_IMAGE by lazy {
+            get().get<ResourceWrapper>().getString(R.string.cast_player_trans_image)
+        }
+        val TRANS_TITLE by lazy {
+            get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title)
+        }
     }
 }

@@ -6,12 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
-import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -33,6 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -183,12 +181,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                 scoped { BrowseRepository(BrowseJsonLoader(get())) }
                 scoped { BrowseModelMapper(get(), get()) }
                 scoped { BrowseMviView(get(), get()) }
-                scoped {
-                    navigationMapper(
-                        true,
-                        getSource<Fragment>().requireActivity() as AppCompatActivity
-                    )
-                }
+                scoped { navigationMapper(true, this.getFragmentActivity()) }
             }
         }
     }

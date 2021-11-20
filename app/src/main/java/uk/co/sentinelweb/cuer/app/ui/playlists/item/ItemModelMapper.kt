@@ -21,11 +21,16 @@ class ItemModelMapper constructor(
         res.getDrawable(R.drawable.ic_player_play_black, color, R.dimen.list_item_top_text_size, SCALING)
 
     private fun starDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
-        res.getDrawable(R.drawable.ic_button_starred_white, color, R.dimen.list_item_bottom_text_size, SCALING)
+        res.getDrawable(R.drawable.ic_starred, color, R.dimen.list_item_bottom_text_size, SCALING)
 
 
-    private fun unstarDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
-        res.getDrawable(R.drawable.ic_button_unstarred_white, color, R.dimen.list_item_bottom_text_size, SCALING)
+    private fun unstarDrawable(@ColorRes color: Int = R.color.text_primary): Drawable =
+        res.getDrawable(
+            R.drawable.ic_starred_off,
+            color,
+            R.dimen.list_item_bottom_text_size,
+            SCALING
+        )
 
     private val unwatchDrawable: Drawable by lazy {
         res.getDrawable(R.drawable.ic_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
@@ -35,11 +40,21 @@ class ItemModelMapper constructor(
         res.getDrawable(R.drawable.ic_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
-    private fun pinDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
-        res.getDrawable(R.drawable.ic_push_pin_on_24, color, R.dimen.list_item_bottom_text_size, SCALING)
+    private fun pinDrawable(@ColorRes color: Int = R.color.text_primary): Drawable =
+        res.getDrawable(
+            R.drawable.ic_push_pin_on,
+            color,
+            R.dimen.list_item_bottom_text_size,
+            SCALING
+        )
 
-    private fun defaultDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
-        res.getDrawable(R.drawable.ic_playlist_default_black,color, R.dimen.list_item_bottom_text_size, SCALING)
+    private fun defaultDrawable(@ColorRes color: Int = R.color.text_primary): Drawable =
+        res.getDrawable(
+            R.drawable.ic_playlist_default,
+            color,
+            R.dimen.list_item_bottom_text_size,
+            SCALING
+        )
 
 //    private val tree: Drawable by lazy {
 //        res.getDrawable(R.drawable.ic_tree_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
