@@ -15,7 +15,7 @@ class PlayYangProgress(private val res: ResourceWrapper) {
     private var _progressDrawable: Drawable? = null
     private var _progressAnim: ObjectAnimator? = null
 
-    fun init(progress: ProgressBar) {
+    fun init(progress: ProgressBar, tint: Int) {
         _progressBar = progress
         _progressBar?.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
             override fun onLayoutChange(
@@ -29,14 +29,14 @@ class PlayYangProgress(private val res: ResourceWrapper) {
                 }
             }
         })
-        _progressDrawable = res.getDrawable(R.drawable.ic_play_yang_loading)
-        _progressDrawable?.setTint(res.getColor(R.color.build_primary))
+        _progressDrawable = res.getDrawable(R.drawable.ic_play_yang_combined)
+        _progressDrawable?.setTint(res.getColor(tint))
         _progressBar?.indeterminateDrawable = _progressDrawable
     }
 
     fun showLoading() {
         _progressBar?.isVisible = true
-        _progressAnim = ObjectAnimator.ofFloat(_progressBar, "rotation", 0f, 360f)
+        _progressAnim = ObjectAnimator.ofFloat(_progressBar, View.ROTATION, 0f, 360f)
             .apply {
                 setDuration(1000);
                 setRepeatCount(ValueAnimator.INFINITE);

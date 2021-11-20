@@ -10,12 +10,12 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.databinding.ScanFragmentBinding
+import uk.co.sentinelweb.cuer.app.databinding.FragmentScanBinding
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
-class ScanFragment : Fragment(R.layout.scan_fragment), ScanContract.View, AndroidScopeComponent {
+class ScanFragment : Fragment(R.layout.fragment_scan), ScanContract.View, AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource()
     override lateinit var listener: ScanContract.Listener
@@ -24,17 +24,17 @@ class ScanFragment : Fragment(R.layout.scan_fragment), ScanContract.View, Androi
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val playYangProgress: PlayYangProgress by inject()
 
-    private var _binding: ScanFragmentBinding? = null
+    private var _binding: FragmentScanBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = ScanFragmentBinding.inflate(layoutInflater)
+        _binding = FragmentScanBinding.inflate(layoutInflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        playYangProgress.init(binding.scanProgress)
+        playYangProgress.init(binding.scanProgress, R.color.white)
     }
 
     override fun fromShareUrl(uriString: String) {// called from activity

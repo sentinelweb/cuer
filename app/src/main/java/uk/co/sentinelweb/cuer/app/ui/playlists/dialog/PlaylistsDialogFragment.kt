@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
-import uk.co.sentinelweb.cuer.app.databinding.PlaylistsDialogFragmentBinding
+import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsDialogBinding
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -29,7 +29,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     private val itemTouchHelper: ItemTouchHelper by inject()
     private val log: LogWrapper by inject()
 
-    private var _binding: PlaylistsDialogFragmentBinding? = null
+    private var _binding: FragmentPlaylistsDialogBinding? = null
     private val binding get() = _binding!!
 
     init {
@@ -37,7 +37,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     }
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = PlaylistsDialogFragmentBinding.inflate(layoutInflater)
+        _binding = FragmentPlaylistsDialogBinding.inflate(layoutInflater)
         return binding.root
     }
 

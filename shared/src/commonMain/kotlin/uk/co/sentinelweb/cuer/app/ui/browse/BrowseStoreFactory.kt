@@ -91,7 +91,10 @@ class BrowseStoreFactory constructor(
                     getState().categoryLookup.get(intent.id)
                         ?.also { cat ->
                             if (cat.subCategories.size > 0) {
-                                prefs.putString(BROWSE_CAT_TITLE, cat.title)
+                                prefs.putString(
+                                    BROWSE_CAT_TITLE,
+                                    cat.title
+                                ) //fixme: change to some built id(maybe include parent)
                             }
                             cat.platformId
                                 ?.let {

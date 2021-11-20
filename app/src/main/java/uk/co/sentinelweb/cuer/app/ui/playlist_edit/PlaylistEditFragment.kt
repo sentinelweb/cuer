@@ -21,7 +21,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.databinding.PlaylistEditFragmentBinding
+import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistEditBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
@@ -65,7 +65,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
     internal var listener: Listener? = null
 
-    private var _binding: PlaylistEditFragmentBinding? = null
+    private var _binding: FragmentPlaylistEditBinding? = null
     private val binding get() = _binding!!
 
     private var dialogFragment: DialogFragment? = null
@@ -101,7 +101,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         savedInstanceState: Bundle?
     ): View {
         //postponeEnterTransition()
-        _binding = PlaylistEditFragmentBinding.inflate(layoutInflater)
+        _binding = FragmentPlaylistEditBinding.inflate(layoutInflater)
         return binding.root
     }
 

@@ -19,7 +19,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.context.GlobalContext.get
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.databinding.PlaylistItemEditFragmentBinding
+import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistItemEditBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
+import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -58,8 +59,9 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val commitHost: CommitHost by inject()
+    private val compactPlayerScroll: CompactPlayerScroll by inject()
 
-    private lateinit var binding: PlaylistItemEditFragmentBinding
+    private lateinit var binding: FragmentPlaylistItemEditBinding
 
     private val starMenuItem: MenuItem
         get() = binding.pleToolbar.menu.findItem(R.id.plie_star)
@@ -121,7 +123,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = PlaylistItemEditFragmentBinding.inflate(inflater)
+        binding = FragmentPlaylistItemEditBinding.inflate(inflater)
         return binding.root
     }
 
@@ -189,6 +191,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 menuState.scrolledDown = isShow
             }
         })
+        compactPlayerScroll.addScrollListener(binding.pleScroll, this)
 
         // setup data for fragment transition
         itemArg?.apply {

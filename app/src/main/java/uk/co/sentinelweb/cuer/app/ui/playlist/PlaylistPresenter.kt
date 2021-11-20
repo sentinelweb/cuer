@@ -332,22 +332,6 @@ class PlaylistPresenter(
         }
     }
 
-    override fun checkToSave() {
-        if (state.playlist?.id ?: 0 <= 0) {
-            view.showAlertDialog(modelMapper.mapSaveConfirmAlert(
-                {
-                    coroutines.mainScope.launch {
-                        commitPlaylist()
-                        view.navigate(NavigationModel(NAV_DONE))
-                    }
-                },
-                { view.navigate(NavigationModel(NAV_DONE)) }
-            ))
-        } else {
-            view.navigate(NavigationModel(NAV_DONE))
-        }
-    }
-
     override fun undoMoveItem() {
         state.viewModelScope.launch {
             state.movedPlaylistItem
@@ -523,12 +507,7 @@ class PlaylistPresenter(
                     if (interactions != null) {
                         interactions?.onPlay(it)
                     } else {
-                        view.navigate(
-                            NavigationModel(
-                                LOCAL_PLAYER,
-                                mapOf(PLAYLIST_ITEM to it)
-                            )
-                        )
+                        view.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it)))
                     }
                 }
             }
@@ -652,6 +631,22 @@ class PlaylistPresenter(
                 log.e("Caught Error updating playlist", e)
                 view.showError(e.message ?: "Error updating ...")
             }
+        }
+    }
+
+    override fun checkToSave() {
+        if (state.playlist?.id ?: 0 <= 0) {
+            view.showAlertDialog(modelMapper.mapSaveConfirmAlert(
+                {
+                    coroutines.mainScope.launch {
+                        commitPlaylist() // fixme: this doesn't go thru sharePrestent after commit after
+                        view.navigate(NavigationModel(NAV_DONE))
+                    }
+                },
+                { view.navigate(NavigationModel(NAV_DONE)) }
+            ))
+        } else {
+            view.navigate(NavigationModel(NAV_DONE))
         }
     }
 

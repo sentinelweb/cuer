@@ -24,7 +24,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.databinding.PlaylistFragmentBinding
+import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
@@ -95,7 +95,7 @@ class PlaylistFragment :
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
-    private var _binding: PlaylistFragmentBinding? = null
+    private var _binding: FragmentPlaylistBinding? = null
     private val binding get() = _binding!!
 
     private val starMenuItem: MenuItem?
@@ -161,7 +161,7 @@ class PlaylistFragment :
         savedInstanceState: Bundle?
     ): View {
         postponeEnterTransition()
-        _binding = PlaylistFragmentBinding.inflate(layoutInflater)
+        _binding = FragmentPlaylistBinding.inflate(layoutInflater)
         return binding.root
     }
 
