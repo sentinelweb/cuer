@@ -17,10 +17,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -119,6 +118,7 @@ interface CastPlayerContract {
 
                 // todo play usecase - extract
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
                 scoped { navigationMapper(false, this.getFragmentActivity(), false) }
                 scoped {
                     PlayUseCase(
@@ -141,15 +141,6 @@ interface CastPlayerContract {
                         log = get(),
                         alertDialogCreator = get(),
                         youtubeApi = get(),
-                    )
-                }
-                scoped { ItemFactory(get(), get(), get()) }
-                scoped {
-                    ItemModelMapper(
-                        res = get(),
-                        timeFormatter = get(),
-                        timeSinceFormatter = get(),
-                        backgroundMapper = get()
                     )
                 }
             }

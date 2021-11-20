@@ -15,7 +15,6 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 
 interface MainContract {
     interface Presenter {
@@ -70,7 +69,6 @@ interface MainContract {
                         .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).playerControls
                 }
                 scoped { navigationMapper(false, getSource()) }
-                scoped { YoutubeJavaApiWrapper(getSource()) }
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
                 scoped<DoneNavigation> { getSource() }

@@ -11,6 +11,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ScanFragmentBinding
+import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
@@ -21,6 +22,7 @@ class ScanFragment : Fragment(R.layout.scan_fragment), ScanContract.View, Androi
 
     private val presenter: ScanContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
+    private val playYangProgress: PlayYangProgress by inject()
 
     private var _binding: ScanFragmentBinding? = null
     private val binding get() = _binding!!
@@ -32,6 +34,7 @@ class ScanFragment : Fragment(R.layout.scan_fragment), ScanContract.View, Androi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        playYangProgress.init(binding.scanProgress)
     }
 
     override fun fromShareUrl(uriString: String) {// called from activity

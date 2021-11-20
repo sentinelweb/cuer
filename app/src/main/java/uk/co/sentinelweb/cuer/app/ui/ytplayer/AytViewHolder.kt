@@ -17,6 +17,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.You
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.ui.utils.FadeViewHelper
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
@@ -29,6 +30,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.R as aytR
 class AytViewHolder(
     private val res: ResourceWrapper,
     private val log: LogWrapper,
+    private val playYangProgress: PlayYangProgress
 ) {
     init {
         log.tag(this)
@@ -63,9 +65,9 @@ class AytViewHolder(
         parent.addView(_playerView, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
 
         _progressBar = parent.getChildAt(0)
-            .findViewById(aytR.id.progress)
-        val drawable = res.getDrawable(R.drawable.ic_play_yang_combined_rotate)
-        _progressBar?.indeterminateDrawable = drawable
+            .findViewById<ProgressBar>(aytR.id.progress)
+            ?.apply { playYangProgress.init(this) }
+
         parent.getChildAt(0)
             .findViewById<LinearLayout>(aytR.id.youtube_player_seekbar)
             ?.children
@@ -156,7 +158,8 @@ class AytViewHolder(
                 }
                 _mviView?.dispatch(Event.PlayerStateChanged(playStateDomain))
                 _progressBar?.isVisible =
-                    playStateDomain == BUFFERING || playStateDomain == UNSTARTED
+                    (playStateDomain == UNKNOWN || playStateDomain == VIDEO_CUED ||
+                            playStateDomain == BUFFERING || playStateDomain == UNSTARTED)
             }
 
             override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
@@ -168,7 +171,6 @@ class AytViewHolder(
                 _player = youTubePlayer
                 _currentVideoId = videoId
                 _mviView?.dispatch(Event.IdReceived(videoId))
-                //dispatch(PlayerStateChanged(VIDEO_CUED))
             }
 
             override fun onVideoLoadedFraction(
@@ -188,6 +190,7 @@ class AytViewHolder(
                 log.d("PlayerCommand.Load: $_currentVideoId != ${command.platformId} start:${command.startPosition}")
                 if (_currentVideoId != command.platformId) {
                     _player?.loadVideo(command.platformId, command.startPosition / 1000f)
+                    _progressBar?.isVisible = true
                 } else {
                     _player?.play()
                 }
@@ -204,4 +207,5 @@ class AytViewHolder(
             else -> Unit
         }
     }
+
 }

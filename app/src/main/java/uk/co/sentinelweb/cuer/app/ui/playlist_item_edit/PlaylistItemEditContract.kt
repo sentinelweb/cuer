@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -87,6 +88,7 @@ interface PlaylistItemEditContract {
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 scoped { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
                 scoped {
                     PlayUseCase(
                         queue = get(),

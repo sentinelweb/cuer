@@ -180,6 +180,8 @@ interface PlaylistContract {
 
         @JvmStatic
         val fragmentModule = module {
+            factory { ItemFactory(get(), get(), get()) }
+            factory { ItemModelMapper(get(), get(), get(), get()) }
             scope(named<PlaylistFragment>()) {
                 scoped<View> { getSource() }
                 scoped<Presenter> {
@@ -216,15 +218,6 @@ interface PlaylistContract {
                 scoped { PlaylistAdapter(get(), getSource()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
-                scoped { ItemFactory(get(), get(), get()) }
-                scoped {
-                    ItemModelMapper(
-                        res = get(),
-                        timeFormatter = get(),
-                        timeSinceFormatter = get(),
-                        backgroundMapper = get()
-                    )
-                }
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get())
                 }

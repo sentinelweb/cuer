@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
@@ -107,7 +108,8 @@ object Modules {
         factory { DatePickerCreator() }
         factory { IconMapper() }
         factory { BackgroundMapper(get()) }
-        single { AytViewHolder(get(), get()) }
+        single { AytViewHolder(get(), get(), get()) }
+        factory { PlayYangProgress(get()) }
     }
 
     private val utilModule = module {
