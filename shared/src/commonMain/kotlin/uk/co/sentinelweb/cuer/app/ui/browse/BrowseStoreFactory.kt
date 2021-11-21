@@ -45,7 +45,6 @@ class BrowseStoreFactory constructor(
         object Init : Action()
     }
 
-
     private inner class ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
             when (result) {
@@ -63,7 +62,9 @@ class BrowseStoreFactory constructor(
                         currentCategory = result.root,
                         categoryLookup = categoryLookup1,
                         parentLookup = result.root.buildParentLookup(),
-                        recent = recentCategories.getRecent().reversed()
+                        recent = recentCategories
+                            .getRecent()
+                            .reversed()
                             .mapNotNull { recentTitle ->
                                 categoryLookup1.values
                                     .find { it.title == recentTitle }
@@ -171,6 +172,7 @@ class BrowseStoreFactory constructor(
 
         private suspend fun loadCategories() {
             val root = repository.loadAll()
+            // log.d(root.buildIdLookup().values.joinToString("\n") { "${it.title} - ${it.image?.url}" })
             dispatch(Result.LoadCatgeories(root))
 
             prefs.getString(BROWSE_CAT_TITLE, null)

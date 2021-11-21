@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "cc-receiver",
+    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
