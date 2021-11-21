@@ -11,8 +11,7 @@ class BrowseContract {
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
         sealed class Intent {
             object Display : Intent()
-            data class ClickChildren(val id: Long) : Intent()
-            data class ClickNode(val id: Long) : Intent()
+            data class ClickChildren(val id: Long, val forceItem: Boolean) : Intent()
             object Up : Intent()
             object ActionSettings : Intent()
         }
@@ -58,14 +57,14 @@ class BrowseContract {
             val subCategories: List<CategoryModel>,
             val subCount: Int,
             val isPlaylist: Boolean,
+            val forceItem: Boolean,
         )
 
         sealed class Event {
             object OnResume : Event()
             object UpClicked : Event()
             object ActionSettingsClick : Event()
-            data class ClickChildren(val id: Long) : Event()
-            data class ClickNode(val id: Long) : Event()
+            data class ClickChildren(val model: CategoryModel) : Event()
 
         }
     }

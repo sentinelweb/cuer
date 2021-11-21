@@ -105,7 +105,8 @@
             <uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
                 android:id="@+id/ple_description"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:paddingBottom="128dp" />
 
         </androidx.core.widget.NestedScrollView>
     </uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout>

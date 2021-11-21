@@ -17,8 +17,14 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
 interface MainContract {
+
+    enum class LastTab {
+        BROWSE, PLAYLISTS, PLAYLIST
+    }
+
     interface Presenter {
         fun initialise()
+
         //fun startServer()
         fun onStart()
         fun onStop()

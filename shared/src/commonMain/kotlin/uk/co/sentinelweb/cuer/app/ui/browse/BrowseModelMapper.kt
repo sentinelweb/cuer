@@ -17,27 +17,37 @@ class BrowseModelMapper constructor(
         return Model(
             title = state.currentCategory.title,
             categories = state.currentCategory.subCategories
-                .map { categoryModel(it) },
+                .map { categoryModel(it) }
+                .let {
+                    if (state.currentCategory.platformId?.isNotEmpty() ?: false)
+                        listOf(categoryModel(state.currentCategory, true))
+                            .plus(it)
+                    else it
+                },
             isRoot = state.currentCategory.id == ROOT_ID,
             recent = state.recent
-                .also { log.d("Recent List:$it") }
+                //.also { log.d("Recent List:$it") }
                 .takeIf { it.size > 0 }
                 ?.let {
                     BrowseContract.View.CategoryModel(
                         id = -1,
                         title = strings.recent,
                         description = null,
-                        isPlaylist = false,
-                        subCount = state.recent.size,
                         thumbNailUrl = null,
-                        subCategories = state.recent.map { categoryModel(it) }
+                        subCategories = state.recent.map { categoryModel(it) },
+                        subCount = state.recent.size,
+                        isPlaylist = false,
+                        forceItem = true
                     )
-                }?.also { log.d("Recent Model $it") }
+                }//?.also { log.d("Recent Model $it") }
 
         )
     }
 
-    private fun categoryModel(it: CategoryDomain): BrowseContract.View.CategoryModel = BrowseContract.View.CategoryModel(
+    private fun categoryModel(
+        it: CategoryDomain,
+        forceItem: Boolean = false
+    ): BrowseContract.View.CategoryModel = BrowseContract.View.CategoryModel(
         id = it.id,
         title = it.title,
         description = it.description,
@@ -45,7 +55,8 @@ class BrowseModelMapper constructor(
         subCategories = it.subCategories.map {
             categoryModel(it)
         },
-        subCount = it.subCategories.size,
-        isPlaylist = it.platformId != null
+        subCount = if (!forceItem) it.subCategories.size else 0,
+        isPlaylist = it.platformId != null,
+        forceItem = forceItem
     )
 }

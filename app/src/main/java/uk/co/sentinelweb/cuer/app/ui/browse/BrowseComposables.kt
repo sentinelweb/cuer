@@ -81,7 +81,6 @@ object BrowseComposables {
                 style = MaterialTheme.typography.h4,
                 color = Color.White,
                 modifier = Modifier
-                    .clickable(onClick = { view.dispatch(Event.ClickNode(model.id)) })
                     .padding(start = dimensionResource(R.dimen.page_margin))
             )
             model.description?.let {
@@ -131,7 +130,7 @@ object BrowseComposables {
 
             Row(
                 modifier = Modifier
-                    .clickable(onClick = { view.dispatch(ClickChildren(subCategory.id)) })
+                    .clickable(onClick = { view.dispatch(ClickChildren(subCategory)) })
             ) {
                 Box {
                     subCategory.thumbNailUrl?.let {

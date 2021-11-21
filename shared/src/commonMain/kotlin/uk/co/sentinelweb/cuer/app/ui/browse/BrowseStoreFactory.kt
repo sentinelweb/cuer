@@ -87,20 +87,6 @@ class BrowseStoreFactory constructor(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-                is Intent.ClickNode -> {
-                    getState().categoryLookup.get(intent.id)
-                        ?.also { cat ->
-                            prefs.putString(
-                                BROWSE_CAT_TITLE,
-                                cat.title
-                            )
-                            cat.platformId
-                                ?.let {
-                                    checkPlatformId(cat, getState)
-                                }
-                        }
-                    Unit
-                }
                 is Intent.ClickChildren -> {
                     getState().categoryLookup.get(intent.id)
                         ?.also { cat ->
@@ -111,9 +97,8 @@ class BrowseStoreFactory constructor(
                                 ) //fixme: change to some built id(maybe include parent)
                             }
                             cat.platformId
-                                ?.let {
-                                    checkPlatformId(cat, getState)
-                                }
+                                ?.takeIf { intent.forceItem || cat.subCategories.isEmpty() }
+                                ?.let { checkPlatformId(cat, getState) }
                                 ?: run {
                                     if (cat.subCategories.isNotEmpty()) {
                                         dispatch(Result.SetCategory(category = cat))
