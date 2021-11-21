@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.*
-import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.CategoryClicked
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.ClickChildren
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerBrowseTheme
 import uk.co.sentinelweb.cuer.app.ui.common.compose.image.NetworkImage
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.Action
@@ -81,7 +81,7 @@ object BrowseComposables {
                 style = MaterialTheme.typography.h4,
                 color = Color.White,
                 modifier = Modifier
-                    .clickable(onClick = { view.dispatch(CategoryClicked(model.id)) })
+                    .clickable(onClick = { view.dispatch(Event.ClickNode(model.id)) })
                     .padding(start = dimensionResource(R.dimen.page_margin))
             )
             model.description?.let {
@@ -128,8 +128,11 @@ object BrowseComposables {
             elevation = 4.dp,
             shape = MaterialTheme.shapes.medium
         ) {
-            Row(modifier = Modifier
-                .clickable(onClick = { view.dispatch(CategoryClicked(subCategory.id)) })) {
+
+            Row(
+                modifier = Modifier
+                    .clickable(onClick = { view.dispatch(ClickChildren(subCategory.id)) })
+            ) {
                 Box {
                     subCategory.thumbNailUrl?.let {
                         NetworkImage(

@@ -87,7 +87,21 @@ class BrowseStoreFactory constructor(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-                is Intent.ClickCategory -> {
+                is Intent.ClickNode -> {
+                    getState().categoryLookup.get(intent.id)
+                        ?.also { cat ->
+                            prefs.putString(
+                                BROWSE_CAT_TITLE,
+                                cat.title
+                            )
+                            cat.platformId
+                                ?.let {
+                                    checkPlatformId(cat, getState)
+                                }
+                        }
+                    Unit
+                }
+                is Intent.ClickChildren -> {
                     getState().categoryLookup.get(intent.id)
                         ?.also { cat ->
                             if (cat.subCategories.size > 0) {
@@ -98,22 +112,7 @@ class BrowseStoreFactory constructor(
                             }
                             cat.platformId
                                 ?.let {
-                                    playlistOrchestrator.loadList(PlatformIdListFilter(ids = listOf(cat.platformId)), LOCAL.flatOptions())
-                                        .takeIf { it.isNotEmpty() }
-                                        ?.let { it[0].id }
-                                        ?.also {
-                                            recentCategories.addRecent(cat)
-                                            publish(Label.OpenLocalPlaylist(it))
-                                        }
-                                        ?: also {
-                                            val catParent = getTopLevelCategory(cat, getState)
-                                            val parentId =
-                                                playlistOrchestrator.loadList(TitleFilter(title = catParent.title), LOCAL.flatOptions())
-                                                    .takeIf { it.isNotEmpty() }
-                                                    ?.get(0)?.id
-                                            recentCategories.addRecent(cat)
-                                            publish(Label.AddPlaylist(cat.platformId, cat.platform, parentId))
-                                        }
+                                    checkPlatformId(cat, getState)
                                 }
                                 ?: run {
                                     if (cat.subCategories.isNotEmpty()) {
@@ -142,6 +141,33 @@ class BrowseStoreFactory constructor(
                 Intent.ActionSettings -> publish(Label.ActionSettings)
             }
 
+        private suspend fun checkPlatformId(
+            cat: CategoryDomain,
+            getState: () -> State
+        ) =
+            (playlistOrchestrator.loadList(
+                PlatformIdListFilter(ids = listOf(cat.platformId!!)),
+                LOCAL.flatOptions()
+            )
+                .takeIf { it.isNotEmpty() }
+                ?.let { it[0].id }
+                ?.also {
+                    recentCategories.addRecent(cat)
+                    publish(Label.OpenLocalPlaylist(it))
+                }
+                ?: also {
+                    val catParent = getTopLevelCategory(cat, getState)
+                    val parentId =
+                        playlistOrchestrator.loadList(
+                            TitleFilter(title = catParent.title),
+                            LOCAL.flatOptions()
+                        )
+                            .takeIf { it.isNotEmpty() }
+                            ?.get(0)?.id
+                    recentCategories.addRecent(cat)
+                    publish(Label.AddPlaylist(cat.platformId, cat.platform, parentId))
+                })
+
         private fun getTopLevelCategory(
             cat: CategoryDomain,
             getState: () -> State,
@@ -152,7 +178,8 @@ class BrowseStoreFactory constructor(
                 val nextParent = getState().parentLookup[catParent]
                 if (getState().parentLookup[nextParent] == null) break
                 catParent =
-                    getState().parentLookup[catParent] ?: throw IllegalStateException("parent lookup error")
+                    getState().parentLookup[catParent]
+                        ?: throw IllegalStateException("parent lookup error")
             }
             return catParent
         }

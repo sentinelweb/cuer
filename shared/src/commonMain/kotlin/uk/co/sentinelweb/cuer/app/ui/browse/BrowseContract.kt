@@ -11,7 +11,8 @@ class BrowseContract {
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
         sealed class Intent {
             object Display : Intent()
-            data class ClickCategory(val id: Long) : Intent()
+            data class ClickChildren(val id: Long) : Intent()
+            data class ClickNode(val id: Long) : Intent()
             object Up : Intent()
             object ActionSettings : Intent()
         }
@@ -63,7 +64,9 @@ class BrowseContract {
             object OnResume : Event()
             object UpClicked : Event()
             object ActionSettingsClick : Event()
-            data class CategoryClicked(val id: Long) : Event()
+            data class ClickChildren(val id: Long) : Event()
+            data class ClickNode(val id: Long) : Event()
+
         }
     }
 

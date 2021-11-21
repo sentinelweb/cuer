@@ -32,7 +32,8 @@ class BrowseController constructor(
 
     private val eventToIntent: suspend Event.() -> Intent = {
         when (this) {
-            is CategoryClicked -> ClickCategory(id = id)
+            is Event.ClickChildren -> Intent.ClickChildren(id = id)
+            is Event.ClickNode -> Intent.ClickNode(id = id)
             is UpClicked -> Up
             is OnResume -> Display
             is ActionSettingsClick -> ActionSettings

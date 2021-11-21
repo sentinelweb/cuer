@@ -12,6 +12,7 @@
         {
           "id": -1,
           "title": "Greek",
+          "platformId1": "PLmmblQQ1XpT92Xdb-sVomDIbCK3ndEBNk",
           "image": {
             "url": "https://d1e4pidl3fu268.cloudfront.net/fb1ef83c-4a76-4d9b-9bd8-609ef1000462/Picture1.crop_573x430_99%2C0.preview.jpg"
           },
@@ -35,7 +36,7 @@
             {
               "id": -1,
               "title": "Aristotle",
-              "platformId": "",
+              "platformId": "PLmmblQQ1XpT-0JJKFXgI_heKefXFnUxkK",
               "image": {
                 "url": "https://www.livius.org/site/assets/files/6784/aristotle_khmw.jpg"
               }
@@ -43,9 +44,25 @@
             {
               "id": -1,
               "title": "Zeno",
-              "platformId": "",
+              "platformId": "PLmmblQQ1XpT-w16C_xZVjdqeL7UdpIt_y",
               "image": {
                 "url": "https://i5.walmartimages.com/asr/053d007b-0267-4068-8b85-87215335f69d_1.812648a49272fc50ed5ef40bd8d53498.jpeg?odnWidth=612&odnHeight=612&odnBg=ffffff"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Parmenides",
+              "platformId": "PLmmblQQ1XpT-fg7inF-IGOuJKaTKb5w19",
+              "image": {
+                "url": ""
+              }
+            },
+            {
+              "id": -1,
+              "title": "Epicurius",
+              "platformId": "pIETGDgMdtg&list=PLmmblQQ1XpT-E200iGiWesalC28zBuNt5",
+              "image": {
+                "url": ""
               }
             }
           ]
@@ -53,7 +70,7 @@
         {
           "id": -1,
           "title": "Stoicisim",
-          "platformId": "",
+          "platformId1": "PLmmblQQ1XpT-3pqAV-KdrU06Ep7TYtVt1",
           "image": {
             "url": "https://d1e4pidl3fu268.cloudfront.net/fb1ef83c-4a76-4d9b-9bd8-609ef1000462/Picture1.crop_573x430_99%2C0.preview.jpg"
           },
@@ -61,7 +78,7 @@
             {
               "id": -1,
               "title": "Marcus Aurellius",
-              "platformId": "",
+              "platformId": "PLmmblQQ1XpT9TRbKOh5tzztsXDksf1WRn",
               "image": {
                 "url": "https://www.worldhistory.org/img/r/p/750x750/5998.jpg?v=1485682660"
               }
@@ -69,17 +86,17 @@
             {
               "id": -1,
               "title": "Epictetus",
-              "platformId": "",
+              "platformId": "PLmmblQQ1XpT_LZ6Ockfz4bNcS31B-2buG",
               "image": {
-                "url": "https://www.worldhistory.org/img/r/p/750x750/5998.jpg?v=1485682660"
+                "url": ""
               }
             },
             {
               "id": -1,
               "title": "Seneca",
-              "platformId": "",
+              "platformId": "PLmmblQQ1XpT8bizXaDOU3gW8xSLeW4ELa",
               "image": {
-                "url": "https://www.worldhistory.org/img/r/p/750x750/5998.jpg?v=1485682660"
+                "url": ""
               }
             }
           ]
@@ -87,7 +104,6 @@
         {
           "id": -1,
           "title": "Renaissance",
-          "platformId": "",
           "image": {
             "url": "https://4cawmi2va33i3w6dek1d7y1m-wpengine.netdna-ssl.com/wp-content/uploads/2015/05/11.jpg"
           },
@@ -112,34 +128,101 @@
         {
           "id": -1,
           "title": "Eastern",
-          "platformId": "",
+          "platformId1": "PLmmblQQ1XpT-t3P0mMP0qVERi4UbpI3U-",
           "image": {
             "url": "https://i.pinimg.com/originals/d9/68/92/d96892edbf1da6cc5ee68c2dcba366c8.jpg"
-          }
-        },
-        {
-          "id": -1,
-          "title": "Feminist",
-          "platformId": "",
-          "image": {
-            "url": "https://www.everypainterpaintshimself.com/article_images_new/Mona_Lisa_Large.jpg"
-          }
+          },
+          "subCategories": [
+            {
+              "id": -1,
+              "title": "Sun Tzu",
+              "platformId": "PLmmblQQ1XpT-2J6Iqo_Af0QFz3DYpsLSB",
+              "image": {
+                "url": "https://www.bedetheque.com/media/Photos/Photo_46059.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Confucius",
+              "platformId": "PLmmblQQ1XpT9g-3JlKSTEIPWk6ThPFcok",
+              "image": {
+                "url": ""
+              }
+            },
+            {
+              "id": -1,
+              "title": "Lao Tzu",
+              "platformId": "PLmmblQQ1XpT-1AokOoyuu8UWJfAKggx7y",
+              "image": {
+                "url": ""
+              }
+            },
+            {
+              "id": -1,
+              "title": "Buddah",
+              "platformId": "PLmmblQQ1XpT-VPU-488szsv0_XFgd06b1",
+              "image": {
+                "url": ""
+              }
+            }
+          ]
         },
         {
           "id": -1,
           "title": "Metaphysics",
-          "platformId": "",
+          "platformId": "PLmmblQQ1XpT_a7w-sxG1woeG3OeQBF8U2",
           "image": {
             "url": "https://www.danieljoachim.org/wp-content/uploads/2013/07/Metaphysics.jpg"
           }
         },
         {
           "id": -1,
-          "title": "Philosophy of mind",
-          "platformId": "",
+          "title": "Women",
           "image": {
-            "url": "https://d1gekqscl85idp.cloudfront.net/wisdomtimes/wp-content/uploads/2017/08/09222952/7-Questions-To-Help-You-Understand-The-Philosophy-Of-Mind.jpg"
-          }
+            "url": "https://www.everypainterpaintshimself.com/article_images_new/Mona_Lisa_Large.jpg"
+          },
+          "subCategories": [
+            {
+              "id": -1,
+              "title": "Simone de Beauvior",
+              "platformId": "PLmmblQQ1XpT8IqlQT2BT0Rdlr9D7zJfla",
+              "image": {
+                "url": ""
+              }
+            },
+            {
+              "id": -1,
+              "title": "Mary Wollstonecraft",
+              "platformId": "PLmmblQQ1XpT-z4lXnXod6DoLzHvHQiIsT",
+              "image": {
+                "url": ""
+              }
+            },
+            {
+              "id": -1,
+              "title": "Hannah Arednt",
+              "platformId": "PLmmblQQ1XpT_BXTT40WkPeuARv5jrwXPZ",
+              "image": {
+                "url": ""
+              }
+            },
+            {
+              "id": -1,
+              "title": "Simone Weil",
+              "platformId": "PLmmblQQ1XpT9Y9uPtPqoZ8A_ujKDvMnP-",
+              "image": {
+                "url": ""
+              }
+            },
+            {
+              "id": -1,
+              "title": "Mary Astel",
+              "platformId": "PLmmblQQ1XpT_i8_MPMMxsPXyGJHZG0Ugs",
+              "image": {
+                "url": ""
+              }
+            }
+          ]
         },
         {
           "id": -1,
@@ -202,7 +285,6 @@
         {
           "id": -1,
           "title": "Poststructuralism",
-          "platformId": "",
           "image": {
             "url": "https://i1.wp.com/www.hisour.com/wp-content/uploads/2018/06/Post-structuralism.jpg"
           },
