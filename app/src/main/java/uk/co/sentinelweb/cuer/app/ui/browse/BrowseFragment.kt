@@ -128,8 +128,12 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                             startActivity(
                                 ShareActivity.urlIntent(
                                     requireContext(),
-                                    YoutubeJavaApiWrapper.playlistUrl(label.platformId),
-                                    label.parentId
+                                    YoutubeJavaApiWrapper.playlistUrl(
+                                        label.cat.platformId
+                                            ?: throw IllegalArgumentException("Category has no platform ID : ${label.cat} ")
+                                    ),
+                                    label.parentId,
+                                    label.cat
                                 )
                             )
                         }

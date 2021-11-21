@@ -151,7 +151,7 @@ class BrowseStoreFactory constructor(
                             .takeIf { it.isNotEmpty() }
                             ?.get(0)?.id
                     recentCategories.addRecent(cat)
-                    publish(Label.AddPlaylist(cat.platformId, cat.platform, parentId))
+                    publish(Label.AddPlaylist(cat, parentId))
                 })
 
         private fun getTopLevelCategory(

@@ -55,6 +55,7 @@ data class NavigationModel constructor(
         SOURCE, /* uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source */
         HEADLESS /*Boolean*/,
         PLAYLIST_PARENT, /* Long */
+        CATEGORY, /* CategoryDomain */
         PASTE, /* Boolean */
         IMAGE_URL, /*String*/
         ;

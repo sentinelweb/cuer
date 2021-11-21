@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.share
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -16,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -28,7 +30,7 @@ interface ShareContract {
         fun scanResult(result: ScanContract.Result)
         fun afterItemEditNavigation()
         fun isAlreadyScanned(urlOrText: String): Boolean
-        fun setPlaylistParent(longExtra: Long)
+        fun setPlaylistParent(cat: CategoryDomain?, parentId: Long)
         fun onReady(ready: Boolean)
         fun serializeState(): String?
         fun restoreState(s: String)
@@ -73,11 +75,12 @@ interface ShareContract {
 
     @Serializable
     data class State(
-        @kotlinx.serialization.Transient
+        @Transient
         var model: Model? = null,
         var parentPlaylistId: Long? = null,
         var scanResult: ScanContract.Result? = null,
         var ready: Boolean = false,
+        var category: CategoryDomain? = null,
     ) : ViewModel()
 
     interface ShareStrings {
@@ -108,6 +111,7 @@ interface ShareContract {
                         prefsWrapper = get(),
                         timeProvider = get(),
                         playlistItemOrchestrator = get(),
+                        playlistOrchestrator = get(),
                         shareStrings = get(),
                         recentLocalPlaylists = get()
                     )

@@ -4,7 +4,6 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.CategoryDomain.Companion.EMPTY_CATEGORY
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
 class BrowseContract {
 
@@ -22,8 +21,7 @@ class BrowseContract {
             object TopReached : Label()
             object ActionSettings : Label()
             data class AddPlaylist(
-                val platformId: String,
-                val platform: PlatformDomain = PlatformDomain.YOUTUBE,
+                val cat: CategoryDomain,
                 val parentId: Long? = null,
             ) : Label()
 

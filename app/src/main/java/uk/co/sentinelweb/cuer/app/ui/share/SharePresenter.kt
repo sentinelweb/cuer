@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -21,11 +22,8 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
 
 class SharePresenter constructor(
@@ -39,6 +37,7 @@ class SharePresenter constructor(
     private val mapper: ShareModelMapper,
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val playlistOrchestrator: PlaylistOrchestrator,
     private val timeProvider: TimeProvider,
     private val shareStrings: ShareContract.ShareStrings,
     private val recentLocalPlaylists: RecentLocalPlaylists,
@@ -52,8 +51,9 @@ class SharePresenter constructor(
         coroutines.cancel()
     }
 
-    override fun setPlaylistParent(longExtra: Long) {
-        state.parentPlaylistId = longExtra
+    override fun setPlaylistParent(cat: CategoryDomain?, parentId: Long) {
+        state.category = cat
+        state.parentPlaylistId = parentId
     }
 
     override fun onReady(ready: Boolean) {
@@ -103,13 +103,29 @@ class SharePresenter constructor(
                 )
                 mapModel()
             }
-            PLAYLIST -> (result.result as PlaylistDomain).let {
-                it.id?.let {
-                    view.showPlaylist(
-                        it.toIdentifier(if (result.isNew) MEMORY else LOCAL),
-                        state.parentPlaylistId
-                    )
-                    mapModel()
+            PLAYLIST -> (result.result as PlaylistDomain).let { playlist ->
+                playlist.id?.let { id ->
+                    coroutines.mainScope.launch {
+                        if (result.isNew && state.category != null && state.category?.image != null) {
+                            playlist.copy(
+                                image = state.category?.image ?: playlist.image,
+                                thumb = state.category?.image ?: playlist.image,
+                                config = playlist.config.copy(
+                                    description = state.category?.description
+                                )
+                            ).apply {
+                                playlistOrchestrator.save(
+                                    this,
+                                    Options(MEMORY, flat = true, emit = false)
+                                )
+                            }
+                        }
+                        view.showPlaylist(
+                            id.toIdentifier(if (result.isNew) MEMORY else LOCAL),
+                            state.parentPlaylistId
+                        )
+                        mapModel()
+                    }
                 } ?: throw IllegalStateException("Playlist needs an id (isNew = MEMORY)")
             }
             else -> throw IllegalArgumentException("unsupported type: ${result.type}")

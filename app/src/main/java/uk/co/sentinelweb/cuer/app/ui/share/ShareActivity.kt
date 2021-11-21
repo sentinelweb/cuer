@@ -38,7 +38,9 @@ import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseCategory
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class ShareActivity : AppCompatActivity(),
@@ -95,14 +97,13 @@ class ShareActivity : AppCompatActivity(),
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         if (hasFocus && intent.getBooleanExtra(PASTE.toString(), false)) {
-            checkForPlaylistParentInIntent()
+            checkIntentParams()
             clipboard.getPrimaryClip()
                 ?.getItemAt(0)
                 ?.text
                 ?.apply {
                     if (!presenter.isAlreadyScanned(this.toString())) {
                         scanFragment.fromShareUrl(this.toString())
-                            ?: throw IllegalStateException("Scan fragment not visible")
                     }
                 }
                 ?: presenter.linkError(
@@ -133,20 +134,25 @@ class ShareActivity : AppCompatActivity(),
 
     private fun checkIntent(intent: Intent) {
         if (!intent.getBooleanExtra(PASTE.toString(), false)) {
-            checkForPlaylistParentInIntent()
+            checkIntentParams()
             (shareWrapper.getLinkFromIntent(intent)
                 ?: shareWrapper.getTextFromIntent(intent))?.apply {
                 if (!presenter.isAlreadyScanned(this)) {
-                    scanFragment.fromShareUrl(this)
+                    scanFragment.fromShareUrl(
+                        this,
+
+                        )
                 }
             } ?: presenter.linkError(getString(R.string.share_error_no_link))
         }
     }
 
-    private fun checkForPlaylistParentInIntent() {
-        if (intent.hasExtra(PLAYLIST_PARENT.toString())) {
-            presenter.setPlaylistParent(intent.getLongExtra(PLAYLIST_PARENT.toString(), -1))
-        }
+    private fun checkIntentParams() {
+        presenter.setPlaylistParent(
+            intent.getStringExtra(CATEGORY.toString())
+                ?.let { deserialiseCategory(it) },
+            intent.getLongExtra(PLAYLIST_PARENT.toString(), -1)
+        )
     }
 
     override fun onStop() {
@@ -253,7 +259,11 @@ class ShareActivity : AppCompatActivity(),
         private const val STATE_KEY = "share_state"
 
         // todo add parent id if in playlist fragment (called form main atm)
-        fun intent(c: Context, paste: Boolean = false, parentId: Long? = null) =
+        fun intent(
+            c: Context,
+            paste: Boolean = false,
+            parentId: Long? = null
+        ) =
             Intent(c, ShareActivity::class.java).apply {
                 action = Intent.ACTION_VIEW
                 if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
@@ -265,11 +275,19 @@ class ShareActivity : AppCompatActivity(),
                 }
             }
 
-        fun urlIntent(c: Context, url: String, parentId: Long? = null) =
+        fun urlIntent(
+            c: Context,
+            url: String,
+            parentId: Long? = null,
+            fromCategory: CategoryDomain? = null
+        ) =
             Intent(c, ShareActivity::class.java).apply {
                 action = Intent.ACTION_VIEW
                 if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
                 data = Uri.parse(url)
+                if (fromCategory != null) {
+                    this.putExtra(CATEGORY.toString(), fromCategory.serialise())
+                }
                 if (parentId != null) {
                     this.putExtra(PLAYLIST_PARENT.toString(), parentId)
                 }
