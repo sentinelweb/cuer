@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Label
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.Order.CATEGORIES
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Model
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -22,7 +23,9 @@ class BrowseMviView constructor(
         log.tag(this)
     }
 
-    var observableModel: Model by mutableStateOf(Model(res.getString(R.string.bottomnav_title_browse), listOf(), null, true))
+    var observableModel: Model by mutableStateOf(
+        Model(res.getString(R.string.bottomnav_title_browse), listOf(), null, true, CATEGORIES)
+    )
         private set
 
     private val _labelData: MutableLiveData<Label> = MutableLiveData()

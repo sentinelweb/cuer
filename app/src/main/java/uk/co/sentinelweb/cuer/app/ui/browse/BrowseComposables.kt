@@ -15,8 +15,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.Order.A_TO_Z
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.Order.CATEGORIES
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.*
-import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.ClickChildren
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnCategoryClicked
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerBrowseTheme
 import uk.co.sentinelweb.cuer.app.ui.common.compose.image.NetworkImage
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.Action
@@ -45,9 +47,19 @@ object BrowseComposables {
                 Column {
                     CuerTopAppBarComposables.CuerAppBar(
                         text = model.title,
+                        onUp = { view.dispatch(Event.OnUpClicked) },
                         //backgroundColor = Color.White// todo dark theme make color?
                         actions = listOf(
-                            Action(CuerMenuItem.Settings, { view.dispatch(Event.ActionSettingsClick) })
+                            when (model.order) {
+                                CATEGORIES -> Action(CuerMenuItem.SortAlpha,
+                                    { view.dispatch(Event.OnSetOrder(A_TO_Z)) }
+                                )
+                                A_TO_Z -> Action(CuerMenuItem.SortCategory,
+                                    { view.dispatch(Event.OnSetOrder(CATEGORIES)) }
+                                )
+                            },
+                            Action(CuerMenuItem.Settings,
+                                { view.dispatch(Event.OnActionSettingsClicked) }),
                         )
                     )
                     Column(
@@ -90,9 +102,10 @@ object BrowseComposables {
                     color = Color.White
                 )
             }
-            Divider(color = Color.White, modifier = Modifier
-                .padding(bottom = 8.dp)
-                .padding(start = dimensionResource(R.dimen.page_margin))
+            Divider(
+                color = Color.White, modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .padding(start = dimensionResource(R.dimen.page_margin))
             )
             CategoryGrid(rows, model.subCategories, view)
         }
@@ -130,7 +143,7 @@ object BrowseComposables {
 
             Row(
                 modifier = Modifier
-                    .clickable(onClick = { view.dispatch(ClickChildren(subCategory)) })
+                    .clickable(onClick = { view.dispatch(OnCategoryClicked(subCategory)) })
             ) {
                 Box {
                     subCategory.thumbNailUrl?.let {
@@ -248,6 +261,7 @@ object BrowseComposables {
 }
 
 class TestStrings : BrowseContract.BrowseStrings {
+    override val allCatsTitle = "All cats"
     override val recent = "Recent"
     override val errorNoPlaylistConfigured = "Error no playlist"
     override fun errorNoCatWithID(id: Long) = "Error no cat"

@@ -6,10 +6,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import uk.co.sentinelweb.cuer.app.R
 
@@ -19,6 +22,7 @@ object CuerTopAppBarComposables {
         text: String,
         backgroundColor: Color = MaterialTheme.colors.primarySurface,
         contentColor: Color = contentColorFor(backgroundColor),
+        onUp: (() -> Unit)? = null,
         actions: List<Action> = listOf(),
     ) {
         TopAppBar(
@@ -27,6 +31,18 @@ object CuerTopAppBarComposables {
                     text = text,
                     style = MaterialTheme.typography.h4
                 )
+            },
+            navigationIcon = {
+                if (onUp != null) {
+                    IconButton(onClick = { onUp() }) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            tint = MaterialTheme.colors.onSurface,
+                            contentDescription = stringResource(id = R.string.up)
+
+                        )
+                    }
+                }
             },
             backgroundColor = backgroundColor,
             contentColor = contentColor,
@@ -57,6 +73,8 @@ sealed class CuerMenuItem constructor(
     @DrawableRes val icon: Int,
 ) {
     object Settings : CuerMenuItem(R.string.menu_settings, R.drawable.ic_menu_settings_black)
+    object SortAlpha : CuerMenuItem(R.string.menu_sort_alpha, R.drawable.ic_sort_by_alpha)
+    object SortCategory : CuerMenuItem(R.string.menu_sort_category, R.drawable.ic_category)
 }
 
 data class Action(

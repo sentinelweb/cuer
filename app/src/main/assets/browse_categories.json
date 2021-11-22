@@ -126,17 +126,27 @@
           "subCategories": [
             {
               "id": -1,
-              "title": "Hume",
-              "platformId": "",
+              "title": "Decartes",
+              "platformId": "PLmmblQQ1XpT-hQNcM1tZLlF7CJtp2c1wg",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:David_Hume_2.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Decartes.jpg"
               }
-            },
+            }
+          ]
+        },
+        {
+          "id": -1,
+          "title": "Enlightenment",
+          "image": {
+            "url": "https://cuer-275020.web.app/images/categories/Enlightenment.jpg"
+          },
+          "subCategories": [
             {
               "id": -1,
-              "title": "Decartes",
+              "title": "Hume",
+              "platformId": "PLmmblQQ1XpT-Oq5g_AdulYofxSt7aCamW",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:Frans_Hals_-_Portret_van_Ren%C3%A9_Descartes.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Hume.jpg"
               }
             }
           ]
@@ -154,7 +164,7 @@
               "title": "Sun Tzu",
               "platformId": "PLmmblQQ1XpT-2J6Iqo_Af0QFz3DYpsLSB",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:%E5%90%B4%E5%8F%B8%E9%A9%AC%E5%AD%99%E6%AD%A6.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Sun-Tzu.jpg"
               }
             },
             {
@@ -162,7 +172,7 @@
               "title": "Confucius",
               "platformId": "PLmmblQQ1XpT9g-3JlKSTEIPWk6ThPFcok",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:Confucius_Tang_Dynasty.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Confucius.jpg"
               }
             },
             {
@@ -170,7 +180,7 @@
               "title": "Lao Tzu",
               "platformId": "PLmmblQQ1XpT-1AokOoyuu8UWJfAKggx7y",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:Zhang_Lu-Laozi_Riding_an_Ox.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Lao-Tzu.jpg"
               }
             },
             {
@@ -178,7 +188,7 @@
               "title": "Buddah",
               "platformId": "PLmmblQQ1XpT-VPU-488szsv0_XFgd06b1",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:P1040704.JPG"
+                "url": "https://cuer-275020.web.app/images/categories/Buddah.JPG"
               }
             }
           ]
@@ -204,7 +214,7 @@
               "title": "Simone de Beauvoir",
               "platformId": "PLmmblQQ1XpT8IqlQT2BT0Rdlr9D7zJfla",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:Simone_de_Beauvoir2.png"
+                "url": "https://cuer-275020.web.app/images/categories/Simone_de_Beauvoir.png"
               }
             },
             {
@@ -212,7 +222,7 @@
               "title": "Mary Wollstonecraft",
               "platformId": "PLmmblQQ1XpT-z4lXnXod6DoLzHvHQiIsT",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:Mary_Wollstonecraft_by_John_Opie_(c._1797).jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Mary_Wollstonecraft.jpg"
               }
             },
             {
@@ -220,7 +230,7 @@
               "title": "Hannah Arendt",
               "platformId": "PLmmblQQ1XpT_BXTT40WkPeuARv5jrwXPZ",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:Hannah_Arendt_1924.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Hannah_Arendt.jpg"
               }
             },
             {
@@ -228,7 +238,7 @@
               "title": "Simone Weil",
               "platformId": "PLmmblQQ1XpT9Y9uPtPqoZ8A_ujKDvMnP-",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:Simone_Weil_04_(cropped).png"
+                "url": "https://cuer-275020.web.app/images/categories/Simone_Weil.png"
               }
             },
             {
@@ -236,7 +246,15 @@
               "title": "Mary Astel",
               "platformId": "PLmmblQQ1XpT_i8_MPMMxsPXyGJHZG0Ugs",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:Reynold%27_Study_for_a_portrait.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Mary_Astel.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Margret Cavendish",
+              "platformId": "PLmmblQQ1XpT8sqxJaPpx5jyuA4AGVlq4-",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Margaret_cavendish.jpg"
               }
             }
           ]
@@ -254,7 +272,7 @@
               "title": "Kierkegaard",
               "platformId": "PLmmblQQ1XpT8CyV8Q_YfRKIVheCwKnbGk",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:S%C3%B8ren_Kierkegaard_(1813-1855)_-_(cropped).jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Kierkegaard.jpg"
               }
             },
             {
@@ -262,7 +280,7 @@
               "title": "Nietzche",
               "platformId": "PLmmblQQ1XpT8EjL-sA_YhXpn2srPjl5Hy",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/File:Nietzsche187a.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Nietzche.jpg"
               }
             },
             {
@@ -270,7 +288,7 @@
               "title": "Heidegger",
               "platformId": "PLmmblQQ1XpT9bNUUA5WgPO9BqqHiziYVN",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/Martin_Heidegger#/media/File:Heidegger_2_(1960).jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Heidegger.jpg"
               }
             },
             {
@@ -278,7 +296,7 @@
               "title": "Sartre",
               "platformId": "PLmmblQQ1XpT-3Scppc5Dmx3873XLjPM3M",
               "image": {
-                "url": "https://en.wikipedia.org/wiki/Jean-Paul_Sartre#/media/File:Sartre_1967_crop.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Sartre.jpg"
               }
             },
             {
@@ -286,7 +304,7 @@
               "title": "Dostovevsky",
               "platformId": "PLmmblQQ1XpT9jG7VrN0e4upd0FFI8smWb",
               "image": {
-                "url": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Fyodor_Dostoyevsky_%28Shapiro%2C_1879%29_-_3_%28only_face%29.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Dostovevsky.jpg"
               }
             },
             {
@@ -294,7 +312,7 @@
               "title": "Camus",
               "platformId": "PLmmblQQ1XpT-B7ESgd4Q34ak8RTcKnb6f",
               "image": {
-                "url": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.hdg.de%2Flemo%2Fimg%2Fgaleriebilder%2Fbiografien%2Fcamus-albert_foto_LEMO-F-4-242_dhm.jpg&f=1&nofb=1"
+                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
               }
             }
           ]
@@ -319,7 +337,7 @@
               "title": "Baudrillard",
               "platformId": "PLmmblQQ1XpT-I0LNP4p2j3z7jPz3aMGb-",
               "image": {
-                "url": "https://www.doppiozero.com/sites/default/files/jean-baudrillard.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Baudrillard.jpg"
               }
             },
             {
@@ -327,7 +345,7 @@
               "title": "Delueze",
               "platformId": "PLmmblQQ1XpT9Xu1ZAwC1HByiRO-RiqHw6",
               "image": {
-                "url": "https://assets.mubicdn.net/images/cast_member/386450/image-original.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Delueze.jpg"
               }
             }
           ]
@@ -345,28 +363,28 @@
           "id": -1,
           "title": "Sigmund Freud",
           "image": {
-            "url": "https://images.fineartamerica.com/images/artworkimages/mediumlarge/1/sigmund-freud-colorized-20170520-wingsdomain-art-and-photography.jpg"
+            "url": "https://cuer-275020.web.app/images/categories/Sigmund-Freud.jpg"
           }
         },
         {
           "id": -1,
           "title": "Jung",
           "image": {
-            "url": "https://www.lifestreamcoaching.net/wp-content/uploads/2019/08/Carl-Jung.jpg"
+            "url": "https://cuer-275020.web.app/images/categories/Jung.jpg"
           }
         },
         {
           "id": -1,
           "title": "Anna Freud",
           "image": {
-            "url": "https://www.thefamouspeople.com/profiles/images/anna-freud-2.jpg"
+            "url": "https://cuer-275020.web.app/images/categories/Anna-Freud.jpg"
           }
         },
         {
           "id": -1,
           "title": "Lacan",
           "image": {
-            "url": "https://laregledujeu.org/files/2015/04/jacques_lacan.jpg"
+            "url": "https://cuer-275020.web.app/images/categories/Lacan.jpg"
           }
         }
       ]
@@ -382,42 +400,42 @@
           "id": -1,
           "title": "Vipassana",
           "image": {
-            "url": "https://i.pinimg.com/originals/ee/44/b6/ee44b6e2e4460d43c635e929ab9f6eaa.jpg"
+            "url": "https://cuer-275020.web.app/images/categories/Vipassana.jpg"
           }
         },
         {
           "id": -1,
           "title": "Zen",
           "image": {
-            "url": "https://d20aeo683mqd6t.cloudfront.net/articles/title_images/000/000/475/medium/16036391499_df20993867_z.jpg?2017"
+            "url": "https://cuer-275020.web.app/images/categories/Zen.jpg"
           }
         },
         {
           "id": -1,
           "title": "Trancendental",
           "image": {
-            "url": "https://i0.wp.com/mindisthemaster.com/wp-content/uploads/2020/03/Transcendental-Meditation-Training.jpg?fit=2100%2C1500&ssl=1"
+            "url": "https://cuer-275020.web.app/images/categories/Transcendental.jpg"
           }
         },
         {
           "id": -1,
           "title": "Chakra",
           "image": {
-            "url": "https://cdn-az.allevents.in/events5/banners/2fdbf70d01dbd5b108ecfc5006951b07c6f41bff06f922d823ec541f62391bc8-rimg-w1200-h1200-gmir.jpg?v=1575284947"
+            "url": "https://cuer-275020.web.app/images/categories/Chakra.jpg"
           }
         },
         {
           "id": -1,
           "title": "Yoga",
           "image": {
-            "url": "https://retreatsinsedona.com/wp-content/uploads/2015/10/hatha-yoga-meditation-sedona-retreat.jpg"
+            "url": "https://cuer-275020.web.app/images/categories/Yoga.jpg"
           }
         },
         {
           "id": -1,
           "title": "Jain",
           "image": {
-            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Ahinsa_Sthal.jpg/1200px-Ahinsa_Sthal.jpg"
+            "url": "https://cuer-275020.web.app/images/categories/Jain.jpg"
           }
         }
       ]

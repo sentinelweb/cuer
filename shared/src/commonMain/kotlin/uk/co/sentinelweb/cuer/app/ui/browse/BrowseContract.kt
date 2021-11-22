@@ -7,12 +7,15 @@ import uk.co.sentinelweb.cuer.domain.CategoryDomain.Companion.EMPTY_CATEGORY
 
 class BrowseContract {
 
+    enum class Order { CATEGORIES, A_TO_Z }
+
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
         sealed class Intent {
             object Display : Intent()
-            data class ClickChildren(val id: Long, val forceItem: Boolean) : Intent()
+            data class ClickCategory(val id: Long, val forceItem: Boolean) : Intent()
             object Up : Intent()
             object ActionSettings : Intent()
+            data class SetOrder(val order: Order) : Intent()
         }
 
         sealed class Label {
@@ -33,6 +36,7 @@ class BrowseContract {
             val categoryLookup: Map<Long, CategoryDomain> = mapOf(),
             val parentLookup: Map<CategoryDomain, CategoryDomain> = mapOf(),
             val recent: List<CategoryDomain> = listOf(),
+            val order: Order = Order.CATEGORIES
         )
     }
 
@@ -45,6 +49,7 @@ class BrowseContract {
             val categories: List<CategoryModel>,
             val recent: CategoryModel?,
             val isRoot: Boolean,
+            val order: Order,
         )
 
         data class CategoryModel(
@@ -60,14 +65,16 @@ class BrowseContract {
 
         sealed class Event {
             object OnResume : Event()
-            object UpClicked : Event()
-            object ActionSettingsClick : Event()
-            data class ClickChildren(val model: CategoryModel) : Event()
+            object OnUpClicked : Event()
+            object OnActionSettingsClicked : Event()
+            data class OnCategoryClicked(val model: CategoryModel) : Event()
+            data class OnSetOrder(val order: Order) : Event()
 
         }
     }
 
     interface BrowseStrings {
+        val allCatsTitle: String
         val recent: String
         val errorNoPlaylistConfigured: String
         fun errorNoCatWithID(id: Long): String

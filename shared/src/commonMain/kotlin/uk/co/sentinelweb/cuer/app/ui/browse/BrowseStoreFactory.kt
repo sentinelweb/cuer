@@ -39,6 +39,7 @@ class BrowseStoreFactory constructor(
         class SetCategoryByTitle(val title: String) : Result()
         class LoadCatgeories(val root: CategoryDomain) : Result()
         object Display : Result()
+        class SetOrder(val order: BrowseContract.Order) : Result()
     }
 
     private sealed class Action {
@@ -50,6 +51,7 @@ class BrowseStoreFactory constructor(
             when (result) {
                 is Result.Display -> this
                 is Result.SetCategory -> copy(currentCategory = result.category)
+                is Result.SetOrder -> copy(order = result.order)
                 is Result.SetCategoryByTitle -> {
                     this.categoryLookup.values
                         .find { it.title == result.title }
@@ -88,7 +90,7 @@ class BrowseStoreFactory constructor(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-                is Intent.ClickChildren -> {
+                is Intent.ClickCategory -> {
                     getState().categoryLookup.get(intent.id)
                         ?.also { cat ->
                             if (cat.subCategories.size > 0) {
@@ -112,6 +114,7 @@ class BrowseStoreFactory constructor(
                     Unit
                 }
                 is Intent.Display -> dispatch(Result.Display)
+                is Intent.SetOrder -> dispatch(Result.SetOrder(intent.order))
                 is Intent.Up -> {
                     getState().parentLookup.get(getState().currentCategory)
                         ?.apply {

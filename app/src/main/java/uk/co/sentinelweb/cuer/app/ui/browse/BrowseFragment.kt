@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnResume
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnUpClicked
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -62,7 +63,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     // saves the data on back press (enabled in onResume)
     private val upCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            browseMviView.dispatch(BrowseContract.View.Event.UpClicked)
+            browseMviView.dispatch(OnUpClicked)
         }
     }
 
@@ -150,6 +151,8 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     }
 
     class BrowseStrings(private val res: ResourceWrapper) : BrowseContract.BrowseStrings {
+        override val allCatsTitle: String
+            get() = res.getString(R.string.browse_all_cats_title)
         override val recent: String
             get() = res.getString(R.string.browse_recent)
         override val errorNoPlaylistConfigured = res.getString(R.string.browse_error_no_playlist)

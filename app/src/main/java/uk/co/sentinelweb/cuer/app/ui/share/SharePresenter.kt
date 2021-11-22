@@ -106,10 +106,11 @@ class SharePresenter constructor(
             PLAYLIST -> (result.result as PlaylistDomain).let { playlist ->
                 playlist.id?.let { id ->
                     coroutines.mainScope.launch {
-                        if (result.isNew && state.category != null && state.category?.image != null) {
+                        // fixme image is still replaced even is blank
+                        if (result.isNew && state.category?.image?.url?.isNotEmpty() ?: false) {
                             playlist.copy(
                                 image = state.category?.image ?: playlist.image,
-                                thumb = state.category?.image ?: playlist.image,
+                                thumb = state.category?.image ?: playlist.thumb,
                                 config = playlist.config.copy(
                                     description = state.category?.description
                                 )
