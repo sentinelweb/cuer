@@ -134,14 +134,6 @@
             },
             {
               "id": -1,
-              "title": "Voltaire",
-              "platformId": "PLmmblQQ1XpT-K5YTBBAOoNoqbJoDwbiU6",
-              "image": {
-                "url": "https://cuer-275020.web.app/images/categories/Voltaire.png"
-              }
-            },
-            {
-              "id": -1,
               "title": "Machiavelli",
               "platformId": "PLmmblQQ1XpT8nIvKJI36VfOGAeeoz1JU3",
               "image": {
@@ -171,6 +163,22 @@
               "image": {
                 "url": "https://cuer-275020.web.app/images/categories/Leibniz.jpg"
               }
+            },
+            {
+              "id": -1,
+              "title": "Spinoza",
+              "platformId": "PLmmblQQ1XpT8da-LgLV5XFone4m1S_m0W",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Montaigne",
+              "platformId": "PLmmblQQ1XpT_VcMDDiIXOBM9deohrUcNa",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
             }
           ]
         },
@@ -187,6 +195,200 @@
               "platformId": "PLmmblQQ1XpT-Oq5g_AdulYofxSt7aCamW",
               "image": {
                 "url": "https://cuer-275020.web.app/images/categories/Hume.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Voltaire",
+              "platformId": "PLmmblQQ1XpT-K5YTBBAOoNoqbJoDwbiU6",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Voltaire.png"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Rousseau",
+              "platformId": "PLmmblQQ1XpT-Zj-4bJc2TG-GDR9jeqkOp",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Adam Smith",
+              "platformId": "PLmmblQQ1XpT99T42l0l4dLi8AbmCcwW5x",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Kant",
+              "platformId": "PLmmblQQ1XpT8EgA29VpYLncThHScB9_bB",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Hegel",
+              "platformId": "PLmmblQQ1XpT_v1a8JDgUqjcEu8fDU43GS",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Schopenhauer",
+              "platformId": "PLmmblQQ1XpT-vKSW-t-EfctomXZdJZhNc",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "John Stuart Mill",
+              "platformId": "PLmmblQQ1XpT-OS05om1rTC83XIpSGU7EC",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Kierkegaard",
+              "platformId": "PLmmblQQ1XpT8CyV8Q_YfRKIVheCwKnbGk",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Kierkegaard.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Marx",
+              "platformId": "PLmmblQQ1XpT_kWTHR-aAmN0r-6SchvW3R",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Mary Wollstonecraft",
+              "platformId": "PLmmblQQ1XpT-z4lXnXod6DoLzHvHQiIsT",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Mary_Wollstonecraft.jpg"
+              }
+            }
+          ]
+        },
+        {
+          "id": -1,
+          "title": "Modernisim",
+          "platformId": "PLmmblQQ1XpT-UwUzp3rRxOEmcU_l9_uiM",
+          "image": {
+            "url": "https://cuer-275020.web.app/images/categories/Modernisim.jpg"
+          },
+          "subCategories": [
+            {
+              "id": -1,
+              "title": "Bertrand Russel",
+              "platformId": "PLmmblQQ1XpT_7XAXrmS6xaCqm4r3knZU2",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Nietzche",
+              "platformId": "PLmmblQQ1XpT8EjL-sA_YhXpn2srPjl5Hy",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Nietzche.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Wittgenstein",
+              "platformId": "PLmmblQQ1XpT97eTySyjjhqz28jCLL-CbX",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Heidegger",
+              "platformId": "PLmmblQQ1XpT9bNUUA5WgPO9BqqHiziYVN",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Heidegger.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Wittgenstein",
+              "platformId": "PLmmblQQ1XpT97eTySyjjhqz28jCLL-CbX",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Marcuse",
+              "platformId": "PLmmblQQ1XpT_ubXa703Whg7nMoBKNpd5a",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Karl Popper",
+              "platformId": "PLmmblQQ1XpT8CdZEQimp3XFtEHBmk_f-B",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Adorno and Horkheimer",
+              "platformId": "PLmmblQQ1XpT8HfLHQbwjMEaL9v8tAHAhL",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Sartre",
+              "platformId": "PLmmblQQ1XpT-3Scppc5Dmx3873XLjPM3M",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Sartre.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Hannah Arendt",
+              "platformId": "PLmmblQQ1XpT_BXTT40WkPeuARv5jrwXPZ",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Hannah_Arendt.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Simone de Beauvoir",
+              "platformId": "PLmmblQQ1XpT8IqlQT2BT0Rdlr9D7zJfla",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Simone_de_Beauvoir.png"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Camus",
+              "platformId": "PLmmblQQ1XpT-B7ESgd4Q34ak8RTcKnb6f",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Proust",
+              "platformId": "PLmmblQQ1XpT-7Ja2PAHiS2XWZEIeWh0Ut",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
               }
             }
           ]
@@ -243,14 +445,6 @@
         },
         {
           "id": -1,
-          "title": "Modernisim",
-          "platformId": "PLmmblQQ1XpT-UwUzp3rRxOEmcU_l9_uiM",
-          "image": {
-            "url": "https://cuer-275020.web.app/images/categories/Modernisim.jpg"
-          }
-        },
-        {
-          "id": -1,
           "title": "Women",
           "platformId": "PLmmblQQ1XpT_xCeSTLAYLwi7Yc2TnFdYB",
           "image": {
@@ -303,6 +497,62 @@
               "platformId": "PLmmblQQ1XpT8sqxJaPpx5jyuA4AGVlq4-",
               "image": {
                 "url": "https://cuer-275020.web.app/images/categories/Margaret_cavendish.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Iris Murdoch",
+              "platformId": "PLmmblQQ1XpT_Q_dg5nFhHMMIWIB4zTxa8",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Maya Angelou",
+              "platformId": "PLmmblQQ1XpT-Nu7msuPHNBx9R6TMvnXKp",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Ayn Rand",
+              "platformId": "PLmmblQQ1XpT-DrQLxxZxczOZZj8Wu7NJ4",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Mary Midgely",
+              "platformId": "PLmmblQQ1XpT_xM2s58k7Z9bV3nozyN9ql",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Philipa Foot",
+              "platformId": "PLmmblQQ1XpT-r4J5HHblW39dkWsL5bFI6",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Elizabeth Anscombe",
+              "platformId": "PLmmblQQ1XpT8m7Kx7rVC5im8mzeOzbtSR",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "",
+              "platformId": "",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
               }
             }
           ]
@@ -371,7 +621,73 @@
           "platformId": "PLmmblQQ1XpT9iktIR3QY10qCPf7sqYK-5",
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Post-Modernism.jpg"
-          }
+          },
+          "subCategories": [
+            {
+              "id": -1,
+              "title": "John Rawls",
+              "platformId": "PLmmblQQ1XpT9uEOyWsGeHWGrFdaTO1yah",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Chomsky",
+              "platformId": "PLmmblQQ1XpT8kGVZ9oMLg8JjZYT81bMBO",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Maya Angelou",
+              "platformId": "PLmmblQQ1XpT-Nu7msuPHNBx9R6TMvnXKp",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Vicktor Frankl",
+              "platformId": "PLmmblQQ1XpT_lVNWGzbqWhADx0FlUW81V",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Foucault",
+              "platformId": "PLmmblQQ1XpT_p__8klYk7dJYlSQYD-eI8",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Habermas",
+              "platformId": "PLmmblQQ1XpT-RKjC9VPUKUkz7GItr2cwd",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Zizek",
+              "platformId": "PLmmblQQ1XpT9eNPkw6cyvLKV8Ry4scQYU",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Derrida",
+              "platformId": "PLmmblQQ1XpT9YMKuFdgUzv8FJVtczoQEN",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+              }
+            }
+          ]
         },
         {
           "id": -1,
@@ -440,6 +756,7 @@
     },
     {
       "id": -1,
+      "visible": false,
       "title": "Meditation",
       "image": {
         "url": "gs://cuer-275020.appspot.com/playlist_header/pexels-emily-hopper-1359000-600.jpg"
