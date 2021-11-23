@@ -54,13 +54,13 @@
               "title": "Parmenides",
               "platformId": "PLmmblQQ1XpT-fg7inF-IGOuJKaTKb5w19",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Parmenides.jpg"
               }
             },
             {
               "id": -1,
               "title": "Epicurius",
-              "platformId": "pIETGDgMdtg&list=PLmmblQQ1XpT-E200iGiWesalC28zBuNt5",
+              "platformId": "PLmmblQQ1XpT-E200iGiWesalC28zBuNt5",
               "image": {
                 "url": "https://cuer-275020.web.app/images/categories/Epicurius.jpg"
               }
@@ -131,6 +131,46 @@
               "image": {
                 "url": "https://cuer-275020.web.app/images/categories/Decartes.jpg"
               }
+            },
+            {
+              "id": -1,
+              "title": "Voltaire",
+              "platformId": "PLmmblQQ1XpT-K5YTBBAOoNoqbJoDwbiU6",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Voltaire.png"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Machiavelli",
+              "platformId": "PLmmblQQ1XpT8nIvKJI36VfOGAeeoz1JU3",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Machiavelli.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Hobbes",
+              "platformId": "PLmmblQQ1XpT-H2o9NGg5oXUgtZ34jsWVn",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Hobbes.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Locke",
+              "platformId": "PLmmblQQ1XpT9_D0BMAU_zXd-szA_EUWsw",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Locke.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Leibniz",
+              "platformId": "PLmmblQQ1XpT8o529sCzGU_VhvlBeJjQxH",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Leibniz.jpg"
+              }
             }
           ]
         },
@@ -199,6 +239,14 @@
           "platformId": "PLmmblQQ1XpT_a7w-sxG1woeG3OeQBF8U2",
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Metaphysics.png"
+          }
+        },
+        {
+          "id": -1,
+          "title": "Modernisim",
+          "platformId": "PLmmblQQ1XpT-UwUzp3rRxOEmcU_l9_uiM",
+          "image": {
+            "url": "https://cuer-275020.web.app/images/categories/Modernisim.jpg"
           }
         },
         {
@@ -328,6 +376,7 @@
         {
           "id": -1,
           "title": "Post Structuralism",
+          "platformId": "PLmmblQQ1XpT_WeqVnBwZrS8gv6w1Q7JZi",
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Post-Structuralism.png"
           },
