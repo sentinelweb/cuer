@@ -79,7 +79,7 @@ object BrowseComposables {
                                 Category(it, view, 3)
                             }
                         } else {
-                            CategoryGrid(7, model.categories, view)
+                            CategoryGrid(8, model.categories, view)
                         }
                     }
                 }

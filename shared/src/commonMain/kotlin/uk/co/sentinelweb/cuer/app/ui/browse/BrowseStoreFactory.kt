@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import io.ktor.http.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.TitleFilter
@@ -134,29 +135,31 @@ class BrowseStoreFactory constructor(
         private suspend fun checkPlatformId(
             cat: CategoryDomain,
             getState: () -> State
-        ) =
-            (playlistOrchestrator.loadList(
-                PlatformIdListFilter(ids = listOf(cat.platformId!!)),
-                LOCAL.flatOptions()
-            )
-                .takeIf { it.isNotEmpty() }
-                ?.let { it[0].id }
-                ?.also {
-                    recentCategories.addRecent(cat)
-                    publish(Label.OpenLocalPlaylist(it))
-                }
-                ?: also {
-                    val catParent = getTopLevelCategory(cat, getState)
-                    val parentId =
-                        playlistOrchestrator.loadList(
-                            TitleFilter(title = catParent.title),
-                            LOCAL.flatOptions()
-                        )
-                            .takeIf { it.isNotEmpty() }
-                            ?.get(0)?.id
-                    recentCategories.addRecent(cat)
-                    publish(Label.AddPlaylist(cat, parentId))
-                })
+        ) = playlistOrchestrator.loadList(
+            PlatformIdListFilter(ids = listOf(cat.platformId!!)),
+            LOCAL.flatOptions()
+        )
+            .takeIf { it.isNotEmpty() }
+            ?.let { it[0].id }
+            ?.also {
+                recentCategories.addRecent(cat)
+                publish(Label.OpenLocalPlaylist(it))
+            }
+            ?: also {
+                val catParent = getTopLevelCategory(cat, getState)
+                val parentId =
+                    playlistOrchestrator.loadList(
+                        TitleFilter(title = catParent.title),
+                        LOCAL.flatOptions()
+                    )
+                        .takeIf { it.isNotEmpty() }
+                        ?.get(0)?.id
+                recentCategories.addRecent(cat)
+                val params = listOf("search" to cat.title).formUrlEncode()
+                cat
+                    .copy(description = "Wikipedia link: https://en.wikipedia.org/w/index.php?${params}")
+                    .apply { publish(Label.AddPlaylist(this, parentId)) }
+            }
 
         private fun getTopLevelCategory(
             cat: CategoryDomain,

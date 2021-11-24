@@ -225,7 +225,7 @@ interface PlaylistContract {
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
-                scoped { navigationMapper(true, this.getFragmentActivity(), false) }
+                scoped { navigationMapper(true, this.getFragmentActivity()) }
                 scoped {
                     PlayUseCase(
                         queue = get(),
