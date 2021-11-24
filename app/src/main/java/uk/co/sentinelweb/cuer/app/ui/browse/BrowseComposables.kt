@@ -50,6 +50,8 @@ object BrowseComposables {
                         onUp = { view.dispatch(Event.OnUpClicked) },
                         //backgroundColor = Color.White// todo dark theme make color?
                         actions = listOf(
+                            Action(CuerMenuItem.Search,
+                                { view.dispatch(Event.OnActionSearchClicked) }),
                             when (model.order) {
                                 CATEGORIES -> Action(CuerMenuItem.SortAlpha,
                                     { view.dispatch(Event.OnSetOrder(A_TO_Z)) }
@@ -86,7 +88,7 @@ object BrowseComposables {
     }
 
     @Composable
-    private fun Category(model: CategoryModel, view: BaseMviView<Model, Event>, rows: Int = 3) {
+    private fun Category(model: CategoryModel, view: BaseMviView<Model, Event>, rows: Int) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = model.title,
@@ -94,6 +96,8 @@ object BrowseComposables {
                 color = Color.White,
                 modifier = Modifier
                     .padding(start = dimensionResource(R.dimen.page_margin))
+                    .clickable(onClick = { view.dispatch(OnCategoryClicked(model)) })
+
             )
             model.description?.let {
                 Text(

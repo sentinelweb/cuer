@@ -133,6 +133,7 @@ interface PlaylistContract {
         var playlistsTree: PlaylistTreeDomain? = null,
         var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null,
         var addPlaylistParent: Long? = null,
+        var isModified: Boolean = false,
     ) : ViewModel()
 
     data class Model constructor(

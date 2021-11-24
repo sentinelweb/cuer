@@ -325,6 +325,7 @@ class PlaylistPresenter(
                         )
                     }
                     ?.also { state.selectedPlaylistItem = null }
+                    ?.also { state.isModified = true }
                     ?: apply {
                         view.showError(res.getString(R.string.playlist_error_moveitem_already_exists))
                     }
@@ -529,38 +530,32 @@ class PlaylistPresenter(
         if (state.dragFrom != null && state.dragTo != null) {
             state.playlist
                 ?.let { playlist ->
-                    playlistMutator.moveItem(
-                        playlist,
-                        state.dragFrom!!,
-                        state.dragTo!!
-                    )
+                    playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!)
                 }
                 ?.also { state.playlist = it }
-                ?.also {
+                ?.also { playlistModified ->
+                    state.viewModelScope.launch {
+                        state.dragTo
+                            ?.let { playlistModified.items[it] }
+                            ?.let { item ->
+                                item to (item.id ?: 0)
+                                    .toIdentifier(state.playlistIdentifier.source)
+                                    .flatOptions()
+                            }
+                            // updates order
+                            ?.let {
+                                playlistItemOrchestrator.save(it.first, it.second)
+                            }
+                    }
+                }?.also {
                     modelMapper.map(
-                        it,
-                        isPlaylistPlaying(),
+                        it, isPlaylistPlaying(),
                         id = state.playlistIdentifier,
                         playlists = state.playlistsTreeLookup,
                         pinned = isPlaylistPinned()
                     )
                         .also { view.setModel(it, false) }
                     view.highlightPlayingItem(it.currentIndex)
-                }
-                ?.also { playlistModified ->
-                    state.viewModelScope.launch {
-                        state.dragTo
-                            ?.let { playlistModified.items[it] }
-                            ?.let { item ->
-                                item to (item.id
-                                    ?: throw java.lang.IllegalStateException("Moved item has no ID"))
-                                    .toIdentifier(state.playlistIdentifier.source)
-                                    .flatOptions()
-                            }
-                            ?.let {
-                                playlistItemOrchestrator.save(it.first, it.second)
-                            }
-                    }
                 }
         } else {
             if (state.dragFrom != null || state.dragTo != null) {
@@ -635,7 +630,7 @@ class PlaylistPresenter(
     }
 
     override fun checkToSave() {
-        if (state.playlist?.id ?: 0 <= 0) {
+        if (state.playlist?.id ?: 0 <= 0 && state.isModified) {
             view.showAlertDialog(modelMapper.mapSaveConfirmAlert(
                 {
                     coroutines.mainScope.launch {

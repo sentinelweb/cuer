@@ -29,6 +29,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
+import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
@@ -125,6 +127,10 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         is Error -> snackbarWrapper.makeError(label.message).show()
                         TopReached -> navMapper.navigate(NavigationModel.FINISH)
                         ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
+                        ActionSearch -> {
+                            SearchBottomSheetFragment()
+                                .show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
+                        }
                         is AddPlaylist -> {
                             startActivity(
                                 ShareActivity.urlIntent(

@@ -128,6 +128,7 @@ class BrowseStoreFactory constructor(
                     Unit
                 }
                 Intent.ActionSettings -> publish(Label.ActionSettings)
+                Intent.ActionSearch -> publish(Label.ActionSearch)
             }
 
         private suspend fun checkPlatformId(
@@ -173,16 +174,16 @@ class BrowseStoreFactory constructor(
             return catParent
         }
 
-        private suspend fun loadCategories() {
-            val root = repository.loadAll()
-            // log.d(root.buildIdLookup().values.joinToString("\n") { "${it.title} - ${it.image?.url}" })
-            dispatch(Result.LoadCatgeories(root))
-
+        private suspend fun loadCategories(): Unit = kotlin.runCatching {
+            repository.loadAll()
+            // .apply { log.d(root.buildIdLookup().values.joinToString("\n") { "${it.title} - ${it.image?.url}" })*/ }
+        }.onSuccess {
+            dispatch(Result.LoadCatgeories(it))
             prefs.getString(BROWSE_CAT_TITLE, null)
                 ?.also { dispatch(Result.SetCategoryByTitle(it)) }
         }
-
-
+            .onFailure { log.e("browse load fail", it) }
+            .let { }
     }
 
     fun create(): MviStore =

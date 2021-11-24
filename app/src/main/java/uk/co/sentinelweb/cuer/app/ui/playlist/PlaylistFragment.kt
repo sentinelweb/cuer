@@ -150,6 +150,7 @@ class PlaylistFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
         sharedElementReturnTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         sharedElementEnterTransition = from(context).inflateTransition(android.R.transition.move)

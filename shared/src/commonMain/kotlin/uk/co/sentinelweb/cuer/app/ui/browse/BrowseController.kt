@@ -37,6 +37,7 @@ class BrowseController constructor(
             is OnResume -> Display
             is OnActionSettingsClicked -> ActionSettings
             is OnSetOrder -> SetOrder(order)
+            is OnActionSearchClicked -> ActionSearch
         }
     }
 

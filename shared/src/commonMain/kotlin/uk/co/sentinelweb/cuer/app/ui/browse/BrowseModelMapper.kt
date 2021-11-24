@@ -19,6 +19,8 @@ class BrowseModelMapper constructor(
             Model(
                 title = state.currentCategory.title,
                 categories = state.currentCategory.subCategories
+                    .filter { it.visible }
+                    .sortedBy { it.title }
                     .map { categoryModel(it) }
                     .let {
                         if (state.currentCategory.platformId?.isNotEmpty() ?: false)
@@ -33,7 +35,8 @@ class BrowseModelMapper constructor(
         } else {
             Model(
                 categories = state.categoryLookup.values
-                    .distinctBy { it.title }
+                    .filter { it.visible }
+                    .distinctBy { it.platformId }
                     .sortedBy { it.title }
                     .filter { it.platformId?.isNotEmpty() ?: false }
                     .map { categoryModel(it, true) },
@@ -41,6 +44,7 @@ class BrowseModelMapper constructor(
                 isRoot = false,
                 recent = makeRecent(state),
                 order = state.order
+
             )
         }
     }

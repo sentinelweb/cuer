@@ -72,6 +72,14 @@
               "image": {
                 "url": "https://cuer-275020.web.app/images/categories/Diogenes.jpg"
               }
+            },
+            {
+              "id": -1,
+              "title": "Heraclitus",
+              "platformId": "PLmmblQQ1XpT89ZxbHE7FJeR3uYvF_N8i-",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Heraclitus.jpg"
+              }
             }
           ]
         },
@@ -169,7 +177,7 @@
               "title": "Spinoza",
               "platformId": "PLmmblQQ1XpT8da-LgLV5XFone4m1S_m0W",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Spinoza.jpg"
               }
             },
             {
@@ -177,7 +185,7 @@
               "title": "Montaigne",
               "platformId": "PLmmblQQ1XpT_VcMDDiIXOBM9deohrUcNa",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Montaigne.jpg"
               }
             }
           ]
@@ -210,7 +218,7 @@
               "title": "Rousseau",
               "platformId": "PLmmblQQ1XpT-Zj-4bJc2TG-GDR9jeqkOp",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Rousseau.jpg"
               }
             },
             {
@@ -218,7 +226,7 @@
               "title": "Adam Smith",
               "platformId": "PLmmblQQ1XpT99T42l0l4dLi8AbmCcwW5x",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Adam-Smith.jpg"
               }
             },
             {
@@ -226,7 +234,7 @@
               "title": "Kant",
               "platformId": "PLmmblQQ1XpT8EgA29VpYLncThHScB9_bB",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Kant.jpg"
               }
             },
             {
@@ -234,7 +242,7 @@
               "title": "Hegel",
               "platformId": "PLmmblQQ1XpT_v1a8JDgUqjcEu8fDU43GS",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Hegel.jpg"
               }
             },
             {
@@ -242,7 +250,7 @@
               "title": "Schopenhauer",
               "platformId": "PLmmblQQ1XpT-vKSW-t-EfctomXZdJZhNc",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Schopenhauer.jpg"
               }
             },
             {
@@ -250,7 +258,7 @@
               "title": "John Stuart Mill",
               "platformId": "PLmmblQQ1XpT-OS05om1rTC83XIpSGU7EC",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/John-Stuart-Mill.jpg"
               }
             },
             {
@@ -266,7 +274,7 @@
               "title": "Marx",
               "platformId": "PLmmblQQ1XpT_kWTHR-aAmN0r-6SchvW3R",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Marx.jpg"
               }
             },
             {
@@ -292,7 +300,7 @@
               "title": "Bertrand Russel",
               "platformId": "PLmmblQQ1XpT_7XAXrmS6xaCqm4r3knZU2",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Bertrand-Russel.jpg"
               }
             },
             {
@@ -308,7 +316,7 @@
               "title": "Wittgenstein",
               "platformId": "PLmmblQQ1XpT97eTySyjjhqz28jCLL-CbX",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Wittgenstein.jpg"
               }
             },
             {
@@ -321,18 +329,10 @@
             },
             {
               "id": -1,
-              "title": "Wittgenstein",
-              "platformId": "PLmmblQQ1XpT97eTySyjjhqz28jCLL-CbX",
-              "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
-              }
-            },
-            {
-              "id": -1,
               "title": "Marcuse",
               "platformId": "PLmmblQQ1XpT_ubXa703Whg7nMoBKNpd5a",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Marcuse.jpeg"
               }
             },
             {
@@ -340,7 +340,7 @@
               "title": "Karl Popper",
               "platformId": "PLmmblQQ1XpT8CdZEQimp3XFtEHBmk_f-B",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Karl-Popper.png"
               }
             },
             {
@@ -348,7 +348,7 @@
               "title": "Adorno and Horkheimer",
               "platformId": "PLmmblQQ1XpT8HfLHQbwjMEaL9v8tAHAhL",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Adorno-Horkheimer.jpg"
               }
             },
             {
@@ -388,7 +388,7 @@
               "title": "Proust",
               "platformId": "PLmmblQQ1XpT-7Ja2PAHiS2XWZEIeWh0Ut",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Proust.jpg"
               }
             }
           ]
@@ -504,7 +504,7 @@
               "title": "Iris Murdoch",
               "platformId": "PLmmblQQ1XpT_Q_dg5nFhHMMIWIB4zTxa8",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Iris-Murdoch.jpg"
               }
             },
             {
@@ -512,7 +512,7 @@
               "title": "Maya Angelou",
               "platformId": "PLmmblQQ1XpT-Nu7msuPHNBx9R6TMvnXKp",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Maya-Angelou.jpg"
               }
             },
             {
@@ -520,7 +520,7 @@
               "title": "Ayn Rand",
               "platformId": "PLmmblQQ1XpT-DrQLxxZxczOZZj8Wu7NJ4",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Ayn-Rand.jpg"
               }
             },
             {
@@ -528,15 +528,15 @@
               "title": "Mary Midgely",
               "platformId": "PLmmblQQ1XpT_xM2s58k7Z9bV3nozyN9ql",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Mary-Midgely.jpg"
               }
             },
             {
               "id": -1,
-              "title": "Philipa Foot",
+              "title": "Philippa Foot",
               "platformId": "PLmmblQQ1XpT-r4J5HHblW39dkWsL5bFI6",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Philippa_Foot.jpg"
               }
             },
             {
@@ -544,15 +544,7 @@
               "title": "Elizabeth Anscombe",
               "platformId": "PLmmblQQ1XpT8m7Kx7rVC5im8mzeOzbtSR",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
-              }
-            },
-            {
-              "id": -1,
-              "title": "",
-              "platformId": "",
-              "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Elizabeth-Anscombe.jpg"
               }
             }
           ]
@@ -628,7 +620,7 @@
               "title": "John Rawls",
               "platformId": "PLmmblQQ1XpT9uEOyWsGeHWGrFdaTO1yah",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/John-Rawls.jpg"
               }
             },
             {
@@ -636,7 +628,7 @@
               "title": "Chomsky",
               "platformId": "PLmmblQQ1XpT8kGVZ9oMLg8JjZYT81bMBO",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Chomsky.jpg"
               }
             },
             {
@@ -644,7 +636,7 @@
               "title": "Maya Angelou",
               "platformId": "PLmmblQQ1XpT-Nu7msuPHNBx9R6TMvnXKp",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/"
+                "url": "https://cuer-275020.web.app/images/categories/Maya-Angelou.jpg"
               }
             },
             {
@@ -652,7 +644,7 @@
               "title": "Vicktor Frankl",
               "platformId": "PLmmblQQ1XpT_lVNWGzbqWhADx0FlUW81V",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Vicktor-Frankl.jpg"
               }
             },
             {
@@ -660,7 +652,7 @@
               "title": "Foucault",
               "platformId": "PLmmblQQ1XpT_p__8klYk7dJYlSQYD-eI8",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Foucault.jpg"
               }
             },
             {
@@ -668,7 +660,7 @@
               "title": "Habermas",
               "platformId": "PLmmblQQ1XpT-RKjC9VPUKUkz7GItr2cwd",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Habermas.jpg"
               }
             },
             {
@@ -676,7 +668,7 @@
               "title": "Zizek",
               "platformId": "PLmmblQQ1XpT9eNPkw6cyvLKV8Ry4scQYU",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Zizek.jpg"
               }
             },
             {
@@ -684,7 +676,23 @@
               "title": "Derrida",
               "platformId": "PLmmblQQ1XpT9YMKuFdgUzv8FJVtczoQEN",
               "image": {
-                "url": "https://cuer-275020.web.app/images/categories/Camus.jpg"
+                "url": "https://cuer-275020.web.app/images/categories/Derrida.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Ayn Rand",
+              "platformId": "PLmmblQQ1XpT-DrQLxxZxczOZZj8Wu7NJ4",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Ayn-Rand.jpg"
+              }
+            },
+            {
+              "id": -1,
+              "title": "Bourdieu",
+              "platformId": "PLmmblQQ1XpT-XLxqXX60VY1eu8-wNnMeO",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Bourdieu.jpg"
               }
             }
           ]
@@ -712,6 +720,14 @@
               "image": {
                 "url": "https://cuer-275020.web.app/images/categories/Delueze.jpg"
               }
+            },
+            {
+              "id": -1,
+              "title": "Derrida",
+              "platformId": "PLmmblQQ1XpT9YMKuFdgUzv8FJVtczoQEN",
+              "image": {
+                "url": "https://cuer-275020.web.app/images/categories/Derrida.jpg"
+              }
             }
           ]
         }
@@ -727,6 +743,7 @@
         {
           "id": -1,
           "title": "Sigmund Freud",
+          "platformId": "PLmmblQQ1XpT-6sZFDfVV0NQuOq3-1CWS9",
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Sigmund-Freud.jpg"
           }
@@ -734,6 +751,7 @@
         {
           "id": -1,
           "title": "Jung",
+          "platformId": "PLmmblQQ1XpT-vKqCRZXI3L0ep372LunuF",
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Jung.jpg"
           }
@@ -741,15 +759,33 @@
         {
           "id": -1,
           "title": "Anna Freud",
+          "platformId": "PLmmblQQ1XpT8pQSE_0Pil98dvbCK3iJCu",
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Anna-Freud.jpg"
           }
         },
         {
           "id": -1,
+          "title": "Melanie Klein",
+          "platformId": "PLmmblQQ1XpT8-q3IFehOyW3CrjuG98Rra",
+          "image": {
+            "url": "https://cuer-275020.web.app/images/categories/Melanie-Klein.png"
+          }
+        },
+        {
+          "id": -1,
           "title": "Lacan",
+          "platformId": "PLmmblQQ1XpT8JbjNX2UNgQ0pF8ffzrBYu",
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Lacan.jpg"
+          }
+        },
+        {
+          "id": -1,
+          "title": "Viktor Frankl",
+          "platformId": "PLmmblQQ1XpT_lVNWGzbqWhADx0FlUW81V",
+          "image": {
+            "url": "https://cuer-275020.web.app/images/categories/Vicktor-Frankl.jpg"
           }
         }
       ]
@@ -765,6 +801,7 @@
         {
           "id": -1,
           "title": "Vipassana",
+          "visible": false,
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Vipassana.jpg"
           }
@@ -772,6 +809,7 @@
         {
           "id": -1,
           "title": "Zen",
+          "visible": false,
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Zen.jpg"
           }
@@ -779,6 +817,7 @@
         {
           "id": -1,
           "title": "Trancendental",
+          "visible": false,
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Transcendental.jpg"
           }
@@ -786,6 +825,7 @@
         {
           "id": -1,
           "title": "Chakra",
+          "visible": false,
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Chakra.jpg"
           }
@@ -793,6 +833,7 @@
         {
           "id": -1,
           "title": "Yoga",
+          "visible": false,
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Yoga.jpg"
           }
@@ -800,6 +841,7 @@
         {
           "id": -1,
           "title": "Jain",
+          "visible": false,
           "image": {
             "url": "https://cuer-275020.web.app/images/categories/Jain.jpg"
           }
