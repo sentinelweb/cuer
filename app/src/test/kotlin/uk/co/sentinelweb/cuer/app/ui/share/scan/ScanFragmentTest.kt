@@ -19,6 +19,7 @@ import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
 import uk.co.sentinelweb.cuer.app.CuerTestApp
+import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.tools.provider.FragmentScenarioProvider
 
@@ -31,6 +32,9 @@ class ScanFragmentTest : FragmentScenarioProvider<ScanFragment> {
 
     @Mock
     lateinit var mockSnackbarWrapper: SnackbarWrapper
+
+    @Mock
+    lateinit var playYangProgress: PlayYangProgress
 
     private val fixture = JFixture()
 
@@ -48,6 +52,7 @@ class ScanFragmentTest : FragmentScenarioProvider<ScanFragment> {
                 scope(named<ScanFragment>()) {
                     factory { mockPresenter }
                     factory { mockSnackbarWrapper }
+                    factory { playYangProgress }
                 }
             })
         }
