@@ -133,6 +133,7 @@ interface PlaylistContract {
         var playlistsTree: PlaylistTreeDomain? = null,
         var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null,
         var addPlaylistParent: Long? = null,
+        var isModified: Boolean = false,
     ) : ViewModel()
 
     data class Model constructor(
@@ -224,7 +225,7 @@ interface PlaylistContract {
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
-                scoped { navigationMapper(true, this.getFragmentActivity(), false) }
+                scoped { navigationMapper(true, this.getFragmentActivity()) }
                 scoped {
                     PlayUseCase(
                         queue = get(),

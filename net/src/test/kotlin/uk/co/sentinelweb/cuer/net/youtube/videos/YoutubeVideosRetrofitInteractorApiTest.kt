@@ -5,7 +5,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
@@ -14,6 +13,7 @@ import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
+import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
 import uk.co.sentinelweb.cuer.net.retrofit.RetrofitBuilder
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
@@ -122,7 +122,7 @@ class YoutubeVideosRetrofitInteractorApiTest {
             assertTrue(actual.isSuccessful)
             assertNotNull(actual.data)
             // note the items come out of order
-            assertEquals(170, actual.data!!.items.size)
+            assertEquals(168, actual.data!!.items.size)
 
             val actualLive = sut.playlist(// live - news
                 "PLf-zrdqNE8p9qjU-kzB8ROMpgbXYahCQR"
@@ -133,7 +133,6 @@ class YoutubeVideosRetrofitInteractorApiTest {
             // note the items come out of order
             assertEquals(10, actualLive.data!!.items.size)
             assertTrue(actualLive.data!!.items[0].media.isLiveBroadcast)
-
         }
     }
 

@@ -12,6 +12,7 @@ data class CategoryDomain constructor(
     val platform: PlatformDomain = YOUTUBE,
     val platformId: String? = null,
     val image: ImageDomain? = null,
+    val visible: Boolean = true,
 ) {
     companion object {
         val EMPTY_CATEGORY = CategoryDomain(0, "Empty")

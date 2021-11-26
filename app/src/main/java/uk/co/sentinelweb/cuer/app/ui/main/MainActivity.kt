@@ -19,15 +19,15 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.databinding.MainActivityBinding
+import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.main.MainContract.LastTab.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
@@ -66,8 +66,8 @@ class MainActivity :
     private val prefs: GeneralPreferencesWrapper by inject()
     private lateinit var navController: NavController
 
-    private var _binding: MainActivityBinding? = null
-    private val binding: MainActivityBinding
+    private var _binding: ActivityMainBinding? = null
+    private val binding: ActivityMainBinding
         get() = _binding ?: throw Exception("Main view not bound")
 
     private val playerFragment: Fragment
@@ -87,7 +87,7 @@ class MainActivity :
             setTheme(R.style.AppTheme)
         }
         super.onCreate(savedInstanceState)
-        _binding = MainActivityBinding.inflate(layoutInflater)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         val navHostFragment =
@@ -97,13 +97,14 @@ class MainActivity :
         binding.bottomNavView.setOnNavigationItemSelectedListener {
             prefs.putInt(
                 LAST_BOTTOM_TAB, when (it.itemId) {
-                    R.id.navigation_browse -> 0
-                    R.id.navigation_playlists -> 1
-                    R.id.navigation_playlist -> 2
-                    else -> 0
-                }
+                    R.id.navigation_browse -> BROWSE
+                    R.id.navigation_playlists -> PLAYLISTS
+                    R.id.navigation_playlist -> PLAYLIST
+                    else -> BROWSE
+                }.ordinal
             )
-            navController.navigate(it.itemId)
+            if (navController.currentDestination?.id != it.itemId)
+                navController.navigate(it.itemId)
             true
         }
 
@@ -116,11 +117,13 @@ class MainActivity :
         prefs.getInt(LAST_BOTTOM_TAB, 0)
             .takeIf { it > 0 }
             .apply {
-                when (this) {
-                    1 -> if (navController.currentDestination?.id != R.id.navigation_playlists)
+                when (MainContract.LastTab.values()[0]) {
+                    PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists)
                         navController.navigate(R.id.navigation_playlists)
-                    2 -> if (navController.currentDestination?.id != R.id.navigation_playlist)
+                    PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist)
                         navController.navigate(R.id.navigation_playlist)
+                    else -> if (navController.currentDestination?.id != R.id.navigation_playlists)
+                        navController.navigate(R.id.navigation_browse)
                 }
             }
         presenter.initialise()
@@ -218,7 +221,7 @@ class MainActivity :
             ?.takeIf { target == null || it == target.name }
             ?.let {
                 return when (it) {
-                    PLAYLIST.name ->
+                    Target.PLAYLIST.name ->
                         PlaylistContract.makeNav(
                             PLAYLIST_ID.getLong(intent)
                                 ?: throw IllegalArgumentException("Playlist ID is required"),

@@ -124,6 +124,7 @@ fun deserialiseCategory(input: String) = domainJsonSerializer.decodeFromString(
 val domainJsonSerializer = Json {
     prettyPrint = true
     isLenient = true
+    ignoreUnknownKeys = true
     classDiscriminator = "domainType"// property added when base domain type is use (see ResponseDomain)
     serializersModule = SerializersModule {
         mapOf(

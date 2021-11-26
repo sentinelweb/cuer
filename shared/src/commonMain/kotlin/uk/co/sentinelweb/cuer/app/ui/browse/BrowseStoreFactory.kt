@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import io.ktor.http.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.TitleFilter
@@ -39,18 +40,19 @@ class BrowseStoreFactory constructor(
         class SetCategoryByTitle(val title: String) : Result()
         class LoadCatgeories(val root: CategoryDomain) : Result()
         object Display : Result()
+        class SetOrder(val order: BrowseContract.Order) : Result()
     }
 
     private sealed class Action {
         object Init : Action()
     }
 
-
     private inner class ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
             when (result) {
                 is Result.Display -> this
                 is Result.SetCategory -> copy(currentCategory = result.category)
+                is Result.SetOrder -> copy(order = result.order)
                 is Result.SetCategoryByTitle -> {
                     this.categoryLookup.values
                         .find { it.title == result.title }
@@ -63,7 +65,9 @@ class BrowseStoreFactory constructor(
                         currentCategory = result.root,
                         categoryLookup = categoryLookup1,
                         parentLookup = result.root.buildParentLookup(),
-                        recent = recentCategories.getRecent().reversed()
+                        recent = recentCategories
+                            .getRecent()
+                            .reversed()
                             .mapNotNull { recentTitle ->
                                 categoryLookup1.values
                                     .find { it.title == recentTitle }
@@ -91,27 +95,14 @@ class BrowseStoreFactory constructor(
                     getState().categoryLookup.get(intent.id)
                         ?.also { cat ->
                             if (cat.subCategories.size > 0) {
-                                prefs.putString(BROWSE_CAT_TITLE, cat.title)
+                                prefs.putString(
+                                    BROWSE_CAT_TITLE,
+                                    cat.title
+                                ) //fixme: change to some built id(maybe include parent)
                             }
                             cat.platformId
-                                ?.let {
-                                    playlistOrchestrator.loadList(PlatformIdListFilter(ids = listOf(cat.platformId)), LOCAL.flatOptions())
-                                        .takeIf { it.isNotEmpty() }
-                                        ?.let { it[0].id }
-                                        ?.also {
-                                            recentCategories.addRecent(cat)
-                                            publish(Label.OpenLocalPlaylist(it))
-                                        }
-                                        ?: also {
-                                            val catParent = getTopLevelCategory(cat, getState)
-                                            val parentId =
-                                                playlistOrchestrator.loadList(TitleFilter(title = catParent.title), LOCAL.flatOptions())
-                                                    .takeIf { it.isNotEmpty() }
-                                                    ?.get(0)?.id
-                                            recentCategories.addRecent(cat)
-                                            publish(Label.AddPlaylist(cat.platformId, cat.platform, parentId))
-                                        }
-                                }
+                                ?.takeIf { intent.forceItem || cat.subCategories.isEmpty() }
+                                ?.let { checkPlatformId(cat, getState) }
                                 ?: run {
                                     if (cat.subCategories.isNotEmpty()) {
                                         dispatch(Result.SetCategory(category = cat))
@@ -124,6 +115,7 @@ class BrowseStoreFactory constructor(
                     Unit
                 }
                 is Intent.Display -> dispatch(Result.Display)
+                is Intent.SetOrder -> dispatch(Result.SetOrder(intent.order))
                 is Intent.Up -> {
                     getState().parentLookup.get(getState().currentCategory)
                         ?.apply {
@@ -137,6 +129,36 @@ class BrowseStoreFactory constructor(
                     Unit
                 }
                 Intent.ActionSettings -> publish(Label.ActionSettings)
+                Intent.ActionSearch -> publish(Label.ActionSearch)
+            }
+
+        private suspend fun checkPlatformId(
+            cat: CategoryDomain,
+            getState: () -> State
+        ) = playlistOrchestrator.loadList(
+            PlatformIdListFilter(ids = listOf(cat.platformId!!)),
+            LOCAL.flatOptions()
+        )
+            .takeIf { it.isNotEmpty() }
+            ?.let { it[0].id }
+            ?.also {
+                recentCategories.addRecent(cat)
+                publish(Label.OpenLocalPlaylist(it))
+            }
+            ?: also {
+                val catParent = getTopLevelCategory(cat, getState)
+                val parentId =
+                    playlistOrchestrator.loadList(
+                        TitleFilter(title = catParent.title),
+                        LOCAL.flatOptions()
+                    )
+                        .takeIf { it.isNotEmpty() }
+                        ?.get(0)?.id
+                recentCategories.addRecent(cat)
+                val params = listOf("search" to cat.title).formUrlEncode()
+                cat
+                    .copy(description = "Wikipedia link: https://en.wikipedia.org/w/index.php?${params}")
+                    .apply { publish(Label.AddPlaylist(this, parentId)) }
             }
 
         private fun getTopLevelCategory(
@@ -149,20 +171,22 @@ class BrowseStoreFactory constructor(
                 val nextParent = getState().parentLookup[catParent]
                 if (getState().parentLookup[nextParent] == null) break
                 catParent =
-                    getState().parentLookup[catParent] ?: throw IllegalStateException("parent lookup error")
+                    getState().parentLookup[catParent]
+                        ?: throw IllegalStateException("parent lookup error")
             }
             return catParent
         }
 
-        private suspend fun loadCategories() {
-            val root = repository.loadAll()
-            dispatch(Result.LoadCatgeories(root))
-
+        private suspend fun loadCategories(): Unit = kotlin.runCatching {
+            repository.loadAll()
+            // .apply { log.d(root.buildIdLookup().values.joinToString("\n") { "${it.title} - ${it.image?.url}" })*/ }
+        }.onSuccess {
+            dispatch(Result.LoadCatgeories(it))
             prefs.getString(BROWSE_CAT_TITLE, null)
                 ?.also { dispatch(Result.SetCategoryByTitle(it)) }
         }
-
-
+            .onFailure { log.e("browse load fail", it) }
+            .let { }
     }
 
     fun create(): MviStore =

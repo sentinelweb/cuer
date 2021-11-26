@@ -251,7 +251,7 @@ class PlaylistPresenterTest {
 
     private fun createDefaultState() = State(
         playlistIdentifier = fixtCurrentIdentifier,
-        playlist = fixtCurrentPlaylist
+        playlist = fixtCurrentPlaylist,
     )
 
     private fun setCurrentlyPlaying(id: Identifier<Long>, playlist: PlaylistDomain, currentIndex: Int = playlist.currentIndex) {

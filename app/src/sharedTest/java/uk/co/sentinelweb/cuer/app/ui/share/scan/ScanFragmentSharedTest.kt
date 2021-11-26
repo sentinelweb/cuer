@@ -37,9 +37,7 @@ class ScanFragmentSharedTest constructor(
     }
 
     fun setModel_isLoading() {
-        val fixtModel = fixture.create(ScanContract.Model::class.java).copy(
-            isLoading = true
-        )
+        val fixtModel = fixture.create(ScanContract.Model::class.java).copy(isLoading = true)
         scenario.get().onFragment { it.setModel(fixtModel) }
         onView(withId(R.id.scan_progress)).check(matches(isDisplayed()))
         onView(withId(R.id.scan_result)).check(matches(CoreMatchers.not(isDisplayed())))

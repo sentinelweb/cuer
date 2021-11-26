@@ -39,6 +39,7 @@ data class PlaylistDomain constructor(
         PLATFORM /* External playlist do allow adding - just fix to source - maybe allow archiving of items */
     }
 
+    // todo embed
     @Serializable
     data class PlaylistConfigDomain constructor(
         val updateUrl: String? = null,

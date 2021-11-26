@@ -12,7 +12,7 @@
         android:id="@+id/navigation_scan"
         android:name="uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragment"
         android:label="@string/sharenav_title_scan"
-        tools:layout="@layout/scan_fragment"
+        tools:layout="@layout/fragment_scan"
         >
         <action
             android:id="@+id/action_goto_playlist"
@@ -35,7 +35,7 @@
         android:id="@+id/navigation_playlist"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment"
         android:label="@string/sharenav_title_playlist"
-        tools:layout="@layout/playlist_fragment"
+        tools:layout="@layout/fragment_playlist"
         >
         <argument
             android:name="PLAYLIST_ID"
@@ -78,7 +78,7 @@
         android:id="@+id/navigation_playlist_item_edit"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment"
         android:label="@string/sharenav_playlist_iten"
-        tools:layout="@layout/playlist_item_edit_fragment"
+        tools:layout="@layout/fragment_playlist_item_edit"
         >
         <argument
             android:name="PLAYLIST_ITEM"
@@ -104,7 +104,7 @@
         android:id="@+id/navigation_playlist_edit"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment"
         android:label="@string/sharenav_title_playlist_edit"
-        tools:layout="@layout/playlist_edit_fragment"
+        tools:layout="@layout/fragment_playlist_edit"
         >
         <argument
             android:name="PLAYLIST_ID"
@@ -125,6 +125,6 @@
         android:id="@+id/navigation_main"
         android:name="uk.co.sentinelweb.cuer.app.ui.main.MainActivity"
         android:label="@string/sharenav_title_main"
-        tools:layout="@layout/main_activity"
+        tools:layout="@layout/activity_main"
         />
 </navigation>

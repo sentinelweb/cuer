@@ -66,7 +66,7 @@ class AytViewHolder(
 
         _progressBar = parent.getChildAt(0)
             .findViewById<ProgressBar>(aytR.id.progress)
-            ?.apply { playYangProgress.init(this) }
+            ?.apply { playYangProgress.init(this, R.color.build_primary) }
 
         parent.getChildAt(0)
             .findViewById<LinearLayout>(aytR.id.youtube_player_seekbar)

@@ -19,7 +19,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.databinding.PlaylistsFragmentBinding
+import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
@@ -57,7 +57,7 @@ class PlaylistsFragment :
     private val navMapper: NavigationMapper by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
-    private var _binding: PlaylistsFragmentBinding? = null
+    private var _binding: FragmentPlaylistsBinding? = null
     private val binding get() = _binding!!
 
     private val searchMenuItem: MenuItem
@@ -84,7 +84,7 @@ class PlaylistsFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = PlaylistsFragmentBinding.inflate(layoutInflater)
+        _binding = FragmentPlaylistsBinding.inflate(layoutInflater)
         return binding.root
     }
 

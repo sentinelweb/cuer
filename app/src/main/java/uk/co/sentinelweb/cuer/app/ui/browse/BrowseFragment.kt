@@ -22,12 +22,15 @@ import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnResume
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnUpClicked
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
+import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
@@ -62,7 +65,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     // saves the data on back press (enabled in onResume)
     private val upCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            browseMviView.dispatch(BrowseContract.View.Event.UpClicked)
+            browseMviView.dispatch(OnUpClicked)
         }
     }
 
@@ -124,12 +127,20 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         is Error -> snackbarWrapper.makeError(label.message).show()
                         TopReached -> navMapper.navigate(NavigationModel.FINISH)
                         ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
+                        ActionSearch -> {
+                            SearchBottomSheetFragment()
+                                .show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
+                        }
                         is AddPlaylist -> {
                             startActivity(
                                 ShareActivity.urlIntent(
                                     requireContext(),
-                                    YoutubeJavaApiWrapper.playlistUrl(label.platformId),
-                                    label.parentId
+                                    YoutubeJavaApiWrapper.playlistUrl(
+                                        label.cat.platformId
+                                            ?: throw IllegalArgumentException("Category has no platform ID : ${label.cat} ")
+                                    ),
+                                    label.parentId,
+                                    label.cat
                                 )
                             )
                         }
@@ -146,6 +157,8 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     }
 
     class BrowseStrings(private val res: ResourceWrapper) : BrowseContract.BrowseStrings {
+        override val allCatsTitle: String
+            get() = res.getString(R.string.browse_all_cats_title)
         override val recent: String
             get() = res.getString(R.string.browse_recent)
         override val errorNoPlaylistConfigured = res.getString(R.string.browse_error_no_playlist)

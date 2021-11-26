@@ -4,16 +4,19 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.CategoryDomain.Companion.EMPTY_CATEGORY
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
 class BrowseContract {
+
+    enum class Order { CATEGORIES, A_TO_Z }
 
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
         sealed class Intent {
             object Display : Intent()
-            data class ClickCategory(val id: Long) : Intent()
+            data class ClickCategory(val id: Long, val forceItem: Boolean) : Intent()
             object Up : Intent()
             object ActionSettings : Intent()
+            object ActionSearch : Intent()
+            data class SetOrder(val order: Order) : Intent()
         }
 
         sealed class Label {
@@ -21,9 +24,10 @@ class BrowseContract {
             data class Error(val message: String, val exception: Throwable? = null) : Label()
             object TopReached : Label()
             object ActionSettings : Label()
+            object ActionSearch : Label()
+
             data class AddPlaylist(
-                val platformId: String,
-                val platform: PlatformDomain = PlatformDomain.YOUTUBE,
+                val cat: CategoryDomain,
                 val parentId: Long? = null,
             ) : Label()
 
@@ -35,6 +39,7 @@ class BrowseContract {
             val categoryLookup: Map<Long, CategoryDomain> = mapOf(),
             val parentLookup: Map<CategoryDomain, CategoryDomain> = mapOf(),
             val recent: List<CategoryDomain> = listOf(),
+            val order: Order = Order.CATEGORIES
         )
     }
 
@@ -47,6 +52,7 @@ class BrowseContract {
             val categories: List<CategoryModel>,
             val recent: CategoryModel?,
             val isRoot: Boolean,
+            val order: Order,
         )
 
         data class CategoryModel(
@@ -57,17 +63,21 @@ class BrowseContract {
             val subCategories: List<CategoryModel>,
             val subCount: Int,
             val isPlaylist: Boolean,
+            val forceItem: Boolean,
         )
 
         sealed class Event {
             object OnResume : Event()
-            object UpClicked : Event()
-            object ActionSettingsClick : Event()
-            data class CategoryClicked(val id: Long) : Event()
+            object OnUpClicked : Event()
+            object OnActionSettingsClicked : Event()
+            object OnActionSearchClicked : Event()
+            data class OnCategoryClicked(val model: CategoryModel) : Event()
+            data class OnSetOrder(val order: Order) : Event()
         }
     }
 
     interface BrowseStrings {
+        val allCatsTitle: String
         val recent: String
         val errorNoPlaylistConfigured: String
         fun errorNoCatWithID(id: Long): String

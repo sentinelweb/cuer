@@ -1,7 +1,7 @@
 plugins {
     kotlin("js")
 }
-
+// ./gradlew :website:browserRun --continue
 group = "sentinelweb.cuer"
 version = "0.1-alpha"
 

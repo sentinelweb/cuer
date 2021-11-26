@@ -57,17 +57,20 @@ Using
 
 ## screenshots
 
+### Browse
+
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/25-11-21/browse-sm-2021-11-25-170212.png" width="400">
 ### Playlist
 
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/playlist-2021-07-19-204351.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/25-11-21/playlist-sm-2021-11-25-170440.png" width="400">
 
 ### Playlists
 
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/playlists-2021-07-19-204433.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/25-11-21/playlists-sm-2021-11-25-170316.png" width="400">
 
 ### Video info
 
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/info-2021-07-19-204911.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/25-11-21/item-description-sm-2021-11-25-170511.png" width="400">
 
 ### Portrait Player
 

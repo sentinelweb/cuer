@@ -33,6 +33,7 @@ class AndroidSnackbarWrapper constructor(
     override fun makeError(msg: String): Snackbar =
         Snackbar.make(a.findViewById(android.R.id.content), msg, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(res.getColor(R.color.error_snackbar))
+            .setTextColor(res.getColor(R.color.text_primary))
 
 
 }
