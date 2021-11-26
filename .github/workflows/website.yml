@@ -1,0 +1,43 @@
+name: App website Build and Publish
+on: [ pull_request ]
+#on:
+#  pull_request:
+#    paths:
+#      - website/**
+jobs:
+  build:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    steps:
+      # Setup Java 1.8 environment for the next steps
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v2
+
+      # Build application
+      - name: Test and Build
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD -PCUER_UPLOAD_KEY_ALIAS=$CUER_UPLOAD_KEY_ALIAS -PCUER_UPLOAD_KEY_FILE=$CUER_UPLOAD_KEY_FILE -PCUER_UPLOAD_PASSWORD=$CUER_UPLOAD_PASSWORD :website:build
+        env:
+          YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
+          PIXABAY_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"
+          CUER_SIGNING_KEY_ALIAS: "${{ secrets.CUER_SIGNING_KEY_ALIAS }}"
+          CUER_SIGNING_KEY_FILE: "${{ secrets.CUER_SIGNING_KEY_FILE }}"
+          CUER_SIGNING_PASSWORD: "${{ secrets.CUER_SIGNING_PASSWORD }}"
+          CUER_UPLOAD_KEY_ALIAS: "${{ secrets.CUER_UPLOAD_KEY_ALIAS }}"
+          CUER_UPLOAD_KEY_FILE: "${{ secrets.CUER_UPLOAD_KEY_FILE }}"
+          CUER_UPLOAD_PASSWORD: "${{ secrets.CUER_UPLOAD_PASSWORD }}"
+      # If main branch update, deploy to gh-pages
+      - name: Deploy
+#        if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: website/build/distributions # The folder the action should deploy.
+          CLEAN: true # Automatically remove deleted files from the deploy branch
+

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="colorCheckIcon" format="color" />
+    <attr name="colorDelete" format="color" />
+    <attr name="colorMove" format="color" />
+    <attr name="colorEdit" format="color" />
+    <attr name="playerButtonColor" format="color" />
+    <attr name="contextMenuItemColor" format="color" />
+    <attr name="colorProgress" format="color" />
+    <attr name="bodyFont" format="reference" />
+    <attr name="headlineFont" format="reference" />
+    <attr name="headlineFontLetterSpacing" format="float" />
+    <attr name="headlineFontXScaling" format="float" />
+    <attr name="textEditBackground" format="color" />
+    <attr name="colorNavigation" format="color" />
+
+    <declare-styleable name="FABProgress">
+        <attr name="progressColor" format="color" />
+        <attr name="progressMargin" format="dimension" />
+    </declare-styleable>
+</resources>

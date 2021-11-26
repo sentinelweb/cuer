@@ -1,75 +1,269 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlinx-serialization'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    compileSdkVersion project.properties.app_compileSdkVersion as int
+
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
 
     defaultConfig {
-        applicationId "uk.co.sentinelweb.cuer.app"
-        minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        applicationId project.properties.app_applicationId
+        minSdkVersion project.properties.app_minSdkVersion as int
+        targetSdkVersion app_targetSdkVersion as int
+        versionCode app_versionCode as int
+        versionName app_versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "youtubeApiKey", "\"$CUER_YOUTUBE_API_KEY\""
+        buildConfigField "String", "pixabayApiKey", "\"$CUER_PIXABAY_API_KEY\""
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+
     }
 
-    buildTypes {
+    signingConfigs {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            keyAlias "$CUER_UPLOAD_KEY_ALIAS"
+            keyPassword "$CUER_UPLOAD_PASSWORD"
+            storeFile file("$CUER_UPLOAD_KEY_FILE")
+            storePassword "$CUER_UPLOAD_PASSWORD"
         }
     }
 
-// To inline the bytecode built with JVM target 1.8 into
-// bytecode that is being built with JVM target 1.6. (e.g. navArgs)
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-DEBUG'
+        }
 
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'app-proguard-rules.pro'
+            signingConfig signingConfigs.release
+
+        }
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
-        jvmTarget = "1.8"
-    }
-    viewBinding {
-        enabled = true
+        jvmTarget = ver_jvm
+        useIR = true
+        // bypass compose kotlin version compatability check
+        // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
+//        freeCompilerArgs += [
+//                "-P",
+//                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+//        ]
     }
 
+    composeOptions {
+        kotlinCompilerVersion ver_kotlin
+        kotlinCompilerExtensionVersion ver_compose
+    }
+
+    buildFeatures {
+        viewBinding true
+        compose true
+    }
+
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+        test {
+            java.srcDir 'src/sharedTest/java'
+        }
+        androidTest {
+            java.srcDir 'src/sharedTest/java'
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/INDEX.LIST'
+    }
 }
 
 dependencies {
+    implementation project(":shared")
+    implementation project(":net")
+    implementation project(":remote")
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.2.0'
-    implementation 'com.google.android.material:material:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
-    def navigation_version = '2.2.1'
-    implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
-    implementation "androidx.navigation:navigation-fragment:$navigation_version"
-    implementation "androidx.navigation:navigation-ui:$navigation_version"
-    def koin = "2.1.4"
-    implementation  "org.koin:koin-core:$koin"
-    implementation "org.koin:koin-androidx-scope:$koin"
-    implementation  "org.koin:koin-android-viewmodel:$koin"
+    // deps
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$ver_kotlin"
+    implementation "androidx.appcompat:appcompat:$ver_appcompat"
+    implementation "androidx.fragment:fragment:$ver_fragment_ktx"
+    implementation "androidx.fragment:fragment-ktx:$ver_fragment_ktx"
+    implementation "androidx.core:core:$ver_androidx_core"
+    implementation "androidx.core:core-ktx:$ver_androidx_core"
+    implementation "androidx.annotation:annotation:$ver_androidx_annotation"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$ver_lifecycle_viewmodel_ktx"
+    implementation "com.google.android.material:material:$ver_material"
+    implementation "androidx.constraintlayout:constraintlayout:$ver_constraintlayout"
+    implementation "androidx.lifecycle:lifecycle-extensions:$ver_lifecycle_extensions"
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime"
+    implementation "androidx.recyclerview:recyclerview:$ver_recyclerview"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$ver_swipe_refresh"
+    implementation "androidx.preference:preference-ktx:$ver_preference"
 
+    // Compose
+    implementation "androidx.compose.runtime:runtime:$ver_compose"
+    implementation "androidx.compose.ui:ui:$ver_compose"
+    implementation "androidx.compose.foundation:foundation:$ver_compose"
+    implementation "androidx.compose.foundation:foundation-layout:$ver_compose"
+    implementation "androidx.compose.material:material:$ver_compose"
+    implementation "androidx.compose.runtime:runtime-livedata:$ver_compose"
+    implementation ("androidx.compose.ui:ui-tooling:$ver_compose"){
+        version{strictly("1.0.0-beta09")}// todo remove when preview starts working
+    }
+    implementation "com.google.android.material:compose-theme-adapter:$ver_compose"
+    implementation "androidx.compose.compiler:compiler:$ver_compose"
+
+    // mvikotlin
+    debugImplementation "com.arkivanov.mvikotlin:mvikotlin-android-debug:$ver_mvikotlin"
+    releaseImplementation "com.arkivanov.mvikotlin:mvikotlin-android:$ver_mvikotlin"
+    implementation "com.arkivanov.mvikotlin:mvikotlin-main:$ver_mvikotlin"
+    // for debugging only remove
+    implementation "com.arkivanov.mvikotlin:mvikotlin-logging:$ver_mvikotlin"
+
+    //navigation
+    implementation "androidx.navigation:navigation-fragment-ktx:$ver_navigation"
+    implementation "androidx.navigation:navigation-ui-ktx:$ver_navigation"
+    implementation "androidx.navigation:navigation-fragment:$ver_navigation"
+    implementation "androidx.navigation:navigation-ui:$ver_navigation"
+
+    // koin
+    implementation "io.insert-koin:koin-core:$ver_koin"
+    implementation "io.insert-koin:koin-android:$ver_koin"
+
+    // room
+    implementation "androidx.room:room-runtime:$ver_room"
+    kapt "androidx.room:room-compiler:$ver_room"
+    implementation "androidx.room:room-ktx:$ver_room"
+
+    // debug
+    implementation "com.facebook.stetho:stetho:$ver_stetho"
+    implementation "com.facebook.stetho:stetho-okhttp3:$ver_stetho"
+
+    // https://github.com/PierfrancescoSoffritti/Android-YouTube-Player#1-youtubeplayerviewgetyoutubeplayerwhenready
+    implementation "com.pierfrancescosoffritti.androidyoutubeplayer:core:$ver_android_youtube_player"
     // cc sender
-    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.23'
+    implementation "com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:$ver_chromecast_sender"
     // this is not needed to use the library, but it provides the very useful MediaRouteButton.
-    implementation 'androidx.mediarouter:mediarouter:1.1.0'
+    implementation "androidx.mediarouter:mediarouter:$ver_mediarouter"
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation "org.koin:koin-test:$koin"
-    testImplementation "io.mockk:mockk:1.9.3"
-    testImplementation "com.flextrade.jfixture:jfixture:2.7.2"
+    implementation "androidx.media:media:$ver_androidx_media"
 
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    // FIREBASE
+    // Import the BoM for the Firebase platform
+    implementation platform("com.google.firebase:firebase-bom:$ver_firebase_bom")
+    // Declare the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-storage-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
+    implementation "com.firebaseui:firebase-ui-storage:$ver_firebase_ui"
+
+    // korlin serialization
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core"
+
+
+    // glide
+    implementation "com.github.bumptech.glide:glide:$ver_glide"
+    annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
+    kapt "com.github.bumptech.glide:compiler:$ver_glide"
+    // https://google.github.io/accompanist/glide/
+    implementation ("com.google.accompanist:accompanist-glide:$ver_glide_accompanist"){
+        exclude group:"androidx.compose.runtime"
+        exclude group:"androidx.compose.ui"
+        exclude group:"androidx.compose.foundation"
+        exclude group:"androidx.compose.material"
+        exclude group:"com.google.android.material"
+    }
+    // coil
+    implementation("io.coil-kt:coil-compose:1.3.1")
+
+    // ktor
+    implementation "io.ktor:ktor-client-core:$ver_ktor"
+    implementation "io.ktor:ktor-client-cio:$ver_ktor"
+
+    // splash screen
+    implementation "androidx.core:core-splashscreen:$ver_splash"
+
+    debugImplementation ("androidx.fragment:fragment-testing:$ver_androidx_fragment_test"){// hack
+        exclude group:"androidx.test"
+    }
+
+    testImplementation "junit:junit:$ver_junit"
+    testImplementation "io.insert-koin:koin-test:$ver_koin"
+    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
+    testImplementation "io.mockk:mockk:$ver_mockk"
+    testImplementation "com.google.truth:truth:$ver_truth"
+    testImplementation "org.mockito:mockito-core:$ver_mockito"
+    testImplementation "org.mockito:mockito-inline:$ver_mockito_inline"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$ver_mockito_kotlin"
+    testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
+    testImplementation "androidx.room:room-testing:$ver_room"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test"
+    testImplementation "org.robolectric:robolectric:$ver_robolectric"
+    testImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
+    testImplementation "androidx.test:core:$ver_androidx_test"
+    testImplementation "androidx.test:runner:$ver_androidx_test"
+    testImplementation "androidx.test:rules:$ver_androidx_test"
+    testImplementation "android.arch.core:core-testing:$ver_android_arch_test"
+    testImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
+    testImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
+    testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
+
+    androidTestImplementation "io.insert-koin:koin-test:$ver_koin"
+    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
+    androidTestImplementation "com.google.truth:truth:$ver_truth"
+    androidTestImplementation "org.mockito:mockito-core:$ver_mockito"
+    androidTestImplementation "org.mockito:mockito-android:$ver_mockito"
+    androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$ver_mockito_kotlin"
+    androidTestImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
+    androidTestImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
+    androidTestImplementation "androidx.test:core:$ver_androidx_test"
+    androidTestImplementation "androidx.test:runner:$ver_androidx_test"
+    androidTestImplementation "androidx.test:rules:$ver_androidx_test"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso:espresso-accessibility:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso:espresso-web:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso.idling:idling-concurrent:$ver_espresso_core"
+    androidTestImplementation "androidx.test.espresso:espresso-idling-resource:$ver_espresso_core"
+    androidTestImplementation "org.robolectric:annotations:$ver_robolectric"
 
 }

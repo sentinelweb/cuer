@@ -1,8 +1,196 @@
 <resources>
-    <string name="app_name">Cuer</string>
+    <string name="app_name" translatable="false">Cuer Dbg</string>
+
+    <!-- nav -->
     <string name="bottomnav_title_browse">Browse</string>
+    <string name="bottomnav_title_playlists">Playlists</string>
     <string name="bottomnav_title_playlist">Playlist</string>
     <string name="bottomnav_title_player">Player</string>
-    <string name="media_route_menu_title">Cast on</string>
+    <string name="nav_title_backup_settings">Backup settings</string>
+    <string name="nav_playlist_item_edit_title">View Item</string>
+
+    <string name="sharenav_title_scan">Scaning …</string>
+    <string name="sharenav_title_playlist">New Playlist</string>
+    <string name="sharenav_playlist_iten">New playlist item</string>
+    <string name="sharenav_title_playlist_edit">Playlist settings</string>
+    <string name="sharenav_title_main">Main</string>
+
+    <!-- menu -->
     <string name="menu_play">Play</string>
+    <string name="menu_play_yt">Launch</string>
+    <string name="menu_channel_yt">Go to channel</string>
+    <string name="menu_star">Star</string>
+    <string name="menu_unstar">UnStar</string>
+    <string name="menu_pin">Pin</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_paste">Paste &amp; add</string>
+    <string name="menu_restart">Restart</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_playlist_mode_shuffle">Shuffle</string>
+    <string name="menu_playlist_mode_loop">Loop</string>
+    <string name="menu_playlist_mode_single">Single</string>
+    <string name="menu_show_unlistened">Show unlistened</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_merge">Merge with &#8230;</string>
+
+    <!-- share activity -->
+    <string name="share_button_add_return">Add Return</string>
+    <string name="share_button_reject">Reject</string>
+    <string name="share_button_play_now">Play Now</string>
+    <string name="share_button_add_to_queue">Add to queue</string>
+    <string name="share_button_add_playlist">Add playlist</string>
+    <string name="share_button_play_locally">Play locally</string>
+    <string name="share_button_play_return">Play / Return</string>
+    <string name="share_button_goto_item">Go to item</string>
+    <string name="share_button_return">Return</string>
+    <string name="share_button_goto_app">Go to app</string>
+    <string name="share_error_no_link">Could not find a link to process</string>
+    <string name="share_error_already_exists">%1$s already exists …</string>
+    <string name="share_error_no_default_playlist">No default playlist - select a playlist to save the item</string>
+
+    <!-- playlist_item_edit -->
+    <string name="pie_empty_desc">We can only add youtube video links at the moment</string>
+    <string name="playlist_dialog_title">Select Playlist</string>
+    <string name="pie_add_playlist_dialog_title">Create Playlist</string>
+    <string name="pie_empty_title">Sorry &#8230; ❤</string>
+
+    <!-- playlist fragment -->
+    <string name="playlist_fab_up_contentdesc">Up</string>
+    <string name="playlist_fab_down_contentdesc">Down</string>
+    <string name="playlist_fab_refresh_contentdesc">Refresh</string>
+    <string name="pl_item_delete"> Delete </string>
+    <string name="pl_item_move"> Move </string>
+    <string name="playlist_change_dialog_title">Change playlist?</string>
+    <string name="playlist_change_dialog_message">This will change the current playlist …</string>
+    <string name="playlist_item_menu_view">View</string>
+    <string name="playlist_item_menu_play">Play</string>
+    <string name="playlist_item_menu_play_start">Play from start</string>
+    <string name="playlist_item_menu_play_yt">Launch</string>
+    <string name="playlist_item_menu_channel_yt">Go to channel</string>
+    <string name="playlist_item_menu_star">Star</string>
+    <string name="playlist_item_menu_share">Share</string>
+    <string name="playlist_item_menu_related">Related</string>
+    <string name="playlist_msg_deleted">This playlist was deleted</string>
+    <string name="playlist_play_items_from_start">Play items from start</string>
+    <string name="playlist_error_moveitem_already_exists">Item already exists on this playlist …</string>
+    <string name="playlist_item_moved_undo_message">Moved to %1$s</string>
+
+    <!-- playlist edit fragemnt -->
+    <string name="pe_fragment_title">Edit playlist</string>
+    <string name="pe_fragment_title_add">Create playlist</string>
+    <string name="pe_title">Title</string>
+    <string name="pe_create">Create</string>
+    <string name="pe_save">Save</string>
+    <string name="pe_play_from_start">Play from start</string>
+    <string name="pe_parent">Parent</string>
+    <string name="pe_mark_all_watched">Mark all watched</string>
+    <string name="pe_mark_all_unwatched">Mark all unwatched</string>
+    <string name="pe_info">Information</string>
+    <string name="pe_playable">Playable</string>
+    <string name="pe_deletable">Deletable</string>
+    <string name="pe_editable_items">Editable items</string>
+    <string name="pe_deletable_items">Deletable items</string>
+    <string name="pe_other_actions">Other actions</string>
+    <string name="pe_click_image_to_change">Click image to change</string>
+
+    <!-- local player -->
+    <string name="title_activity_fullscreen">Video Player</string>
+
+    <!-- generic contentdescription -->
+    <string name="cd_overflow">More actions</string>
+    <string name="cd_check">Select item</string>
+
+    <!-- prefs -->
+    <string name="prefs_root_backup_item_title">Backup</string>
+    <string name="prefs_root_backup_cat_title">Backup/Restore</string>
+    <string name="prefs_root_backup_summary">Data backup options</string>
+    <string name="prefs_root_debug_cat_title">Debug</string>
+    <string name="prefs_root_debug_send_reports_summary">Trigger unsent crash report to crashlytics</string>
+    <string name="prefs_root_debug_send_reports_title">Send unsent reports</string>
+    <string name="prefs_root_remote_service_not_running">Not running</string>
+    <string name="prefs_root_remote_service_running">Running</string>
+    <string name="prefs_root_remote_service_title">Remote service</string>
+
+    <string name="pref_backup_backup_summary">Back up data to a ZIP file</string>
+    <string name="pref_backup_backup_title">Backup database</string>
+    <string name="pref_backup_restore_summary">Restore the DB from a ZIP/JSON file</string>
+    <string name="pref_backup_restore_title">Restore database</string>
+
+    <!-- playlist edit -->
+    <string name="pe_default_display_title">Enter a title …</string>
+    <string name="pe_error_title_blank">Add a title</string>
+
+    <!-- playlists & item -->
+    <string name="pls_item_edit">Edit</string>
+    <string name="pls_item_delete">Delete</string>
+    <string name="playlists_up_contentdesc">Up</string>
+    <string name="playlists_title">Playlists</string>
+    <string name="playlists_section_app">App</string>
+    <string name="playlists_section_starred">Starred</string>
+    <string name="playlists_section_recent">Recent</string>
+    <string name="playlists_section_all">All</string>
+
+    <!-- dialogs -->
+    <string name="playlist_dialog_add_playlist">Add playlist …</string>
+    <string name="select_route_dialog_title">Select Route</string>
+    <string name="create_playlist_dialog_title">Create playlist</string>
+    <string name="dialog_button_view_info">View info</string>
+    <string name="dialog_title_select_fwd_skip_time">Forward skip time</string>
+    <string name="dialog_title_select_back_skip_time">Back skip time</string>
+    <string name="dialog_title_save_check">Save check</string>
+    <string name="dialog_message_save_item_check">Do you want to save the item?</string>
+    <string name="dialog_message_save_playlist_check">Do you want to save the item?</string>
+    <string name="dialog_button_save">Save</string>
+    <string name="dialog_button_dont_save">Don\'t save</string>
+
+    <!-- search -->
+    <string name="search_title">Search</string>
+    <string name="search_local">Local</string>
+    <string name="search_remote">Remote</string>
+    <string name="search_youtube">YouTube</string>
+    <string name="search_watched">Watched</string>
+    <string name="search_live">Live</string>
+    <string name="search_select_dates">Select Dates …</string>
+
+    <!-- browse -->
+    <string name="browse_error_no_playlist">No playlist configured</string>
+    <string name="browse_error_no_category">No category with that id = %1$s</string>
+    <string name="browse_recent">Recently viewed</string>
+
+    <!-- player -->
+    <string name="player_fab_fullscreen">Fullscreen</string>
+    <string name="player_fab_pip">Picture in Picture</string>
+
+    <!-- misc -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="up">Up</string>
+    <string name="media_route_menu_title">Cast on</string>
+    <string name="default_playlist">Default</string>
+    <string name="dash">-</string>
+    <string name="chip_select">Select &#8230;</string>
+    <string name="live">LIVE</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="clear">Clear</string>
+    <string name="imagesearch_dialog_title">Image Search</string>
+    <string name="searchimage_term">Search Term</string>
+    <string name="menu_show_children">Show children</string>
+    <string name="playlist_item_menu_goto_playlist">Goto playlist</string>
+    <string name="menu_launch">Launch</string>
+    <string name="title_select_picture">Select Picture</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_playlist_add">Create playlist</string>
+    <string name="playlist_empty">No Items</string>
+    <string name="dialog_play_chromecast">Chromecast</string>
+    <string name="dialog_play_portrait">Portrait</string>
+    <string name="dialog_play_fullscreen">Fullscreen</string>
+    <string name="dialog_play_floating">Floating</string>
+    <string name="dialog_play_remember_my_decision">Remember my decision</string>
+    <string name="play_dialog_title">Play Item</string>
+    <string name="dialog_play_youtube">Launch youtube</string>
+    <string name="menu_sort_alpha">Alphabetical</string>
+    <string name="menu_sort_category">Categories</string>
+
 </resources>

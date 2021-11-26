@@ -1,41 +1,80 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
-import android.util.Log
-import com.google.android.gms.cast.framework.CastContext
-import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
+import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class MainPresenter(
     private val view: MainContract.View,
-    private val state: MainState,
-    private val playerPresenter: CastPlayerContract.PresenterExternal,
-    private val creator: YoutubePlayerContextCreator
+    private val state: MainContract.State,
+    private val ytServiceManager: YoutubeCastServiceManager,
+    private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val floatingPlayerServiceManager: FloatingPlayerServiceManager,
+    private val castListener: FloatingPlayerCastListener,
+    private val log: LogWrapper,
 ) : MainContract.Presenter {
-    val TAGP = "CuerLog"
-    private val TAG = "$TAGP${MainPresenter::class.java.simpleName}"
+    // todo add connection listener and close floating player if connectioned
+    init {
+        log.tag(this)
+    }
 
-    override fun initChromecast() {
-        playerPresenter.initMediaRouteButton()
-        playerPresenter.reset()
-        if (state.youtubePlayerContext == null) {
+    override fun initialise() {
+        if (!state.playServiceCheckDone) {
             view.checkPlayServices()
+            state.playServiceCheckDone = true
+        }
+        castListener.observeConnection()
+    }
+
+    override fun onPlayServicesOk() {
+        log.d("onPlayServicesOk()")
+        state.playServicesAvailable = true
+        if (!ytContextHolder.isCreated()) {
+            initialiseCastContext()
         }
     }
 
-    override fun setCastContext(castContext: CastContext) {
-        // todo remove on disconnection? will need to move to a servicxe
-        state.youtubePlayerContext = creator.createContext(castContext)
-        state.youtubePlayerContext?.playerUi = playerPresenter
+    override fun onDestroy() {
+
+    }
+
+    private fun initialiseCastContext() {
+        ytContextHolder.create()
     }
 
     override fun onStart() {
-        state.youtubePlayerContext?.playerUi = playerPresenter
-        Log.d(TAG,"onStart()")
+        log.d("onStart()")
+        ytServiceManager.stop()
+        if (!ytContextHolder.isCreated() && state.playServicesAvailable) {
+            initialiseCastContext()
+        }
+        if (!state.playControlsInit) {
+            view.playerControls.initMediaRouteButton()
+            view.playerControls.reset()
+            state.playControlsInit = true
+        }
+        ytContextHolder.playerUi = view.playerControls
+        if (!ytContextHolder.isConnected()) {
+            floatingPlayerServiceManager.get()?.external?.mainPlayerControls = view.playerControls
+        }
     }
 
     override fun onStop() {
-        state.youtubePlayerContext?.playerUi = null
-        Log.d(TAG,"onStop()")
+        floatingPlayerServiceManager.get()?.external?.mainPlayerControls = null
+        ytContextHolder.playerUi = null
+        if (!view.isRecreating()) {
+            if (ytContextHolder.isCreated() && !ytContextHolder.isConnected()) {
+                ytContextHolder.destroy()
+            } else {
+                ytServiceManager.start()
+            }
+        }
+    }
+
+    override fun restartYtCastContext() {
+        ytContextHolder.destroy()
+        ytContextHolder.create()
     }
 
 }

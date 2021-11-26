@@ -1,0 +1,563 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "af2e8448df5a1c7780d888ffd2f08b33",
+    "entities": [
+      {
+        "tableName": "playlist",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `currentIndex` INTEGER NOT NULL, `mode` TEXT NOT NULL, `flags` INTEGER NOT NULL, `type` TEXT NOT NULL, `platform` TEXT, `platform_id` TEXT, `channel_id` INTEGER, `parentId` INTEGER NOT NULL, `config_json` TEXT NOT NULL, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentIndex",
+            "columnName": "currentIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mode",
+            "columnName": "mode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "flags",
+            "columnName": "flags",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "platform",
+            "columnName": "platform",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "platformId",
+            "columnName": "platform_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "channelId",
+            "columnName": "channel_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parentId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "config",
+            "columnName": "config_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumb.url",
+            "columnName": "thumburl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumb.width",
+            "columnName": "thumbwidth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumb.height",
+            "columnName": "thumbheight",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image.url",
+            "columnName": "imageurl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image.width",
+            "columnName": "imagewidth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image.height",
+            "columnName": "imageheight",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_playlist_flags",
+            "unique": false,
+            "columnNames": [
+              "flags"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_flags` ON `${TABLE_NAME}` (`flags`)"
+          },
+          {
+            "name": "index_playlist_type",
+            "unique": false,
+            "columnNames": [
+              "type"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_type` ON `${TABLE_NAME}` (`type`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "playlist_item",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `media_id` INTEGER NOT NULL, `order` INTEGER NOT NULL, `flags` INTEGER NOT NULL, `playlist_id` INTEGER NOT NULL, `date_added` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mediaId",
+            "columnName": "media_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "order",
+            "columnName": "order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "flags",
+            "columnName": "flags",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "playlistId",
+            "columnName": "playlist_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateAdded",
+            "columnName": "date_added",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_playlist_item_order_playlist_id",
+            "unique": false,
+            "columnNames": [
+              "order",
+              "playlist_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_item_order_playlist_id` ON `${TABLE_NAME}` (`order`, `playlist_id`)"
+          },
+          {
+            "name": "index_playlist_item_playlist_id",
+            "unique": false,
+            "columnNames": [
+              "playlist_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_item_playlist_id` ON `${TABLE_NAME}` (`playlist_id`)"
+          },
+          {
+            "name": "index_playlist_item_media_id",
+            "unique": false,
+            "columnNames": [
+              "media_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_item_media_id` ON `${TABLE_NAME}` (`media_id`)"
+          },
+          {
+            "name": "index_playlist_item_playlist_id_media_id",
+            "unique": true,
+            "columnNames": [
+              "playlist_id",
+              "media_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_playlist_item_playlist_id_media_id` ON `${TABLE_NAME}` (`playlist_id`, `media_id`)"
+          },
+          {
+            "name": "index_playlist_item_flags",
+            "unique": false,
+            "columnNames": [
+              "flags"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_item_flags` ON `${TABLE_NAME}` (`flags`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "media",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `url` TEXT NOT NULL, `media_id` TEXT NOT NULL, `type` TEXT NOT NULL, `title` TEXT, `duration` INTEGER, `positon` INTEGER, `date_last_played` TEXT, `description` TEXT, `platform` TEXT NOT NULL, `published` TEXT, `channel_id` INTEGER, `flags` INTEGER NOT NULL, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mediaId",
+            "columnName": "media_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mediaType",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "positon",
+            "columnName": "positon",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dateLastPlayed",
+            "columnName": "date_last_played",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "platform",
+            "columnName": "platform",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "published",
+            "columnName": "published",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "channelId",
+            "columnName": "channel_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "flags",
+            "columnName": "flags",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumbNail.url",
+            "columnName": "thumburl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbNail.width",
+            "columnName": "thumbwidth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbNail.height",
+            "columnName": "thumbheight",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image.url",
+            "columnName": "imageurl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image.width",
+            "columnName": "imagewidth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image.height",
+            "columnName": "imageheight",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_media_media_id",
+            "unique": true,
+            "columnNames": [
+              "media_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_media_media_id` ON `${TABLE_NAME}` (`media_id`)"
+          },
+          {
+            "name": "index_media_type",
+            "unique": false,
+            "columnNames": [
+              "type"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_type` ON `${TABLE_NAME}` (`type`)"
+          },
+          {
+            "name": "index_media_title",
+            "unique": false,
+            "columnNames": [
+              "title"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_title` ON `${TABLE_NAME}` (`title`)"
+          },
+          {
+            "name": "index_media_description",
+            "unique": false,
+            "columnNames": [
+              "description"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_description` ON `${TABLE_NAME}` (`description`)"
+          },
+          {
+            "name": "index_media_channel_id",
+            "unique": false,
+            "columnNames": [
+              "channel_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_channel_id` ON `${TABLE_NAME}` (`channel_id`)"
+          },
+          {
+            "name": "index_media_flags",
+            "unique": false,
+            "columnNames": [
+              "flags"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_flags` ON `${TABLE_NAME}` (`flags`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "channel",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `remote_id` TEXT NOT NULL, `title` TEXT, `description` TEXT, `custom_url` TEXT, `country` TEXT, `platform` TEXT NOT NULL, `flags` INTEGER NOT NULL, `published` TEXT, `thumburl` TEXT, `thumbwidth` INTEGER, `thumbheight` INTEGER, `imageurl` TEXT, `imagewidth` INTEGER, `imageheight` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remoteId",
+            "columnName": "remote_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "customUrl",
+            "columnName": "custom_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "country",
+            "columnName": "country",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "platform",
+            "columnName": "platform",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "flags",
+            "columnName": "flags",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "published",
+            "columnName": "published",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbNail.url",
+            "columnName": "thumburl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbNail.width",
+            "columnName": "thumbwidth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbNail.height",
+            "columnName": "thumbheight",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image.url",
+            "columnName": "imageurl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image.width",
+            "columnName": "imagewidth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image.height",
+            "columnName": "imageheight",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_channel_remote_id_platform",
+            "unique": true,
+            "columnNames": [
+              "remote_id",
+              "platform"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_channel_remote_id_platform` ON `${TABLE_NAME}` (`remote_id`, `platform`)"
+          },
+          {
+            "name": "index_channel_remote_id",
+            "unique": false,
+            "columnNames": [
+              "remote_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_channel_remote_id` ON `${TABLE_NAME}` (`remote_id`)"
+          },
+          {
+            "name": "index_channel_platform",
+            "unique": false,
+            "columnNames": [
+              "platform"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_channel_platform` ON `${TABLE_NAME}` (`platform`)"
+          },
+          {
+            "name": "index_channel_title",
+            "unique": false,
+            "columnNames": [
+              "title"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_channel_title` ON `${TABLE_NAME}` (`title`)"
+          },
+          {
+            "name": "index_channel_flags",
+            "unique": false,
+            "columnNames": [
+              "flags"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_channel_flags` ON `${TABLE_NAME}` (`flags`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'af2e8448df5a1c7780d888ffd2f08b33')"
+    ]
+  }
+}

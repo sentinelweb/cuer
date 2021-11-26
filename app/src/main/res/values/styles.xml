@@ -1,11 +1,445 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+    <!-- TextAppearance -->
+    <style name="TextAppearance.App.Headline1"
+           parent="@style/TextAppearance.MaterialComponents.Headline1">
+        <item name="android:textSize">36sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
     </style>
+
+    <style name="TextAppearance.App.Headline2"
+           parent="@style/TextAppearance.MaterialComponents.Headline2">
+        <item name="android:textSize">28sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline3"
+           parent="@style/TextAppearance.MaterialComponents.Headline3">
+        <item name="android:textSize">24sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline4"
+           parent="@style/TextAppearance.MaterialComponents.Headline4">
+        <item name="android:textSize">20sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline5"
+           parent="@style/TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textSize">18sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textSize">16sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Button"
+           parent="@style/TextAppearance.MaterialComponents.Button">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontFamily">?bodyFont</item>
+        <item name="android:fontFamily">?bodyFont</item>
+    </style>
+
+    <style name="TextAppearance.App.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="fontFamily">?bodyFont</item>
+        <item name="android:fontFamily">?bodyFont</item>
+    </style>
+
+    <style name="TextAppearance.App.Body2" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">?bodyFont</item>
+        <item name="android:fontFamily">?bodyFont</item>
+    </style>
+
+    <style name="TextAppearance.App.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="fontFamily">?bodyFont</item>
+        <item name="android:fontFamily">?bodyFont</item>
+    </style>
+
+    <style name="TextAppearance.App.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textSize">16sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="TextAppearance.App.Overline" parent="TextAppearance.MaterialComponents.Overline">
+        <item name="android:textSize">12sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+    </style>
+    <!-- end TextAppearance -->
+
+    <!-- TextAppearance ActionBar -->
+    <style name="TextAppearance" />
+
+    <style name="TextAppearance.ActionBar" />
+
+    <style name="TextAppearance.ActionBar.Collapsed">
+        <item name="android:textSize">18sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="TextAppearance.ActionBar.Expanded">
+        <item name="android:textSize">22sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+    <!-- end TextAppearance ActionBar-->
+
+
+    <style name="Toolbar" parent="@style/Widget.MaterialComponents.Toolbar">
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+    </style>
+
+    <style name="Cuer" />
+
+    <style name="Cuer.AppBar" />
+
+    <style name="Cuer.AppBar.OverFlow">
+        <item name="android:src">@drawable/ic_more_vert_black</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:tint">@color/white</item>
+        <item name="android:elevation">4dp</item>
+    </style>
+
+    <style name="Cuer.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/Cuer.MaterialAlertDialog.Window</item>
+        <item name="materialAlertDialogTitleTextStyle">
+            @style/Cuer.MaterialAlertDialog.App.Title.Text
+        </item>
+        <!--        <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button</item>-->
+        <!--        <item name="buttonBarNeutralButtonStyle">@style/Widget.App.Button</item>-->
+    </style>
+
+    <style name="Cuer.MaterialAlertDialog.Window" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="shapeAppearance">@style/ShapeAppearance.Medium</item>
+    </style>
+
+    <style name="Cuer.MaterialAlertDialog.App.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textSize">24sp</item>
+        <item name="fontFamily">?headlineFont</item>
+        <item name="android:fontFamily">?headlineFont</item>
+    </style>
+
+
+    <style name="Cuer.MaterialAlertDialog.Item">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:drawableTint">@color/text_primary</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <!-- Headers =========================== -->
+    <style name="Header" />
+
+    <style name="Header.InfoText">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">top|end</item>
+        <item name="android:layout_marginTop">48dp</item>
+        <item name="android:background">@color/info_text_overlay_background</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1
+        </item>
+    </style>
+    <!-- end Headers =========================== -->
+
+    <!-- ItemView =========================== -->
+    <style name="ItemView" />
+
+    <style name="ItemView.Container">
+        <item name="android:layout_margin">@dimen/list_item_margin</item>
+        <item name="android:background">@drawable/ic_ripple_item_background</item>
+        <item name="android:elevation">@dimen/list_item_elevation</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/itemview_icon_height</item>
+    </style>
+
+    <style name="ItemView.Container.Playlist">
+        <item name="android:layout_margin">@dimen/list_item_margin</item>
+        <item name="android:background">@drawable/ic_ripple_item_background</item>
+        <item name="android:elevation">@dimen/list_item_elevation</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/playlist_row_icon_height</item>
+    </style>
+
+    <style name="ItemView.Background">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:textColor">?colorOnPrimary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="tint">?colorOnPrimary</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:drawableTint">?colorOnPrimary</item>
+        <item name="android:alpha">0</item>
+        <item name="android:padding">@dimen/list_item_swipe_margin</item>
+    </style>
+
+    <style name="ItemView.Background.Right">
+        <item name="android:gravity">left|center_vertical</item>
+
+    </style>
+
+    <style name="ItemView.Background.Left">
+        <item name="android:gravity">right|center_vertical</item>
+    </style>
+
+    <style name="ItemView.Thumb">
+        <item name="android:padding">0dp</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <style name="ItemView.Thumb.Row">
+        <item name="android:layout_width">@dimen/itemview_icon_width</item>
+        <item name="android:layout_height">@dimen/itemview_icon_height</item>
+        <item name="android:background">@color/surface</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
+    </style>
+
+    <style name="ItemView.Thumb.Playlist">
+        <item name="android:layout_width">@dimen/playlist_row_icon_width</item>
+        <item name="android:layout_height">@dimen/playlist_row_icon_height</item>
+        <item name="android:background">@color/surface</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
+    </style>
+
+    <style name="ItemView.Thumb.InfoText">
+        <item name="android:background">@color/black_transparent_background</item>
+        <item name="android:padding">2dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="ItemView.TopText" parent="@style/TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">@dimen/list_item_top_text_size</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Subtitle2</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingExtra">-4dp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">3</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+    <style name="ItemView.BottomText" parent="@style/TextAppearance.AppCompat.Small">
+        <item name="android:textSize">@dimen/list_item_bottom_text_size</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="ItemView.OverflowButtonClick">
+        <item name="android:layout_width">64dp</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+    </style>
+
+    <style name="ItemView.OverflowButton">
+        <item name="android:layout_width">16dp</item>
+        <item name="tint">@color/grey_300</item>
+        <item name="android:src">@drawable/ic_more_vert_black</item>
+        <item name="android:scaleType">center</item>
+    </style>
+
+    <style name="ItemView.CheckIcon">
+        <item name="tint">?colorCheckIcon</item>
+        <item name="android:src">@drawable/ic_item_tick_white</item>
+        <item name="android:visibility">visible</item><!-- todo gone -->
+    </style>
+
+    <style name="ItemView.CheckIcon.Row">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+    </style>
+
+    <style name="ContextMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">?contextMenuItemColor</item>
+        <item name="android:iconTint">?contextMenuItemColor</item>
+    </style>
+    <!-- end ItemView =========================== -->
+
+    <!-- ItemTile =========================== -->
+    <style name="ItemTile" />
+
+    <style name="ItemTile.Root" >
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
+        <item name="android:layout_width">@dimen/playlist_tile_size</item>
+        <item name="android:layout_height">@dimen/playlist_tile_size</item>
+    </style>
+
+    <style name="ItemTile.Container">
+        <item name="android:elevation">@dimen/list_item_elevation</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="ItemTile.Thumb">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="ItemTile.Title" parent="@style/TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">@dimen/list_item_top_text_size</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Subtitle2</item>
+        <item name="android:paddingStart">2dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:paddingEnd">2dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingExtra">-4dp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@color/black_transparent_background</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="ItemTile.OverflowButtonClick">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+    </style>
+    <!-- end ItemTile =========================== -->
+    <!-- CompactPlayer =========================== -->
+    <style name="CompactPlayer" />
+
+    <style name="CompactPlayer.Button">
+        <item name="android:background">@drawable/ic_ripple_play_background</item>
+        <item name="android:layout_width">@dimen/player_button_size</item>
+        <item name="android:layout_height">@dimen/player_button_size</item>
+        <item name="android:padding">@dimen/player_button_padding</item>
+        <item name="android:tint">?playerButtonColor</item>
+    </style>
+    <!-- end CompactPlayer =========================== -->
+
+    <!-- YoutubePlayer =========================== -->
+    <style name="YoutubePlayer" />
+
+    <style name="YoutubePlayer.Button">
+        <item name="android:background">@drawable/ic_ripple_play_background</item>
+        <item name="android:layout_width">@dimen/controls_button_size</item>
+        <item name="android:layout_height">@dimen/controls_button_size</item>
+        <item name="android:padding">@dimen/controls_button_padding</item>
+        <item name="android:tint">@color/white</item>
+        <item name="android:layout_margin">@dimen/controls_button_margin</item>
+    </style>
+
+    <style name="YoutubePlayer.InfoText" parent="TextAppearance.App.Body1">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">4dp</item>
+    </style>
+    <!-- end CompactPlayer =========================== -->
+
+    <!-- Chips =========================== -->
+    <style name="Chip" />
+
+    <style name="Chip.SelectPlaylist" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="chipIcon">@drawable/ic_playlist_black</item>
+        <item name="chipIconSize">20dp</item>
+        <item name="chipIconTint">@color/chip_icon_tint</item>
+    </style>
+
+    <style name="Chip.Playlist" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="chipIconSize">@dimen/chip_thumb_icon_size</item>
+        <item name="chipIconVisible">true</item>
+        <item name="android:checkable">false</item>
+    </style>
+    <!-- end Chips =========================== -->
+
+    <style name="FullscreenTheme" parent="AppTheme">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+    </style>
+
+    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/grey_800</item>
+    </style>
+
+    <style name="FabButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="backgroundTint">@color/fab_primary_csl</item>
+        <item name="tint">?colorOnPrimary</item>
+    </style>
+
+    <style name="FabButton.Secondary">
+        <item name="backgroundTint">?colorSecondary</item>
+        <item name="tint">?colorOnSecondary</item>
+    </style>
+
+    <style name="Button.IconOnly" parent="Widget.MaterialComponents.Button">
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
 
 </resources>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <FrameLayout
+        android:id="@+id/player_container"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:background="@color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/portrait_player_fullscreen"
+        style="@style/FabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:contentDescription="@string/player_fab_fullscreen"
+        app:fabSize="mini"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/player_container"
+        app:srcCompat="@drawable/ic_fullscreen_24"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/portrait_player_pip"
+        style="@style/FabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:contentDescription="@string/player_fab_pip"
+        app:fabSize="mini"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/portrait_player_fullscreen"
+        app:srcCompat="@drawable/ic_picture_in_picture"
+        />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="104dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/player_container"
+        >
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/portrait_player_description_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+            >
+
+            <uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
+                android:id="@+id/portrait_player_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="48dp"
+                />
+        </androidx.core.widget.NestedScrollView>
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/portrait_player_playlist"
+            android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            />
+
+    </FrameLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/portrait_player_controls"
+        android:name="uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/red_600</color>
-    <color name="colorPrimaryDark">@color/red_900</color>
-    <color name="colorAccent">@color/light_blue_700</color>
+    <color name="primary">@color/red_600</color>
+    <color name="primary_on">@color/white</color>
+    <color name="primary_variant">@color/dark_red</color>
+    <color name="secondary">@color/indigo_600</color>
+    <color name="secondary_on">@color/white</color>
+    <color name="secondary_variant">@color/dark_indigo</color>
+    <color name="text_primary">@color/grey_900</color>
+    <color name="text_secondary">@color/grey_600</color>
+    <color name="surface">@color/grey_50</color>
+    <color name="background">@color/white</color>
+    <color name="accent">@color/light_green_700</color><!-- links, etc -->
+    <color name="control_control_normal">@color/grey_400</color>
+    <color name="control_control_activated">@color/grey_600</color>
+    <color name="control_control_highlight">@color/grey_100</color>
+    <color name="upcoming_background">@color/orange_700</color>
+    <color name="live_background">@color/red_700</color>
+    <color name="info_text_overlay_background">@color/black_transparent_background</color>
+    <color name="controls_overlay_background">#33000000</color>
+
+    <color name="default_tint">@color/white</color>
+    <color name="fab_button_icon_tint">@color/default_tint</color>
+    <color name="button_fg_tint">@color/default_tint</color>
+    <color name="menu_button_icon_tint">@color/default_tint</color>
+    <color name="chip_icon_tint">@color/black</color>
+    <color name="player_button_tint">@color/black</color>
+    <color name="player_button_background_tint">@color/surface</color>
+    <color name="player_button_ripple_tint">@color/grey_400</color>
+    <color name="player_button_progress">@color/primary_variant</color>
+    <color name="text_edit_background">@color/white</color>
+
+    <!--    custom colors-->
+    <color name="fab_disabled">@color/grey_400</color>
+    <color name="divider">@color/grey_400</color>
+    <color name="error_snackbar">@color/deep_orange_700</color>
+    <color name="dark_red">#961717</color>
+    <color name="dark_indigo">#1e245f</color>
+    <color name="black_transparent_background">#8a000000</color>
+    <color name="floating_drag_background">#44000000</color>
+    <color name="nav_bar">#80000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="error_image_load_color">@color/grey_300</color>
+    <color name="placeholder_image_load_color">@color/grey_100</color>
+
+    <color name="build_primary">@color/secondary</color>
+    <color name="build_primary_variant">@color/secondary_variant</color>
+    <color name="build_secondary">@color/primary</color>
+    <color name="build_secondary_variant">@color/primary_variant</color>
+
 </resources>

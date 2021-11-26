@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer-array name="skip_time_values">
+        <item>5000</item>
+        <item>10000</item>
+        <item>30000</item><!-- 30 sec -->
+        <item>60000</item><!-- 1 min -->
+        <item>300000</item><!-- 5 min -->
+        <item>600000</item><!-- 10 min -->
+        <item>1800000</item><!-- 30 min -->
+    </integer-array>
+
+</resources>

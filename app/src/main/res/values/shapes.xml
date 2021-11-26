@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ShapeAppearance.Item.Icon" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSizeTopLeft">@dimen/medium_corner_cut</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">@dimen/medium_corner_cut</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Item.TileText" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">@dimen/medium_corner_cut</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Button" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSizeTopLeft">@dimen/medium_corner_cut</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">@dimen/medium_corner_cut</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Player.Icon" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSizeTopLeft">@dimen/medium_corner_cut</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">@dimen/medium_corner_cut</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Small" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSizeTopLeft">@dimen/small_corner_cut</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">@dimen/small_corner_cut</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Medium" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSizeTopLeft">@dimen/medium_corner_cut</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">@dimen/medium_corner_cut</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Large" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSizeTopLeft">@dimen/large_corner_cut</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">@dimen/large_corner_cut</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+</resources>
+
+

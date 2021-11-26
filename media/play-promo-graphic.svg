@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg version="1.1" width="1024" height="500" viewBox="0 0 1024 500" id="svg51"
+    sodipodi:docname="play-promo-graphic.svg" inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns="http://www.w3.org/2000/svg">
+    <defs id="defs55" />
+    <sodipodi:namedview id="namedview53" pagecolor="#ffffff" bordercolor="#666666"
+        borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
+        inkscape:pagecheckerboard="0" showgrid="false" inkscape:snap-global="true"
+        inkscape:zoom="1.0367734" inkscape:cx="331.31637" inkscape:cy="305.7563"
+        inkscape:window-width="1779" inkscape:window-height="1066" inkscape:window-x="34"
+        inkscape:window-y="38" inkscape:window-maximized="0" inkscape:current-layer="svg51"
+        width="1024px" />
+    <path id="path269"
+        style="fill:#e53935;fill-opacity:1;stroke:none;stroke-width:6.02931;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+        d="M 500.05266,18.680778 A 200.97713,200.97713 0 0 0 299.07553,219.65791 200.97713,200.97713 0 0 0 500.05266,420.63503 200.97713,200.97713 0 0 0 701.02978,219.65791 200.97713,200.97713 0 0 0 500.05266,18.680778 Z m 0,40.195425 a 80.39085,80.39085 0 0 1 80.39085,80.390857 80.39085,80.39085 0 0 1 -80.39085,80.39085 80.39085,80.39085 0 0 0 -80.39085,80.39085 80.39085,80.39085 0 0 0 80.39085,80.39085 A 160.7817,160.7817 0 0 1 339.27095,219.65791 160.7817,160.7817 0 0 1 500.05266,58.876203 Z m -26.37825,40.548705 v 75.955222 l 63.55116,-37.99723 z m 54.99393,171.537112 v 68.37933 l -57.19212,-34.18966 z"
+        inkscape:export-filename="/Users/robmunro/repos/personal/cuer/cuer/media/play_yang_512.png"
+        inkscape:export-xdpi="2457.6001" inkscape:export-ydpi="2457.6001" />
+    <text xml:space="preserve"
+        style="font-style:normal;font-weight:500;font-size:40px;line-height:1.25;font-family:Montserrat;fill:#000000;fill-opacity:1;stroke:none;-inkscape-font-specification:'Montserrat, Medium';font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+        x="461.04581" y="472.76205" id="text1403"><tspan
+       sodipodi:role="line"
+       id="tspan1401"
+       x="461.04581"
+       y="472.76205">Cuer</tspan></text>
+</svg>

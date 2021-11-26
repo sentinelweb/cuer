@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. -->
+    <!-- https://medium.com/androiddevelopers/android-styling-common-theme-attributes-8f7c50c9eaba -->
+    <!--    https://material.io/design/color/the-color-system.html#color-usage-and-palettes-->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_variant</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorOnPrimary">@color/primary_on</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary_variant</item>
+        <item name="colorOnSecondary">@color/secondary_on</item>
+
+        <item name="fontFamily">?bodyFont</item>
+
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorControlNormal">@color/control_control_normal</item>
+        <item name="colorControlActivated">@color/control_control_activated</item>
+        <item name="colorControlHighlight">@color/control_control_highlight</item>
+        <item name="android:colorControlNormal">@color/control_control_normal</item>
+        <item name="android:colorControlActivated">@color/control_control_activated</item>
+        <item name="android:colorControlHighlight">@color/control_control_highlight</item>
+
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+
+        <item name="colorSurface">@color/surface</item>
+        <item name="android:colorBackground">@color/background</item>
+
+        <item name="android:statusBarColor">?attr/colorNavigation</item>
+        <item name="android:navigationBarColor">?attr/colorNavigation</item>
+        <item name="android:selectableItemBackground">@drawable/ic_ripple_item_background</item>
+        <item name="android:selectableItemBackgroundBorderless">
+            @drawable/ic_ripple_item_background_borderless
+        </item>
+        <item name="android:actionOverflowButtonStyle">@style/Cuer.AppBar.OverFlow</item>
+
+        <!-- custom attributes -->
+        <item name="colorCheckIcon">@color/green_700</item>
+        <item name="colorDelete">@color/red_600</item>
+        <item name="colorMove">@color/blue_600</item>
+        <item name="colorEdit">@color/green_600</item>
+        <item name="contextMenuItemColor">?android:textColorSecondary</item>
+        <item name="playerButtonColor">@color/player_button_tint</item>
+        <item name="colorProgress">@color/primary</item>
+        <item name="bodyFont">@font/montserrat</item>
+        <item name="headlineFont">@font/didact_gothic</item>
+        <item name="headlineFontLetterSpacing">0.02</item>
+        <item name="headlineFontXScaling">1.05</item>
+        <item name="textEditBackground">@color/text_edit_background</item>
+        <item name="colorNavigation">@color/nav_bar</item>
+
+        <item name="android:popupMenuStyle">@style/ContextMenu</item>
+        <item name="android:toolbarStyle">@style/Toolbar</item>
+        <item name="toolbarStyle">@style/Toolbar</item>
+
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Large</item>
+
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
+        <item name="textAppearanceHeadline1">@style/TextAppearance.App.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.App.Headline2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.App.Headline3</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.App.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.App.Headline5</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.App.Headline6</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.App.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.App.Body2</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.App.Caption</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.App.Subtitle1</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.App.Subtitle2</item>
+        <item name="textAppearanceOverline">@style/TextAppearance.App.Overline</item>
+
+        <item name="materialAlertDialogTheme">@style/Cuer.MaterialAlertDialog</item>
+    </style>
+
+    <style name="AppSplash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/build_primary</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_splash</item>
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
+
+        <!--        <item name="android:windowSplashScreenBackground">@color/build_primary</item>-->
+        <!--        <item name="android:windowSplashScreenBrandingImage">@drawable/ic_launcher_cuer_splash</item>-->
+        <!--        <item name="android:windowSplashScreenAnimationDuration">2000</item>-->
+        <!--        <item name="android:windowSplashScreenIconBackgroundColor">@color/white</item>-->
+        <!--        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_cuer_splash</item>-->
+    </style>
+</resources>

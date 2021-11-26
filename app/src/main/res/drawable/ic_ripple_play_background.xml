@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?><!--https://stackoverflow.com/questions/29445342/ripples-on-a-shape-with-a-transparent-background-->
+<ripple
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/player_button_ripple_tint"
+    >
+    <!-- Use this to define the shape of the ripple effect (rectangle, oval, ring or line). The color specified here isn't used anyway -->
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval">
+            <!-- This color is needed to be set - doesn't affect anything -->
+            <solid android:color="@color/white" />
+        </shape>
+    </item>
+    <!-- This is the background for your button -->
+    <item>
+        <!-- Use the shape you want here -->
+        <shape android:shape="oval">
+            <!-- Use the solid tag to define the background color you want -->
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</ripple>

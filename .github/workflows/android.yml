@@ -1,0 +1,65 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ develop ]
+  #    paths:
+  #      - app/**
+  #      - remote/**
+  #      - shared/**
+  #      - net/**
+  pull_request:
+    branches:
+      - feature/**
+      - bugfix/**
+      - develop
+      - main
+#    paths:
+#      - app/**
+#      - remote/**
+#      - shared/**
+#      - net/**
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Decode google-services file
+        run: echo $GS > ./app/google-services.json
+        env:
+          GS: "${{ secrets.GOOGLESERVICES_JSON }}"
+      - name: Build
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD -PCUER_UPLOAD_KEY_ALIAS=$CUER_UPLOAD_KEY_ALIAS -PCUER_UPLOAD_KEY_FILE=$CUER_UPLOAD_KEY_FILE -PCUER_UPLOAD_PASSWORD=$CUER_UPLOAD_PASSWORD clean :app:assembleDebug
+        env:
+          YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
+          PIXABAY_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"
+          CUER_SIGNING_KEY_ALIAS: "${{ secrets.CUER_SIGNING_KEY_ALIAS }}"
+          CUER_SIGNING_KEY_FILE: "${{ secrets.CUER_SIGNING_KEY_FILE }}"
+          CUER_SIGNING_PASSWORD: "${{ secrets.CUER_SIGNING_PASSWORD }}"
+          CUER_UPLOAD_KEY_ALIAS: "${{ secrets.CUER_UPLOAD_KEY_ALIAS }}"
+          CUER_UPLOAD_KEY_FILE: "${{ secrets.CUER_UPLOAD_KEY_FILE }}"
+          CUER_UPLOAD_PASSWORD: "${{ secrets.CUER_UPLOAD_PASSWORD }}"
+      - name: Test
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD -PCUER_UPLOAD_KEY_ALIAS=$CUER_UPLOAD_KEY_ALIAS -PCUER_UPLOAD_KEY_FILE=$CUER_UPLOAD_KEY_FILE -PCUER_UPLOAD_PASSWORD=$CUER_UPLOAD_PASSWORD shared:test shared:jvmTest net:test remote:test app:testDebugUnitTest
+        # https://issuetracker.google.com/issues/192927707
+        #        app:testDebugUnitTest
+        env:
+          YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
+          PIXABAY_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"
+          CUER_SIGNING_KEY_ALIAS: "${{ secrets.CUER_SIGNING_KEY_ALIAS }}"
+          CUER_SIGNING_KEY_FILE: "${{ secrets.CUER_SIGNING_KEY_FILE }}"
+          CUER_SIGNING_PASSWORD: "${{ secrets.CUER_SIGNING_PASSWORD }}"
+          CUER_UPLOAD_KEY_ALIAS: "${{ secrets.CUER_UPLOAD_KEY_ALIAS }}"
+          CUER_UPLOAD_KEY_FILE: "${{ secrets.CUER_UPLOAD_KEY_FILE }}"
+          CUER_UPLOAD_PASSWORD: "${{ secrets.CUER_UPLOAD_PASSWORD }}"
+#      - name: Android Test Report
+#        uses: asadmansr/android-test-report-action@v1.2.0
+#        if: ${{ always() }} # IMPORTANT: run Android Test Report regardless

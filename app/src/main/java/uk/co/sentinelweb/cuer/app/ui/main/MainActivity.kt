@@ -1,66 +1,189 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.updatePadding
+import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.cast.framework.CastContext
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.main.MainContract.LastTab.*
+import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerFragment
+import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
+import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_BOTTOM_TAB
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class MainActivity : AppCompatActivity(), MainContract.View {
 
-    private val presenter: MainContract.Presenter by currentScope.inject()
+class MainActivity :
+    AppCompatActivity(),
+    MainContract.View,
+    PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
+    NavigationProvider,
+    DoneNavigation,
+    CompactPlayerScroll.PlayerHost,
+    AndroidScopeComponent,
+    MainContract.PlayerViewControl {
+
+    override val scope: Scope by activityScopeWithSource()
+
+    private val presenter: MainContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
+    private val snackBarWrapper: SnackbarWrapper by inject()
+    private val log: LogWrapper by inject()
+    private val navMapper: NavigationMapper by inject()
+    private val volumeControl: CuerSimpleVolumeController by inject()
+    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+    private val res: ResourceWrapper by inject()
+    private val prefs: GeneralPreferencesWrapper by inject()
+    private lateinit var navController: NavController
+
+    private var _binding: ActivityMainBinding? = null
+    private val binding: ActivityMainBinding
+        get() = _binding ?: throw Exception("Main view not bound")
+
+    private val playerFragment: Fragment
+        get() = supportFragmentManager.findFragmentById(R.id.cast_player_fragment)
+            ?: throw Exception("No player fragment")
+
+    init {
+        log.tag(this)
+    }
+
+    override val playerControls: PlayerContract.PlayerControls by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (!isChangingConfigurations) {
+            installSplashScreen()
+        } else {
+            setTheme(R.style.AppTheme)
+        }
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main_activity)
-        val navView: BottomNavigationView = findViewById(R.id.bottom_nav_view)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+        binding.bottomNavView.setupWithNavController(navController)
+        binding.bottomNavView.setOnNavigationItemSelectedListener {
+            prefs.putInt(
+                LAST_BOTTOM_TAB, when (it.itemId) {
+                    R.id.navigation_browse -> BROWSE
+                    R.id.navigation_playlists -> PLAYLISTS
+                    R.id.navigation_playlist -> PLAYLIST
+                    else -> BROWSE
+                }.ordinal
+            )
+            if (navController.currentDestination?.id != it.itemId)
+                navController.navigate(it.itemId)
+            true
+        }
 
-        val navController = findNavController(R.id.nav_host_fragment)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(setOf(R.id.bottom_navigation))
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
-        presenter.initChromecast()
+        edgeToEdgeWrapper.doOnApplyWindowInsets(binding.bottomNavView) { view, insets, padding ->
+            view.updatePadding(
+                bottom = padding.bottom + insets.systemWindowInsetBottom
+            )
+        }
+
+        prefs.getInt(LAST_BOTTOM_TAB, 0)
+            .takeIf { it > 0 }
+            .apply {
+                when (MainContract.LastTab.values()[0]) {
+                    PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists)
+                        navController.navigate(R.id.navigation_playlists)
+                    PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist)
+                        navController.navigate(R.id.navigation_playlist)
+                    else -> if (navController.currentDestination?.id != R.id.navigation_playlists)
+                        navController.navigate(R.id.navigation_browse)
+                }
+            }
+        presenter.initialise()
     }
+
+    override fun onDestroy() {
+        presenter.onDestroy()
+        super.onDestroy()
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean =
+        if (volumeControl.handleVolumeKey(event)) true else super.dispatchKeyEvent(event)
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         super.onCreateOptionsMenu(menu)
-        menuInflater.inflate(R.menu.main_actionbar_menu, menu)
+        menuInflater.inflate(R.menu.main_actionbar, menu)
+
         return true
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_paste_add -> startActivity(ShareActivity.intent(this, true))
+            R.id.menu_settings -> navigate(R.id.navigation_settings_root)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun checkPlayServices() {
-        // can't use CastContext until I'm sure the user has GooglePlayServices
-        chromeCastWrapper.checkPlayServices(this, SERVICES_REQUEST_CODE, this::initChromeCast)
+        chromeCastWrapper.checkPlayServices(
+            this,
+            SERVICES_REQUEST_CODE,
+            presenter::onPlayServicesOk
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        // rerun check which definitely should pass here
         if (requestCode == SERVICES_REQUEST_CODE) {
-            chromeCastWrapper.checkPlayServices(this, SERVICES_REQUEST_CODE, this::initChromeCast)
+            chromeCastWrapper.checkPlayServices(
+                this,
+                SERVICES_REQUEST_CODE,
+                presenter::onPlayServicesOk
+            )
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        checkForPendingNavigation(null)?.apply { navMapper.navigate(this) }
     }
 
     override fun onStart() {
         super.onStart()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         presenter.onStart()
+        //checkIntent(intent)
+        checkForPendingNavigation(null)?.apply { navMapper.navigate(this) }
     }
 
     override fun onStop() {
@@ -68,25 +191,106 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         presenter.onStop()
     }
 
-    private fun initChromeCast() {
-        presenter.setCastContext(CastContext.getSharedInstance(this))
+    override fun isRecreating() = isChangingConfigurations
+
+    override fun showMessage(msg: String) {
+        snackBarWrapper.make(msg)
+    }
+
+    override fun onPreferenceStartFragment(
+        caller: PreferenceFragmentCompat,
+        pref: Preference,
+    ): Boolean {
+        when (pref.title) {
+            getString(R.string.prefs_root_backup_item_title) -> navController.navigate(R.id.navigation_settings_backup)
+        }
+        return true
+    }
+
+    override fun navigate(destination: NavigationModel) {
+        navMapper.navigate(destination)
+    }
+
+    override fun navigate(id: Int) {
+        navController.navigate(id)
+    }
+
+    override fun checkForPendingNavigation(target: Target?): NavigationModel? {
+        log.d("checkForPendingNavigation:$target > ${intent.getStringExtra(Target.KEY)}")
+        return intent.getStringExtra(Target.KEY)
+            ?.takeIf { target == null || it == target.name }
+            ?.let {
+                return when (it) {
+                    Target.PLAYLIST.name ->
+                        PlaylistContract.makeNav(
+                            PLAYLIST_ID.getLong(intent)
+                                ?: throw IllegalArgumentException("Playlist ID is required"),
+                            PLAYLIST_ITEM_ID.getLong(intent),
+                            PLAY_NOW.getBoolean(intent),
+                            SOURCE.getEnum<Source>(intent)
+                        ).apply {
+                            log.d("got nav:$this")
+                        }
+                    else -> null
+                }
+            }
+    }
+
+    override fun clearPendingNavigation(target: Target) {
+        navMapper.clearArgs(intent, target)
+    }
+
+    override fun navigateDone() {
+        navController.popBackStack()
+    }
+
+    override fun showPlayer() {
+        supportFragmentManager
+            .beginTransaction()
+            .show(playerFragment)
+            .commitAllowingStateLoss()
+        binding.navHostFragment.setPadding(
+            0,
+            0,
+            0,
+            res.getDimensionPixelSize(R.dimen.main_navhost_bottom_padding_player)
+        )
+    }
+
+    override fun hidePlayer() {
+        supportFragmentManager
+            .beginTransaction()
+            .hide(playerFragment)
+            .commitAllowingStateLoss()
+        binding.navHostFragment.setPadding(0, 0, 0, 0)
+    }
+
+    var isRaised = true
+    override fun raisePlayer() {
+        if (isRaised) {
+            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
+            val transAnimation =
+                ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", 0f, lowerY)
+            transAnimation.setDuration(200)
+            transAnimation.start()
+            isRaised = false
+        }
+    }
+
+    override fun lowerPlayer() {
+        if (!isRaised) {
+            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
+            val transAnimation =
+                ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", lowerY, 0f)
+            transAnimation.setDuration(200)
+            transAnimation.start()
+            isRaised = true
+        }
     }
 
     companion object {
-        private val SERVICES_REQUEST_CODE = 1
-
-        @JvmStatic
-        val activityModule = module {
-            scope(named<MainActivity>()) {
-                scoped<MainContract.View> { getSource() }
-                scoped<MainContract.Presenter> { MainPresenter(get(), get(), get(), get()) }
-                scoped {
-                    (getSource<MainActivity>()
-                        .supportFragmentManager
-                        .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).presenterExternal
-                }
-                viewModel { MainState() }
-            }
-        }
+        val TOP_LEVEL_DESTINATIONS =
+            setOf(R.id.navigation_browse, R.id.navigation_playlists, R.id.navigation_playlist)
+        private const val SERVICES_REQUEST_CODE = 1
     }
 }

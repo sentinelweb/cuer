@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@id/navigation_browse"
+        android:icon="@drawable/ic_nav_browse_black"
+        android:title="@string/bottomnav_title_browse"
+        />
+
+    <item
+        android:id="@id/navigation_playlists"
+        android:icon="@drawable/ic_playlists"
+        android:title="@string/bottomnav_title_playlists"
+        />
+
+    <item
+        android:id="@id/navigation_playlist"
+        android:icon="@drawable/ic_playlist_black"
+        android:title="@string/bottomnav_title_playlist"
+        />
+
+</menu>

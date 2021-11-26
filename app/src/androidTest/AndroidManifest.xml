@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="uk.co.sentinelweb.cuer.app.test">
+
+    <!-- todo this does nothing - it SHOULD allow me to override the AppClass but doesn't work-->
+    <application
+        android:name="uk.co.sentinelweb.cuer.app.CuerApp"
+        tools:replace="android:name" />
+    <!--    android:theme="@style/AppTheme"  ,android:theme-->
+
+</manifest>

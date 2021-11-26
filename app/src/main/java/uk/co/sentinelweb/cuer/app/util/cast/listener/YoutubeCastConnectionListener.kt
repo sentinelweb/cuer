@@ -2,15 +2,51 @@ package uk.co.sentinelweb.cuer.app.util.cast.listener
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
-
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract
-import uk.co.sentinelweb.cuer.app.util.cast.ui.CastPlayerContract.ConnectionState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class YoutubeCastConnectionListener constructor(
-    private val creator: YoutubePlayerContextCreator
+    private val state: State,
+    private val creator: YoutubePlayerContextCreator,
+    private val mediaSessionManager: MediaSessionContract.Manager,
+    private val castWrapper: ChromeCastWrapper,
+    private val queue: QueueMediatorContract.Consumer,
+    private val coroutines: CoroutineContextProvider,
+    private val log: LogWrapper,
 ) : ChromecastConnectionListener {
 
-    var playerUi: CastPlayerContract.PresenterExternal? = null
+    data class State constructor(
+        var connectionState: PlayerContract.ConnectionState? = null,
+    )
+
+    private var context: ChromecastYouTubePlayerContext? = null
+    private var youTubePlayerListener: YouTubePlayerListener? = null
+
+    private lateinit var playlistFlowJob: Job
+
+    fun setContext(context: ChromecastYouTubePlayerContext) {
+        this.context = context
+        playlistFlowJob = queue.currentPlaylistFlow
+            .onEach { updateFromQueue() }
+            .launchIn(coroutines.mainScope)
+        if (state.connectionState == CC_CONNECTED) {
+            setupPlayerListener()
+            youTubePlayerListener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
+            updateFromQueue()
+        }
+    }
+
+    var playerUi: PlayerContract.PlayerControls? = null
         get() = field
         set(value) {
             field = value
@@ -20,31 +56,77 @@ class YoutubeCastConnectionListener constructor(
             }
         }
 
-    private var youTubePlayerListener: YouTubePlayerListener? = null
-    private var connectionState: ConnectionState? = null
-    private var chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext? = null
-
     override fun onChromecastConnecting() {
-        connectionState = ConnectionState.CC_CONNECTING.also { playerUi?.setConnectionState(it) }
-    }
-
-    override fun onChromecastDisconnected() {
-        connectionState = ConnectionState.CC_DISCONNECTED.also { playerUi?.setConnectionState(it) }
-        //chromecastYouTubePlayerContext?.release()
-        youTubePlayerListener?.onDisconnected()
-        youTubePlayerListener = null
+        state.connectionState = CC_CONNECTING.also {
+            playerUi?.setConnectionState(it)
+        }
     }
 
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        connectionState = ConnectionState.CC_CONNECTED.also { playerUi?.setConnectionState(it) }
-        this.chromecastYouTubePlayerContext = chromecastYouTubePlayerContext // same context object as in ChromecastYouTubePlayerContextWrapper
-        youTubePlayerListener = creator.createListener().also {
-            chromecastYouTubePlayerContext.initialize(it)
+        state.connectionState = CC_CONNECTED.also {
+            playerUi?.setConnectionState(it)
+        }
+        youTubePlayerListener?.let {
+            it.playerUi = playerUi
+            mediaSessionManager.checkCreateMediaSession(it)
+        } ?: run {
+            context?.apply { setupPlayerListener() }
+        }
+
+        updateFromQueue()
+    }
+
+    private fun setupPlayerListener() {
+        youTubePlayerListener = creator.createPlayerListener().also {
+            context?.initialize(it) ?: throw IllegalStateException("context has not been initialised")
+            mediaSessionManager.checkCreateMediaSession(it)
             it.playerUi = playerUi
         }
     }
 
-    private fun restoreState() {
-        connectionState?.apply { playerUi?.setConnectionState(this) }
+    override fun onChromecastDisconnected() {
+        state.connectionState = CC_DISCONNECTED.also {
+            playerUi?.setConnectionState(it)
+        }
+        youTubePlayerListener?.onDisconnected()
+        youTubePlayerListener = null
+        mediaSessionManager.destroyMediaSession()
     }
+
+    private fun restoreState() {
+        state.connectionState?.apply { playerUi?.setConnectionState(this) }
+        updateFromQueue()
+    }
+
+    fun isConnected(): Boolean {
+        return state.connectionState == CC_CONNECTED
+    }
+
+    fun destroy() {
+        playlistFlowJob.cancel()
+        castWrapper.killCurrentSession()
+        coroutines.cancel()
+    }
+
+    private fun updateFromQueue() {
+        if (queue.currentItem != null) {
+            playerUi?.apply {
+                if (youTubePlayerListener != null) {
+                    queue.currentItem?.apply {
+                        //setPlayerState(PlayerStateDomain.PAUSED)
+                        setCurrentSecond((media.positon?.toFloat() ?: 0f) / 1000f)
+                    }
+                }
+                queue.currentItem?.let { setPlaylistItem(it, queue.source) }
+                setPlaylistName(queue.playlist?.title ?: "none")
+                setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
+            }
+        } else {
+            coroutines.mainScope.launch {
+                delay(100)
+                updateFromQueue()
+            }
+        }
+    }
+
 }

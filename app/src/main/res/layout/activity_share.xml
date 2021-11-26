@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Material theme only has one icon so no arrows for buttons -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.share.ShareActivity"
+    android:id="@+id/share_root"
+    >
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@id/share_button_barrier"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/share_navigation"
+        />
+
+    <TextView
+        android:id="@+id/share_warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorPrimary"
+        android:padding="8dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/share_button_barrier"
+        tools:text="Video already in queue ..."
+        tools:visibility="visible"
+        />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/share_button_barrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="top_left_button,top_right_button,bottom_left_button,bottom_right_button"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/bottom_left_button"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/button_fg_tint"
+        android:elevation="@dimen/button_elevation"
+        android:text="@string/share_button_add_return"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/bottom_right_button"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/top_left_button"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/button_fg_tint"
+        android:elevation="@dimen/button_elevation"
+        android:text="@string/share_button_reject"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_button_reject_black"
+        app:layout_constraintBottom_toTopOf="@id/bottom_right_button"
+        app:layout_constraintEnd_toStartOf="@id/top_right_button"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/top_right_button"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/button_fg_tint"
+        android:elevation="@dimen/button_elevation"
+        android:text="@string/share_button_play_now"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_button_play_black"
+        app:layout_constraintBottom_toTopOf="@id/bottom_right_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/top_left_button"
+        android:visibility="gone"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/bottom_right_button"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:drawableTint="@color/button_fg_tint"
+        android:elevation="@dimen/button_elevation"
+        android:text="@string/share_button_add_to_queue"
+        android:textAppearance="?attr/textAppearanceButton"
+        app:icon="@drawable/ic_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/bottom_left_button"
+        android:visibility="gone"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
