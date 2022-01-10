@@ -2,14 +2,16 @@
 import kotlinx.css.*
 import kotlinx.html.DIV
 import kotlinx.html.unsafe
-import react.*
-import react.dom.attrs
-import react.dom.div
-import react.dom.h3
+import react.Props
+import react.RBuilder
+import react.RComponent
+import react.State
+import react.dom.*
 import styled.StyledDOMBuilder
 import styled.css
 import styled.styledDiv
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.videoUrl
 import uk.co.sentinelweb.cuer.remote.util.WebLink
 
 external interface PlaylistItemProps : Props {
@@ -41,11 +43,17 @@ class PlaylistItem : RComponent<PlaylistItemProps, PlaylistItemState>() {
                     display = Display.block
                     width = 80.pct
                 }
-//                reactPlayerLite {
-//                    attrs.url = props.video.url
-//                }
+                reactPlayerLite {
+                    attrs.url = props.video.url
+                }
             }
             shareButtons()
+            span {
+                +"Video : "
+                a(href = videoUrl(props.video), target = "cuer-${props.video.platform}") {
+                    +videoUrl(props.video)
+                }
+            }
 
             div {
                 attrs {
