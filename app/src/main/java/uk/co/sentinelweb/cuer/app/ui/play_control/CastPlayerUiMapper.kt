@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
-import kotlin.time.ExperimentalTime
 
 class CastPlayerUiMapper constructor(
     private val dateTimeMapper: TimeFormatter,
@@ -14,7 +13,6 @@ class CastPlayerUiMapper constructor(
         dateTimeMapper.formatTime(ms / 1000f)
     } else "-"
 
-    @ExperimentalTime
     fun formatLiveTime(ms: Long): String {
         val liveTime = timeProvider.getOffsetTime(ms)
         return timeFormatter.formatTime(liveTime)

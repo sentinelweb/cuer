@@ -1,10 +1,9 @@
 
+//import kotlinext.js.jsObject
 import Content.ComponentStyles.drawer
 import com.ccfraser.muirwik.components.*
 import com.ccfraser.muirwik.components.button.mIconButton
 import dialog.addPlaylistDialog
-import kotlinext.js.js
-import kotlinext.js.jsObject
 import kotlinx.css.*
 import kotlinx.css.properties.Timing
 import kotlinx.css.properties.Transition
@@ -63,7 +62,10 @@ class Content : RComponent<ContentProps, ContentState>() {
                             })
                         }
                         mToolbarTitle(props.title)
-                        mIconButton("add", color = MColor.inherit, onClick = { setState { formDialogOpen = true } })
+                        mIconButton(
+                            "add",
+                            color = MColor.inherit,
+                            onClick = { setState { formDialogOpen = true } })
                     }
                     styledDiv {
                         css {
@@ -72,19 +74,23 @@ class Content : RComponent<ContentProps, ContentState>() {
                         mLinearProgress(color = MLinearProgressColor.secondary)
                     }
                 }
-
-                val pp: MPaperProps = jsObject { }
-                pp.asDynamic().style = js { position = "relative" }
-                mDrawer(drawerOpen, MDrawerAnchor.left, MDrawerVariant.persistent, paperProps = pp) {
+// todo find another way to do this for kotlin 1.6
+//                val pp: MPaperProps = jsObject { }
+//                pp.asDynamic().style = js { position = "relative" }
+                mDrawer(
+                    drawerOpen,
+                    MDrawerAnchor.left,
+                    MDrawerVariant.persistent/*, paperProps = pp*/
+                ) {
                     css {
                         transition += Transition("left", 5000.ms, Timing.easeInOut, 0.ms)
                         width = drawerWidth.px
                     }
                     styledDiv {
                         css {
-                            display = Display.flex;
-                            alignItems = Align.center;
-                            justifyContent = JustifyContent.flexEnd;
+                            display = Display.flex
+                            alignItems = Align.center
+                            justifyContent = JustifyContent.flexEnd
                             toolbarJsCssToPartialCss(theme.mixins.toolbar)
                         }
                         mIconButton("chevron_left", onClick = { setState { drawerOpen = false } })
