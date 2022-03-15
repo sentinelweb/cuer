@@ -15,7 +15,7 @@ class TimeProvider {
     fun currentTimeMillis() = Clock.System.now().toEpochMilliseconds()
 
     fun timeZomeOffsetSecs() =
-        TimeZone.currentSystemDefault().offsetAt(instant())// todo might be broken
+        TimeZone.currentSystemDefault().offsetAt(instant()) // todo might be broken
 
     fun getOffsetTime(millis: Long): LocalDateTime {
         val timeZone = TimeZone.currentSystemDefault()

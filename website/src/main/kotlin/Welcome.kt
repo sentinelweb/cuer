@@ -1,26 +1,20 @@
+import react.Component
+import react.Props
+import react.ReactNode
+import react.State
 
-import react.RBuilder
-import react.RComponent
-import react.RProps
-import react.RState
-import react.dom.div
-
-external interface WelcomeProps : RProps {
+external interface WelcomeProps : Props {
     var name: String
 }
 
-data class WelcomeState(val name: String) : RState
+data class WelcomeState(val name: String) : State
 
-@JsExport
-class Welcome(props: WelcomeProps) : RComponent<WelcomeProps, WelcomeState>(props) {
+class Welcome(props: WelcomeProps) : Component<WelcomeProps, WelcomeState>(props) {
 
     init {
         state = WelcomeState(props.name)
     }
 
-    override fun RBuilder.render() {
-        div {
-            +"Hello, ${state.name}"
-        }
-    }
+    // todo port html to kotlin
+    override fun render(): ReactNode? = null
 }
