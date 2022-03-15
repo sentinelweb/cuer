@@ -3,9 +3,10 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_edit
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
+import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.channelUrl
+import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 
 class PlaylistEditModelMapper constructor(
     private val res: ResourceWrapper,
@@ -43,7 +44,7 @@ class PlaylistEditModelMapper constructor(
     private fun buildInfo(domain: PlaylistDomain): String = "<b>Type</b>: ${domain.type}" +
             (if (domain.type == PLATFORM) "<br/><b>Platform</b>: ${domain.platform}" +
                     (domain.config.platformUrl?.let { "<br/><b>Platform URL</b>: ${domain.config.platformUrl}" }
-                        ?: YoutubeJavaApiWrapper.playlistUrl(domain))
+                        ?: playlistUrl(domain))
             else "") +
             (domain.config.updateUrl?.let { "<br/><b>Update URL</b>: ${domain.config.updateUrl}" }
                 ?: "") +
@@ -52,7 +53,7 @@ class PlaylistEditModelMapper constructor(
             (domain.channelData?.let {
                 ("<br/><br/><b>Channel</b>: ${it.title}") +
                         ("<br/><b>Channel URL</b>: " + (it.customUrl
-                            ?: YoutubeJavaApiWrapper.channelUrl(it))) +
+                            ?: channelUrl(it))) +
                         (it.description?.let { "<br/><br/><b>Description</b>:<br/> ${it}" } ?: "")
             } ?: "")
 

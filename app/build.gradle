@@ -65,17 +65,18 @@ android {
     kotlinOptions {
         jvmTarget = ver_jvm
         useIR = true
-        // bypass compose kotlin version compatability check
-        // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
-//        freeCompilerArgs += [
+        freeCompilerArgs += [
+                // bypass compose kotlin version compatability check
+                // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
 //                "-P",
 //                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
-//        ]
+                "-Xopt-in=kotlin.time.ExperimentalTime"
+        ]
     }
 
     composeOptions {
         kotlinCompilerVersion ver_kotlin
-        kotlinCompilerExtensionVersion ver_compose
+        kotlinCompilerExtensionVersion ver_compose_compiler
     }
 
     buildFeatures {
@@ -143,10 +144,10 @@ dependencies {
     implementation "androidx.compose.material:material:$ver_compose"
     implementation "androidx.compose.runtime:runtime-livedata:$ver_compose"
     implementation ("androidx.compose.ui:ui-tooling:$ver_compose"){
-        version{strictly("1.0.0-beta09")}// todo remove when preview starts working
+        version{strictly("1.0.0-beta09")} // todo remove when preview starts working
     }
-    implementation "com.google.android.material:compose-theme-adapter:$ver_compose"
-    implementation "androidx.compose.compiler:compiler:$ver_compose"
+    implementation "androidx.compose.compiler:compiler:$ver_compose_compiler"
+    implementation "com.google.android.material:compose-theme-adapter:$ver_compose_theme_adapter"
 
     // mvikotlin
     debugImplementation "com.arkivanov.mvikotlin:mvikotlin-android-debug:$ver_mvikotlin"
@@ -245,9 +246,9 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
+    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
 
     androidTestImplementation "io.insert-koin:koin-test:$ver_koin"
-    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     androidTestImplementation "com.google.truth:truth:$ver_truth"
     androidTestImplementation "org.mockito:mockito-core:$ver_mockito"
     androidTestImplementation "org.mockito:mockito-android:$ver_mockito"

@@ -52,6 +52,9 @@ kotlin {
     android()
 
     sourceSets {
+        all {
+            languageSettings.optIn("kotlin.time.ExperimentalTime")
+        }
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core")
@@ -110,10 +113,12 @@ kotlin {
 }
 
 //https://stackoverflow.com/questions/55456176/unresolved-reference-compilekotlin-in-build-gradle-kts
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = ver_jvm
-        freeCompilerArgs = listOf("-Xopt-in=kotlin.time.ExperimentalTime")
-
-    }
+//tasks.withType<KotlinCompile> {
+//    kotlinOptions {
+//        jvmTarget = ver_jvm
+//        freeCompilerArgs = listOf("-Xopt-in=kotlin.time.ExperimentalTime")
+//    }
+//}
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.time.ExperimentalTime"
 }

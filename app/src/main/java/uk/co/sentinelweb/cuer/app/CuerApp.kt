@@ -18,7 +18,9 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper.Companion.SERVICE_NOT_FOUND
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class CuerApp : Application() {
 
     private val stethoWrapper: StethoWrapper by inject()
@@ -65,7 +67,9 @@ class CuerApp : Application() {
         if (castServiceManager.isRunning()) {
             log.e(
                 "App terminated while playing", TerminatedWhilePlayingError(
-                    castServiceManager.get()?.let { serviceWrapper.getServiceData(it::class.java.name) } ?: SERVICE_NOT_FOUND,
+                    castServiceManager.get()
+                        ?.let { serviceWrapper.getServiceData(it::class.java.name) }
+                        ?: SERVICE_NOT_FOUND,
                     log
                 )
             )
@@ -73,18 +77,16 @@ class CuerApp : Application() {
         queue.destroy()
     }
 
-    private lateinit var oldHandler: java.lang.Thread.UncaughtExceptionHandler
+    private var oldHandler: Thread.UncaughtExceptionHandler? = null
 
     fun setDefaultExceptionHander() {
         oldHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
             firebaseWrapper.logMessage("Thread Name: ${paramThread.name} state:${paramThread.state} group:${paramThread.threadGroup?.name}")
             log.e("FATAL Global Exception", paramThrowable)
-            if (oldHandler != null) {
-                oldHandler.uncaughtException(paramThread, paramThrowable)
-            } else {
-                System.exit(0)
-            }
+            oldHandler
+                ?.uncaughtException(paramThread, paramThrowable)
+                ?: run { System.exit(0) }
         }
     }
 }

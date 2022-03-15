@@ -30,6 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FUL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -57,6 +58,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
     private val navMapper: NavigationMapper by inject()
+    private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     private val starMenuItem: MenuItem
         get() = binding.peToolbar.menu.findItem(R.id.pe_star)
@@ -210,7 +212,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                 return true
             }
         })
-
+        compactPlayerScroll.addScrollListener(binding.peScroll, this)
         observeUi()
         observeModel()
         observeDomain()

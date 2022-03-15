@@ -38,9 +38,9 @@ import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 
 class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
 
@@ -135,7 +135,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                             startActivity(
                                 ShareActivity.urlIntent(
                                     requireContext(),
-                                    YoutubeJavaApiWrapper.playlistUrl(
+                                    playlistUrl(
                                         label.cat.platformId
                                             ?: throw IllegalArgumentException("Category has no platform ID : ${label.cat} ")
                                     ),

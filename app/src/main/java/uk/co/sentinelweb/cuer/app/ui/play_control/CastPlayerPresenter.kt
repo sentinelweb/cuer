@@ -17,7 +17,6 @@ import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import kotlin.time.ExperimentalTime
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
@@ -146,7 +145,6 @@ class CastPlayerPresenter(
         view.setState(playState)
     }
 
-    @ExperimentalTime
     override fun setCurrentSecond(second: Float) {
         state.positionMs = (second * 1000).toLong()
         skipControl.updatePosition(state.positionMs)

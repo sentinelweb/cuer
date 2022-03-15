@@ -26,44 +26,44 @@ class CuerCastSessionListener constructor(
         chromeCastWrapper.removeSessionListener(this)
     }
 
-    override fun onSessionStarted(castSession: CastSession?, p1: String?) {
+    override fun onSessionStarted(castSession: CastSession, p1: String) {
         //log.d("onSessionStarted $castSession")
         _currentCastSession = castSession
     }
 
-    override fun onSessionStarting(castSession: CastSession?) {
+    override fun onSessionStarting(castSession: CastSession) {
         //log.d("onSessionStarting $castSession")
     }
 
-    override fun onSessionStartFailed(castSession: CastSession?, p1: Int) {
+    override fun onSessionStartFailed(castSession: CastSession, p1: Int) {
         //log.d("onSessionStartFailed $castSession")
         _currentCastSession = null
     }
 
-    override fun onSessionEnding(castSession: CastSession?) {
+    override fun onSessionEnding(castSession: CastSession) {
         //log.d("onSessionEnding $castSession")
     }
 
-    override fun onSessionEnded(castSession: CastSession?, p1: Int) {
+    override fun onSessionEnded(castSession: CastSession, p1: Int) {
         //log.d("onSessionEnded $castSession")
         _currentCastSession = null
     }
 
-    override fun onSessionResuming(castSession: CastSession?, p1: String?) {
+    override fun onSessionResuming(castSession: CastSession, p1: String) {
         //log.d("onSessionResuming $castSession")
     }
 
-    override fun onSessionResumed(castSession: CastSession?, p1: Boolean) {
+    override fun onSessionResumed(castSession: CastSession, p1: Boolean) {
         //log.d("onSessionResumed $castSession")
         _currentCastSession = castSession
     }
 
-    override fun onSessionResumeFailed(castSession: CastSession?, p1: Int) {
+    override fun onSessionResumeFailed(castSession: CastSession, p1: Int) {
         //log.d("onSessionResumeFailed $castSession")
         _currentCastSession = null
     }
 
-    override fun onSessionSuspended(castSession: CastSession?, p1: Int) {
+    override fun onSessionSuspended(castSession: CastSession, p1: Int) {
         //log.d("onSessionSuspended $castSession")
         _currentCastSession = null
     }
