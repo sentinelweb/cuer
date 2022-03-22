@@ -6,8 +6,7 @@ class LinkExtractor {
 
     fun extractLinks(text: String): List<LinkDomain> {
         val links = REGEX.findAll(text).map {
-            val url = it.value
-            val domain = LinkDomain.domain(url)
+            val domain = LinkDomain.domain(it.value)
             val domainHost = LinkDomain.DomainHost.values()
                 .find { domainHost -> domainHost.domains.find { domain.contains(it) } != null }
                 ?: LinkDomain.DomainHost.UNKNOWN
