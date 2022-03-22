@@ -75,80 +75,78 @@ class YoutubeVideosRetrofitInteractorApiTest {
         )
     }
 
-    @Ignore("Real api test .. run manually only")
+    //@Ignore("Real api test .. run manually only")
     @Test
-    fun videos() {
-        runBlocking {
-            val actual = sut.videos(
-                listOf("8nhPVOM97Jg", "fY7M3pzXdUo", "GXfsI-zZO7s"/* live broadcast test (might change)*/),
-                listOf(ID, SNIPPET, CONTENT_DETAILS, PLAYER)
-            )
+    fun videos() = runBlocking {
+        val actual = sut.videos(
+            listOf(
+                "8nhPVOM97Jg",
+                "fY7M3pzXdUo",//live broadcast
+                "9umtumSsm7U",
+            ),
+            listOf(ID, SNIPPET, CONTENT_DETAILS, PLAYER)
+        )
 
-            assertTrue(actual.isSuccessful)
-            assertNotNull(actual.data)
-            assertEquals("8nhPVOM97Jg", actual.data!![0].platformId)
-            assertEquals("fY7M3pzXdUo", actual.data!![1].platformId)
-            assertFalse(actual.data!![1].isLiveBroadcast)
-            assertEquals("GXfsI-zZO7s", actual.data!![2].platformId)
-            assertTrue(actual.data!![2].isLiveBroadcast)
-        }
+        assertTrue(actual.isSuccessful)
+        assertNotNull(actual.data)
+        assertEquals("8nhPVOM97Jg", actual.data!![0].platformId)
+        assertEquals("fY7M3pzXdUo", actual.data!![1].platformId)
+        assertFalse(actual.data!![1].isLiveBroadcast)
+        println(actual.data!![2])
     }
 
     @Ignore("Real api test .. run manually only")
     @Test
-    fun channels() {
-        runBlocking {
-            val actual = sut.channels(
-                listOf("UCzuqE7-t13O4NIDYJfakrhw", "UC2UIXt4VQnhQ-VZM4P1bUMQ"),
-                listOf(ID, SNIPPET)
-            )
+    fun channels() = runBlocking {
+        val actual = sut.channels(
+            listOf("UCzuqE7-t13O4NIDYJfakrhw", "UC2UIXt4VQnhQ-VZM4P1bUMQ"),
+            listOf(ID, SNIPPET)
+        )
 
-            assertTrue(actual.isSuccessful)
-            assertNotNull(actual.data)
-            // note the items come out of order
-            assertEquals("UCzuqE7-t13O4NIDYJfakrhw", actual.data!![0].platformId)
-            assertEquals("UC2UIXt4VQnhQ-VZM4P1bUMQ", actual.data!![1].platformId)
-        }
+        assertTrue(actual.isSuccessful)
+        assertNotNull(actual.data)
+        // note the items come out of order
+        assertEquals("UCzuqE7-t13O4NIDYJfakrhw", actual.data!![0].platformId)
+        assertEquals("UC2UIXt4VQnhQ-VZM4P1bUMQ", actual.data!![1].platformId)
     }
+
 
     @Ignore("Real api test .. run manually only")
     @Test
-    fun playlist() {
-        runBlocking {
-            val actual = sut.playlist(// long 170 items
-                "PLf-zrdqNE8p-7tt7JHtlpLH3w9QA1EU0L"
-            )
+    fun playlist() = runBlocking {
+        val actual = sut.playlist(// long 170 items
+            "PLf-zrdqNE8p-7tt7JHtlpLH3w9QA1EU0L"
+        )
 
-            assertTrue(actual.isSuccessful)
-            assertNotNull(actual.data)
-            // note the items come out of order
-            assertEquals(168, actual.data!!.items.size)
+        assertTrue(actual.isSuccessful)
+        assertNotNull(actual.data)
+        // note the items come out of order
+        assertEquals(168, actual.data!!.items.size)
 
-            val actualLive = sut.playlist(// live - news
-                "PLf-zrdqNE8p9qjU-kzB8ROMpgbXYahCQR"
-            )
+        val actualLive = sut.playlist(// live - news
+            "PLf-zrdqNE8p9qjU-kzB8ROMpgbXYahCQR"
+        )
 
-            assertTrue(actualLive.isSuccessful)
-            assertNotNull(actualLive.data)
-            // note the items come out of order
-            assertEquals(10, actualLive.data!!.items.size)
-            assertTrue(actualLive.data!!.items[0].media.isLiveBroadcast)
-        }
+        assertTrue(actualLive.isSuccessful)
+        assertNotNull(actualLive.data)
+        // note the items come out of order
+        assertEquals(10, actualLive.data!!.items.size)
+        assertTrue(actualLive.data!!.items[0].media.isLiveBroadcast)
     }
+
 
     //@Ignore("Real api test .. run manually only")
     @Test
-    fun search() {
-        runBlocking {
-            val actual = sut.search(// long 170 items
-                SearchRemoteDomain("heidegger")
-            )
+    fun search() = runBlocking {
+        val actual = sut.search(// long 170 items
+            SearchRemoteDomain("heidegger")
+        )
 
-            assertTrue(actual.isSuccessful)
-            assertNotNull(actual.data)
-            // note the items come out of order
-            assertEquals(50, actual.data!!.items.size)
+        assertTrue(actual.isSuccessful)
+        assertNotNull(actual.data)
+        // note the items come out of order
+        assertEquals(50, actual.data!!.items.size)
 
-        }
     }
+
 }
