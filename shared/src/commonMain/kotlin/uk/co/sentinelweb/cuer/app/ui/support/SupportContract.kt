@@ -24,6 +24,8 @@ interface SupportContract {
     }
 
     interface View : MviView<View.Model, View.Event> {
+        suspend fun processLabel(label: MviStore.Label)
+
         data class Model(
             val links: List<Link>
         ) {
@@ -37,5 +39,9 @@ interface SupportContract {
             data class LinkClicked(val link: Model.Link) : Event()
             data class Load(val media: MediaDomain) : Event()
         }
+    }
+
+    interface Strings {
+
     }
 }

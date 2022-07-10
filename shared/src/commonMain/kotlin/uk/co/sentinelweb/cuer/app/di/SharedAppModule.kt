@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
+import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapperImpl
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
@@ -54,7 +55,14 @@ object SharedAppModule {
         factory { RecentItemsPlayistInteractor(get()) }
         factory { AddLinkOrchestrator(get(), get(), get(), get(), get()) }
         factory { LocalSearchPlayistInteractor(get(), get()) }
-        factory { RemoteSearchPlayistOrchestrator(get(), get(), get(), RemoteSearchPlayistOrchestrator.State()) }
+        factory {
+            RemoteSearchPlayistOrchestrator(
+                get(),
+                get(),
+                get(),
+                RemoteSearchPlayistOrchestrator.State()
+            )
+        }
         factory { PlaylistMediaUpdateOrchestrator(get()) }
         factory { PlaylistOrDefaultOrchestrator(get(), get()) }
     }
@@ -67,6 +75,7 @@ object SharedAppModule {
         factory { BrowseRecentCategories(get(), get()) }
         factory { RecentLocalPlaylists(get(), get()) }
         factory { PlatformFileOperation() }
+        factory { LinkExtractor() }
     }
 
     val modules = listOf(objectModule)
