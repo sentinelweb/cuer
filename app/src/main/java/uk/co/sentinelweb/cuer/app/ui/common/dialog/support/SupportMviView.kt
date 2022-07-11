@@ -39,5 +39,4 @@ class SupportMviView constructor(
         log.d(model.toString())
         observableModel = model
     }
-
 }

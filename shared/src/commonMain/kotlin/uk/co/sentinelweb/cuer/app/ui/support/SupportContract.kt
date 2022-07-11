@@ -36,7 +36,7 @@ interface SupportContract {
         }
 
         sealed class Event {
-            data class LinkClicked(val link: Model.Link) : Event()
+            data class OnLinkClicked(val link: Model.Link) : Event()
             data class Load(val media: MediaDomain) : Event()
         }
     }

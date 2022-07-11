@@ -57,7 +57,7 @@ class PlaylistItemEditViewModel constructor(
         val type: Type,
         val data: Any?,
     ) {
-        enum class Type { REFRESHING, ERROR, UNPIN }
+        enum class Type { REFRESHING, ERROR, UNPIN, SUPPORT }
     }
 
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
@@ -411,5 +411,9 @@ class PlaylistItemEditViewModel constructor(
                     model = modelMapper.map(state.media!!, state.selectedPlaylists)
                 }
             }
+    }
+
+    fun onSupport() {
+        _uiLiveData.value = UiEvent(SUPPORT, state.media)
     }
 }

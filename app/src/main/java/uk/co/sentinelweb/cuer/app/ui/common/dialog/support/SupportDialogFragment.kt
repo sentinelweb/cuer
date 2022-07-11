@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
@@ -25,8 +26,11 @@ import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 
-class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
+class SupportDialogFragment(
+    private val media: MediaDomain
+) : DialogFragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource()
     private val controller: SupportController by inject()
@@ -37,12 +41,10 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         controller.onViewCreated(listOf(mviView), lifecycle.asMviLifecycle())
-
     }
 
     override fun onCreateView(
@@ -60,6 +62,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
             SupportComposables.SupportUi(mviView)
         }
         observeLabels()
+        mviView.dispatch(SupportContract.View.Event.Load(media))
     }
 
     private fun observeLabels() {
@@ -79,6 +82,14 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     }
 
     companion object {
+        val TAG = "SupportDialogFragment"
+
+        // todo use navigation?
+        fun show(a: FragmentActivity, m: MediaDomain) {
+            SupportDialogFragment(m)
+                .show(a.supportFragmentManager, TAG)
+        }
+
         @JvmStatic
         val fragmentModule = module {
             scope(named<SupportDialogFragment>()) {

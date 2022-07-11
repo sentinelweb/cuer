@@ -10,13 +10,13 @@
     >
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/ple_appbar"
+        android:id="@+id/plie_appbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_header_height"
         >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/ple_collapsing_toolbar"
+            android:id="@+id/plie_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/background"
@@ -31,7 +31,7 @@
             >
 
             <ImageView
-                android:id="@+id/ple_image"
+                android:id="@+id/plie_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/background"
@@ -44,7 +44,7 @@
                 />
 
             <View
-                android:id="@+id/ple_action_bg"
+                android:id="@+id/plie_action_bg"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_gravity="top"
@@ -52,7 +52,7 @@
                 />
 
             <View
-                android:id="@+id/ple_title_bg"
+                android:id="@+id/plie_title_bg"
                 android:layout_width="match_parent"
                 android:layout_height="64sp"
                 android:layout_gravity="bottom"
@@ -60,7 +60,7 @@
                 />
 
             <View
-                android:id="@+id/ple_title_pos"
+                android:id="@+id/plie_title_pos"
                 android:layout_width="match_parent"
                 android:layout_height="4dp"
                 android:layout_gravity="bottom"
@@ -68,14 +68,14 @@
                 />
 
             <TextView
-                android:id="@+id/ple_duration"
+                android:id="@+id/plie_duration"
                 style="@style/Header.InfoText"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="1:00:00"
                 />
 
             <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/ple_toolbar"
+                android:id="@+id/plie_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
@@ -90,20 +90,20 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout
-        android:id="@+id/ple_swipe"
+        android:id="@+id/plie_swipe"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.core.widget.NestedScrollView
-            android:id="@+id/ple_scroll"
+            android:id="@+id/plie_scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:scrollbarThumbVertical="@drawable/scrollbar_thumb">
 
             <uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
-                android:id="@+id/ple_description"
+                android:id="@+id/plie_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="128dp" />
@@ -112,28 +112,28 @@
     </uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/ple_play_fab"
+        android:id="@+id/plie_play_fab"
         style="@style/FabButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:contentDescription="@string/menu_play"
-        app:layout_anchor="@id/ple_appbar"
+        app:layout_anchor="@id/plie_appbar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_player_play_black"
         />
 
-    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-    <!--        android:id="@+id/ple_star_fab"-->
-    <!--        style="@style/FabButton"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginEnd="80dp"-->
-    <!--        android:contentDescription="@string/menu_star"-->
-    <!--        app:fabSize="mini"-->
-    <!--        app:layout_anchor="@id/ple_appbar"-->
-    <!--        app:layout_anchorGravity="bottom|end"-->
-    <!--        app:srcCompat="@drawable/ic_button_unstarred_white"-->
-    <!--        />-->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/plie_support_fab"
+            style="@style/FabButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="80dp"
+            android:contentDescription="@string/menu_support"
+            app:fabSize="mini"
+            app:layout_anchor="@id/plie_appbar"
+            app:layout_anchorGravity="bottom|end"
+            app:srcCompat="@drawable/ic_support"
+            />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

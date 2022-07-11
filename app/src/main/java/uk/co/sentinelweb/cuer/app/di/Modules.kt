@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
@@ -101,6 +102,7 @@ object Modules {
         DescriptionView.viewModule,
         BrowseFragment.fragmentModule,
         FloatingPlayerContract.serviceModule,
+        SupportDialogFragment.fragmentModule
     )
 
     private val uiModule = module {

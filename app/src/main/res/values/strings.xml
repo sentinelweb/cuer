@@ -34,6 +34,7 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_merge">Merge with &#8230;</string>
+    <string name="menu_support">Support</string>
 
     <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>

@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistItemEditBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
@@ -41,6 +42,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
@@ -64,15 +66,15 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private lateinit var binding: FragmentPlaylistItemEditBinding
 
     private val starMenuItem: MenuItem
-        get() = binding.pleToolbar.menu.findItem(R.id.plie_star)
+        get() = binding.plieToolbar.menu.findItem(R.id.plie_star)
     private val playMenuItem: MenuItem
-        get() = binding.pleToolbar.menu.findItem(R.id.plie_play)
+        get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
     private val editMenuItem: MenuItem
-        get() = binding.pleToolbar.menu.findItem(R.id.plie_play)
+        get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
     private val launchMenuItem: MenuItem
-        get() = binding.pleToolbar.menu.findItem(R.id.plie_launch)
+        get() = binding.plieToolbar.menu.findItem(R.id.plie_launch)
     private val shareMenuItem: MenuItem
-        get() = binding.pleToolbar.menu.findItem(R.id.plie_share)
+        get() = binding.plieToolbar.menu.findItem(R.id.plie_share)
 
     private var dialog: AppCompatDialog? = null
     private var dialogFragment: DialogFragment? = null
@@ -132,16 +134,19 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 //        binding.pleScroll.doOnPreDraw {
 //            startPostponedEnterTransition()
 //        }
-        binding.pleToolbar.let {
+        binding.plieToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
         //ple_play_button.setOnClickListener { viewModel.onPlayVideoLocal() }
         //ple_star_fab.setOnClickListener { viewModel.onStarClick() }
-        binding.plePlayFab.setOnClickListener { viewModel.onPlayVideo() }
+        binding.pliePlayFab.setOnClickListener { viewModel.onPlayVideo() }
+        binding.plieSupportFab.setOnClickListener {
+            viewModel.onSupport()
+        }
         starMenuItem.isVisible = true
         playMenuItem.isVisible = false
-        binding.pleDescription.interactions = viewModel
-        binding.pleToolbar.setOnMenuItemClickListener { menuItem ->
+        binding.plieDescription.interactions = viewModel
+        binding.plieToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.plie_star -> {
                     viewModel.onStarClick()
@@ -166,8 +171,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 else -> false
             }
         }
-        binding.pleSwipe.setOnRefreshListener { viewModel.refreshMediaBackground() }
-        binding.pleAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+        binding.plieSwipe.setOnRefreshListener { viewModel.refreshMediaBackground() }
+        binding.plieAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false
             var scrollRange = -1
@@ -191,7 +196,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 menuState.scrolledDown = isShow
             }
         })
-        compactPlayerScroll.addScrollListener(binding.pleScroll, this)
+        compactPlayerScroll.addScrollListener(binding.plieScroll, this)
 
         // setup data for fragment transition
         itemArg?.apply {
@@ -200,11 +205,11 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 media.image?.apply {
                     Glide.with(requireContext())
                         .load(this.url)
-                        .into(binding.pleImage)
+                        .into(binding.plieImage)
                 }
-                binding.pleDescription.channelImageVisible(false)
-                binding.pleTitlePos.isVisible = false
-                binding.pleTitleBg.isVisible = false
+                binding.plieDescription.channelImageVisible(false)
+                binding.plieTitlePos.isVisible = false
+                binding.plieTitleBg.isVisible = false
                 playMenuItem.isVisible = false
             }
             viewModel.setData(this, sourceArg, parentArg)
@@ -250,7 +255,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                     when (model.type) {
                         REFRESHING -> {
                             val refreshing = model.data as Boolean
-                            binding.pleSwipe.isRefreshing = refreshing
+                            binding.plieSwipe.isRefreshing = refreshing
                             if (refreshing) {
                                 commitHost.isReady(false)
                             }
@@ -259,6 +264,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                         UNPIN -> snackbarWrapper
                             .make("Unpin playlist?", actionText = "UNPIN", action = { viewModel.onUnPin() })
                             .show()
+                        SUPPORT -> SupportDialogFragment.show(requireActivity(), model.data as MediaDomain)
                     }
                 }
             })
@@ -269,10 +275,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             this.viewLifecycleOwner,
             object : Observer<PlaylistItemEditContract.Model> {
                 override fun onChanged(model: PlaylistItemEditContract.Model) {
-                    binding.pleTitleBg.isVisible = true
-                    binding.pleTitlePos.isVisible = !model.empty
-                    binding.pleDuration.isVisible = !model.empty
-                    //ple_star_fab.isVisible = !model.empty
+                    binding.plieTitleBg.isVisible = true
+                    binding.plieTitlePos.isVisible = !model.empty
+                    binding.plieDuration.isVisible = !model.empty
+                    binding.plieSupportFab.isVisible = !model.empty
                     if (menuState.scrolledDown) {
                         //starMenuItem.isVisible = !model.empty
                         playMenuItem.isVisible = !model.empty
@@ -283,23 +289,23 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                     val imageUrl = model.imageUrl
                     setImage(imageUrl)
 
-                    binding.pleCollapsingToolbar.title = model.description.title
-                    binding.pleToolbar.title = model.description.title
+                    binding.plieCollapsingToolbar.title = model.description.title
+                    binding.plieToolbar.title = model.description.title
                     menuState.modelEmpty = model.empty
-                    binding.pleSwipe.isRefreshing = false
+                    binding.plieSwipe.isRefreshing = false
                     commitHost.isReady(!model.empty)
                     if (model.empty) {
                         return
                     }
 
-                    binding.pleDescription.setModel(model.description)
-                    binding.pleDuration.text = model.durationText
-                    binding.pleDuration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
+                    binding.plieDescription.setModel(model.description)
+                    binding.plieDuration.text = model.durationText
+                    binding.plieDuration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
 
                     model.position?.let { ratio ->
-                        binding.pleTitlePos.layoutParams.width =
-                            (ratio * binding.pleTitleBg.width).toInt()
-                    } ?: binding.pleTitlePos.apply { isVisible = false }
+                        binding.plieTitlePos.layoutParams.width =
+                            (ratio * binding.plieTitleBg.width).toInt()
+                    } ?: binding.plieTitlePos.apply { isVisible = false }
                     val starIconResource =
                         if (model.starred) R.drawable.ic_starred
                         else R.drawable.ic_starred_off
@@ -312,7 +318,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         Glide.with(requireContext())
             .load(imageUrl)
             .transition(DrawableTransitionOptions.withCrossFade())
-            .into(binding.pleImage)
+            .into(binding.plieImage)
     }
 
     private fun observeNavigation() {

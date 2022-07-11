@@ -22,7 +22,7 @@ class SupportController constructor(
     private val eventToIntent: suspend Event.() -> Intent =
         {
             when (this) {
-                is Event.LinkClicked -> Intent.Open(url = this.link.link)
+                is Event.OnLinkClicked -> Intent.Open(url = this.link.link)
                 is Event.Load -> Intent.Load(this.media)
             }
         }
