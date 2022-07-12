@@ -13,6 +13,8 @@ import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.View.Event
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.LinkDomain.Category.OTHER
 
 class SupportMviView constructor(
     private val log: LogWrapper,
@@ -24,7 +26,7 @@ class SupportMviView constructor(
     }
 
     // todo get list of links from description
-    var observableModel: Model by mutableStateOf(Model(mapOf()))
+    var observableModel: Model by mutableStateOf(INITIAL)
         private set
 
     private val _labelData: MutableLiveData<Label> = MutableLiveData()
@@ -38,5 +40,9 @@ class SupportMviView constructor(
     override fun render(model: Model) {
         log.d(model.toString())
         observableModel = model
+    }
+
+    companion object {
+        val INITIAL = Model(mapOf(OTHER to listOf()))
     }
 }

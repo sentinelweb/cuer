@@ -12,7 +12,8 @@ class SupportModelMapper {
                         title = link.run { address },
                         link = link.address,
                         index = i,
-                        category = link.category
+                        category = link.category,
+                        domain = link
                     )
                 }.groupBy { it.category }
             )

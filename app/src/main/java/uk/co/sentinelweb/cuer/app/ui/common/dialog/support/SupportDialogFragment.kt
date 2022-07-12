@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.support.SupportStoreFactory
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.UrlLauncherWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -44,6 +45,7 @@ class SupportDialogFragment(
     private val coroutines: CoroutineContextProvider by inject()
     private val urlLauncher: UrlLauncherWrapper by inject()
     private val ytLauncher: YoutubeJavaApiWrapper by inject()
+    private val toast: ToastWrapper by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!

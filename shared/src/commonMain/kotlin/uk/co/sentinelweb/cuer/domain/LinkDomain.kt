@@ -25,14 +25,19 @@ sealed class LinkDomain constructor(
         PAYPAL("paypal.com", "paypal.me"),
         APPLE_PODCASTS("podcasts.apple.com"),
         SPOTIFY_PODCASTS("open.spotify.com"),
+        ANCHOR_FM("anchor.fm"),
         BUY_ME_A_COFFEE("buymeacoffee.com"),
         KO_FI("ko-fi.com"),
         FACEBOOK("facebook.com", "fb.me"),
         INSTAGRAM("instagram.com"),
         TWITTER("twitter.com", "t.co"),
-        DISCORD("discord.gg"),
+        DISCORD("discord.gg", "discord.io"),
         YOUTUBE("youtube.com", "youtu.be"),
         VIMEO("vimeo.com"),
+        SOUNDCLOUD("soundcloud.com"),
+        TEESPRING("teespring.com"),
+        TWITCH("twitch.tv"),
+        WIKIPEDIA("wikipedia.org", "wikimedia.org"),
         UNKNOWN();
 
         constructor(vararg domains: String) : this(domains.toList())
@@ -41,14 +46,17 @@ sealed class LinkDomain constructor(
     enum class Category(val hosts: List<DomainHost>) {
         SUPPORT(
             DomainHost.PATREON, DomainHost.PAYPAL, DomainHost.AMAZON, DomainHost.KO_FI,
-            DomainHost.BUY_ME_A_COFFEE
+            DomainHost.BUY_ME_A_COFFEE, DomainHost.TEESPRING
         ),
-        VIDEO(DomainHost.YOUTUBE, DomainHost.VIMEO),
+        VIDEO(DomainHost.YOUTUBE, DomainHost.VIMEO, DomainHost.TWITCH),
         SOCIAL(
             DomainHost.TWITTER, DomainHost.FACEBOOK, DomainHost.INSTAGRAM,
             DomainHost.GOOGLE, DomainHost.DISCORD
         ),
-        PODCAST(DomainHost.APPLE_PODCASTS, DomainHost.SPOTIFY_PODCASTS),
+        PODCAST(
+            DomainHost.APPLE_PODCASTS, DomainHost.SPOTIFY_PODCASTS, DomainHost.SOUNDCLOUD,
+            DomainHost.ANCHOR_FM
+        ),
         OTHER,
         ;
 

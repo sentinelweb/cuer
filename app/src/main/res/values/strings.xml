@@ -193,5 +193,7 @@
     <string name="dialog_play_youtube">Launch youtube</string>
     <string name="menu_sort_alpha">Alphabetical</string>
     <string name="menu_sort_category">Categories</string>
+    <string name="support_no_links">No links in the description</string>
+    <string name="support_links_loading">Loading …</string>
 
 </resources>

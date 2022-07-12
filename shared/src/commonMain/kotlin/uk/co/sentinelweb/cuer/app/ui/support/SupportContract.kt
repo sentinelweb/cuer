@@ -35,6 +35,7 @@ interface SupportContract {
                 val link: String,
                 val index: Int,
                 val category: LinkDomain.Category,
+                val domain: LinkDomain,
             )
         }
 
