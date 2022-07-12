@@ -24,7 +24,7 @@ class SupportMviView constructor(
     }
 
     // todo get list of links from description
-    var observableModel: Model by mutableStateOf(Model(listOf()))
+    var observableModel: Model by mutableStateOf(Model(mapOf()))
         private set
 
     private val _labelData: MutableLiveData<Label> = MutableLiveData()

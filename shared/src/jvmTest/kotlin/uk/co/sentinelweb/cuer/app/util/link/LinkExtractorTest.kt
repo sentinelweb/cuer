@@ -30,6 +30,12 @@ class LinkExtractorTest {
         actual.forEach { println(it) }
     }
 
+    @Test
+    fun extractLinks_coinbureau() {
+        val actual = sut.extractLinks(COINBUREAU_DESC)
+        actual.forEach { println(it) }
+    }
+
     companion object {
         const val THEN_AND_NOW_DESC = """
             Earth, we have a problem.
@@ -204,6 +210,7 @@ Anyway, outside of those caveats, I do try to keep it light and humorous whereve
 
 Oh..and me... Dave Borlace. Born 1969. BSc in Technology from the Open University in the UK. After a 30 year career in People and Project Management,  I now work full time on the channel thanks to the amazing folks who support me on Patreon http://www.patreon.com/justhaveathink
         """
+
         const val CRYPTO1_DESC = """
             Hello, I am NCashOfficial delivering you the hard truth with technical analysis without any fake hopium. I make strong and unwanted calls that are highly probable. Don’t get caught in the bear traps, stay strong and HODL on through the moonboy/girl hopium.
 
@@ -258,5 +265,52 @@ Keep producing and preserving the art you love!
 //        """
 //        const val _DESC = """
 //        """
+
+    private val COINBUREAU_DESC = """🛒 Best Deals in Crypto 👉 https://guy.coinbureau.com/deals/
+📲 Insider Info in my Socials 👉 https://guy.coinbureau.com/socials/
+👕 My Merch Store 👉 https://store.coinbureau.com
+🔥 TOP Crypto TIPS In My Newsletter 👉 https://guy.coinbureau.com/signup/
+
+~~~~~~
+
+📺 Useful Vids 📺 
+
+Sanctions 👉 https://www.youtube.com/watch?v=hOjbqMdqZRU
+Supply Chains 👉 https://www.youtube.com/watch?v=-5RPwo0dlek
+
+~~~~~~
+
+⛓️ 🔗 Useful Links 🔗 ⛓️
+
+Europe's Nuclear Problem: https://www.bloomberg.com/news/features/2022-01-31/europe-s-nuclear-power-plants-are-disappearing-just-as-energy-crisis-hits-hard#xj4y7vzkg 
+Green Energy Issues: https://www.reuters.com/markets/commodities/weak-winds-worsened-europes-power-crunch-utilities-need-better-storage-2021-12-22/
+Lehman Like Moment: https://www.businessinsider.com/germany-says-energy-crisis-may-trigger-lehman-like-contagion-2022-6
+Russian Gas: https://www.ft.com/content/c0398409-56f7-4924-a4cb-dfb0860c447d
+Underinvestment: https://fortune.com/2022/06/27/exxonmobil-ceo-blames-europes-energy-crisis-on-underinvestment-in-the-oil-and-gas-industry/
+Closing Plants: https://www.washingtonpost.com/opinions/2022/01/01/germany-is-closing-its-last-nuclear-plants-what-disaster/
+Europe's Energy Conundrum: https://fortune.com/2022/06/27/exxonmobil-ceo-blames-europes-energy-crisis-on-underinvestment-in-the-oil-and-gas-industry/
+Reclassify: https://www.ft.com/content/0df04289-1014-406e-81c7-1e4a6b1ea5bc
+Using Coal: https://www.washingtonpost.com/world/2022/06/22/coal-plant-europe-germany-austria-netherlands-russia-gas/
+
+~~~~~~
+
+- TIMESTAMPS -
+0:00 Intro
+1:28 Background
+4:16 Misconceptions
+6:40 Issues With “Green” Energy
+10:23 Gas Dependence
+13:08 Sanctions & Energy
+16:46 Panic Sets in
+18:53 Conclusion
+ 
+~~~~~~~
+
+📜 Disclaimer 📜
+
+The information contained herein is for informational purposes only. Nothing herein shall be construed to be financial legal or tax advice. The content of this video is solely the opinions of the speaker who is not a licensed financial advisor or registered investment advisor. Trading cryptocurrencies poses considerable risk of loss. The speaker does not guarantee any particular outcome.
+
+#Energy #Europe #Gas #Crisis #economics
+    """.trimIndent()
     }
 }

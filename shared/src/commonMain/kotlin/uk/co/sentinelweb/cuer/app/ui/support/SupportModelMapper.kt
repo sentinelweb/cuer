@@ -1,16 +1,20 @@
 package uk.co.sentinelweb.cuer.app.ui.support
 
+import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.View.Model
+
 
 class SupportModelMapper {
-    fun map(state: SupportContract.MviStore.State): SupportContract.View.Model =
+    fun map(state: SupportContract.MviStore.State): Model =
         state.run {
-            SupportContract.View.Model(
-                links = listOf(
-                    SupportContract.View.Model.Link(
-                        title = "title",
-                        link = "link"
+            Model(
+                links = links.mapIndexed { i, link ->
+                    Model.Link(
+                        title = link.run { address },
+                        link = link.address,
+                        index = i,
+                        category = link.category
                     )
-                )
+                }.groupBy { it.category }
             )
         }
 }

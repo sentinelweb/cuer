@@ -22,7 +22,7 @@ class LinkExtractor {
     fun mapUrlToLinkDomain(it: MatchResult): LinkDomain.UrlLinkDomain {
         val domain = LinkDomain.domain(it.value)
         val domainHost = LinkDomain.DomainHost.values()
-            .find { domainHost -> domainHost.domains.find { domain.contains(it) } != null }
+            .find { domainHost -> domainHost.domains.find { domain.endsWith(it) } != null }
             ?: LinkDomain.DomainHost.UNKNOWN
         val category =
             LinkDomain.Category.categoryLookup[domainHost]

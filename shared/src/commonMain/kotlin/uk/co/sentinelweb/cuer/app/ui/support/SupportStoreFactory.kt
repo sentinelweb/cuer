@@ -42,7 +42,10 @@ class SupportStoreFactory constructor(
             when (intent) {
                 is Intent.Open -> publish(Label.Open(intent.url))
                 is Intent.Load -> intent.media.description
-                    ?.let { dispatch(Result.Load(linkExtractor.extractLinks(it))) }
+                    ?.also { log.d("intent.media.description: ${intent.media.description}") }
+                    ?.let{linkExtractor.extractLinks(it)}
+                    ?.also { log.d("extracted: \n${it}") }
+                    ?.let { dispatch(Result.Load(it)) }
                     ?: dispatch(Result.Load(listOf()))
             }
     }

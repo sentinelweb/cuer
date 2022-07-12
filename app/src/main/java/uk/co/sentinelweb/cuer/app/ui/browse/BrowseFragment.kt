@@ -73,7 +73,6 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         controller.onViewCreated(listOf(browseMviView), lifecycle.asMviLifecycle())
-
     }
 
     override fun onCreateView(

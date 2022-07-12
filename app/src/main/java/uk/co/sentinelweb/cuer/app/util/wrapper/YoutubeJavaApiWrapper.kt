@@ -29,15 +29,17 @@ class YoutubeJavaApiWrapper(
     fun launchChannel(media: MediaDomain) =
         canLaunchChannel()
             .takeIf { it }
-            .also {
+            ?.let {
                 activity.startActivity(createChannelIntent(activity, media.channelData.platformId))
+                true
             } ?: false
 
     fun launchChannel(id: String) =
         canLaunchChannel()
             .takeIf { it }
-            .also {
+            ?.let {
                 activity.startActivity(createChannelIntent(activity, id))
+                true
             } ?: false
 
     fun launchPlaylist(id: String) =

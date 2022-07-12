@@ -9,12 +9,15 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.Label.Open
@@ -24,6 +27,8 @@ import uk.co.sentinelweb.cuer.app.ui.support.SupportStoreFactory
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.UrlLauncherWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -37,9 +42,15 @@ class SupportDialogFragment(
     private val mviView: SupportMviView by inject()
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
+    private val urlLauncher: UrlLauncherWrapper by inject()
+    private val ytLauncher: YoutubeJavaApiWrapper by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
+
+    init {
+        log.tag(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +73,10 @@ class SupportDialogFragment(
             SupportComposables.SupportUi(mviView)
         }
         observeLabels()
-        mviView.dispatch(SupportContract.View.Event.Load(media))
+        coroutines.mainScope.launch {
+            delay(300)
+            mviView.dispatch(SupportContract.View.Event.Load(media))
+        }
     }
 
     private fun observeLabels() {
@@ -71,7 +85,8 @@ class SupportDialogFragment(
             object : Observer<SupportContract.MviStore.Label> {
                 override fun onChanged(label: SupportContract.MviStore.Label) {
                     when (label) {
-                        is Open -> log.d("open: ${label.url}")
+                        // todo need to be loads smarter
+                        is Open -> urlLauncher.launchUrl(label.url)
                     }
                 }
             })
@@ -111,6 +126,8 @@ class SupportDialogFragment(
                 scoped<SupportContract.Strings> { SupportStrings(get()) }
                 scoped { SupportModelMapper() }
                 scoped { SupportMviView(get(), get()) }
+                scoped { UrlLauncherWrapper(this.getFragmentActivity()) }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
                 scoped { navigationMapper(true, this.getFragmentActivity()) }
             }
         }

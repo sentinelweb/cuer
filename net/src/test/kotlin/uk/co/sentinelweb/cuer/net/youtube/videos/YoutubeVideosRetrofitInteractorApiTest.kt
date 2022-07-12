@@ -83,6 +83,7 @@ class YoutubeVideosRetrofitInteractorApiTest {
                 "8nhPVOM97Jg",
                 "fY7M3pzXdUo",//live broadcast
                 "9umtumSsm7U",
+                "Mz5fgoUrJf4",
             ),
             listOf(ID, SNIPPET, CONTENT_DETAILS, PLAYER)
         )
@@ -92,7 +93,7 @@ class YoutubeVideosRetrofitInteractorApiTest {
         assertEquals("8nhPVOM97Jg", actual.data!![0].platformId)
         assertEquals("fY7M3pzXdUo", actual.data!![1].platformId)
         assertFalse(actual.data!![1].isLiveBroadcast)
-        println(actual.data!![2])
+        println(actual.data!![3])
     }
 
     @Ignore("Real api test .. run manually only")
