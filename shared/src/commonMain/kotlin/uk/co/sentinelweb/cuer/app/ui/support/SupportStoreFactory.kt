@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl
 
 class SupportStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory,
@@ -40,12 +41,17 @@ class SupportStoreFactory constructor(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-                is Intent.Open -> publish(Label.Open(intent.url))
+                is Intent.Open -> when (intent.link) {
+                    is LinkDomain.UrlLinkDomain -> publish(Label.Open(intent.link))
+                    is LinkDomain.CryptoLinkDomain -> publish(Label.Crypto(intent.link))
+                }
                 is Intent.Load -> intent.media.description
                     ?.let { linkExtractor.extractLinks(it).toMutableList() }
                     ?.let { list ->
-                        intent.media.channelData.customUrl
-                            ?.let { list.add(linkExtractor.mapUrlToLinkDomain(it)); list }
+//                        intent.media.channelData.customUrl
+//                            ?.let { list.add(linkExtractor.mapUrlToLinkDomain(it)); list }
+                        intent.media.channelData
+                            .let { list.add(linkExtractor.mapUrlToLinkDomain(YoutubeUrl.channelPlatformIdUrl(it))); list }
                     }
                     ?.let { list -> list.distinctBy { it.address } }
                     ?.let { dispatch(Result.Load(it)) }

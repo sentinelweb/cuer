@@ -116,10 +116,7 @@ object Modules {
 
     private val utilModule = module {
         factory<LinkScanner> {
-            AndroidLinkScanner(
-                log = get(),
-                mappers = urlMediaMappers
-            )
+            AndroidLinkScanner(log = get(), mappers = urlMediaMappers)
         }
         single { CuerAppState() }
 

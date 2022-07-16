@@ -7,11 +7,18 @@ import androidx.annotation.VisibleForTesting
 import com.google.android.youtube.player.YouTubeApiServiceUtil.isYouTubeApiServiceAvailable
 import com.google.android.youtube.player.YouTubeInitializationResult.SUCCESS
 import com.google.android.youtube.player.YouTubeIntents.*
+import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
+import uk.co.sentinelweb.cuer.app.util.share.scan.NO_PLATFORM_ID
+import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.channelUrl
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.videoUrl
 
 class YoutubeJavaApiWrapper(
     private val activity: Activity,
+    private val linkScanner: LinkScanner
 ) {
 
     @VisibleForTesting
@@ -27,12 +34,19 @@ class YoutubeJavaApiWrapper(
     internal fun canLaunchPlaylist() = canResolvePlayPlaylistIntent(activity)
 
     fun launchChannel(media: MediaDomain) =
-        canLaunchChannel()
-            .takeIf { it }
-            ?.let {
-                activity.startActivity(createChannelIntent(activity, media.channelData.platformId))
-                true
-            } ?: false
+        media.channelData.platformId
+            ?.let { launchChannel(it) }
+            ?: false
+
+    // todo launch youtube app with customUrl and NoPlatformId
+    fun launchChannel(channel: ChannelDomain) =
+        channel.let {
+            if (it.platformId?.isNotEmpty() ?: false && it.platformId != NO_PLATFORM_ID) {
+                return launchChannel(it.platformId!!)
+            } else if (it.customUrl != null) {
+                return launchChannelSystem(it)
+            } else false
+        }
 
     fun launchChannel(id: String) =
         canLaunchChannel()
@@ -41,6 +55,11 @@ class YoutubeJavaApiWrapper(
                 activity.startActivity(createChannelIntent(activity, id))
                 true
             } ?: false
+
+    fun launchPlaylist(playlist: PlaylistDomain) =
+        playlist.platformId
+            ?.let { launchPlaylist(it) }
+            ?: false
 
     fun launchPlaylist(id: String) =
         canLaunchPlaylist()
@@ -91,4 +110,19 @@ class YoutubeJavaApiWrapper(
             .apply { activity.startActivity(this) }
     }.isSuccess
 
+    fun launchChannelSystem(channel: ChannelDomain): Boolean = runCatching {
+        Intent(Intent.ACTION_VIEW, Uri.parse(channelUrl(channel)))
+            .apply { activity.startActivity(this) }
+    }.isSuccess
+
+    fun launch(address: String): Boolean =
+        linkScanner.scan(address)
+            ?.let {
+                when (it.first) {
+                    MEDIA -> launchVideo(it.second as MediaDomain)
+                    PLAYLIST -> launchPlaylist((it.second as PlaylistDomain))
+                    CHANNEL -> launchChannel((it.second as ChannelDomain))
+                    else -> false
+                }
+            } ?: false
 }

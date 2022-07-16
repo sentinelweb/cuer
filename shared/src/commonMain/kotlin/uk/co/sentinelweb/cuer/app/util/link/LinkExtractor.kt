@@ -12,7 +12,13 @@ class LinkExtractor {
         val crypto = LinkDomain.Crypto.values()
             .map { crypto ->
                 crypto.regex.findAll(text).toList()
-                    .map { LinkDomain.CryptoLinkDomain(it.value, crypto) }
+                    .map { match ->
+                        LinkDomain.CryptoLinkDomain(
+                            match.value,
+                            crypto,
+                            extractRegion = match.range.start to match.range.endInclusive
+                        )
+                    }
             }
             .toList()
             .flatten()

@@ -156,7 +156,7 @@ fun Scope.navigationMapper(
     activity = sourceActivity,
     toastWrapper = ToastWrapper(sourceActivity),
     fragment = if (isFragment) (getSource() as Fragment) else null,
-    ytJavaApi = YoutubeJavaApiWrapper(sourceActivity),
+    ytJavaApi = YoutubeJavaApiWrapper(sourceActivity, get()),
     navController = if (withNavHost && sourceActivity is AppCompatActivity) {
         if (isFragment) {
             try {

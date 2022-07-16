@@ -20,13 +20,12 @@ class SupportController constructor(
 ) {
     private val store = storeFactory.create()
 
-    private val eventToIntent: suspend Event.() -> Intent =
-        {
-            when (this) {
-                is Event.OnLinkClicked -> Intent.Open(url = this.link.link)
-                is Event.Load -> Intent.Load(this.media)
-            }
+    private val eventToIntent: suspend Event.() -> Intent = {
+        when (this) {
+            is Event.OnLinkClicked -> Intent.Open(link = this.link.domain)
+            is Event.Load -> Intent.Load(this.media)
         }
+    }
 
     private var binder: Binder? = null
 

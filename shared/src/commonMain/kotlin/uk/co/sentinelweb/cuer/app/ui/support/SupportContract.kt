@@ -12,11 +12,12 @@ interface SupportContract {
 
         sealed class Intent {
             data class Load(val media: MediaDomain) : MviStore.Intent()
-            data class Open(val url: String) : Intent()
+            data class Open(val link: LinkDomain) : Intent()
         }
 
         sealed class Label {
-            data class Open(val url: String) : Label()
+            data class Open(val link: LinkDomain.UrlLinkDomain) : Label()
+            data class Crypto(val link: LinkDomain.CryptoLinkDomain) : Label()
         }
 
         data class State constructor(

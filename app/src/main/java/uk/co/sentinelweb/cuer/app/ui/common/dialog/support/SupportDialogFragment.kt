@@ -21,18 +21,17 @@ import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract
+import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.Label.Crypto
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.Label.Open
 import uk.co.sentinelweb.cuer.app.ui.support.SupportController
 import uk.co.sentinelweb.cuer.app.ui.support.SupportModelMapper
 import uk.co.sentinelweb.cuer.app.ui.support.SupportStoreFactory
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.UrlLauncherWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.LinkDomain.DomainHost.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseMedia
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -45,6 +44,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
     private val urlLauncher: UrlLauncherWrapper by inject()
+    private val cryptoLauncher: CryptoLauncher by inject()
     private val ytLauncher: YoutubeJavaApiWrapper by inject()
     private val toast: ToastWrapper by inject()
 
@@ -113,8 +113,11 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
             object : Observer<SupportContract.MviStore.Label> {
                 override fun onChanged(label: SupportContract.MviStore.Label) {
                     when (label) {
-                        // todo need to be loads smarter
-                        is Open -> urlLauncher.launchUrl(label.url)
+                        is Open -> when (label.link.domain) {
+                            YOUTUBE -> ytLauncher.launch(label.link.address)
+                            else -> urlLauncher.launchUrl(label.link.address)
+                        }
+                        is Crypto -> cryptoLauncher.launch(label.link)
                     }
                 }
             })
@@ -156,7 +159,8 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                 scoped { SupportModelMapper() }
                 scoped { SupportMviView(get(), get()) }
                 scoped { UrlLauncherWrapper(this.getFragmentActivity()) }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped { CryptoLauncher(this.getFragmentActivity(), get()) }
                 scoped { navigationMapper(true, this.getFragmentActivity()) }
             }
         }

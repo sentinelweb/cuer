@@ -15,7 +15,8 @@ sealed class LinkDomain constructor(
     data class CryptoLinkDomain(
         override val address: String,
         val type: Crypto,
-        override val category: Category = Category.CRYPTO
+        override val category: Category = Category.CRYPTO,
+        val extractRegion: Pair<Int,Int>? = null
     ) : LinkDomain(address)
 
     enum class DomainHost(val domains: List<String>) {

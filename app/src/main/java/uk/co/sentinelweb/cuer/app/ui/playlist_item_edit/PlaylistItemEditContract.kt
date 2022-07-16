@@ -88,7 +88,7 @@ interface PlaylistItemEditContract {
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 scoped { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped {
                     PlayUseCase(
                         queue = get(),

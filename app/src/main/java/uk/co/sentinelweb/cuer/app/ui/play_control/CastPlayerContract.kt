@@ -121,7 +121,7 @@ interface CastPlayerContract {
 
                 // todo play usecase - extract
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 // fixme needed for play dialog - but shouldn't be needed - remove
                 scoped { navigationMapper(false, this.getFragmentActivity(), false) }
                 scoped {
