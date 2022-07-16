@@ -20,7 +20,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportMviView.Companion.INITIAL
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.View.Companion.CATEGORY_ORDER
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.View.Event
@@ -43,16 +42,18 @@ object SupportComposables : KoinComponent {
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState())
                 ) {
-                    if (model === INITIAL) {
+                    if (!model.isInitialised) {
                         Initial()
-                    } else if (model.links.size > 0) {
+                    } else if ((model.links?.size ?: 0) > 0) {
                         CATEGORY_ORDER.forEach { cat ->
-                            model.links[cat]?.let { linkList ->
-                                Category(cat)
-                                linkList.forEach {
-                                    Link(it, view)
+                            model.links
+                                ?.get(cat)
+                                ?.let { linkList ->
+                                    Category(cat)
+                                    linkList.forEach {
+                                        Link(it, view)
+                                    }
                                 }
-                            }
                         }
                     } else {
                         Empty()
@@ -71,6 +72,7 @@ object SupportComposables : KoinComponent {
             Icon(
                 painter = painterResource(iconMapper.map(cat)),
                 contentDescription = null,
+                tint = MaterialTheme.colors.onPrimary,
                 modifier = Modifier
                     .padding(start = 8.dp, top = 16.dp)
                     .size(24.dp)
@@ -80,7 +82,7 @@ object SupportComposables : KoinComponent {
                 style = MaterialTheme.typography.body1,
                 color = MaterialTheme.colors.onPrimary,
                 modifier = Modifier
-                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
                     .fillMaxWidth()
             )
         }
@@ -116,24 +118,24 @@ object SupportComposables : KoinComponent {
 
     @Composable
     private fun Initial() {
-        Text(
+        Text( // todo move to Strings
             text = stringResource(id = R.string.support_links_loading),
             style = MaterialTheme.typography.body1,
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colors.onSurface,
             modifier = Modifier
-                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
+                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
                 .fillMaxWidth()
         )
     }
 
     @Composable
     private fun Empty() {
-        Text(
+        Text( // todo move to Strings
             text = stringResource(id = R.string.support_no_links),
             style = MaterialTheme.typography.body1,
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colors.onSurface,
             modifier = Modifier
-                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
+                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
                 .fillMaxWidth()
         )
     }

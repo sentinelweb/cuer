@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
@@ -17,7 +18,7 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
-import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.Label.Open
@@ -33,10 +34,10 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseMedia
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-class SupportDialogFragment(
-    private val media: MediaDomain
-) : DialogFragment(), AndroidScopeComponent {
+class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource()
     private val controller: SupportController by inject()
@@ -50,6 +51,11 @@ class SupportDialogFragment(
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
 
+    private val media: MediaDomain? by lazy {
+        arguments
+            ?.getString(MEDIA.toString())
+            ?.let{ deserialiseMedia(it)}
+    }
     init {
         log.tag(this)
     }
@@ -69,16 +75,36 @@ class SupportDialogFragment(
         return binding.root
     }
 
+// todo show title
+//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = media
+//        .let {
+//            _binding = FragmentComposeBinding.inflate(layoutInflater)
+//            initView()
+//            AlertDialog.Builder(requireContext())
+//                .setTitle(it?.title?:getString(R.string.menu_support))
+//                .setIcon(R.drawable.ic_support)
+//                .setView(binding.composeView)
+//                .create()
+//
+//        }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
             SupportComposables.SupportUi(mviView)
         }
         observeLabels()
-        coroutines.mainScope.launch {
-            delay(300)
-            mviView.dispatch(SupportContract.View.Event.Load(media))
-        }
+        media
+            ?.also {
+                coroutines.mainScope.launch {
+                    delay(300)
+                    mviView.dispatch(SupportContract.View.Event.Load(it))
+                }
+            }
+            ?:run {
+                toast.show("Can't load media")
+                dismissAllowingStateLoss()
+            }
     }
 
     private fun observeLabels() {
@@ -103,7 +129,8 @@ class SupportDialogFragment(
 
         // todo use navigation?
         fun show(a: FragmentActivity, m: MediaDomain) {
-            SupportDialogFragment(m)
+            SupportDialogFragment()
+                .apply { arguments = bundleOf(MEDIA.toString() to m.serialise()) }
                 .show(a.supportFragmentManager, TAG)
         }
 

@@ -20,7 +20,7 @@ interface SupportContract {
         }
 
         data class State constructor(
-            val links: List<LinkDomain> = listOf()
+            val links: List<LinkDomain>? = null
         )
     }
 
@@ -28,7 +28,8 @@ interface SupportContract {
         suspend fun processLabel(label: MviStore.Label)
 
         data class Model(
-            val links: Map<LinkDomain.Category,List<Link>>
+            val links: Map<LinkDomain.Category,List<Link>>? = null,
+            val isInitialised: Boolean = false
         ) {
             data class Link(
                 val title: String,
@@ -45,7 +46,7 @@ interface SupportContract {
         }
 
         companion object {
-            val CATEGORY_ORDER = listOf(SUPPORT, VIDEO, SOCIAL, PODCAST, OTHER)
+            val CATEGORY_ORDER = listOf(DONATE, CRYPTO, VIDEO, SOCIAL, PODCAST, OTHER)
         }
     }
 

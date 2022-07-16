@@ -15,7 +15,7 @@ sealed class LinkDomain constructor(
     data class CryptoLinkDomain(
         override val address: String,
         val type: Crypto,
-        override val category: Category = Category.SUPPORT
+        override val category: Category = Category.CRYPTO
     ) : LinkDomain(address)
 
     enum class DomainHost(val domains: List<String>) {
@@ -44,7 +44,7 @@ sealed class LinkDomain constructor(
     }
 
     enum class Category(val hosts: List<DomainHost>) {
-        SUPPORT(
+        DONATE(
             DomainHost.PATREON, DomainHost.PAYPAL, DomainHost.AMAZON, DomainHost.KO_FI,
             DomainHost.BUY_ME_A_COFFEE, DomainHost.TEESPRING
         ),
@@ -57,6 +57,7 @@ sealed class LinkDomain constructor(
             DomainHost.APPLE_PODCASTS, DomainHost.SPOTIFY_PODCASTS, DomainHost.SOUNDCLOUD,
             DomainHost.ANCHOR_FM
         ),
+        CRYPTO,
         OTHER,
         ;
 

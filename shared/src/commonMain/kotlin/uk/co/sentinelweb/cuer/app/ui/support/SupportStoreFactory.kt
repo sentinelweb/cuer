@@ -23,7 +23,7 @@ class SupportStoreFactory constructor(
     }
 
     private sealed class Result {
-        class Load(val links: List<LinkDomain>) : Result()
+        class Load(val links: List<LinkDomain>?) : Result()
     }
 
     private sealed class Action
@@ -42,9 +42,12 @@ class SupportStoreFactory constructor(
             when (intent) {
                 is Intent.Open -> publish(Label.Open(intent.url))
                 is Intent.Load -> intent.media.description
-                    ?.also { log.d("intent.media.description: ${intent.media.description}") }
-                    ?.let{linkExtractor.extractLinks(it)}
-                    ?.also { log.d("extracted: \n${it}") }
+                    ?.let { linkExtractor.extractLinks(it).toMutableList() }
+                    ?.let { list ->
+                        intent.media.channelData.customUrl
+                            ?.let { list.add(linkExtractor.mapUrlToLinkDomain(it)); list }
+                    }
+                    ?.let { list -> list.distinctBy { it.address } }
                     ?.let { dispatch(Result.Load(it)) }
                     ?: dispatch(Result.Load(listOf()))
             }

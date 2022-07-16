@@ -26,6 +26,7 @@ interface PlayerContract {
             object FullScreenPlayerOpen : Intent()
             object PortraitPlayerOpen : Intent()
             object PipPlayerOpen : Intent()
+            object Support : Intent()
 
             data class InitFromService(val item: PlaylistItemDomain) : Intent()
             data class PlayItemFromService(val item: PlaylistItemDomain) : Intent()
@@ -49,6 +50,7 @@ interface PlayerContract {
             data class FullScreenPlayerOpen(val item: PlaylistItemDomain) : Label()
             data class PortraitPlayerOpen(val item: PlaylistItemDomain) : Label()
             data class PipPlayerOpen(val item: PlaylistItemDomain) : Label()
+            data class ShowSupport(val item: PlaylistItemDomain) : Label()
         }
 
         enum class Screen { DESCRIPTION, PLAYLIST, PLAYLISTS }
@@ -109,6 +111,7 @@ interface PlayerContract {
             object PortraitClick : Event()
             object PipClick : Event()
             object ChannelClick : Event()
+            object Support : Event()
             //object OnDestroy : Event()
 
             data class SeekBarChanged(val fraction: Float) : Event()

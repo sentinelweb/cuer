@@ -7,7 +7,7 @@ class SupportModelMapper {
     fun map(state: SupportContract.MviStore.State): Model =
         state.run {
             Model(
-                links = links.mapIndexed { i, link ->
+                links = links?.mapIndexed { i, link ->
                     Model.Link(
                         title = link.run { address },
                         link = link.address,
@@ -15,7 +15,8 @@ class SupportModelMapper {
                         category = link.category,
                         domain = link
                     )
-                }.groupBy { it.category }
+                }?.groupBy { it.category },
+                isInitialised = links != null
             )
         }
 }

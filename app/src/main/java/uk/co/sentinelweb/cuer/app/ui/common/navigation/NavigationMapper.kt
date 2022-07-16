@@ -41,7 +41,8 @@ class NavigationMapper constructor(
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
                     //YoutubeFullScreenActivity.start(activity, it)
                     AytLandActivity.start(activity, it)
-                } ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
+                }
+                    ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
             LOCAL_PLAYER -> {
                 log.d("YoutubePortraitActivity.NavigationMapper")
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
@@ -147,14 +148,22 @@ class NavigationMapper constructor(
     }
 }
 
-fun Scope.navigationMapper(isFragment: Boolean, sourceActivity: Activity, withNavHost: Boolean = true) = NavigationMapper(
+fun Scope.navigationMapper(
+    isFragment: Boolean,
+    sourceActivity: Activity,
+    withNavHost: Boolean = true
+) = NavigationMapper(
     activity = sourceActivity,
     toastWrapper = ToastWrapper(sourceActivity),
     fragment = if (isFragment) (getSource() as Fragment) else null,
     ytJavaApi = YoutubeJavaApiWrapper(sourceActivity),
     navController = if (withNavHost && sourceActivity is AppCompatActivity) {
         if (isFragment) {
-            (getSource() as Fragment).findNavController()
+            try {
+                (getSource() as Fragment).findNavController()
+            } catch (e: IllegalStateException) {
+                null
+            }
         } else {
             (sourceActivity
                 .supportFragmentManager

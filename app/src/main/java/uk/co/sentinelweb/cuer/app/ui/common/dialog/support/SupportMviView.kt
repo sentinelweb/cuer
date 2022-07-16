@@ -25,8 +25,7 @@ class SupportMviView constructor(
         log.tag(this)
     }
 
-    // todo get list of links from description
-    var observableModel: Model by mutableStateOf(INITIAL)
+    var observableModel: Model by mutableStateOf(Model())
         private set
 
     private val _labelData: MutableLiveData<Label> = MutableLiveData()
@@ -40,9 +39,5 @@ class SupportMviView constructor(
     override fun render(model: Model) {
         log.d(model.toString())
         observableModel = model
-    }
-
-    companion object {
-        val INITIAL = Model(mapOf(OTHER to listOf()))
     }
 }

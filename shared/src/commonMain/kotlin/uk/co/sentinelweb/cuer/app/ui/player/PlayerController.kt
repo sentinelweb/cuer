@@ -10,8 +10,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.Support
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -32,7 +34,7 @@ class PlayerController constructor(
         lifecycle?.doOnDestroy(store::dispose)
     }
 
-    private val eventToIntent: suspend PlayerContract.View.Event.() -> PlayerContract.MviStore.Intent = {
+    private val eventToIntent: suspend PlayerContract.View.Event.() -> Intent = {
         when (this) {
             is PlayerStateChanged -> PlayState(state)
             is TrackFwdClicked -> TrackFwd
@@ -58,14 +60,15 @@ class PlayerController constructor(
             is OnInitFromService -> InitFromService(item)
             is OnPlayItemFromService -> PlayItemFromService(item)
             is OnSeekToPosition -> SeekToPosition(ms)
+            is Support -> Intent.Support
         }
     }
 
-    private val trackChangeToIntent: suspend PlaylistItemDomain.() -> PlayerContract.MviStore.Intent = {
+    private val trackChangeToIntent: suspend PlaylistItemDomain.() -> Intent = {
         TrackChange(this)
     }
 
-    private val playlistChangeToIntent: suspend PlaylistDomain.() -> PlayerContract.MviStore.Intent = {
+    private val playlistChangeToIntent: suspend PlaylistDomain.() -> Intent = {
         PlaylistChange(this)
     }
 

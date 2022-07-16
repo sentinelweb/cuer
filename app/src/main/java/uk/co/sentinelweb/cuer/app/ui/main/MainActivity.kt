@@ -140,7 +140,6 @@ class MainActivity :
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_actionbar, menu)
-
         return true
     }
 

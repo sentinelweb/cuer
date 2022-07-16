@@ -58,6 +58,7 @@ data class NavigationModel constructor(
         CATEGORY, /* CategoryDomain */
         PASTE, /* Boolean */
         IMAGE_URL, /*String*/
+        MEDIA, /*MediaDomain*/
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)
@@ -66,15 +67,14 @@ data class NavigationModel constructor(
 
         fun getBoolean(b: Bundle?, def: Boolean = false) = b?.getBoolean(name, def) ?: def
         fun getBoolean(i: Intent?) = i?.getBooleanExtra(name, false) ?: false
+
         fun getString(b: Bundle?) = b?.getString(name)
         fun getString(i: Intent?) = i?.getStringExtra(name)
+
         inline fun <reified T : Enum<T>> getEnum(b: Bundle?): T? =
             b?.getString(name)?.let { pref -> enumValues<T>().find { it.name == pref } }
-
         inline fun <reified T : Enum<T>> getEnum(i: Intent?): T? =
             i?.getStringExtra(name)?.let { pref -> enumValues<T>().find { it.name == pref } }
-
-
     }
 
     companion object {

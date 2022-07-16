@@ -35,7 +35,8 @@ class IconMapper {
     @DrawableRes
     fun map(category: LinkDomain.Category): Int =
         when (category) {
-            LinkDomain.Category.SUPPORT -> R.drawable.ic_support
+            LinkDomain.Category.DONATE -> R.drawable.ic_donate
+            LinkDomain.Category.CRYPTO -> R.drawable.ic_coin
             LinkDomain.Category.VIDEO -> R.drawable.ic_video
             LinkDomain.Category.SOCIAL -> R.drawable.ic_social
             LinkDomain.Category.PODCAST -> R.drawable.ic_podcast

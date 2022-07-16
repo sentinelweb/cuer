@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -57,7 +58,7 @@ class PlaylistItemEditViewModel constructor(
         val type: Type,
         val data: Any?,
     ) {
-        enum class Type { REFRESHING, ERROR, UNPIN, SUPPORT }
+        enum class Type { REFRESHING, ERROR, UNPIN }
     }
 
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
@@ -414,6 +415,13 @@ class PlaylistItemEditViewModel constructor(
     }
 
     fun onSupport() {
-        _uiLiveData.value = UiEvent(SUPPORT, state.media)
+        state.media
+            ?.also { media ->
+                _dialogModelLiveData.value = ArgumentDialogModel(
+                    DialogModel.Type.SUPPORT,
+                    R.string.menu_support,
+                    mapOf(NavigationModel.Param.MEDIA.toString() to media)
+                )
+            }
     }
 }

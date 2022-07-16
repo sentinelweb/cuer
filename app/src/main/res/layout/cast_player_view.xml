@@ -118,6 +118,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/cast_player_support"
+                style="@style/CompactPlayer.Button"
+                android:src="@drawable/ic_support"
+                android:padding="12dp"
+                app:tint="@color/primary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="32dp"
+                />
+
             <TextView
                 android:id="@+id/cast_player_position"
                 android:layout_width="wrap_content"

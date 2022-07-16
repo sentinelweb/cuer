@@ -13,9 +13,6 @@ import uk.co.sentinelweb.cuer.domain.serialization.LocalDateTimeSerializer
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 
-//import java.time.Instant
-//import java.time.LocalDateTime
-
 fun ChannelDomain.serialise() = domainJsonSerializer.encodeToString(
     ChannelDomain.serializer(), this
 )

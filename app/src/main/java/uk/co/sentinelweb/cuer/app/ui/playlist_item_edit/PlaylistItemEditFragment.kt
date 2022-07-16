@@ -140,9 +140,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         //ple_play_button.setOnClickListener { viewModel.onPlayVideoLocal() }
         //ple_star_fab.setOnClickListener { viewModel.onStarClick() }
         binding.pliePlayFab.setOnClickListener { viewModel.onPlayVideo() }
-        binding.plieSupportFab.setOnClickListener {
-            viewModel.onSupport()
-        }
+        binding.plieSupportFab.setOnClickListener { viewModel.onSupport() }
         starMenuItem.isVisible = true
         playMenuItem.isVisible = false
         binding.plieDescription.interactions = viewModel
@@ -264,7 +262,6 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                         UNPIN -> snackbarWrapper
                             .make("Unpin playlist?", actionText = "UNPIN", action = { viewModel.onUnPin() })
                             .show()
-                        SUPPORT -> SupportDialogFragment.show(requireActivity(), model.data as MediaDomain)
                     }
                 }
             })
@@ -378,7 +375,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                                 .createMulti(model as SelectDialogModel)
                                 .apply { show() }
                         }
-
+                        DialogModel.Type.SUPPORT -> SupportDialogFragment.show(
+                            requireActivity(),
+                            (model as ArgumentDialogModel).args[MEDIA.toString()] as MediaDomain
+                        )
                         else -> Unit
                     }
                 }

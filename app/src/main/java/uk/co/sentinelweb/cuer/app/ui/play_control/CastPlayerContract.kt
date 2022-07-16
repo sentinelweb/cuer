@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -40,6 +41,7 @@ interface CastPlayerContract {
         fun onSeekBackSelectTimePressed(): Boolean
         fun onSeekSelectTimeFwdPressed(): Boolean
         fun onResume()
+        fun onSupport()
     }
 
     interface View {
@@ -66,6 +68,7 @@ interface CastPlayerContract {
         fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int)
         fun setSeekEnabled(enabled: Boolean)
         fun setState(state: PlayerStateDomain?)
+        fun showSupport(media: MediaDomain)
     }
 
     data class State(
