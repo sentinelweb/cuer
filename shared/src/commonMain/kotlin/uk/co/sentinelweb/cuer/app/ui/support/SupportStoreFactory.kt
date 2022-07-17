@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl
 
 class SupportStoreFactory constructor(
@@ -24,7 +25,7 @@ class SupportStoreFactory constructor(
     }
 
     private sealed class Result {
-        class Load(val links: List<LinkDomain>?) : Result()
+        class Load(val media: MediaDomain, val links: List<LinkDomain>?) : Result()
     }
 
     private sealed class Action
@@ -32,7 +33,7 @@ class SupportStoreFactory constructor(
     private inner class ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
             when (result) {
-                is Result.Load -> copy(links = result.links)
+                is Result.Load -> copy(media = result.media, links = result.links)
             }
     }
 
@@ -51,11 +52,19 @@ class SupportStoreFactory constructor(
 //                        intent.media.channelData.customUrl
 //                            ?.let { list.add(linkExtractor.mapUrlToLinkDomain(it)); list }
                         intent.media.channelData
-                            .let { list.add(linkExtractor.mapUrlToLinkDomain(YoutubeUrl.channelPlatformIdUrl(it))); list }
+                            .let {
+                                list.add(
+                                    linkExtractor.mapUrlToLinkDomain(
+                                        YoutubeUrl.channelPlatformIdUrl(
+                                            it
+                                        )
+                                    )
+                                ); list
+                            }
                     }
                     ?.let { list -> list.distinctBy { it.address } }
-                    ?.let { dispatch(Result.Load(it)) }
-                    ?: dispatch(Result.Load(listOf()))
+                    ?.let { dispatch(Result.Load(intent.media, it)) }
+                    ?: dispatch(Result.Load(intent.media, listOf()))
             }
     }
 

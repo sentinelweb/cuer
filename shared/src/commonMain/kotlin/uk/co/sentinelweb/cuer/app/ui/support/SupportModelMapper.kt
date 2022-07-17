@@ -7,6 +7,7 @@ class SupportModelMapper {
     fun map(state: SupportContract.MviStore.State): Model =
         state.run {
             Model(
+                title = media?.channelData?.title,
                 links = links?.mapIndexed { i, link ->
                     Model.Link(
                         title = link.run { address },

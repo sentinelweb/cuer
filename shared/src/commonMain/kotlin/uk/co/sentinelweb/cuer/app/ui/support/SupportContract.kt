@@ -7,8 +7,7 @@ import uk.co.sentinelweb.cuer.domain.LinkDomain.Category.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 interface SupportContract {
-    interface MviStore :
-        Store<MviStore.Intent, MviStore.State, MviStore.Label> {
+    interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
 
         sealed class Intent {
             data class Load(val media: MediaDomain) : MviStore.Intent()
@@ -21,15 +20,18 @@ interface SupportContract {
         }
 
         data class State constructor(
+            val media: MediaDomain? = null,
             val links: List<LinkDomain>? = null
         )
     }
 
     interface View : MviView<View.Model, View.Event> {
+
         suspend fun processLabel(label: MviStore.Label)
 
         data class Model(
-            val links: Map<LinkDomain.Category,List<Link>>? = null,
+            val title:String?=null,
+            val links: Map<LinkDomain.Category, List<Link>>? = null,
             val isInitialised: Boolean = false
         ) {
             data class Link(

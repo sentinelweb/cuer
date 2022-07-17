@@ -40,11 +40,13 @@ object SupportComposables : KoinComponent {
         CuerTheme {
             Surface {
                 Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState())
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
                 ) {
                     if (!model.isInitialised) {
                         Initial()
                     } else if ((model.links?.size ?: 0) > 0) {
+                        model.title?.also { Title(title = it) }
                         CATEGORY_ORDER.forEach { cat ->
                             model.links
                                 ?.get(cat)
@@ -64,10 +66,36 @@ object SupportComposables : KoinComponent {
     }
 
     @Composable
-    private fun Category(cat: LinkDomain.Category) {
+    private fun Title(title: String) {
         Row(
             modifier = Modifier
                 .background(MaterialTheme.colors.primary)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_support),
+                contentDescription = null,
+                tint = MaterialTheme.colors.onPrimary,
+                modifier = Modifier
+                    .padding(start = 8.dp, top = 16.dp)
+                    .size(24.dp)
+                    .alignByBaseline()
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.h5,
+                color = MaterialTheme.colors.onPrimary,
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .fillMaxWidth()
+            )
+        }
+    }
+
+    @Composable
+    private fun Category(cat: LinkDomain.Category) {
+        Row(
+            modifier = Modifier
+                .background(MaterialTheme.colors.primaryVariant)
         ) {
             Icon(
                 painter = painterResource(iconMapper.map(cat)),
