@@ -160,7 +160,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                 scoped { SupportMviView(get(), get()) }
                 scoped { UrlLauncherWrapper(this.getFragmentActivity()) }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
-                scoped { CryptoLauncher(this.getFragmentActivity(), get()) }
+                scoped { CryptoLauncher(this.getFragmentActivity(), get(), get()) }
                 scoped { navigationMapper(true, this.getFragmentActivity()) }
             }
         }
