@@ -10,18 +10,20 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 // todo make another test with robolectric activity spy
 class YoutubeJavaApiWrapperTest {
 
     private var mockActivity: AppCompatActivity = mockk(relaxUnitFun = true)
+    private var mockLinkScanner: LinkScanner = mockk(relaxUnitFun = true)
     private var mockIntent: Intent = mockk(relaxUnitFun = true)
     private var mockUri: Uri = mockk(relaxUnitFun = true)
     private val fixture: JFixture = JFixture()
     private val fixtMedia: MediaDomain = fixture.create(MediaDomain::class.java)
 
-    private var sut: YoutubeJavaApiWrapper = spyk(YoutubeJavaApiWrapper(mockActivity))
+    private var sut: YoutubeJavaApiWrapper = spyk(YoutubeJavaApiWrapper(mockActivity, mockLinkScanner))
 
     @Before
     fun setUp() {
