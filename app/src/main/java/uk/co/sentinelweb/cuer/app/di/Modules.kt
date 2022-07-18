@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
@@ -45,6 +46,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.image.BitmapSizer
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
@@ -102,7 +104,8 @@ object Modules {
         DescriptionView.viewModule,
         BrowseFragment.fragmentModule,
         FloatingPlayerContract.serviceModule,
-        SupportDialogFragment.fragmentModule
+        SupportDialogFragment.fragmentModule,
+        AppSelectorBottomSheet.fragmentModule
     )
 
     private val uiModule = module {
@@ -180,6 +183,7 @@ object Modules {
         }
         factory { ServiceWrapper(androidApplication(), get()) }
         factory { EdgeToEdgeWrapper() }
+        factory { AppListBuilder(androidApplication(), get()) }
     }
 
     private val appNetModule = module {

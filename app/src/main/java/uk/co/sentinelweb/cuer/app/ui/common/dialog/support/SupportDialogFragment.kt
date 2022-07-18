@@ -18,6 +18,7 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract
@@ -54,8 +55,9 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     private val media: MediaDomain? by lazy {
         arguments
             ?.getString(MEDIA.toString())
-            ?.let{ deserialiseMedia(it)}
+            ?.let { deserialiseMedia(it) }
     }
+
     init {
         log.tag(this)
     }
@@ -101,7 +103,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                     mviView.dispatch(SupportContract.View.Event.Load(it))
                 }
             }
-            ?:run {
+            ?: run {
                 toast.show("Can't load media")
                 dismissAllowingStateLoss()
             }
@@ -118,6 +120,12 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                             else -> urlLauncher.launchUrl(label.link.address)
                         }
                         is Crypto -> cryptoLauncher.launch(label.link)
+                            .also {
+                                AppSelectorBottomSheet.show(
+                                    requireActivity(),
+                                    cryptoLauncher.cryptoAppWhiteList
+                                )
+                            }
                     }
                 }
             })
@@ -160,7 +168,9 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                 scoped { SupportMviView(get(), get()) }
                 scoped { UrlLauncherWrapper(this.getFragmentActivity()) }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
-                scoped { CryptoLauncher(this.getFragmentActivity(), get(), get()) }
+                scoped<CryptoLauncher> {
+                    AndroidCryptoLauncher(this.getFragmentActivity(), get(), get())
+                }
                 scoped { navigationMapper(true, this.getFragmentActivity()) }
             }
         }

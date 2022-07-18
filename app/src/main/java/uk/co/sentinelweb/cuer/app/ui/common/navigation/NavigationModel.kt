@@ -57,8 +57,9 @@ data class NavigationModel constructor(
         PLAYLIST_PARENT, /* Long */
         CATEGORY, /* CategoryDomain */
         PASTE, /* Boolean */
-        IMAGE_URL, /*String*/
-        MEDIA, /*MediaDomain*/
+        IMAGE_URL, /* String */
+        MEDIA, /* MediaDomain */
+        APP_LIST, /* List<String> */
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)

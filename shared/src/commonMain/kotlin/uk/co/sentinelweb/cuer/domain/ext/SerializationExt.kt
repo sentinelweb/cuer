@@ -117,6 +117,14 @@ fun deserialiseResponse(input: String) = domainJsonSerializer.decodeFromString(
 fun deserialiseCategory(input: String) = domainJsonSerializer.decodeFromString(
     CategoryDomain.serializer(), input
 )
+// AppDetailsDomain
+fun List<AppDetailsDomain>.serialiseAppList() = domainJsonSerializer.encodeToString(
+    ListSerializer(AppDetailsDomain.serializer()), this
+)
+
+fun deserialiseAppList(input: String) = domainJsonSerializer.decodeFromString(
+    AppDetailsDomain.serializer(), input
+)
 
 val domainJsonSerializer = Json {
     prettyPrint = true
@@ -135,6 +143,7 @@ val domainJsonSerializer = Json {
             BackupFileModel::class to BackupFileModel.serializer(),
             ErrorDomain::class to ErrorDomain.serializer(),
             ResponseDomain::class to ResponseDomain.serializer(),
+            AppDetailsDomain::class to AppDetailsDomain.serializer(),
         )
         polymorphic(Domain::class, PlaylistDomain::class, PlaylistDomain.serializer())
         polymorphic(Domain::class, MediaDomain::class, MediaDomain.serializer())

@@ -23,6 +23,7 @@
         <package android:name="com.sofi.mobile" />
         <package android:name="com.binance.dev" />
         <package android:name="net.bitstamp.app" />
+        <package android:name="com.revolut.revolut" />
     </queries>
     <application
         android:name="uk.co.sentinelweb.cuer.app.CuerApp"

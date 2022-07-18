@@ -23,7 +23,9 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.tools.provider.FragmentScenarioProvider
-
+// this test doesnt work now can try
+// https://proandroiddev.com/mocking-androidtest-in-kotlin-51f0a603d500 make debug classes open
+// or try to convert to mockk
 @RunWith(AndroidJUnit4::class)
 class ScanFragmentEspressoTest : FragmentScenarioProvider<ScanFragment> {
 

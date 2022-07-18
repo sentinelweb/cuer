@@ -29,7 +29,7 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment(), AndroidScopeCompo
     private val log: LogWrapper by inject()
 
     private var _binding: FragmentComposeBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException("Not bound")
 
     private var dialogFragment: DialogFragment? = null
 
@@ -37,7 +37,11 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment(), AndroidScopeCompo
         log.tag(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentComposeBinding.inflate(layoutInflater)
         binding.composeView.setContent {
             SearchView(viewModel = viewModel)
