@@ -6,10 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -46,7 +43,7 @@ object SupportComposables : KoinComponent {
                         .verticalScroll(rememberScrollState())
                 ) {
                     if (!model.isInitialised) {
-                        Initial()
+                        Loading()
                     } else if ((model.links?.size ?: 0) > 0) {
                         model.title?.also { Title(title = it) }
                         CATEGORY_ORDER.forEach { cat ->
@@ -148,20 +145,29 @@ object SupportComposables : KoinComponent {
     }
 
     @Composable
-    private fun Initial() {
-        Text( // todo move to Strings
-            text = stringResource(id = R.string.support_links_loading),
-            style = MaterialTheme.typography.body1,
-            color = MaterialTheme.colors.onSurface,
-            modifier = Modifier
-                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
-                .fillMaxWidth()
-        )
+    private fun Loading() {
+        Row(modifier = Modifier.padding(8.dp)) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .padding(end = 24.dp)
+                    .align(CenterVertically)
+                    .width(36.dp)
+                    .height(36.dp)
+            )
+            Text(
+                text = stringResource(id = R.string.support_links_loading),
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.onSurface,
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .fillMaxWidth()
+            )
+        }
     }
 
     @Composable
     private fun Empty() {
-        Text( // todo move to Strings
+        Text(
             text = stringResource(id = R.string.support_no_links),
             style = MaterialTheme.typography.body1,
             color = MaterialTheme.colors.onSurface,

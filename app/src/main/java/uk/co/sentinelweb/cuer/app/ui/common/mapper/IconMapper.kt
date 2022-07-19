@@ -77,10 +77,12 @@ class IconMapper {
             ETHERIUM -> R.drawable.ic_eth
             LITECOIN -> R.drawable.ic_litecoin
             DOGE -> R.drawable.ic_doge
-            XMR -> R.drawable.ic_xmr
-            XRP -> R.drawable.ic_ripple
+            MONERO -> R.drawable.ic_xmr
+            RIPPLE -> R.drawable.ic_ripple
             NEO -> R.drawable.ic_neo
             DASH -> R.drawable.ic_dash
+            BITCOIN_CASH -> R.drawable.ic_bitcoincash
+            ALGO -> R.drawable.ic_algo
             ADA_SHELLEY, ADA_DAEDALUS, ADA_ICARUS -> R.drawable.ic_cardano
         }
 

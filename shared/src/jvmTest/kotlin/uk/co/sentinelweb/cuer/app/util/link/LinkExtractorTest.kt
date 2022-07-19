@@ -3,7 +3,8 @@ package uk.co.sentinelweb.cuer.app.util.link
 import org.junit.Test
 import uk.co.sentinelweb.cuer.domain.LinkDomain
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class LinkExtractorTest {
 
@@ -20,7 +21,7 @@ class LinkExtractorTest {
         val actual = sut.extractLinks(EINZELGANGER_DESC)
         actual.forEach { println(it) }
         actual
-            .find { it is LinkDomain.CryptoLinkDomain && it.type==LinkDomain.Crypto.BITCOIN }
+            .find { it is LinkDomain.CryptoLinkDomain && it.type == LinkDomain.Crypto.BITCOIN }
             ?.apply { assertEquals("✔️ Bitcoin: ", title) }
 
     }
@@ -36,17 +37,39 @@ class LinkExtractorTest {
         val actual = sut.extractLinks(CRYPTO1_DESC)
         actual.forEach { println(it) }
         actual
-            .find { it is LinkDomain.CryptoLinkDomain && it.type==LinkDomain.Crypto.BITCOIN }
+            .find { it is LinkDomain.CryptoLinkDomain && it.type == LinkDomain.Crypto.BITCOIN }
+            ?.apply { assertEquals("3BfsmJP4PvzKTMYDwFT5h33PWMbf6g1XnV", address) }
             ?.apply { assertEquals("\$BTC - ", title) }
         actual
-            .find { it is LinkDomain.CryptoLinkDomain && it.type==LinkDomain.Crypto.XRP }
+            .find { it is LinkDomain.CryptoLinkDomain && it.type == LinkDomain.Crypto.BITCOIN_CASH }
+            ?.apply { assertEquals("qqeugcrwctrp7xgnqlue3py75qr377zgfgnhzarspg", address) }
+            ?.apply { assertEquals("\$BCH - ", title) }
+        actual
+            .find { it is LinkDomain.CryptoLinkDomain && it.type == LinkDomain.Crypto.RIPPLE }
+            ?.apply { assertEquals("rMdG3ju8pgyVh29ELPWaDuA74CpWW6Fxns", address) }
             ?.apply { assertEquals("\$XRP - ", title) }
-//        actual
-//            .find { it is LinkDomain.CryptoLinkDomain && it.type==LinkDomain.Crypto.BITCOIN }
-//            ?.apply { assertEquals("\$BTC - ", title) }
-//        actual
-//            .find { it is LinkDomain.CryptoLinkDomain && it.type==LinkDomain.Crypto.BITCOIN }
-//            ?.apply { assertEquals("\$BTC - ", title) }
+        actual
+            .find { it is LinkDomain.CryptoLinkDomain && it.type == LinkDomain.Crypto.ALGO }
+            ?.apply {
+                assertEquals("XWYE2BM5HC7OPT4ICTAIYEHPQJVX74ZXN2U7BOEUI7VSELQAOY4ACUWGO4", address)
+            }
+            ?.apply { assertEquals("\$ALGO - ", title) }
+        actual
+            .find { it is LinkDomain.CryptoLinkDomain && it.type == LinkDomain.Crypto.ETHERIUM && it.address == "0xd8B899c8A3f537F84E4661Fa9BE758FF19078637" }
+            .apply { assertNotNull(this) }
+            ?.apply { assertEquals("\$ETH - ", title) }
+        actual
+            .find { it is LinkDomain.CryptoLinkDomain && it.type == LinkDomain.Crypto.ETHERIUM && it.address == "0x0bDFf0EF1bA2e4F2eC1299a32350aF4007c18f99" }
+            .apply { assertNotNull(this) }
+            ?.apply { assertEquals("\$LINK - ", title) }
+        actual
+            .find { it is LinkDomain.CryptoLinkDomain && it.type == LinkDomain.Crypto.ETHERIUM && it.address == "0x74C2D3bFe62c0b27C2854C3FdEBD9C0d9e6E2b8E" }
+            .apply { assertNotNull(this) }
+            ?.apply { assertEquals("\$REN - ", title) }
+        actual
+            .find { it is LinkDomain.CryptoLinkDomain && it.type == LinkDomain.Crypto.ETHERIUM && it.address == "0x49a2F63e2786cA59008210c5D97086764bff1343" }
+            .apply { assertNotNull(this) }
+            ?.apply { assertEquals("\$DNT - ", title) }
     }
 
     @Test
@@ -280,7 +303,8 @@ Description Tags (Ignore)
 //        const val _DESC = """
 //        """
 
-    private val COINBUREAU_DESC = """🛒 Best Deals in Crypto 👉 https://guy.coinbureau.com/deals/
+        private val COINBUREAU_DESC =
+            """🛒 Best Deals in Crypto 👉 https://guy.coinbureau.com/deals/
 📲 Insider Info in my Socials 👉 https://guy.coinbureau.com/socials/
 👕 My Merch Store 👉 https://store.coinbureau.com
 🔥 TOP Crypto TIPS In My Newsletter 👉 https://guy.coinbureau.com/signup/
