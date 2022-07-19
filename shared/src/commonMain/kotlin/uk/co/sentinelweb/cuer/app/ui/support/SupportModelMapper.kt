@@ -10,7 +10,11 @@ class SupportModelMapper {
                 title = media?.channelData?.title,
                 links = links?.mapIndexed { i, link ->
                     Model.Link(
-                        title = link.run { address },
+                        title = link.run {
+                            if (!title.isNullOrEmpty()) {
+                                "$title\n $address"
+                            } else address
+                        },
                         link = link.address,
                         index = i,
                         category = link.category,

@@ -11,6 +11,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -78,7 +80,7 @@ object SupportComposables : KoinComponent {
                 modifier = Modifier
                     .padding(start = 8.dp, top = 16.dp)
                     .size(24.dp)
-                    .alignByBaseline()
+                    .align(CenterVertically)
             )
             Text(
                 text = title,
@@ -139,7 +141,8 @@ object SupportComposables : KoinComponent {
             Text(
                 text = it.title,
                 style = MaterialTheme.typography.body1,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
             )
         }
     }

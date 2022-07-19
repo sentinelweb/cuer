@@ -2,18 +2,20 @@ package uk.co.sentinelweb.cuer.domain
 
 sealed class LinkDomain constructor(
     open val address: String,
+    open val title: String? = null,
     open val category: Category = Category.OTHER
 ) {
 
     data class UrlLinkDomain(
         override val address: String,
-        val title: String? = null,
+        override val title: String? = null,
         val domain: DomainHost = DomainHost.UNKNOWN,
         override val category: Category = Category.OTHER
-    ) : LinkDomain(address)
+    ) : LinkDomain(address, title)
 
     data class CryptoLinkDomain(
         override val address: String,
+        override val title: String? = null,
         val type: Crypto,
         override val category: Category = Category.CRYPTO,
         val extractRegion: Pair<Int,Int>? = null

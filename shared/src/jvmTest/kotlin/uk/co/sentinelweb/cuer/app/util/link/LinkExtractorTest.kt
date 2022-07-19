@@ -1,6 +1,9 @@
 package uk.co.sentinelweb.cuer.app.util.link
 
 import org.junit.Test
+import uk.co.sentinelweb.cuer.domain.LinkDomain
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class LinkExtractorTest {
 
@@ -16,6 +19,10 @@ class LinkExtractorTest {
     fun extractLinks_einzelganger() {
         val actual = sut.extractLinks(EINZELGANGER_DESC)
         actual.forEach { println(it) }
+        actual
+            .find { it is LinkDomain.CryptoLinkDomain && it.type==LinkDomain.Crypto.BITCOIN }
+            ?.apply { assertEquals("✔️ Bitcoin: ", title) }
+
     }
 
     @Test
@@ -28,6 +35,18 @@ class LinkExtractorTest {
     fun extractLinks_crypto() {
         val actual = sut.extractLinks(CRYPTO1_DESC)
         actual.forEach { println(it) }
+        actual
+            .find { it is LinkDomain.CryptoLinkDomain && it.type==LinkDomain.Crypto.BITCOIN }
+            ?.apply { assertEquals("\$BTC - ", title) }
+        actual
+            .find { it is LinkDomain.CryptoLinkDomain && it.type==LinkDomain.Crypto.XRP }
+            ?.apply { assertEquals("\$XRP - ", title) }
+//        actual
+//            .find { it is LinkDomain.CryptoLinkDomain && it.type==LinkDomain.Crypto.BITCOIN }
+//            ?.apply { assertEquals("\$BTC - ", title) }
+//        actual
+//            .find { it is LinkDomain.CryptoLinkDomain && it.type==LinkDomain.Crypto.BITCOIN }
+//            ?.apply { assertEquals("\$BTC - ", title) }
     }
 
     @Test
@@ -252,12 +271,7 @@ ${'$'}XLM - GDQP2KPQGKIHYJGXNUIYOMHARUARCA7DJT5FO2FFOOKY3B2WSQHG4W37 TAG: 225847
 DISCLAIMER: I am not a financial adviser, & all information given in my videos or on my social media platforms is for entertainment purposes only and is not financial advice. Investing/trading is a risk that is your own responsibility. You can easily lose your money in this market. None of my information should be used to make any investment decisions. Thank you all for the continued support, I appreciate you all.
 
 Description Tags (Ignore) 
-#hbar #hedera #crypto, published=2022-03-15T20:21:33, channelData=ChannelDomain(id=null, platformId=UCRxJO2INa3EWX19IfoWqS5Q, platform=YOUTUBE, country=null, title=Sound Engraver, customUrl=https://youtube.com/channel/soundengraver, description=Experimental electronic music in SuperCollider and Logic Pro every week!
-Weekly commentary on music, composing, and (occasionally) writing!
-
-If you would like to support my work, you can donate here: paypal.me/soundengraver
-
-Keep producing and preserving the art you love!
+#hbar #hedera #crypto
         """
 //        const val _DESC = """
 //        """
