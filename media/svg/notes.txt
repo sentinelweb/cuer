@@ -1,0 +1,4 @@
+sites:
+https://www.svgrepo.com
+https://materialdesignicons.com/
+http://cryptoicons.co/

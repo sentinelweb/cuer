@@ -19,6 +19,7 @@ import org.koin.core.context.GlobalContext.get
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -28,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 class CastPlayerFragment() :
@@ -68,6 +70,7 @@ class CastPlayerFragment() :
         binding.castPlayerTrackNext.setOnClickListener { presenter.onTrackFwdPressed() }
         binding.castPlayerPlaylistText.setOnClickListener { presenter.onPlaylistClick() }
         binding.castPlayerImage.setOnClickListener { presenter.onPlaylistItemClick() }
+        binding.castPlayerSupport.setOnClickListener { presenter.onSupport() }
         binding.castPlayerSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -81,6 +84,10 @@ class CastPlayerFragment() :
             }
         })
         presenter.initialise()
+    }
+
+    override fun showSupport(media: MediaDomain) {
+        SupportDialogFragment.show(requireActivity(), media)
     }
 
     override fun onAttach(context: Context) {

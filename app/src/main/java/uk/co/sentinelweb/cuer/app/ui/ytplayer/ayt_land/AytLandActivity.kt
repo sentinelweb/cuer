@@ -16,6 +16,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityAytFullsreenBinding
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -133,6 +134,7 @@ class AytLandActivity : AppCompatActivity(),
         binding.controls.controlsPlayFab.setOnClickListener { mviView.dispatch(PlayPauseClicked()) }
         binding.controls.controlsPortraitFab.setOnClickListener { mviView.dispatch(PortraitClick); }
         binding.controls.controlsPipFab.setOnClickListener { mviView.dispatch(PipClick); }
+        binding.controls.controlsSupportFab.setOnClickListener { mviView.dispatch(Support); }
         binding.controls.controlsSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -231,6 +233,7 @@ class AytLandActivity : AppCompatActivity(),
                     navMapper.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))
                     finish()
                 }
+                is ShowSupport -> SupportDialogFragment.show(this@AytLandActivity, label.item.media)
             }
         }
 

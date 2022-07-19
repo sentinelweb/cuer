@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -410,6 +411,17 @@ class PlaylistItemEditViewModel constructor(
                     parentPlaylistId = restored.parentPlaylistId
                     model = modelMapper.map(state.media!!, state.selectedPlaylists)
                 }
+            }
+    }
+
+    fun onSupport() {
+        state.media
+            ?.also { media ->
+                _dialogModelLiveData.value = ArgumentDialogModel(
+                    DialogModel.Type.SUPPORT,
+                    R.string.menu_support,
+                    mapOf(NavigationModel.Param.MEDIA.toString() to media)
+                )
             }
     }
 }

@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.CategoryDomain.Companion.ROOT_ID
 
 class BrowseModelMapper constructor(
-    private val strings: BrowseContract.BrowseStrings,
+    private val strings: BrowseContract.Strings,
     private val log: LogWrapper,
 ) {
     init {

@@ -45,6 +45,11 @@ class CastPlayerPresenter(
         view.setSkipFwdText(skipControl.skipForwardText)
     }
 
+    override fun onSupport() {
+        state.playlistItem?.media
+            ?.also { view.showSupport(it) }
+    }
+
     override fun onSeekBackSelectTimePressed(): Boolean {
         skipControl.onSelectSkipTime(false)
         return true

@@ -8,7 +8,7 @@ interface DescriptionContract {
     data class DescriptionModel constructor(
         val title: CharSequence?,
         val description: String?,
-        val chips: List<ChipModel> = listOf(ChipModel.PLAYLIST_SELECT_MODEL),
+        val playlistChips: List<ChipModel> = listOf(ChipModel.PLAYLIST_SELECT_MODEL),
         val channelTitle: String?,
         val channelThumbUrl: String?,
         val channelDescription: String?,

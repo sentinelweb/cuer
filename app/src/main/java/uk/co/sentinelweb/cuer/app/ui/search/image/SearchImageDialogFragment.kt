@@ -17,7 +17,8 @@ import uk.co.sentinelweb.cuer.app.util.image.ImageSelectIntentHandler
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class SearchImageDialogFragment(private val config: SearchImageContract.Config) : DialogFragment(), AndroidScopeComponent {
+class SearchImageDialogFragment(private val config: SearchImageContract.Config) : DialogFragment(),
+    AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource()
     private val viewModel: SearchImageViewModel by inject()
@@ -30,9 +31,13 @@ class SearchImageDialogFragment(private val config: SearchImageContract.Config) 
     }
 
     private var _binding: FragmentComposeBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException("Not bound")
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentComposeBinding.inflate(layoutInflater)
         viewModel.setConfig(config)
         binding.composeView.setContent {
@@ -55,7 +60,6 @@ class SearchImageDialogFragment(private val config: SearchImageContract.Config) 
                         ERROR -> toastWrapper.show(model.data as String)
                         CLOSE -> dismiss()
                         GOTO_LIBRARY -> imageSelectIntentHandler.launchImageChooser(this@SearchImageDialogFragment)
-                        else -> Unit
                     }
                 }
             })

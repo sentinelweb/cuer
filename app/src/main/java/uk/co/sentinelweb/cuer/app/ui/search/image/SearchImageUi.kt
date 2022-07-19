@@ -105,7 +105,6 @@ fun SearchImageParametersUi(
                     if (search.loading) {
                         CircularProgressIndicator(
                             modifier = Modifier
-
                                 .padding(end = 48.dp)
                                 .align(Alignment.CenterEnd)
                                 .width(36.dp)

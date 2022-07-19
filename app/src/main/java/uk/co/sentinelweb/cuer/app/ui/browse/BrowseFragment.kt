@@ -73,7 +73,6 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         controller.onViewCreated(listOf(browseMviView), lifecycle.asMviLifecycle())
-
     }
 
     override fun onCreateView(
@@ -156,7 +155,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
             })
     }
 
-    class BrowseStrings(private val res: ResourceWrapper) : BrowseContract.BrowseStrings {
+    class BrowseStrings(private val res: ResourceWrapper) : BrowseContract.Strings {
         override val allCatsTitle: String
             get() = res.getString(R.string.browse_all_cats_title)
         override val recent: String
@@ -190,7 +189,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         recentCategories = get()
                     )
                 }
-                scoped<BrowseContract.BrowseStrings> { BrowseStrings(get()) }
+                scoped<BrowseContract.Strings> { BrowseStrings(get()) }
                 scoped { BrowseRepository(BrowseJsonLoader(get())) }
                 scoped { BrowseModelMapper(get(), get()) }
                 scoped { BrowseMviView(get(), get()) }

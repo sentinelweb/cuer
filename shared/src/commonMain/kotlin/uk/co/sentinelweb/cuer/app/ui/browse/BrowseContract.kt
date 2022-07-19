@@ -76,7 +76,7 @@ class BrowseContract {
         }
     }
 
-    interface BrowseStrings {
+    interface Strings {
         val allCatsTitle: String
         val recent: String
         val errorNoPlaylistConfigured: String
