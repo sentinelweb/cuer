@@ -3,6 +3,8 @@ package uk.co.sentinelweb.cuer.app.ui.common.mapper
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.LinkDomain.Crypto.*
+import uk.co.sentinelweb.cuer.domain.LinkDomain.DomainHost.*
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
@@ -46,38 +48,40 @@ class IconMapper {
     @DrawableRes
     fun map(domainHost: LinkDomain.DomainHost): Int =
         when (domainHost) {
-            LinkDomain.DomainHost.GOOGLE -> R.drawable.ic_google
-            LinkDomain.DomainHost.AMAZON -> R.drawable.ic_amazon
-            LinkDomain.DomainHost.PATREON -> R.drawable.ic_patreon
-            LinkDomain.DomainHost.PAYPAL -> R.drawable.ic_paypal
-            LinkDomain.DomainHost.APPLE_PODCASTS -> R.drawable.ic_apple
-            LinkDomain.DomainHost.SPOTIFY_PODCASTS -> R.drawable.ic_spotify
-            LinkDomain.DomainHost.BUY_ME_A_COFFEE -> R.drawable.ic_buymeacoffee
-            LinkDomain.DomainHost.KO_FI -> R.drawable.ic_ko_fi
-            LinkDomain.DomainHost.FACEBOOK -> R.drawable.ic_facebook
-            LinkDomain.DomainHost.INSTAGRAM -> R.drawable.ic_instagram
-            LinkDomain.DomainHost.TWITTER -> R.drawable.ic_platform_twitter_24_black
-            LinkDomain.DomainHost.DISCORD -> R.drawable.ic_discord
-            LinkDomain.DomainHost.YOUTUBE -> R.drawable.ic_youtube
-            LinkDomain.DomainHost.VIMEO -> R.drawable.ic_vimeo
-            LinkDomain.DomainHost.SOUNDCLOUD -> R.drawable.ic_soundcloud
-            LinkDomain.DomainHost.TEESPRING -> R.drawable.ic_teespring
-            LinkDomain.DomainHost.TWITCH -> R.drawable.ic_twitch
-            LinkDomain.DomainHost.WIKIPEDIA -> R.drawable.ic_wikipedia
-            LinkDomain.DomainHost.ANCHOR_FM -> R.drawable.ic_platfrom_web
-            LinkDomain.DomainHost.UNKNOWN -> R.drawable.ic_platfrom_web
+            GOOGLE -> R.drawable.ic_google
+            AMAZON -> R.drawable.ic_amazon
+            PATREON -> R.drawable.ic_patreon
+            PAYPAL -> R.drawable.ic_paypal
+            APPLE_PODCASTS -> R.drawable.ic_apple
+            SPOTIFY_PODCASTS -> R.drawable.ic_spotify
+            BUY_ME_A_COFFEE -> R.drawable.ic_buymeacoffee
+            KO_FI -> R.drawable.ic_ko_fi
+            FACEBOOK -> R.drawable.ic_facebook
+            INSTAGRAM -> R.drawable.ic_instagram
+            TWITTER -> R.drawable.ic_platform_twitter_24_black
+            DISCORD -> R.drawable.ic_discord
+            YOUTUBE -> R.drawable.ic_youtube
+            VIMEO -> R.drawable.ic_vimeo
+            SOUNDCLOUD -> R.drawable.ic_soundcloud
+            TEESPRING -> R.drawable.ic_teespring
+            TWITCH -> R.drawable.ic_twitch
+            WIKIPEDIA -> R.drawable.ic_wikipedia
+            ANCHOR_FM -> R.drawable.ic_platfrom_web
+            UNKNOWN -> R.drawable.ic_platfrom_web
         }
 
     @DrawableRes
     fun map(coin: LinkDomain.Crypto): Int =
         when (coin) {
-            LinkDomain.Crypto.BITCOIN -> R.drawable.ic_bitcoin
-            LinkDomain.Crypto.ETHERIUM -> R.drawable.ic_eth
-            LinkDomain.Crypto.LITECOIN -> R.drawable.ic_litecoin
-            LinkDomain.Crypto.DOGE -> R.drawable.ic_doge
-            LinkDomain.Crypto.XMR -> R.drawable.ic_xmr
-            LinkDomain.Crypto.XRP -> R.drawable.ic_ripple
-            LinkDomain.Crypto.NEO -> R.drawable.ic_neo
+            BITCOIN -> R.drawable.ic_bitcoin
+            ETHERIUM -> R.drawable.ic_eth
+            LITECOIN -> R.drawable.ic_litecoin
+            DOGE -> R.drawable.ic_doge
+            XMR -> R.drawable.ic_xmr
+            XRP -> R.drawable.ic_ripple
+            NEO -> R.drawable.ic_neo
+            DASH -> R.drawable.ic_dash
+            ADA_SHELLEY, ADA_DAEDALUS, ADA_ICARUS -> R.drawable.ic_cardano
         }
 
     @DrawableRes
@@ -85,6 +89,4 @@ class IconMapper {
         is LinkDomain.UrlLinkDomain -> map(link.domain)
         is LinkDomain.CryptoLinkDomain -> map(link.type)
     }
-
-
 }

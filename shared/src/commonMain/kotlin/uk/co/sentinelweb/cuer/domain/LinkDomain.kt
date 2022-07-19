@@ -81,6 +81,12 @@ sealed class LinkDomain constructor(
         XMR("\\b4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}\\b".toRegex()),
         XRP("\\br[0-9a-zA-Z]{33}\\b".toRegex()),
         NEO("\\bA[0-9a-zA-Z]{33}\\b".toRegex()),
+        DASH("\\bX[1-9A-HJ-NP-Za-km-z]{33}\\b".toRegex()),
+        // https://iohk.zendesk.com/hc/en-us/articles/900005403563-Cardano-address-types
+        // https://cardano.stackexchange.com/questions/2370/how-would-i-create-a-regular-expression-to-match-all-of-cardanos-public-wallet
+        ADA_SHELLEY("\\baddr1[a-z0-9]+\\b".toRegex()),
+        ADA_ICARUS("\\bAe2[1-9A-HJ-NP-Za-km-z]+\\b".toRegex()),
+        ADA_DAEDALUS("\\bDdzFF[1-9A-HJ-NP-Za-km-z]+\\b".toRegex()),
     }
 
     companion object {
