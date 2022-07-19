@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.channelUrl
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.videoUrl
 
+@Suppress("TooManyFunctions")
 class YoutubeJavaApiWrapper(
     private val activity: Activity,
     private val linkScanner: LinkScanner

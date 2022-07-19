@@ -77,19 +77,6 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
         return binding.root
     }
 
-// todo show title
-//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = media
-//        .let {
-//            _binding = FragmentComposeBinding.inflate(layoutInflater)
-//            initView()
-//            AlertDialog.Builder(requireContext())
-//                .setTitle(it?.title?:getString(R.string.menu_support))
-//                .setIcon(R.drawable.ic_support)
-//                .setView(binding.composeView)
-//                .create()
-//
-//        }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
@@ -131,12 +118,10 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
             })
     }
 
-    class SupportStrings(private val res: ResourceWrapper) : SupportContract.Strings {
-
-    }
+    class SupportStrings(private val res: ResourceWrapper) : SupportContract.Strings
 
     companion object {
-        val TAG = "SupportDialogFragment"
+        const val TAG = "SupportDialogFragment"
 
         // todo use navigation?
         fun show(a: FragmentActivity, m: MediaDomain) {

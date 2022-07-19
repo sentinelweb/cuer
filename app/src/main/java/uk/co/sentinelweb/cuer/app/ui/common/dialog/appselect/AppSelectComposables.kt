@@ -15,13 +15,13 @@ import com.google.accompanist.imageloading.rememberDrawablePainter
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
 
 object AppSelectComposables {
-
+    const val COLS = 3
     @Composable
     fun AppSelectView(apps: List<AppDetails>, onClick: (AppDetails) -> Unit) {
         CuerTheme {
             Surface {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
+                    columns = GridCells.Fixed(COLS),
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(apps.size) { index ->

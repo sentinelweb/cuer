@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.domain.LinkDomain
 class AndroidCryptoLauncher(
     private val activity: Activity,
     private val toast: ToastWrapper,
-    private val log: LogWrapper,
+    log: LogWrapper,
 ) : CryptoLauncher {
 
     init {
@@ -23,8 +23,7 @@ class AndroidCryptoLauncher(
         val clipData = ClipData.newPlainText(link.type.toString(), link.address)
         clipboardManager.setPrimaryClip(clipData)
         // todo show warning dialog
-        // todo show list of crypto payment apps
-        toast.show("${link.type} address copied")
+        toast.show("${link.type.name} address copied")
     }
 
 

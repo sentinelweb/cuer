@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl
 
 class SupportStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory,
-    private val log: LogWrapper,
+    log: LogWrapper,
     private val prefs: MultiPlatformPreferencesWrapper,
     private val linkExtractor: LinkExtractor,
 ) {
@@ -37,8 +37,7 @@ class SupportStoreFactory constructor(
             }
     }
 
-    private inner class ExecutorImpl() :
-        SuspendExecutor<Intent, Action, State, Result, Label>() {
+    private inner class ExecutorImpl : SuspendExecutor<Intent, Action, State, Result, Label>() {
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
@@ -48,16 +47,12 @@ class SupportStoreFactory constructor(
                 }
                 is Intent.Load -> intent.media.description
                     ?.let { linkExtractor.extractLinks(it).toMutableList() }
-                    ?.let { list ->
-//                        intent.media.channelData.customUrl
-//                            ?.let { list.add(linkExtractor.mapUrlToLinkDomain(it)); list }
+                    ?.let { list -> // add channel url (customUrl doesn't work)
                         intent.media.channelData
                             .let {
                                 list.add(
                                     linkExtractor.mapUrlToLinkDomain(
-                                        YoutubeUrl.channelPlatformIdUrl(
-                                            it
-                                        )
+                                        YoutubeUrl.channelPlatformIdUrl(it)
                                     )
                                 ); list
                             }

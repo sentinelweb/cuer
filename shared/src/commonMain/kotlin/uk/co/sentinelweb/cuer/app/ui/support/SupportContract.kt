@@ -53,7 +53,5 @@ interface SupportContract {
         }
     }
 
-    interface Strings {
-
-    }
+    interface Strings
 }

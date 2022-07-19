@@ -46,6 +46,7 @@ class IconMapper {
         }
 
     @DrawableRes
+    @Suppress("ComplexMethod")
     fun map(domainHost: LinkDomain.DomainHost): Int =
         when (domainHost) {
             GOOGLE -> R.drawable.ic_google

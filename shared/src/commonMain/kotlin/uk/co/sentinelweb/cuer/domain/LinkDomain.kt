@@ -94,8 +94,9 @@ sealed class LinkDomain constructor(
     }
 
     companion object {
+        const val PROTO_SEPARATOR = "://"
         fun domain(url: String): String {
-            val startIndex = url.indexOf("://") + 3
+            val startIndex = url.indexOf(PROTO_SEPARATOR) + PROTO_SEPARATOR.length
             val endIndex = url.indexOf("/", startIndex)
                 .takeIf { it != -1 }
                 ?: url.length

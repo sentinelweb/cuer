@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.wrapper
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.net.Uri
@@ -12,7 +13,7 @@ class UrlLauncherWrapper(private val activity: Activity) {
         val parse = Uri.parse(url)
         activity.startActivity(Intent(ACTION_VIEW, parse))
         true
-    } catch (e: Exception) {
+    } catch (e: ActivityNotFoundException ) {
         false
     }
 }
