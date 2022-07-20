@@ -72,6 +72,7 @@ class CastPlayerMviFragment() :
         binding.castPlayerTrackNext.setOnClickListener { _mviView.dispatch(Event.TrackFwdClicked) }
         binding.castPlayerPlaylistText.setOnClickListener { _mviView.dispatch(Event.PlaylistClicked) }
         binding.castPlayerImage.setOnClickListener { _mviView.dispatch(Event.ItemClicked) }
+        binding.castPlayerSupport.setOnClickListener { _mviView.dispatch(Event.Support) }
         binding.castPlayerSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
 //                if (fromUser) {

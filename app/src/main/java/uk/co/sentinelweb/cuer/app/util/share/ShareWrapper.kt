@@ -3,10 +3,12 @@ package uk.co.sentinelweb.cuer.app.util.share
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
+import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.channelUrl
+import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
+import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.videoShortUrl
 
 class ShareWrapper(
     private val activity: AppCompatActivity
@@ -32,7 +34,7 @@ class ShareWrapper(
     fun share(playlist: PlaylistDomain) {
         Intent().apply {
             action = Intent.ACTION_SEND
-            data = Uri.parse(YoutubeJavaApiWrapper.playlistUrl(playlist))
+            data = Uri.parse(playlistUrl(playlist))
             putExtra(
                 Intent.EXTRA_TEXT,
                 playlistMessage(playlist).trimMargin()
@@ -53,7 +55,7 @@ class ShareWrapper(
                     |${media.title}
                     |${media.url}
                     |
-                    |by "${media.channelData.title}" (${YoutubeJavaApiWrapper.channelUrl(media)})
+                    |by "${media.channelData.title}" (${channelUrl(media)})
                     | 
                     |Sent via Cuer @cuerapp (https://twitter.com/cuerapp) 
                     |
@@ -64,7 +66,7 @@ class ShareWrapper(
         return """${media.title}
                     |${media.url}
                     |
-                    |by "${media.channelData.title}" (${YoutubeJavaApiWrapper.channelUrl(media)})
+                    |by "${media.channelData.title}" (${channelUrl(media)})
                     """
     }
 
@@ -72,7 +74,7 @@ class ShareWrapper(
         val sb = StringBuilder()
         sb.append("Playlist: ").append(playlist.title).append("\n\n")
         if (playlist.type == PLATFORM) {
-            sb.append("URL:").append(YoutubeJavaApiWrapper.playlistUrl(playlist)).append("\n\n")
+            sb.append("URL:").append(playlistUrl(playlist)).append("\n\n")
         }
         playlist.config.description?.apply {
             sb.append(this).append("\n\n")
@@ -85,9 +87,9 @@ class ShareWrapper(
                         sb.append(Character.toChars(0x2B50)).append(" ")
                     }
                     sb.append(title).append("\n")
-                    sb.append(YoutubeJavaApiWrapper.videoShortUrl(this)).append("\n")
+                    sb.append(videoShortUrl(this)).append("\n")
                     sb.append("   by: ").append(channelData.title).append(" - ")
-                        .append(channelData.customUrl ?: YoutubeJavaApiWrapper.channelUrl(channelData))
+                        .append(channelData.customUrl ?: channelUrl(channelData))
                         .append("\n\n")
                 }
             }

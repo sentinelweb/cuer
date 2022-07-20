@@ -73,7 +73,8 @@ private class YoutubeUrlPlaylistMapper : UrlMediaMapper {
         )
 }
 
-// https://youtube.com/c/<userName>.
+// https://youtube.com/c/customUrl
+// https://youtube.com/channel/customUrl also?? - might be more work to do to differentiate from simple channel id
 // todo need to exec https://developers.google.com/youtube/v3/docs/channels/list#forUsername to get platformID
 private class YoutubeUrlChannelUserMapper : UrlMediaMapper {
 
@@ -86,6 +87,7 @@ private class YoutubeUrlChannelUserMapper : UrlMediaMapper {
             id = null,
             platform = YOUTUBE,
             platformId = NO_PLATFORM_ID,
+            // todo make full url to match YoutubeChannelDomainMapper
             customUrl = uri.path?.let { it.substring(it.lastIndexOf('/')) }
         )
 }

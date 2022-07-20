@@ -34,6 +34,7 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_merge">Merge with &#8230;</string>
+    <string name="menu_support">Support</string>
 
     <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>
@@ -55,6 +56,9 @@
     <string name="playlist_dialog_title">Select Playlist</string>
     <string name="pie_add_playlist_dialog_title">Create Playlist</string>
     <string name="pie_empty_title">Sorry &#8230; ❤</string>
+    <string name="pie_watched">Watched</string>
+    <string name="pie_play_start">Always play from start</string>
+    <string name="pie_unpin_playlist">Unpin playlist?</string>
 
     <!-- playlist fragment -->
     <string name="playlist_fab_up_contentdesc">Up</string>
@@ -192,5 +196,7 @@
     <string name="dialog_play_youtube">Launch youtube</string>
     <string name="menu_sort_alpha">Alphabetical</string>
     <string name="menu_sort_category">Categories</string>
+    <string name="support_no_links">No links in the description</string>
+    <string name="support_links_loading">Loading …</string>
 
 </resources>

@@ -25,7 +25,7 @@ class BrowseStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory,
     private val repository: BrowseRepository,
     private val playlistOrchestrator: PlaylistOrchestrator,
-    private val browseStrings: BrowseContract.BrowseStrings,
+    private val browseStrings: BrowseContract.Strings,
     private val log: LogWrapper,
     private val prefs: MultiPlatformPreferencesWrapper,
     private val recentCategories: BrowseRecentCategories,

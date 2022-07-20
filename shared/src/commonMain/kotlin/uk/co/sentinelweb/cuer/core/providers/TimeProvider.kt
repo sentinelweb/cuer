@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.core.providers
 
 import kotlinx.datetime.*
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 
 //import java.time.Instant
 //import java.time.LocalDateTime
@@ -16,9 +15,8 @@ class TimeProvider {
     fun currentTimeMillis() = Clock.System.now().toEpochMilliseconds()
 
     fun timeZomeOffsetSecs() =
-        TimeZone.currentSystemDefault().offsetAt(instant())// todo might be broken
+        TimeZone.currentSystemDefault().offsetAt(instant()) // todo might be broken
 
-    @OptIn(ExperimentalTime::class)
     fun getOffsetTime(millis: Long): LocalDateTime {
         val timeZone = TimeZone.currentSystemDefault()
         val now = localDateTime().toInstant(timeZone)

@@ -220,9 +220,9 @@ interface PlaylistContract {
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { ItemTouchHelperCallback(getSource()) }
                 scoped<SnackbarWrapper> {
-                    AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), get())
+                    AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(),get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 scoped { navigationMapper(true, this.getFragmentActivity()) }
@@ -251,7 +251,6 @@ interface PlaylistContract {
                 }
                 viewModel { State() }
             }
-
         }
     }
 }

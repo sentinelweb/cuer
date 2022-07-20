@@ -89,7 +89,7 @@ class DescriptionView @JvmOverloads constructor(
         } ?: run { binding.pidAuthorImage.setImageDrawable(ytDrawable) }
 
         binding.pidChips.removeAllViews()
-        model.chips.forEach { chipModel ->
+        model.playlistChips.forEach { chipModel ->
             chipCreator.create(chipModel, binding.pidChips).apply {
                 binding.pidChips.addView(this)
                 when (chipModel.type) {

@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -33,7 +34,6 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
-import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 
 class PlaylistItemEditViewModel constructor(
@@ -132,10 +132,22 @@ class PlaylistItemEditViewModel constructor(
                 ) {
                     refreshMedia()
                 } else {
+                    checkToAutoSelectPlaylists()
                     update()
                 }
             } ?: run {
                 _modelLiveData.value = modelMapper.mapEmpty()
+            }
+        }
+    }
+
+    private suspend fun checkToAutoSelectPlaylists() {
+        if (state.selectedPlaylists.isEmpty()) {
+            state.media?.apply {
+                playlistOrchestrator.loadList(
+                    ChannelPlatformIdFilter(channelData.platformId!!),
+                    LOCAL.flatOptions()
+                ).forEach { state.selectedPlaylists.add(it) }
             }
         }
     }
@@ -159,6 +171,7 @@ class PlaylistItemEditViewModel constructor(
                             )
                                 .also { state.media = it }
                                 .also { state.isMediaChanged = true }
+                                .also { checkToAutoSelectPlaylists() }
                                 .also { update() }
                         }
                         ?: also { updateError() }
@@ -410,6 +423,17 @@ class PlaylistItemEditViewModel constructor(
                     parentPlaylistId = restored.parentPlaylistId
                     model = modelMapper.map(state.media!!, state.selectedPlaylists)
                 }
+            }
+    }
+
+    fun onSupport() {
+        state.media
+            ?.also { media ->
+                _dialogModelLiveData.value = ArgumentDialogModel(
+                    DialogModel.Type.SUPPORT,
+                    R.string.menu_support,
+                    mapOf(NavigationModel.Param.MEDIA.toString() to media)
+                )
             }
     }
 }

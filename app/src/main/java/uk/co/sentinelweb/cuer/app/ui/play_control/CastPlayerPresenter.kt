@@ -17,7 +17,6 @@ import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import kotlin.time.ExperimentalTime
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
@@ -44,6 +43,11 @@ class CastPlayerPresenter(
         skipControl.updateSkipTimes()
         view.setSkipBackText(skipControl.skipBackText)
         view.setSkipFwdText(skipControl.skipForwardText)
+    }
+
+    override fun onSupport() {
+        state.playlistItem?.media
+            ?.also { view.showSupport(it) }
     }
 
     override fun onSeekBackSelectTimePressed(): Boolean {
@@ -146,7 +150,6 @@ class CastPlayerPresenter(
         view.setState(playState)
     }
 
-    @ExperimentalTime
     override fun setCurrentSecond(second: Float) {
         state.positionMs = (second * 1000).toLong()
         skipControl.updatePosition(state.positionMs)

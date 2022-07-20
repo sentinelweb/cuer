@@ -321,7 +321,6 @@ fun SearchTextEntryInput(
                 onTextChange = textChange,
                 onImeAction = submit
             )
-
             Spacer(modifier = Modifier.width(8.dp))
         }
     }

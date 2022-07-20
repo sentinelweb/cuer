@@ -62,7 +62,7 @@ class PlayUseCase constructor(
                     queue.switchToPlaylist(toIdentifier)
                     queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)
                 }
-            }, {/*cancel*/ }
+            }, {/*cancel*/}
             ))
         }
     }

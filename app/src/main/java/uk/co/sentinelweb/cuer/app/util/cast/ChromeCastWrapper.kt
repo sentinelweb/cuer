@@ -32,7 +32,7 @@ class ChromeCastWrapper(private val application: Application) {
 
     fun checkPlayServices(activity: Activity, requestCode: Int, okFunc: () -> Unit) {
         PlayServicesUtils.checkGooglePlayServicesAvailability(
-            activity, requestCode, Runnable { okFunc() })
+            activity, requestCode, { okFunc() })
     }
 
     fun getCastContext(): CastContext = CastContext.getSharedInstance(application)
@@ -48,10 +48,10 @@ class ChromeCastWrapper(private val application: Application) {
     fun buildCastMediaInfo(media: MediaDomain): MediaInfo {
         val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE)
 
-        metadata.putString(MediaMetadata.KEY_TITLE, media.title)
+        metadata.putString(MediaMetadata.KEY_TITLE, media.title ?: "No title")
         metadata.putString(
             MediaMetadata.KEY_SUBTITLE,
-            media.description?.substring(0, min(media.description?.length ?: 0, 50))
+            media.description ?: "".substring(0, min(media.description?.length ?: 0, 50))
         )
         metadata.addImage(WebImage(Uri.parse("https://www.stateofdigital.com/wp-content/uploads/2012/01/slap-on-wrist.jpg")))
 

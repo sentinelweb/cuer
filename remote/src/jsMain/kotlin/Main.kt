@@ -7,7 +7,7 @@ import styled.styledDiv
 
 fun main() {
     document.bgColor = "white"
-    render(document.getElementById("root")) {
+    render(document.getElementById("root")!!) {
         styledDiv {
             css {
                 fontFamily = "Roboto"

@@ -223,14 +223,29 @@
         app:srcCompat="@drawable/ic_picture_in_picture"
         tools:ignore="RtlHardcoded" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/controls_support_fab"
+        style="@style/FabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginRight="8dp"
+        android:contentDescription="@string/menu_support"
+        app:fabSize="mini"
+        app:layout_constraintRight_toLeftOf="@id/controls_pip_fab"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_support"
+        tools:ignore="RtlHardcoded" />
+
     <androidx.mediarouter.app.MediaRouteButton
         android:id="@+id/controls_media_route_button"
         android:layout_width="@dimen/player_button_size"
         android:layout_height="@dimen/player_button_size"
         android:layout_marginTop="24dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintRight_toLeftOf="@id/controls_pip_fab"
+        app:layout_constraintRight_toLeftOf="@id/controls_support_fab"
         app:layout_constraintTop_toTopOf="parent"
         app:mediaRouteButtonTint="@color/white"
         tools:ignore="RtlHardcoded" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

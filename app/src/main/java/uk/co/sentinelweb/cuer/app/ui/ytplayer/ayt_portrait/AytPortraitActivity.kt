@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.databinding.ActivityAytPortraitBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -29,7 +30,6 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
@@ -44,7 +44,6 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
@@ -182,6 +181,7 @@ class AytPortraitActivity : AppCompatActivity(),
                     }
                 }
                 is PortraitPlayerOpen -> toast.show("Already in portrait mode - shouldn't get here")
+                is ShowSupport -> SupportDialogFragment.show(this@AytPortraitActivity, label.item.media)
             }
         }
     }

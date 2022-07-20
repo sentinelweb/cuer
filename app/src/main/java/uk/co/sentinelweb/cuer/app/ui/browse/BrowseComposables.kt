@@ -264,7 +264,7 @@ object BrowseComposables {
 
 }
 
-class TestStrings : BrowseContract.BrowseStrings {
+class TestStrings : BrowseContract.Strings {
     override val allCatsTitle = "All cats"
     override val recent = "Recent"
     override val errorNoPlaylistConfigured = "Error no playlist"

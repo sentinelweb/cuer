@@ -127,7 +127,7 @@ interface PlaylistsContract {
                         get()
                     )
                 }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity()) }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }

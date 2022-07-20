@@ -123,7 +123,8 @@ class PlayerStoreFactory(
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.url))
                 is Intent.ChannelOpen ->
                     getState().item?.media?.channelData
-                        ?.let { publish(Label.ChannelOpen(it)) } ?: Unit
+                        ?.let { publish(Label.ChannelOpen(it)) }
+                        ?: Unit
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
                 is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
                 is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
@@ -146,6 +147,9 @@ class PlayerStoreFactory(
                         ?.also { dispatch(Result.Playlist(it)) }
                     Unit
                 }
+                Intent.Support -> getState().item
+                    ?.let { publish(Label.ShowSupport(it)) }
+                    ?: Unit
             }
 
         private suspend fun init() {
