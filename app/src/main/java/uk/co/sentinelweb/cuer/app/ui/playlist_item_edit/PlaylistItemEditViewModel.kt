@@ -34,7 +34,6 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
-import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 
 class PlaylistItemEditViewModel constructor(
@@ -133,10 +132,22 @@ class PlaylistItemEditViewModel constructor(
                 ) {
                     refreshMedia()
                 } else {
+                    checkToAutoSelectPlaylists()
                     update()
                 }
             } ?: run {
                 _modelLiveData.value = modelMapper.mapEmpty()
+            }
+        }
+    }
+
+    private suspend fun checkToAutoSelectPlaylists() {
+        if (state.selectedPlaylists.isEmpty()) {
+            state.media?.apply {
+                playlistOrchestrator.loadList(
+                    ChannelPlatformIdFilter(channelData.platformId!!),
+                    LOCAL.flatOptions()
+                ).forEach { state.selectedPlaylists.add(it) }
             }
         }
     }
@@ -160,6 +171,7 @@ class PlaylistItemEditViewModel constructor(
                             )
                                 .also { state.media = it }
                                 .also { state.isMediaChanged = true }
+                                .also { checkToAutoSelectPlaylists() }
                                 .also { update() }
                         }
                         ?: also { updateError() }
