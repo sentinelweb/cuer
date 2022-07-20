@@ -80,11 +80,12 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?) {
+    fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?, allowPlay: Boolean) {
         item.let {
             state.editingPlaylistItem = it
             state.source = source
             state.parentPlaylistId = parentId ?: -1
+            state.allowPlay = allowPlay
             it.media.let { setData(it) }
         }
     }
@@ -316,7 +317,7 @@ class PlaylistItemEditViewModel constructor(
     }
 
     private fun update() {
-        state.model = modelMapper.map(state.media!!, state.selectedPlaylists)
+        state.model = modelMapper.map(state)
         _modelLiveData.value = state.model
     }
 
@@ -421,7 +422,7 @@ class PlaylistItemEditViewModel constructor(
                     editSettings.playFromStart = restored.editSettings.playFromStart
                     editSettings.watched = restored.editSettings.watched
                     parentPlaylistId = restored.parentPlaylistId
-                    model = modelMapper.map(state.media!!, state.selectedPlaylists)
+                    model = modelMapper.map(state)
                 }
             }
     }
