@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -170,7 +171,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             }
         }
         binding.plieSwipe.setOnRefreshListener { viewModel.refreshMediaBackground() }
-        binding.plieAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+        binding.plieAppbar.addOnOffsetChangedListener(object :
+            AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false
             var scrollRange = -1
@@ -213,10 +215,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             viewModel.setData(this, sourceArg, parentArg)
         }
 
-        observeUi()
-        observeModel()
-        observeNavigation()
-        observeDialog()
+        bindObserver(viewModel.getDialogObservable(), this::observeDialog)
+        bindObserver(viewModel.getNavigationObservable(), this::observeNavigation)
+        bindObserver(viewModel.getModelObservable(), this::observeModel)
+        bindObserver(viewModel.getUiObservable(), this::observeUi)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -245,71 +247,63 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         dialogFragment?.dismissAllowingStateLoss()
     }
 
-    private fun observeUi() {
-        viewModel.getUiObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<PlaylistItemEditViewModel.UiEvent> {
-                override fun onChanged(model: PlaylistItemEditViewModel.UiEvent) {
-                    when (model.type) {
-                        REFRESHING -> {
-                            val refreshing = model.data as Boolean
-                            binding.plieSwipe.isRefreshing = refreshing
-                            if (refreshing) {
-                                commitHost.isReady(false)
-                            }
-                        }
-                        ERROR -> snackbarWrapper.makeError(model.data as String).show()
-                        UNPIN -> snackbarWrapper
-                            .make("Unpin playlist?", actionText = "UNPIN", action = { viewModel.onUnPin() })
-                            .show()
-                    }
-                }
-            })
+    private fun observeUi(model: PlaylistItemEditViewModel.UiEvent) = when (model.type) {
+        REFRESHING -> {
+            val refreshing = model.data as Boolean
+            binding.plieSwipe.isRefreshing = refreshing
+            if (refreshing) {
+                commitHost.isReady(false)
+            }
+            Unit
+        }
+        ERROR -> snackbarWrapper.makeError(model.data as String).show()
+        UNPIN -> snackbarWrapper
+            .make(
+                getString(R.string.pie_unpin_playlist),
+                actionText = "UNPIN",
+                action = { viewModel.onUnPin() })
+            .show()
     }
 
-    private fun observeModel() {
-        viewModel.getModelObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<PlaylistItemEditContract.Model> {
-                override fun onChanged(model: PlaylistItemEditContract.Model) {
-                    binding.plieTitleBg.isVisible = true
-                    binding.plieTitlePos.isVisible = !model.empty
-                    binding.plieDuration.isVisible = !model.empty
-                    binding.plieSupportFab.isVisible = !model.empty
-                    if (menuState.scrolledDown) {
-                        //starMenuItem.isVisible = !model.empty
-                        playMenuItem.isVisible = !model.empty
-                    } else {
-                        //starMenuItem.isVisible = false
-                        playMenuItem.isVisible = false
-                    }
-                    val imageUrl = model.imageUrl
-                    setImage(imageUrl)
 
-                    binding.plieCollapsingToolbar.title = model.description.title
-                    binding.plieToolbar.title = model.description.title
-                    menuState.modelEmpty = model.empty
-                    binding.plieSwipe.isRefreshing = false
-                    commitHost.isReady(!model.empty)
-                    if (model.empty) {
-                        return
-                    }
+    private fun observeModel(model: PlaylistItemEditContract.Model) {
+        binding.plieTitleBg.isVisible = true
+        binding.plieTitlePos.isVisible = !model.empty
+        binding.plieDuration.isVisible = !model.empty
+        binding.plieSupportFab.isVisible = !model.empty
+        if (menuState.scrolledDown) {
+            //starMenuItem.isVisible = !model.empty
+            playMenuItem.isVisible = !model.empty
+        } else {
+            //starMenuItem.isVisible = false
+            playMenuItem.isVisible = false
+        }
+        val imageUrl = model.imageUrl
+        setImage(imageUrl)
 
-                    binding.plieDescription.setModel(model.description)
-                    binding.plieDuration.text = model.durationText
-                    binding.plieDuration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
+        binding.plieCollapsingToolbar.title = model.description.title
+        binding.plieToolbar.title = model.description.title
+        menuState.modelEmpty = model.empty
+        binding.plieSwipe.isRefreshing = false
+        commitHost.isReady(!model.empty)
+        if (model.empty) {
+            return
+        }
 
-                    model.position?.let { ratio ->
-                        binding.plieTitlePos.layoutParams.width =
-                            (ratio * binding.plieTitleBg.width).toInt()
-                    } ?: binding.plieTitlePos.apply { isVisible = false }
-                    val starIconResource =
-                        if (model.starred) R.drawable.ic_starred
-                        else R.drawable.ic_starred_off
-                    starMenuItem.setIcon(starIconResource)
-                }
-            })
+        binding.plieDescription.setModel(model.description)
+        binding.plieDuration.text = model.durationText
+        binding.plieDuration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
+
+        model.position?.let { ratio ->
+            binding.plieTitlePos.layoutParams.width =
+                (ratio * binding.plieTitleBg.width).toInt()
+        } ?: binding.plieTitlePos.apply { isVisible = false }
+        val starIconResource =
+            if (model.starred) R.drawable.ic_starred
+            else R.drawable.ic_starred_off
+        starMenuItem.setIcon(starIconResource)
     }
+
 
     private fun setImage(imageUrl: String?) {
         Glide.with(requireContext())
@@ -318,72 +312,57 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             .into(binding.plieImage)
     }
 
-    private fun observeNavigation() {
-        viewModel.getNavigationObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<NavigationModel> {
-                override fun onChanged(nav: NavigationModel) {
-                    when (nav.target) {
-                        NAV_DONE -> doneNavigation.navigateDone()
-                        else -> navMapper.navigate(nav)
-                    }
-                }
-            }
-        )
+    private fun observeNavigation(nav: NavigationModel) = when (nav.target) {
+        NAV_DONE -> doneNavigation.navigateDone()
+        else -> navMapper.navigate(nav)
     }
 
-    private fun observeDialog() {
-        viewModel.getDialogObservable().observe(this.viewLifecycleOwner,
-            object : Observer<DialogModel> {
-                override fun onChanged(model: DialogModel) {
-                    dialog?.dismiss()
-                    hideDialogFragment()
-                    when (model.type) {
-                        DialogModel.Type.PLAYLIST_FULL -> {
-                            dialogFragment =
-                                PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
-                            dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
-                        }
-                        DialogModel.Type.PLAYLIST_ADD -> {
-                            // todo need a callback to select the parent in the add dialog i.e. another type DialogModel.Type.PLAYLIST_SELECT_PARENT ??
-                            // todo also to select the image
-                            dialogFragment = PlaylistEditFragment.newInstance()
-                                .apply {
-                                    listener = object : PlaylistEditFragment.Listener {
-                                        override fun onPlaylistCommit(domain: PlaylistDomain?) {
-                                            domain?.apply { viewModel.onPlaylistCreated(this) }
-                                            dialogFragment?.dismissAllowingStateLoss()
-                                            hideDialogFragment()
-                                        }
-                                    }
-                                }
-                            dialogFragment?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
-                        }
-                        DialogModel.Type.SELECT_ROUTE -> {
-                            castDialogWrapper.showRouteSelector(childFragmentManager)
-                        }
-                        DialogModel.Type.CONFIRM -> {
-                            alertDialogCreator.create(model as AlertDialogModel).show()
-                        }
-                        DialogModel.Type.PLAYLIST -> {
-                            selectDialogCreator
-                                .createMulti(model as SelectDialogModel)
-                                .apply { show() }
-                        }
-                        DialogModel.Type.PLAYLIST_ITEM_SETTNGS -> {
-                            selectDialogCreator
-                                .createMulti(model as SelectDialogModel)
-                                .apply { show() }
-                        }
-                        DialogModel.Type.SUPPORT -> SupportDialogFragment.show(
-                            requireActivity(),
-                            (model as ArgumentDialogModel).args[MEDIA.toString()] as MediaDomain
-                        )
-                        else -> Unit
-                    }
-                }
+    private fun observeDialog(model: DialogModel) {
+        dialog?.dismiss()
+        hideDialogFragment()
+        when (model.type) {
+            DialogModel.Type.PLAYLIST_FULL -> {
+                dialogFragment =
+                    PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+                dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
             }
-        )
+            DialogModel.Type.PLAYLIST_ADD -> {
+                // todo need a callback to select the parent in the add dialog i.e. another type DialogModel.Type.PLAYLIST_SELECT_PARENT ??
+                // todo also to select the image
+                dialogFragment = PlaylistEditFragment.newInstance()
+                    .apply {
+                        listener = object : PlaylistEditFragment.Listener {
+                            override fun onPlaylistCommit(domain: PlaylistDomain?) {
+                                domain?.apply { viewModel.onPlaylistCreated(this) }
+                                dialogFragment?.dismissAllowingStateLoss()
+                                hideDialogFragment()
+                            }
+                        }
+                    }
+                dialogFragment?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
+            }
+            DialogModel.Type.SELECT_ROUTE -> {
+                castDialogWrapper.showRouteSelector(childFragmentManager)
+            }
+            DialogModel.Type.CONFIRM -> {
+                alertDialogCreator.create(model as AlertDialogModel).show()
+            }
+            DialogModel.Type.PLAYLIST -> {
+                selectDialogCreator
+                    .createMulti(model as SelectDialogModel)
+                    .apply { show() }
+            }
+            DialogModel.Type.PLAYLIST_ITEM_SETTNGS -> {
+                selectDialogCreator
+                    .createMulti(model as SelectDialogModel)
+                    .apply { show() }
+            }
+            DialogModel.Type.SUPPORT -> SupportDialogFragment.show(
+                requireActivity(),
+                (model as ArgumentDialogModel).args[MEDIA.toString()] as MediaDomain
+            )
+            else -> Unit
+        }
     }
 
     private fun hideDialogFragment() {

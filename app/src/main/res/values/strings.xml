@@ -56,6 +56,9 @@
     <string name="playlist_dialog_title">Select Playlist</string>
     <string name="pie_add_playlist_dialog_title">Create Playlist</string>
     <string name="pie_empty_title">Sorry &#8230; ❤</string>
+    <string name="pie_watched">Watched</string>
+    <string name="pie_play_start">Always play from start</string>
+    <string name="pie_unpin_playlist">Unpin playlist?</string>
 
     <!-- playlist fragment -->
     <string name="playlist_fab_up_contentdesc">Up</string>

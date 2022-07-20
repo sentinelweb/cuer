@@ -69,8 +69,8 @@ class PlaylistItemEditModelMapper(
         R.string.menu_settings,
         true,
         listOf(
-            SelectDialogModel.Item("Watched", item.watched, true),
-            SelectDialogModel.Item("Always play from start", item.playFromStart, true)
+            SelectDialogModel.Item(res.getString(R.string.pie_watched), item.watched, true),
+            SelectDialogModel.Item(res.getString(R.string.pie_play_start), item.playFromStart, true)
         ),
         itemClick,
         confirm,
