@@ -282,15 +282,25 @@ class PlaylistEditViewModel constructor(
                 .buildTree()
                 .buildLookup()
         }
-        val childNode = state.treeLookup[state.playlistEdit.id]!!
-        val parentNode = state.treeLookup[parent?.id]
-        if (parent?.id == null || !childNode.isAncestor(parentNode!!)) {
-            state.playlistParent = parent?.id?.let { parent }
-            state.playlistEdit = state.playlistEdit.copy(parentId = parent?.id)
-            update()
-        } else {
-            _uiLiveData.value = UiEvent(ERROR, "That's a circular reference ..")
-        }
+        state.playlistEdit.id
+            ?.let { state.treeLookup[state.playlistEdit.id]!! }
+            ?.also { childNode ->
+                val parentNode = state.treeLookup[parent?.id]
+                if (parent?.id == null || !childNode.isAncestor(parentNode!!)) {
+                    setParent(parent)
+                } else {
+                    _uiLiveData.value = UiEvent(ERROR, "That's a circular reference ..")
+                }
+            }
+            ?: also {
+                setParent(parent)
+            }
+    }
+
+    private fun setParent(parent: PlaylistDomain?) {
+        state.playlistParent = parent?.id?.let { parent }
+        state.playlistEdit = state.playlistEdit.copy(parentId = parent?.id)
+        update()
     }
 
     fun onPlaylistDialogClose() {
