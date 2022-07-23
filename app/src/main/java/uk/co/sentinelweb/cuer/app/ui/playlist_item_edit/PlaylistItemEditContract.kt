@@ -52,7 +52,8 @@ interface PlaylistItemEditContract {
         var isSaved: Boolean = false,
         val editSettings: Edit = Edit(),
         var parentPlaylistId: Long = -1,
-        var allowPlay: Boolean = false
+        var allowPlay: Boolean = false,
+        val deletedPlayLists: MutableSet<PlaylistDomain> = mutableSetOf(),
     ) {
         lateinit var source: OrchestratorContract.Source
 
