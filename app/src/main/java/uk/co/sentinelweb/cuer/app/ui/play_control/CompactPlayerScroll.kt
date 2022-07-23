@@ -12,13 +12,17 @@ class CompactPlayerScroll {
         fun lowerPlayer()
     }
 
+    fun raisePlayer(f: Fragment) {
+        (f.requireActivity() as? PlayerHost)?.raisePlayer()
+    }
+
     fun addScrollListener(recyclerView: RecyclerView, f: Fragment) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (0 > dy) {
+                if (0 < dy) {
                     (f.requireActivity() as? PlayerHost)?.lowerPlayer()
-                } else if (0 < dy) {
+                } else if (0 > dy) {
                     (f.requireActivity() as? PlayerHost)?.raisePlayer()
                 }
             }
@@ -32,9 +36,9 @@ class CompactPlayerScroll {
             override fun onScrollChange(
                 v: View?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int
             ) {
-                if (scrollY < oldScrollY) {
+                if (scrollY > oldScrollY) {
                     (f.requireActivity() as? PlayerHost)?.lowerPlayer()
-                } else if (scrollY > oldScrollY) {
+                } else if (scrollY < oldScrollY) {
                     (f.requireActivity() as? PlayerHost)?.raisePlayer()
                 }
             }

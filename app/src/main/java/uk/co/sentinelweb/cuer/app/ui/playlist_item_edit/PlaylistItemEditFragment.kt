@@ -35,6 +35,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -97,6 +98,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         PLAYLIST_PARENT.getLong(arguments)
     }
 
+    private val allowPlayArg: Boolean by lazy {
+        ALLOW_PLAY.getBoolean(arguments, true)
+    }
+
     init {
         log.tag(this)
     }
@@ -141,6 +146,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         //ple_play_button.setOnClickListener { viewModel.onPlayVideoLocal() }
         //ple_star_fab.setOnClickListener { viewModel.onStarClick() }
         binding.pliePlayFab.setOnClickListener { viewModel.onPlayVideo() }
+        binding.pliePlayFab.isVisible = allowPlayArg
         binding.plieSupportFab.setOnClickListener { viewModel.onSupport() }
         starMenuItem.isVisible = true
         playMenuItem.isVisible = false
@@ -212,7 +218,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 binding.plieTitleBg.isVisible = false
                 playMenuItem.isVisible = false
             }
-            viewModel.setData(this, sourceArg, parentArg)
+            viewModel.setData(this, sourceArg, parentArg, allowPlayArg)
         }
 
         bindObserver(viewModel.getDialogObservable(), this::observeDialog)
@@ -232,9 +238,14 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         linkScopeToActivity()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        /* init */ viewModel
+//    override fun onActivityCreated(savedInstanceState: Bundle?) {
+//        super.onActivityCreated(savedInstanceState)
+//        /* init */ viewModel
+//    }
+
+    override fun onStart() {
+        super.onStart()
+        compactPlayerScroll.raisePlayer(this)
     }
 
     override fun onResume() {
@@ -289,7 +300,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         if (model.empty) {
             return
         }
-
+        binding.pliePlayFab.isVisible = model.showPlay
+        binding.pliePlayFab.isEnabled = model.canPlay
         binding.plieDescription.setModel(model.description)
         binding.plieDuration.text = model.durationText
         binding.plieDuration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))

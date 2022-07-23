@@ -60,6 +60,7 @@ data class NavigationModel constructor(
         IMAGE_URL, /* String */
         MEDIA, /* MediaDomain */
         APP_LIST, /* List<String> */
+        ALLOW_PLAY, /* Boolean */
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)

@@ -194,7 +194,8 @@ class ShareActivity : AppCompatActivity(),
         ScanFragmentDirections.actionGotoPlaylistItem(
             itemDomain.serialise(),
             source.toString(),
-            playlistParentId ?: -1
+            playlistParentId ?: -1,
+            false
         )
             .apply { navController.navigate(this) }
         //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
@@ -204,7 +205,8 @@ class ShareActivity : AppCompatActivity(),
         ScanFragmentDirections.actionGotoPlaylist(
             id.id,
             id.source.toString(),
-            playlistParentId ?: -1
+            playlistParentId ?: -1,
+            false
         )
             .apply { navController.navigate(this) }
     }

@@ -69,7 +69,7 @@ object BrowseComposables {
                             .fillMaxSize()
                             .background(MaterialTheme.colors.secondaryVariant)
                             .verticalScroll(rememberScrollState())
-                            .padding(vertical = dimensionResource(R.dimen.page_margin))
+                            .padding(top = dimensionResource(R.dimen.page_margin), bottom = 128.dp)
                     ) {
                         if (model.isRoot) {
                             if (model.recent != null) {
