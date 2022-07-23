@@ -104,7 +104,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
 
     override fun onStart() {
         super.onStart()
-        playerView.hidePlayer()
+        //playerView.hidePlayer()
     }
 
     override fun onResume() {
@@ -114,7 +114,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
 
     override fun onStop() {
         super.onStop()
-        playerView.showPlayer()
+        //playerView.showPlayer()
     }
 
     private fun observeLabels() {
