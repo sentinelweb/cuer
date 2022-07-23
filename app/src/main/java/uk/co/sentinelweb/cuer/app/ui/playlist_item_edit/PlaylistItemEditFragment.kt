@@ -238,9 +238,14 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         linkScopeToActivity()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        /* init */ viewModel
+//    override fun onActivityCreated(savedInstanceState: Bundle?) {
+//        super.onActivityCreated(savedInstanceState)
+//        /* init */ viewModel
+//    }
+
+    override fun onStart() {
+        super.onStart()
+        compactPlayerScroll.raisePlayer(this)
     }
 
     override fun onResume() {

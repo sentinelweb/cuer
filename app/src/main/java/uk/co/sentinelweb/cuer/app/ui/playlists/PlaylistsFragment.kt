@@ -130,6 +130,11 @@ class PlaylistsFragment :
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        compactPlayerScroll.raisePlayer(this)
+    }
+
     override fun onResume() {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())

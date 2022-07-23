@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
@@ -54,6 +55,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     private val navMapper: NavigationMapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
+    private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
@@ -104,7 +106,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
 
     override fun onStart() {
         super.onStart()
-        //playerView.hidePlayer()
+        compactPlayerScroll.raisePlayer(this)
     }
 
     override fun onResume() {
