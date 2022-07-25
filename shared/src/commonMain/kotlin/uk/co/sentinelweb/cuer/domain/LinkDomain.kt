@@ -90,7 +90,11 @@ sealed class LinkDomain constructor(
         ADA_SHELLEY("\\baddr1[a-z0-9]+\\b".toRegex(), "ADA"),
         ADA_ICARUS("\\bAe2[1-9A-HJ-NP-Za-km-z]+\\b".toRegex(), "ADA"),
         ADA_DAEDALUS("\\bDdzFF[1-9A-HJ-NP-Za-km-z]+\\b".toRegex(), "ADA"),
-        ALGO("\\b[A-Z2-7]{58}\\b".toRegex(),"Algorand")
+        ALGO("\\b[A-Z2-7]{58}\\b".toRegex(),"Algorand"),
+        // https://www.reddit.com/r/solana/comments/soi03d/regex_for_validating_solana_addresses/
+        // fixme not very good. consider validating with: https://solana-labs.github.io/solana-web3.js/classes/PublicKey.html#isOnCurve
+        // or https://security.stackexchange.com/questions/233099/validating-an-ed25519-public-key
+        //SOLANA("\\b([1-9A-HJ-NP-Za-km-z]{32,44})\\b".toRegex(),"Solana")//ed25519-public-key
     }
 
     companion object {
