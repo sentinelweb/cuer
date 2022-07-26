@@ -84,7 +84,7 @@ sealed class LinkDomain constructor(
         RIPPLE("\\br[0-9a-zA-Z]{33}\\b".toRegex(), "Ripple"),
         NEO("\\bA[0-9a-zA-Z]{33}\\b".toRegex(), "Neo"),
         DASH("\\bX[1-9A-HJ-NP-Za-km-z]{33}\\b".toRegex(), "Dash"),
-        BITCOIN_CASH("\\b(q|p)[a-z0-9]{41}\\b".toRegex(), "Bitcoin cash"),
+        BITCOIN_CASH("\\b[qp][a-z0-9]{41}\\b".toRegex(), "Bitcoin cash"),
         // https://iohk.zendesk.com/hc/en-us/articles/900005403563-Cardano-address-types
         // https://cardano.stackexchange.com/questions/2370/how-would-i-create-a-regular-expression-to-match-all-of-cardanos-public-wallet
         ADA_SHELLEY("\\baddr1[a-z0-9]+\\b".toRegex(), "ADA"),
@@ -95,16 +95,5 @@ sealed class LinkDomain constructor(
         // fixme not very good. consider validating with: https://solana-labs.github.io/solana-web3.js/classes/PublicKey.html#isOnCurve
         // or https://security.stackexchange.com/questions/233099/validating-an-ed25519-public-key
         //SOLANA("\\b([1-9A-HJ-NP-Za-km-z]{32,44})\\b".toRegex(),"Solana")//ed25519-public-key
-    }
-
-    companion object {
-        const val PROTO_SEPARATOR = "://"
-        fun domain(url: String): String {
-            val startIndex = url.indexOf(PROTO_SEPARATOR) + PROTO_SEPARATOR.length
-            val endIndex = url.indexOf("/", startIndex)
-                .takeIf { it != -1 }
-                ?: url.length
-            return url.substring(startIndex, endIndex)
-        }
     }
 }
