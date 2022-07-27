@@ -5,7 +5,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogCreator
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
@@ -64,7 +64,7 @@ interface SearchContract {
                     )
                 }
                 scoped { State() }
-                scoped { navigationMapper(true, this.getFragmentActivity()) }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { EnumValuesDialogCreator(this.getFragmentActivity()) }
             }
             factory { SearchMapper(get(), get()) }

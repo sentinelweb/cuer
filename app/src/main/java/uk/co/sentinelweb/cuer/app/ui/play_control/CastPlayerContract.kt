@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
@@ -123,7 +123,7 @@ interface CastPlayerContract {
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 // fixme needed for play dialog - but shouldn't be needed - remove
-                scoped { navigationMapper(false, this.getFragmentActivity(), false) }
+                scoped { navigationRouter(false, this.getFragmentActivity(), false) }
                 scoped {
                     PlayUseCase(
                         queue = get(),
@@ -139,7 +139,7 @@ interface CastPlayerContract {
                         getSource(),
                         itemFactory = get(),
                         itemModelMapper = get(),
-                        navigationMapper = get(),
+                        navigationRouter = get(),
                         castDialogWrapper = get(),
                         floatingService = get(),
                         log = get(),

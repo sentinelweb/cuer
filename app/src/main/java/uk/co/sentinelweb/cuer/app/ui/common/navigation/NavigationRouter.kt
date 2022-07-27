@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.common.navigation
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -20,19 +19,21 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.Co
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandActivity
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.UrlLauncherWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-class NavigationMapper constructor(
+class NavigationRouter constructor(
     private val activity: Activity,
     private val toastWrapper: ToastWrapper,
     private val fragment: Fragment? = null,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val navController: NavController?,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val urlLauncher: UrlLauncherWrapper
 ) {
 
     fun navigate(nav: NavigationModel) {
@@ -41,8 +42,7 @@ class NavigationMapper constructor(
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
                     //YoutubeFullScreenActivity.start(activity, it)
                     AytLandActivity.start(activity, it)
-                }
-                    ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
+                } ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
             LOCAL_PLAYER -> {
                 log.d("YoutubePortraitActivity.NavigationMapper")
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
@@ -52,12 +52,7 @@ class NavigationMapper constructor(
             }
             WEB_LINK ->
                 nav.params[LINK]?.let {
-                    val parse = Uri.parse(it.toString())
-                    activity.startActivity(
-                        Intent.createChooser(
-                            Intent(Intent.ACTION_VIEW, parse), "Launch ${parse.host}"
-                        )
-                    )
+                    urlLauncher.launchUrl(it.toString())
                 } ?: throw IllegalArgumentException("$WEB_LINK: $LINK param required")
             NAV_BACK -> navController?.popBackStack()
             NAV_FINISH -> activity.finish()
@@ -148,11 +143,11 @@ class NavigationMapper constructor(
     }
 }
 
-fun Scope.navigationMapper(
+fun Scope.navigationRouter(
     isFragment: Boolean,
     sourceActivity: Activity,
     withNavHost: Boolean = true
-) = NavigationMapper(
+) = NavigationRouter(
     activity = sourceActivity,
     toastWrapper = ToastWrapper(sourceActivity),
     fragment = if (isFragment) (getSource() as Fragment) else null,
@@ -171,5 +166,6 @@ fun Scope.navigationMapper(
                 .navController
         }
     } else null,
+    urlLauncher = UrlLauncherWrapper(sourceActivity),
     log = AndroidLogWrapper()
 )

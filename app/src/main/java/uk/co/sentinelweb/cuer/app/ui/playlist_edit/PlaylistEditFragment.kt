@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
@@ -27,7 +26,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
@@ -57,7 +57,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     private val starMenuItem: MenuItem
@@ -93,7 +93,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         setHasOptionsMenu(true)
         playlistIdArg?.apply {
             sharedElementEnterTransition =
-                TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+                TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
         }
     }
 
@@ -146,35 +146,20 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         binding.peCommitButton.setOnClickListener { viewModel.onCommitClick() }
         binding.peWatchAll.setOnClickListener { viewModel.onWatchAllClick() }
         binding.pePlayStart.setOnCheckedChangeListener { v, b ->
-            viewModel.onFlagChanged(
-                b,
-                PLAY_START
-            )
+            viewModel.onFlagChanged(b, PLAY_START)
         }
         binding.peDefault.setOnCheckedChangeListener { v, b -> viewModel.onFlagChanged(b, DEFAULT) }
         binding.pePlayable.setOnCheckedChangeListener { v, b ->
-            viewModel.onFlagChanged(
-                b,
-                PLAYABLE
-            )
+            viewModel.onFlagChanged(b, PLAYABLE)
         }
         binding.peDeletable.setOnCheckedChangeListener { v, b ->
-            viewModel.onFlagChanged(
-                b,
-                DELETABLE
-            )
+            viewModel.onFlagChanged(b, DELETABLE)
         }
         binding.peEditableItems.setOnCheckedChangeListener { v, b ->
-            viewModel.onFlagChanged(
-                b,
-                EDIT_ITEMS
-            )
+            viewModel.onFlagChanged(b, EDIT_ITEMS)
         }
         binding.peDeletableItems.setOnCheckedChangeListener { v, b ->
-            viewModel.onFlagChanged(
-                b,
-                DELETE_ITEMS
-            )
+            viewModel.onFlagChanged(b, DELETE_ITEMS)
         }
         binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
         binding.peAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
@@ -213,11 +198,11 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
             }
         })
         compactPlayerScroll.addScrollListener(binding.peScroll, this)
-        observeUi()
-        observeModel()
-        observeDomain()
-        observeDialog()
-        observeNavigation()
+        bindObserver(viewModel.getUiObservable(), ::observeUi)
+        bindObserver(viewModel.getModelObservable(), ::observeModel)
+        bindObserver(viewModel.getDomainObservable(), ::observeDomain)
+        bindObserver(viewModel.getDialogObservable(), ::observeDialog)
+        bindObserver(viewModel.getNavigationObservable(), ::observeNavigation)
 
         imageUrlArg?.also { setImage(it) }
         (playlistIdArg to (SOURCE.getEnum(arguments) ?: Source.LOCAL)).apply {
@@ -225,9 +210,14 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        /* init */ viewModel
+//    override fun onActivityCreated(savedInstanceState: Bundle?) {
+//        super.onActivityCreated(savedInstanceState)
+//        /* init */ viewModel
+//    }
+
+    override fun onStart() {
+        super.onStart()
+        compactPlayerScroll.raisePlayer(this)
     }
 
     override fun onResume() {
@@ -242,83 +232,71 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         }
     }
 
-    private fun observeUi() {
-        viewModel.getUiObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<PlaylistEditViewModel.UiEvent> {
-                override fun onChanged(model: PlaylistEditViewModel.UiEvent) {
-                    when (model.type) {
-                        ERROR -> snackbarWrapper.makeError(model.data as String).show()
-                        MESSAGE -> toastWrapper.show(model.data as String)
-                        IMAGE -> setImage(model.data as String?)
+    private fun observeUi(model: PlaylistEditViewModel.UiEvent) =
+        when (model.type) {
+            ERROR -> snackbarWrapper.makeError(model.data as String).show()
+            MESSAGE -> toastWrapper.show(model.data as String)
+            IMAGE -> setImage(model.data as String?)
+        }
+
+
+    private fun observeModel(model: PlaylistEditContract.Model) {
+        if (binding.peTitleEdit.text.toString() != model.titleEdit) {
+            binding.peTitleEdit.setText(model.titleEdit)
+            binding.peTitleEdit.setSelection(model.titleEdit.length)
+        }
+        binding.peCollapsingToolbar.title = model.titleDisplay
+        binding.peClickPrompt.isVisible = !model.isDialog
+        val starIconResource =
+            if (model.starred) R.drawable.ic_starred
+            else R.drawable.ic_starred_off
+        starMenuItem.setIcon(starIconResource)
+        binding.peStarFab.setImageResource(starIconResource)
+
+        val pinIconResource =
+            if (model.pinned) R.drawable.ic_push_pin_on
+            else R.drawable.ic_push_pin_off
+        pinMenuItem.setIcon(pinIconResource)
+        binding.pePinFab.setImageResource(pinIconResource)
+
+        model.buttonText?.apply { binding.peCommitButton.text = this }
+        model.imageUrl?.also { setImage(it) }
+        binding.peWatchAll.setText(model.watchAllText)
+        binding.peWatchAll.setIconResource(model.watchAllIIcon)
+        binding.peDefault.isChecked = model.default
+        binding.peDefault.isVisible = model.showDefault
+        binding.peInfo.text = Html.fromHtml(model.info, Html.FROM_HTML_MODE_LEGACY)
+        binding.pePlayStart.isChecked = model.playFromStart
+        binding.pePlayable.isChecked = model.config.playable
+        binding.peDeletable.isChecked = model.config.deletable
+        binding.peDeletableItems.isChecked = model.config.deletableItems
+        binding.peEditableItems.isChecked = model.config.editableItems
+        binding.peParentChip.removeAllViews()
+        chipCreator.create(model.chip, binding.peParentChip).apply {
+            binding.peParentChip.addView(this)
+            when (model.chip.type) {
+                ChipModel.Type.PLAYLIST_SELECT -> {
+                    setOnClickListener { viewModel.onSelectParent() }
+                }
+                ChipModel.Type.PLAYLIST -> {
+                    setOnCloseIconClickListener { viewModel.onRemoveParent() }
+                }
+            }
+        }
+
+        model.validation?.apply {
+            binding.peCommitButton.isEnabled = valid
+            if (!valid) {
+                fieldValidations.forEach {
+                    when (it.field) {
+                        PlaylistValidator.PlaylistField.TITLE ->
+                            binding.peTitle.error = getString(it.error)
                     }
                 }
-            })
-    }
-
-    private fun observeModel() {
-        viewModel.getModelObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<PlaylistEditContract.Model> {
-                override fun onChanged(model: PlaylistEditContract.Model) {
-                    if (binding.peTitleEdit.text.toString() != model.titleEdit) {
-                        binding.peTitleEdit.setText(model.titleEdit)
-                        binding.peTitleEdit.setSelection(model.titleEdit.length)
-                    }
-                    binding.peCollapsingToolbar.title = model.titleDisplay
-                    binding.peClickPrompt.isVisible = !model.isDialog
-                    val starIconResource =
-                        if (model.starred) R.drawable.ic_starred
-                        else R.drawable.ic_starred_off
-                    starMenuItem.setIcon(starIconResource)
-                    binding.peStarFab.setImageResource(starIconResource)
-
-                    val pinIconResource =
-                        if (model.pinned) R.drawable.ic_push_pin_on
-                        else R.drawable.ic_push_pin_off
-                    pinMenuItem.setIcon(pinIconResource)
-                    binding.pePinFab.setImageResource(pinIconResource)
-
-                    model.buttonText?.apply { binding.peCommitButton.text = this }
-                    model.imageUrl?.also { setImage(it) }
-                    binding.peWatchAll.setText(model.watchAllText)
-                    binding.peWatchAll.setIconResource(model.watchAllIIcon)
-                    binding.peDefault.isChecked = model.default
-                    binding.peDefault.isVisible = model.showDefault
-                    binding.peInfo.text = Html.fromHtml(model.info, Html.FROM_HTML_MODE_LEGACY)
-                    binding.pePlayStart.isChecked = model.playFromStart
-                    binding.pePlayable.isChecked = model.config.playable
-                    binding.peDeletable.isChecked = model.config.deletable
-                    binding.peDeletableItems.isChecked = model.config.deletableItems
-                    binding.peEditableItems.isChecked = model.config.editableItems
-                    binding.peParentChip.removeAllViews()
-                    chipCreator.create(model.chip, binding.peParentChip).apply {
-                        binding.peParentChip.addView(this)
-                        when (model.chip.type) {
-                            ChipModel.Type.PLAYLIST_SELECT -> {
-                                setOnClickListener { viewModel.onSelectParent() }
-                            }
-                            ChipModel.Type.PLAYLIST -> {
-                                setOnCloseIconClickListener { viewModel.onRemoveParent() }
-                            }
-                        }
-                    }
-
-                    model.validation?.apply {
-                        binding.peCommitButton.isEnabled = valid
-                        if (!valid) {
-                            fieldValidations.forEach {
-                                when (it.field) {
-                                    PlaylistValidator.PlaylistField.TITLE ->
-                                        binding.peTitle.error = getString(it.error)
-                                }
-                            }
-                        } else {
-                            binding.peTitle.error = null
-                        }
-                    }
-                }
-            })
+            } else {
+                binding.peTitle.error = null
+            }
+        }
     }
 
     private fun setImage(url: String?) {
@@ -330,52 +308,31 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         }
     }
 
-    private fun observeDialog() =
-        viewModel.getDialogObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<DialogModel> {
-                override fun onChanged(model: DialogModel) {
-                    dialog?.dismiss()
-                    hideDialogFragment()
-                    when (model) {
-                        is PlaylistsDialogContract.Config -> {
-                            dialogFragment =
-                                PlaylistsDialogFragment.newInstance(model)
-                            dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())
-                        }
-                        is SearchImageContract.Config -> {
-                            dialogFragment =
-                                SearchImageDialogFragment.newInstance(model)
-                            dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())
-                        }
-                        is DialogModel.DismissDialogModel -> dialogFragment?.dismiss()
-                        else -> Unit
-                    }
-                }
+    private fun observeDialog(model: DialogModel) {
+        dialog?.dismiss()
+        hideDialogFragment()
+        when (model) {
+            is PlaylistsDialogContract.Config -> {
+                dialogFragment =
+                    PlaylistsDialogFragment.newInstance(model)
+                dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())
             }
-        )
-
-    private fun observeNavigation() {
-        viewModel.getNavigationObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<NavigationModel> {
-                override fun onChanged(nav: NavigationModel) {
-                    navMapper.navigate(nav)
-                }
+            is SearchImageContract.Config -> {
+                dialogFragment =
+                    SearchImageDialogFragment.newInstance(model)
+                dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())
             }
-        )
+            is DialogModel.DismissDialogModel -> dialogFragment?.dismiss()
+            else -> Unit
+        }
     }
 
-    private fun observeDomain() {
-        viewModel.getDomainObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<PlaylistDomain> {
-                override fun onChanged(domain: PlaylistDomain) {
-                    softKeyboard.hideSoftKeyboard(binding.peTitleEdit)
-                    listener?.onPlaylistCommit(domain)
-                        ?: findNavController().popBackStack()
-                }
-            })
+    private fun observeNavigation(nav: NavigationModel) = navRouter.navigate(nav)
+
+    private fun observeDomain(domain: PlaylistDomain) {
+        softKeyboard.hideSoftKeyboard(binding.peTitleEdit)
+        listener?.onPlaylistCommit(domain)
+            ?: findNavController().popBackStack()
     }
 
     private fun hideDialogFragment() {

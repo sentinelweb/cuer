@@ -11,17 +11,21 @@ class ImageProvider(
     private val imageFileRepo: ImageFileRepository
 ) {
     fun doLoad(requestManager: RequestManager, url: String) =
-        if (url.startsWith("gs://")) requestManager.load(imageProvider.makeRef(url))
-        else if (url.startsWith(ImageFileRepository.REPO_SCHEME_PREFIX)) requestManager.load(
-            imageFileRepo.toLocalUri(url)
-        )
-        else requestManager.load(url)
+        if (url.startsWith("gs://")) {
+            requestManager.load(imageProvider.makeRef(url))
+        } else if (url.startsWith(ImageFileRepository.REPO_SCHEME_PREFIX)) {
+            requestManager.load(imageFileRepo.toLocalUri(url))
+        } else {
+            requestManager.load(url)
+        }
 
     fun doLoad(requestBuilder: RequestBuilder<Bitmap>, url: String) =
-        if (url.startsWith("gs://")) requestBuilder.load(imageProvider.makeRef(url))
-        else if (url.startsWith(ImageFileRepository.REPO_SCHEME_PREFIX)) requestBuilder.load(
-            imageFileRepo.toLocalUri(url)
-        )
-        else requestBuilder.load(url)
+        if (url.startsWith("gs://")) {
+            requestBuilder.load(imageProvider.makeRef(url))
+        } else if (url.startsWith(ImageFileRepository.REPO_SCHEME_PREFIX)) {
+            requestBuilder.load(imageFileRepo.toLocalUri(url))
+        } else {
+            requestBuilder.load(url)
+        }
 
 }

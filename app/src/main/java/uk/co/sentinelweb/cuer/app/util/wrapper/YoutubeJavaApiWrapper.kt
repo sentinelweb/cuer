@@ -49,13 +49,12 @@ class YoutubeJavaApiWrapper(
             } else false
         }
 
-    fun launchChannel(id: String) =
-        canLaunchChannel()
-            .takeIf { it }
-            ?.let {
-                activity.startActivity(createChannelIntent(activity, id))
-                true
-            } ?: false
+    fun launchChannel(id: String) = try {
+        activity.startActivity(createChannelIntent(activity, id))
+        true
+    } catch (e: Exception) {
+        false
+    }
 
     fun launchPlaylist(playlist: PlaylistDomain) =
         playlist.platformId

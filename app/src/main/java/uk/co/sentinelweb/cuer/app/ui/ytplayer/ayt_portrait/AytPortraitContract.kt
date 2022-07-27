@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.EmptyNavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
@@ -69,7 +69,7 @@ interface AytPortraitContract {
                         .supportFragmentManager
                         .findFragmentById(R.id.portrait_player_playlist) as PlaylistFragment)
                 }
-                scoped { navigationMapper(false, getSource(), withNavHost = false) }
+                scoped { navigationRouter(false, getSource(), withNavHost = false) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = get(),

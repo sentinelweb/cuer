@@ -24,7 +24,7 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubeFullsreenBinding
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -69,7 +69,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
     private val coroutines: CoroutineContextProvider by inject()
     private val showHideUi: ShowHideUi by inject()
     private val res: ResourceWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val toast: ToastWrapper by inject()
 
     lateinit var mviView: YouTubePlayerViewImpl
@@ -96,11 +96,11 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
         binding.controls.controlsTrackNext.setOnClickListener { mviView.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
         binding.controls.controlsTrackLast.setOnClickListener { mviView.dispatch(TrackBackClicked);showHideUi.delayedHide() }
         binding.controls.controlsSeekBack.setOnClickListener {
-            mviView.dispatch(SkipBackClicked);
+            mviView.dispatch(SkipBackClicked)
             showHideUi.delayedHide()
         }
         binding.controls.controlsSeekForward.setOnClickListener {
-            mviView.dispatch(SkipFwdClicked);
+            mviView.dispatch(SkipFwdClicked)
             showHideUi.delayedHide()
         }
         binding.controls.controlsSeekBack.setOnLongClickListener { mviView.dispatch(SkipBackSelectClicked);true }
@@ -290,7 +290,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
                 is FullScreenPlayerOpen -> toast.show("Already in Fullscreen mode - shouldnt get here")
                 is PipPlayerOpen -> toast.show("PIP Open")
                 is PortraitPlayerOpen -> label.also {
-                    navMapper.navigate(NavigationModel(NavigationModel.Target.LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))
+                    navRouter.navigate(NavigationModel(NavigationModel.Target.LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))
                     finish()
                 }
             }

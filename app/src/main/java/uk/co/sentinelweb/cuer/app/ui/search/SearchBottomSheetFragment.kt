@@ -12,7 +12,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
@@ -23,7 +23,7 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment(), AndroidScopeCompo
 
     override val scope: Scope by fragmentScopeWithSource()
     private val viewModel: SearchViewModel by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val datePickerCreator: DatePickerCreator by inject()
     private val enumPickerCreator: EnumValuesDialogCreator by inject()
     private val log: LogWrapper by inject()
@@ -93,7 +93,7 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment(), AndroidScopeCompo
             object : Observer<NavigationModel> {
                 override fun onChanged(nav: NavigationModel) {
                     when (nav.target) {
-                        else -> navMapper.navigate(nav)
+                        else -> navRouter.navigate(nav)
                     }
                 }
             }

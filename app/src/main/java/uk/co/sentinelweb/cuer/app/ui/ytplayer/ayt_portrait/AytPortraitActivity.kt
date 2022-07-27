@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
@@ -59,7 +59,7 @@ class AytPortraitActivity : AppCompatActivity(),
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val playerFragment: CastPlayerMviFragment by inject()
     private val playlistFragment: PlaylistFragment by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val itemLoader: PlayerContract.PlaylistItemLoader by inject()
     private val toast: ToastWrapper by inject()
     private val castListener: LocalPlayerCastListener by inject()
@@ -103,6 +103,7 @@ class AytPortraitActivity : AppCompatActivity(),
 
         binding.portraitPlayerDescription.interactions = object : DescriptionContract.Interactions {
             override fun onLinkClick(urlString: String) {
+                // this doesnt get event until the DescriptionView is setup to capture the links properly
                 mviView.dispatch(LinkClick(urlString))
             }
 
@@ -162,12 +163,12 @@ class AytPortraitActivity : AppCompatActivity(),
             when (label) {
                 is Command -> label.command.let { aytViewHolder.processCommand(it) }
                 is LinkOpen ->
-                    navMapper.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
+                    navRouter.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
                 is ChannelOpen ->
-                    label.channel.platformId?.let { id -> navMapper.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
+                    label.channel.platformId?.let { id -> navRouter.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
                 is FullScreenPlayerOpen -> label.also {
                     aytViewHolder.switchView()
-                    navMapper.navigate(NavigationModel(LOCAL_PLAYER_FULL, mapOf(PLAYLIST_ITEM to it.item)))
+                    navRouter.navigate(NavigationModel(LOCAL_PLAYER_FULL, mapOf(PLAYLIST_ITEM to it.item)))
                     finish()
                 }
                 is PipPlayerOpen -> {

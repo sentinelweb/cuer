@@ -51,7 +51,7 @@ class PlaylistUpdateOrchestrator constructor(
     }
 
     private suspend fun removeExistingItems(platform: PlaylistDomain, existing: PlaylistDomain): PlaylistDomain {
-        val existingPlaylistMediaPlatformIds = existing.items.map { it.media.platformId }
+//        val existingPlaylistMediaPlatformIds = existing.items.map { it.media.platformId }
         val platformPlaylistExistingMediaPlatformIds =
             mediaOrchestrator.loadList(PlatformIdListFilter(platform.items.map { it.media.platformId }), LOCAL.flatOptions())
                 .map { it.platformId }

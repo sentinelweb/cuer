@@ -8,12 +8,12 @@ import android.view.KeyEvent
  * - there is probably a better way to do it with cast API or a MediaButtonReceiver
  */
 class CuerSimpleVolumeController constructor(
-    private val cuerCasSessionListener: CuerCastSessionListener
+    private val cuerCastSessionListener: CuerCastSessionListener
 ) {
     fun handleVolumeKey(event: KeyEvent): Boolean {
         val action: Int = event.getAction()
         val keyCode: Int = event.getKeyCode()
-        return cuerCasSessionListener.currentCastSession?.let { castSession ->
+        return cuerCastSessionListener.currentCastSession?.let { castSession ->
             when (keyCode) {
                 KeyEvent.KEYCODE_VOLUME_UP -> {
                     if (action == KeyEvent.ACTION_DOWN) {

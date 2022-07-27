@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.link
 
 import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.ext.urlDomain
 import kotlin.math.max
 
 class LinkExtractor {
@@ -34,7 +35,7 @@ class LinkExtractor {
             ?.takeIf { (TITLE_MIN..TITLE_MAX).contains(it.length) }
 
     fun mapUrlToLinkDomain(url: String): LinkDomain.UrlLinkDomain {
-        val domain = LinkDomain.domain(url)
+        val domain = urlDomain(url)
         val domainHost = LinkDomain.DomainHost.values()
             .find { domainHost -> domainHost.domains.find { domain.endsWith(it) } != null }
             ?: LinkDomain.DomainHost.UNKNOWN

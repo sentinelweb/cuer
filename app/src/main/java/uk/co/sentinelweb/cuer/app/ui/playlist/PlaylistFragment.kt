@@ -32,7 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
@@ -88,7 +88,7 @@ class PlaylistFragment :
     private val imageProvider: ImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val doneNavigation: DoneNavigation by inject()// from activity (see onAttach)
     private val commitHost: CommitHost by inject()
@@ -153,7 +153,8 @@ class PlaylistFragment :
 
         sharedElementReturnTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
-        sharedElementEnterTransition = from(context).inflateTransition(android.R.transition.move)
+        sharedElementEnterTransition =
+            from(requireContext()).inflateTransition(android.R.transition.move)
     }
 
     override fun onCreateView(
@@ -260,10 +261,6 @@ class PlaylistFragment :
         linkScopeToActivity()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return super.onOptionsItemSelected(item)
-    }
-
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
         if (isHeadless) {
@@ -278,6 +275,11 @@ class PlaylistFragment :
         presenter.destroy()
         _binding = null
         super.onDestroyView()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        compactPlayerScroll.raisePlayer(this)
     }
 
     override fun onResume() {
@@ -361,7 +363,7 @@ class PlaylistFragment :
     override fun navigate(nav: NavigationModel) {
         when (nav.target) {
             NAV_DONE -> doneNavigation.navigateDone()
-            else -> navMapper.navigate(nav)
+            else -> navRouter.navigate(nav)
         }
     }
 
@@ -493,11 +495,10 @@ class PlaylistFragment :
 
     override fun gotoEdit(id: Long, source: Source) {
         PlaylistFragmentDirections.actionGotoEditPlaylist(
-            id,
             source.toString(),
-            null
-        )
-            .apply { findNavController().navigate(this) }
+            null,
+            id
+        ).apply { findNavController().navigate(this) }
     }
 
     override fun showAlertDialog(model: AlertDialogModel) {

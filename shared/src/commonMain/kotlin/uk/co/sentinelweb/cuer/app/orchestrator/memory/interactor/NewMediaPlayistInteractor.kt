@@ -18,7 +18,7 @@ class NewMediaPlayistInteractor constructor(
             ?.data
             ?.let {
                 makeNewItemsHeader()
-                    .copy(items = it.mapIndexed { i, playlistItem -> playlistItem.copy() })
+                    .copy(items = it.mapIndexed { _, playlistItem -> playlistItem.copy() })
             }
 
     fun makeNewItemsHeader(): PlaylistDomain = PlaylistDomain(

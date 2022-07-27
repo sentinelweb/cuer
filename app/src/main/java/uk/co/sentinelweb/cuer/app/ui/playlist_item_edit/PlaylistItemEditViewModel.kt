@@ -28,10 +28,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
 
@@ -80,11 +77,12 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?) {
+    fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?, allowPlay: Boolean) {
         item.let {
             state.editingPlaylistItem = it
             state.source = source
             state.parentPlaylistId = parentId ?: -1
+            state.allowPlay = allowPlay
             it.media.let { setData(it) }
         }
     }
@@ -199,11 +197,9 @@ class PlaylistItemEditViewModel constructor(
     }
 
     override fun onLinkClick(urlString: String) {
+        // this doesnt get event until the DescriptionView is setup to capture the links properly
         _navigateLiveData.value =
-            NavigationModel(
-                WEB_LINK,
-                mapOf(NavigationModel.Param.LINK to urlString)
-            )
+            NavigationModel(WEB_LINK, mapOf(NavigationModel.Param.LINK to urlString))
     }
 
     override fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
@@ -226,8 +222,10 @@ class PlaylistItemEditViewModel constructor(
             ?.apply {
                 if (checked) {
                     state.selectedPlaylists.add(this)
+                    state.deletedPlayLists.removeIf { it.id == this.id }
                 } else {
                     state.selectedPlaylists.remove(this)
+                    state.deletedPlayLists.add(this)
                 }
             }
             ?.also { update() }
@@ -282,7 +280,12 @@ class PlaylistItemEditViewModel constructor(
     override fun onRemovePlaylist(chipModel: ChipModel) {
         state.isPlaylistsChanged = true
         val plId = chipModel.value?.toLong()
-        state.selectedPlaylists.removeIf { it.id == plId }
+        state.selectedPlaylists
+            .find { it.id == plId }
+            ?.also {
+                state.selectedPlaylists.remove(it)
+                state.deletedPlayLists.add(it)
+            }
         prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
             ?.takeIf { it == plId }
             ?.apply {
@@ -316,7 +319,7 @@ class PlaylistItemEditViewModel constructor(
     }
 
     private fun update() {
-        state.model = modelMapper.map(state.media!!, state.selectedPlaylists)
+        state.model = modelMapper.map(state)
         _modelLiveData.value = state.model
     }
 
@@ -362,10 +365,17 @@ class PlaylistItemEditViewModel constructor(
                     ?: throw NoDefaultPlaylistException()
             }
             val saveSource = if (isNew) LOCAL else state.source
-            if (state.isPlaylistsChanged && state.editingPlaylistItem?.playlistId != null) {// todo need original playlists (not editingPlaylistItem)
-                state.editingPlaylistItem?.also { item ->
-                    state.selectedPlaylists.find { it.id == item.playlistId }
-                        ?: playlistItemOrchestrator.delete(item, Options(state.source))
+            if (state.isPlaylistsChanged && state.editingPlaylistItem?.playlistId != null && state.deletedPlayLists.size > 0) {
+                val deletePlaylistIds = state.deletedPlayLists.map { it.id }
+                state.editingPlaylistItem?.media?.platformId?.let {
+                    playlistItemOrchestrator.loadList(
+                        PlatformIdListFilter(listOf(it), PlatformDomain.YOUTUBE),
+                        state.source.flatOptions(false)
+                    )
+                }?.forEach { item ->
+                    if (item.playlistId in deletePlaylistIds) {
+                        playlistItemOrchestrator.delete(item, Options(state.source))
+                    }
                 }
             }
             log.d("commit items: ${state.isMediaChanged}")
@@ -421,7 +431,7 @@ class PlaylistItemEditViewModel constructor(
                     editSettings.playFromStart = restored.editSettings.playFromStart
                     editSettings.watched = restored.editSettings.watched
                     parentPlaylistId = restored.parentPlaylistId
-                    model = modelMapper.map(state.media!!, state.selectedPlaylists)
+                    model = modelMapper.map(state)
                 }
             }
     }

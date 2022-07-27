@@ -38,6 +38,9 @@ class PlaylistEditViewModel constructor(
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : ViewModel() {
+    init {
+        log.tag(this)
+    }
 
     data class UiEvent(
         val type: Type,
@@ -189,20 +192,38 @@ class PlaylistEditViewModel constructor(
         }
     }
 
-    fun onWatchAllClick() {
-        viewModelScope.launch {
+    fun onWatchAllClick() = viewModelScope.launch {
+        val watched = state.isAllWatched != false
+        val newWatched = !watched
+        log.d("watched load mem items = ${state.playlistEdit.id}")
+        if ((state.playlistEdit.id ?: 0) > 0) {
             playlistOrchestrator.load(state.playlistEdit.id!!, state.source.deepOptions())
                 ?.apply {
-                    val watched = state.isAllWatched == true
                     mediaOrchestrator.save(
-                        items.map { it.media.copy(watched = !watched) },
+                        items.map { it.media.copy(watched = newWatched) },
                         state.source.deepOptions()
                     )
-                    state.isAllWatched = !watched
-                    update()
+                    state.isAllWatched = newWatched
                 }
+        } else { // memory playlist
+            playlistOrchestrator.load(state.playlistEdit.id!!, state.source.deepOptions())
+                ?.also { log.d("watched load mem items = ${it.items.size}") }
+                ?.run {
+                    copy(
+                        items = items.map {
+                            it.copy(media = it.media.copy(watched = newWatched))
+                        }
+                    )
+                }
+                ?.also { log.d("watched save mem items = ${it.items.size}") }
+                ?.apply {
+                    playlistOrchestrator.save(this, state.source.deepOptions())
+                }
+            state.isAllWatched = newWatched
         }
+        update()
     }
+
 
     enum class Flag { DEFAULT, PLAY_START, DELETABLE, EDITABLE, PLAYABLE, DELETE_ITEMS, EDIT_ITEMS }
 
@@ -261,15 +282,25 @@ class PlaylistEditViewModel constructor(
                 .buildTree()
                 .buildLookup()
         }
-        val childNode = state.treeLookup[state.playlistEdit.id]!!
-        val parentNode = state.treeLookup[parent?.id]
-        if (parent?.id == null || !childNode.isAncestor(parentNode!!)) {
-            state.playlistParent = parent?.id?.let { parent }
-            state.playlistEdit = state.playlistEdit.copy(parentId = parent?.id)
-            update()
-        } else {
-            _uiLiveData.value = UiEvent(ERROR, "That's a circular reference ..")
-        }
+        state.playlistEdit.id
+            ?.let { state.treeLookup[state.playlistEdit.id]!! }
+            ?.also { childNode ->
+                val parentNode = state.treeLookup[parent?.id]
+                if (parent?.id == null || !childNode.isAncestor(parentNode!!)) {
+                    setParent(parent)
+                } else {
+                    _uiLiveData.value = UiEvent(ERROR, "That's a circular reference ..")
+                }
+            }
+            ?: also {
+                setParent(parent)
+            }
+    }
+
+    private fun setParent(parent: PlaylistDomain?) {
+        state.playlistParent = parent?.id?.let { parent }
+        state.playlistEdit = state.playlistEdit.copy(parentId = parent?.id)
+        update()
     }
 
     fun onPlaylistDialogClose() {

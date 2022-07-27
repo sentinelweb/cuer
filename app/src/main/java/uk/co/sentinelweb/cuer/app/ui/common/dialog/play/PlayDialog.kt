@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.DialogPlayBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -26,7 +26,7 @@ class PlayDialog constructor(
     private val f: Fragment,
     private val itemFactory: ItemFactory,
     private val itemModelMapper: ItemModelMapper,
-    private val navigationMapper: NavigationMapper,
+    private val navigationRouter: NavigationRouter,
     private val castDialogWrapper: CastDialogWrapper,
     private val floatingService: FloatingPlayerServiceManager,
     private val log: LogWrapper,
@@ -60,7 +60,7 @@ class PlayDialog constructor(
         }
         binding.dpPortrait.setOnClickListener {
             dialog.dismiss()
-            navigationMapper.navigate(
+            navigationRouter.navigate(
                 NavigationModel(
                     NavigationModel.Target.LOCAL_PLAYER,
                     mapOf(NavigationModel.Param.PLAYLIST_ITEM to item)
@@ -69,7 +69,7 @@ class PlayDialog constructor(
         }
         binding.dpFullscreen.setOnClickListener {
             dialog.dismiss()
-            navigationMapper.navigate(
+            navigationRouter.navigate(
                 NavigationModel(
                     NavigationModel.Target.LOCAL_PLAYER_FULL,
                     mapOf(NavigationModel.Param.PLAYLIST_ITEM to item)

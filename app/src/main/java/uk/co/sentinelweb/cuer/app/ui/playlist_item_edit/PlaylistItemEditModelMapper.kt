@@ -19,29 +19,31 @@ class PlaylistItemEditModelMapper(
     private val backgroundMapper: BackgroundMapper
 ) {
 
-    fun map(
-        domain: MediaDomain,
-        selectedPlaylists: Set<PlaylistDomain>
-    ) = PlaylistItemEditContract.Model(
-        description = descriptionMapper.map(domain, selectedPlaylists),
-        imageUrl = (domain.image ?: domain.thumbNail)?.url,
-        starred = domain.starred,
-        canPlay = domain.platformId.isNotEmpty(),
-        durationText = (
-                if (domain.isLiveBroadcast) {
-                    if (domain.isLiveBroadcastUpcoming) res.getString(R.string.upcoming)
-                    else res.getString(R.string.live)
-                } else domain.duration?.let { timeFormater.formatMillis(it, SECS) }
-                ),
-        positionText = domain.positon?.let { timeFormater.formatMillis(it, SECS) },
-        position = domain.positon
-            ?.takeIf { domain.duration != null && domain.duration!! > 0L }
-            ?.let { (it / domain.duration!!).toFloat() },
-        empty = false,
-        isLive = domain.isLiveBroadcast,
-        isUpcoming = domain.isLiveBroadcastUpcoming,
-        infoTextBackgroundColor = backgroundMapper.mapInfoBackground(domain)
-    )
+    fun map(state: PlaylistItemEditContract.State) = with(state) {
+        media?.let { media ->
+            PlaylistItemEditContract.Model(
+                description = descriptionMapper.map(media, selectedPlaylists),
+                imageUrl = (media.image ?: media.thumbNail)?.url,
+                starred = media.starred,
+                canPlay = media.platformId.isNotEmpty(),
+                showPlay = allowPlay,
+                durationText = (
+                        if (media.isLiveBroadcast) {
+                            if (media.isLiveBroadcastUpcoming) res.getString(R.string.upcoming)
+                            else res.getString(R.string.live)
+                        } else media.duration?.let { timeFormater.formatMillis(it, SECS) }
+                        ),
+                positionText = media.positon?.let { timeFormater.formatMillis(it, SECS) },
+                position = media.positon
+                    ?.takeIf { media.duration != null && media.duration!! > 0L }
+                    ?.let { (it / media.duration!!).toFloat() },
+                empty = false,
+                isLive = media.isLiveBroadcast,
+                isUpcoming = media.isLiveBroadcastUpcoming,
+                infoTextBackgroundColor = backgroundMapper.mapInfoBackground(media)
+            )
+        } ?: mapEmpty()
+    }
 
     fun mapEmpty(): PlaylistItemEditContract.Model = PlaylistItemEditContract.Model(
         description = descriptionMapper.mapEmpty(),
@@ -51,20 +53,26 @@ class PlaylistItemEditModelMapper(
         durationText = null,
         starred = false,
         canPlay = false,
+        showPlay = false,
         empty = true,
         isLive = false,
         isUpcoming = false,
         infoTextBackgroundColor = R.color.info_text_overlay_background
     )
 
-    fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel = AlertDialogModel(
-        R.string.dialog_title_save_check,
-        R.string.dialog_message_save_item_check,
-        AlertDialogModel.Button(R.string.dialog_button_save, confirm),
-        cancel = AlertDialogModel.Button(R.string.dialog_button_dont_save, cancel),
-    )
+    fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel =
+        AlertDialogModel(
+            R.string.dialog_title_save_check,
+            R.string.dialog_message_save_item_check,
+            AlertDialogModel.Button(R.string.dialog_button_save, confirm),
+            cancel = AlertDialogModel.Button(R.string.dialog_button_dont_save, cancel),
+        )
 
-    fun mapItemSettings(item: MediaDomain, itemClick: (Int, Boolean) -> Unit, confirm: () -> Unit): SelectDialogModel = SelectDialogModel(
+    fun mapItemSettings(
+        item: MediaDomain,
+        itemClick: (Int, Boolean) -> Unit,
+        confirm: () -> Unit
+    ): SelectDialogModel = SelectDialogModel(
         DialogModel.Type.PLAYLIST_ITEM_SETTNGS,
         R.string.menu_settings,
         true,

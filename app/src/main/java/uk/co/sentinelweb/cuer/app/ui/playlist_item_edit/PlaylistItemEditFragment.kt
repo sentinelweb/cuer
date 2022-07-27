@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -26,7 +25,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
@@ -53,7 +52,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     override val scope: Scope by fragmentScopeWithSource()
     private val viewModel: PlaylistItemEditViewModel by inject()
     private val log: LogWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val selectDialogCreator: SelectDialogCreator by inject()
     private val res: ResourceWrapper by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
@@ -97,6 +96,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         PLAYLIST_PARENT.getLong(arguments)
     }
 
+    private val allowPlayArg: Boolean by lazy {
+        ALLOW_PLAY.getBoolean(arguments, true)
+    }
+
     init {
         log.tag(this)
     }
@@ -114,10 +117,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         savedInstanceState
             ?.getString(STATE_KEY)
             ?.apply { viewModel.restoreState(this) }
-        log.d("onCreate id = ${itemArg?.id}")
         itemArg?.id?.apply {
             sharedElementEnterTransition =
-                TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+                TransitionInflater.from(requireContext())
+                    .inflateTransition(android.R.transition.move)
         }
     }
 
@@ -132,15 +135,11 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        binding.pleScroll.doOnPreDraw {
-//            startPostponedEnterTransition()
-//        }
         binding.plieToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
-        //ple_play_button.setOnClickListener { viewModel.onPlayVideoLocal() }
-        //ple_star_fab.setOnClickListener { viewModel.onStarClick() }
         binding.pliePlayFab.setOnClickListener { viewModel.onPlayVideo() }
+        binding.pliePlayFab.isVisible = allowPlayArg
         binding.plieSupportFab.setOnClickListener { viewModel.onSupport() }
         starMenuItem.isVisible = true
         playMenuItem.isVisible = false
@@ -148,24 +147,19 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         binding.plieToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.plie_star -> {
-                    viewModel.onStarClick()
-                    true
+                    viewModel.onStarClick(); true
                 }
                 R.id.plie_edit -> {
-                    viewModel.onEditClick()
-                    true
+                    viewModel.onEditClick(); true
                 }
                 R.id.plie_play -> {
-                    viewModel.onPlayVideo()
-                    true
+                    viewModel.onPlayVideo(); true
                 }
                 R.id.plie_launch -> {
-                    viewModel.onLaunchVideo()
-                    true
+                    viewModel.onLaunchVideo(); true
                 }
                 R.id.plie_share -> {
-                    viewModel.onShare()
-                    true
+                    viewModel.onShare(); true
                 }
                 else -> false
             }
@@ -203,16 +197,14 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             saveCallback.isEnabled = true
             if (id != null) { // fixme needs new flag assumes transition
                 media.image?.apply {
-                    Glide.with(requireContext())
-                        .load(this.url)
-                        .into(binding.plieImage)
+                    setImage(url)
                 }
                 binding.plieDescription.channelImageVisible(false)
                 binding.plieTitlePos.isVisible = false
                 binding.plieTitleBg.isVisible = false
                 playMenuItem.isVisible = false
             }
-            viewModel.setData(this, sourceArg, parentArg)
+            viewModel.setData(this, sourceArg, parentArg, allowPlayArg)
         }
 
         bindObserver(viewModel.getDialogObservable(), this::observeDialog)
@@ -232,9 +224,9 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         linkScopeToActivity()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        /* init */ viewModel
+    override fun onStart() {
+        super.onStart()
+        compactPlayerScroll.raisePlayer(this)
     }
 
     override fun onResume() {
@@ -289,7 +281,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         if (model.empty) {
             return
         }
-
+        binding.pliePlayFab.isVisible = model.showPlay
+        binding.pliePlayFab.isEnabled = model.canPlay
         binding.plieDescription.setModel(model.description)
         binding.plieDuration.text = model.durationText
         binding.plieDuration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
@@ -314,7 +307,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     private fun observeNavigation(nav: NavigationModel) = when (nav.target) {
         NAV_DONE -> doneNavigation.navigateDone()
-        else -> navMapper.navigate(nav)
+        else -> navRouter.navigate(nav)
     }
 
     private fun observeDialog(model: DialogModel) {

@@ -22,7 +22,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
@@ -59,7 +59,7 @@ class MainActivity :
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val snackBarWrapper: SnackbarWrapper by inject()
     private val log: LogWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val res: ResourceWrapper by inject()
@@ -116,14 +116,17 @@ class MainActivity :
 
         prefs.getInt(LAST_BOTTOM_TAB, 0)
             .takeIf { it > 0 }
-            .apply {
-                when (MainContract.LastTab.values()[0]) {
-                    PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists)
+            ?.also {
+                when (MainContract.LastTab.values()[it]) {
+                    PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
                         navController.navigate(R.id.navigation_playlists)
-                    PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist)
+                    }
+                    PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
                         navController.navigate(R.id.navigation_playlist)
-                    else -> if (navController.currentDestination?.id != R.id.navigation_playlists)
+                    }
+                    else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
                         navController.navigate(R.id.navigation_browse)
+                    }
                 }
             }
         presenter.initialise()
@@ -135,9 +138,10 @@ class MainActivity :
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
-        if (volumeControl.handleVolumeKey(event)) true else super.dispatchKeyEvent(event)
+        if (volumeControl.handleVolumeKey(event)) true
+        else super.dispatchKeyEvent(event)
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_actionbar, menu)
         return true
@@ -174,7 +178,7 @@ class MainActivity :
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
-        checkForPendingNavigation(null)?.apply { navMapper.navigate(this) }
+        checkForPendingNavigation(null)?.apply { navRouter.navigate(this) }
     }
 
     override fun onStart() {
@@ -182,7 +186,7 @@ class MainActivity :
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         presenter.onStart()
         //checkIntent(intent)
-        checkForPendingNavigation(null)?.apply { navMapper.navigate(this) }
+        checkForPendingNavigation(null)?.apply { navRouter.navigate(this) }
     }
 
     override fun onStop() {
@@ -207,7 +211,7 @@ class MainActivity :
     }
 
     override fun navigate(destination: NavigationModel) {
-        navMapper.navigate(destination)
+        navRouter.navigate(destination)
     }
 
     override fun navigate(id: Int) {
@@ -236,7 +240,7 @@ class MainActivity :
     }
 
     override fun clearPendingNavigation(target: Target) {
-        navMapper.clearArgs(intent, target)
+        navRouter.clearArgs(intent, target)
     }
 
     override fun navigateDone() {
@@ -265,7 +269,7 @@ class MainActivity :
     }
 
     var isRaised = true
-    override fun raisePlayer() {
+    override fun lowerPlayer() {
         if (isRaised) {
             val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
             val transAnimation =
@@ -276,7 +280,7 @@ class MainActivity :
         }
     }
 
-    override fun lowerPlayer() {
+    override fun raisePlayer() {
         if (!isRaised) {
             val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
             val transAnimation =

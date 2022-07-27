@@ -15,16 +15,16 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_share.*
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.databinding.ActivityShareBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
@@ -56,11 +56,15 @@ class ShareActivity : AppCompatActivity(),
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
     private var snackbar: Snackbar? = null
+
+    private var _binding: ActivityShareBinding? = null
+    private val binding: ActivityShareBinding
+        get() = _binding ?: throw Exception("Share view not bound")
 
     private val scanFragment: ScanContract.View
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
@@ -80,11 +84,12 @@ class ShareActivity : AppCompatActivity(),
             ?.getString(STATE_KEY)
             ?.apply { presenter.restoreState(this) }
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
-        setContentView(R.layout.activity_share)
+        _binding = ActivityShareBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        edgeToEdgeWrapper.doOnApplyWindowInsets(share_root) { view, insets, padding ->
+        edgeToEdgeWrapper.doOnApplyWindowInsets(binding.shareRoot) { view, insets, padding ->
             view.updatePadding(
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
@@ -172,10 +177,10 @@ class ShareActivity : AppCompatActivity(),
     }
 
     override fun setData(model: ShareContract.Model) {
-        top_left_button.applyButton(model.topLeft)
-        bottom_left_button.applyButton(model.bottomLeft)
-        top_right_button.applyButton(model.topRight)
-        bottom_right_button.applyButton(model.bottomRight)
+        binding.topLeftButton.applyButton(model.topLeft)
+        binding.bottomLeftButton.applyButton(model.bottomLeft)
+        binding.topRightButton.applyButton(model.topRight)
+        binding.bottomRightButton.applyButton(model.bottomRight)
     }
 
     private fun MaterialButton.applyButton(model: ShareContract.Model.Button) {
@@ -194,7 +199,8 @@ class ShareActivity : AppCompatActivity(),
         ScanFragmentDirections.actionGotoPlaylistItem(
             itemDomain.serialise(),
             source.toString(),
-            playlistParentId ?: -1
+            playlistParentId ?: -1,
+            false
         )
             .apply { navController.navigate(this) }
         //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
@@ -202,9 +208,10 @@ class ShareActivity : AppCompatActivity(),
 
     override fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?) {
         ScanFragmentDirections.actionGotoPlaylist(
-            id.id,
             id.source.toString(),
-            playlistParentId ?: -1
+            id.id,
+            playlistParentId ?: -1,
+            false
         )
             .apply { navController.navigate(this) }
     }
@@ -223,8 +230,8 @@ class ShareActivity : AppCompatActivity(),
 
     override fun warning(msg: String) {
         msg.apply {
-            share_warning.setText(msg)
-            share_warning.isVisible = true
+            binding.shareWarning.setText(msg)
+            binding.shareWarning.isVisible = true
         }
     }
 
@@ -242,7 +249,7 @@ class ShareActivity : AppCompatActivity(),
     }
 
     override fun navigate(nav: NavigationModel) {
-        navMapper.navigate(nav)
+        navRouter.navigate(nav)
     }
 
     // CommitHost
