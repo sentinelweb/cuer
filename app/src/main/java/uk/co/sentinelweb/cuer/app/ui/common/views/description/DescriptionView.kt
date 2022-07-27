@@ -53,18 +53,20 @@ class DescriptionView @JvmOverloads constructor(
     override fun onFinishInflate() {
         super.onFinishInflate()
         binding.pidAuthorImage.setOnClickListener { interactions.onChannelClick() }
-        binding.pidDesc.setMovementMethod(object : LinkMovementMethod() {
-            override fun handleMovementKey(
-                widget: TextView?,
-                buffer: Spannable?,
-                keyCode: Int,
-                movementMetaState: Int,
-                event: KeyEvent?
-            ): Boolean {
-                buffer?.run { interactions.onLinkClick(this.toString()) }
-                return true
-            }
-        })
+        // fixme: link clicks are handled in the TextView - need to extract the links manually
+        //  and set the spans o get the click events
+        // https://stackoverflow.com/questions/46343014/capture-http-link-click-event-in-android-textview
+//        binding.pidDesc.setMovementMethod(object : LinkMovementMethod() {
+//            override fun handleMovementKey(
+//                widget: TextView?, buffer: Spannable?, keyCode: Int,
+//                movementMetaState: Int, event: KeyEvent?
+//            ): Boolean {
+//                buffer
+//                    ?.takeIf { it.toString().startsWith("http") }
+//                    ?.run { interactions.onLinkClick(this.toString()) }
+//                return true
+//            }
+//        })
         binding.pidDesc.setTextIsSelectable(true)
     }
 
@@ -80,13 +82,17 @@ class DescriptionView @JvmOverloads constructor(
         binding.pidAuthorTitle.text = model.channelTitle
         binding.pidAuthorDesc.text = model.channelDescription
         binding.pidAuthorImage.isVisible = true
-        model.channelThumbUrl?.also { url ->
-            Glide.with(context)
-                .load(url)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .addListener(GlideFallbackLoadListener(binding.pidAuthorImage, url, ytDrawable, log))
-                .into(binding.pidAuthorImage)
-        } ?: run { binding.pidAuthorImage.setImageDrawable(ytDrawable) }
+        model.channelThumbUrl
+            ?.also { url ->
+                Glide.with(context)
+                    .load(url)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .addListener(
+                        GlideFallbackLoadListener(binding.pidAuthorImage, url, ytDrawable, log)
+                    )
+                    .into(binding.pidAuthorImage)
+            }
+            ?: run { binding.pidAuthorImage.setImageDrawable(ytDrawable) }
 
         binding.pidChips.removeAllViews()
         model.playlistChips.forEach { chipModel ->

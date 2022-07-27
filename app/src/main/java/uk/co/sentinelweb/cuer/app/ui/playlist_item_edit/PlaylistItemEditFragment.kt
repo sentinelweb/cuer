@@ -107,7 +107,6 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     // saves the data on back press (enabled in onResume)
     private val saveCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            log.d("onBackPressed - PlaylistItemEditFragment")
             viewModel.checkToSave()
         }
     }
@@ -118,10 +117,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         savedInstanceState
             ?.getString(STATE_KEY)
             ?.apply { viewModel.restoreState(this) }
-        log.d("onCreate id = ${itemArg?.id}")
         itemArg?.id?.apply {
             sharedElementEnterTransition =
-                TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
+                TransitionInflater.from(requireContext())
+                    .inflateTransition(android.R.transition.move)
         }
     }
 
@@ -136,14 +135,9 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        binding.pleScroll.doOnPreDraw {
-//            startPostponedEnterTransition()
-//        }
         binding.plieToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
-        //ple_play_button.setOnClickListener { viewModel.onPlayVideoLocal() }
-        //ple_star_fab.setOnClickListener { viewModel.onStarClick() }
         binding.pliePlayFab.setOnClickListener { viewModel.onPlayVideo() }
         binding.pliePlayFab.isVisible = allowPlayArg
         binding.plieSupportFab.setOnClickListener { viewModel.onSupport() }
@@ -153,24 +147,19 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         binding.plieToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.plie_star -> {
-                    viewModel.onStarClick()
-                    true
+                    viewModel.onStarClick(); true
                 }
                 R.id.plie_edit -> {
-                    viewModel.onEditClick()
-                    true
+                    viewModel.onEditClick(); true
                 }
                 R.id.plie_play -> {
-                    viewModel.onPlayVideo()
-                    true
+                    viewModel.onPlayVideo(); true
                 }
                 R.id.plie_launch -> {
-                    viewModel.onLaunchVideo()
-                    true
+                    viewModel.onLaunchVideo(); true
                 }
                 R.id.plie_share -> {
-                    viewModel.onShare()
-                    true
+                    viewModel.onShare(); true
                 }
                 else -> false
             }
@@ -234,11 +223,6 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         requireActivity().onBackPressedDispatcher.addCallback(this, saveCallback)
         linkScopeToActivity()
     }
-
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//        /* init */ viewModel
-//    }
 
     override fun onStart() {
         super.onStart()

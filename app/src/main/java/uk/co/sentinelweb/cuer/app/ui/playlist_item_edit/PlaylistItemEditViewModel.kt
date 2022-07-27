@@ -197,11 +197,9 @@ class PlaylistItemEditViewModel constructor(
     }
 
     override fun onLinkClick(urlString: String) {
+        // this doesnt get event until the DescriptionView is setup to capture the links properly
         _navigateLiveData.value =
-            NavigationModel(
-                WEB_LINK,
-                mapOf(NavigationModel.Param.LINK to urlString)
-            )
+            NavigationModel(WEB_LINK, mapOf(NavigationModel.Param.LINK to urlString))
     }
 
     override fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {

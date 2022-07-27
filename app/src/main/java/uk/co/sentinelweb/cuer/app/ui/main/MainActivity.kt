@@ -124,17 +124,12 @@ class MainActivity :
                     PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
                         navController.navigate(R.id.navigation_playlist)
                     }
-                    else -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
+                    else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
                         navController.navigate(R.id.navigation_browse)
                     }
                 }
             }
         presenter.initialise()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        log.d("onBackPressed - MainActivity")
     }
 
     override fun onDestroy() {
@@ -143,7 +138,8 @@ class MainActivity :
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
-        if (volumeControl.handleVolumeKey(event)) true else super.dispatchKeyEvent(event)
+        if (volumeControl.handleVolumeKey(event)) true
+        else super.dispatchKeyEvent(event)
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)

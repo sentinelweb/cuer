@@ -103,6 +103,7 @@ class AytPortraitActivity : AppCompatActivity(),
 
         binding.portraitPlayerDescription.interactions = object : DescriptionContract.Interactions {
             override fun onLinkClick(urlString: String) {
+                // this doesnt get event until the DescriptionView is setup to capture the links properly
                 mviView.dispatch(LinkClick(urlString))
             }
 
