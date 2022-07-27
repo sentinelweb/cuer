@@ -198,5 +198,15 @@
     <string name="menu_sort_category">Categories</string>
     <string name="support_no_links">No links in the description</string>
     <string name="support_links_loading">Loading …</string>
+    <string name="support_crypto_warning_title">About crypto</string>
+    <string name="support_crypto_warning_message">TRANSACTIONS ARE NON REVERSIBLE
+\n\n・ These addresses are just scanned from the description and NOT VALIDATED.
+\n・ETH style addresses (starting 0x) can represent lots of different tokens.
+\n・Please check the address with the channel first.
+\n・Consider making a small payment first to check it goes through properly.
+\n\nSelected address was copied to the clipboard, the following apps are the whitelisted apps but you can use any on your device.
+    </string>
+    <string name="support_crypto_warning_ok">OK</string>
+    <string name="support_crypto_warning_dont_show">I know don\'t show this</string>
 
 </resources>

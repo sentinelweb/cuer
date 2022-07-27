@@ -22,7 +22,6 @@ class AndroidCryptoLauncher(
             activity.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = ClipData.newPlainText(link.type.toString(), link.address)
         clipboardManager.setPrimaryClip(clipData)
-        // todo show warning dialog
         toast.show("${link.type.name} address copied")
     }
 

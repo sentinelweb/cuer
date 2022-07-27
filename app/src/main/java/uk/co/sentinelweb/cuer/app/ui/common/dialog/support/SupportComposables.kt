@@ -75,7 +75,7 @@ object SupportComposables : KoinComponent {
                 contentDescription = null,
                 tint = MaterialTheme.colors.onPrimary,
                 modifier = Modifier
-                    .padding(start = 8.dp, top = 16.dp)
+                    .padding(start = 8.dp)
                     .size(24.dp)
                     .align(CenterVertically)
             )
