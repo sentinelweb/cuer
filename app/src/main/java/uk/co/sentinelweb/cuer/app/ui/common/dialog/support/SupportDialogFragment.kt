@@ -20,7 +20,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.Label.Crypto
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.Label.Open
@@ -156,7 +156,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                 scoped<CryptoLauncher> {
                     AndroidCryptoLauncher(this.getFragmentActivity(), get(), get())
                 }
-                scoped { navigationMapper(true, this.getFragmentActivity()) }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
             }
         }
     }

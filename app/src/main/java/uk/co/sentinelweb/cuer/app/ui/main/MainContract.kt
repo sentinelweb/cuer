@@ -9,7 +9,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
@@ -74,7 +74,7 @@ interface MainContract {
                         .supportFragmentManager
                         .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).playerControls
                 }
-                scoped { navigationMapper(false, getSource()) }
+                scoped { navigationRouter(false, getSource()) }
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
                 scoped<DoneNavigation> { getSource() }

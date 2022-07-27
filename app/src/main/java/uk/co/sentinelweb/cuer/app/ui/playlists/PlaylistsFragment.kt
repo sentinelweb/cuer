@@ -22,7 +22,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
@@ -54,7 +54,7 @@ class PlaylistsFragment :
     private val imageProvider: ImageProvider by inject()
     private val log: LogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     private var _binding: FragmentPlaylistsBinding? = null
@@ -246,7 +246,7 @@ class PlaylistsFragment :
                     )
                         .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
                 }
-            else -> navMapper.navigate(nav)
+            else -> navRouter.navigate(nav)
         }
 
     }

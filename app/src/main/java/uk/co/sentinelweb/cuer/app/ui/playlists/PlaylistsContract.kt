@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
@@ -131,7 +131,7 @@ interface PlaylistsContract {
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }
-                scoped { navigationMapper(true, this.getFragmentActivity()) }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
                 viewModel { State() }
             }
         }

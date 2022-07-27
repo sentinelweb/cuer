@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import androidx.annotation.DrawableRes
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -19,7 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
@@ -225,7 +224,7 @@ interface PlaylistContract {
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(),get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
-                scoped { navigationMapper(true, this.getFragmentActivity()) }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped {
                     PlayUseCase(
                         queue = get(),
@@ -241,7 +240,7 @@ interface PlaylistContract {
                         getSource(),
                         itemFactory = get(),
                         itemModelMapper = get(),
-                        navigationMapper = get(),
+                        navigationRouter = get(),
                         castDialogWrapper = get(),
                         floatingService = get(),
                         log = get(),

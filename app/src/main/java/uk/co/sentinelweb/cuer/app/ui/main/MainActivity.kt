@@ -22,7 +22,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
@@ -59,7 +59,7 @@ class MainActivity :
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val snackBarWrapper: SnackbarWrapper by inject()
     private val log: LogWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val res: ResourceWrapper by inject()
@@ -174,7 +174,7 @@ class MainActivity :
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
-        checkForPendingNavigation(null)?.apply { navMapper.navigate(this) }
+        checkForPendingNavigation(null)?.apply { navRouter.navigate(this) }
     }
 
     override fun onStart() {
@@ -182,7 +182,7 @@ class MainActivity :
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         presenter.onStart()
         //checkIntent(intent)
-        checkForPendingNavigation(null)?.apply { navMapper.navigate(this) }
+        checkForPendingNavigation(null)?.apply { navRouter.navigate(this) }
     }
 
     override fun onStop() {
@@ -207,7 +207,7 @@ class MainActivity :
     }
 
     override fun navigate(destination: NavigationModel) {
-        navMapper.navigate(destination)
+        navRouter.navigate(destination)
     }
 
     override fun navigate(id: Int) {
@@ -236,7 +236,7 @@ class MainActivity :
     }
 
     override fun clearPendingNavigation(target: Target) {
-        navMapper.clearArgs(intent, target)
+        navRouter.clearArgs(intent, target)
     }
 
     override fun navigateDone() {

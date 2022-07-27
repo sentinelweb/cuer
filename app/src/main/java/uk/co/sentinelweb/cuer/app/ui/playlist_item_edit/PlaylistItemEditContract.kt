@@ -9,7 +9,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
@@ -85,7 +85,7 @@ interface PlaylistItemEditContract {
                 }
                 scoped { State() }
                 scoped { PlaylistItemEditModelMapper(get(), get(), get(), get()) }
-                scoped { navigationMapper(true, this.getFragmentActivity()) }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { SelectDialogCreator(this.getFragmentActivity()) }
                 scoped { this.getFragmentActivity() }
                 scoped { AlertDialogCreator(this.getFragmentActivity()) }
@@ -107,7 +107,7 @@ interface PlaylistItemEditContract {
                         getSource(),
                         itemFactory = get(),
                         itemModelMapper = get(),
-                        navigationMapper = get(),
+                        navigationRouter = get(),
                         castDialogWrapper = get(),
                         floatingService = get(),
                         log = get(),

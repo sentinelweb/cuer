@@ -126,7 +126,7 @@ interface ShareContract {
                     )
                 }
                 scoped<DoneNavigation> { getSource() }
-                scoped { navigationMapper(false, getSource()) }
+                scoped { navigationRouter(false, getSource()) }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<ShareStrings> { AndroidShareStrings(get()) }
                 scoped<CommitHost> { getSource() }

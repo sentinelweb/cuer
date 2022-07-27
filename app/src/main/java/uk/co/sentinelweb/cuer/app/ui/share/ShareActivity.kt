@@ -24,7 +24,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
@@ -56,7 +56,7 @@ class ShareActivity : AppCompatActivity(),
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
@@ -244,7 +244,7 @@ class ShareActivity : AppCompatActivity(),
     }
 
     override fun navigate(nav: NavigationModel) {
-        navMapper.navigate(nav)
+        navRouter.navigate(nav)
     }
 
     // CommitHost

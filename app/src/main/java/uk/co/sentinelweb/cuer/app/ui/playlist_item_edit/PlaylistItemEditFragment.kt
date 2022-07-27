@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -26,7 +25,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
@@ -35,7 +34,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
-import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -54,7 +52,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     override val scope: Scope by fragmentScopeWithSource()
     private val viewModel: PlaylistItemEditViewModel by inject()
     private val log: LogWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val selectDialogCreator: SelectDialogCreator by inject()
     private val res: ResourceWrapper by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
@@ -326,7 +324,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     private fun observeNavigation(nav: NavigationModel) = when (nav.target) {
         NAV_DONE -> doneNavigation.navigateDone()
-        else -> navMapper.navigate(nav)
+        else -> navRouter.navigate(nav)
     }
 
     private fun observeDialog(model: DialogModel) {

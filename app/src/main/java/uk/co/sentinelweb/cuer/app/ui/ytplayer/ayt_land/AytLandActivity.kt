@@ -17,14 +17,13 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityAytFullsreenBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
@@ -57,7 +56,7 @@ class AytLandActivity : AppCompatActivity(),
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val toast: ToastWrapper by inject()
     private val showHideUi: ShowHideUi by inject()
     private val res: ResourceWrapper by inject()
@@ -214,9 +213,9 @@ class AytLandActivity : AppCompatActivity(),
                     aytViewHolder.processCommand(command)
                 }
                 is LinkOpen ->
-                    navMapper.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
+                    navRouter.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
                 is ChannelOpen ->
-                    label.channel.platformId?.let { id -> navMapper.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
+                    label.channel.platformId?.let { id -> navRouter.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
                 is FullScreenPlayerOpen -> toast.show("Already in protrait mode - shouldnt get here")
                 is PipPlayerOpen -> {
                     val hasPermission = floatingService.hasPermission(this@AytLandActivity)
@@ -230,7 +229,7 @@ class AytLandActivity : AppCompatActivity(),
                 }
                 is PortraitPlayerOpen -> label.also {
                     aytViewHolder.switchView()
-                    navMapper.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))
+                    navRouter.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))
                     finish()
                 }
                 is ShowSupport -> SupportDialogFragment.show(this@AytLandActivity, label.item.media)

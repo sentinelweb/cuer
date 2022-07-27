@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
@@ -28,7 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationMapper
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
@@ -58,7 +57,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
-    private val navMapper: NavigationMapper by inject()
+    private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     private val starMenuItem: MenuItem
@@ -328,7 +327,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         }
     }
 
-    private fun observeNavigation(nav: NavigationModel) = navMapper.navigate(nav)
+    private fun observeNavigation(nav: NavigationModel) = navRouter.navigate(nav)
 
     private fun observeDomain(domain: PlaylistDomain) {
         softKeyboard.hideSoftKeyboard(binding.peTitleEdit)
