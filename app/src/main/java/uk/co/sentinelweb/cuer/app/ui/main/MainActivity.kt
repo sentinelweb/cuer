@@ -116,14 +116,17 @@ class MainActivity :
 
         prefs.getInt(LAST_BOTTOM_TAB, 0)
             .takeIf { it > 0 }
-            .apply {
-                when (MainContract.LastTab.values()[0]) {
-                    PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists)
+            ?.also {
+                when (MainContract.LastTab.values()[it]) {
+                    PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
                         navController.navigate(R.id.navigation_playlists)
-                    PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist)
+                    }
+                    PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
                         navController.navigate(R.id.navigation_playlist)
-                    else -> if (navController.currentDestination?.id != R.id.navigation_playlists)
+                    }
+                    else -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
                         navController.navigate(R.id.navigation_browse)
+                    }
                 }
             }
         presenter.initialise()
