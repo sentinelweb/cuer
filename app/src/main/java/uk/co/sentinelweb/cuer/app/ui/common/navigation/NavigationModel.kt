@@ -3,7 +3,13 @@ package uk.co.sentinelweb.cuer.app.ui.common.navigation
 import android.content.Intent
 import android.os.Bundle
 import androidx.navigation.NavOptions
+import androidx.navigation.fragment.FragmentNavigator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.domain.CategoryDomain
+import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import kotlin.reflect.KClass
 
 data class NavigationModel constructor(
     val target: Target,
@@ -14,6 +20,13 @@ data class NavigationModel constructor(
         params.keys
             .containsAll(target.requiredParams)
             .takeIf { it }
+            ?.also {
+                params.forEach {
+                    if (it.value != null && it.key.type != it.value!!::class)
+                        throw IllegalArgumentException("Invalid parameter type: ${it.key} requires ${it.key.type} - was ${it.value!!::class}"
+                    )
+                }
+            }
             ?: throw IllegalArgumentException("$target requires ${target.requiredParams}")
     }
 
@@ -42,25 +55,26 @@ data class NavigationModel constructor(
         }
     }
 
-    // todo add types as a class field - verify types in init
-    enum class Param {
-        PLATFORM_ID, /* String */
-        CHANNEL_ID, /* String */
-        LINK, /* String */
-        PLAY_NOW, /* Boolean */
-        PLAYLIST_ID, /* Long */
-        PLAYLIST_ITEM_ID, /* Long */
-        PLAYLIST_ITEM, /* PlaylistItemDomain */
-        FRAGMENT_NAV_EXTRAS, /* FragmentNavigator.Extras */
-        SOURCE, /* uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source */
-        HEADLESS /*Boolean*/,
-        PLAYLIST_PARENT, /* Long */
-        CATEGORY, /* CategoryDomain */
-        PASTE, /* Boolean */
-        IMAGE_URL, /* String */
-        MEDIA, /* MediaDomain */
-        APP_LIST, /* List<String> */
-        ALLOW_PLAY, /* Boolean */
+    enum class Param(
+        val type: KClass<*>
+    ) {
+        PLATFORM_ID(String::class),
+        CHANNEL_ID(String::class),
+        LINK(String::class),
+        PLAY_NOW(Boolean::class),
+        PLAYLIST_ID(Long::class),
+        PLAYLIST_ITEM_ID(Long::class),
+        PLAYLIST_ITEM((PlaylistItemDomain::class)),
+        FRAGMENT_NAV_EXTRAS(FragmentNavigator.Extras::class),
+        SOURCE(OrchestratorContract.Source::class),
+        HEADLESS(Boolean::class),
+        PLAYLIST_PARENT(Long::class),
+        CATEGORY(CategoryDomain::class),
+        PASTE(Boolean::class),
+        IMAGE_URL(String::class),
+        MEDIA(MediaDomain::class),
+        APP_LIST(List::class),
+        ALLOW_PLAY(Boolean::class),
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)
@@ -75,6 +89,7 @@ data class NavigationModel constructor(
 
         inline fun <reified T : Enum<T>> getEnum(b: Bundle?): T? =
             b?.getString(name)?.let { pref -> enumValues<T>().find { it.name == pref } }
+
         inline fun <reified T : Enum<T>> getEnum(i: Intent?): T? =
             i?.getStringExtra(name)?.let { pref -> enumValues<T>().find { it.name == pref } }
     }
