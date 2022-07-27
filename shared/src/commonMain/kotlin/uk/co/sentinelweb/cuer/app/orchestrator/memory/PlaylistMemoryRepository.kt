@@ -60,7 +60,7 @@ class PlaylistMemoryRepository constructor(
         domain.id?.let { playlistId ->
             if (!options.flat || !data.containsKey(playlistId)) {
                 domain.copy(// todo fix this in share
-                    items = domain.items.mapIndexed { index, item ->
+                    items = domain.items.mapIndexed { _, item ->
                         item.copy(
                             //id = playlistItemMemoryRepository.idCounter,
                             playlistId = playlistId,

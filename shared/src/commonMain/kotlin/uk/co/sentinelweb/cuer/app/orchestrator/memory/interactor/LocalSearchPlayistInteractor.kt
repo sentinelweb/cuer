@@ -31,7 +31,7 @@ class LocalSearchPlayistInteractor constructor(
                     ?.data
                     ?.let {
                         makeSearchHeader()
-                            .copy(items = it.mapIndexed { i, playlistItem -> playlistItem.copy() })
+                            .copy(items = it.mapIndexed { _, playlistItem -> playlistItem.copy() })
                     }
             }
 

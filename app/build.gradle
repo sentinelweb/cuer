@@ -1,7 +1,6 @@
-//todo convert .kts
+// todo convert .kts
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlinx-serialization'
 apply plugin: 'com.google.gms.google-services'

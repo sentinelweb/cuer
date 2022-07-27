@@ -54,6 +54,9 @@ kotlin {
     sourceSets {
         all {
             languageSettings.optIn("kotlin.time.ExperimentalTime")
+            languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            languageSettings.optIn("com.russhwolf.settings.ExperimentalSettingsImplementation")
+            languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
         val commonMain by getting {
             dependencies {
