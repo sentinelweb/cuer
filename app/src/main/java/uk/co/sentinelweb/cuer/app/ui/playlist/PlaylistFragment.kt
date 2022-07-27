@@ -153,7 +153,8 @@ class PlaylistFragment :
 
         sharedElementReturnTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
-        sharedElementEnterTransition = from(context).inflateTransition(android.R.transition.move)
+        sharedElementEnterTransition =
+            from(requireContext()).inflateTransition(android.R.transition.move)
     }
 
     override fun onCreateView(
@@ -498,11 +499,10 @@ class PlaylistFragment :
 
     override fun gotoEdit(id: Long, source: Source) {
         PlaylistFragmentDirections.actionGotoEditPlaylist(
-            id,
             source.toString(),
-            null
-        )
-            .apply { findNavController().navigate(this) }
+            null,
+            id
+        ).apply { findNavController().navigate(this) }
     }
 
     override fun showAlertDialog(model: AlertDialogModel) {

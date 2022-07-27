@@ -203,8 +203,8 @@ class ShareActivity : AppCompatActivity(),
 
     override fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?) {
         ScanFragmentDirections.actionGotoPlaylist(
-            id.id,
             id.source.toString(),
+            id.id,
             playlistParentId ?: -1,
             false
         )

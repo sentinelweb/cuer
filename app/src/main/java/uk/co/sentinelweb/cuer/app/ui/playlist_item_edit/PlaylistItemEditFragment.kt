@@ -107,6 +107,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     // saves the data on back press (enabled in onResume)
     private val saveCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
+            log.d("onBackPressed - PlaylistItemEditFragment")
             viewModel.checkToSave()
         }
     }
@@ -120,7 +121,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         log.d("onCreate id = ${itemArg?.id}")
         itemArg?.id?.apply {
             sharedElementEnterTransition =
-                TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+                TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
         }
     }
 

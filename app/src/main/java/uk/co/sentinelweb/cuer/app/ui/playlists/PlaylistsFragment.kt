@@ -230,25 +230,24 @@ class PlaylistsFragment :
             NavigationModel.Target.PLAYLIST ->
                 sourceView?.let { view ->
                     PlaylistsFragmentDirections.actionGotoPlaylist(
-                        nav.params[PLAYLIST_ID] as Long,
-                        nav.params[PLAY_NOW] as Boolean,
                         (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
                         nav.params[IMAGE_URL] as String?,
+                        nav.params[PLAYLIST_ID] as Long,
+                        nav.params[PLAY_NOW] as Boolean,
                     )
                         .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
                 }
             NavigationModel.Target.PLAYLIST_EDIT ->
                 sourceView?.let { view ->
                     PlaylistsFragmentDirections.actionEditPlaylist(
-                        nav.params[PLAYLIST_ID] as Long,
                         (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
                         nav.params[IMAGE_URL] as String?,
+                        nav.params[PLAYLIST_ID] as Long,
                     )
                         .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
                 }
             else -> navRouter.navigate(nav)
         }
-
     }
     //endregion
 

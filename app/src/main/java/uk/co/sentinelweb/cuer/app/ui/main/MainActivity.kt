@@ -132,6 +132,11 @@ class MainActivity :
         presenter.initialise()
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        log.d("onBackPressed - MainActivity")
+    }
+
     override fun onDestroy() {
         presenter.onDestroy()
         super.onDestroy()
@@ -140,7 +145,7 @@ class MainActivity :
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
         if (volumeControl.handleVolumeKey(event)) true else super.dispatchKeyEvent(event)
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_actionbar, menu)
         return true

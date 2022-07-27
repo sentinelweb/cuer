@@ -93,7 +93,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         setHasOptionsMenu(true)
         playlistIdArg?.apply {
             sharedElementEnterTransition =
-                TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+                TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
         }
     }
 
