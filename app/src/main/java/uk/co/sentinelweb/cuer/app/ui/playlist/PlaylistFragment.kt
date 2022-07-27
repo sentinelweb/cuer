@@ -261,10 +261,6 @@ class PlaylistFragment :
         linkScopeToActivity()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return super.onOptionsItemSelected(item)
-    }
-
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
         if (isHeadless) {

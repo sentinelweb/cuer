@@ -37,7 +37,7 @@ class PlaylistModelMapper constructor(
         val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
         return PlaylistContract.Model(
             title = domain.title,
-            imageUrl = domain.image?.url
+            imageUrl = (domain.image?:domain.thumb)?.url
                 ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
             loopModeIndex = domain.mode.ordinal,
             loopModeIcon = iconMapper.map(domain.mode),

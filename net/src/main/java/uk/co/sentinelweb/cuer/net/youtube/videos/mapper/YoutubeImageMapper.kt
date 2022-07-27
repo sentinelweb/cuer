@@ -11,7 +11,9 @@ internal class YoutubeImageMapper {
 
     fun mapImage(thumbnails: ThumbnailsDto) =
         map(thumbnails
-            .let { thumbnailsDto -> thumbnailsDto.maxres ?: thumbnailsDto.standard })
+            .let { thumbnailsDto ->
+                thumbnailsDto.maxres ?: thumbnailsDto.high ?: thumbnailsDto.standard
+            })
 
 
     private fun map(thumbNail: ThumbnailDto?) =

@@ -208,9 +208,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             saveCallback.isEnabled = true
             if (id != null) { // fixme needs new flag assumes transition
                 media.image?.apply {
-                    Glide.with(requireContext())
-                        .load(this.url)
-                        .into(binding.plieImage)
+                    setImage(url)
                 }
                 binding.plieDescription.channelImageVisible(false)
                 binding.plieTitlePos.isVisible = false
