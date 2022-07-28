@@ -12,6 +12,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -51,8 +52,8 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment(), AndroidScopeCompo
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeDialog()
-        observeNavigation()
+        bindObserver(viewModel.getDialogObservable(), ::observeDialog)
+        bindObserver(viewModel.getNavigationObservable(), ::observeNavigation)
     }
 
     override fun onStop() {
@@ -60,44 +61,32 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment(), AndroidScopeCompo
         dialogFragment?.dismissAllowingStateLoss()
     }
 
-    private fun observeDialog() {
-        viewModel.getDialogObservable().observe(this.viewLifecycleOwner,
-            object : Observer<DialogModel> {
-                override fun onChanged(model: DialogModel) {
-                    hideDialogFragment()
-                    when (model) {
-                        is PlaylistsDialogContract.Config -> {
-                            dialogFragment = PlaylistsDialogFragment.newInstance(model)
-                                .also { it.show(childFragmentManager, SELECT_PLAYLIST_TAG) }
-                        }
-                        is DateRangePickerDialogModel -> {
-                            dialogFragment = datePickerCreator.createDateRangePicker(model)
-                                .also { it.show(childFragmentManager, SELECT_DATES_TAG) }
-                        }
-                        is EnumValuesDialogModel<*> -> {
-                            log.d("Show order")
-                            enumPickerCreator.create(model).show()
-                        }
-                        is DialogModel.DismissDialogModel -> {
-                            hideDialogFragment()
-                        }
-                        else -> Unit
-                    }
-                }
+    private fun observeDialog(model: DialogModel) {
+        hideDialogFragment()
+        when (model) {
+            is PlaylistsDialogContract.Config -> {
+                dialogFragment = PlaylistsDialogFragment.newInstance(model)
+                    .also { it.show(childFragmentManager, SELECT_PLAYLIST_TAG) }
             }
-        )
+            is DateRangePickerDialogModel -> {
+                dialogFragment = datePickerCreator.createDateRangePicker(model)
+                    .also { it.show(childFragmentManager, SELECT_DATES_TAG) }
+            }
+            is EnumValuesDialogModel<*> -> {
+                log.d("Show order")
+                enumPickerCreator.create(model).show()
+            }
+            is DialogModel.DismissDialogModel -> {
+                hideDialogFragment()
+            }
+            else -> Unit
+        }
     }
 
-    private fun observeNavigation() {
-        viewModel.getNavigationObservable().observe(this.viewLifecycleOwner,
-            object : Observer<NavigationModel> {
-                override fun onChanged(nav: NavigationModel) {
-                    when (nav.target) {
-                        else -> navRouter.navigate(nav)
-                    }
-                }
-            }
-        )
+    private fun observeNavigation(nav: NavigationModel) {
+        when (nav.target) {
+            else -> navRouter.navigate(nav)
+        }
     }
 
     private fun hideDialogFragment() {

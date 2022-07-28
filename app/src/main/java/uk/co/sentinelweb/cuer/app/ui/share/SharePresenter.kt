@@ -71,7 +71,7 @@ class SharePresenter constructor(
                                 .replaceFirstChar { char -> char.uppercase() })
                     )
             }
-            ?.let { mapper.mapShareModel(state, ::finish) }
+            ?.let { mapper.mapShareModel(state, ::finish, view.canCommit(state.scanResult?.type)) }
             ?: mapper.mapEmptyModel(::finish)) // todo fail result
             .apply {
                 state.model = this
@@ -156,7 +156,7 @@ class SharePresenter constructor(
                 state.ready = ready
                 state.scanResult = scanResult
                 state.model = state.scanResult
-                    ?.let { mapper.mapShareModel(state, ::finish) }
+                    ?.let { mapper.mapShareModel(state, ::finish, view.canCommit(state.scanResult?.type)) }
                     ?: mapper.mapEmptyModel(::finish)
             }
     }
@@ -172,11 +172,15 @@ class SharePresenter constructor(
     private fun finish(add: Boolean, play: Boolean, forward: Boolean) {
         coroutines.mainScope.launch {
             if (add) {// fixme if playlist items are changed then they aren't saved here
-                view.commit(object : ShareContract.Committer.OnCommit {
-                    override suspend fun onCommit(type: ObjectTypeDomain, data: List<*>) {
-                        afterCommit(type, data, play, forward)
-                    }
-                })
+                if (view.canCommit(state.scanResult?.type)) {
+                    view.commit(object : ShareContract.Committer.OnCommit {
+                        override suspend fun onCommit(type: ObjectTypeDomain, data: List<*>) {
+                            afterCommit(type, data, play, forward)
+                        }
+                    })
+                } else {
+                    view.warning("Can't save from here")
+                }
             } else {
                 when (state.scanResult?.type) {
                     MEDIA ->
@@ -201,6 +205,10 @@ class SharePresenter constructor(
             }
         }
 
+    }
+
+    override fun onDestinationChange() {
+        view.hideWarning()
     }
 
     private suspend fun afterCommit(

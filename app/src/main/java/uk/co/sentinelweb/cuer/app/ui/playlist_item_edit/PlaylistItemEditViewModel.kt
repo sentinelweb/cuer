@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SHARED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -77,12 +78,13 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?, allowPlay: Boolean) {
+    fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?, allowPlay: Boolean, isOnSharePlaylist: Boolean) {
         item.let {
             state.editingPlaylistItem = it
             state.source = source
             state.parentPlaylistId = parentId ?: -1
             state.allowPlay = allowPlay
+            state.isOnSharePlaylist = isOnSharePlaylist
             it.media.let { setData(it) }
         }
     }
@@ -140,7 +142,7 @@ class PlaylistItemEditViewModel constructor(
     }
 
     private suspend fun checkToAutoSelectPlaylists() {
-        if (state.selectedPlaylists.isEmpty()) {
+        if (state.selectedPlaylists.isEmpty() && !state.isOnSharePlaylist) {
             state.media?.apply {
                 playlistOrchestrator.loadList(
                     ChannelPlatformIdFilter(channelData.platformId!!),

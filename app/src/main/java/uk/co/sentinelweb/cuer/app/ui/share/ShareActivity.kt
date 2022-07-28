@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
@@ -30,6 +31,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
@@ -39,6 +41,7 @@ import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseCategory
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -74,9 +77,18 @@ class ShareActivity : AppCompatActivity(),
 
     private val commitFragment: ShareContract.Committer
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            ?.run { (getChildFragmentManager().getFragments().get(0) as? ShareContract.Committer?) }
+            ?.run { (getChildFragmentManager().getFragments().get(0) as? ShareContract.Committer) }
             ?: throw IllegalStateException("Not a commit fragment")
 
+    private val isOnPlaylist: Boolean
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.run { (getChildFragmentManager().getFragments().get(0) is PlaylistFragment) }
+            ?: false
+
+    private val isOnPlaylistItem: Boolean
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.run { (getChildFragmentManager().getFragments().get(0) is PlaylistItemEditFragment) }
+            ?: false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +105,9 @@ class ShareActivity : AppCompatActivity(),
             view.updatePadding(
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
+        }
+        navController.addOnDestinationChangedListener { _: NavController, _: NavDestination, _: Bundle? ->
+                   presenter.onDestinationChange()
         }
         scanFragment.listener = this
     }
@@ -201,8 +216,7 @@ class ShareActivity : AppCompatActivity(),
             source.toString(),
             playlistParentId ?: -1,
             false
-        )
-            .apply { navController.navigate(this) }
+        ).apply { navController.navigate(this) }
         //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
     }
 
@@ -212,8 +226,7 @@ class ShareActivity : AppCompatActivity(),
             id.id,
             playlistParentId ?: -1,
             false
-        )
-            .apply { navController.navigate(this) }
+        ).apply { navController.navigate(this) }
     }
 
     override fun scanResult(result: ScanContract.Result) {
@@ -223,16 +236,32 @@ class ShareActivity : AppCompatActivity(),
     override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) =
         commitFragment.commit(onCommit)
 
+    override fun canCommit(type: ObjectTypeDomain?): Boolean =
+        when (type) {
+            ObjectTypeDomain.MEDIA -> isOnPlaylistItem
+            ObjectTypeDomain.PLAYLIST -> isOnPlaylist
+            ObjectTypeDomain.PLAYLIST_ITEM -> isOnPlaylistItem
+            ObjectTypeDomain.CHANNEL -> false
+            ObjectTypeDomain.IMAGE -> false
+            ObjectTypeDomain.SEARCH_LOCAL -> false
+            ObjectTypeDomain.SEARCH_REMOTE -> false
+            ObjectTypeDomain.PLAYLIST_TREE -> false
+            ObjectTypeDomain.UNKNOWN -> false
+            null -> false
+        }
+
     override fun error(msg: String) {
         snackbar?.dismiss()
         snackbar = snackbarWrapper.make("ERROR: $msg").apply { show() }
     }
 
-    override fun warning(msg: String) {
-        msg.apply {
-            binding.shareWarning.setText(msg)
-            binding.shareWarning.isVisible = true
-        }
+    override fun warning(msg: String) = with (binding.shareWarning) {
+        text = msg
+        isVisible = true
+    }
+
+    override fun hideWarning() = with (binding.shareWarning) {
+        isVisible = false
     }
 
     override fun exit() {

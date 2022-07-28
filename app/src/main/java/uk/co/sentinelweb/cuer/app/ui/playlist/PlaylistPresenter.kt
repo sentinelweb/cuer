@@ -294,6 +294,8 @@ class PlaylistPresenter(
     override fun onPlayPlaylist(): Boolean {
         if (isPlaylistPlaying()) {
             chromeCastWrapper.killCurrentSession()
+        } else if ((state.playlist?.id ?: 0) <= 0) {
+            view.showError("Please add the playlist first")
         } else {
             playUseCase.playLogic(state.playlist?.currentItemOrStart(), state.playlist, false)
         }
@@ -388,6 +390,8 @@ class PlaylistPresenter(
             ?.let { itemDomain ->
                 if (interactions != null) {
                     interactions?.onPlay(itemDomain)
+                } else if ((state.playlist?.id ?: 0) <=  0) {
+                    view.showError("Please add the playlist first")
                 } else {
                     playUseCase.playLogic(itemDomain, state.playlist, false)
                 }
@@ -399,6 +403,8 @@ class PlaylistPresenter(
             ?.let { itemDomain ->
                 if (interactions != null) {
                     interactions?.onPlayStartClick(itemDomain)
+                } else if ((state.playlist?.id ?: 0) <= 0) {
+                    view.showError("Please add the playlist first")
                 } else playUseCase.playLogic(itemDomain, state.playlist, false)
             }
     } // todo error
