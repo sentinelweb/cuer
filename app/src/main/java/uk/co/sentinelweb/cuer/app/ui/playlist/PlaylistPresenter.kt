@@ -95,6 +95,11 @@ class PlaylistPresenter(
     private val isQueuedPlaylist: Boolean
         get() = state.playlistIdentifier == queue.playlistId
 
+    private fun canPlayPlaylist() = (state.playlist?.id ?: 0) > 0
+
+    private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
+        (itemDomain.playlistId ?: 0) > 0
+
     private val castConnectionListener = object : ChromecastConnectionListener {
         override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
             if (isQueuedPlaylist) {
@@ -294,7 +299,7 @@ class PlaylistPresenter(
     override fun onPlayPlaylist(): Boolean {
         if (isPlaylistPlaying()) {
             chromeCastWrapper.killCurrentSession()
-        } else if ((state.playlist?.id ?: 0) <= 0) {
+        } else if (!canPlayPlaylist()) {
             view.showError("Please add the playlist first")
         } else {
             playUseCase.playLogic(state.playlist?.currentItemOrStart(), state.playlist, false)
@@ -390,7 +395,7 @@ class PlaylistPresenter(
             ?.let { itemDomain ->
                 if (interactions != null) {
                     interactions?.onPlay(itemDomain)
-                } else if ((state.playlist?.id ?: 0) <=  0) {
+                } else if (!canPlayPlaylistItem(itemDomain)) {
                     view.showError("Please add the playlist first")
                 } else {
                     playUseCase.playLogic(itemDomain, state.playlist, false)
@@ -403,9 +408,11 @@ class PlaylistPresenter(
             ?.let { itemDomain ->
                 if (interactions != null) {
                     interactions?.onPlayStartClick(itemDomain)
-                } else if ((state.playlist?.id ?: 0) <= 0) {
+                } else if (!canPlayPlaylistItem(itemDomain)) {
                     view.showError("Please add the playlist first")
-                } else playUseCase.playLogic(itemDomain, state.playlist, false)
+                } else {
+                    playUseCase.playLogic(itemDomain, state.playlist, false)
+                }
             }
     } // todo error
 
