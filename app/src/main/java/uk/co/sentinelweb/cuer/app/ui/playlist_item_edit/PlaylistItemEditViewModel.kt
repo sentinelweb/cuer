@@ -78,7 +78,13 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?, allowPlay: Boolean, isOnSharePlaylist: Boolean) {
+    fun setData(
+        item: PlaylistItemDomain,
+        source: Source,
+        parentId: Long?,
+        allowPlay: Boolean,
+        isOnSharePlaylist: Boolean
+    ) {
         item.let {
             state.editingPlaylistItem = it
             state.source = source
@@ -320,14 +326,14 @@ class PlaylistItemEditViewModel constructor(
             ?: toast.show("No item to share ...")
     }
 
-    private fun update() {
-        state.model = modelMapper.map(state)
-        _modelLiveData.value = state.model
+    private fun update() = modelMapper.map(state).apply {
+        state.model = this
+        _modelLiveData.value = this
     }
 
-    private fun updateError() {
-        state.model = modelMapper.mapEmpty()
-        _modelLiveData.value = state.model
+    private fun updateError() = modelMapper.mapEmpty().apply {
+        state.model = this
+        _modelLiveData.value = this
     }
 
     fun checkToSave() {
