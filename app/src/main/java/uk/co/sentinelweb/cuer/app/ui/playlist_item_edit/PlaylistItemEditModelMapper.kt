@@ -22,7 +22,7 @@ class PlaylistItemEditModelMapper(
     fun map(state: PlaylistItemEditContract.State) = with(state) {
         media?.let { media ->
             PlaylistItemEditContract.Model(
-                description = descriptionMapper.map(media, selectedPlaylists),
+                description = descriptionMapper.map(media, selectedPlaylists, !isOnSharePlaylist),
                 imageUrl = (media.image ?: media.thumbNail)?.url,
                 starred = media.starred,
                 canPlay = media.platformId.isNotEmpty(),

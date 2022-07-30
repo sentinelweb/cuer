@@ -11,6 +11,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.image.ImageSelectIntentHandler
@@ -48,21 +49,15 @@ class SearchImageDialogFragment(private val config: SearchImageContract.Config) 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeUi()
+        bindObserver(viewModel.getUiObservable(), ::observeUi)
     }
 
-    private fun observeUi() {
-        viewModel.getUiObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<SearchImageViewModel.UiEvent> {
-                override fun onChanged(model: SearchImageViewModel.UiEvent) {
-                    when (model.type) {
-                        ERROR -> toastWrapper.show(model.data as String)
-                        CLOSE -> dismiss()
-                        GOTO_LIBRARY -> imageSelectIntentHandler.launchImageChooser(this@SearchImageDialogFragment)
-                    }
-                }
-            })
+    private fun observeUi(model: SearchImageViewModel.UiEvent) {
+        when (model.type) {
+            ERROR -> toastWrapper.show(model.data as String)
+            CLOSE -> dismiss()
+            GOTO_LIBRARY -> imageSelectIntentHandler.launchImageChooser(this@SearchImageDialogFragment)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

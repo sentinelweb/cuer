@@ -36,7 +36,7 @@ interface PlaylistItemEditContract {
         val isLive: Boolean,
         val isUpcoming: Boolean,
         @ColorRes val infoTextBackgroundColor: Int,
-        val showPlay: Boolean
+        val showPlay: Boolean,
     )
 
     @Serializable
@@ -54,6 +54,7 @@ interface PlaylistItemEditContract {
         var parentPlaylistId: Long = -1,
         var allowPlay: Boolean = false,
         val deletedPlayLists: MutableSet<PlaylistDomain> = mutableSetOf(),
+        var isOnSharePlaylist: Boolean = false,
     ) {
         lateinit var source: OrchestratorContract.Source
 

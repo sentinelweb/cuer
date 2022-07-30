@@ -48,11 +48,21 @@ fun PlaylistDomain.removeItemByPlatformId(item: PlaylistItemDomain): PlaylistDom
 
 fun PlaylistDomain.replaceItem(item: PlaylistItemDomain) =
     this.items.indexOfFirst { it.id == item.id }
-        .let { index ->
-            if (index > -1) {
-                this.copy(items = this.items.toMutableList().apply { set(index, item) }.toList())
-            } else this
+        .takeIf { it > -1 }
+        ?.let { index ->
+            this.copy(items = this.items.toMutableList().apply { set(index, item) }.toList())
         }
+        ?: this
+
+fun PlaylistDomain.replaceMediaByPlatformId(media: MediaDomain) =
+    this.items.indexOfFirst { it.media.platform == media.platform && it.media.platformId == media.platformId }
+        .takeIf { it > -1 }
+        ?.let { index ->
+            this.copy(
+                items = this.items.toMutableList()
+                    .apply { set(index, get(index).copy(media = media)) }.toList()
+            )
+        } ?: this
 
 fun PlaylistDomain.replaceItemByPlatformId(item: PlaylistItemDomain) =
     this.items

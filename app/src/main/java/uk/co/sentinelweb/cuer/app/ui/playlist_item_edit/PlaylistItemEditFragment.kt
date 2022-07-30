@@ -20,6 +20,8 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistItemEditBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SHARED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
@@ -28,6 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_BACK
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
@@ -100,6 +103,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         ALLOW_PLAY.getBoolean(arguments, true)
     }
 
+    private val isOnSharePlaylist: Boolean by lazy {
+        itemArg?.playlistId == SHARED_PLAYLIST
+    }
+
     init {
         log.tag(this)
     }
@@ -117,11 +124,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         savedInstanceState
             ?.getString(STATE_KEY)
             ?.apply { viewModel.restoreState(this) }
-        itemArg?.id?.apply {
-            sharedElementEnterTransition =
-                TransitionInflater.from(requireContext())
-                    .inflateTransition(android.R.transition.move)
-        }
+
+        sharedElementEnterTransition =
+            TransitionInflater.from(requireContext())
+                .inflateTransition(android.R.transition.move)
     }
 
     override fun onCreateView(
@@ -204,7 +210,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 binding.plieTitleBg.isVisible = false
                 playMenuItem.isVisible = false
             }
-            viewModel.setData(this, sourceArg, parentArg, allowPlayArg)
+            viewModel.setData(this, sourceArg, parentArg, allowPlayArg, isOnSharePlaylist)
         }
 
         bindObserver(viewModel.getDialogObservable(), this::observeDialog)

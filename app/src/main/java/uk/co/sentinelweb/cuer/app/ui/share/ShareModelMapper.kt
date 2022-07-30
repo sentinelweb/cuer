@@ -12,6 +12,7 @@ class ShareModelMapper constructor(
     fun mapShareModel(
         state: ShareContract.State,
         finish: (Boolean, Boolean, Boolean) -> Unit,
+        canCommit: Boolean
     ): ShareContract.Model {
         val isConnected = ytContextHolder.isConnected()
         val isMedia = state.scanResult?.let { it.type == MEDIA } ?: false
@@ -24,27 +25,27 @@ class ShareModelMapper constructor(
                     text = if (isConnected) res.getString(R.string.share_button_play_now) else null,
                     icon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white
                     else R.drawable.ic_button_play_black,
-                    enabled = state.ready
+                    enabled = state.ready && canCommit
                 ),
                 topLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ true, /*forward = */ false) },
                     text = if (isConnected) res.getString(R.string.share_button_play_return) else null,
                     icon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white
                     else R.drawable.ic_button_play_black,
-                    enabled = state.ready
+                    enabled = state.ready && canCommit
                 ),
                 bottomRight = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ false, /*forward = */ true) },
                     text = if (isMedia) res.getString(R.string.share_button_add_to_queue)
                     else res.getString(R.string.share_button_add_playlist),
                     icon = R.drawable.ic_add,
-                    enabled = state.ready
+                    enabled = state.ready && canCommit
                 ),
                 bottomLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ false, /*forward = */ false) },
                     text = res.getString(R.string.share_button_add_return),
                     icon = R.drawable.ic_back,
-                    enabled = state.ready
+                    enabled = state.ready && canCommit
                 )
             )
         } else {

@@ -34,6 +34,7 @@ interface ShareContract {
         fun onReady(ready: Boolean)
         fun serializeState(): String?
         fun restoreState(s: String)
+        fun onDestinationChange()
     }
 
     interface View {
@@ -46,6 +47,8 @@ interface ShareContract {
         fun showMedia(itemDomain: PlaylistItemDomain, source: Source, playlistParentId: Long?)
         fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?)
         fun navigate(nav: NavigationModel)
+        fun canCommit(type: ObjectTypeDomain?): Boolean
+        fun hideWarning()
     }
 
     interface Committer {

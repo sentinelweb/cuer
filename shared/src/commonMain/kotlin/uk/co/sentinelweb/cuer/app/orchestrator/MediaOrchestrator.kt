@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.map
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
@@ -13,6 +14,7 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 class MediaOrchestrator constructor(
     private val mediaDatabaseRepository: MediaDatabaseRepository,
+    private val mediaMemoryRepository: PlaylistMemoryRepository.MediaMemoryRepository,
     private val ytInteractor: YoutubeInteractor
 ) : OrchestratorContract<MediaDomain> {
 
@@ -71,7 +73,7 @@ class MediaOrchestrator constructor(
 
     suspend override fun save(domain: MediaDomain, options: Options): MediaDomain =
         when (options.source) {
-            MEMORY -> throw NotImplementedException()
+            MEMORY -> mediaMemoryRepository.save(domain, options)
             LOCAL -> mediaDatabaseRepository
                 .save(domain, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
@@ -83,7 +85,7 @@ class MediaOrchestrator constructor(
 
     suspend override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> =
         when (options.source) {
-            MEMORY -> throw NotImplementedException()
+            MEMORY -> mediaMemoryRepository.save(domains, options)
             LOCAL -> mediaDatabaseRepository
                 .save(domains, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed ${domains.map { it.platformId }}")

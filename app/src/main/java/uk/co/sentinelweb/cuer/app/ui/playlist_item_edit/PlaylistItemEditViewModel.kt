@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SHARED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -77,12 +78,19 @@ class PlaylistItemEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun setData(item: PlaylistItemDomain, source: Source, parentId: Long?, allowPlay: Boolean) {
+    fun setData(
+        item: PlaylistItemDomain,
+        source: Source,
+        parentId: Long?,
+        allowPlay: Boolean,
+        isOnSharePlaylist: Boolean
+    ) {
         item.let {
             state.editingPlaylistItem = it
             state.source = source
             state.parentPlaylistId = parentId ?: -1
             state.allowPlay = allowPlay
+            state.isOnSharePlaylist = isOnSharePlaylist
             it.media.let { setData(it) }
         }
     }
@@ -140,7 +148,7 @@ class PlaylistItemEditViewModel constructor(
     }
 
     private suspend fun checkToAutoSelectPlaylists() {
-        if (state.selectedPlaylists.isEmpty()) {
+        if (state.selectedPlaylists.isEmpty() && !state.isOnSharePlaylist) {
             state.media?.apply {
                 playlistOrchestrator.loadList(
                     ChannelPlatformIdFilter(channelData.platformId!!),
@@ -318,39 +326,40 @@ class PlaylistItemEditViewModel constructor(
             ?: toast.show("No item to share ...")
     }
 
-    private fun update() {
-        state.model = modelMapper.map(state)
-        _modelLiveData.value = state.model
+    private fun update() = modelMapper.map(state).apply {
+        state.model = this
+        _modelLiveData.value = this
     }
 
-    private fun updateError() {
-        state.model = modelMapper.mapEmpty()
-        _modelLiveData.value = state.model
+    private fun updateError() = modelMapper.mapEmpty().apply {
+        state.model = this
+        _modelLiveData.value = this
     }
 
     fun checkToSave() {
         if (!state.isSaved && (state.isMediaChanged || state.isPlaylistsChanged)) {
-            if (isNew) {
+            if (state.isOnSharePlaylist) {
+                doCommitAndReturn()
+            } else if (isNew) {
                 _dialogModelLiveData.value = modelMapper.mapSaveConfirmAlert({
-                    viewModelScope.launch {
-                        commitPlaylistItems()
-                        _navigateLiveData.value = NavigationModel(NAV_DONE)
-                    }
-                }, {// cancel
-                    _navigateLiveData.value = NavigationModel(NAV_DONE)
-                })
+                    doCommitAndReturn()
+                }, { _navigateLiveData.value = NavigationModel(NAV_DONE) })
             } else {
                 if (state.selectedPlaylists.size > 0) {
-                    viewModelScope.launch {
-                        commitPlaylistItems()
-                        _navigateLiveData.value = NavigationModel(NAV_DONE)
-                    }
+                    doCommitAndReturn()
                 } else {
                     _uiLiveData.value =
                         UiEvent(ERROR, "Please select a playlist (or delete the item)")
                 }
             }
         } else {
+            _navigateLiveData.value = NavigationModel(NAV_DONE)
+        }
+    }
+
+    private fun doCommitAndReturn() {
+        viewModelScope.launch {
+            commitPlaylistItems()
             _navigateLiveData.value = NavigationModel(NAV_DONE)
         }
     }
@@ -383,8 +392,11 @@ class PlaylistItemEditViewModel constructor(
                     state.media
                         ?.let {
                             if (state.isMediaChanged) {
-                                log.d("saving media: ${it.playFromStart}")
-                                mediaOrchestrator.save(it, Options(saveSource, flat = false))
+                                if (state.isOnSharePlaylist) {
+                                    mediaOrchestrator.save(it, state.source.flatOptions())
+                                } else {
+                                    mediaOrchestrator.save(it, saveSource.deepOptions())
+                                }
                             } else it
                         }
                         ?.let { savedMedia ->

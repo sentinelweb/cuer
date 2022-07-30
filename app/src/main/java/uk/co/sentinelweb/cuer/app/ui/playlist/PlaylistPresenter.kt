@@ -95,6 +95,11 @@ class PlaylistPresenter(
     private val isQueuedPlaylist: Boolean
         get() = state.playlistIdentifier == queue.playlistId
 
+    private fun canPlayPlaylist() = (state.playlist?.id ?: 0) > 0
+
+    private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
+        (itemDomain.playlistId ?: 0) > 0
+
     private val castConnectionListener = object : ChromecastConnectionListener {
         override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
             if (isQueuedPlaylist) {
@@ -294,6 +299,8 @@ class PlaylistPresenter(
     override fun onPlayPlaylist(): Boolean {
         if (isPlaylistPlaying()) {
             chromeCastWrapper.killCurrentSession()
+        } else if (!canPlayPlaylist()) {
+            view.showError("Please add the playlist first")
         } else {
             playUseCase.playLogic(state.playlist?.currentItemOrStart(), state.playlist, false)
         }
@@ -388,6 +395,8 @@ class PlaylistPresenter(
             ?.let { itemDomain ->
                 if (interactions != null) {
                     interactions?.onPlay(itemDomain)
+                } else if (!canPlayPlaylistItem(itemDomain)) {
+                    view.showError("Please add the playlist first")
                 } else {
                     playUseCase.playLogic(itemDomain, state.playlist, false)
                 }
@@ -399,7 +408,11 @@ class PlaylistPresenter(
             ?.let { itemDomain ->
                 if (interactions != null) {
                     interactions?.onPlayStartClick(itemDomain)
-                } else playUseCase.playLogic(itemDomain, state.playlist, false)
+                } else if (!canPlayPlaylistItem(itemDomain)) {
+                    view.showError("Please add the playlist first")
+                } else {
+                    playUseCase.playLogic(itemDomain, state.playlist, false)
+                }
             }
     } // todo error
 
@@ -648,7 +661,7 @@ class PlaylistPresenter(
     override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit?) {
         if (state.playlistIdentifier.source == MEMORY) {
             state.playlist
-                ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it, LOCAL) }
+                ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }
                 ?.let {
                     it.copy(
                         items = it.items.map { it.copy(id = null) },

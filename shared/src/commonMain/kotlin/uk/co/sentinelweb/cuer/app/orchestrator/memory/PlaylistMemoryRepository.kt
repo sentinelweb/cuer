@@ -10,10 +10,12 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayist
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.removeItemByPlatformId
 import uk.co.sentinelweb.cuer.domain.ext.replaceItemByPlatformId
+import uk.co.sentinelweb.cuer.domain.ext.replaceMediaByPlatformId
 
 class PlaylistMemoryRepository constructor(
     private val coroutines: CoroutineContextProvider,
@@ -26,6 +28,7 @@ class PlaylistMemoryRepository constructor(
     private val data: MutableMap<Long, PlaylistDomain> = mutableMapOf()
 
     val playlistItemMemoryRepository = PlayListItemMemoryRepository()
+    val mediaMemoryRepository = MediaMemoryRepository()
 
     private val _playlistFlow = MutableSharedFlow<Pair<Operation, PlaylistDomain>>()
     override val updates: Flow<Pair<Operation, PlaylistDomain>>
@@ -70,7 +73,8 @@ class PlaylistMemoryRepository constructor(
                 )
             } else {
                 domain.copy(
-                    items = data[playlistId]?.items ?: throw IllegalStateException("Data got emptied")
+                    items = data[playlistId]?.items
+                        ?: throw IllegalStateException("Data got emptied")
                 )
             }
         }?.also { data[it.id!!] = it }
@@ -120,13 +124,14 @@ class PlaylistMemoryRepository constructor(
             throw NotImplementedException()
         }
 
-        override fun loadList(filter: Filter, options: Options): List<PlaylistItemDomain> = when (filter) {
-            is MediaIdListFilter -> data.values
-                .map { it.items }
-                .flatten()
-                .filter { filter.ids.contains(it.media.id) }
-            else -> throw NotImplementedException()
-        }
+        override fun loadList(filter: Filter, options: Options): List<PlaylistItemDomain> =
+            when (filter) {
+                is MediaIdListFilter -> data.values
+                    .map { it.items }
+                    .flatten()
+                    .filter { filter.ids.contains(it.media.id) }
+                else -> throw NotImplementedException()
+            }
 
         override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
             domain.playlistId
@@ -143,7 +148,10 @@ class PlaylistMemoryRepository constructor(
                     }
                 } ?: throw DoesNotExistException("Playlist ${domain.playlistId} does not exist")
 
-        override fun save(domains: List<PlaylistItemDomain>, options: Options): List<PlaylistItemDomain> {
+        override fun save(
+            domains: List<PlaylistItemDomain>,
+            options: Options
+        ): List<PlaylistItemDomain> {
             throw NotImplementedException()
         }
 
@@ -166,6 +174,60 @@ class PlaylistMemoryRepository constructor(
                     }
                     false
                 } ?: false
+    }
+
+    inner class MediaMemoryRepository : MemoryRepository<MediaDomain> {
+        private val _playlistItemFlow = MutableSharedFlow<Pair<Operation, MediaDomain>>()
+        override val updates: Flow<Pair<Operation, MediaDomain>>
+            get() = _playlistItemFlow
+
+        override fun load(platformId: String, options: Options): MediaDomain? {
+            throw NotImplementedException()
+        }
+
+        override fun load(domain: MediaDomain, options: Options): MediaDomain? {
+            throw NotImplementedException()
+        }
+
+        override suspend fun load(id: Long, options: Options): MediaDomain? {
+            throw NotImplementedException()
+        }
+
+        override fun loadList(filter: Filter, options: Options): List<MediaDomain> {
+            throw NotImplementedException()
+        }
+
+        override fun save(domain: MediaDomain, options: Options): MediaDomain {
+            if (domain.id == null) {
+                data[SHARED_PLAYLIST]
+                    .takeIf { it != null }
+                    ?.also { data[SHARED_PLAYLIST] = it.replaceMediaByPlatformId(media = domain) }
+            }
+            return domain
+        }
+
+        override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> {
+            data[SHARED_PLAYLIST]
+                .takeIf { it != null }
+                ?.also { playlist ->
+                    var playlistMutate = playlist
+                    domains.forEach { domain ->
+                        if (domain.id == null) {
+                            playlistMutate = playlistMutate.replaceMediaByPlatformId(media = domain)
+                        }
+                    }
+                    data[SHARED_PLAYLIST] = playlistMutate
+                }
+            return domains
+        }
+
+        override fun count(filter: Filter, options: Options): Int {
+            throw NotImplementedException()
+        }
+
+        override fun delete(domain: MediaDomain, options: Options): Boolean {
+            throw NotImplementedException()
+        }
     }
 
     companion object {
