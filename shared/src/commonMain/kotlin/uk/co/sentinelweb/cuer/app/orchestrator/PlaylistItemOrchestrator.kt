@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.map
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistItemOrchestrator constructor(
     private val roomPlaylistItemDatabaseRepository: PlaylistItemDatabaseRepository,
-    private val playlistItemMemoryRepository: MemoryRepository<PlaylistItemDomain>,
+    private val playlistItemMemoryRepository: PlaylistMemoryRepository.PlayListItemMemoryRepository,
     private val log: LogWrapper
 ) : OrchestratorContract<PlaylistItemDomain> {
 

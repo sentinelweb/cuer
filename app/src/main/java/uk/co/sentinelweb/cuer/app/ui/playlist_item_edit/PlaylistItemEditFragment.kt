@@ -114,11 +114,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     // saves the data on back press (enabled in onResume)
     private val saveCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (!isOnSharePlaylist) {
-                viewModel.checkToSave()
-            } else {
-                observeNavigation(NavigationModel(NAV_BACK))
-            }
+            viewModel.checkToSave()
         }
     }
 

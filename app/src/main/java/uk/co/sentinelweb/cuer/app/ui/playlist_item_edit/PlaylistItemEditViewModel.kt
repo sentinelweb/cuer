@@ -338,27 +338,28 @@ class PlaylistItemEditViewModel constructor(
 
     fun checkToSave() {
         if (!state.isSaved && (state.isMediaChanged || state.isPlaylistsChanged)) {
-            if (isNew) {
+            if (state.isOnSharePlaylist) {
+                doCommitAndReturn()
+            } else if (isNew) {
                 _dialogModelLiveData.value = modelMapper.mapSaveConfirmAlert({
-                    viewModelScope.launch {
-                        commitPlaylistItems()
-                        _navigateLiveData.value = NavigationModel(NAV_DONE)
-                    }
-                }, {// cancel
-                    _navigateLiveData.value = NavigationModel(NAV_DONE)
-                })
+                    doCommitAndReturn()
+                }, { _navigateLiveData.value = NavigationModel(NAV_DONE) })
             } else {
                 if (state.selectedPlaylists.size > 0) {
-                    viewModelScope.launch {
-                        commitPlaylistItems()
-                        _navigateLiveData.value = NavigationModel(NAV_DONE)
-                    }
+                    doCommitAndReturn()
                 } else {
                     _uiLiveData.value =
                         UiEvent(ERROR, "Please select a playlist (or delete the item)")
                 }
             }
         } else {
+            _navigateLiveData.value = NavigationModel(NAV_DONE)
+        }
+    }
+
+    private fun doCommitAndReturn() {
+        viewModelScope.launch {
+            commitPlaylistItems()
             _navigateLiveData.value = NavigationModel(NAV_DONE)
         }
     }
@@ -391,8 +392,11 @@ class PlaylistItemEditViewModel constructor(
                     state.media
                         ?.let {
                             if (state.isMediaChanged) {
-                                log.d("saving media: ${it.playFromStart}")
-                                mediaOrchestrator.save(it, Options(saveSource, flat = false))
+                                if (state.isOnSharePlaylist) {
+                                    mediaOrchestrator.save(it, state.source.flatOptions())
+                                } else {
+                                    mediaOrchestrator.save(it, saveSource.deepOptions())
+                                }
                             } else it
                         }
                         ?.let { savedMedia ->

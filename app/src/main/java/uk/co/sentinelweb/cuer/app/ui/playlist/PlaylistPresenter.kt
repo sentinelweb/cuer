@@ -661,7 +661,7 @@ class PlaylistPresenter(
     override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit?) {
         if (state.playlistIdentifier.source == MEMORY) {
             state.playlist
-                ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it, LOCAL) }
+                ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }
                 ?.let {
                     it.copy(
                         items = it.items.map { it.copy(id = null) },

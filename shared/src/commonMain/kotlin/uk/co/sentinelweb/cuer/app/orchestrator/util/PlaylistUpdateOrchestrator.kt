@@ -1,11 +1,8 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.util
 
-import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
@@ -39,11 +36,11 @@ class PlaylistUpdateOrchestrator constructor(
                 when (p.platform) {
                     YOUTUBE -> p.platformId?.apply {
                         playlistOrchestrator
-                            .load(this, Options(Source.PLATFORM, flat = false))
+                            .load(this, Source.PLATFORM.deepOptions())
                             ?.let { removeExistingItems(it, p) }
                             ?.takeIf { it.items.size > 0 }
-                            ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it, LOCAL) }
-                            ?.let { playlistItemOrchestrator.save(it.items, Options(LOCAL, flat = false)) }
+                            ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }
+                            ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
                     }
                     else -> Unit
                 }
@@ -51,7 +48,6 @@ class PlaylistUpdateOrchestrator constructor(
     }
 
     private suspend fun removeExistingItems(platform: PlaylistDomain, existing: PlaylistDomain): PlaylistDomain {
-//        val existingPlaylistMediaPlatformIds = existing.items.map { it.media.platformId }
         val platformPlaylistExistingMediaPlatformIds =
             mediaOrchestrator.loadList(PlatformIdListFilter(platform.items.map { it.media.platformId }), LOCAL.flatOptions())
                 .map { it.platformId }
@@ -67,7 +63,6 @@ class PlaylistUpdateOrchestrator constructor(
             )
         })
     }
-
 
     interface UpdateCheck {
         fun shouldUpdate(p: PlaylistDomain): Boolean

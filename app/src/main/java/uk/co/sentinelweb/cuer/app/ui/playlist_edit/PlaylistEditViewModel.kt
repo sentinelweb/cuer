@@ -196,31 +196,14 @@ class PlaylistEditViewModel constructor(
         val watched = state.isAllWatched != false
         val newWatched = !watched
         log.d("watched load mem items = ${state.playlistEdit.id}")
-        if ((state.playlistEdit.id ?: 0) > 0) {
-            playlistOrchestrator.load(state.playlistEdit.id!!, state.source.deepOptions())
-                ?.apply {
-                    mediaOrchestrator.save(
-                        items.map { it.media.copy(watched = newWatched) },
-                        state.source.deepOptions()
-                    )
-                    state.isAllWatched = newWatched
-                }
-        } else { // memory playlist
-            playlistOrchestrator.load(state.playlistEdit.id!!, state.source.deepOptions())
-                ?.also { log.d("watched load mem items = ${it.items.size}") }
-                ?.run {
-                    copy(
-                        items = items.map {
-                            it.copy(media = it.media.copy(watched = newWatched))
-                        }
-                    )
-                }
-                ?.also { log.d("watched save mem items = ${it.items.size}") }
-                ?.apply {
-                    playlistOrchestrator.save(this, state.source.deepOptions())
-                }
-            state.isAllWatched = newWatched
-        }
+        playlistOrchestrator.load(state.playlistEdit.id!!, state.source.deepOptions())
+            ?.apply {
+                mediaOrchestrator.save(
+                    items.map { it.media.copy(watched = newWatched) },
+                    state.source.deepOptions()
+                )
+                state.isAllWatched = newWatched
+            }
         update()
     }
 
