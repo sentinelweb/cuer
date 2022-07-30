@@ -124,11 +124,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         savedInstanceState
             ?.getString(STATE_KEY)
             ?.apply { viewModel.restoreState(this) }
-        itemArg?.id?.apply {
-            sharedElementEnterTransition =
-                TransitionInflater.from(requireContext())
-                    .inflateTransition(android.R.transition.move)
-        }
+
+        sharedElementEnterTransition =
+            TransitionInflater.from(requireContext())
+                .inflateTransition(android.R.transition.move)
     }
 
     override fun onCreateView(
