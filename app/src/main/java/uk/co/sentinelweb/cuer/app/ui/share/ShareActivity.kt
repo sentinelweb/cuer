@@ -32,6 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
@@ -88,6 +89,11 @@ class ShareActivity : AppCompatActivity(),
     private val isOnPlaylistItem: Boolean
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.run { (getChildFragmentManager().getFragments().get(0) is PlaylistItemEditFragment) }
+            ?: false
+
+    private val isOnPlaylistEdit: Boolean
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.run { (getChildFragmentManager().getFragments().get(0) is PlaylistEditFragment) }
             ?: false
 
     override fun onCreate(savedInstanceState: Bundle?) {

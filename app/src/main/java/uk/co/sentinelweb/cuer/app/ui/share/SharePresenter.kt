@@ -204,7 +204,6 @@ class SharePresenter constructor(
                 }
             }
         }
-
     }
 
     override fun onDestinationChange() {

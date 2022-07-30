@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_edit
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.text.Html
 import android.text.Spannable
@@ -26,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
+import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -38,6 +40,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageDialogFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -59,6 +62,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val toastWrapper: ToastWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
+    private val commitHost: CommitHost by inject()
 
     private val starMenuItem: MenuItem
         get() = binding.peToolbar.menu.findItem(R.id.pe_star)
@@ -210,10 +214,10 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         }
     }
 
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//        /* init */ viewModel
-//    }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        linkScopeToActivity()
+    }
 
     override fun onStart() {
         super.onStart()
@@ -283,7 +287,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                 }
             }
         }
-
+        commitHost.isReady(false)
         model.validation?.apply {
             binding.peCommitButton.isEnabled = valid
             if (!valid) {
