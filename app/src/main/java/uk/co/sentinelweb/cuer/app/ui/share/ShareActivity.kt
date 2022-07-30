@@ -140,6 +140,10 @@ class ShareActivity : AppCompatActivity(),
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         finish()
+        // this could be used to reset the nav controller when home is pressed.
+        // so in onNewIntent can get scanFragment
+        // but need to stop it for things like link launch - whichmans setting up the descriptionView to parse links
+        //navController.popBackStack()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -158,10 +162,7 @@ class ShareActivity : AppCompatActivity(),
             (shareWrapper.getLinkFromIntent(intent)
                 ?: shareWrapper.getTextFromIntent(intent))?.apply {
                 if (!presenter.isAlreadyScanned(this)) {
-                    scanFragment.fromShareUrl(
-                        this,
-
-                        )
+                    scanFragment.fromShareUrl(this)
                 }
             } ?: presenter.linkError(getString(R.string.share_error_no_link))
         }

@@ -243,9 +243,8 @@ class SharePresenter constructor(
                 view.exit()
             } else { // return play is hidden for not connected
                 playId
-                    .takeIf { play }
-                    ?.takeIf { isConnected }
-                    ?.let { _ ->
+                    .takeIf { play && isConnected}
+                    ?.let {
                         playId.first.let { itemPlaylistId ->
                             queue.playNow(itemPlaylistId.toIdentifier(LOCAL), playId.second)
                         }
