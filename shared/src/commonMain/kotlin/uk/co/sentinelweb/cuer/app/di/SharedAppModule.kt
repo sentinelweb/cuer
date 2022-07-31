@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
+import uk.co.sentinelweb.cuer.app.util.link.TimecodeExtractor
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapperImpl
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
@@ -75,6 +76,7 @@ object SharedAppModule {
         factory { RecentLocalPlaylists(get(), get()) }
         factory { PlatformFileOperation() }
         factory { LinkExtractor() }
+        factory { TimecodeExtractor() }
     }
 
     val modules = listOf(objectModule)

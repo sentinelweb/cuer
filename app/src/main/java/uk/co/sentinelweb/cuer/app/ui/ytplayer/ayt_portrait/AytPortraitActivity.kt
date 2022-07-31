@@ -125,7 +125,7 @@ class AytPortraitActivity : AppCompatActivity(),
             }
 
             override fun onTimecodeClick(timecode: TimecodeDomain) {
-                TODO("Not yet implemented")
+                mviView.dispatch(OnSeekToPosition(timecode.position))
             }
 
             override fun onSelectPlaylistChipClick(model: ChipModel) = Unit
