@@ -7,6 +7,7 @@ import androidx.navigation.fragment.FragmentNavigator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
+import uk.co.sentinelweb.cuer.domain.LinkDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import kotlin.reflect.KClass
@@ -30,6 +31,8 @@ data class NavigationModel constructor(
             ?: throw IllegalArgumentException("$target requires ${target.requiredParams}")
     }
 
+    inline fun <reified T> getParam(p:Param): T? = params[p] as T
+
     enum class Target constructor(
         val requiredParams: List<Param> = listOf(),
         @Suppress("unused") val optionalParams: List<Param> = listOf()
@@ -37,6 +40,8 @@ data class NavigationModel constructor(
         LOCAL_PLAYER_FULL(listOf(Param.PLAYLIST_ITEM)),
         LOCAL_PLAYER(listOf(Param.PLAYLIST_ITEM)),
         WEB_LINK(listOf(LINK)),
+        SHARE(listOf(LINK)),
+        CRYPTO_LINK(listOf(CRYPTO_ADDRESS)),
         YOUTUBE_VIDEO(listOf(PLATFORM_ID)),
         YOUTUBE_CHANNEL(listOf(CHANNEL_ID)),
         PLAYLIST(listOf(PLAYLIST_ID, SOURCE), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
@@ -50,6 +55,7 @@ data class NavigationModel constructor(
         NAV_DONE, // nav after operation is finished
         ;
 
+
         companion object {
             const val KEY = "Target"
         }
@@ -61,6 +67,7 @@ data class NavigationModel constructor(
         PLATFORM_ID(String::class),
         CHANNEL_ID(String::class),
         LINK(String::class),
+        CRYPTO_ADDRESS(LinkDomain.CryptoLinkDomain::class),
         PLAY_NOW(Boolean::class),
         PLAYLIST_ID(Long::class),
         PLAYLIST_ITEM_ID(Long::class),

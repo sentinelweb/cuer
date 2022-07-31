@@ -163,9 +163,7 @@ class PlayerControlsNotificationController constructor(
         state.playlistName = name
     }
 
-    override fun setPlaylistImage(image: ImageDomain?) {
-        // not needed here
-    }
+    override fun setPlaylistImage(image: ImageDomain?) = Unit
 
     override fun setPlaylistItem(
         playlistItem: PlaylistItemDomain?,
@@ -178,14 +176,6 @@ class PlayerControlsNotificationController constructor(
         updateNotification()
     }
 
-    override fun disconnectSource() {
-
-    }
-
-    override fun initMediaRouteButton() {
-        // not needed here
-    }
-
     override fun reset() {
         //log.e("reset: state.media=${state.media?.stringMedia()}", Exception())
         state.bitmap = null
@@ -193,21 +183,23 @@ class PlayerControlsNotificationController constructor(
         updateNotification()
     }
 
-    override fun restoreState() {
-
-    }
-
     override fun skipSeekTo(target: Long) {
         listener?.seekTo(target)
     }
 
-    override fun skipSetBackText(text: String) {
+    override fun disconnectSource() = Unit
 
-    }
+    override fun seekTo(ms: Long) = Unit
 
-    override fun skipSetFwdText(text: String) {
+    override fun getPlaylistItem() = null // add pli to state if needed
 
-    }
+    override fun initMediaRouteButton() = Unit
+
+    override fun restoreState() = Unit
+
+    override fun skipSetBackText(text: String) = Unit
+
+    override fun skipSetFwdText(text: String) = Unit
 
     companion object {
         const val ACTION_PAUSE = "pause"
@@ -219,6 +211,5 @@ class PlayerControlsNotificationController constructor(
         const val ACTION_DISCONNECT = "disconnect"
         const val ACTION_STAR = "star"
         const val ACTION_UNSTAR = "unstar"
-
     }
 }

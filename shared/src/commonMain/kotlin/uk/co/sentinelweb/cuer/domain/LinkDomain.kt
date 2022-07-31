@@ -3,14 +3,16 @@ package uk.co.sentinelweb.cuer.domain
 sealed class LinkDomain constructor(
     open val address: String,
     open val title: String? = null,
-    open val category: Category = Category.OTHER
+    open val category: Category = Category.OTHER,
+    open val extractRegion: Pair<Int, Int>? = null
 ) {
 
     data class UrlLinkDomain(
         override val address: String,
         override val title: String? = null,
         val domain: DomainHost = DomainHost.UNKNOWN,
-        override val category: Category = Category.OTHER
+        override val category: Category = Category.OTHER,
+        override val extractRegion: Pair<Int, Int>? = null
     ) : LinkDomain(address, title)
 
     data class CryptoLinkDomain(
@@ -18,8 +20,8 @@ sealed class LinkDomain constructor(
         override val title: String? = null,
         val type: Crypto,
         override val category: Category = Category.CRYPTO,
-        val extractRegion: Pair<Int, Int>? = null
-    ) : LinkDomain(address)
+        override val extractRegion: Pair<Int, Int>? = null
+    ) : LinkDomain(address, category=category, extractRegion = extractRegion)
 
     enum class DomainHost(val domains: List<String>) {
         GOOGLE("google.com", "goo.gl"),

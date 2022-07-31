@@ -306,8 +306,7 @@ class ShareActivity : AppCompatActivity(),
             c: Context,
             paste: Boolean = false,
             parentId: Long? = null
-        ) =
-            Intent(c, ShareActivity::class.java).apply {
+        ) = Intent(c, ShareActivity::class.java).apply {
                 action = Intent.ACTION_VIEW
                 if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
                 if (paste) {
@@ -323,8 +322,7 @@ class ShareActivity : AppCompatActivity(),
             url: String,
             parentId: Long? = null,
             fromCategory: CategoryDomain? = null
-        ) =
-            Intent(c, ShareActivity::class.java).apply {
+        ) = Intent(c, ShareActivity::class.java).apply {
                 action = Intent.ACTION_VIEW
                 if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
                 data = Uri.parse(url)

@@ -6,7 +6,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
@@ -82,6 +81,7 @@ interface PlaylistItemEditContract {
                         prefsWrapper = get(),
                         shareWrapper = get(),
                         playUseCase = get(),
+                        linkScanner = get()
                     )
                 }
                 scoped { State() }
@@ -89,7 +89,6 @@ interface PlaylistItemEditContract {
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { SelectDialogCreator(this.getFragmentActivity()) }
                 scoped { this.getFragmentActivity() }
-                scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 scoped { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }

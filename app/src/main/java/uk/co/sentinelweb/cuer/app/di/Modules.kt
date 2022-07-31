@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
@@ -115,12 +116,11 @@ object Modules {
         factory { BackgroundMapper(get()) }
         single { AytViewHolder(get(), get(), get()) }
         factory { PlayYangProgress(get()) }
+        factory { AlertDialogCreator(androidApplication()) }
     }
 
     private val utilModule = module {
-        factory<LinkScanner> {
-            AndroidLinkScanner(log = get(), mappers = urlMediaMappers)
-        }
+        factory<LinkScanner> { AndroidLinkScanner(log = get(), mappers = urlMediaMappers) }
         single { CuerAppState() }
 
         factory<MediaSessionContract.Manager> {

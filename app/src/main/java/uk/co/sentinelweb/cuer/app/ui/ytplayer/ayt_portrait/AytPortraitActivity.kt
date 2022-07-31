@@ -40,11 +40,16 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
+import uk.co.sentinelweb.cuer.app.util.wrapper.CryptoLauncher
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.TimecodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 @ExperimentalCoroutinesApi
@@ -66,7 +71,8 @@ class AytPortraitActivity : AppCompatActivity(),
     private val aytViewHolder: AytViewHolder by inject()
     private val floatingService: FloatingPlayerServiceManager by inject()
     private val queueConsumer: QueueMediatorContract.Consumer by inject()
-
+    private val cryptoLauncher: CryptoLauncher by inject()
+    private val linkScanner: LinkScanner by inject()
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl
     private lateinit var binding: ActivityAytPortraitBinding
@@ -99,16 +105,27 @@ class AytPortraitActivity : AppCompatActivity(),
         }
         mviView = MviViewImpl(aytViewHolder)
         playerFragment.initMediaRouteButton()
-        controller.onViewCreated(listOf(mviView, playerFragment.mviView), lifecycle.asMviLifecycle())
+        controller.onViewCreated(
+            listOf(mviView, playerFragment.mviView),
+            lifecycle.asMviLifecycle()
+        )
 
         binding.portraitPlayerDescription.interactions = object : DescriptionContract.Interactions {
-            override fun onLinkClick(urlString: String) {
-                // this doesnt get event until the DescriptionView is setup to capture the links properly
-                mviView.dispatch(LinkClick(urlString))
+
+            override fun onLinkClick(link: LinkDomain.UrlLinkDomain) {
+                mviView.dispatch(LinkClick(link.address))
             }
 
             override fun onChannelClick() {
                 mviView.dispatch(ChannelClick)
+            }
+
+            override fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain) {
+                cryptoLauncher.launch(cryptoAddress)
+            }
+
+            override fun onTimecodeClick(timecode: TimecodeDomain) {
+                mviView.dispatch(OnSeekToPosition(timecode.position))
             }
 
             override fun onSelectPlaylistChipClick(model: ChipModel) = Unit
@@ -163,12 +180,28 @@ class AytPortraitActivity : AppCompatActivity(),
             when (label) {
                 is Command -> label.command.let { aytViewHolder.processCommand(it) }
                 is LinkOpen ->
-                    navRouter.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
+                    navRouter.navigate(
+                        linkScanner.scan(label.url)?.let { scanned ->
+                            when (scanned.first) {
+                                ObjectTypeDomain.MEDIA -> navShare(label.url)
+                                ObjectTypeDomain.PLAYLIST -> navShare(label.url)
+                                ObjectTypeDomain.PLAYLIST_ITEM -> navShare(label.url)
+                                ObjectTypeDomain.CHANNEL -> navLink(label.url)
+                                else -> navLink(label.url)
+                            }
+                        } ?: navLink(label.url)
+                    )
                 is ChannelOpen ->
-                    label.channel.platformId?.let { id -> navRouter.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
+                    label.channel.platformId?.let { id ->
+                        navRouter.navigate(
+                            NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))
+                        )
+                    }
                 is FullScreenPlayerOpen -> label.also {
                     aytViewHolder.switchView()
-                    navRouter.navigate(NavigationModel(LOCAL_PLAYER_FULL, mapOf(PLAYLIST_ITEM to it.item)))
+                    navRouter.navigate(
+                        NavigationModel(LOCAL_PLAYER_FULL, mapOf(PLAYLIST_ITEM to it.item))
+                    )
                     finish()
                 }
                 is PipPlayerOpen -> {
@@ -182,9 +215,16 @@ class AytPortraitActivity : AppCompatActivity(),
                     }
                 }
                 is PortraitPlayerOpen -> toast.show("Already in portrait mode - shouldn't get here")
-                is ShowSupport -> SupportDialogFragment.show(this@AytPortraitActivity, label.item.media)
+                is ShowSupport -> SupportDialogFragment.show(
+                    this@AytPortraitActivity,
+                    label.item.media
+                )
             }
         }
+
+        private fun navLink(link: String) = NavigationModel(WEB_LINK, mapOf(LINK to link))
+
+        private fun navShare(link: String) = NavigationModel(SHARE, mapOf(LINK to link))
     }
 
     private val playlistInteractions = object : PlaylistContract.Interactions {

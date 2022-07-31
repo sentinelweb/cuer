@@ -26,9 +26,7 @@ private class YoutubeShortUrlMediaMapper : UrlMediaMapper {
 
     override fun map(uri: Uri): Pair<ObjectTypeDomain, MediaDomain> =
         uri.path
-            ?.let {
-                MEDIA to MediaDomain.createYoutube(uri.toString(), it.substring(1))
-            }
+            ?.let { MEDIA to MediaDomain.createYoutube(uri.toString(), it.substring(1)) }
             ?: throw IllegalArgumentException("Link format error: $uri")
 }
 
