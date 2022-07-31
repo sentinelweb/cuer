@@ -29,6 +29,7 @@
         android:id="@+id/wwwYoutubePlaylist"
         app:uri="https://www.youtube.com/playlist?list={id}"
         />
+
     <deepLink
         android:id="@+id/youtubePlaylist"
         app:uri="https://youtube.com/playlist?list={id}"

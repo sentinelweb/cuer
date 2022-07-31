@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.share.scan
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentScanBinding
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
 class ScanFragment : Fragment(R.layout.fragment_scan), ScanContract.View, AndroidScopeComponent {
@@ -23,6 +25,7 @@ class ScanFragment : Fragment(R.layout.fragment_scan), ScanContract.View, Androi
     private val presenter: ScanContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val playYangProgress: PlayYangProgress by inject()
+    private val shareWrapper: ShareWrapper by inject()
 
     private var _binding: FragmentScanBinding? = null
     private val binding get() = _binding!!
@@ -37,7 +40,16 @@ class ScanFragment : Fragment(R.layout.fragment_scan), ScanContract.View, Androi
         playYangProgress.init(binding.scanProgress, R.color.white)
     }
 
-    override fun fromShareUrl(uriString: String) {// called from activity
+    override fun onResume() {
+        super.onStart()
+        Log.d("ScanFragment", "id: ${arguments?.get("id")}")
+        requireActivity().intent
+            ?.let { shareWrapper.getLinkFromIntent(it) }
+            ?.also {Log.d("ScanFragment", "url: $it") }
+            ?.also { fromShareUrl(uriString = it) }
+    }
+
+    override fun fromShareUrl(uriString: String) { // called from activity
         binding.scanProgress.isVisible = true
         binding.scanResult.isVisible = false
         presenter.fromShareUrl(uriString)

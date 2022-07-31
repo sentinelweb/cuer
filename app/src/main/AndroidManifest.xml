@@ -56,8 +56,7 @@
 
         <activity
             android:name="uk.co.sentinelweb.cuer.app.ui.share.ShareActivity"
-            android:exported="true"
-            android:launchMode="standard">
+            android:exported="true">
 
             <nav-graph android:value="@navigation/deeplink" />
 

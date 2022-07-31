@@ -7,6 +7,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.Domain
@@ -74,6 +75,7 @@ interface ScanContract {
                         log = get()
                     )
                 }
+                scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { ScanMapper() }
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(
