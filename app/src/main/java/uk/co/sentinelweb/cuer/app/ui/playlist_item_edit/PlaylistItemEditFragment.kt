@@ -33,6 +33,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_BACK
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -65,6 +66,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val commitHost: CommitHost by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
+    private val playerControls: PlayerContract.PlayerControls by inject()
 
     private lateinit var binding: FragmentPlaylistItemEditBinding
 
@@ -261,6 +263,12 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 actionText = "UNPIN",
                 action = { viewModel.onUnPin() })
             .show()
+        JUMPTO -> {
+            playerControls.getPlaylistItem()?.media?.platformId
+                ?.takeIf { it == itemArg?.media?.platformId }
+                ?.apply { playerControls.seekTo(model.data as Long) }
+            Unit
+        }
     }
 
 

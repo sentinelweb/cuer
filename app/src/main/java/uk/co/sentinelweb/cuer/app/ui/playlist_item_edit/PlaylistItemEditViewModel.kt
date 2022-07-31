@@ -56,7 +56,7 @@ class PlaylistItemEditViewModel constructor(
         val type: Type,
         val data: Any?,
     ) {
-        enum class Type { REFRESHING, ERROR, UNPIN }
+        enum class Type { REFRESHING, ERROR, UNPIN, JUMPTO }
     }
 
     private val _uiLiveData: MutableLiveData<UiEvent> = MutableLiveData()
@@ -330,7 +330,7 @@ class PlaylistItemEditViewModel constructor(
     }
 
     override fun onTimecodeClick(timecode: TimecodeDomain) {
-        TODO("Not yet implemented")
+        _uiLiveData.value = UiEvent(JUMPTO, timecode.position)
     }
 
     fun onLaunchVideo() {

@@ -12,6 +12,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
+import uk.co.sentinelweb.cuer.app.ui.play_control.EmptyPlayerControls
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -133,6 +135,7 @@ interface ShareContract {
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<ShareStrings> { AndroidShareStrings(get()) }
                 scoped<CommitHost> { getSource() }
+                scoped<PlayerContract.PlayerControls> { EmptyPlayerControls() }
             }
         }
     }
