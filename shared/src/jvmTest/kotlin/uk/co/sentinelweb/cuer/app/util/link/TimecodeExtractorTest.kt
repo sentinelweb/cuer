@@ -24,5 +24,6 @@ class TimecodeExtractorTest {
         assertEquals(TimecodeDomain(123000, "02:03", 0 to 4), sut.extractTimecodes("02:03").firstOrNull())
         assertEquals(TimecodeDomain(123000, "02:03", 1 to 5), sut.extractTimecodes(":02:03").firstOrNull())
         assertEquals(TimecodeDomain(129723000, "36:02:03", 0 to 7), sut.extractTimecodes("36:02:03").firstOrNull())
+        assertEquals(TimecodeDomain(0, "0:00", 0 to 3), sut.extractTimecodes("0:00").firstOrNull())
     }
 }
