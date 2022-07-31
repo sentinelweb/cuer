@@ -105,7 +105,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:autoLink="web|email"
         android:linksClickable="true"
         android:textIsSelectable="true"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"

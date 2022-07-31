@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.app.ui.common.views.description
 
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.TimecodeDomain
 
 interface DescriptionContract {
 
@@ -16,8 +18,10 @@ interface DescriptionContract {
     )
 
     interface Interactions {
-        fun onLinkClick(urlString: String)
+        fun onLinkClick(link: LinkDomain.UrlLinkDomain)
         fun onChannelClick()
+        fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain)
+        fun onTimecodeClick(timecode: TimecodeDomain)
 
         fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel)
         fun onRemovePlaylist(chipModel: ChipModel)

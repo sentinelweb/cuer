@@ -11,7 +11,6 @@ import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SHARED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -27,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
@@ -45,7 +45,8 @@ class PlaylistItemEditViewModel constructor(
     private val mediaOrchestrator: MediaOrchestrator,
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val shareWrapper: ShareWrapper,
-    private val playUseCase: PlayUseCase
+    private val playUseCase: PlayUseCase,
+    private val linkScanner: LinkScanner
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -204,12 +205,6 @@ class PlaylistItemEditViewModel constructor(
             ?.also { update() }
     }
 
-    override fun onLinkClick(urlString: String) {
-        // this doesnt get event until the DescriptionView is setup to capture the links properly
-        _navigateLiveData.value =
-            NavigationModel(WEB_LINK, mapOf(NavigationModel.Param.LINK to urlString))
-    }
-
     override fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
         _dialogModelLiveData.value =
             PlaylistsDialogContract.Config(
@@ -309,6 +304,33 @@ class PlaylistItemEditViewModel constructor(
                 mapOf(NavigationModel.Param.CHANNEL_ID to channelId)
             )
         }
+    }
+
+    override fun onLinkClick(link: LinkDomain.UrlLinkDomain) {
+        _navigateLiveData.value = linkScanner.scan(link)?.let { scanned ->
+            when (scanned.first) {
+                ObjectTypeDomain.MEDIA -> navShare(link)
+                ObjectTypeDomain.PLAYLIST -> navShare(link)
+                ObjectTypeDomain.PLAYLIST_ITEM -> navShare(link)
+                ObjectTypeDomain.CHANNEL -> navLink(link)
+                else -> navLink(link)
+            }
+        } ?: let { navLink(link) }
+    }
+
+    private fun navLink(link: LinkDomain.UrlLinkDomain): NavigationModel =
+            NavigationModel(WEB_LINK, mapOf(NavigationModel.Param.LINK to link.address))
+
+    private fun navShare(link: LinkDomain.UrlLinkDomain): NavigationModel  =
+            NavigationModel(SHARE, mapOf(NavigationModel.Param.LINK to link.address))
+
+    override fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain) {
+        _navigateLiveData.value =
+            NavigationModel(CRYPTO_LINK, mapOf(NavigationModel.Param.CRYPTO_ADDRESS to cryptoAddress))
+    }
+
+    override fun onTimecodeClick(timecode: TimecodeDomain) {
+        TODO("Not yet implemented")
     }
 
     fun onLaunchVideo() {

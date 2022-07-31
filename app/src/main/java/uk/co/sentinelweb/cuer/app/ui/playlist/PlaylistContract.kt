@@ -223,7 +223,6 @@ interface PlaylistContract {
                 }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(),get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
-                scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped {
                     PlayUseCase(

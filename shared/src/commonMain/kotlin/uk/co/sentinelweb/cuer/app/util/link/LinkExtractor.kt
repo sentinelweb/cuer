@@ -9,7 +9,7 @@ class LinkExtractor {
     fun extractLinks(text: String): List<LinkDomain> {
         val links = REGEX
             .findAll(text)
-            .map { mapUrlToLinkDomain(it.value) }
+            .map { mapUrlToLinkDomain(it) }
             .toList()
         val crypto = LinkDomain.Crypto.values()
             .map { crypto ->
@@ -34,15 +34,20 @@ class LinkExtractor {
             ?.let { text.substring(it + 1, match.range.start) }
             ?.takeIf { (TITLE_MIN..TITLE_MAX).contains(it.length) }
 
-    fun mapUrlToLinkDomain(url: String): LinkDomain.UrlLinkDomain {
-        val domain = urlDomain(url)
+    fun mapUrlToLinkDomain(match: MatchResult): LinkDomain.UrlLinkDomain {
+        val domain = urlDomain(match.value)
         val domainHost = LinkDomain.DomainHost.values()
             .find { domainHost -> domainHost.domains.find { domain.endsWith(it) } != null }
             ?: LinkDomain.DomainHost.UNKNOWN
         val category =
             LinkDomain.Category.categoryLookup[domainHost]
                 ?: LinkDomain.Category.OTHER
-        return LinkDomain.UrlLinkDomain(url, domain = domainHost, category = category)
+        return LinkDomain.UrlLinkDomain(
+            match.value,
+            domain = domainHost,
+            category = category,
+            extractRegion = match.range.start to match.range.endInclusive
+        )
     }
 
     companion object {
