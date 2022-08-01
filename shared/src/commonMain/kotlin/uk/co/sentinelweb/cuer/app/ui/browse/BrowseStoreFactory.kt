@@ -22,7 +22,7 @@ import uk.co.sentinelweb.cuer.domain.ext.buildIdLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildParentLookup
 
 class BrowseStoreFactory constructor(
-    private val storeFactory: StoreFactory = DefaultStoreFactory,
+    private val storeFactory: StoreFactory = DefaultStoreFactory(),
     private val repository: BrowseRepository,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val browseStrings: BrowseContract.Strings,

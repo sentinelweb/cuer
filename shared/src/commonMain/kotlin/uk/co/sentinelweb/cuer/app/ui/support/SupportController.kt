@@ -1,15 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.support
 
+import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.mvikotlin.core.binder.Binder
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
-import com.arkivanov.mvikotlin.core.lifecycle.Lifecycle
 import com.arkivanov.mvikotlin.extensions.coroutines.bind
 import com.arkivanov.mvikotlin.extensions.coroutines.events
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.states
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
-
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.View.Event
 

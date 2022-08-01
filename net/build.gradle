@@ -27,7 +27,7 @@ dependencies {
     // test
     testImplementation "junit:junit:$ver_junit"
     testImplementation "io.insert-koin:koin-test:$ver_koin"
-    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
+//    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
 }

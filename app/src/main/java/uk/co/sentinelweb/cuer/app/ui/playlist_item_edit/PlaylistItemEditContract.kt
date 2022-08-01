@@ -104,7 +104,7 @@ interface PlaylistItemEditContract {
                 }
                 scoped {
                     PlayDialog(
-                        getSource(),
+                        get<PlaylistItemEditFragment>(),
                         itemFactory = get(),
                         itemModelMapper = get(),
                         navigationRouter = get(),

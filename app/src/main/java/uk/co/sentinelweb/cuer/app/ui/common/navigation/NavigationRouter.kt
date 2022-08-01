@@ -160,12 +160,12 @@ fun Scope.navigationRouter(
 ) = NavigationRouter(
     activity = sourceActivity,
     toastWrapper = ToastWrapper(sourceActivity),
-    fragment = if (isFragment) (getSource() as Fragment) else null,
+    fragment = if (isFragment) (get() as Fragment) else null,
     ytJavaApi = YoutubeJavaApiWrapper(sourceActivity, get()),
     navController = if (withNavHost && sourceActivity is AppCompatActivity) {
         if (isFragment) {
             try {
-                (getSource() as Fragment).findNavController()
+                (get() as Fragment).findNavController()
             } catch (e: IllegalStateException) {
                 null
             }

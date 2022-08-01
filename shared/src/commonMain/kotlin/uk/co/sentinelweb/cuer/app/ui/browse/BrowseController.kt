@@ -1,9 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.browse
 
+import com.arkivanov.essenty.lifecycle.Lifecycle
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.core.binder.Binder
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
-import com.arkivanov.mvikotlin.core.lifecycle.Lifecycle
-import com.arkivanov.mvikotlin.core.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.extensions.coroutines.bind
 import com.arkivanov.mvikotlin.extensions.coroutines.events
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
@@ -27,7 +27,7 @@ class BrowseController constructor(
 
     init {
         log.tag(this)
-        lifecycle?.doOnDestroy(store::dispose)
+        lifecycle?.doOnDestroy { store.dispose() }
     }
 
     private val eventToIntent: suspend Event.() -> Intent = {

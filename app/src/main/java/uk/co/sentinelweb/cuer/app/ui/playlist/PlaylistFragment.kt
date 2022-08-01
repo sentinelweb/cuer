@@ -32,12 +32,12 @@ import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.CastState.*
@@ -74,7 +74,7 @@ class PlaylistFragment :
     ShareContract.Committer,
     AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<PlaylistFragment>()
     override val external: PlaylistContract.External
         get() = presenter as PlaylistContract.External
 

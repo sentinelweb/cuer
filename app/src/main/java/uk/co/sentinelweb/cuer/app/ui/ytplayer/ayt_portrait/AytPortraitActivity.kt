@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
+import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
@@ -19,11 +19,11 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -56,7 +56,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 class AytPortraitActivity : AppCompatActivity(),
     AndroidScopeComponent {
 
-    override val scope: Scope by activityScopeWithSource()
+    override val scope: Scope by activityScopeWithSource<AytPortraitActivity>()
 
     private val controller: PlayerController by inject()
     private val log: LogWrapper by inject()
@@ -107,7 +107,7 @@ class AytPortraitActivity : AppCompatActivity(),
         playerFragment.initMediaRouteButton()
         controller.onViewCreated(
             listOf(mviView, playerFragment.mviView),
-            lifecycle.asMviLifecycle()
+            lifecycle.asEssentyLifecycle()
         )
 
         binding.portraitPlayerDescription.interactions = object : DescriptionContract.Interactions {

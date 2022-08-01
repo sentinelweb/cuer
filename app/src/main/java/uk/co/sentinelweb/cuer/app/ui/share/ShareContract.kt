@@ -103,7 +103,7 @@ interface ShareContract {
         @JvmStatic
         val activityModule = module {
             scope(named<ShareActivity>()) {
-                scoped<View> { getSource() }
+                scoped<View> { get<ShareActivity>() }
                 scoped<Presenter> {
                     SharePresenter(
                         view = get(),
@@ -122,8 +122,8 @@ interface ShareContract {
                         recentLocalPlaylists = get()
                     )
                 }
-                scoped { ShareWrapper(getSource()) }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
+                scoped { ShareWrapper(get<ShareActivity>()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<ShareActivity>(), get()) }
                 viewModel { State() }
                 scoped {
                     ShareModelMapper(
@@ -131,13 +131,13 @@ interface ShareContract {
                         res = get()
                     )
                 }
-                scoped<DoneNavigation> { getSource() }
-                scoped { navigationRouter(false, getSource()) }
+                scoped<DoneNavigation> { get<ShareActivity>() }
+                scoped { navigationRouter(false, get<ShareActivity>()) }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<ShareStrings> { AndroidShareStrings(get()) }
-                scoped<CommitHost> { getSource() }
+                scoped<CommitHost> { get<ShareActivity>() }
                 scoped<PlayerContract.PlayerControls> { EmptyPlayerControls() }
-                scoped { AlertDialogCreator(getSource()) }
+                scoped { AlertDialogCreator(get<ShareActivity>()) }
             }
         }
     }

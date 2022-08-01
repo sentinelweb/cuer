@@ -47,7 +47,7 @@ class RemoteContract {
             scope(named<RemoteService>()) {
                 scoped<Controller> {
                     RemoteServiceController(
-                        service = getSource(),
+                        service = get<RemoteService>(),
                         notification = get(),
                         webServer = get(),
                         coroutines = get(),
@@ -62,7 +62,7 @@ class RemoteContract {
                 }
                 scoped<Notification.View> {
                     RemoteNotification(
-                        service = getSource(),
+                        service = get<RemoteService>(),
                         appState = get(),
                         timeProvider = get(),
                         log = get(),

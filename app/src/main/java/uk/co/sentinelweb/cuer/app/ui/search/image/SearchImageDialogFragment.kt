@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Observer
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
@@ -21,7 +20,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 class SearchImageDialogFragment(private val config: SearchImageContract.Config) : DialogFragment(),
     AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<SearchImageDialogFragment>()
     private val viewModel: SearchImageViewModel by inject()
     private val log: LogWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()

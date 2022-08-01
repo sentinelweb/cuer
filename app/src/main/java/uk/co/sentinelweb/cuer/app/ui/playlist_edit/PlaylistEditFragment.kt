@@ -29,9 +29,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.*
@@ -51,7 +51,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<PlaylistEditFragment>()
     private val viewModel: PlaylistEditViewModel by inject()
     private val chipCreator: ChipCreator by inject()
     private val log: LogWrapper by inject()

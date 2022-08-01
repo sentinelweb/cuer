@@ -1,0 +1,25 @@
+PRAGMA foreign_keys = 'ON';
+
+CREATE TABLE playlist (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    flags INTEGER  NOT NULL DEFAULT 0,
+    title TEXT NOT NULL,
+    currentIndex INTEGER  NOT NULL DEFAULT -1,
+    mode TEXT AS uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain NOT NULL DEFAULT "SINGLE",
+    type TEXT AS uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain NOT NULL DEFAULT "USER",
+    platform TEXT AS uk.co.sentinelweb.cuer.domain.PlatformDomain,
+    platform_id TEXT,
+    channel_id INTEGER,
+    parent_id INTEGER,
+    thumb_id INTEGER,
+    image_id INTEGER,
+    config_json TEXT AS uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistConfigDomain NOT NULL DEFAULT "{}",
+    FOREIGN KEY (channel_id) REFERENCES channel(id),
+    FOREIGN KEY (parent_id) REFERENCES playlist(id),
+    FOREIGN KEY (thumb_id) REFERENCES image(id),
+    FOREIGN KEY (image_id) REFERENCES image(id)
+);
+
+CREATE INDEX playlist_flags_index ON playlist(flags);
+
+CREATE INDEX playlist_type_index ON playlist(type);

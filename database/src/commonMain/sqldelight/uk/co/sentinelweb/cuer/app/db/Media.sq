@@ -1,0 +1,31 @@
+PRAGMA foreign_keys = 'ON';
+
+CREATE TABLE media (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    flags INTEGER NOT NULL DEFAULT 0,
+    type TEXT AS uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain NOT NULL,
+    title TEXT,
+    duration INTEGER,
+    positon INTEGER,
+    date_last_played TEXT AS kotlinx.datetime.Instant,
+    description TEXT,
+    platform  TEXT AS uk.co.sentinelweb.cuer.domain.PlatformDomain NOT NULL,
+    platform_id TEXT NOT NULL,
+    published TEXT AS kotlinx.datetime.LocalDateTime,
+    channel_id INTEGER,
+    thumb_id INTEGER,
+    image_id INTEGER,
+    FOREIGN KEY (channel_id) REFERENCES channel(id)
+);
+
+CREATE UNIQUE INDEX media_platform_id_index ON media(platform_id);
+
+CREATE INDEX media_type_index ON media(type);
+
+CREATE INDEX media_flags_index ON media(flags);
+
+CREATE INDEX media_channel_id_index ON media(channel_id);
+
+CREATE INDEX media_title_index ON media(title);
+
+CREATE INDEX media_description_index ON media(description);

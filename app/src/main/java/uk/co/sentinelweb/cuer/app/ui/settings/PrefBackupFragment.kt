@@ -26,7 +26,7 @@ import java.io.File
 
 class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupContract.View, AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<PrefBackupFragment>()
     private val presenter: PrefBackupContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private lateinit var progress: ProgressBar

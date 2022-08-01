@@ -54,7 +54,7 @@ class ShareActivity : AppCompatActivity(),
     CommitHost,
     AndroidScopeComponent {
 
-    override val scope: Scope by activityScopeWithSource()
+    override val scope: Scope by activityScopeWithSource<ShareActivity>()
     private val presenter: ShareContract.Presenter by inject()
     private val shareWrapper: ShareWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()

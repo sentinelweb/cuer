@@ -22,9 +22,9 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -46,7 +46,7 @@ class PlaylistsFragment :
     ItemBaseContract.ItemMoveInteractions,
     AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<PlaylistsFragment>()
     private val presenter: PlaylistsContract.Presenter by inject()
     private val adapter: PlaylistsAdapter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()

@@ -1,9 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.player
 
+import com.arkivanov.essenty.lifecycle.Lifecycle
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.core.binder.Binder
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
-import com.arkivanov.mvikotlin.core.lifecycle.Lifecycle
-import com.arkivanov.mvikotlin.core.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.extensions.coroutines.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
@@ -31,7 +31,7 @@ class PlayerController constructor(
 ) {
     init {
         log.tag(this)
-        lifecycle?.doOnDestroy(store::dispose)
+        lifecycle?.doOnDestroy { store.dispose() }
     }
 
     private val eventToIntent: suspend PlayerContract.View.Event.() -> Intent = {
