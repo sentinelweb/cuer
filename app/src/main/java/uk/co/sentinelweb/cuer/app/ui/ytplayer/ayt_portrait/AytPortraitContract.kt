@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
@@ -89,6 +90,7 @@ interface AytPortraitContract {
                 scoped { LocalPlayerCastListener(getSource(), get()) }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<CommitHost> { EmptyCommitHost() }
+                scoped { AlertDialogCreator(getSource()) }
             }
         }
     }

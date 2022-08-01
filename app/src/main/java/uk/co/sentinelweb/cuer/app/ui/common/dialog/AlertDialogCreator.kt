@@ -13,7 +13,7 @@ class AlertDialogCreator(
 ) {
 
     fun create(model: AlertDialogModel): AlertDialog {
-        val builder = MaterialAlertDialogBuilder(context, R.style.Cuer_MaterialAlertDialog)
+        val builder = MaterialAlertDialogBuilder(context)
             .setTitle(model.title)
             .setPositiveButton(model.confirm.label, object : DialogInterface.OnClickListener {
                 override fun onClick(dialog: DialogInterface?, p1: Int) {

@@ -3,8 +3,10 @@ package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land
 import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -71,6 +73,7 @@ interface AytLandContract {
                         )
                     )
                 }
+                scoped { AlertDialogCreator(getSource()) }
                 scoped { LocalPlayerCastListener(getSource(), get()) }
             }
         }

@@ -5,6 +5,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
@@ -81,6 +82,7 @@ interface MainContract {
                 scoped<PlaylistContract.Interactions?> { null }
                 scoped<CommitHost> { EmptyCommitHost() }
                 scoped { FloatingPlayerCastListener(getSource(), get(), get()) }
+                scoped { AlertDialogCreator(getSource()) }
             }
         }
     }

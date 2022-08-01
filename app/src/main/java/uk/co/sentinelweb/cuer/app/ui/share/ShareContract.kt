@@ -10,6 +10,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.EmptyPlayerControls
@@ -136,6 +137,7 @@ interface ShareContract {
                 scoped<ShareStrings> { AndroidShareStrings(get()) }
                 scoped<CommitHost> { getSource() }
                 scoped<PlayerContract.PlayerControls> { EmptyPlayerControls() }
+                scoped { AlertDialogCreator(getSource()) }
             }
         }
     }

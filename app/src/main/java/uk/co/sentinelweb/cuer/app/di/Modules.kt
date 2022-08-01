@@ -116,7 +116,6 @@ object Modules {
         factory { BackgroundMapper(get()) }
         single { AytViewHolder(get(), get(), get()) }
         factory { PlayYangProgress(get()) }
-        factory { AlertDialogCreator(androidApplication()) }
     }
 
     private val utilModule = module {
