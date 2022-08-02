@@ -23,3 +23,13 @@ CREATE INDEX channel_platform_id_index ON channel(platform_id);
 CREATE INDEX channel_flags_index ON channel(flags);
 
 CREATE INDEX channel_title_index ON channel(title);
+
+createChannel:
+INSERT INTO channel ( flags,title,description,custom_url,country,platform,platform_id,thumb_id,image_id,published )
+VALUES ?;
+
+getInsertIdChannel:
+SELECT last_insert_rowid() FROM channel;
+
+loadChannel:
+SELECT * FROM channel WHERE id = ?;

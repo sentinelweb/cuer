@@ -11,7 +11,7 @@ dependencies {
     implementation project(":shared")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core"
     implementation "org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime"
 

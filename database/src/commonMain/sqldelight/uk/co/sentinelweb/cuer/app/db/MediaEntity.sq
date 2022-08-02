@@ -29,3 +29,13 @@ CREATE INDEX media_channel_id_index ON media(channel_id);
 CREATE INDEX media_title_index ON media(title);
 
 CREATE INDEX media_description_index ON media(description);
+
+createMedia:
+INSERT INTO media ( flags, type, title, duration, positon, date_last_played, description, platform, platform_id,
+published, channel_id, thumb_id, image_id ) VALUES ?;
+
+getInsertIdMedia:
+SELECT last_insert_rowid() FROM media;
+
+loadMedia:
+SELECT * FROM media WHERE id = ?;

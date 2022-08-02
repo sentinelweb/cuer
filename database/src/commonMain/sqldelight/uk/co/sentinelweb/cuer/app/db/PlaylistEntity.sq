@@ -23,3 +23,15 @@ CREATE TABLE playlist (
 CREATE INDEX playlist_flags_index ON playlist(flags);
 
 CREATE INDEX playlist_type_index ON playlist(type);
+
+createPlaylist:
+INSERT INTO playlist (
+flags, title, currentIndex, mode, type, platform, platform_id, channel_id,
+parent_id, thumb_id, image_id, config_json
+) VALUES ?;
+
+getInsertIdPlaylist:
+SELECT last_insert_rowid() FROM playlist;
+
+loadPlaylist:
+SELECT * FROM playlist WHERE id = ?;

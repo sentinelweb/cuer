@@ -6,7 +6,7 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-val ver_coroutines_core: String by project
+val ver_coroutines: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_kotlinx_datetime: String by project
 val ver_koin: String by project
@@ -62,7 +62,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
@@ -93,7 +93,7 @@ kotlin {
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
                 implementation("com.google.truth:truth:$ver_truth")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
                 implementation("app.cash.turbine:turbine:$ver_turbine")
                 implementation("org.mock-server:mockserver-netty:$ver_mockserver")
                 implementation("org.mock-server:mockserver-client-java:$ver_mockserver")

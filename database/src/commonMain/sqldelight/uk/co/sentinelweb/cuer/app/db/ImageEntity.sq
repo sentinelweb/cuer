@@ -1,0 +1,18 @@
+PRAGMA foreign_keys = 'ON';
+
+CREATE TABLE image(
+  id INTEGER NOT NULL PRIMARY KEY ,
+  url TEXT NOT NULL,
+  width INTEGER,
+  height INTEGER
+);
+
+createImage:
+INSERT INTO image ( url, width, height )
+VALUES ?;
+
+getInsertIdImage:
+SELECT last_insert_rowid() FROM image;
+
+loadImage:
+SELECT * FROM image WHERE id = ?;

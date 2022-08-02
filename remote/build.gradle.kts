@@ -12,7 +12,7 @@ plugins {
 val ver_kotlin: String by project
 val ver_kotlinx_datetime: String by project
 val ver_kotlinx_serialization_core: String by project
-val ver_coroutines_core: String by project
+val ver_coroutines: String by project
 val ver_ktor: String by project
 val ver_jvm: String by project
 val ver_koin: String by project
@@ -52,7 +52,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
                 implementation("io.insert-koin:koin-core:$ver_koin")
             }

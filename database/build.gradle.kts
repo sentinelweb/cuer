@@ -8,9 +8,13 @@ plugins {
 
 version = "1.0"
 
+val ver_coroutines: String by project
+val ver_kotlinx_serialization_core: String by project
 val ver_sqldelight: String by project
 val ver_kotlinx_datetime: String by project
 val ver_koin: String by project
+val ver_turbine: String by project
+val ver_kotlin_fixture: String by project
 
 kotlin {
     android()
@@ -29,26 +33,45 @@ kotlin {
             baseName = "database"
         }
     }
-    
+
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(project(":shared"))
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
+                implementation("io.insert-koin:koin-core:$ver_koin")
+
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("io.insert-koin:koin-test:$ver_koin")
+//                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
+//                implementation("com.google.truth:truth:$ver_truth")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
+                implementation("app.cash.turbine:turbine:$ver_turbine")
+
             }
         }
         val androidMain by getting {
             dependencies {
 //                implementation(project(":shared"))
                 implementation("com.squareup.sqldelight:android-driver:$ver_sqldelight")
+                implementation("io.insert-koin:koin-android:$ver_koin")
             }
         }
-        val androidTest by getting
+        val androidTest by getting {
+            dependencies {
+                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
+                implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
+                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
+
+            }
+        }
         val iosX64Main by getting
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
