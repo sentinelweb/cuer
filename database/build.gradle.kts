@@ -15,6 +15,9 @@ val ver_kotlinx_datetime: String by project
 val ver_koin: String by project
 val ver_turbine: String by project
 val ver_kotlin_fixture: String by project
+val app_compileSdkVersion: String by project
+val app_targetSdkVersion: String by project
+val app_minSdkVersion: String by project
 
 kotlin {
     android()
@@ -105,11 +108,11 @@ kotlin {
 }
 
 android {
-    compileSdk = 32
+    compileSdk = app_compileSdkVersion.toInt()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = 21
-        targetSdk = 32
+        minSdk = app_minSdkVersion.toInt()
+        targetSdk = app_targetSdkVersion.toInt()
     }
 }
 

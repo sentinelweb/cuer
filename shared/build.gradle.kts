@@ -22,15 +22,17 @@ val ver_turbine: String by project
 val ver_ktor: String by project
 val ver_mockserver: String by project
 val app_compileSdkVersion: String by project
+val app_targetSdkVersion: String by project
+val app_minSdkVersion: String by project
 
 version = "1.0"
 
 android {
-    compileSdkVersion(app_compileSdkVersion.toInt())
+    compileSdk = app_compileSdkVersion.toInt()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdkVersion(26)
-        targetSdkVersion(30)
+        minSdk = app_minSdkVersion.toInt()
+        targetSdk = app_targetSdkVersion.toInt()
     }
     // remove when upgrading to kotlin 1.5
     configurations {
