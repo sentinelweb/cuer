@@ -81,7 +81,7 @@ interface MainContract {
                 scoped<DoneNavigation> { get<MainActivity>() }
                 scoped<PlaylistContract.Interactions?> { null }
                 scoped<CommitHost> { EmptyCommitHost() }
-                scoped { FloatingPlayerCastListener(get<MainActivity>(), get(), get()) }
+                scoped { FloatingPlayerCastListener(get(), get(), get()) }
                 scoped { AlertDialogCreator(get<MainActivity>()) }
             }
         }
