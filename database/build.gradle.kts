@@ -24,9 +24,9 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-//    js {
-//        browser()
-//    }
+    js {
+        browser()
+    }
     cocoapods {
         summary = "Some description for the Shared Module"
         homepage = "Link to the Shared Module homepage"
@@ -98,12 +98,12 @@ kotlin {
             iosArm64Test.dependsOn(this)
             iosSimulatorArm64Test.dependsOn(this)
         }
-//        val jsMain by getting {
-//            dependencies {
-//                implementation("com.squareup.sqldelight:sqljs-driver:$ver_sqldelight")
-//            }
-//        }
-//        val jsTest by getting
+        val jsMain by getting {
+            dependencies {
+                implementation("com.squareup.sqldelight:sqljs-driver:$ver_sqldelight")
+            }
+        }
+        val jsTest by getting
     }
 }
 

@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.constants
 
-class MediaEntity {
+class MediaConstants {
     companion object {
         const val FLAG_WATCHED = 1L
         const val FLAG_STARRED = 2L

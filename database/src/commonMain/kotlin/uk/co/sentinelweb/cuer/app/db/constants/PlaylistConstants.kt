@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.constants
 
-class PlaylistEntity {
+class PlaylistConstants {
     companion object {
         const val FLAG_STARRED = 1L
         const val FLAG_ARCHIVED = 2L
