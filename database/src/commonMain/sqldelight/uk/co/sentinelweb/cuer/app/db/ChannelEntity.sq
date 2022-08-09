@@ -25,11 +25,34 @@ CREATE INDEX channel_flags_index ON channel(flags);
 CREATE INDEX channel_title_index ON channel(title);
 
 createChannel:
-INSERT INTO channel ( flags,title,description,custom_url,country,platform,platform_id,thumb_id,image_id,published )
+INSERT INTO channel (flags,title,description,custom_url,country,platform,platform_id,thumb_id,image_id,published)
 VALUES ?;
 
 getInsertIdChannel:
 SELECT last_insert_rowid() FROM channel;
 
-loadChannel:
+load:
 SELECT * FROM channel WHERE id = ?;
+
+loadAllChannels:
+SELECT * FROM channel;
+
+count:
+SELECT count() FROM channel;
+
+loadAllByIds:
+SELECT * FROM channel WHERE id IN ?;
+
+delete:
+DELETE FROM channel WHERE id = ?;
+
+deleteByIds:
+DELETE FROM channel WHERE id IN ?;
+
+deleteAll:
+DELETE FROM channel;
+
+update:
+REPLACE INTO channel (id, flags,title,description,custom_url,country,platform,platform_id,thumb_id,image_id,published)
+VALUES ?;
+
