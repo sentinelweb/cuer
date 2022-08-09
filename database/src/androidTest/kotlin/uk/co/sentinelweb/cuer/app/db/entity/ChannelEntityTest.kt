@@ -14,6 +14,7 @@ import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Channel
 import uk.co.sentinelweb.cuer.app.db.Database
+import uk.co.sentinelweb.cuer.app.db.Image
 import uk.co.sentinelweb.cuer.app.db.di.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.app.db.util.MainCoroutineRule
@@ -150,4 +151,16 @@ class ChannelEntityTest : KoinTest {
         assertEquals(update, actual)
     }
 
+    @Test
+    fun createLoadEntityWithImages() {
+        val initial = fixture<Channel>().copy(id = 0, image_id = 1, thumb_id = 2)
+        val initialImage = fixture<Image>().copy(id = 1)
+        val initialThumb = fixture<Image>().copy(id = 2)
+        database.imageEntityQueries.createImage(initialImage)
+        database.imageEntityQueries.createImage(initialThumb)
+        database.channelEntityQueries.createChannel(initial)
+        val insertId = database.channelEntityQueries.getInsertIdChannel().executeAsOne()
+        val actual = database.channelEntityQueries.load(insertId).executeAsOne()
+        assertEquals(initial.copy(id = insertId), actual)
+    }
 }
