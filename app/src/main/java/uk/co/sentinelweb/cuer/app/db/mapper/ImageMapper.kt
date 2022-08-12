@@ -7,18 +7,18 @@ class ImageMapper {
     fun mapImage(thumbNail: ImageDomain?) =
         thumbNail?.let {
             Image(
-                it.url,
-                it.width,
-                it.height
+                url = it.url,
+                width = it.width,
+                height = it.height
             )
         }
 
     fun mapImage(thumbNail: Image?) =
         thumbNail?.let {
             ImageDomain(
-                it.url,
-                it.width,
-                it.height
+                url = it.url,
+                width = it.width,
+                height = it.height
             )
         }
 }

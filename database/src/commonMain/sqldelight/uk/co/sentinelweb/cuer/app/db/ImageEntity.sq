@@ -2,7 +2,7 @@ PRAGMA foreign_keys = 'ON';
 
 CREATE TABLE image(
   id INTEGER NOT NULL PRIMARY KEY ,
-  url TEXT NOT NULL,
+  url TEXT UNIQUE NOT NULL,
   width INTEGER,
   height INTEGER
 );
@@ -16,3 +16,7 @@ SELECT last_insert_rowid() FROM image;
 
 loadImage:
 SELECT * FROM image WHERE id = ?;
+
+update:
+REPLACE INTO image (id,  url, width, height )
+VALUES ?;

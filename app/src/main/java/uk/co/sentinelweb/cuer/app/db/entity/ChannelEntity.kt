@@ -56,8 +56,4 @@ data class ChannelEntity(
 
     @ColumnInfo(name = "published")
     val published: LocalDateTime? = null
-) {
-    companion object {
-        const val FLAG_STARRED = 1L
-    }
-}
+)

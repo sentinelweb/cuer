@@ -92,7 +92,9 @@ class ChannelEntityTest : KoinTest {
             }
         }
         val idList = listOf(1L, 3L, 5L)
-        val actual = database.channelEntityQueries.loadAllByIds(idList).executeAsList()
+        val actual = database.channelEntityQueries
+            .loadAllByIds(idList)
+            .executeAsList()
         assertEquals(actual.size, idList.size)
         idList.forEach { id -> assertNotNull(actual.filter { it.id == id }) }
     }
@@ -101,10 +103,28 @@ class ChannelEntityTest : KoinTest {
     fun createDeleteEntity() {
         val initial = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
         database.channelEntityQueries.createChannel(initial)
-        val insertId = database.channelEntityQueries.getInsertIdChannel().executeAsOne()
+        val insertId = database.channelEntityQueries
+            .getInsertIdChannel()
+            .executeAsOne()
         database.channelEntityQueries.delete(insertId)
-        val actual = database.channelEntityQueries.count().executeAsOne()
+        val actual = database.channelEntityQueries
+            .count()
+            .executeAsOne()
         assertEquals(0, actual.toInt())
+    }
+
+    @Test
+    fun findByChannelId() {
+        val initial = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
+        database.channelEntityQueries.createChannel(initial)
+        val insertId = database.channelEntityQueries
+            .getInsertIdChannel()
+            .executeAsOne()
+        database.channelEntityQueries.findByChannelId(initial.platform_id, initial.platform)
+        val actual = database.channelEntityQueries
+            .findByChannelId(initial.platform_id, initial.platform)
+            .executeAsOne()
+        assertEquals(insertId, actual.id)
     }
 
     @Test
@@ -118,10 +138,14 @@ class ChannelEntityTest : KoinTest {
 
         val deleteIdList = listOf(1L, 3L, 5L)
         database.channelEntityQueries.deleteByIds(deleteIdList)
-        val actual = database.channelEntityQueries.count().executeAsOne()
+        val actual = database.channelEntityQueries
+            .count()
+            .executeAsOne()
         assertEquals(2, actual.toInt())
         val remainIdList = listOf(2L, 4L)
-        val actualRemain = database.channelEntityQueries.loadAllByIds(remainIdList).executeAsList()
+        val actualRemain = database.channelEntityQueries
+            .loadAllByIds(remainIdList)
+            .executeAsList()
         assertEquals(actualRemain.size, remainIdList.size)
         remainIdList.forEach { id -> assertNotNull(actualRemain.filter { it.id == id }) }
     }

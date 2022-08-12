@@ -54,4 +54,15 @@ class ImageEntityTest : KoinTest {
         val actual = database.imageEntityQueries.loadImage(1).executeAsOne()
         assertEquals(initial.copy(id = insertId), actual)
     }
+
+    @Test
+    fun update() {
+        val initial = fixture<Image>().copy(id = 0)
+        database.imageEntityQueries.createImage(initial)
+        val insertId = database.imageEntityQueries.getInsertIdImage().executeAsOne()
+        val update = fixture<Image>().copy(id = insertId)
+        database.imageEntityQueries.update(update)
+        val actual = database.imageEntityQueries.loadImage(insertId).executeAsOne()
+        assertEquals(update, actual)
+    }
 }

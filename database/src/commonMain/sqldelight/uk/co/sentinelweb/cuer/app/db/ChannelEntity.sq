@@ -7,11 +7,11 @@ CREATE TABLE channel (
     description TEXT,
     custom_url TEXT,
     country TEXT,
-    platform TEXT AS uk.co.sentinelweb.cuer.domain.PlatformDomain,
+    platform TEXT AS uk.co.sentinelweb.cuer.domain.PlatformDomain NOT NULL,
     platform_id TEXT NOT NULL,
     thumb_id INTEGER,
     image_id INTEGER,
-    published TEXT AS kotlinx.datetime.LocalDateTime NOT NULL,
+    published TEXT AS kotlinx.datetime.LocalDateTime,
     FOREIGN KEY (thumb_id) REFERENCES image(id),
     FOREIGN KEY (image_id) REFERENCES image(id)
 );
@@ -42,6 +42,9 @@ SELECT count() FROM channel;
 
 loadAllByIds:
 SELECT * FROM channel WHERE id IN ?;
+
+findByChannelId:
+SELECT * FROM channel WHERE platform_id LIKE ? AND platform = ? LIMIT 1;
 
 delete:
 DELETE FROM channel WHERE id = ?;

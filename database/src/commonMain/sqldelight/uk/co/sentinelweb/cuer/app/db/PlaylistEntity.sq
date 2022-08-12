@@ -24,6 +24,8 @@ CREATE INDEX playlist_flags_index ON playlist(flags);
 
 CREATE INDEX playlist_type_index ON playlist(type);
 
+CREATE UNIQUE INDEX playlist_platform_platform_id_index ON channel(platform, platform_id);
+
 createPlaylist:
 INSERT INTO playlist (
 flags, title, currentIndex, mode, type, platform, platform_id, channel_id,

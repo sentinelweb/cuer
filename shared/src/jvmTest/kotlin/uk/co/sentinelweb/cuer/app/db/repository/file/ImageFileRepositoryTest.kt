@@ -68,7 +68,7 @@ class ImageFileRepositoryIntegrationTest {
     fun saveImage_local() = runBlocking {
         val url: URL? =
             this::class.java.classLoader?.getResource("art-school-of-athens-1143741_640.jpg")
-        val savedImage = sut.saveImage(ImageDomain(url.toString()))
+        val savedImage = sut.saveImage(ImageDomain(url = url.toString()))
         val savedLocalUri = sut.toLocalUri(savedImage.url)
         assertThat(savedLocalUri).isEqualTo(makeRepoRoot() + "art-school-of-athens-1143741_640.jpg")
         val filePath = sut.toLocalUri(savedImage.url)?.substring("file://".length)
@@ -79,8 +79,8 @@ class ImageFileRepositoryIntegrationTest {
     fun saveImage_local_duplicate_same_name_and_data() = runBlocking {
         val url: URL? =
             this::class.java.classLoader?.getResource("art-school-of-athens-1143741_640.jpg")
-        val firstImage = sut.saveImage(ImageDomain(url.toString()))
-        val savedImage = sut.saveImage(ImageDomain(url.toString()))
+        val firstImage = sut.saveImage(ImageDomain(url = url.toString()))
+        val savedImage = sut.saveImage(ImageDomain(url = url.toString()))
         val savedLocalUri = sut.toLocalUri(savedImage.url)
         assertThat(savedLocalUri).isEqualTo(makeRepoRoot() + "art-school-of-athens-1143741_640.jpg")
         val filePath = sut.toLocalUri(savedImage.url)?.substring("file://".length)
@@ -92,7 +92,7 @@ class ImageFileRepositoryIntegrationTest {
         val name = "test name"
         val firstFileUrl: URL? =
             this::class.java.classLoader?.getResource("art-school-of-athens-1143741_640.jpg")
-        val firstImage = sut.saveImage(ImageDomain(firstFileUrl.toString()), name)
+        val firstImage = sut.saveImage(ImageDomain(url = firstFileUrl.toString()), name)
         val firstLocalUri = sut.toLocalUri(firstImage.url)
         assertThat(firstLocalUri).isEqualTo(makeRepoRoot() + "test_name.jpg")
         val firsrFilePath = sut.toLocalUri(firstImage.url)?.substring("file://".length)
@@ -100,7 +100,7 @@ class ImageFileRepositoryIntegrationTest {
 
         val diffFileUrl: URL? =
             this::class.java.classLoader?.getResource("diff-name-art-school-of-athens-1143741_640.jpg")
-        val sameImage = sut.saveImage(ImageDomain(diffFileUrl.toString()), name)
+        val sameImage = sut.saveImage(ImageDomain(url = diffFileUrl.toString()), name)
         assertThat(sameImage).isEqualTo(firstImage)
         val sameLocalUri = sut.toLocalUri(sameImage.url)
         assertThat(sameLocalUri).isEqualTo(makeRepoRoot() + "test_name.jpg")
@@ -112,8 +112,8 @@ class ImageFileRepositoryIntegrationTest {
     fun saveImage_local_named_duplicate_same_name_and_data() = runBlocking {
         val url: URL? =
             this::class.java.classLoader?.getResource("art-school-of-athens-1143741_640.jpg")
-        val firstImage = sut.saveImage(ImageDomain(url.toString()))
-        val savedImage = sut.saveImage(ImageDomain(url.toString()))
+        val firstImage = sut.saveImage(ImageDomain(url = url.toString()))
+        val savedImage = sut.saveImage(ImageDomain(url = url.toString()))
         val savedLocalUri = sut.toLocalUri(savedImage.url)
         assertThat(savedLocalUri).isEqualTo(makeRepoRoot() + "art-school-of-athens-1143741_640.jpg")
         val filePath = sut.toLocalUri(savedImage.url)?.substring("file://".length)
@@ -125,12 +125,12 @@ class ImageFileRepositoryIntegrationTest {
         val name = "test name"
         val url: URL? =
             this::class.java.classLoader?.getResource("art-school-of-athens-1143741_640.jpg")
-        val firstImage = sut.saveImage(ImageDomain(url.toString()), name)
+        val firstImage = sut.saveImage(ImageDomain(url = url.toString()), name)
         val firstLocalUri = sut.toLocalUri(firstImage.url)
         assertThat(firstLocalUri).isEqualTo(makeRepoRoot() + "test_name.jpg")
         val differentUrl: URL? =
             this::class.java.classLoader?.getResource("diff_file_same_name/art-school-of-athens-1143741_640.jpg")
-        val savedImage = sut.saveImage(ImageDomain(differentUrl.toString()), name)
+        val savedImage = sut.saveImage(ImageDomain(url = differentUrl.toString()), name)
         val savedLocalUri = sut.toLocalUri(savedImage.url)
         assertThat(savedLocalUri).isEqualTo(makeRepoRoot() + "test_name_1.jpg")
         val filePath = sut.toLocalUri(savedImage.url)?.substring("file://".length)
@@ -141,7 +141,7 @@ class ImageFileRepositoryIntegrationTest {
     fun loadImage_bytes() = runBlocking {
         val url: URL? =
             this::class.java.classLoader?.getResource("art-school-of-athens-1143741_640.jpg")
-        val savedImage = sut.saveImage(ImageDomain(url.toString()))
+        val savedImage = sut.saveImage(ImageDomain(url = url.toString()))
         val savedLocalUri = sut.toLocalUri(savedImage.url)
         assertThat(savedLocalUri).isEqualTo(makeRepoRoot() + "art-school-of-athens-1143741_640.jpg")
         val bytes = sut.loadImage(savedImage)
@@ -168,7 +168,7 @@ class ImageFileRepositoryIntegrationTest {
             val inputPath = url.toString().substring("file:".length)
             val bytes = File(inputPath).readBytes()
             setupMockServer(path, bytes)
-            testImageFromWebServer = ImageDomain("http://localhost:1080" + path)
+            testImageFromWebServer = ImageDomain(url = "http://localhost:1080" + path)
         }
 
         @AfterClass()

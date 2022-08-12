@@ -17,4 +17,8 @@ data class ChannelDomain constructor(
     val thumbNail: ImageDomain? = null,
     val image: ImageDomain? = null,
     val starred: Boolean = false
-) : Domain
+) : Domain {
+    companion object {
+        const val FLAG_STARRED = 1L
+    }
+}

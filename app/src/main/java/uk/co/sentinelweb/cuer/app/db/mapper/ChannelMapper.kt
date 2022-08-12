@@ -4,8 +4,8 @@ import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
-import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
+import uk.co.sentinelweb.cuer.domain.ChannelDomain.Companion.FLAG_STARRED
 
 class ChannelMapper constructor(val imageMapper: ImageMapper) {
     fun map(domain: ChannelDomain): ChannelEntity = ChannelEntity(

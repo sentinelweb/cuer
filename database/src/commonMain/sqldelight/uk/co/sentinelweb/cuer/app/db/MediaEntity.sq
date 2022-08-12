@@ -18,7 +18,7 @@ CREATE TABLE media (
     FOREIGN KEY (channel_id) REFERENCES channel(id)
 );
 
-CREATE UNIQUE INDEX media_platform_id_index ON media(platform_id);
+CREATE UNIQUE INDEX media_platform_platform_id_index ON channel(platform, platform_id);
 
 CREATE INDEX media_type_index ON media(type);
 
