@@ -7,6 +7,8 @@ import org.junit.runner.Description
 import org.koin.core.component.KoinComponent
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.di.DatabaseModule
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 
 class DatabaseTestRule : TestWatcher(), KoinComponent {
 
@@ -14,7 +16,11 @@ class DatabaseTestRule : TestWatcher(), KoinComponent {
         single<SqlDriver> { JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY) }
     }
 
-    val modules = listOf(driverModule)
+    private val dbTestModule = module {
+        factory<LogWrapper> { SystemLogWrapper() }
+    }
+
+    val modules = listOf(driverModule, dbTestModule)
         .plus(DatabaseModule.modules)
 
     override fun starting(description: Description?) {

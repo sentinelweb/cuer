@@ -51,6 +51,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
+                implementation(project(":shared"))
                 implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:$ver_koin")
 //                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
@@ -69,6 +70,7 @@ kotlin {
         }
         val androidTest by getting {
             dependencies {
+                implementation(project(":shared"))
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
                 implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")

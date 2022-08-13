@@ -9,6 +9,8 @@ import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.TestCoroutineContextProvider
 
 class MainCoroutineRule(
     val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
@@ -16,6 +18,7 @@ class MainCoroutineRule(
 
     private val dispatcherModule = module {
         single<CoroutineDispatcher> { testDispatcher }
+        single<CoroutineContextProvider> { TestCoroutineContextProvider(testDispatcher) }
     }
     val modules = listOf(dispatcherModule)
 

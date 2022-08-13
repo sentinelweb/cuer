@@ -52,8 +52,8 @@ class ChannelEntityTest : KoinTest {
     @Test
     fun createLoadEntity() {
         val initial = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
-        database.channelEntityQueries.createChannel(initial)
-        val insertId = database.channelEntityQueries.getInsertIdChannel().executeAsOne()
+        database.channelEntityQueries.create(initial)
+        val insertId = database.channelEntityQueries.getInsertId().executeAsOne()
         val actual = database.channelEntityQueries.load(insertId).executeAsOne()
         assertEquals(initial.copy(id = insertId), actual)
     }
@@ -63,10 +63,10 @@ class ChannelEntityTest : KoinTest {
         val initial = fixture<List<Channel>>().map { it.copy(id = 0, image_id = null, thumb_id = null) }
         database.channelEntityQueries.transaction {
             initial.forEach {
-                database.channelEntityQueries.createChannel(it)
+                database.channelEntityQueries.create(it)
             }
         }
-        val actual = database.channelEntityQueries.loadAllChannels().executeAsList()
+        val actual = database.channelEntityQueries.loadAll().executeAsList()
         assertEquals(initial.size, actual.size)
         actual.forEach { assertTrue(it.id > 0) }
     }
@@ -76,7 +76,7 @@ class ChannelEntityTest : KoinTest {
         val initial = fixture<List<Channel>>().map { it.copy(id = 0, image_id = null, thumb_id = null) }
         database.channelEntityQueries.transaction {
             initial.forEach {
-                database.channelEntityQueries.createChannel(it)
+                database.channelEntityQueries.create(it)
             }
         }
         val actual = database.channelEntityQueries.count().executeAsOne()
@@ -88,7 +88,7 @@ class ChannelEntityTest : KoinTest {
         val initial = fixture<List<Channel>>().map { it.copy(id = 0, image_id = null, thumb_id = null) }
         database.channelEntityQueries.transaction {
             initial.forEach {
-                database.channelEntityQueries.createChannel(it)
+                database.channelEntityQueries.create(it)
             }
         }
         val idList = listOf(1L, 3L, 5L)
@@ -102,9 +102,9 @@ class ChannelEntityTest : KoinTest {
     @Test
     fun createDeleteEntity() {
         val initial = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
-        database.channelEntityQueries.createChannel(initial)
+        database.channelEntityQueries.create(initial)
         val insertId = database.channelEntityQueries
-            .getInsertIdChannel()
+            .getInsertId()
             .executeAsOne()
         database.channelEntityQueries.delete(insertId)
         val actual = database.channelEntityQueries
@@ -116,13 +116,13 @@ class ChannelEntityTest : KoinTest {
     @Test
     fun findByChannelId() {
         val initial = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
-        database.channelEntityQueries.createChannel(initial)
+        database.channelEntityQueries.create(initial)
         val insertId = database.channelEntityQueries
-            .getInsertIdChannel()
+            .getInsertId()
             .executeAsOne()
-        database.channelEntityQueries.findByChannelId(initial.platform_id, initial.platform)
+        database.channelEntityQueries.findByPlatformId(initial.platform_id, initial.platform)
         val actual = database.channelEntityQueries
-            .findByChannelId(initial.platform_id, initial.platform)
+            .findByPlatformId(initial.platform_id, initial.platform)
             .executeAsOne()
         assertEquals(insertId, actual.id)
     }
@@ -132,7 +132,7 @@ class ChannelEntityTest : KoinTest {
         val initial = fixture<List<Channel>>().map { it.copy(id = 0, image_id = null, thumb_id = null) }
         database.channelEntityQueries.transaction {
             initial.forEach {
-                database.channelEntityQueries.createChannel(it)
+                database.channelEntityQueries.create(it)
             }
         }
 
@@ -155,7 +155,7 @@ class ChannelEntityTest : KoinTest {
         val initial = fixture<List<Channel>>().map { it.copy(id = 0, image_id = null, thumb_id = null) }
         database.channelEntityQueries.transaction {
             initial.forEach {
-                database.channelEntityQueries.createChannel(it)
+                database.channelEntityQueries.create(it)
             }
         }
 
@@ -165,10 +165,48 @@ class ChannelEntityTest : KoinTest {
     }
 
     @Test
+    fun deleteAllWithImages() {
+        var idCtr = 1L
+        val initial = fixture<List<Channel>>().map {
+            it.copy(
+                id = 0,
+                thumb_id = idCtr++,
+                image_id = idCtr++
+            )
+        }
+        var mapped = listOf<Channel>()
+        database.imageEntityQueries.transaction {
+            mapped = initial.map { channel ->
+                database.imageEntityQueries.create(fixture<Image>().copy(id = channel.thumb_id!!))
+                database.imageEntityQueries.create(fixture<Image>().copy(id = channel.image_id!!))
+                database.channelEntityQueries.create(channel)
+                channel.copy(
+                    id = database.channelEntityQueries
+                        .getInsertId()
+                        .executeAsOne()
+                )
+            }
+        }
+
+        database.channelEntityQueries.deleteAll()
+        mapped.forEach {
+            database.imageEntityQueries
+                .deleteByIds(
+                    mapped.flatMap { listOf(it.image_id!!, it.thumb_id!!) }
+                )
+        }
+
+        val actual = database.channelEntityQueries.count().executeAsOne()
+        assertEquals(0, actual.toInt())
+        val actualImageCount = database.imageEntityQueries.count().executeAsOne()
+        assertEquals(0, actualImageCount.toInt())
+    }
+
+    @Test
     fun update() {
         val initial = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
-        database.channelEntityQueries.createChannel(initial)
-        val insertId = database.channelEntityQueries.getInsertIdChannel().executeAsOne()
+        database.channelEntityQueries.create(initial)
+        val insertId = database.channelEntityQueries.getInsertId().executeAsOne()
         val update = fixture<Channel>().copy(id = insertId, image_id = null, thumb_id = null)
         database.channelEntityQueries.update(update)
         val actual = database.channelEntityQueries.load(insertId).executeAsOne()
@@ -180,11 +218,22 @@ class ChannelEntityTest : KoinTest {
         val initial = fixture<Channel>().copy(id = 0, image_id = 1, thumb_id = 2)
         val initialImage = fixture<Image>().copy(id = 1)
         val initialThumb = fixture<Image>().copy(id = 2)
-        database.imageEntityQueries.createImage(initialImage)
-        database.imageEntityQueries.createImage(initialThumb)
-        database.channelEntityQueries.createChannel(initial)
-        val insertId = database.channelEntityQueries.getInsertIdChannel().executeAsOne()
+        database.imageEntityQueries.create(initialImage)
+        database.imageEntityQueries.create(initialThumb)
+        database.channelEntityQueries.create(initial)
+        val insertId = database.channelEntityQueries.getInsertId().executeAsOne()
         val actual = database.channelEntityQueries.load(insertId).executeAsOne()
+        assertEquals(initial.copy(id = insertId), actual)
+    }
+
+    @Test
+    fun findByPlatformId() {
+        val initial = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
+        database.channelEntityQueries.create(initial)
+        val insertId = database.channelEntityQueries.getInsertId().executeAsOne()
+        val actual = database.channelEntityQueries
+            .findByPlatformId(initial.platform_id, initial.platform)
+            .executeAsOne()
         assertEquals(initial.copy(id = insertId), actual)
     }
 }

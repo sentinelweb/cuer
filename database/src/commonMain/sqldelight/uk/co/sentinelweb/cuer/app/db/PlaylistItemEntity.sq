@@ -8,7 +8,7 @@ CREATE TABLE playlist_item (
     playlist_id INTEGER NOT NULL,
     date_added TEXT AS kotlinx.datetime.Instant NOT NULL,
     FOREIGN KEY (media_id) REFERENCES media(id),
-    FOREIGN KEY (playlist_id) REFERENCES playlist(id)
+    FOREIGN KEY (playlist_id) REFERENCES playlist(id) ON DELETE CASCADE
 );
 
 CREATE INDEX playlist_item_flags_index ON playlist_item(flags);
@@ -22,7 +22,7 @@ CREATE INDEX playlist_item_media_id_index ON playlist_item(media_id);
 CREATE UNIQUE INDEX playlist_item_media_id_playlist_id_index ON playlist_item(media_id, playlist_id);
 
 createPlaylistItem:
-INSERT INTO playlist_item (flags,media_id,ordering,playlist_id,date_added) VALUES ?;
+INSERT INTO playlist_item (flags, media_id, ordering, playlist_id, date_added) VALUES ?;
 
 getInsertIdPlaylistItem:
 SELECT last_insert_rowid() FROM playlist_item;

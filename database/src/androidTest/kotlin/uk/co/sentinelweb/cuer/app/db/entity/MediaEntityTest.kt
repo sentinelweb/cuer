@@ -48,8 +48,8 @@ class MediaEntityTest : KoinTest {
     @Test
     fun createLoadEntity() {
         val channel = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
-        database.channelEntityQueries.createChannel(channel)
-        val channelId = database.channelEntityQueries.getInsertIdChannel().executeAsOne()
+        database.channelEntityQueries.create(channel)
+        val channelId = database.channelEntityQueries.getInsertId().executeAsOne()
         val initial = fixture<Media>().copy(id = 0, channel_id = channelId, image_id = null, thumb_id = null)
         database.mediaEntityQueries.createMedia(initial)
         val insertId = database.mediaEntityQueries.getInsertIdMedia().executeAsOne()

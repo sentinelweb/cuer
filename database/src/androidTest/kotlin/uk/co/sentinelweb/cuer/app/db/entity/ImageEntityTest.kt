@@ -49,20 +49,63 @@ class ImageEntityTest : KoinTest {
     @Test
     fun createLoadEntity() {
         val initial = fixture<Image>().copy(id = 0)
-        database.imageEntityQueries.createImage(initial)
-        val insertId = database.imageEntityQueries.getInsertIdImage().executeAsOne()
-        val actual = database.imageEntityQueries.loadImage(1).executeAsOne()
+        database.imageEntityQueries.create(initial)
+        val insertId = database.imageEntityQueries.getInsertId().executeAsOne()
+        val actual = database.imageEntityQueries.load(1).executeAsOne()
         assertEquals(initial.copy(id = insertId), actual)
     }
 
     @Test
     fun update() {
         val initial = fixture<Image>().copy(id = 0)
-        database.imageEntityQueries.createImage(initial)
-        val insertId = database.imageEntityQueries.getInsertIdImage().executeAsOne()
+        database.imageEntityQueries.create(initial)
+        val insertId = database.imageEntityQueries.getInsertId().executeAsOne()
         val update = fixture<Image>().copy(id = insertId)
         database.imageEntityQueries.update(update)
-        val actual = database.imageEntityQueries.loadImage(insertId).executeAsOne()
+        val actual = database.imageEntityQueries.load(insertId).executeAsOne()
         assertEquals(update, actual)
     }
+
+    @Test
+    fun deleteAll() {
+        val initial = fixture<List<Image>>().map { it.copy(id = 0) }
+        database.imageEntityQueries.transaction {
+            initial.forEach {
+                database.imageEntityQueries.create(it)
+            }
+        }
+
+        database.channelEntityQueries.deleteAll()
+        val actual = database.channelEntityQueries.count().executeAsOne()
+        assertEquals(0, actual.toInt())
+    }
+
+    @Test
+    fun createDeleteEntity() {
+        val initial = fixture<Image>().copy(id = 0)
+        database.imageEntityQueries.create(initial)
+        val insertId = database.imageEntityQueries
+            .getInsertId()
+            .executeAsOne()
+        database.imageEntityQueries.delete(insertId)
+        val actual = database.imageEntityQueries
+            .count()
+            .executeAsOne()
+        assertEquals(0, actual.toInt())
+    }
+
+    @Test
+    fun loadByUrl() {
+        val initial = fixture<Image>().copy(id = 0)
+        database.imageEntityQueries.create(initial)
+        val insertId = database.imageEntityQueries
+            .getInsertId()
+            .executeAsOne()
+        database.imageEntityQueries.delete(insertId)
+        val actual = database.imageEntityQueries
+            .loadByUrl(initial.url)
+            .executeAsOne()
+        assertEquals(insertId, actual.id)
+    }
+
 }

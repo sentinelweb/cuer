@@ -7,16 +7,33 @@ CREATE TABLE image(
   height INTEGER
 );
 
-createImage:
+CREATE UNIQUE INDEX image_url ON image(url);
+
+create:
 INSERT INTO image ( url, width, height )
 VALUES ?;
 
-getInsertIdImage:
-SELECT last_insert_rowid() FROM image;
+getInsertId:
+SELECT last_insert_rowid() FROM image LIMIT 1;
 
-loadImage:
+load:
 SELECT * FROM image WHERE id = ?;
+
+loadByUrl:
+SELECT * FROM image WHERE url = ?;
 
 update:
 REPLACE INTO image (id,  url, width, height )
 VALUES ?;
+
+delete:
+DELETE FROM image WHERE id = ?;
+
+deleteByIds:
+DELETE FROM image WHERE id IN ?;
+
+count:
+SELECT count() FROM image;
+
+deleteAll:
+DELETE FROM image;

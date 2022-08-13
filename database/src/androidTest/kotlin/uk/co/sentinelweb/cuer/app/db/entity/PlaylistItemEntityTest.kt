@@ -48,8 +48,8 @@ class PlaylistItemEntityTest : KoinTest {
     @Test
     fun createLoadEntity() {
         val channel = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
-        database.channelEntityQueries.createChannel(channel)
-        val channelId = database.channelEntityQueries.getInsertIdChannel().executeAsOne()
+        database.channelEntityQueries.create(channel)
+        val channelId = database.channelEntityQueries.getInsertId().executeAsOne()
         val media = fixture<Media>().copy(id = 0, channel_id = channelId, image_id = null, thumb_id = null)
         database.mediaEntityQueries.createMedia(media)
         val mediaId = database.mediaEntityQueries.getInsertIdMedia().executeAsOne()
@@ -63,4 +63,6 @@ class PlaylistItemEntityTest : KoinTest {
         val actual = database.playlistItemEntityQueries.loadPlaylistItem(1).executeAsOne()
         assertEquals(initial.copy(id = insertId), actual)
     }
+
+    // todo test delete cascade playlist-> playlist-item
 }
