@@ -22,7 +22,8 @@ object DatabaseModule {
 
     private val repoModule = module {
         single<ChannelDatabaseRepository> { SqldelightChannelDatabaseRepository(get(), get(), get(), get(), get()) }
-        single<ImageDatabaseRepository> { SqldelightImageDatabaseRepository(get(), get(), get(), get()) }
+        single {SqldelightImageDatabaseRepository(get(), get(), get(), get())}
+        single<ImageDatabaseRepository> { get<SqldelightImageDatabaseRepository>() }
     }
 
     val modules = listOf(dataBaseModule, mapperModule, repoModule)

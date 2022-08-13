@@ -101,11 +101,10 @@ class ImageEntityTest : KoinTest {
         val insertId = database.imageEntityQueries
             .getInsertId()
             .executeAsOne()
-        database.imageEntityQueries.delete(insertId)
+
         val actual = database.imageEntityQueries
             .loadByUrl(initial.url)
             .executeAsOne()
         assertEquals(insertId, actual.id)
     }
-
 }

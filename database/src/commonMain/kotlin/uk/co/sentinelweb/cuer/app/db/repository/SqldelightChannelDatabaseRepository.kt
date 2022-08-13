@@ -34,57 +34,63 @@ class SqldelightChannelDatabaseRepository(
 
     override suspend fun save(domain: ChannelDomain, flat: Boolean, emit: Boolean): RepoResult<ChannelDomain> =
         withContext(coProvider.IO) {
-            database.channelEntityQueries.transactionWithResult<RepoResult<ChannelDomain>> {
-                try {// todo flat, emit, images
-                    domain
-                        .also { it.thumbNail?.also { imageDatabaseRepository.checkToSaveImage(it) } }
-                        .also { it.image?.also { imageDatabaseRepository.checkToSaveImage(it) } }
-                        .let { channelMapper.map(it) }
-                        .let {
-                            if (it.id > 0) {
-                                database.channelEntityQueries
-                                    .update(it)
-                                domain.id!!
-                            } else {
-                                database.channelEntityQueries
-                                    .create(it)
-                                database.channelEntityQueries
-                                    .getInsertId()
-                                    .executeAsOne()
-                            }
-                        }
-                        .let { domain.copy(id = it) }
-                        .let { channel: ChannelDomain -> RepoResult.Data(channel) }
-                } catch (e: Throwable) {
-                    val msg = "couldn't save channel $domain"
-                    log.e(msg, e)
-                    RepoResult.Error<ChannelDomain>(e, msg)
-                }
-            }.also {
-                if (it.isSuccessful && emit)
-                    it.data
+            saveInternal(domain)
+                .also {
+                    it.takeIf { it.isSuccessful && emit }
+                        ?.data
                         ?.also { _updatesFlow.emit(emitOperation(flat, it)) }
+                }
+        }
+
+    private fun saveInternal(domain: ChannelDomain): RepoResult<ChannelDomain> =
+        database.channelEntityQueries.transactionWithResult<RepoResult<ChannelDomain>> {
+            try {
+                domain
+                    .also { it.thumbNail?.also { imageDatabaseRepository.checkToSaveImage(it) } }
+                    .also { it.image?.also { imageDatabaseRepository.checkToSaveImage(it) } }
+                    .let { channelMapper.map(it) }
+                    .let {
+                        if (it.id > 0) {
+                            database.channelEntityQueries
+                                .update(it)
+                            domain.id!!
+                        } else {
+                            database.channelEntityQueries
+                                .create(it)
+                            database.channelEntityQueries
+                                .getInsertId()
+                                .executeAsOne()
+                        }
+                    }
+                    .let { domain.copy(id = it) }
+                    .let { channel: ChannelDomain -> RepoResult.Data(channel) }
+            } catch (e: Throwable) {
+                val msg = "couldn't save channel $domain"
+                log.e(msg, e)
+                rollback(RepoResult.Error<ChannelDomain>(e, msg))
             }
         }
 
-    private fun emitOperation(
-        flat: Boolean,
-        it: ChannelDomain
-    ) = (if (flat) Operation.FLAT else Operation.FULL) to it
 
     override suspend fun save(
         domains: List<ChannelDomain>,
         flat: Boolean,
         emit: Boolean
     ): RepoResult<List<ChannelDomain>> = withContext(coProvider.IO) {
-        try {
-            domains
-                .map { save(it, flat, emit).data!! }
-                .let { RepoResult.Data(it) }
-        } catch (e: Exception) {
-            val msg = "couldn't save channels"
-            log.e(msg, e)
-            RepoResult.Error<List<ChannelDomain>>(e, msg)
+        database.channelEntityQueries.transactionWithResult<RepoResult<List<ChannelDomain>>> {
+            try {
+                domains
+                    .map { saveInternal(it).data!! }
+                    .let { RepoResult.Data(it) }
+            } catch (e: Exception) {
+                val msg = "couldn't save channels"
+                log.e(msg, e)
+                rollback(RepoResult.Error<List<ChannelDomain>>(e, msg))
+            }
+        }.also {
+            it.takeIf { it.isSuccessful && emit }
+                ?.data
+                ?.forEach { _updatesFlow.emit(emitOperation(flat, it)) }
         }
     }
 
@@ -188,4 +194,9 @@ class SqldelightChannelDatabaseRepository(
                 .also { it.image?.also { imageDatabaseRepository.checkToSaveImage(it) } }
         }
     }
+
+    private fun emitOperation(
+        flat: Boolean,
+        it: ChannelDomain
+    ) = (if (flat) Operation.FLAT else Operation.FULL) to it
 }
