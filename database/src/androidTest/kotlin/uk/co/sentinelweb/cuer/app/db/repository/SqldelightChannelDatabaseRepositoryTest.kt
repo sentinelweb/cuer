@@ -128,7 +128,18 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun load() {
+    fun load() = runTest {
+        val initial = fixture<ChannelDomain>().run {
+            copy(
+                id = null,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        }
+        val saved = sut.save(initial).data
+        assertNotNull(saved)
+        val actual = sut.load(saved!!.id!!)
+        assertEquals(saved, actual.data)
     }
 
     @Test
@@ -156,10 +167,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun `loadChannel$Cuer_database_commonMain`() {
-    }
-
-    @Test
     fun `checkToSaveChannel$Cuer_database_commonMain`() {
+
     }
 }

@@ -17,7 +17,8 @@ class ChannelMapper(private val imageMapper: ImageMapper) {
         entity.description,
         entity.published,
         thumbEntity?.let { imageMapper.map(it) },
-        imageEntity?.let { imageMapper.map(it) }
+        imageEntity?.let { imageMapper.map(it) },
+        starred = (entity.flags and FLAG_STARRED) == FLAG_STARRED
     )
 
     fun map(domain: ChannelDomain) = Channel(
@@ -29,8 +30,8 @@ class ChannelMapper(private val imageMapper: ImageMapper) {
         domain.country,
         domain.platform,
         domain.platformId!!,
-        domain.image?.id,
         domain.thumbNail?.id,
+        domain.image?.id,
         domain.published
     )
 }
