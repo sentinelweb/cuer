@@ -57,12 +57,6 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
                 image = image?.copy(id = null),
             )
         }
-        val savedImage = initial.image
-            ?.let { database.imageEntityQueries.loadByUrl(it.url) }
-            ?.executeAsOneOrNull()
-        val savedThumb = initial.thumbNail
-            ?.let { database.imageEntityQueries.loadByUrl(it.url) }
-            ?.executeAsOneOrNull()
         with(sut.save(initial)) {
             assertTrue(isSuccessful)
             assertEquals(1L, data?.id)
@@ -76,24 +70,61 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
             initial.image
                 ?.apply {
                     assertNotNull(data!!.image!!.id)
-                    assertEquals(savedImage!!.url, data!!.image!!.url)
-                    assertEquals(savedImage.width, data!!.image!!.width)
-                    assertEquals(savedImage.url, data!!.image!!.url)
+                    assertEquals(initial.image!!.url, data!!.image!!.url)
+                    assertEquals(initial.image!!.width, data!!.image!!.width)
+                    assertEquals(initial.image!!.url, data!!.image!!.url)
                 }
                 ?: apply { assertNull(data?.image) }
             initial.thumbNail
                 ?.apply {
-                    assertNotNull(data!!.image!!.id)
-                    assertEquals(savedThumb!!.url, data!!.thumbNail!!.url)
-                    assertEquals(savedThumb.width, data!!.thumbNail!!.width)
-                    assertEquals(savedThumb.url, data!!.thumbNail!!.url)
+                    assertNotNull(data!!.thumbNail!!.id)
+                    assertEquals(initial.thumbNail!!.url, data!!.thumbNail!!.url)
+                    assertEquals(initial.thumbNail!!.width, data!!.thumbNail!!.width)
+                    assertEquals(initial.thumbNail!!.url, data!!.thumbNail!!.url)
                 }
                 ?: apply { assertNull(data?.thumbNail) }
         }
     }
 
     @Test
-    fun testSave() {
+    fun saveList() = runTest {
+        val initial = fixture<List<ChannelDomain>>().map { fixt ->
+            fixt.copy(
+                id = null,
+                thumbNail = fixt.thumbNail?.copy(id = null),
+                image = fixt.image?.copy(id = null),
+            )
+        }
+        with(sut.save(initial)) {
+            assertTrue(isSuccessful)
+            assertNotNull(data)
+            data!!.forEachIndexed { i, savedChannel ->
+                assertEquals((i+1).toLong(), savedChannel.id)
+                assertEquals(initial[i].platform, savedChannel.platform)
+                assertEquals(initial[i].platformId, savedChannel.platformId)
+                assertEquals(initial[i].country, savedChannel.country)
+                assertEquals(initial[i].title, savedChannel.title)
+                assertEquals(initial[i].customUrl, savedChannel.customUrl)
+                assertEquals(initial[i].description, savedChannel.description)
+                assertEquals(initial[i].published, savedChannel.published)
+                initial[i].image
+                    ?.apply {
+                        assertNotNull(savedChannel.image!!.id)
+                        assertEquals(initial[i].image!!.url, savedChannel.image!!.url)
+                        assertEquals(initial[i].image!!.width, savedChannel.image!!.width)
+                        assertEquals(initial[i].image!!.url, savedChannel.image!!.url)
+                    }
+                    ?: apply { assertNull(savedChannel.image) }
+                initial[i].thumbNail
+                    ?.apply {
+                        assertNotNull(savedChannel.thumbNail!!.id)
+                        assertEquals(initial[i].thumbNail!!.url, savedChannel.thumbNail!!.url)
+                        assertEquals(initial[i].thumbNail!!.width, savedChannel.thumbNail!!.width)
+                        assertEquals(initial[i].thumbNail!!.url, savedChannel.thumbNail!!.url)
+                    }
+                    ?: apply { assertNull(savedChannel.thumbNail) }
+            }
+        }
     }
 
     @Test

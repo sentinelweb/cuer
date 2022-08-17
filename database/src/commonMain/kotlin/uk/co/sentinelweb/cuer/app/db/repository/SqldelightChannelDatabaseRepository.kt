@@ -43,26 +43,30 @@ class SqldelightChannelDatabaseRepository(
         }
 
     private fun saveInternal(domain: ChannelDomain): RepoResult<ChannelDomain> =
-        database.channelEntityQueries.transactionWithResult<RepoResult<ChannelDomain>> {
+        database.channelEntityQueries.transactionWithResult {
             try {
                 domain
-                    .also { it.thumbNail?.also { imageDatabaseRepository.checkToSaveImage(it) } }
-                    .also { it.image?.also { imageDatabaseRepository.checkToSaveImage(it) } }
-                    .let { channelMapper.map(it) }
                     .let {
-                        if (it.id > 0) {
+                        it.copy(thumbNail = it.thumbNail
+                            ?.let { imageDatabaseRepository.checkToSaveImage(it) })
+                    }
+                    .let { it.copy(image = it.image
+                        ?.let { imageDatabaseRepository.checkToSaveImage(it) }) }
+                    .let {
+                        val channel =  channelMapper.map(it)
+                        val id  = if (channel.id > 0) {
                             database.channelEntityQueries
-                                .update(it)
+                                .update(channel)
                             domain.id!!
                         } else {
                             database.channelEntityQueries
-                                .create(it)
+                                .create(channel)
                             database.channelEntityQueries
                                 .getInsertId()
                                 .executeAsOne()
                         }
+                        it.copy(id = id)
                     }
-                    .let { domain.copy(id = it) }
                     .let { channel: ChannelDomain -> RepoResult.Data(channel) }
             } catch (e: Throwable) {
                 val msg = "couldn't save channel $domain"
