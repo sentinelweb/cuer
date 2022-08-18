@@ -50,11 +50,13 @@ class SqldelightChannelDatabaseRepository(
                         it.copy(thumbNail = it.thumbNail
                             ?.let { imageDatabaseRepository.checkToSaveImage(it) })
                     }
-                    .let { it.copy(image = it.image
-                        ?.let { imageDatabaseRepository.checkToSaveImage(it) }) }
                     .let {
-                        val channel =  channelMapper.map(it)
-                        val id  = if (channel.id > 0) {
+                        it.copy(image = it.image
+                            ?.let { imageDatabaseRepository.checkToSaveImage(it) })
+                    }
+                    .let {
+                        val channel = channelMapper.map(it)
+                        val id = if (channel.id > 0) {
                             database.channelEntityQueries
                                 .update(channel)
                             domain.id!!
@@ -145,57 +147,66 @@ class SqldelightChannelDatabaseRepository(
 
     internal suspend fun loadChannel(id: Long): RepoResult<ChannelDomain> =
         withContext(coProvider.IO) {
-            try {
-                database.channelEntityQueries
-                    .load(id)
-                    .executeAsOneOrNull()!!
-                    .let { channel: Channel ->
-                        channelMapper.map(
-                            channel,
-                            imageDatabaseRepository.loadEntity(channel.thumb_id),
-                            imageDatabaseRepository.loadEntity(channel.image_id),
-                        )
-                    }
-                    .let { channel: ChannelDomain -> RepoResult.Data(channel) }
-            } catch (e: Throwable) {
-                val msg = "couldn't load $id"
-                log.e(msg, e)
-                RepoResult.Error<ChannelDomain>(e, msg)
-            }
+            loadChannelInternal(id)
         }
+
+    private fun loadChannelInternal(id: Long) = try {
+        database.channelEntityQueries
+            .load(id)
+            .executeAsOneOrNull()!!
+            .let { channel: Channel ->
+                channelMapper.map(
+                    channel,
+                    imageDatabaseRepository.loadEntity(channel.thumb_id),
+                    imageDatabaseRepository.loadEntity(channel.image_id),
+                )
+            }
+            .let { channel: ChannelDomain -> RepoResult.Data(channel) }
+    } catch (e: Throwable) {
+        val msg = "couldn't load $id"
+        log.e(msg, e)
+        RepoResult.Error<ChannelDomain>(e, msg)
+    }
 
     internal suspend fun checkToSaveChannel(domain: ChannelDomain): ChannelDomain = withContext(coProvider.IO) {
         if (domain.platformId.isNullOrEmpty())
             throw IllegalArgumentException("Channel data is missing remoteID")
         database.channelEntityQueries.transactionWithResult {
             domain
-                .let { channelMapper.map(it) }
                 .let { toCheck ->
+                    // old images are left in db - otherwise constraint check needed
+                    val toCheckImages = database.channelEntityQueries.transactionWithResult<ChannelDomain> {
+                        toCheck
+                            .copy(thumbNail = toCheck.thumbNail
+                                ?.let { imageDatabaseRepository.checkToSaveImage(it) })
+                            .copy(image = toCheck.image
+                                ?.let { imageDatabaseRepository.checkToSaveImage(it) })
+                    }
+
+                    val entity = channelMapper.map(toCheckImages)
                     database.channelEntityQueries
-                        .findByPlatformId(toCheck.platform_id, toCheck.platform)
+                        .findByPlatformId(entity.platform_id, entity.platform)
                         .executeAsOneOrNull()
                         ?.let { saved ->
                             // check for updated channel data + save
-                            if (toCheck.image_id != saved.image_id ||
-                                toCheck.thumb_id != saved.thumb_id ||
-                                toCheck.published != saved.published ||
-                                toCheck.description != saved.description
+                            if (entity.image_id != saved.image_id ||
+                                entity.thumb_id != saved.thumb_id ||
+                                entity.published != saved.published ||
+                                entity.description != saved.description
                             ) {
-                                database.channelEntityQueries.update(toCheck.copy(id = saved.id))
+                                database.channelEntityQueries.update(entity.copy(id = saved.id))
                             }
                             saved.id
                         }
                         ?: let {
                             database.channelEntityQueries
-                                .create(toCheck)
+                                .create(entity)
                             database.channelEntityQueries
                                 .getInsertId()
                                 .executeAsOne()
                         }
                 }
-                .let { domain.copy(id = it) }
-                .also { it.thumbNail?.also { imageDatabaseRepository.checkToSaveImage(it) } }
-                .also { it.image?.also { imageDatabaseRepository.checkToSaveImage(it) } }
+                .let { loadChannelInternal(it).data!! }
         }
     }
 

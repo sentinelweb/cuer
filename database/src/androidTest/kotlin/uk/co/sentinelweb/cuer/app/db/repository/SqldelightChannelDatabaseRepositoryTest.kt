@@ -99,7 +99,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
             assertTrue(isSuccessful)
             assertNotNull(data)
             data!!.forEachIndexed { i, savedChannel ->
-                assertEquals((i+1).toLong(), savedChannel.id)
+                assertEquals((i + 1).toLong(), savedChannel.id)
                 assertEquals(initial[i].platform, savedChannel.platform)
                 assertEquals(initial[i].platformId, savedChannel.platformId)
                 assertEquals(initial[i].country, savedChannel.country)
@@ -167,7 +167,74 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun `checkToSaveChannel$Cuer_database_commonMain`() {
+    fun `checkToSaveChannel$Cuer_database_commonMain platformId exists`() = runTest {
+        val initial = fixture<ChannelDomain>().run {
+            copy(
+                id = null,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        }
+        val saved = sut.save(initial).data
+        assertNotNull(saved)
+        val updated = fixture<ChannelDomain>().run {
+            copy(
+                id = null,
+                platform = initial.platform,
+                platformId = initial.platformId,
+                thumbNail = initial.thumbNail,
+                image = initial.image,
+            )
+        }
 
+        val sutImpl = sut as SqldelightChannelDatabaseRepository
+        val actual = sutImpl.checkToSaveChannel(updated)
+        val expected = sutImpl.load(saved!!.id!!).data
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `checkToSaveChannel$Cuer_database_commonMain platformId exists new images`() = runTest {
+        val initial = fixture<ChannelDomain>().run {
+            copy(
+                id = null,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        }
+        val saved = sut.save(initial).data
+        assertNotNull(saved)
+        val updated = fixture<ChannelDomain>().run {
+            copy(
+                id = null,
+                platform = initial.platform,
+                platformId = initial.platformId
+            )
+        }
+
+        val sutImpl = sut as SqldelightChannelDatabaseRepository
+        val actual = sutImpl.checkToSaveChannel(updated)
+        val expected = sutImpl.load(saved!!.id!!).data
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `checkToSaveChannel$Cuer_database_commonMain does not exist`() = runTest {
+        val initial = fixture<ChannelDomain>().run {
+            copy(
+                id = null,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        }
+
+        val sutImpl = sut as SqldelightChannelDatabaseRepository
+        val actual = sutImpl.checkToSaveChannel(initial)
+        val expected = initial.copy(
+            id = database.channelEntityQueries.getInsertId().executeAsOne(),
+            thumbNail = initial.thumbNail?.copy(id = 1L),
+            image = initial.image?.copy(id = initial.thumbNail?.let { 2L } ?: 1L),
+        )
+        assertEquals(expected, actual)
     }
 }

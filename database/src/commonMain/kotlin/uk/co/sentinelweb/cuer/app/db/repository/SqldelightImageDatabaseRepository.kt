@@ -140,4 +140,17 @@ class SqldelightImageDatabaseRepository(
                         }
                 }
             }.let { imageMapper.map(it) }
+
+    internal suspend fun delete(id: Long?): RepoResult<Boolean> = withContext(coProvider.IO) {
+        id?.let {
+            try {
+                database.imageEntityQueries.delete(it)
+                RepoResult.Data(true)
+            } catch (e: Throwable) {
+                val msg = "couldn't delete image: $id"
+                log.e(msg, e)
+                RepoResult.Error<Boolean>(e, msg)
+            }
+        } ?: RepoResult.Data(false)
+    }
 }
