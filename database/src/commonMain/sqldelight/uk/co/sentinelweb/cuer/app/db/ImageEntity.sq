@@ -16,15 +16,15 @@ VALUES ?;
 getInsertId:
 SELECT last_insert_rowid() FROM image LIMIT 1;
 
+update:
+REPLACE INTO image (id,  url, width, height )
+VALUES ?;
+
 load:
 SELECT * FROM image WHERE id = ?;
 
 loadByUrl:
 SELECT * FROM image WHERE url = ?;
-
-update:
-REPLACE INTO image (id,  url, width, height )
-VALUES ?;
 
 delete:
 DELETE FROM image WHERE id = ?;

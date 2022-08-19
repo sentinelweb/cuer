@@ -14,7 +14,6 @@ import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.Playlist
-import uk.co.sentinelweb.cuer.app.db.di.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.app.db.util.MainCoroutineRule
 import kotlin.test.assertEquals
@@ -33,7 +32,6 @@ class PlaylistEntityTest : KoinTest {
         printLogger(Level.ERROR)
         modules(
             listOf<Module>()
-                .plus(DatabaseModule.modules)
                 .plus(dbIntegrationRule.modules)
                 .plus(mainCoroutineRule.modules)
         )

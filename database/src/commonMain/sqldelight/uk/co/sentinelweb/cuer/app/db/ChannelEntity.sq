@@ -31,6 +31,10 @@ VALUES ?;
 getInsertId:
 SELECT last_insert_rowid() FROM channel LIMIT 1;
 
+update:
+REPLACE INTO channel (id, flags,title,description,custom_url,country,platform,platform_id,thumb_id,image_id,published)
+VALUES ?;
+
 load:
 SELECT * FROM channel WHERE id = ?;
 
@@ -55,7 +59,4 @@ DELETE FROM channel WHERE id IN ?;
 deleteAll:
 DELETE FROM channel;
 
-update:
-REPLACE INTO channel (id, flags,title,description,custom_url,country,platform,platform_id,thumb_id,image_id,published)
-VALUES ?;
 

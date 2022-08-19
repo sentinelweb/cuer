@@ -4,8 +4,6 @@ import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
 import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
 import com.appmattus.kotlinfixture.kotlinFixture
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -16,10 +14,11 @@ import org.koin.test.KoinTest
 import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
-import uk.co.sentinelweb.cuer.app.db.di.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.app.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.ImageDomain
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class SqldelightImageDatabaseRepositoryTest : KoinTest {
 
@@ -36,7 +35,6 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
         printLogger(Level.ERROR)
         modules(
             listOf<Module>()
-                .plus(DatabaseModule.modules)
                 .plus(dbIntegrationRule.modules)
                 .plus(mainCoroutineRule.modules)
         )
@@ -131,8 +129,8 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
         with(sutImpl.loadEntity(saved.id!!)!!) {
             assertEquals(saved.id, id)
             assertEquals(saved.url, url)
-            assertEquals(saved.width, width)
-            assertEquals(saved.height, height)
+            assertEquals(saved.width?.toLong(), width)
+            assertEquals(saved.height?.toLong(), height)
         }
     }
 

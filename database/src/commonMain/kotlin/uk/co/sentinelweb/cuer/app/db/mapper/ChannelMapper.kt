@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.db.Channel
 import uk.co.sentinelweb.cuer.app.db.Image
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ChannelDomain.Companion.FLAG_STARRED
+import uk.co.sentinelweb.cuer.domain.ext.hasFlag
 
 class ChannelMapper(private val imageMapper: ImageMapper) {
 
@@ -18,7 +19,7 @@ class ChannelMapper(private val imageMapper: ImageMapper) {
         published = entity.published,
         thumbNail = thumbEntity?.let { imageMapper.map(it) },
         image = imageEntity?.let { imageMapper.map(it) },
-        starred = (entity.flags and FLAG_STARRED) == FLAG_STARRED
+        starred = entity.flags.hasFlag(FLAG_STARRED)
     )
 
     fun map(domain: ChannelDomain) = Channel(

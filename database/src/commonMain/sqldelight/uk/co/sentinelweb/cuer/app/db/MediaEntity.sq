@@ -7,7 +7,7 @@ CREATE TABLE media (
     url TEXT NOT NULL,
     title TEXT,
     duration INTEGER,
-    positon INTEGER,
+    position INTEGER,
     date_last_played TEXT AS kotlinx.datetime.Instant,
     description TEXT,
     platform  TEXT AS uk.co.sentinelweb.cuer.domain.PlatformDomain NOT NULL,
@@ -31,12 +31,45 @@ CREATE INDEX media_title_index ON media(title);
 
 CREATE INDEX media_description_index ON media(description);
 
-createMedia:
-INSERT INTO media ( flags, type, url, title, duration, positon, date_last_played, description, platform, platform_id,
+create:
+INSERT INTO media ( flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,
 published, channel_id, thumb_id, image_id ) VALUES ?;
 
-getInsertIdMedia:
-SELECT last_insert_rowid() FROM media;
+getInsertId:
+SELECT last_insert_rowid() FROM media LIMIT 1;
 
-loadMedia:
+update:
+REPLACE INTO media ( id, flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,
+published, channel_id, thumb_id, image_id ) VALUES ?;
+
+updatePosition:
+UPDATE media SET date_last_played=:dateLastPlayed, position=:position, duration=:duration, flags=:flags WHERE id=:id;
+
+loadById:
 SELECT * FROM media WHERE id = ?;
+
+loadAll:
+SELECT * FROM media;
+
+loadAllByFlags:
+SELECT * FROM media WHERE flags & :flags == :flags;
+
+loadAllByIds:
+SELECT * FROM media WHERE id IN ?;
+
+loadByPlatformId:
+SELECT * FROM media WHERE platform_id LIKE ? LIMIT 1;
+
+loadFlags:
+SELECT flags FROM media WHERE id == :id;
+
+count:
+SELECT count() FROM media;
+
+delete:
+DELETE FROM media WHERE id = ?;
+
+deleteAll:
+DELETE FROM media;
+
+

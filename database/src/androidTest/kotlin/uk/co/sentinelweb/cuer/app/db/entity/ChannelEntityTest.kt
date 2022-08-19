@@ -15,7 +15,6 @@ import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Channel
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.Image
-import uk.co.sentinelweb.cuer.app.db.di.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.app.db.util.MainCoroutineRule
 import kotlin.test.assertEquals
@@ -36,7 +35,6 @@ class ChannelEntityTest : KoinTest {
         printLogger(Level.ERROR)
         modules(
             listOf<Module>()
-                .plus(DatabaseModule.modules)
                 .plus(dbIntegrationRule.modules)
                 .plus(mainCoroutineRule.modules)
         )

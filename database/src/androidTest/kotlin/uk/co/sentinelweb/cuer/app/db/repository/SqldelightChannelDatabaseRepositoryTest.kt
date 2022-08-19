@@ -4,7 +4,6 @@ import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
 import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
 import com.appmattus.kotlinfixture.kotlinFixture
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -15,10 +14,13 @@ import org.koin.test.KoinTest
 import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
-import uk.co.sentinelweb.cuer.app.db.di.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.app.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class SqldelightChannelDatabaseRepositoryTest : KoinTest {
     private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
@@ -34,7 +36,6 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
         printLogger(Level.ERROR)
         modules(
             listOf<Module>()
-                .plus(DatabaseModule.modules)
                 .plus(dbIntegrationRule.modules)
                 .plus(mainCoroutineRule.modules)
         )
@@ -138,7 +139,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
         }
         val saved = sut.save(initial).data
         assertNotNull(saved)
-        val actual = sut.load(saved!!.id!!)
+        val actual = sut.load(saved.id!!)
         assertEquals(saved, actual.data)
     }
 
@@ -165,7 +166,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
 
         val sutImpl = sut as SqldelightChannelDatabaseRepository
         val actual = sutImpl.checkToSaveChannel(updated)
-        val expected = sutImpl.load(saved!!.id!!).data
+        val expected = sutImpl.load(saved.id!!).data
         assertEquals(expected, actual)
     }
 
@@ -190,7 +191,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
 
         val sutImpl = sut as SqldelightChannelDatabaseRepository
         val actual = sutImpl.checkToSaveChannel(updated)
-        val expected = sutImpl.load(saved!!.id!!).data
+        val expected = sutImpl.load(saved.id!!).data
         assertEquals(expected, actual)
     }
 

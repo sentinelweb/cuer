@@ -13,7 +13,6 @@ import org.koin.test.KoinTest
 import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.*
-import uk.co.sentinelweb.cuer.app.db.di.DatabaseModule
 import uk.co.sentinelweb.cuer.app.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.app.db.util.MainCoroutineRule
 import kotlin.test.assertEquals
@@ -32,7 +31,6 @@ class PlaylistItemEntityTest : KoinTest {
         printLogger(Level.ERROR)
         modules(
             listOf<Module>()
-                .plus(DatabaseModule.modules)
                 .plus(dbIntegrationRule.modules)
                 .plus(mainCoroutineRule.modules)
         )
@@ -51,8 +49,8 @@ class PlaylistItemEntityTest : KoinTest {
         database.channelEntityQueries.create(channel)
         val channelId = database.channelEntityQueries.getInsertId().executeAsOne()
         val media = fixture<Media>().copy(id = 0, channel_id = channelId, image_id = null, thumb_id = null)
-        database.mediaEntityQueries.createMedia(media)
-        val mediaId = database.mediaEntityQueries.getInsertIdMedia().executeAsOne()
+        database.mediaEntityQueries.create(media)
+        val mediaId = database.mediaEntityQueries.getInsertId().executeAsOne()
         val playlist = fixture<Playlist>().copy(id = 0, parent_id = null, channel_id = null, image_id = null, thumb_id = null)
         database.playlistEntityQueries.createPlaylist(playlist)
         val playlistId = database.playlistEntityQueries.getInsertIdPlaylist().executeAsOne()

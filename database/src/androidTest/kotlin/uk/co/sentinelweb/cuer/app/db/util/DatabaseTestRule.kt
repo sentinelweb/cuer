@@ -7,6 +7,7 @@ import org.junit.runner.Description
 import org.koin.core.component.KoinComponent
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.di.DatabaseModule
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 
@@ -20,14 +21,18 @@ class DatabaseTestRule : TestWatcher(), KoinComponent {
         factory<LogWrapper> { SystemLogWrapper() }
     }
 
-    val modules = listOf(driverModule, dbTestModule)
+    private val utilTestModule = module {
+        factory { TimeProvider() }
+    }
+
+    val modules = listOf(driverModule, dbTestModule, utilTestModule)
         .plus(DatabaseModule.modules)
 
-    override fun starting(description: Description?) {
+    override fun starting(description: Description) {
         super.starting(description)
     }
 
-    override fun finished(description: Description?) {
+    override fun finished(description: Description) {
         super.finished(description)
     }
 }
