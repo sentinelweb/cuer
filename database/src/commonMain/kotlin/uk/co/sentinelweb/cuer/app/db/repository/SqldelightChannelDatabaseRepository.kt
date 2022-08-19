@@ -150,7 +150,7 @@ class SqldelightChannelDatabaseRepository(
             loadChannelInternal(id)
         }
 
-    private fun loadChannelInternal(id: Long) = try {
+    internal fun loadChannelInternal(id: Long) = try {
         database.channelEntityQueries
             .load(id)
             .executeAsOneOrNull()!!
@@ -163,7 +163,7 @@ class SqldelightChannelDatabaseRepository(
             }
             .let { channel: ChannelDomain -> RepoResult.Data(channel) }
     } catch (e: Throwable) {
-        val msg = "couldn't load $id"
+        val msg = "couldn't load channel: $id"
         log.e(msg, e)
         RepoResult.Error<ChannelDomain>(e, msg)
     }

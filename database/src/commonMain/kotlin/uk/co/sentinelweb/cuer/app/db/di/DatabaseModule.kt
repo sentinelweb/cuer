@@ -4,6 +4,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.factory.DatabaseFactory
 import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
+import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.*
 
 object DatabaseModule {
@@ -13,6 +14,7 @@ object DatabaseModule {
     }
 
     private val mapperModule = module {
+        factory { MediaMapper(get()) }
         factory { ChannelMapper(get()) }
         factory { ImageMapper() }
     }
