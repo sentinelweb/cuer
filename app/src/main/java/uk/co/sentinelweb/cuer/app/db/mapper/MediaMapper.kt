@@ -8,12 +8,12 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
 import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
-import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity.Companion.FLAG_LIVE
-import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity.Companion.FLAG_LIVE_UPCOMING
-import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity.Companion.FLAG_PLAY_FROM_START
-import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity.Companion.FLAG_STARRED
-import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity.Companion.FLAG_WATCHED
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_LIVE
+import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_LIVE_UPCOMING
+import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_PLAY_FROM_START
+import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_STARRED
+import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 
 class MediaMapper(
     private val imageMapper: ImageMapper,

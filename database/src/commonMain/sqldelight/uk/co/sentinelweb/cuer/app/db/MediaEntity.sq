@@ -4,6 +4,7 @@ CREATE TABLE media (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     flags INTEGER NOT NULL DEFAULT 0,
     type TEXT AS uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain NOT NULL,
+    url TEXT NOT NULL,
     title TEXT,
     duration INTEGER,
     positon INTEGER,
@@ -31,7 +32,7 @@ CREATE INDEX media_title_index ON media(title);
 CREATE INDEX media_description_index ON media(description);
 
 createMedia:
-INSERT INTO media ( flags, type, title, duration, positon, date_last_played, description, platform, platform_id,
+INSERT INTO media ( flags, type, url, title, duration, positon, date_last_played, description, platform, platform_id,
 published, channel_id, thumb_id, image_id ) VALUES ?;
 
 getInsertIdMedia:

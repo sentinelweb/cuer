@@ -143,30 +143,6 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun loadList() {
-    }
-
-    @Test
-    fun loadStatsList() {
-    }
-
-    @Test
-    fun count() {
-    }
-
-    @Test
-    fun delete() {
-    }
-
-    @Test
-    fun update() {
-    }
-
-    @Test
-    fun deleteAll() {
-    }
-
-    @Test
     fun `checkToSaveChannel$Cuer_database_commonMain platformId exists`() = runTest {
         val initial = fixture<ChannelDomain>().run {
             copy(
@@ -237,4 +213,28 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
         )
         assertEquals(expected, actual)
     }
+
+//    @Test
+//    fun loadList() {
+//    }
+//
+//    @Test
+//    fun loadStatsList() {
+//    }
+//
+//    @Test
+//    fun count() {
+//    }
+//
+//    @Test
+//    fun delete() {
+//    }
+//
+//    @Test
+//    fun update() {
+//    }
+//
+//    @Test
+//    fun deleteAll() {
+//    }
 }

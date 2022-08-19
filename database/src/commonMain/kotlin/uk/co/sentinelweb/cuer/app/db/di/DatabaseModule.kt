@@ -4,10 +4,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.factory.DatabaseFactory
 import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
-import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.ImageDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.SqldelightChannelDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.SqldelightImageDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.*
 
 object DatabaseModule {
 
@@ -21,7 +18,10 @@ object DatabaseModule {
     }
 
     private val repoModule = module {
-        single<ChannelDatabaseRepository> { SqldelightChannelDatabaseRepository(get(), get(), get(), get(), get()) }
+        single { SqldelightMediaDatabaseRepository(get(), get(), get(), get(), get(), get()) }
+        single<MediaDatabaseRepository> { get<SqldelightMediaDatabaseRepository>() }
+        single { SqldelightChannelDatabaseRepository(get(), get(), get(), get(), get()) }
+        single<ChannelDatabaseRepository> { get<SqldelightChannelDatabaseRepository>() }
         single {SqldelightImageDatabaseRepository(get(), get(), get(), get())}
         single<ImageDatabaseRepository> { get<SqldelightImageDatabaseRepository>() }
     }

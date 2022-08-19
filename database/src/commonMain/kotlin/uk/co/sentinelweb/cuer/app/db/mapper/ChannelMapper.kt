@@ -8,30 +8,30 @@ import uk.co.sentinelweb.cuer.domain.ChannelDomain.Companion.FLAG_STARRED
 class ChannelMapper(private val imageMapper: ImageMapper) {
 
     fun map(entity: Channel, thumbEntity: Image?, imageEntity: Image?): ChannelDomain = ChannelDomain(
-        entity.id,
-        entity.platform_id,
-        entity.platform,
-        entity.country,
-        entity.title,
-        entity.custom_url,
-        entity.description,
-        entity.published,
-        thumbEntity?.let { imageMapper.map(it) },
-        imageEntity?.let { imageMapper.map(it) },
+        id = entity.id,
+        platformId = entity.platform_id,
+        platform = entity.platform,
+        country = entity.country,
+        title = entity.title,
+        customUrl = entity.custom_url,
+        description = entity.description,
+        published = entity.published,
+        thumbNail = thumbEntity?.let { imageMapper.map(it) },
+        image = imageEntity?.let { imageMapper.map(it) },
         starred = (entity.flags and FLAG_STARRED) == FLAG_STARRED
     )
 
     fun map(domain: ChannelDomain) = Channel(
-        domain.id ?: 0,
-        if (domain.starred) FLAG_STARRED else 0,
-        domain.title,
-        domain.description,
-        domain.customUrl,
-        domain.country,
-        domain.platform,
-        domain.platformId!!,
-        domain.thumbNail?.id,
-        domain.image?.id,
-        domain.published
+        id = domain.id ?: 0,
+        flags = if (domain.starred) FLAG_STARRED else 0,
+        title = domain.title,
+        description = domain.description,
+        custom_url = domain.customUrl,
+        country = domain.country,
+        platform = domain.platform,
+        platform_id = domain.platformId!!,
+        thumb_id = domain.thumbNail?.id,
+        image_id = domain.image?.id,
+        published = domain.published
     )
 }
