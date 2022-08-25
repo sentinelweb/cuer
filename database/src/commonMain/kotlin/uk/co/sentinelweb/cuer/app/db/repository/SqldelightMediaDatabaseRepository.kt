@@ -7,12 +7,13 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.Media
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class SqldelightMediaDatabaseRepository(
@@ -99,9 +100,37 @@ class SqldelightMediaDatabaseRepository(
 
     override suspend fun load(id: Long, flat: Boolean): RepoResult<MediaDomain> = loadMedia(id)
 
-    override suspend fun loadList(filter: OrchestratorContract.Filter?, flat: Boolean): RepoResult<List<MediaDomain>> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun loadList(filter: Filter?, flat: Boolean): RepoResult<List<MediaDomain>> =
+        withContext(coProvider.IO) {
+            database.mediaEntityQueries.transactionWithResult<RepoResult<List<MediaDomain>>> {
+                try {
+                    when (filter) {
+                        is IdListFilter ->
+                            database.mediaEntityQueries
+                                .loadAllByIds(filter.ids)
+                                .executeAsList()
+                                .map { fillAndMapEntity(it) }
+                                .let { RepoResult.Data(it) }
+                        is PlatformIdListFilter ->
+                            filter.ids
+                                // todo make query to load all
+                                .mapNotNull {
+                                    database.mediaEntityQueries
+                                        .loadByPlatformId(it, YOUTUBE)
+                                        .executeAsOne()
+                                }
+                                .map { fillAndMapEntity(it) }
+                                .let { RepoResult.Data.dataOrEmpty(it) }
+                        is ChannelPlatformIdFilter -> TODO()
+                        else -> throw IllegalArgumentException("$filter not implemented")
+                    }
+                } catch (e: Exception) {
+                    val msg = "couldn't load medias"
+                    log.e(msg, e)
+                    RepoResult.Error<List<MediaDomain>>(e, msg)
+                }
+            }
+        }
 
     override suspend fun loadStatsList(filter: OrchestratorContract.Filter?): RepoResult<List<Nothing>> {
         TODO("Not yet implemented")
@@ -136,19 +165,19 @@ class SqldelightMediaDatabaseRepository(
         database.mediaEntityQueries
             .loadById(id)
             .executeAsOneOrNull()!!
-            .let { media: Media ->
-                mediaMapper.map(
-                    media,
-                    channelDatabaseRepository.loadChannelInternal(media.channel_id!!).data!!,
-                    imageDatabaseRepository.loadEntity(media.thumb_id),
-                    imageDatabaseRepository.loadEntity(media.image_id),
-                )
-            }
+            .let { media: Media -> fillAndMapEntity(media) }
             .let { media: MediaDomain -> RepoResult.Data(media) }
     } catch (e: Throwable) {
         val msg = "couldn't load $id"
         log.e(msg, e)
         RepoResult.Error<MediaDomain>(e, msg)
     }
+
+    private fun fillAndMapEntity(media: Media): MediaDomain = mediaMapper.map(
+        media,
+        channelDatabaseRepository.loadChannelInternal(media.channel_id!!).data!!,
+        imageDatabaseRepository.loadEntity(media.thumb_id),
+        imageDatabaseRepository.loadEntity(media.image_id),
+    )
 
 }

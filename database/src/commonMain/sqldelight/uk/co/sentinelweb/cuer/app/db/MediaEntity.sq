@@ -58,7 +58,7 @@ loadAllByIds:
 SELECT * FROM media WHERE id IN ?;
 
 loadByPlatformId:
-SELECT * FROM media WHERE platform_id LIKE ? LIMIT 1;
+SELECT * FROM media WHERE platform_id LIKE :platformId AND platform==:platform LIMIT 1;
 
 loadFlags:
 SELECT flags FROM media WHERE id == :id;

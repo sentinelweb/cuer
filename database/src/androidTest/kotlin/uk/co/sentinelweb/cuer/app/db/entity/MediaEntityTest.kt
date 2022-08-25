@@ -142,9 +142,9 @@ class MediaEntityTest : KoinTest {
         val initial = (1..4).map { media() }
 
         val index = 3
-        val selectedPlatformId = initial[index].first.platform_id
+        val (selectedPlatformId,selectedPlatform)  = initial[index].first.let {it.platform_id to it.platform}
         val actual = database.mediaEntityQueries
-            .loadByPlatformId(selectedPlatformId)
+            .loadByPlatformId(selectedPlatformId, selectedPlatform)
             .executeAsOne()
 
         val expected = initial[index].first

@@ -17,8 +17,11 @@ import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.app.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import kotlin.test.assertEquals
 
 class SqldelightMediaDatabaseRepositoryTest : KoinTest {
@@ -155,7 +158,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
         val initial = fixture<List<MediaDomain>>()
         val initialSaved = sut.save(initial, emit = false, flat = false).data!!
         sut.updates.test {
-            val changed = initialSaved.map{
+            val changed = initialSaved.map {
                 fixture<MediaDomain>().copy(
                     id = it.id,
                     channelData = it.channelData,
@@ -183,7 +186,47 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun loadList() = runTest {
+    fun loadListByIds() = runTest {
+        val initialSaved = addMediaToDb()
+
+        val expected = initialSaved
+            .filterIndexed { index, _ -> index.mod(2) == 0 }
+        val expectedIds = expected.map { it.id!! }
+
+        val actual = sut.loadList(filter = IdListFilter(expectedIds))
+
+        assertEquals(expected, actual.data)
+    }
+
+    @Test
+    fun loadListByPlatformIds() = runTest {
+        val initialSaved = addMediaToDb()
+
+        val expected = initialSaved
+            .filterIndexed { index, _ -> index.mod(2) == 0 }
+        val expectedIds = expected.map { it.platformId }
+
+        val actual = sut.loadList(filter = OrchestratorContract.PlatformIdListFilter(expectedIds))
+
+        assertEquals(expected, actual.data)
+    }
+
+    private suspend fun addMediaToDb(): List<MediaDomain> {
+        val initial = fixture<List<MediaDomain>>().map {
+            it.copy(
+                id = null,
+                platform = PlatformDomain.YOUTUBE,
+                channelData = it.channelData.copy(
+                    id = null,
+                    thumbNail = it.channelData.thumbNail?.copy(id = null),
+                    image = it.channelData.image?.copy(id = null)
+                ),
+                thumbNail = it.thumbNail?.copy(id = null),
+                image = it.image?.copy(id = null)
+            )
+        }
+        val initialSaved = sut.save(initial, emit = false, flat = false).data!!
+        return initialSaved
     }
 
     @Test
