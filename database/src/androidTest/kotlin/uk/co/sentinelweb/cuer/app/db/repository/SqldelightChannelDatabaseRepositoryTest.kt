@@ -218,24 +218,32 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
 //    @Test
 //    fun loadList() {
 //    }
-//
+
 //    @Test
 //    fun loadStatsList() {
 //    }
-//
+
 //    @Test
 //    fun count() {
 //    }
-//
-//    @Test
+
+    //    @Test
 //    fun delete() {
 //    }
-//
-//    @Test
-//    fun update() {
-//    }
-//
-//    @Test
-//    fun deleteAll() {
-//    }
+    @Test
+    fun deleteAll() = runTest {
+        val initial = fixture<ChannelDomain>().run {
+            copy(
+                id = null,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        }
+        val saved = sut.save(initial).data
+        assertNotNull(saved)
+        val actual = sut.deleteAll()
+        assertEquals(true, actual.data)
+        val actualCount = database.channelEntityQueries.count().executeAsOne()
+        assertEquals(0, actualCount)
+    }
 }

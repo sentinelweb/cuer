@@ -18,11 +18,15 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.app.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.AllFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 
 class SqldelightMediaDatabaseRepositoryTest : KoinTest {
     private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
@@ -231,14 +235,42 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
     @Test
     fun count() = runTest {
+        val initialSaved = addMediaToDb()
+
+        val actual = sut.count(AllFilter()).data!!
+
+        assertEquals(initialSaved.size, actual)
     }
 
     @Test
     fun delete() = runTest {
+        val initialSaved = addMediaToDb()
+
+        val toDelete = initialSaved[1]
+        sut.updates.test {
+            val actual = sut.delete(toDelete, emit = true)
+            assertEquals(true, actual.data!!)
+            assertEquals(DELETE to toDelete, awaitItem())
+        }
+        val tryToLoadDeleted = sut.load(toDelete.id!!)
+        assertFalse { tryToLoadDeleted.isSuccessful }
     }
 
     @Test
     fun deleteAll() = runTest {
+        val initial = fixture<MediaDomain>().run {
+            copy(
+                id = null,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        }
+        val saved = sut.save(initial).data
+        assertNotNull(saved)
+        val actual = sut.deleteAll()
+        assertEquals(true, actual.data)
+        val actualCount = database.mediaEntityQueries.count().executeAsOne()
+        assertEquals(0, actualCount)
     }
 
     @Test

@@ -111,6 +111,7 @@ class SqldelightMediaDatabaseRepository(
                                 .executeAsList()
                                 .map { fillAndMapEntity(it) }
                                 .let { RepoResult.Data(it) }
+
                         is PlatformIdListFilter ->
                             filter.ids
                                 // todo make query to load all
@@ -121,6 +122,7 @@ class SqldelightMediaDatabaseRepository(
                                 }
                                 .map { fillAndMapEntity(it) }
                                 .let { RepoResult.Data.dataOrEmpty(it) }
+
                         is ChannelPlatformIdFilter -> TODO()
                         else -> throw IllegalArgumentException("$filter not implemented")
                     }
@@ -132,20 +134,51 @@ class SqldelightMediaDatabaseRepository(
             }
         }
 
-    override suspend fun loadStatsList(filter: OrchestratorContract.Filter?): RepoResult<List<Nothing>> {
+    override suspend fun loadStatsList(filter: Filter?): RepoResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> {
-        TODO("Not yet implemented")
+    override suspend fun count(filter: Filter?): RepoResult<Int> = withContext(coProvider.IO) {
+        try {
+            when (filter) {
+                is AllFilter, null -> RepoResult.Data(database.mediaEntityQueries.count().executeAsOne().toInt())
+                else -> throw IllegalArgumentException("$filter not implemented")
+            }
+        } catch (e: Exception) {
+            val msg = "couldn't count medias"
+            log.e(msg, e)
+            RepoResult.Error<Int>(e, msg)
+        }
     }
 
-    override suspend fun delete(domain: MediaDomain, emit: Boolean): RepoResult<Boolean> {
-        TODO("Not yet implemented")
+    override suspend fun delete(domain: MediaDomain, emit: Boolean): RepoResult<Boolean> = withContext(coProvider.IO) {
+        try {
+            domain.id
+                ?.let { database.mediaEntityQueries.delete(it) }
+                ?.let { RepoResult.Data(true) }
+                ?.also { if (emit) _updatesFlow.emit(Operation.DELETE to domain) }
+                ?: let { RepoResult.Data(false) }
+        } catch (e: Exception) {
+            val msg = "couldn't delete medias"
+            log.e(msg, e)
+            RepoResult.Error<Boolean>(e, msg)
+        }
     }
 
-    override suspend fun deleteAll(): RepoResult<Boolean> {
-        TODO("Not yet implemented")
+    override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
+        var result: RepoResult<Boolean> = RepoResult.Data(false)
+        database.channelEntityQueries.transaction {
+            result = try {
+                database.mediaEntityQueries
+                    .deleteAll()
+                RepoResult.Data(true)
+            } catch (e: Throwable) {
+                val msg = "couldn't deleteAll medias"
+                log.e(msg, e)
+                RepoResult.Error<Boolean>(e, msg)
+            }
+        }
+        result
     }
 
     override suspend fun update(
@@ -168,7 +201,7 @@ class SqldelightMediaDatabaseRepository(
             .let { media: Media -> fillAndMapEntity(media) }
             .let { media: MediaDomain -> RepoResult.Data(media) }
     } catch (e: Throwable) {
-        val msg = "couldn't load $id"
+        val msg = "couldn't load media:$id"
         log.e(msg, e)
         RepoResult.Error<MediaDomain>(e, msg)
     }
