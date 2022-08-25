@@ -41,47 +41,49 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
         )
     }
 
-    val database: Database by inject()
     val sut: MediaDatabaseRepository by inject()
-    val captureMediaFlow: MutableList<Pair<OrchestratorContract.Operation,MediaDomain>> = mutableListOf()
 
     @Before
-    fun before(){
+    fun before() {
         Database.Schema.create(get())
     }
-
 
     @Test
     fun saveCreate() = runTest {
         val initial = fixture<MediaDomain>()
-
-        val saved = sut.save(initial, emit = true, flat = false).data!!
-
-        val expected = initial.copy(
-            id = saved.id,
-            channelData = initial.channelData.copy(
-                id = saved.channelData.id,
-                thumbNail = initial.channelData.thumbNail?.copy(id = saved.channelData.thumbNail?.id),
-                image = initial.channelData.image?.copy(id = saved.channelData.image?.id)
-            ),
-            thumbNail = initial.thumbNail?.copy(id = saved.thumbNail?.id),
-            image = initial.image?.copy(id = saved.image?.id)
-        )
-
-        assertEquals(expected, saved)
         sut.updates.test {
+            val saved = sut.save(initial, emit = true, flat = false).data!!
+
+            val expected = initial.copy(
+                id = saved.id,
+                channelData = initial.channelData.copy(
+                    id = saved.channelData.id,
+                    thumbNail = initial.channelData.thumbNail?.copy(id = saved.channelData.thumbNail?.id),
+                    image = initial.channelData.image?.copy(id = saved.channelData.image?.id)
+                ),
+                thumbNail = initial.thumbNail?.copy(id = saved.thumbNail?.id),
+                image = initial.image?.copy(id = saved.image?.id)
+            )
+
+            assertEquals(expected, saved)
+
+
             assertEquals(FULL to saved, awaitItem())
             expectNoEvents()
         }
     }
 
+    fun saveCreateChannelExists() = runTest {
+    }
+
+    fun saveUpdate() = runTest {
+    }
+
     @Test
-    fun saveList() {
+    fun saveList() = runTest {
 
     }
 
-    fun saveChannelExists() = runTest {
-    }
 
     @Test
     fun testSave() = runTest {
