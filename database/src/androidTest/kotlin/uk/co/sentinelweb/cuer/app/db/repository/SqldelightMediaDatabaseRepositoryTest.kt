@@ -17,7 +17,6 @@ import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.app.db.util.MainCoroutineRule
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import kotlin.test.assertEquals
@@ -40,6 +39,9 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                 .plus(mainCoroutineRule.modules)
         )
     }
+
+    val database: Database by inject()
+    val channelDatabaseRepository: ChannelDatabaseRepository by inject()
 
     val sut: MediaDatabaseRepository by inject()
 
@@ -66,17 +68,55 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
             )
 
             assertEquals(expected, saved)
-
-
             assertEquals(FULL to saved, awaitItem())
             expectNoEvents()
         }
     }
 
+    @Test
     fun saveCreateChannelExists() = runTest {
+        val initial = fixture<MediaDomain>()
+        val savedChannel = channelDatabaseRepository.save(initial.channelData).data!!
+        val initialWithChannel = initial.copy(channelData = savedChannel)
+        sut.updates.test {
+            val saved = sut.save(initialWithChannel, emit = true, flat = false).data!!
+
+            val expected = initialWithChannel.copy(
+                id = saved.id,
+                thumbNail = initial.thumbNail?.copy(id = saved.thumbNail?.id),
+                image = initial.image?.copy(id = saved.image?.id)
+            )
+
+            assertEquals(expected, saved)
+
+            assertEquals(FULL to saved, awaitItem())
+            expectNoEvents()
+        }
+        val channelCount = database.channelEntityQueries.count().executeAsOne()
+        assertEquals(1, channelCount)
     }
 
+    @Test
     fun saveUpdate() = runTest {
+        val initial = fixture<MediaDomain>()
+        val initialSaved = sut.save(initial, emit = false, flat = false).data!!
+        sut.updates.test {
+            val changed = fixture<MediaDomain>().copy(
+                id = initialSaved.id,
+                channelData = initialSaved.channelData,
+                thumbNail = initialSaved.thumbNail,
+                image = initialSaved.image
+            )
+            val updated = sut.save(changed, emit = true, flat = false).data!!
+
+            assertEquals(changed, updated)
+            assertEquals(FULL to updated, awaitItem())
+            expectNoEvents()
+        }
+        val channelCount = database.channelEntityQueries.count().executeAsOne()
+        assertEquals(1, channelCount)
+        val mediaCount = database.mediaEntityQueries.count().executeAsOne()
+        assertEquals(1, mediaCount)
     }
 
     @Test
