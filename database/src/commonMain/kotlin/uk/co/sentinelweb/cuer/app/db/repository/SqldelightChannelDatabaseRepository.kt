@@ -172,43 +172,46 @@ class SqldelightChannelDatabaseRepository(
         if (domain.platformId.isNullOrEmpty())
             throw IllegalArgumentException("Channel data is missing remoteID")
         database.channelEntityQueries.transactionWithResult {
-            domain
-                .let { toCheck ->
-                    // old images are left in db - otherwise constraint check needed
-                    val toCheckImages = database.channelEntityQueries.transactionWithResult<ChannelDomain> {
-                        toCheck
-                            .copy(thumbNail = toCheck.thumbNail
-                                ?.let { imageDatabaseRepository.checkToSaveImage(it) })
-                            .copy(image = toCheck.image
-                                ?.let { imageDatabaseRepository.checkToSaveImage(it) })
-                    }
-
-                    val entity = channelMapper.map(toCheckImages)
-                    database.channelEntityQueries
-                        .findByPlatformId(entity.platform_id, entity.platform)
-                        .executeAsOneOrNull()
-                        ?.let { saved ->
-                            // check for updated channel data + save
-                            if (entity.image_id != saved.image_id ||
-                                entity.thumb_id != saved.thumb_id ||
-                                entity.published != saved.published ||
-                                entity.description != saved.description
-                            ) {
-                                database.channelEntityQueries.update(entity.copy(id = saved.id))
-                            }
-                            saved.id
-                        }
-                        ?: let {
-                            database.channelEntityQueries
-                                .create(entity)
-                            database.channelEntityQueries
-                                .getInsertId()
-                                .executeAsOne()
-                        }
-                }
-                .let { loadChannelInternal(it).data!! }
+            checkToSaveChannelInternal(domain)
         }
     }
+
+    internal fun checkToSaveChannelInternal(domain: ChannelDomain) =
+        domain
+            .let { toCheck ->
+                // old images are left in db - otherwise constraint check needed
+                val toCheckImages = database.channelEntityQueries.transactionWithResult<ChannelDomain> {
+                    toCheck
+                        .copy(thumbNail = toCheck.thumbNail
+                            ?.let { imageDatabaseRepository.checkToSaveImage(it) })
+                        .copy(image = toCheck.image
+                            ?.let { imageDatabaseRepository.checkToSaveImage(it) })
+                }
+
+                val entity = channelMapper.map(toCheckImages)
+                database.channelEntityQueries
+                    .findByPlatformId(entity.platform_id, entity.platform)
+                    .executeAsOneOrNull()
+                    ?.let { saved ->
+                        // check for updated channel data + save
+                        if (entity.image_id != saved.image_id ||
+                            entity.thumb_id != saved.thumb_id ||
+                            entity.published != saved.published ||
+                            entity.description != saved.description
+                        ) {
+                            database.channelEntityQueries.update(entity.copy(id = saved.id))
+                        }
+                        saved.id
+                    }
+                    ?: let {
+                        database.channelEntityQueries
+                            .create(entity)
+                        database.channelEntityQueries
+                            .getInsertId()
+                            .executeAsOne()
+                    }
+            }
+            .let { loadChannelInternal(it).data!! }
 
     private fun emitOperation(
         flat: Boolean,

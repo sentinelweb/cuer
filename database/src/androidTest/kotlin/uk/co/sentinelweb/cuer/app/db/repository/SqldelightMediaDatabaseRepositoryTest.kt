@@ -120,18 +120,66 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun saveList() = runTest {
+    fun saveListCreate() = runTest {
+        val initial = fixture<List<MediaDomain>>()
+        sut.updates.test {
+            val saved = sut.save(initial, emit = true, flat = false).data!!
 
+            val expected = initial.mapIndexed { i, media ->
+                media.copy(
+                    id = saved[i].id,
+                    channelData = media.channelData.copy(
+                        id = saved[i].channelData.id,
+                        thumbNail = media.channelData.thumbNail?.copy(id = saved[i].channelData.thumbNail?.id),
+                        image = media.channelData.image?.copy(id = saved[i].channelData.image?.id)
+                    ),
+                    thumbNail = media.thumbNail?.copy(id = saved[i].thumbNail?.id),
+                    image = media.image?.copy(id = saved[i].image?.id)
+                )
+            }
+
+            assertEquals(expected, saved)
+            expected.forEach {
+                assertEquals(FULL to it, awaitItem())
+            }
+            expectNoEvents()
+        }
+        val channelCount = database.channelEntityQueries.count().executeAsOne()
+        assertEquals(initial.size.toLong(), channelCount)
+        val mediaCount = database.mediaEntityQueries.count().executeAsOne()
+        assertEquals(initial.size.toLong(), mediaCount)
     }
 
-
     @Test
-    fun testSave() = runTest {
+    fun saveListUpdate() = runTest {
+        val initial = fixture<List<MediaDomain>>()
+        val initialSaved = sut.save(initial, emit = false, flat = false).data!!
+        sut.updates.test {
+            val changed = initialSaved.map{
+                fixture<MediaDomain>().copy(
+                    id = it.id,
+                    channelData = it.channelData,
+                    thumbNail = it.thumbNail,
+                    image = it.image
+                )
+            }
+            val updated = sut.save(changed, emit = true, flat = false).data!!
+
+            assertEquals(changed, updated)
+            changed.forEach {
+                assertEquals(FULL to it, awaitItem())
+            }
+            expectNoEvents()
+        }
+        val channelCount = database.channelEntityQueries.count().executeAsOne()
+        assertEquals(initial.size.toLong(), channelCount)
+        val mediaCount = database.mediaEntityQueries.count().executeAsOne()
+        assertEquals(initial.size.toLong(), mediaCount)
     }
 
     @Test
     fun load() = runTest {
-
+        // tested in save
     }
 
     @Test

@@ -38,30 +38,7 @@ class SqldelightMediaDatabaseRepository(
     override suspend fun save(domain: MediaDomain, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             try {
-                domain
-                    .let { if (!flat) it.copy(channelData = channelDatabaseRepository.checkToSaveChannel(it.channelData)) else it }
-                    .let {
-                        it.copy(thumbNail = it.thumbNail
-                            ?.let { imageDatabaseRepository.checkToSaveImage(it) })
-                    }
-                    .let {
-                        it.copy(image = it.image
-                            ?.let { imageDatabaseRepository.checkToSaveImage(it) })
-                    }
-                    .let {
-                        val channel = mediaMapper.map(it)
-                        if (channel.id > 0) {
-                            database.mediaEntityQueries
-                                .update(channel)
-                            domain.id!!
-                        } else {
-                            database.mediaEntityQueries
-                                .create(channel)
-                            database.channelEntityQueries
-                                .getInsertId()
-                                .executeAsOne()
-                        }
-                    }
+                saveInternal(domain, flat)
                     .let { RepoResult.Data(load(id = it, flat).data) }
                     .also {
                         if (emit) it.data
@@ -74,11 +51,53 @@ class SqldelightMediaDatabaseRepository(
             }
         }
 
-    override suspend fun save(domains: List<MediaDomain>, flat: Boolean, emit: Boolean): RepoResult<List<MediaDomain>> {
-        TODO("Not yet implemented")
-    }
+    private fun saveInternal(domain: MediaDomain, flat: Boolean): Long =
+        domain
+            .let { if (!flat) it.copy(channelData = channelDatabaseRepository.checkToSaveChannelInternal(it.channelData)) else it }
+            .let {
+                it.copy(thumbNail = it.thumbNail
+                    ?.let { imageDatabaseRepository.checkToSaveImage(it) })
+            }
+            .let {
+                it.copy(image = it.image
+                    ?.let { imageDatabaseRepository.checkToSaveImage(it) })
+            }
+            .let {
+                val channel = mediaMapper.map(it)
+                if (channel.id > 0) {
+                    database.mediaEntityQueries
+                        .update(channel)
+                    domain.id!!
+                } else {
+                    database.mediaEntityQueries
+                        .create(channel)
+                    database.channelEntityQueries
+                        .getInsertId()
+                        .executeAsOne()
+                }
+            }
 
-    override suspend fun load(id: Long, flat: Boolean): RepoResult<MediaDomain> = loadMedia(id) // todo flat
+    override suspend fun save(domains: List<MediaDomain>, flat: Boolean, emit: Boolean): RepoResult<List<MediaDomain>> =
+        withContext(coProvider.IO) {
+            database.mediaEntityQueries.transactionWithResult<RepoResult<List<MediaDomain>>> {
+                try {
+                    domains
+                        .map { saveInternal(it, flat) }
+                        .map { loadMediaInternal(it).data!! }
+                        .let { RepoResult.Data(it) }
+                } catch (e: Exception) {
+                    val msg = "couldn't save medias"
+                    log.e(msg, e)
+                    rollback(RepoResult.Error<List<MediaDomain>>(e, msg))
+                }
+            }.also {
+                it.takeIf { it.isSuccessful && emit }
+                    ?.data
+                    ?.map { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
+            }
+        }
+
+    override suspend fun load(id: Long, flat: Boolean): RepoResult<MediaDomain> = loadMedia(id)
 
     override suspend fun loadList(filter: OrchestratorContract.Filter?, flat: Boolean): RepoResult<List<MediaDomain>> {
         TODO("Not yet implemented")
