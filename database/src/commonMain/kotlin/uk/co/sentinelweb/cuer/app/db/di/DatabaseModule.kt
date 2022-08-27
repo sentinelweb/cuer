@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.*
+import uk.co.sentinelweb.cuer.app.db.update.MediaUpdateMapper
 
 object DatabaseModule {
 
@@ -17,10 +18,11 @@ object DatabaseModule {
         factory { MediaMapper(get()) }
         factory { ChannelMapper(get()) }
         factory { ImageMapper() }
+        factory { MediaUpdateMapper() }
     }
 
     private val repoModule = module {
-        single { SqldelightMediaDatabaseRepository(get(), get(), get(), get(), get(), get()) }
+        single { SqldelightMediaDatabaseRepository(get(), get(), get(), get(), get(), get(), get()) }
         single<MediaDatabaseRepository> { get<SqldelightMediaDatabaseRepository>() }
         single { SqldelightChannelDatabaseRepository(get(), get(), get(), get(), get()) }
         single<ChannelDatabaseRepository> { get<SqldelightChannelDatabaseRepository>() }

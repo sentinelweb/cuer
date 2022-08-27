@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.Media
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.db.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
@@ -14,6 +14,8 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
+import uk.co.sentinelweb.cuer.domain.update.MediaUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class SqldelightMediaDatabaseRepository(
@@ -21,6 +23,7 @@ class SqldelightMediaDatabaseRepository(
     private val imageDatabaseRepository: SqldelightImageDatabaseRepository,
     private val channelDatabaseRepository: SqldelightChannelDatabaseRepository,
     private val mediaMapper: MediaMapper,
+    private val mediaUpdateMapper: MediaUpdateMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
 ) : MediaDatabaseRepository {
@@ -115,7 +118,7 @@ class SqldelightMediaDatabaseRepository(
                         is PlatformIdListFilter ->
                             filter.ids
                                 // todo make query to load all
-                                .mapNotNull {
+                                .map {
                                     database.mediaEntityQueries
                                         .loadByPlatformId(it, YOUTUBE)
                                         .executeAsOne()
@@ -185,8 +188,31 @@ class SqldelightMediaDatabaseRepository(
         update: UpdateDomain<MediaDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<MediaDomain> {
-        TODO("Not yet implemented")
+    ): RepoResult<MediaDomain> = withContext(coProvider.IO) {
+        try {
+            when (update as? MediaUpdateDomain) {
+                is MediaPositionUpdateDomain ->
+                    (update as MediaPositionUpdateDomain)
+                        .let { it to database.mediaEntityQueries.loadFlags(it.id).executeAsOne() }
+                        .let { mediaUpdateMapper.map(it.first, it.second) }
+                        .also {
+                            database.mediaEntityQueries.updatePosition(
+                                id = it.id,
+                                dateLastPlayed = it.dateLastPlayed,
+                                position = it.positon,
+                                duration = it.duration,
+                                flags = it.flags
+                            )
+                        }
+                        .let { RepoResult.Data(load(id = it.id, flat).data) }
+                        .also { if (emit) it.data?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) } }
+                else -> throw IllegalArgumentException("update object not valid: $update")
+            }
+        } catch (e: Throwable) {
+            val msg = "couldn't update media: $update"
+            log.e(msg, e)
+            RepoResult.Error<MediaDomain>(e, msg)
+        }
     }
 
     internal suspend fun loadMedia(id: Long): RepoResult<MediaDomain> =

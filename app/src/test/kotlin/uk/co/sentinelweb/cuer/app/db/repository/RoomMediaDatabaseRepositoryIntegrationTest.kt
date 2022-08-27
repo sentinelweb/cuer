@@ -7,7 +7,8 @@ import com.flextrade.jfixture.FixtureAnnotations
 import com.flextrade.jfixture.annotations.Fixture
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -18,13 +19,12 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import uk.co.sentinelweb.cuer.app.CuerTestApp
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
-import uk.co.sentinelweb.cuer.app.db.entity.update.MediaUpdateMapper
+import uk.co.sentinelweb.cuer.app.db.mapper.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
@@ -39,7 +39,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class RoomMediaDatabaseRepositoryIntegrationTest {
     private lateinit var database: AppDatabase
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+    private val testCoroutineDispatcher = UnconfinedTestDispatcher()
     private val coCxtProvider = CoroutineContextTestProvider(testCoroutineDispatcher)
 
     @Fixture

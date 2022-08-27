@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.dao.MediaDao
-import uk.co.sentinelweb.cuer.app.db.entity.update.MediaUpdateMapper
+import uk.co.sentinelweb.cuer.app.db.mapper.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult.Data.Empty

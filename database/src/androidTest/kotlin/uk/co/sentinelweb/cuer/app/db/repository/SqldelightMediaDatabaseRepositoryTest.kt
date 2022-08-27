@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -275,5 +276,21 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
     @Test
     fun updatePosition() = runTest {
+        val initial = fixture<MediaDomain>().run {
+            copy(
+                id = null,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        }
+        val saved = sut.save(initial).data!!
+        sut.updates.test {
+            val update = fixture<MediaPositionUpdateDomain>().copy(id=saved.id!!)
+            val actual = sut.update(update, emit = true)
+            val expected = sut.load(saved.id!!)
+            assertEquals(expected.data!!, actual.data!! )
+            assertEquals(FULL to actual.data!!, awaitItem())
+            expectNoEvents()
+        }
     }
 }

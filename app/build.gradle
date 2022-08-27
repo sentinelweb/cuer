@@ -123,6 +123,7 @@ dependencies {
     implementation project(":shared")
     implementation project(":net")
     implementation project(":remote")
+    implementation project(":database")
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // deps

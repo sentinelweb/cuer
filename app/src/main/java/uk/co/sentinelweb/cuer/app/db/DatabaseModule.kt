@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.db
 
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.db.entity.update.MediaUpdateMapper
+import uk.co.sentinelweb.cuer.app.db.mapper.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.init.JsonDatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.mapper.*
