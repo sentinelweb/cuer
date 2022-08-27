@@ -1,5 +1,6 @@
-package uk.co.sentinelweb.cuer.app.db.entity.update
+package uk.co.sentinelweb.cuer.db.update
 
+import kotlinx.datetime.Instant
 import uk.co.sentinelweb.cuer.db.AppData
 
 data class MediaPositionUpdateEntity(
@@ -9,7 +10,7 @@ data class MediaPositionUpdateEntity(
 
     val positon: Long?,
 
-    val dateLastPlayed: String,
+    val dateLastPlayed: Instant,
 
     val flags: Long = 0
 )

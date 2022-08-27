@@ -1,9 +1,9 @@
 package uk.co.sentinelweb.cuer.core.providers
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestDispatcher
 
 @ExperimentalCoroutinesApi
 class TestCoroutineContextProvider constructor(
-    d: TestCoroutineDispatcher,
+    d: TestDispatcher,
 ) : CoroutineContextProvider(d, d, d, d)

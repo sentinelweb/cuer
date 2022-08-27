@@ -7,7 +7,6 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabase
 import uk.co.sentinelweb.cuer.app.db.dao.ChannelDao
 import uk.co.sentinelweb.cuer.app.db.dao.PlaylistDao
 import uk.co.sentinelweb.cuer.app.db.dao.PlaylistItemDao
-import uk.co.sentinelweb.cuer.app.db.entity.MediaEntity
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistAndItems
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
 import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistItemMapper
@@ -16,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
@@ -289,7 +289,7 @@ class RoomPlaylistDatabaseRepository constructor(
                                 PlaylistStatDomain(
                                     playlistId = it,
                                     itemCount = playlistItemDao.countItems(it),
-                                    watchedItemCount = playlistItemDao.countMediaFlags(it, MediaEntity.FLAG_WATCHED)
+                                    watchedItemCount = playlistItemDao.countMediaFlags(it, FLAG_WATCHED)
                                 )
                             }).also { database.setTransactionSuccessful() }
                     else -> throw UnsupportedOperationException("$filter not supported")

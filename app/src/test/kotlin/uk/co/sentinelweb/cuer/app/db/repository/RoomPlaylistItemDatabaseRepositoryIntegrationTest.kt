@@ -18,8 +18,11 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import uk.co.sentinelweb.cuer.app.CuerTestApp
 import uk.co.sentinelweb.cuer.app.db.AppDatabase
+import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
+import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
+import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
+import uk.co.sentinelweb.cuer.app.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.app.db.mapper.update.MediaUpdateMapper
-import uk.co.sentinelweb.cuer.app.db.mapper.*
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider

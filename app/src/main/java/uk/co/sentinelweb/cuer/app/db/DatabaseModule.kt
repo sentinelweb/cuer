@@ -8,6 +8,9 @@ import uk.co.sentinelweb.cuer.app.db.init.JsonDatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.mapper.*
 import uk.co.sentinelweb.cuer.app.db.repository.*
 import uk.co.sentinelweb.cuer.app.db.typeconverter.InstantTypeConverter
+import uk.co.sentinelweb.cuer.app.db.mapper.ChannelMapper
+import uk.co.sentinelweb.cuer.app.db.mapper.ImageMapper
+import uk.co.sentinelweb.cuer.app.db.mapper.MediaMapper
 
 object DatabaseModule {
     val dbModule = module {
