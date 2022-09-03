@@ -47,9 +47,11 @@ class PlaylistEntityTest : KoinTest {
     @Test
     fun createLoadEntity() {
         val initial = fixture<Playlist>().copy(id = 0, parent_id = null, channel_id = null, image_id = null, thumb_id = null)
-        database.playlistEntityQueries.createPlaylist(initial)
-        val insertId = database.playlistEntityQueries.getInsertIdPlaylist().executeAsOne()
-        val actual = database.playlistEntityQueries.loadPlaylist(insertId).executeAsOne()
+        database.playlistEntityQueries.create(initial)
+        val insertId = database.playlistEntityQueries.getInsertId().executeAsOne()
+        val actual = database.playlistEntityQueries.load(insertId).executeAsOne()
         assertEquals(initial.copy(id = insertId), actual)
     }
+
+
 }

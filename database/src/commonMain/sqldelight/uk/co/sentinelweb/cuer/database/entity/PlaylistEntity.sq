@@ -26,14 +26,47 @@ CREATE INDEX playlist_type_index ON playlist(type);
 
 CREATE UNIQUE INDEX playlist_platform_platform_id_index ON channel(platform, platform_id);
 
-createPlaylist:
+create:
 INSERT INTO playlist (
 flags, title, currentIndex, mode, type, platform, platform_id, channel_id,
 parent_id, thumb_id, image_id, config_json
 ) VALUES ?;
 
-getInsertIdPlaylist:
-SELECT last_insert_rowid() FROM playlist;
+getInsertId:
+SELECT last_insert_rowid() FROM playlist LIMIT 1;
 
-loadPlaylist:
+update:
+REPLACE INTO playlist (
+id, flags, title, currentIndex, mode, type, platform, platform_id, channel_id,
+parent_id, thumb_id, image_id, config_json
+) VALUES ?;
+
+load:
 SELECT * FROM playlist WHERE id = ?;
+
+loadAll:
+SELECT * FROM playlist;
+
+loadAllByIds:
+SELECT * FROM playlist WHERE id IN :playlistIds;
+
+loadAllByPlatformIds:
+SELECT * FROM playlist WHERE platform_id IN :platformIds;
+
+loadAllByFlags:
+SELECT * FROM playlist WHERE flags & :flags == :flags;
+
+delete:
+DELETE FROM playlist_item WHERE id = ?;
+
+deleteAll:
+DELETE FROM playlist;
+
+updateIndex:
+UPDATE playlist SET currentIndex=:index WHERE id=:id;
+
+findPlaylistsForChannePlatformlId:
+SELECT DISTINCT playlist.* FROM playlist, playlist_item, media, channel WHERE playlist.id==playlist_item.playlist_id AND playlist_item.media_id==media.id AND media.channel_id==channel.id AND channel.platform_id=:channelId;
+
+findPlaylistsWithTitle:
+SELECT * FROM playlist WHERE INSTR(LOWER(title), LOWER(:title));
