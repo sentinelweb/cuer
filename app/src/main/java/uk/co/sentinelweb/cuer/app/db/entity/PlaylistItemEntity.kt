@@ -42,8 +42,4 @@ data class PlaylistItemEntity constructor(
     @ColumnInfo(name = "date_added")
     val dateAdded: Instant
 
-) {
-    companion object {
-        const val FLAG_ARCHIVED = 1L
-    }
-}
+)

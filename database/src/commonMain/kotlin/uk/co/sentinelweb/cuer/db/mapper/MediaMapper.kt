@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_PLAY_FROM_START
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 import uk.co.sentinelweb.cuer.domain.ext.hasFlag
+import uk.co.sentinelweb.cuer.domain.ext.makeFlags
 
 class MediaMapper(
     private val imageMapper: ImageMapper
@@ -56,9 +57,11 @@ class MediaMapper(
     )
 
     private fun mapFlags(domain: MediaDomain):Long =
-        (if (domain.watched) FLAG_WATCHED else 0) +
-            (if (domain.starred) FLAG_STARRED else 0) +
-            (if (domain.isLiveBroadcast) FLAG_LIVE else 0) +
-            (if (domain.isLiveBroadcastUpcoming) FLAG_LIVE_UPCOMING else 0) +
-            (if (domain.playFromStart) FLAG_PLAY_FROM_START else 0)
+        makeFlags(
+            FLAG_WATCHED to domain.watched,
+            FLAG_STARRED to domain.starred,
+            FLAG_LIVE to domain.isLiveBroadcast,
+            FLAG_LIVE_UPCOMING to domain.isLiveBroadcastUpcoming,
+            FLAG_PLAY_FROM_START to domain.playFromStart
+        )
 }

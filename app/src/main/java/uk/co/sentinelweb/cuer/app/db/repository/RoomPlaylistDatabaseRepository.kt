@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.Companion.FLAG_DEFAULT
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
@@ -186,10 +187,10 @@ class RoomPlaylistDatabaseRepository constructor(
                                     .mapDeep()
                             is DefaultFilter ->
                                 if (flat) playlistDao
-                                    .loadAllByFlags(PlaylistEntity.FLAG_DEFAULT)
+                                    .loadAllByFlags(FLAG_DEFAULT)
                                     .mapFlat()
                                 else playlistDao
-                                    .loadAllByFlagsWithItems(PlaylistEntity.FLAG_DEFAULT)
+                                    .loadAllByFlagsWithItems(FLAG_DEFAULT)
                                     .mapDeep()
                             is AllFilter ->
                                 if (flat) playlistDao
@@ -295,7 +296,7 @@ class RoomPlaylistDatabaseRepository constructor(
                     else -> throw UnsupportedOperationException("$filter not supported")
                 }
             } catch (e: Throwable) {
-                val msg = "couldn't delete all media"
+                val msg = "couldn't load playlist stats "
                 log.e(msg, e)
                 RepoResult.Error<List<PlaylistStatDomain>>(e, msg)
             }.also { database.endTransaction() }
@@ -310,7 +311,7 @@ class RoomPlaylistDatabaseRepository constructor(
                     else -> throw InvalidClassException("update object not valid: ${update::class.simpleName}")
                 }
             } catch (e: Throwable) {
-                val msg = "couldn't delete all channels"
+                val msg = "couldn't update playlist $update"
                 log.e(msg, e)
                 RepoResult.Error<PlaylistDomain>(e, msg)
             }
@@ -328,7 +329,7 @@ class RoomPlaylistDatabaseRepository constructor(
                         }
                     }
             } catch (e: Exception) {
-                val msg = "couldn't delete all media"
+                val msg = "couldn't update current index $update"
                 log.e(msg, e)
                 RepoResult.Error<PlaylistDomain>(e, msg)
             }

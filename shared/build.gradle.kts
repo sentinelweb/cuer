@@ -24,6 +24,7 @@ val ver_mockserver: String by project
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
+val ver_kotlin_fixture: String by project
 
 version = "1.0"
 
@@ -94,6 +95,7 @@ kotlin {
                 // Koin for JUnit 4
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
+                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
                 implementation("com.google.truth:truth:$ver_truth")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
                 implementation("app.cash.turbine:turbine:$ver_turbine")

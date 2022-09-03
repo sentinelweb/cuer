@@ -4,14 +4,14 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabase.Companion.INITIAL_ID
 import uk.co.sentinelweb.cuer.app.db.entity.ChannelEntity
 import uk.co.sentinelweb.cuer.app.db.entity.MediaAndChannel
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity
-import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_ARCHIVED
-import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_DEFAULT
-import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_PLAY_ITEMS_FROM_START
-import uk.co.sentinelweb.cuer.app.db.entity.PlaylistEntity.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.app.db.entity.PlaylistItemEntity
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.Companion.FLAG_ARCHIVED
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.Companion.FLAG_DEFAULT
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.Companion.FLAG_PLAY_ITEMS_FROM_START
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.Companion.FLAG_STARRED
 
 class PlaylistMapper(
     private val imageMapper: ImageMapper,
