@@ -2,21 +2,28 @@ package uk.co.sentinelweb.cuer.db.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
+import uk.co.sentinelweb.cuer.db.mapper.PlaylistMapper
 import uk.co.sentinelweb.cuer.db.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class SqldelightPlaylistDatabaseRepository(
     private val database: Database,
-    private val mediaDatabaseRepository: SqldelightChannelDatabaseRepository,
+    private val channelDatabaseRepository: SqldelightChannelDatabaseRepository,
+    private val mediaDatabaseRepository: SqldelightMediaDatabaseRepository,
+    private val imageDatabaseRepository: SqldelightImageDatabaseRepository,
+    private val playlistMapper: PlaylistMapper,
     private val playlistItemMapper: PlaylistItemMapper,
     private val mediaUpdateMapper: MediaUpdateMapper,
     private val coProvider: CoroutineContextProvider,
@@ -50,9 +57,12 @@ class SqldelightPlaylistDatabaseRepository(
         TODO("Not yet implemented")
     }
 
-    override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistDomain> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistDomain> =
+        if (flat) {
+            loadPlaylist(id)
+        } else {
+            loadPlaylist(id) // todo items
+        }
 
     override suspend fun loadList(
         filter: OrchestratorContract.Filter?,
@@ -85,4 +95,31 @@ class SqldelightPlaylistDatabaseRepository(
         TODO("Not yet implemented")
     }
 
+    private suspend fun loadPlaylist(id: Long): RepoResult<PlaylistDomain> =
+        withContext(coProvider.IO) {
+            loadPlaylistInternal(id)
+        }
+
+    private fun loadPlaylistInternal(id: Long) = try {
+        database.playlistEntityQueries
+            .load(id)
+            .executeAsOneOrNull()!!
+            .let { entity: Playlist -> fillAndMapEntity(entity, listOf()) }
+            .let { domain: PlaylistDomain -> RepoResult.Data(domain) }
+    } catch (e: Throwable) {
+        val msg = "couldn't load playlist:$id"
+        log.e(msg, e)
+        RepoResult.Error<PlaylistDomain>(e, msg)
+    }
+
+    private fun fillAndMapEntity(
+        playlist: Playlist,
+        items: List<PlaylistItemDomain>
+    ): PlaylistDomain = playlistMapper.map(
+        playlist,
+        items,
+        playlist.channel_id?.let { channelDatabaseRepository.loadChannelInternal(it).data!!},
+        imageDatabaseRepository.loadEntity(playlist.thumb_id),
+        imageDatabaseRepository.loadEntity(playlist.image_id),
+    )
 }

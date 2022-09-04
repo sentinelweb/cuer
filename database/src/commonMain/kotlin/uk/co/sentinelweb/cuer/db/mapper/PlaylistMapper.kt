@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.db.mapper
 import uk.co.sentinelweb.cuer.database.entity.Image
 import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.Companion.FLAG_ARCHIVED
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.Companion.FLAG_DEFAULT
@@ -20,7 +19,7 @@ class PlaylistMapper(
     fun map(
         entity: Playlist,
         items: List<PlaylistItemDomain>,
-        channelDomain: ChannelDomain,
+        channelDomain: ChannelDomain?,
         thumbEntity: Image?,
         imageEntity: Image?
     ) = PlaylistDomain(

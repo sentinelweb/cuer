@@ -1,13 +1,12 @@
 package uk.co.sentinelweb.cuer.db.mapper
 
-import uk.co.sentinelweb.cuer.database.entity.Media
 import uk.co.sentinelweb.cuer.database.entity.Playlist_item
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain.Companion.FLAG_ARCHIVED
 import uk.co.sentinelweb.cuer.domain.ext.hasFlag
 
-class PlaylistItemMapper() {
+class PlaylistItemMapper {
     fun map(entity: Playlist_item, mediaDomain: MediaDomain) = PlaylistItemDomain(
         id = entity.id,
         media = mediaDomain,

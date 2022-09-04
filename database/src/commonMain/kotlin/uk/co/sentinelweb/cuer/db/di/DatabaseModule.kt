@@ -2,14 +2,10 @@ package uk.co.sentinelweb.cuer.db.di
 
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.db.factory.DatabaseFactory
-import uk.co.sentinelweb.cuer.db.mapper.ChannelMapper
-import uk.co.sentinelweb.cuer.db.mapper.ImageMapper
-import uk.co.sentinelweb.cuer.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.app.db.repository.*
+import uk.co.sentinelweb.cuer.db.mapper.*
+import uk.co.sentinelweb.cuer.db.repository.*
 import uk.co.sentinelweb.cuer.db.update.MediaUpdateMapper
-import uk.co.sentinelweb.cuer.db.repository.SqldelightChannelDatabaseRepository
-import uk.co.sentinelweb.cuer.db.repository.SqldelightImageDatabaseRepository
-import uk.co.sentinelweb.cuer.db.repository.SqldelightMediaDatabaseRepository
 
 object DatabaseModule {
 
@@ -18,6 +14,8 @@ object DatabaseModule {
     }
 
     private val mapperModule = module {
+        factory { PlaylistMapper(get()) }
+        factory { PlaylistItemMapper() }
         factory { MediaMapper(get()) }
         factory { ChannelMapper(get()) }
         factory { ImageMapper() }
@@ -25,6 +23,10 @@ object DatabaseModule {
     }
 
     private val repoModule = module {
+        single { SqldelightPlaylistDatabaseRepository(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+        single<PlaylistDatabaseRepository> { get<SqldelightPlaylistDatabaseRepository>() }
+        single { SqldelightPlaylistItemDatabaseRepository(get(), get(), get(), get(), get(), get()) }
+        single<PlaylistItemDatabaseRepository> { get<SqldelightPlaylistItemDatabaseRepository>() }
         single { SqldelightMediaDatabaseRepository(get(), get(), get(), get(), get(), get(), get()) }
         single<MediaDatabaseRepository> { get<SqldelightMediaDatabaseRepository>() }
         single { SqldelightChannelDatabaseRepository(get(), get(), get(), get(), get()) }

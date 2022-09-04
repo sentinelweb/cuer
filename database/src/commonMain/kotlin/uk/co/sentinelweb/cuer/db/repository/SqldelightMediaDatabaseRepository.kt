@@ -217,7 +217,7 @@ class SqldelightMediaDatabaseRepository(
         }
     }
 
-    internal suspend fun loadMedia(id: Long): RepoResult<MediaDomain> =
+    private suspend fun loadMedia(id: Long): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             loadMediaInternal(id)
         }
