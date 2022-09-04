@@ -63,7 +63,11 @@ class PlaylistItemEntityTest : KoinTest {
     @Test
     fun updateEntity() {
         val (_, initial) = createPlaylistAndItem()
-        val updated = fixture<Playlist_item>().copy(id = initial.id, media_id = initial.media_id, playlist_id = initial.playlist_id)
+        val updated = fixture<Playlist_item>().copy(
+            id = initial.id,
+            media_id = initial.media_id,
+            playlist_id = initial.playlist_id
+        )
         database.playlistItemEntityQueries.update(updated)
 
         val actual = database.playlistItemEntityQueries.load(initial.id).executeAsOne()
@@ -73,20 +77,21 @@ class PlaylistItemEntityTest : KoinTest {
     @Test
     fun loadAllByIds() {
         val (_, item0) = createPlaylistAndItem()
-        val item1 = createPlaylistItem(item0.playlist_id)
+        createPlaylistItem(item0.playlist_id)
         val item2 = createPlaylistItem(item0.playlist_id)
 
-        val actual = database.playlistItemEntityQueries.loadAllByIds(listOf(1,3)).executeAsList()
+        val actual = database.playlistItemEntityQueries.loadAllByIds(listOf(1, 3)).executeAsList()
         assertEquals(listOf(item0, item2), actual)
     }
 
     @Test
     fun loadItemsByMediaId() {
         val (_, item0) = createPlaylistAndItem()
-        val item1 = createPlaylistItem(item0.playlist_id)
+        createPlaylistItem(item0.playlist_id)
         val item2 = createPlaylistItem(item0.playlist_id)
 
-        val actual = database.playlistItemEntityQueries.loadItemsByMediaId(listOf(item0.media_id,item2.media_id)).executeAsList()
+        val actual = database.playlistItemEntityQueries.loadItemsByMediaId(listOf(item0.media_id, item2.media_id))
+            .executeAsList()
         assertEquals(listOf(item0, item2), actual)
     }
 
@@ -94,14 +99,32 @@ class PlaylistItemEntityTest : KoinTest {
     fun delete() {
         val (_, item0) = createPlaylistAndItem()
         database.playlistItemEntityQueries.delete(item0.id)
-        val actual = database.playlistItemEntityQueries.load(item0.id,).executeAsOneOrNull()
-        assertNull( actual)
+        val actual = database.playlistItemEntityQueries.load(item0.id).executeAsOneOrNull()
+        assertNull(actual)
+    }
+
+    @Test
+    fun deleteAll() {
+        val (_, item0) = createPlaylistAndItem()
+        createPlaylistItem(item0.playlist_id)
+        createPlaylistItem(item0.playlist_id)
+        database.playlistItemEntityQueries.deleteAll()
+        val actual = database.playlistItemEntityQueries.loadAll().executeAsList()
+        assertEquals(0, actual.size)
+    }
+
+    @Test
+    fun deleteCascade() {
+        val (_, item0) = createPlaylistAndItem()
+        database.playlistEntityQueries.delete(item0.playlist_id)
+        val actual = database.playlistItemEntityQueries.load(item0.id).executeAsOneOrNull()
+        assertNull(actual)
     }
 
     @Test
     fun deletePlaylistItems() {
-        val (playlist0, item0) = createPlaylistAndItem()
-        val (playlist1, item1) = createPlaylistAndItem()
+        val (playlist0, _) = createPlaylistAndItem()
+        val (_, item1) = createPlaylistAndItem()
 
         database.playlistItemEntityQueries.deletePlaylistItems(playlist0.id)
 
@@ -115,25 +138,23 @@ class PlaylistItemEntityTest : KoinTest {
         val (_, item0) = createPlaylistAndItem()
         val item1 = createPlaylistItem(item0.playlist_id)
         val item2 = createPlaylistItem(item0.playlist_id)
-        val updated0 = fixture<Playlist_item>().copy(id = item0.id, media_id = item0.media_id, playlist_id = item0.playlist_id, flags = FLAG_WATCHED)
-        database.playlistItemEntityQueries.update(updated0)
-        val updated1 = fixture<Playlist_item>().copy(id = item1.id, media_id = item1.media_id, playlist_id = item1.playlist_id, flags = FLAG_WATCHED)
-        database.playlistItemEntityQueries.update(updated1)
-        val updated2 = fixture<Playlist_item>().copy(id = item2.id, media_id = item2.media_id, playlist_id = item2.playlist_id, flags = 0L)
-        database.playlistItemEntityQueries.update(updated2)
+        with(database.mediaEntityQueries) {
+            updatePosition(Clock.System.now(), 22L, 1000, flags = FLAG_WATCHED, item0.media_id)
+            updatePosition(Clock.System.now(), 22L, 1000, flags = FLAG_WATCHED, item1.media_id)
+            updatePosition(Clock.System.now(), 22L, 1000, flags = 0L, item2.media_id)
+        }
 
         val actual = database.playlistItemEntityQueries.countMediaFlags(item0.playlist_id, FLAG_WATCHED).executeAsOne()
         assertEquals(2, actual.toInt())
     }
 
     @Test
-    fun count() {
+    fun countItemsInPlaylist() {
         val (_, item0) = createPlaylistAndItem()
-        val (playlist1, item1) = createPlaylistAndItem()
-        val item01 = createPlaylistItem(item0.playlist_id)
+        createPlaylistItem(item0.playlist_id)
+        createPlaylistAndItem()
 
-
-        val actual = database.playlistItemEntityQueries.countItems(item0.playlist_id).executeAsOne()
+        val actual = database.playlistItemEntityQueries.countItemsInPlaylist(item0.playlist_id).executeAsOne()
         assertEquals(2, actual.toInt())
     }
 
@@ -143,11 +164,12 @@ class PlaylistItemEntityTest : KoinTest {
         val item1 = createPlaylistItem(item0.playlist_id)
         val item2 = createPlaylistItem(item0.playlist_id)
         val item3 = createPlaylistItem(item0.playlist_id)
-        database.mediaEntityQueries.updatePosition(Clock.System.now(), 22L, 1000, flags = 0L, item0.media_id)
-        database.mediaEntityQueries.updatePosition(Clock.System.now(), 22L, 1000, flags = 0L, item1.media_id)
-        database.mediaEntityQueries.updatePosition(Clock.System.now(), 22L, 1000, flags = 0L, item2.media_id)
-        database.mediaEntityQueries.updatePosition(Clock.System.now(), 22L, 1000, flags = FLAG_WATCHED, item3.media_id)
-
+        with(database.mediaEntityQueries) {
+            updatePosition(Clock.System.now(), 22L, 1000, flags = 0L, item0.media_id)
+            updatePosition(Clock.System.now(), 22L, 1000, flags = 0L, item1.media_id)
+            updatePosition(Clock.System.now(), 22L, 1000, flags = 0L, item2.media_id)
+            updatePosition(Clock.System.now(), 22L, 1000, flags = FLAG_WATCHED, item3.media_id)
+        }
         val actual = database.playlistItemEntityQueries.loadAllPlaylistItemsWithNewMedia(2).executeAsList()
         assertEquals(2, actual.size)
         val actual1 = database.playlistItemEntityQueries.loadAllPlaylistItemsWithNewMedia(4).executeAsList()
@@ -161,11 +183,12 @@ class PlaylistItemEntityTest : KoinTest {
         val item2 = createPlaylistItem(item0.playlist_id)
         val item3 = createPlaylistItem(item0.playlist_id)
         val dateLastPlayed = Clock.System.now()
-        database.mediaEntityQueries.updatePosition(dateLastPlayed.minus(1, SECOND), 22L, 1000, flags = FLAG_WATCHED, item0.media_id)
-        database.mediaEntityQueries.updatePosition(dateLastPlayed, 22L, 1000, flags = FLAG_WATCHED, item1.media_id)
-        database.mediaEntityQueries.updatePosition(dateLastPlayed.minus(2, SECOND), 22L, 1000, flags = FLAG_WATCHED, item2.media_id)
-        database.mediaEntityQueries.updatePosition(dateLastPlayed, 22L, 1000, flags = 0, item3.media_id)
-
+        with(database.mediaEntityQueries) {
+            updatePosition(dateLastPlayed.minus(1, SECOND), 22L, 1000, flags = FLAG_WATCHED, item0.media_id)
+            updatePosition(dateLastPlayed, 22L, 1000, flags = FLAG_WATCHED, item1.media_id)
+            updatePosition(dateLastPlayed.minus(2, SECOND), 22L, 1000, flags = FLAG_WATCHED, item2.media_id)
+            updatePosition(dateLastPlayed, 22L, 1000, flags = 0, item3.media_id)
+        }
         val actual = database.playlistItemEntityQueries.loadAllPlaylistItemsRecent(4).executeAsList()
         assertEquals(3, actual.size)
         assertEquals(item1, actual[0])
@@ -173,7 +196,51 @@ class PlaylistItemEntityTest : KoinTest {
         assertEquals(item2, actual[2])
     }
 
-    private fun createPlaylistAndItem(): Pair<Playlist,Playlist_item> {
+    @Test
+    fun search() {
+        val (_, item0) = createPlaylistAndItem()
+        val item1 = createPlaylistItem(item0.playlist_id)
+        createPlaylistItem(item0.playlist_id)
+        createPlaylistItem(item0.playlist_id)
+        val media1 = database.mediaEntityQueries.loadById(item1.media_id).executeAsOne()
+        val actual = database.playlistItemEntityQueries
+            .search(media1.title!!.substring(2, 10), 2)
+            .executeAsList()
+        assertEquals(1, actual.size)
+        assertEquals(item1, actual[0])
+    }
+
+    @Test
+    fun searchPlaylist() {
+        val (_, item0) = createPlaylistAndItem()
+        val (_, item1) = createPlaylistAndItem()
+        val media0 = database.mediaEntityQueries.loadById(item0.media_id).executeAsOne()
+        database.mediaEntityQueries.update(media0.copy(id = item1.media_id)) // media0 == media1
+
+        val actual = database.playlistItemEntityQueries
+            .searchPlaylists(media0.title!!.substring(2, 10), listOf(item0.playlist_id), 2)
+            .executeAsList()
+        assertEquals(1, actual.size)
+        assertEquals(item0, actual[0])
+    }
+
+    @Test
+    fun loadAllByPlatformIds() {
+        val (_, item0) = createPlaylistAndItem()
+        val (_, item1) = createPlaylistAndItem()
+        val (_, item2) = createPlaylistAndItem()
+        val medias = database.mediaEntityQueries.loadAll().executeAsList()
+
+        val actual = database.playlistItemEntityQueries
+            .loadAllByPlatformIds(medias.map { it.platform_id })
+            .executeAsList()
+        assertEquals(3, actual.size)
+        assertEquals(item0, actual[0])
+        assertEquals(item1, actual[1])
+        assertEquals(item2, actual[2])
+    }
+
+    private fun createPlaylistAndItem(): Pair<Playlist, Playlist_item> {
         val playlist = createPlaylist()
         val item = createPlaylistItem(playlist.id)
         return playlist to item
@@ -201,6 +268,4 @@ class PlaylistItemEntityTest : KoinTest {
         val item = initial.copy(id = insertId)
         return item
     }
-
-    // todo test delete cascade playlist-> playlist-item
 }

@@ -57,7 +57,7 @@ loadAllByFlags:
 SELECT * FROM playlist WHERE flags & :flags == :flags;
 
 delete:
-DELETE FROM playlist_item WHERE id = ?;
+DELETE FROM playlist WHERE id = ?;
 
 deleteAll:
 DELETE FROM playlist;
@@ -65,8 +65,14 @@ DELETE FROM playlist;
 updateIndex:
 UPDATE playlist SET currentIndex=:index WHERE id=:id;
 
-findPlaylistsForChannePlatformlId:
-SELECT DISTINCT playlist.* FROM playlist, playlist_item, media, channel WHERE playlist.id==playlist_item.playlist_id AND playlist_item.media_id==media.id AND media.channel_id==channel.id AND channel.platform_id=:channelId;
+findPlaylistsForChannelPlatformId:
+SELECT DISTINCT playlist.*
+FROM playlist, playlist_item, media, channel
+WHERE
+    playlist.id==playlist_item.playlist_id
+    AND playlist_item.media_id==media.id
+    AND media.channel_id==channel.id
+    AND channel.platform_id=:channelId;
 
 findPlaylistsWithTitle:
 SELECT * FROM playlist WHERE INSTR(LOWER(title), LOWER(:title));

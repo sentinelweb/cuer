@@ -54,7 +54,7 @@ DELETE FROM playlist_item;
 countMediaFlags:
 SELECT count() FROM playlist_item,media WHERE playlist_item.playlist_id=:playlistId AND media.id=playlist_item.media_id AND media.flags & :flags == :flags;
 
-countItems:
+countItemsInPlaylist:
 SELECT count() FROM playlist_item WHERE playlist_id ==:playlistId;
 
 loadAllPlaylistItemsWithNewMedia:
@@ -67,7 +67,7 @@ search:
 SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),:text) AND media.id = playlist_item.media_id ORDER BY media.date_last_played DESC LIMIT :limit;
 
 searchPlaylists:
-SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),LOWER(:text)) AND playlist_item.playlist_id IN (:playlistIds) AND media.id = playlist_item.media_id ORDER BY media.date_last_played DESC LIMIT :limit;
+SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),LOWER(:text)) AND playlist_item.playlist_id IN :playlistIds AND media.id = playlist_item.media_id ORDER BY media.date_last_played DESC LIMIT :limit;
 
 loadAllByPlatformIds:
-SELECT playlist_item.* FROM playlist_item, media WHERE media.platform_id IN (:platformIds) AND media.id = playlist_item.media_id;
+SELECT playlist_item.* FROM playlist_item, media WHERE media.platform_id IN :platformIds AND media.id = playlist_item.media_id;
