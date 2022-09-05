@@ -17,7 +17,7 @@ class PlaylistItemMapper {
     )
 
     fun map(domain: PlaylistItemDomain) = Playlist_item(
-        id = domain.id?:0,
+        id = domain.id ?: 0,
         flags = mapFlags(domain),
         media_id = domain.media.id ?: throw IllegalArgumentException("No media id"),
         ordering = domain.order,
@@ -25,6 +25,6 @@ class PlaylistItemMapper {
         date_added = domain.dateAdded
     )
 
-    private fun mapFlags(domain: PlaylistItemDomain):Long =
+    private fun mapFlags(domain: PlaylistItemDomain): Long =
         (if (domain.archived) FLAG_ARCHIVED else 0)
 }

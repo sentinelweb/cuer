@@ -1,8 +1,8 @@
 package uk.co.sentinelweb.cuer.db.di
 
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.db.factory.DatabaseFactory
 import uk.co.sentinelweb.cuer.app.db.repository.*
+import uk.co.sentinelweb.cuer.db.factory.DatabaseFactory
 import uk.co.sentinelweb.cuer.db.mapper.*
 import uk.co.sentinelweb.cuer.db.repository.*
 import uk.co.sentinelweb.cuer.db.update.MediaUpdateMapper
@@ -23,9 +23,13 @@ object DatabaseModule {
     }
 
     private val repoModule = module {
-        single { SqldelightPlaylistDatabaseRepository(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+        single {
+            SqldelightPlaylistDatabaseRepository(
+                get(), get(), get(), get(), get(), get(), get(), get(), get(), get()
+            )
+        }
         single<PlaylistDatabaseRepository> { get<SqldelightPlaylistDatabaseRepository>() }
-        single { SqldelightPlaylistItemDatabaseRepository(get(), get(), get(), get(), get(), get()) }
+        single { SqldelightPlaylistItemDatabaseRepository(get(), get(), get(), get(), get()) }
         single<PlaylistItemDatabaseRepository> { get<SqldelightPlaylistItemDatabaseRepository>() }
         single { SqldelightMediaDatabaseRepository(get(), get(), get(), get(), get(), get(), get()) }
         single<MediaDatabaseRepository> { get<SqldelightMediaDatabaseRepository>() }
