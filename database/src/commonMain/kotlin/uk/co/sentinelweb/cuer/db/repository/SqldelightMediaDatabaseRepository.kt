@@ -198,7 +198,7 @@ class SqldelightMediaDatabaseRepository(
     private fun loadMediaInternal(id: Long) = try {
         database.mediaEntityQueries
             .loadById(id)
-            .executeAsOneOrNull()!!
+            .executeAsOne()
             .let { media: Media -> fillAndMapEntity(media) }
             .let { media: MediaDomain -> RepoResult.Data(media) }
     } catch (e: Throwable) {

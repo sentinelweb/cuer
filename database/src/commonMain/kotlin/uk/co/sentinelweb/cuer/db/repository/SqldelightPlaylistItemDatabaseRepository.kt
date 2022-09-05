@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -27,11 +27,11 @@ class SqldelightPlaylistItemDatabaseRepository(
         log.tag(this)
     }
 
-    val _updatesFlow = MutableSharedFlow<Pair<OrchestratorContract.Operation, PlaylistItemDomain>>()
-    override val updates: Flow<Pair<OrchestratorContract.Operation, PlaylistItemDomain>>
+    val _updatesFlow = MutableSharedFlow<Pair<Operation, PlaylistItemDomain>>()
+    override val updates: Flow<Pair<Operation, PlaylistItemDomain>>
         get() = _updatesFlow
 
-    override val stats: Flow<Pair<OrchestratorContract.Operation, Nothing>>
+    override val stats: Flow<Pair<Operation, Nothing>>
         get() = TODO("Not yet implemented")
 
     override suspend fun save(
@@ -89,7 +89,7 @@ class SqldelightPlaylistItemDatabaseRepository(
         flat: Boolean,
         emit: Boolean
     ): RepoResult<List<PlaylistItemDomain>> = withContext(coProvider.IO) {
-        database.mediaEntityQueries.transactionWithResult<RepoResult<List<PlaylistItemDomain>>> {
+        database.playlistItemEntityQueries.transactionWithResult<RepoResult<List<PlaylistItemDomain>>> {
             try {
                 val checkOrderAndPlaylist: MutableSet<String> = mutableSetOf()
                 domains
@@ -101,14 +101,19 @@ class SqldelightPlaylistItemDatabaseRepository(
                         }
                     }
                     .let { itemDomains ->
-                        itemDomains.filter { it.media.id == null || !flat }
+                        itemDomains
+                            .filter { it.media.id == null || !flat }
                             .takeIf { it.size > 0 }
                             ?.let {
                                 mediaDatabaseRepository
                                     .saveMediasInternal(it.map { it.media }, false)
                                     .associateBy { it.platformId }
                             }?.let { lookup ->
-                                itemDomains.map { if (it.media.id == null) it.copy(media = lookup.get(it.media.platformId)!!) else it }
+                                itemDomains.map {
+                                    if (it.media.id == null)
+                                        it.copy(media = lookup.get(it.media.platformId)!!)
+                                    else it
+                                }
                             }
                             ?: itemDomains
                     }
@@ -145,7 +150,7 @@ class SqldelightPlaylistItemDatabaseRepository(
             } catch (e: Throwable) {
                 val msg = "Couldn't save playlist items"
                 log.e(msg, e)
-                RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
+                rollback(RepoResult.Error<List<PlaylistItemDomain>>(e, msg))
             }
         }.also {
             it.takeIf { it.isSuccessful && emit }
@@ -157,34 +162,94 @@ class SqldelightPlaylistItemDatabaseRepository(
     override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistItemDomain> =
         withContext(coProvider.IO) {
             try {
-                database.playlistItemEntityQueries.load(id).executeAsOne()
+                database.playlistItemEntityQueries.load(id)
+                    .executeAsOne()
                     .let { playlistItemMapper.map(it, mediaDatabaseRepository.load(it.media_id).data!!) }
                     .let { RepoResult.Data(it) }
             } catch (e: Throwable) {
-                val msg = "couldn't save playlist item"
+                val msg = "couldn't load playlist item $id"
                 log.e(msg, e)
                 RepoResult.Error<PlaylistItemDomain>(e, msg)
             }
         }
 
     override suspend fun loadList(
-        filter: OrchestratorContract.Filter?,
+        filter: Filter?,
         flat: Boolean
-    ): RepoResult<List<PlaylistItemDomain>> {
+    ): RepoResult<List<PlaylistItemDomain>> =
+        withContext(coProvider.IO) {
+            try {
+                with(database.playlistItemEntityQueries) {
+                    when (filter) {
+                        // todo load media list (dont map!)
+                        is IdListFilter ->
+                            loadAllByIds(filter.ids)
+
+                        is MediaIdListFilter ->
+                            loadItemsByMediaId(filter.ids)
+
+                        is NewMediaFilter ->
+                            loadAllPlaylistItemsWithNewMedia(200)
+
+                        is RecentMediaFilter ->
+                            loadAllPlaylistItemsRecent(200)
+
+                        is SearchFilter -> {
+                            val playlistIds = filter.playlistIds
+                            if (playlistIds.isNullOrEmpty()) {
+                                search(filter.text.toLowerCase(), 200)
+                            } else {
+                                searchPlaylists(filter.text.toLowerCase(), playlistIds, 200)
+                            }
+                        }
+
+                        is PlatformIdListFilter ->
+                            loadAllByPlatformIds(filter.ids)
+
+                        else -> loadAll()
+
+                    }.executeAsList()
+                        .map {
+                            playlistItemMapper.map(
+                                it,
+                                mediaDatabaseRepository.load(it.media_id, false).data!!
+                            )
+                        }
+                        .let { RepoResult.Data(it) }
+                }
+            } catch (e: Throwable) {
+                val msg = "couldn't load playlist item list for: $filter"
+                log.e(msg, e)
+                RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
+            }
+        }
+
+    override suspend fun loadStatsList(filter: Filter?): RepoResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun loadStatsList(filter: OrchestratorContract.Filter?): RepoResult<List<Nothing>> {
+    override suspend fun count(filter: Filter?): RepoResult<Int> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun delete(domain: PlaylistItemDomain, emit: Boolean): RepoResult<Boolean> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun delete(domain: PlaylistItemDomain, emit: Boolean): RepoResult<Boolean> =
+        withContext(coProvider.IO) {
+            try {
+                domain
+                    .let { playlistItemMapper.map(it) }
+                    .also { database.playlistItemEntityQueries.delete(it.id) }
+                    .also {
+                        if (emit) {
+                            _updatesFlow.emit(Operation.DELETE to domain)
+                        }
+                    }
+                RepoResult.Data.Empty(true)
+            } catch (e: Throwable) {
+                val msg = "couldn't delete ${domain.id}"
+                log.e(msg, e)
+                RepoResult.Error<Boolean>(e, msg)
+            }
+        }
 
     override suspend fun deleteAll(): RepoResult<Boolean> {
         TODO("Not yet implemented")
