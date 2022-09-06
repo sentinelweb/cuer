@@ -36,8 +36,11 @@ SELECT * FROM playlist_item WHERE id = ?;
 loadAll:
 SELECT * FROM playlist_item;
 
+loadPlaylist:
+SELECT * FROM playlist_item WHERE playlist_id = :playlistId;
+
 loadAllByIds:
-SELECT * FROM playlist_item  WHERE id IN :playlistItemIds;
+SELECT * FROM playlist_item WHERE id IN :playlistItemIds;
 
 loadItemsByMediaId:
 SELECT * FROM playlist_item WHERE media_id IN :mediaIds;

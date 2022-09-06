@@ -6,8 +6,9 @@ import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.database.entity.Media
 import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.database.entity.Playlist_item
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
-class DataCreation(private val database:Database, private val fixture:Fixture) {
+class DataCreation(private val database: Database, private val fixture: Fixture) {
     fun createPlaylistAndItem(): Pair<Playlist, Playlist_item> {
         val playlist = createPlaylist()
         val item = createPlaylistItem(playlist.id)
@@ -35,3 +36,26 @@ class DataCreation(private val database:Database, private val fixture:Fixture) {
         return initial.copy(id = insertId)
     }
 }
+
+fun PlaylistDomain.resetIds() = copy(
+    id = null,
+    channelData = channelData?.copy(id = null),
+    parentId = null,
+    thumb = thumb?.copy(id = null),
+    image = image?.copy(id = null),
+    items = items.map {
+        it.copy(
+            id = null,
+            media = it.media.copy(
+                id = null,
+                thumbNail = it.media.thumbNail?.copy(id = null),
+                image = it.media.image?.copy(id = null),
+                channelData = it.media.channelData.copy(
+                    id = null,
+                    thumbNail = it.media.channelData.thumbNail?.copy(id = null),
+                    image = it.media.channelData.image?.copy(id = null)
+                )
+            )
+        )
+    }
+)

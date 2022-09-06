@@ -91,62 +91,7 @@ class SqldelightPlaylistItemDatabaseRepository(
     ): RepoResult<List<PlaylistItemDomain>> = withContext(coProvider.IO) {
         database.playlistItemEntityQueries.transactionWithResult<RepoResult<List<PlaylistItemDomain>>> {
             try {
-                val checkOrderAndPlaylist: MutableSet<String> = mutableSetOf()
-                domains
-                    .apply {
-                        forEach {
-                            val key = "${it.order}:${it.playlistId}"
-                            if (checkOrderAndPlaylist.contains(key)) throw IllegalStateException("Order / playlist is not unique")
-                            else checkOrderAndPlaylist.add(key)
-                        }
-                    }
-                    .let { itemDomains ->
-                        itemDomains
-                            .filter { it.media.id == null || !flat }
-                            .takeIf { it.size > 0 }
-                            ?.let {
-                                mediaDatabaseRepository
-                                    .saveMediasInternal(it.map { it.media }, false)
-                                    .associateBy { it.platformId }
-                            }?.let { lookup ->
-                                itemDomains.map {
-                                    if (it.media.id == null)
-                                        it.copy(media = lookup.get(it.media.platformId)!!)
-                                    else it
-                                }
-                            }
-                            ?: itemDomains
-                    }
-                    .let { itemDomains -> itemDomains to itemDomains.map { playlistItemMapper.map(it) } }
-                    .let { (domains, entities) ->
-                        with(database.playlistItemEntityQueries) {
-                            domains to entities.map { itemEntity ->
-                                if (itemEntity.id == 0L) {
-                                    load(itemEntity.id)// check record exists
-                                        .executeAsOneOrNull()
-                                        ?.also { update(it) }
-                                        ?: let {
-                                            create(itemEntity)
-                                            itemEntity.copy(id = getInsertId().executeAsOne())
-                                        }
-                                } else {
-                                    create(itemEntity)
-                                    itemEntity.copy(id = getInsertId().executeAsOne())
-                                }
-                            }
-                        }
-                    }
-                    .let { (domains, entities) ->
-                        entities.map { savedItem ->
-                            playlistItemMapper.map(
-                                savedItem,
-                                domains.find { it.media.id == savedItem.media_id }
-                                    ?.media
-                                    ?: throw IllegalStateException("Media id saved incorrectly")
-                            )
-                        }
-                    }
-                    .let { RepoResult.Data(it) }
+                saveListInternal(domains, flat)
             } catch (e: Throwable) {
                 val msg = "Couldn't save playlist items"
                 log.e(msg, e)
@@ -176,53 +121,55 @@ class SqldelightPlaylistItemDatabaseRepository(
     override suspend fun loadList(
         filter: Filter?,
         flat: Boolean
-    ): RepoResult<List<PlaylistItemDomain>> =
-        withContext(coProvider.IO) {
-            try {
-                with(database.playlistItemEntityQueries) {
-                    when (filter) {
-                        // todo load media list (dont map!)
-                        is IdListFilter ->
-                            loadAllByIds(filter.ids)
+    ): RepoResult<List<PlaylistItemDomain>> = withContext(coProvider.IO) {
+        try {
+            with(database.playlistItemEntityQueries) {
+                when (filter) {
+                    // todo load media list (dont map!)
+                    is IdListFilter ->
+                        loadAllByIds(filter.ids)
 
-                        is MediaIdListFilter ->
-                            loadItemsByMediaId(filter.ids)
+                    is PlaylistIdLFilter ->
+                        loadPlaylist(filter.id)
 
-                        is NewMediaFilter ->
-                            loadAllPlaylistItemsWithNewMedia(200)
+                    is MediaIdListFilter ->
+                        loadItemsByMediaId(filter.ids)
 
-                        is RecentMediaFilter ->
-                            loadAllPlaylistItemsRecent(200)
+                    is NewMediaFilter ->
+                        loadAllPlaylistItemsWithNewMedia(200)
 
-                        is SearchFilter -> {
-                            val playlistIds = filter.playlistIds
-                            if (playlistIds.isNullOrEmpty()) {
-                                search(filter.text.toLowerCase(), 200)
-                            } else {
-                                searchPlaylists(filter.text.toLowerCase(), playlistIds, 200)
-                            }
+                    is RecentMediaFilter ->
+                        loadAllPlaylistItemsRecent(200)
+
+                    is SearchFilter -> {
+                        val playlistIds = filter.playlistIds
+                        if (playlistIds.isNullOrEmpty()) {
+                            search(filter.text.lowercase(), 200)
+                        } else {
+                            searchPlaylists(filter.text.lowercase(), playlistIds, 200)
                         }
+                    }
 
-                        is PlatformIdListFilter ->
-                            loadAllByPlatformIds(filter.ids)
+                    is PlatformIdListFilter ->
+                        loadAllByPlatformIds(filter.ids)
 
-                        else -> loadAll()
+                    else -> loadAll()
 
-                    }.executeAsList()
-                        .map {
-                            playlistItemMapper.map(
-                                it,
-                                mediaDatabaseRepository.load(it.media_id, false).data!!
-                            )
-                        }
-                        .let { RepoResult.Data(it) }
-                }
-            } catch (e: Throwable) {
-                val msg = "couldn't load playlist item list for: $filter"
-                log.e(msg, e)
-                RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
+                }.executeAsList()
+                    .map {
+                        playlistItemMapper.map(
+                            it,
+                            mediaDatabaseRepository.load(it.media_id, false).data!!
+                        )
+                    }
+                    .let { RepoResult.Data(it) }
             }
+        } catch (e: Throwable) {
+            val msg = "couldn't load playlist item list for: $filter"
+            log.e(msg, e)
+            RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
         }
+    }
 
     override suspend fun loadStatsList(filter: Filter?): RepoResult<List<Nothing>> {
         TODO("Not yet implemented")
@@ -262,4 +209,79 @@ class SqldelightPlaylistItemDatabaseRepository(
     ): RepoResult<PlaylistItemDomain> {
         TODO("Not yet implemented")
     }
+
+    internal fun saveListInternal(
+        domains: List<PlaylistItemDomain>,
+        flat: Boolean
+    ): RepoResult<List<PlaylistItemDomain>> {
+        val checkOrderAndPlaylist: MutableSet<String> = mutableSetOf()
+        return domains
+            .apply {
+                forEach {
+                    val key = "${it.order}:${it.playlistId}"
+                    if (checkOrderAndPlaylist.contains(key)) throw IllegalStateException("Order / playlist is not unique")
+                    else checkOrderAndPlaylist.add(key)
+                }
+            }
+            .let { itemDomains ->
+                itemDomains
+                    .filter { it.media.id == null || !flat }
+                    .takeIf { it.size > 0 }
+                    ?.let {
+                        mediaDatabaseRepository
+                            .saveMediasInternal(it.map { it.media }, false)
+                            .associateBy { it.platformId }
+                    }?.let { lookup ->
+                        itemDomains.map {
+                            if (it.media.id == null)
+                                it.copy(media = lookup.get(it.media.platformId)!!)
+                            else it
+                        }
+                    }
+                    ?: itemDomains
+            }
+            .let { itemDomains -> itemDomains to itemDomains.map { playlistItemMapper.map(it) } }
+            .let { (domains, entities) ->
+                with(database.playlistItemEntityQueries) {
+                    domains to entities.map { itemEntity ->
+                        if (itemEntity.id == 0L) {
+                            load(itemEntity.id)// check record exists
+                                .executeAsOneOrNull()
+                                ?.also { update(it) }
+                                ?: let {
+                                    create(itemEntity)
+                                    itemEntity.copy(id = getInsertId().executeAsOne())
+                                }
+                        } else {
+                            create(itemEntity)
+                            itemEntity.copy(id = getInsertId().executeAsOne())
+                        }
+                    }
+                }
+            }
+            .let { (domains, entities) ->
+                entities.map { savedItem ->
+                    playlistItemMapper.map(
+                        savedItem,
+                        domains.find { it.media.id == savedItem.media_id }
+                            ?.media
+                            ?: throw IllegalStateException("Media id saved incorrectly")
+                    )
+                }
+            }
+            .let { RepoResult.Data(it) }
+    }
+
+    internal fun loadPlaylistItemsInternal(
+        playlistId: Long
+    ): List<PlaylistItemDomain> =
+        database.playlistItemEntityQueries
+            .loadPlaylist(playlistId)
+            .executeAsList()
+            .map {
+                playlistItemMapper.map(
+                    it,
+                    mediaDatabaseRepository.loadMediaInternal(it.media_id).data!!
+                )
+            }
 }

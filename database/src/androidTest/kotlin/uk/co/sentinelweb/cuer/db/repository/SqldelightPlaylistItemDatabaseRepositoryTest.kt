@@ -61,6 +61,21 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
+    fun loadFlat() = runTest {
+        val (_, itemEntity) = dataCreation.createPlaylistAndItem()
+        val expectedDomain = itemMapper.map(itemEntity, mediaRepo.load(itemEntity.media_id).data!!)
+        val actual = sut.load(itemEntity.id)
+        assertTrue(actual.isSuccessful)
+        assertEquals(expectedDomain, actual.data)
+    }
+
+    @Test
+    fun loadDoesntExist() = runTest {
+        val actual = sut.load(42)
+        assertFalse(actual.isSuccessful)
+    }
+
+    @Test
     fun createFlat() = runTest {
         val playlistEntity = dataCreation.createPlaylist()
         val toCreate =
@@ -177,21 +192,6 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
             assertTrue(created is RepoResult.Error)
             expectNoEvents()
         }
-    }
-
-    @Test
-    fun loadFlat() = runTest {
-        val (_, itemEntity) = dataCreation.createPlaylistAndItem()
-        val expectedDomain = itemMapper.map(itemEntity, mediaRepo.load(itemEntity.media_id).data!!)
-        val actual = sut.load(itemEntity.id)
-        assertTrue(actual.isSuccessful)
-        assertEquals(expectedDomain, actual.data)
-    }
-
-    @Test
-    fun loadDoesntExist() = runTest {
-        val actual = sut.load(42)
-        assertFalse(actual.isSuccessful)
     }
 
     @Test

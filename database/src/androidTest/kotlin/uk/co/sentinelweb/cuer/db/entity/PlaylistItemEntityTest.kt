@@ -85,6 +85,15 @@ class PlaylistItemEntityTest : KoinTest {
     }
 
     @Test
+    fun loadAllByPlaylistId() {
+        val (playlist0, item0) = dataCreation.createPlaylistAndItem()
+        dataCreation.createPlaylistAndItem()
+
+        val actual = database.playlistItemEntityQueries.loadPlaylist(playlist0.id).executeAsList()
+        assertEquals(listOf(item0), actual)
+    }
+
+    @Test
     fun loadItemsByMediaId() {
         val (_, item0) = dataCreation.createPlaylistAndItem()
         dataCreation.createPlaylistItem(item0.playlist_id)

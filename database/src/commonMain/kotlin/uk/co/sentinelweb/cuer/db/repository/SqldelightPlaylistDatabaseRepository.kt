@@ -12,10 +12,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FU
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.database.entity.Playlist
-import uk.co.sentinelweb.cuer.db.mapper.ChannelMapper
-import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistMapper
-import uk.co.sentinelweb.cuer.db.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
@@ -27,9 +24,6 @@ class SqldelightPlaylistDatabaseRepository(
     private val imageDatabaseRepository: SqldelightImageDatabaseRepository,
     private val itemDatabaseRepository: SqldelightPlaylistItemDatabaseRepository,
     private val playlistMapper: PlaylistMapper,
-    private val playlistItemMapper: PlaylistItemMapper,
-    private val channelMapper: ChannelMapper,
-    private val mediaUpdateMapper: MediaUpdateMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
 ) : PlaylistDatabaseRepository {
@@ -49,43 +43,51 @@ class SqldelightPlaylistDatabaseRepository(
         domain: PlaylistDomain,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<PlaylistDomain> =
-        withContext(coProvider.IO) {
-            try {
-                saveInternal(domain, flat)
-                    .let { RepoResult.Data(load(id = it, flat).data) }
-                    .also {
-                        if (emit) it.data
-                            ?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
-                    }
-            } catch (e: Exception) {
-                val msg = "couldn't save media: ${domain}"
-                log.e(msg, e)
-                RepoResult.Error<PlaylistDomain>(e, msg)
-            }
+    ): RepoResult<PlaylistDomain> = withContext(coProvider.IO) {
+        try {
+            saveInternal(domain, flat)
+                .let { RepoResult.Data(load(id = it, flat).data) }
+                .also {
+                    if (emit) it.data
+                        ?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
+                }
+        } catch (e: Exception) {
+            val msg = "couldn't save playlist: ${domain}"
+            log.e(msg, e)
+            RepoResult.Error<PlaylistDomain>(e, msg)
         }
+    }
 
     override suspend fun save(
         domains: List<PlaylistDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<List<PlaylistDomain>> {
-        TODO("Not yet implemented")
+    ): RepoResult<List<PlaylistDomain>> = withContext(coProvider.IO) {
+        // todo should be transactional - but its a lot of work ..
+        database.playlistItemEntityQueries.transactionWithResult<RepoResult<List<PlaylistDomain>>> {
+
+            try {
+                domains
+                    .map { saveInternal(it, flat) }
+                    .let { RepoResult.Data(it.map { loadPlaylistInternal(id = it, flat).data!! }) }
+            } catch (e: Exception) {
+                val msg = "couldn't save playlists: ${domains}"
+                log.e(msg, e)
+                RepoResult.Error<List<PlaylistDomain>>(e, msg)
+            }
+        }
+            .also {
+                if (emit) it.data
+                    ?.forEach { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
+            }
     }
 
-    override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistDomain> =
-        if (flat) {
-            loadPlaylist(id)
-        } else {
-            loadPlaylist(id) // todo items
-        }
+    override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistDomain> = loadPlaylist(id, flat)
 
     override suspend fun loadList(
         filter: OrchestratorContract.Filter?,
         flat: Boolean
-    ): RepoResult<List<PlaylistDomain>> {
-        TODO("Not yet implemented")
-    }
+    ): RepoResult<List<PlaylistDomain>> = TODO()
 
     override suspend fun loadStatsList(filter: OrchestratorContract.Filter?): RepoResult<List<PlaylistStatDomain>> {
         TODO("Not yet implemented")
@@ -111,22 +113,30 @@ class SqldelightPlaylistDatabaseRepository(
         TODO("Not yet implemented")
     }
 
-    private suspend fun loadPlaylist(id: Long): RepoResult<PlaylistDomain> =
+    private suspend fun loadPlaylist(id: Long, flat: Boolean): RepoResult<PlaylistDomain> =
         withContext(coProvider.IO) {
-            loadPlaylistInternal(id)
+            loadPlaylistInternal(id, flat)
         }
 
-    private fun loadPlaylistInternal(id: Long) = try {
-        database.playlistEntityQueries
-            .load(id)
-            .executeAsOneOrNull()!!
-            .let { entity: Playlist -> fillAndMapEntity(entity, listOf()) }
-            .let { domain: PlaylistDomain -> RepoResult.Data(domain) }
-    } catch (e: Throwable) {
-        val msg = "couldn't load playlist:$id"
-        log.e(msg, e)
-        RepoResult.Error<PlaylistDomain>(e, msg)
-    }
+    private fun loadPlaylistInternal(id: Long, flat: Boolean) =
+        try {
+            database.playlistEntityQueries
+                .load(id)
+                .executeAsOneOrNull()!!
+                .let { entity: Playlist ->
+                    fillAndMapEntity(
+                        entity,
+                        if (flat) listOf()
+                        else itemDatabaseRepository.loadPlaylistItemsInternal(entity.id)
+                    )
+                }
+                .let { domain: PlaylistDomain -> RepoResult.Data(domain) }
+        } catch (e: Throwable) {
+            val msg = "couldn't load playlist: $id"
+            log.e(msg, e)
+            RepoResult.Error<PlaylistDomain>(e, msg)
+        }
+
 
     private fun fillAndMapEntity(
         playlist: Playlist,
@@ -139,21 +149,17 @@ class SqldelightPlaylistDatabaseRepository(
         imageDatabaseRepository.loadEntity(playlist.image_id),
     )
 
-    private suspend fun saveInternal(domain: PlaylistDomain, flat: Boolean): Long =
+    private fun saveInternal(domain: PlaylistDomain, flat: Boolean): Long =
         domain
             .let {
-                if (!flat) {
-                    it.copy(channelData = it.channelData
-                        ?.let { channelDatabaseRepository.checkToSaveChannelInternal(it) })
-                } else it
+                it.copy(channelData = it.channelData
+                    ?.let { channelDatabaseRepository.checkToSaveChannelInternal(it) })
             }
             .let {
-                it.copy(thumb = it.thumb
-                    ?.let { imageDatabaseRepository.checkToSaveImage(it) })
+                it.copy(thumb = it.thumb?.let { imageDatabaseRepository.checkToSaveImage(it) })
             }
             .let {
-                it.copy(image = it.image
-                    ?.let { imageDatabaseRepository.checkToSaveImage(it) })
+                it.copy(image = it.image?.let { imageDatabaseRepository.checkToSaveImage(it) })
             }
             .let {
                 val playlistEntity = playlistMapper.map(it)
@@ -168,12 +174,9 @@ class SqldelightPlaylistDatabaseRepository(
                 }
             }.also { playlistId ->
                 if (!flat) {
-                    val items = if (domain.id != null) {
-                        domain.items
-                    } else {
-                        domain.items.map { it.copy(playlistId = playlistId) }
-                    }
-                    itemDatabaseRepository.save(items, flat, false)
+                    itemDatabaseRepository.saveListInternal(
+                        domain.items.map { it.copy(playlistId = playlistId) }, flat
+                    )
                 }
             }
 }

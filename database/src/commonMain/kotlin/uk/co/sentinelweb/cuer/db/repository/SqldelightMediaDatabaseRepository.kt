@@ -195,7 +195,7 @@ class SqldelightMediaDatabaseRepository(
             loadMediaInternal(id)
         }
 
-    private fun loadMediaInternal(id: Long) = try {
+    internal fun loadMediaInternal(id: Long) = try {
         database.mediaEntityQueries
             .loadById(id)
             .executeAsOne()
