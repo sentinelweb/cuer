@@ -237,18 +237,18 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    @Ignore // fixme
+    @Ignore // fixme doesnt load channel
     fun loadList_ChannelPlatformIdFilter() = runTest {
         val toCreate = fixture<List<PlaylistDomain>>()
             .map { it.resetIds() }
 
         val saved = sut.save(toCreate, flat = false, emit = false)
         assertTrue(saved.isSuccessful)
-        val channPlatformId = saved.data!!.firstNotNullOf { it.channelData?.platformId }
-        val loaded = sut.loadList(ChannelPlatformIdFilter(channPlatformId))
+        val chanPlatformId = saved.data!!.firstNotNullOf { it.channelData?.platformId }
+        val loaded = sut.loadList(ChannelPlatformIdFilter(chanPlatformId))
         assertTrue(loaded.isSuccessful)
         assertEquals(1, loaded.data!!.size)
-        assertEquals(saved.data!!.filter { it.channelData?.platformId == channPlatformId }, loaded.data!!)
+        assertEquals(saved.data!!.filter { it.channelData?.platformId == chanPlatformId }, loaded.data!!)
     }
 
     @Test
