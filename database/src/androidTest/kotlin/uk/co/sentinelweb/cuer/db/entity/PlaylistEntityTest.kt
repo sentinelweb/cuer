@@ -147,7 +147,7 @@ class PlaylistEntityTest : KoinTest {
     }
 
     @Test
-    fun findPlaylistsForChannelPlatformId() {
+    fun findPlaylistForChannelPlatformId() {
         val playlistInitial =
             fixture<Playlist>().copy(id = 0, parent_id = null, channel_id = null, image_id = null, thumb_id = null)
         database.playlistEntityQueries.create(playlistInitial)

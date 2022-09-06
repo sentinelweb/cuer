@@ -23,11 +23,7 @@ object DatabaseModule {
     }
 
     private val repoModule = module {
-        single {
-            SqldelightPlaylistDatabaseRepository(
-                get(), get(), get(), get(), get(), get(), get(), get(), get(), get()
-            )
-        }
+        single { SqldelightPlaylistDatabaseRepository(get(), get(), get(), get(), get(), get(), get()) }
         single<PlaylistDatabaseRepository> { get<SqldelightPlaylistDatabaseRepository>() }
         single { SqldelightPlaylistItemDatabaseRepository(get(), get(), get(), get(), get()) }
         single<PlaylistItemDatabaseRepository> { get<SqldelightPlaylistItemDatabaseRepository>() }

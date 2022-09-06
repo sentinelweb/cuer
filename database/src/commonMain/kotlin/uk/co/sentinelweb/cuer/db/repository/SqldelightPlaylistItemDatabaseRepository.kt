@@ -125,22 +125,12 @@ class SqldelightPlaylistItemDatabaseRepository(
         try {
             with(database.playlistItemEntityQueries) {
                 when (filter) {
-                    // todo load media list (dont map!)
-                    is IdListFilter ->
-                        loadAllByIds(filter.ids)
-
-                    is PlaylistIdLFilter ->
-                        loadPlaylist(filter.id)
-
-                    is MediaIdListFilter ->
-                        loadItemsByMediaId(filter.ids)
-
-                    is NewMediaFilter ->
-                        loadAllPlaylistItemsWithNewMedia(200)
-
-                    is RecentMediaFilter ->
-                        loadAllPlaylistItemsRecent(200)
-
+                    is IdListFilter -> loadAllByIds(filter.ids)
+                    is PlaylistIdLFilter -> loadPlaylist(filter.id)
+                    is MediaIdListFilter -> loadItemsByMediaId(filter.ids)
+                    is NewMediaFilter -> loadAllPlaylistItemsWithNewMedia(200)
+                    is RecentMediaFilter -> loadAllPlaylistItemsRecent(200)
+                    is PlatformIdListFilter -> loadAllByPlatformIds(filter.ids)
                     is SearchFilter -> {
                         val playlistIds = filter.playlistIds
                         if (playlistIds.isNullOrEmpty()) {
@@ -149,9 +139,6 @@ class SqldelightPlaylistItemDatabaseRepository(
                             searchPlaylists(filter.text.lowercase(), playlistIds, 200)
                         }
                     }
-
-                    is PlatformIdListFilter ->
-                        loadAllByPlatformIds(filter.ids)
 
                     else -> loadAll()
 

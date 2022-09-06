@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -32,11 +32,11 @@ class SqldelightPlaylistDatabaseRepository(
         log.tag(this)
     }
 
-    val _updatesFlow = MutableSharedFlow<Pair<OrchestratorContract.Operation, PlaylistDomain>>()
-    override val updates: Flow<Pair<OrchestratorContract.Operation, PlaylistDomain>>
+    val _updatesFlow = MutableSharedFlow<Pair<Operation, PlaylistDomain>>()
+    override val updates: Flow<Pair<Operation, PlaylistDomain>>
         get() = _updatesFlow
 
-    override val stats: Flow<Pair<OrchestratorContract.Operation, Nothing>>
+    override val stats: Flow<Pair<Operation, Nothing>>
         get() = TODO("Not yet implemented")
 
     override suspend fun save(
@@ -85,15 +85,44 @@ class SqldelightPlaylistDatabaseRepository(
     override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistDomain> = loadPlaylist(id, flat)
 
     override suspend fun loadList(
-        filter: OrchestratorContract.Filter?,
+        filter: Filter?,
         flat: Boolean
-    ): RepoResult<List<PlaylistDomain>> = TODO()
+    ): RepoResult<List<PlaylistDomain>> = withContext(coProvider.IO) {
+        database.playlistItemEntityQueries.transactionWithResult<RepoResult<List<PlaylistDomain>>> {
+            try {
+                with(database.playlistEntityQueries) {
+                    when (filter) {
+                        is IdListFilter -> loadAllByIds(filter.ids)
+                        is DefaultFilter -> loadAllByFlags(PlaylistDomain.FLAG_DEFAULT)
+                        is AllFilter -> loadAll()
+                        is PlatformIdListFilter -> loadAllByPlatformIds(filter.ids)
+                        is ChannelPlatformIdFilter -> findPlaylistsForChannelPlatformId(filter.platformId)
+                        is TitleFilter -> findPlaylistsWithTitle(filter.title)
+                        else ->// todo return empty for else
+                            loadAll()
+                    }
+                }.executeAsList()
+                    .map { entity ->
+                        fillAndMapEntity(
+                            entity,
+                            if (flat) listOf()
+                            else itemDatabaseRepository.loadPlaylistItemsInternal(entity.id)
+                        )
+                    }
+                    .let { RepoResult.Data(it) }
+            } catch (e: Exception) {
+                val msg = "couldn't load playlists: ${filter}"
+                log.e(msg, e)
+                RepoResult.Error<List<PlaylistDomain>>(e, msg)
+            }
+        }
+    }
 
-    override suspend fun loadStatsList(filter: OrchestratorContract.Filter?): RepoResult<List<PlaylistStatDomain>> {
+    override suspend fun loadStatsList(filter: Filter?): RepoResult<List<PlaylistStatDomain>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> {
+    override suspend fun count(filter: Filter?): RepoResult<Int> {
         TODO("Not yet implemented")
     }
 

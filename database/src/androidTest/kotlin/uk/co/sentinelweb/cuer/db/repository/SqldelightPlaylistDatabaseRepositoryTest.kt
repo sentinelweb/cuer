@@ -6,6 +6,7 @@ import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
 import com.appmattus.kotlinfixture.kotlinFixture
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.koin.core.component.get
@@ -18,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
@@ -184,8 +186,82 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun loadList() {
+    fun loadList_IdListFilter() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>().map { it.resetIds() }
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val loaded = sut.loadList(IdListFilter(listOf(1, 2)))
+        assertTrue(loaded.isSuccessful)
+        assertEquals(saved.data!!.filter { listOf(1L, 2L).contains(it.id) }, loaded.data!!)
+    }
 
+    @Test
+    fun loadList_DefaultFilter() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>()
+            .map { it.resetIds() }
+            .mapIndexed { i, item -> item.copy(default = i == 0) }
+
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val loaded = sut.loadList(DefaultFilter())
+        assertTrue(loaded.isSuccessful)
+        assertEquals(1, loaded.data!!.size)
+        assertEquals(saved.data!![0], loaded.data!![0])
+    }
+
+    @Test
+    fun loadList_AllFilter() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>()
+            .map { it.resetIds() }
+
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val loaded = sut.loadList(AllFilter())
+        assertTrue(loaded.isSuccessful)
+        assertEquals(saved.data!!, loaded.data!!)
+    }
+
+    @Test
+    fun loadList_PlatformIdListFilter() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>()
+            .map { it.resetIds() }
+
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val platformIds = saved.data!!.take(2).mapNotNull { it.platformId }
+        val loaded = sut.loadList(PlatformIdListFilter(platformIds))
+        assertTrue(loaded.isSuccessful)
+        assertEquals(platformIds.size, loaded.data!!.size)
+        assertEquals(saved.data!!.filter { platformIds.contains(it.platformId) }, loaded.data!!)
+    }
+
+    @Test
+    @Ignore // fixme
+    fun loadList_ChannelPlatformIdFilter() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>()
+            .map { it.resetIds() }
+
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val channPlatformId = saved.data!!.firstNotNullOf { it.channelData?.platformId }
+        val loaded = sut.loadList(ChannelPlatformIdFilter(channPlatformId))
+        assertTrue(loaded.isSuccessful)
+        assertEquals(1, loaded.data!!.size)
+        assertEquals(saved.data!!.filter { it.channelData?.platformId == channPlatformId }, loaded.data!!)
+    }
+
+    @Test
+    fun loadList_TitleFilter() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>()
+            .map { it.resetIds() }
+
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val title = saved.data!![0].title
+        val loaded = sut.loadList(TitleFilter(title))
+        assertTrue(loaded.isSuccessful)
+        assertEquals(1, loaded.data!!.size)
+        assertEquals(saved.data!!.filterIndexed { i, pl -> i == 0 }, loaded.data!!)
     }
 
     @Test
