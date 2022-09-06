@@ -20,8 +20,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistMapper
 import uk.co.sentinelweb.cuer.db.util.DataCreation
@@ -29,7 +28,9 @@ import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.db.util.resetIds
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
@@ -265,22 +266,70 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
+    fun count() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>()
+            .map { it.resetIds() }
+
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val loaded = sut.count()
+        assertTrue(loaded.isSuccessful)
+        assertEquals(saved.data!!.size, loaded.data!!)
+    }
+
+    @Test
+    fun delete() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>()
+            .map { it.resetIds() }
+
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val toDelete = saved.data!![0]
+        sut.updates.test {
+            val deleted = sut.delete(toDelete, emit = true)
+            assertTrue(deleted.isSuccessful)
+            assertEquals(DELETE to toDelete, awaitItem())
+            expectNoEvents()
+        }
+        val check = sut.load(toDelete.id!!, true)
+        assertFalse(check.isSuccessful)
+    }
+
+    @Test
+    fun deleteAll() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>()
+            .map { it.resetIds() }
+
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val deleted = sut.deleteAll()
+        assertTrue(deleted.isSuccessful)
+
+        val check = sut.count()
+        assertTrue(check.isSuccessful)
+        assertEquals(0, check.data!!)
+    }
+
+    @Test
+    fun update() = runTest {
+        val toCreate = fixture<PlaylistDomain>()
+            .resetIds()
+        val actual = sut.save(toCreate, flat = true, emit = true)
+        assertTrue(actual.isSuccessful)
+        sut.updates.test {
+            val updated =
+                sut.update(PlaylistIndexUpdateDomain(id = actual.data!!.id!!, currentIndex = 1000), emit = true)
+            assertTrue(updated.isSuccessful)
+            val expected = sut.load(actual.data!!.id!!, flat = true)
+            assertTrue(expected.isSuccessful)
+            assertEquals(1000, expected.data!!.currentIndex)
+
+            assertEquals(FLAT to actual.data!!.copy(currentIndex = 1000), awaitItem())
+            expectNoEvents()
+        }
+    }
+
+    @Test // todo test
     fun loadStatsList() {
-    }
-
-    @Test
-    fun count() {
-    }
-
-    @Test
-    fun delete() {
-    }
-
-    @Test
-    fun deleteAll() {
-    }
-
-    @Test
-    fun update() {
     }
 }

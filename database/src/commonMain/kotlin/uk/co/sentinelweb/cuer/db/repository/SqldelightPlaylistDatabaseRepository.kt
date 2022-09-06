@@ -13,9 +13,11 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistMapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class SqldelightPlaylistDatabaseRepository(
@@ -118,28 +120,114 @@ class SqldelightPlaylistDatabaseRepository(
         }
     }
 
-    override suspend fun loadStatsList(filter: Filter?): RepoResult<List<PlaylistStatDomain>> {
-        TODO("Not yet implemented")
+    override suspend fun loadStatsList(filter: Filter?): RepoResult<List<PlaylistStatDomain>> =
+        withContext(coProvider.IO) {
+            database.playlistItemEntityQueries.transactionWithResult {
+                try {
+                    when (filter) {
+                        is IdListFilter ->
+                            RepoResult.Data(
+                                filter.ids.map {
+                                    PlaylistStatDomain(
+                                        playlistId = it,
+                                        itemCount = database.playlistItemEntityQueries
+                                            .countItemsInPlaylist(it).executeAsOne().toInt(),
+                                        watchedItemCount = database.playlistItemEntityQueries
+                                            .countMediaFlags(it, FLAG_WATCHED).executeAsOne().toInt()
+                                    )
+                                })
+
+                        else -> throw UnsupportedOperationException("$filter not supported")
+                    }
+
+                } catch (e: Throwable) {
+                    val msg = "couldn't load playlist stats "
+                    log.e(msg, e)
+                    RepoResult.Error<List<PlaylistStatDomain>>(e, msg)
+                }
+            }
+        }
+
+    override suspend fun count(filter: Filter?): RepoResult<Int> =
+        try {
+            withContext(coProvider.IO) {
+                database.playlistEntityQueries.count().executeAsOne().toInt()
+            }.let { RepoResult.Data(it) }
+        } catch (e: Exception) {
+            val msg = "couldn't count ${filter}"
+            log.e(msg, e)
+            RepoResult.Error<Int>(e, msg)
+        }
+
+    override suspend fun delete(domain: PlaylistDomain, emit: Boolean): RepoResult<Boolean> =
+        withContext(coProvider.IO) {
+            try {
+                domain
+                    .let { playlistMapper.map(it) }
+                    .also { database.playlistEntityQueries.delete(it.id) }
+                    .also {
+                        if (emit) {
+                            _updatesFlow.emit(Operation.DELETE to domain)
+                        }
+                    }
+                RepoResult.Data.Empty(true)
+            } catch (e: Throwable) {
+                val msg = "couldn't delete ${domain.id}"
+                log.e(msg, e)
+                RepoResult.Error<Boolean>(e, msg)
+            }
+        }
+
+    override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
+        try {
+            database.playlistEntityQueries.deleteAll()
+            RepoResult.Data.Empty(true)
+        } catch (e: Exception) {
+            val msg = "couldn't delete all media"
+            log.e(msg, e)
+            RepoResult.Error<Boolean>(e, msg)
+        }
     }
 
-    override suspend fun count(filter: Filter?): RepoResult<Int> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun delete(domain: PlaylistDomain, emit: Boolean): RepoResult<Boolean> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteAll(): RepoResult<Boolean> {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun update(
         update: UpdateDomain<PlaylistDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<PlaylistDomain> {
-        TODO("Not yet implemented")
+    ): RepoResult<PlaylistDomain> = withContext(coProvider.IO) {
+        try {
+            when (update) {
+                is PlaylistIndexUpdateDomain -> updateCurrentIndex(update, emit)
+                else -> throw IllegalArgumentException("update object not valid: ${update::class.simpleName}")
+            }
+        } catch (e: Throwable) {
+            val msg = "couldn't update playlist $update"
+            log.e(msg, e)
+            RepoResult.Error<PlaylistDomain>(e, msg)
+        }
+    }
+
+    private suspend fun updateCurrentIndex(
+        update: PlaylistIndexUpdateDomain,
+        emit: Boolean = true
+    ): RepoResult<PlaylistDomain> = withContext(coProvider.IO) {
+        try {
+            update.id
+                .let {
+                    database.playlistEntityQueries
+                        .updateIndex(update.currentIndex.toLong(), it); it
+                }
+                .let { load(it, flat = true) }
+                .also {
+                    if (emit) {
+                        _updatesFlow.emit(FLAT to it.data!!)
+                    }
+                }
+        } catch (e: Exception) {
+            val msg = "couldn't update current index $update"
+            log.e(msg, e)
+            RepoResult.Error<PlaylistDomain>(e, msg)
+        }
     }
 
     private suspend fun loadPlaylist(id: Long, flat: Boolean): RepoResult<PlaylistDomain> =

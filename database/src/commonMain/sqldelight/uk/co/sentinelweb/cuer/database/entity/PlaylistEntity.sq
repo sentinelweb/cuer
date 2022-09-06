@@ -76,3 +76,6 @@ WHERE
 
 findPlaylistsWithTitle:
 SELECT * FROM playlist WHERE INSTR(LOWER(title), LOWER(:title));
+
+count:
+SELECT count() FROM playlist;
