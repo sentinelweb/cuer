@@ -30,7 +30,7 @@ interface YoutubeCastServiceContract {
             factory { YoutubeCastServiceManager(androidApplication()) }
             scope(named<YoutubeCastService>()) {
                 scoped<Controller> {
-                    YoutubeCastServiceController(getSource(), get(), get(), get(), get(), get())
+                    YoutubeCastServiceController(get<YoutubeCastService>(), get(), get(), get(), get(), get())
                 }
                 scoped {
                     PlayerControlsNotificationController(
@@ -61,7 +61,7 @@ interface YoutubeCastServiceContract {
                 }
                 scoped<PlayerControlsNotificationContract.View> {
                     PlayerControlsNotificationMedia(
-                        service = getSource(),
+                        service = get<YoutubeCastService>(),
                         appState = get(),
                         timeProvider = get(),
                         log = get(),

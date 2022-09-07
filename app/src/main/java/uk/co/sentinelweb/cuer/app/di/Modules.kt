@@ -10,7 +10,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
-import uk.co.sentinelweb.cuer.app.db.DatabaseModule
+import uk.co.sentinelweb.cuer.app.db.AppDatabaseModule
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
@@ -46,7 +46,6 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
-import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.image.BitmapSizer
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
@@ -66,6 +65,8 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.db.di.AndroidDatabaseModule
+import uk.co.sentinelweb.cuer.db.di.DatabaseModule
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
@@ -118,9 +119,7 @@ object Modules {
     }
 
     private val utilModule = module {
-        factory<LinkScanner> {
-            AndroidLinkScanner(log = get(), mappers = urlMediaMappers)
-        }
+        factory<LinkScanner> { AndroidLinkScanner(log = get(), mappers = urlMediaMappers) }
         single { CuerAppState() }
 
         factory<MediaSessionContract.Manager> {
@@ -197,7 +196,9 @@ object Modules {
         .plus(wrapperModule)
         .plus(scopedModules)
         .plus(appNetModule)
-        .plus(DatabaseModule.dbModule)
+        .plus(DatabaseModule.modules)
+        .plus(AppDatabaseModule.module)
+        .plus(AndroidDatabaseModule.modules)
         .plus(NetModule.netModule)
         .plus(SharedCoreModule.objectModule)
         .plus(SharedDomainModule.objectModule)
@@ -207,5 +208,4 @@ object Modules {
         .plus(FirebaseModule.fbModule)
         .plus(RemoteModule.objectModule)
         .plus(PlayerModule.localPlayerModule)
-
 }

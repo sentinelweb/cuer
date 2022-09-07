@@ -53,7 +53,7 @@ class MainActivity :
     AndroidScopeComponent,
     MainContract.PlayerViewControl {
 
-    override val scope: Scope by activityScopeWithSource()
+    override val scope: Scope by activityScopeWithSource<MainActivity>()
 
     private val presenter: MainContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()

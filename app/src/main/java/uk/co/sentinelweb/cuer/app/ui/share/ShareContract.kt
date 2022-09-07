@@ -10,8 +10,11 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
+import uk.co.sentinelweb.cuer.app.ui.play_control.EmptyPlayerControls
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -34,6 +37,7 @@ interface ShareContract {
         fun onReady(ready: Boolean)
         fun serializeState(): String?
         fun restoreState(s: String)
+        fun onDestinationChange()
     }
 
     interface View {
@@ -46,6 +50,8 @@ interface ShareContract {
         fun showMedia(itemDomain: PlaylistItemDomain, source: Source, playlistParentId: Long?)
         fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?)
         fun navigate(nav: NavigationModel)
+        fun canCommit(type: ObjectTypeDomain?): Boolean
+        fun hideWarning()
     }
 
     interface Committer {
@@ -97,7 +103,7 @@ interface ShareContract {
         @JvmStatic
         val activityModule = module {
             scope(named<ShareActivity>()) {
-                scoped<View> { getSource() }
+                scoped<View> { get<ShareActivity>() }
                 scoped<Presenter> {
                     SharePresenter(
                         view = get(),
@@ -116,8 +122,8 @@ interface ShareContract {
                         recentLocalPlaylists = get()
                     )
                 }
-                scoped { ShareWrapper(getSource()) }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
+                scoped { ShareWrapper(get<ShareActivity>()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<ShareActivity>(), get()) }
                 viewModel { State() }
                 scoped {
                     ShareModelMapper(
@@ -125,11 +131,13 @@ interface ShareContract {
                         res = get()
                     )
                 }
-                scoped<DoneNavigation> { getSource() }
-                scoped { navigationRouter(false, getSource()) }
+                scoped<DoneNavigation> { get<ShareActivity>() }
+                scoped { navigationRouter(false, get<ShareActivity>()) }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<ShareStrings> { AndroidShareStrings(get()) }
-                scoped<CommitHost> { getSource() }
+                scoped<CommitHost> { get<ShareActivity>() }
+                scoped<PlayerContract.PlayerControls> { EmptyPlayerControls() }
+                scoped { AlertDialogCreator(get<ShareActivity>()) }
             }
         }
     }

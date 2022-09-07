@@ -16,13 +16,13 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.Companion.KEY
+import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandActivity
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
-import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.UrlLauncherWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.LinkDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
@@ -33,7 +33,8 @@ class NavigationRouter constructor(
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val navController: NavController?,
     private val log: LogWrapper,
-    private val urlLauncher: UrlLauncherWrapper
+    private val urlLauncher: UrlLauncherWrapper,
+    private val cryptoLauncher: CryptoLauncher
 ) {
 
     fun navigate(nav: NavigationModel) {
@@ -42,7 +43,8 @@ class NavigationRouter constructor(
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
                     //YoutubeFullScreenActivity.start(activity, it)
                     AytLandActivity.start(activity, it)
-                } ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
+                }
+                    ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
             LOCAL_PLAYER -> {
                 log.d("YoutubePortraitActivity.NavigationMapper")
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
@@ -52,8 +54,12 @@ class NavigationRouter constructor(
             }
             WEB_LINK ->
                 nav.params[LINK]?.let {
-                    urlLauncher.launchUrl(it.toString())
+                    urlLauncher.launchWithChooser(it.toString())
                 } ?: throw IllegalArgumentException("$WEB_LINK: $LINK param required")
+            CRYPTO_LINK ->
+                nav.getParam<LinkDomain.CryptoLinkDomain>(CRYPTO_ADDRESS)
+                    ?.let { cryptoLauncher.launch(it) }
+                    ?: throw IllegalArgumentException("$CRYPTO_LINK: $CRYPTO_ADDRESS param required")
             NAV_BACK -> navController?.popBackStack()
             NAV_FINISH -> activity.finish()
             YOUTUBE_CHANNEL -> if (!ytJavaApi.launchChannel(nav.params[CHANNEL_ID] as String)) {
@@ -120,6 +126,10 @@ class NavigationRouter constructor(
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+            SHARE -> nav.getParam<String>(LINK)
+                ?.let { activity.startActivity(ShareActivity.urlIntent(activity, it)) }
+                ?: throw IllegalArgumentException("$SHARE: $LINK param required")
+
             else -> toastWrapper.show("Cannot launch ${nav.target}")
         }
     }
@@ -150,12 +160,12 @@ fun Scope.navigationRouter(
 ) = NavigationRouter(
     activity = sourceActivity,
     toastWrapper = ToastWrapper(sourceActivity),
-    fragment = if (isFragment) (getSource() as Fragment) else null,
+    fragment = if (isFragment) (get() as Fragment) else null,
     ytJavaApi = YoutubeJavaApiWrapper(sourceActivity, get()),
     navController = if (withNavHost && sourceActivity is AppCompatActivity) {
         if (isFragment) {
             try {
-                (getSource() as Fragment).findNavController()
+                (get() as Fragment).findNavController()
             } catch (e: IllegalStateException) {
                 null
             }
@@ -167,5 +177,6 @@ fun Scope.navigationRouter(
         }
     } else null,
     urlLauncher = UrlLauncherWrapper(sourceActivity),
-    log = AndroidLogWrapper()
+    log = AndroidLogWrapper(),
+    cryptoLauncher = AndroidCryptoLauncher(sourceActivity, get(), get(), get())
 )

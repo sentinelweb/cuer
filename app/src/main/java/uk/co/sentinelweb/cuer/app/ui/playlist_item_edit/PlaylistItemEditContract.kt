@@ -6,7 +6,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
@@ -36,7 +35,7 @@ interface PlaylistItemEditContract {
         val isLive: Boolean,
         val isUpcoming: Boolean,
         @ColorRes val infoTextBackgroundColor: Int,
-        val showPlay: Boolean
+        val showPlay: Boolean,
     )
 
     @Serializable
@@ -54,6 +53,7 @@ interface PlaylistItemEditContract {
         var parentPlaylistId: Long = -1,
         var allowPlay: Boolean = false,
         val deletedPlayLists: MutableSet<PlaylistDomain> = mutableSetOf(),
+        var isOnSharePlaylist: Boolean = false,
     ) {
         lateinit var source: OrchestratorContract.Source
 
@@ -81,6 +81,7 @@ interface PlaylistItemEditContract {
                         prefsWrapper = get(),
                         shareWrapper = get(),
                         playUseCase = get(),
+                        linkScanner = get()
                     )
                 }
                 scoped { State() }
@@ -88,7 +89,6 @@ interface PlaylistItemEditContract {
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { SelectDialogCreator(this.getFragmentActivity()) }
                 scoped { this.getFragmentActivity() }
-                scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 scoped { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
@@ -104,7 +104,7 @@ interface PlaylistItemEditContract {
                 }
                 scoped {
                     PlayDialog(
-                        getSource(),
+                        get<PlaylistItemEditFragment>(),
                         itemFactory = get(),
                         itemModelMapper = get(),
                         navigationRouter = get(),

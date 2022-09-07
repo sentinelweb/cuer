@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -39,7 +40,7 @@ interface YoutubeFullScreenContract {
                 scoped {
                     PlayerStoreFactory(
                         // storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        storeFactory = DefaultStoreFactory,
+                        storeFactory = DefaultStoreFactory(),
                         itemLoader = get(),
                         queueConsumer = get(),
                         queueProducer = get(),
@@ -51,9 +52,9 @@ interface YoutubeFullScreenContract {
                         playerControls = get(),
                     ).create()
                 }
-                scoped { navigationRouter(false, getSource(), withNavHost = false) }
-                scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
-                scoped { ShowHideUi(getSource()) }
+                scoped { navigationRouter(false, get<YoutubeFullScreenActivity>(), withNavHost = false) }
+                scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(get<YoutubeFullScreenActivity>(), get()) }
+                scoped { ShowHideUi(get<YoutubeFullScreenActivity>()) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = get(),
@@ -66,10 +67,11 @@ interface YoutubeFullScreenContract {
                 scoped<SkipContract.View> {
                     SkipView(
                         selectDialogCreator = SelectDialogCreator(
-                            context = getSource<YoutubeFullScreenActivity>()
+                            context = get<YoutubeFullScreenActivity>()
                         )
                     )
                 }
+                scoped { AlertDialogCreator(get<YoutubeFullScreenActivity>()) }
             }
         }
     }

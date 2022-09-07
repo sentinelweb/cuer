@@ -166,9 +166,7 @@ class CastPlayerPresenter(
                     ?.apply { view.setLiveTime(mapper.formatLiveTime(this)) }
                     ?.takeIf { it > 9 * 1000 }
                     ?.apply { view.setPosition("-" + mapper.formatTime(this)) }
-                    ?: run {
-                        view.setPosition("")
-                    }
+                    ?: run { view.setPosition("") }
             }
         }
     }
@@ -279,9 +277,17 @@ class CastPlayerPresenter(
         }
     }
 
+    override fun seekTo(ms: Long) {
+        listener?.seekTo(ms)
+    }
+
+    override fun getPlaylistItem(): PlaylistItemDomain? = state.playlistItem
+
     override fun skipSeekTo(target: Long) {
         listener?.seekTo(target)
     }
+
+
 
     override fun skipSetBackText(text: String) {
         view.setSkipBackText(text)

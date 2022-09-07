@@ -61,7 +61,7 @@ interface ScanContract {
         @JvmStatic
         val fragmentModule = module {
             scope(named<ScanFragment>()) {
-                scoped<View> { getSource() }
+                scoped<View> { get<ScanFragment>() }
                 scoped<Presenter> {
                     ScanPresenter(
                         view = get(),

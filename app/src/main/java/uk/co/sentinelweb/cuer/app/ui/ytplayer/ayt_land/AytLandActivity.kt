@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
+import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
@@ -17,11 +17,11 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityAytFullsreenBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
@@ -50,7 +50,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 class AytLandActivity : AppCompatActivity(),
     AndroidScopeComponent {
 
-    override val scope: Scope by activityScopeWithSource()
+    override val scope: Scope by activityScopeWithSource<AytLandActivity>()
 
     private val controller: PlayerController by inject()
     private val log: LogWrapper by inject()
@@ -98,7 +98,7 @@ class AytLandActivity : AppCompatActivity(),
         aytViewHolder.playerView
             ?.apply { getLifecycle().addObserver(this) }
             ?: throw IllegalStateException("Player is not created")
-        controller.onViewCreated(listOf(mviView), lifecycle.asMviLifecycle())
+        controller.onViewCreated(listOf(mviView), lifecycle.asEssentyLifecycle())
         showHideUi.showElements = {
             log.d("showElements")
             binding.controls.root.fadeIn()

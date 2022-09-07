@@ -35,7 +35,7 @@ interface PrefBackupContract {
         @JvmStatic
         val fragmentModule = module {
             scope(named<PrefBackupFragment>()) {
-                scoped<View> { getSource() }
+                scoped<View> { get<PrefBackupFragment>() }
                 scoped<Presenter> {
                     PrefBackupPresenter(
                         view = get(),

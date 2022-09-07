@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.tools.rule;
+package uk.co.sentinelweb.cuer.tools.rule
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

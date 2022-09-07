@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ImageDomain constructor(
+    val id: Long? = null,
     val url: String,
     val width: Int? = null,
     val height: Int? = null

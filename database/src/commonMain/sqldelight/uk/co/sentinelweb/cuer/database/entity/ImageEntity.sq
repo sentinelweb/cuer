@@ -1,0 +1,39 @@
+PRAGMA foreign_keys = 'ON';
+
+CREATE TABLE image(
+  id INTEGER NOT NULL PRIMARY KEY ,
+  url TEXT UNIQUE NOT NULL,
+  width INTEGER,
+  height INTEGER
+);
+
+CREATE UNIQUE INDEX image_url ON image(url);
+
+create:
+INSERT INTO image ( url, width, height )
+VALUES ?;
+
+getInsertId:
+SELECT last_insert_rowid() FROM image LIMIT 1;
+
+update:
+REPLACE INTO image (id,  url, width, height )
+VALUES ?;
+
+load:
+SELECT * FROM image WHERE id = ?;
+
+loadByUrl:
+SELECT * FROM image WHERE url = ?;
+
+delete:
+DELETE FROM image WHERE id = ?;
+
+deleteByIds:
+DELETE FROM image WHERE id IN ?;
+
+count:
+SELECT count() FROM image;
+
+deleteAll:
+DELETE FROM image;

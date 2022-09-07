@@ -1,0 +1,76 @@
+PRAGMA foreign_keys = 'ON';
+
+CREATE TABLE playlist_item (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    flags INTEGER NOT NULL DEFAULT 0,
+    media_id INTEGER NOT NULL,
+    ordering INTEGER NOT NULL,
+    playlist_id INTEGER NOT NULL,
+    date_added TEXT AS kotlinx.datetime.Instant NOT NULL,
+    FOREIGN KEY (media_id) REFERENCES media(id),
+    FOREIGN KEY (playlist_id) REFERENCES playlist(id) ON DELETE CASCADE
+);
+
+CREATE INDEX playlist_item_flags_index ON playlist_item(flags);
+
+CREATE INDEX playlist_item_ordering_playlist_id_index ON playlist_item(ordering, playlist_id);
+
+CREATE INDEX playlist_item_playlist_id_index ON playlist_item(playlist_id);
+
+CREATE INDEX playlist_item_media_id_index ON playlist_item(media_id);
+
+CREATE INDEX playlist_item_media_id_playlist_id_index ON playlist_item(media_id, playlist_id);
+
+create:
+INSERT INTO playlist_item (flags, media_id, ordering, playlist_id, date_added) VALUES ?;
+
+getInsertId:
+SELECT last_insert_rowid() FROM playlist_item LIMIT 1;
+
+update:
+REPLACE INTO playlist_item (id, flags, media_id, ordering, playlist_id, date_added) VALUES ?;
+
+load:
+SELECT * FROM playlist_item WHERE id = ?;
+
+loadAll:
+SELECT * FROM playlist_item;
+
+loadPlaylist:
+SELECT * FROM playlist_item WHERE playlist_id = :playlistId;
+
+loadAllByIds:
+SELECT * FROM playlist_item WHERE id IN :playlistItemIds;
+
+loadItemsByMediaId:
+SELECT * FROM playlist_item WHERE media_id IN :mediaIds;
+
+delete:
+DELETE FROM playlist_item WHERE id = ?;
+
+deletePlaylistItems:
+DELETE FROM playlist_item WHERE playlist_id = :playlistId;
+
+deleteAll:
+DELETE FROM playlist_item;
+
+countMediaFlags:
+SELECT count() FROM playlist_item,media WHERE playlist_item.playlist_id=:playlistId AND media.id=playlist_item.media_id AND media.flags & :flags == :flags;
+
+countItemsInPlaylist:
+SELECT count() FROM playlist_item WHERE playlist_id ==:playlistId;
+
+loadAllPlaylistItemsWithNewMedia:
+SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 0 AND media.id=playlist_item.media_id ORDER BY playlist_item.date_added DESC LIMIT :limit;
+
+loadAllPlaylistItemsRecent:
+SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 1 AND media.id = playlist_item.media_id AND media.date_last_played != 'null' ORDER BY media.date_last_played DESC LIMIT :limit;
+
+search:
+SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),:text) AND media.id = playlist_item.media_id ORDER BY media.date_last_played DESC LIMIT :limit;
+
+searchPlaylists:
+SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),LOWER(:text)) AND playlist_item.playlist_id IN :playlistIds AND media.id = playlist_item.media_id ORDER BY media.date_last_played DESC LIMIT :limit;
+
+loadAllByPlatformIds:
+SELECT playlist_item.* FROM playlist_item, media WHERE media.platform_id IN :platformIds AND media.id = playlist_item.media_id;

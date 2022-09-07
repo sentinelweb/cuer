@@ -4,7 +4,6 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.db.repository.file.PlatformFileOperation
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.MemoryRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
@@ -17,10 +16,10 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
+import uk.co.sentinelweb.cuer.app.util.link.TimecodeExtractor
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapperImpl
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 object SharedAppModule {
     private val queueModule = module {
@@ -44,7 +43,7 @@ object SharedAppModule {
     private val orchestratorModule = module {
         single { PlaylistOrchestrator(get(), get(), get()) }
         single { PlaylistItemOrchestrator(get(), get(), get()) }
-        single { MediaOrchestrator(get(), get()) }
+        single { MediaOrchestrator(get(), get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
         single { PlaylistStatsOrchestrator(get()) }
         factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get(), get(), get()) }
@@ -70,12 +69,14 @@ object SharedAppModule {
     private val objectModule = module {
         factory { ParserFactory() }
         single { PlaylistMemoryRepository(get(), get(), get(), get(), get()) }
-        single<MemoryRepository<PlaylistItemDomain>> { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
+        single { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
+        single { get<PlaylistMemoryRepository>().mediaMemoryRepository }
         single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperImpl() }
         factory { BrowseRecentCategories(get(), get()) }
         factory { RecentLocalPlaylists(get(), get()) }
         factory { PlatformFileOperation() }
         factory { LinkExtractor() }
+        factory { TimecodeExtractor() }
     }
 
     val modules = listOf(objectModule)

@@ -26,7 +26,6 @@ class CompactPlayerScroll {
                     (f.requireActivity() as? PlayerHost)?.raisePlayer()
                 }
             }
-
         })
     }
 
@@ -42,7 +41,6 @@ class CompactPlayerScroll {
                     (f.requireActivity() as? PlayerHost)?.raisePlayer()
                 }
             }
-
         })
     }
 }

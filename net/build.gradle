@@ -11,7 +11,7 @@ dependencies {
     implementation project(":shared")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core"
     implementation "org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime"
 
@@ -27,7 +27,7 @@ dependencies {
     // test
     testImplementation "junit:junit:$ver_junit"
     testImplementation "io.insert-koin:koin-test:$ver_koin"
-    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
+//    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     testImplementation "io.mockk:mockk:$ver_mockk"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
 }

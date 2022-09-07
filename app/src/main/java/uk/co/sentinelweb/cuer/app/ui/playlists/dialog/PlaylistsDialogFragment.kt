@@ -23,7 +23,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     ItemBaseContract.ItemMoveInteractions,
     AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<PlaylistsDialogFragment>()
     private val presenter: PlaylistsDialogContract.Presenter by inject()
     private val adapter: PlaylistsDialogAdapter by inject()
     private val itemTouchHelper: ItemTouchHelper by inject()

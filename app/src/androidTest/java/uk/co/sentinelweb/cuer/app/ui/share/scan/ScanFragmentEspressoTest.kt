@@ -50,7 +50,7 @@ class ScanFragmentEspressoTest : FragmentScenarioProvider<ScanFragment> {
             modules(module {
                 scope(named<ScanFragment>()) {
                     factory { mockPresenter }
-                    factory<SnackbarWrapper> { AndroidSnackbarWrapper((getSource() as Fragment).requireActivity(), mockResources) }
+                    factory<SnackbarWrapper> { AndroidSnackbarWrapper(get<ScanFragment>().requireActivity(), mockResources) }
                 }
             })
         }

@@ -6,7 +6,7 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-val ver_coroutines_core: String by project
+val ver_coroutines: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_kotlinx_datetime: String by project
 val ver_koin: String by project
@@ -21,17 +21,19 @@ val ver_multiplatform_settings: String by project
 val ver_turbine: String by project
 val ver_ktor: String by project
 val ver_mockserver: String by project
-//val ver_korio: String by project
 val app_compileSdkVersion: String by project
+val app_targetSdkVersion: String by project
+val app_minSdkVersion: String by project
+val ver_kotlin_fixture: String by project
 
 version = "1.0"
 
 android {
-    compileSdkVersion(app_compileSdkVersion.toInt())
+    compileSdk = app_compileSdkVersion.toInt()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdkVersion(26)
-        targetSdkVersion(30)
+        minSdk = app_minSdkVersion.toInt()
+        targetSdk = app_targetSdkVersion.toInt()
     }
     // remove when upgrading to kotlin 1.5
     configurations {
@@ -50,6 +52,9 @@ kotlin {
         browser()
     }
     android()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 
     sourceSets {
         all {
@@ -60,7 +65,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines_core")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
@@ -90,8 +95,9 @@ kotlin {
                 // Koin for JUnit 4
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
+                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
                 implementation("com.google.truth:truth:$ver_truth")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
                 implementation("app.cash.turbine:turbine:$ver_turbine")
                 implementation("org.mock-server:mockserver-netty:$ver_mockserver")
                 implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
@@ -112,6 +118,27 @@ kotlin {
             }
         }
         val jsTest by getting
+        val iosX64Main by getting
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+        val iosMain by creating {
+            dependsOn(commonMain)
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+            dependencies {
+            }
+
+        }
+        val iosX64Test by getting
+        val iosArm64Test by getting
+        val iosSimulatorArm64Test by getting
+        val iosTest by creating {
+            dependsOn(commonTest)
+            iosX64Test.dependsOn(this)
+            iosArm64Test.dependsOn(this)
+            iosSimulatorArm64Test.dependsOn(this)
+        }
     }
 }
 

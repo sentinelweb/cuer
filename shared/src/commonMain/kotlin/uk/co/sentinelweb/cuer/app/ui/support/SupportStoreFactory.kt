@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl
 
 class SupportStoreFactory constructor(
-    private val storeFactory: StoreFactory = DefaultStoreFactory,
+    private val storeFactory: StoreFactory = DefaultStoreFactory(),
     log: LogWrapper,
     private val prefs: MultiPlatformPreferencesWrapper,
     private val linkExtractor: LinkExtractor,
@@ -51,8 +51,18 @@ class SupportStoreFactory constructor(
                         intent.media.channelData
                             .let {
                                 list.add(
-                                    linkExtractor.mapUrlToLinkDomain(
-                                        YoutubeUrl.channelPlatformIdUrl(it)
+                                    linkExtractor.mapUrlToLinkDomain(// todo map properly
+                                        object : MatchResult {
+                                            override val groupValues = listOf<String>()
+                                            override val groups: MatchGroupCollection
+                                                get() = TODO("Not yet implemented")
+                                            override val range: IntRange = 0..0
+                                            override val value: String =
+                                                YoutubeUrl.channelPlatformIdUrl(it)
+                                            override fun next(): MatchResult? {
+                                                TODO("Not yet implemented")
+                                            }
+                                        }
                                     )
                                 ); list
                             }

@@ -8,7 +8,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
-import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
+import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -17,11 +17,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract
@@ -42,7 +38,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<SupportDialogFragment>()
     private val controller: SupportController by inject()
     private val mviView: SupportMviView by inject()
     private val log: LogWrapper by inject()
@@ -51,7 +47,6 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     private val cryptoLauncher: CryptoLauncher by inject()
     private val ytLauncher: YoutubeJavaApiWrapper by inject()
     private val toast: ToastWrapper by inject()
-    private val alertDialogCreator: AlertDialogCreator by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
@@ -69,7 +64,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        controller.onViewCreated(listOf(mviView), lifecycle.asMviLifecycle())
+        controller.onViewCreated(listOf(mviView), lifecycle.asEssentyLifecycle())
     }
 
     override fun onCreateView(
@@ -111,30 +106,9 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                             else -> urlLauncher.launchUrl(label.link.address)
                         }
                         is Crypto -> cryptoLauncher.launch(label.link)
-                            .also {
-                                alertDialogCreator.create(
-                                    AlertDialogModel(
-                                        R.string.support_crypto_warning_title,
-                                        R.string.support_crypto_warning_message,
-                                        AlertDialogModel.Button(
-                                            R.string.support_crypto_warning_ok,
-                                            { showCryptoAppLauncher() }
-                                        ),
-//                                        AlertDialogModel.Button(
-//                                            R.string.support_crypto_warning_dont_show,
-//                                            { showCryptoAppLauncher() }
-//                                        ),
-                                        AlertDialogModel.Button(R.string.cancel, {})
-                                    )
-                                ).show()
-                            }
                     }
                 }
             })
-    }
-
-    private fun showCryptoAppLauncher() {
-        AppSelectorBottomSheet.show(requireActivity(), cryptoLauncher.cryptoAppWhiteList)
     }
 
     class SupportStrings(private val res: ResourceWrapper) : SupportContract.Strings
@@ -161,7 +135,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                 scoped {
                     SupportStoreFactory(
 //                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        storeFactory = DefaultStoreFactory,
+                        storeFactory = DefaultStoreFactory(),
                         log = get(),
                         prefs = get(),
                         linkExtractor = get()
@@ -173,9 +147,8 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                 scoped { UrlLauncherWrapper(this.getFragmentActivity()) }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped<CryptoLauncher> {
-                    AndroidCryptoLauncher(this.getFragmentActivity(), get(), get())
+                    AndroidCryptoLauncher(this.getFragmentActivity(), get(), get(), get())
                 }
-                scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
             }
         }

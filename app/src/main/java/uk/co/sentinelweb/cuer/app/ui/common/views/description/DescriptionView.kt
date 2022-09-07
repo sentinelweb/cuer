@@ -2,10 +2,11 @@ package uk.co.sentinelweb.cuer.app.ui.common.views.description
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.text.Spannable
+import android.text.SpannableString
+import android.text.Spanned
 import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.AttributeSet
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
@@ -18,13 +19,18 @@ import org.koin.core.component.createScope
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.databinding.PlaylistItemDescriptionBinding
+import uk.co.sentinelweb.cuer.app.databinding.ViewDescriptionBinding
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
+import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
+import uk.co.sentinelweb.cuer.app.util.link.TimecodeExtractor
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.TimecodeDomain
+
 
 class DescriptionView @JvmOverloads constructor(
     context: Context,
@@ -39,34 +45,22 @@ class DescriptionView @JvmOverloads constructor(
     private val chipCreator: ChipCreator by scope.inject()
     private val res: ResourceWrapper by scope.inject()
     private val log: LogWrapper by scope.inject()
+    private val linkExtractor: LinkExtractor by scope.inject()
+    private val timecodeExtractor: TimecodeExtractor by scope.inject()
 
-    private val binding: PlaylistItemDescriptionBinding
+    private val binding: ViewDescriptionBinding
 
     private val ytDrawable: Drawable by lazy {
         res.getDrawable(R.drawable.ic_platform_youtube, R.color.primary)
     }
 
     init {
-        binding = PlaylistItemDescriptionBinding.inflate(LayoutInflater.from(context), this, true)
+        binding = ViewDescriptionBinding.inflate(LayoutInflater.from(context), this, true)
     }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
         binding.pidAuthorImage.setOnClickListener { interactions.onChannelClick() }
-        // fixme: link clicks are handled in the TextView - need to extract the links manually
-        //  and set the spans o get the click events
-        // https://stackoverflow.com/questions/46343014/capture-http-link-click-event-in-android-textview
-//        binding.pidDesc.setMovementMethod(object : LinkMovementMethod() {
-//            override fun handleMovementKey(
-//                widget: TextView?, buffer: Spannable?, keyCode: Int,
-//                movementMetaState: Int, event: KeyEvent?
-//            ): Boolean {
-//                buffer
-//                    ?.takeIf { it.toString().startsWith("http") }
-//                    ?.run { interactions.onLinkClick(this.toString()) }
-//                return true
-//            }
-//        })
         binding.pidDesc.setTextIsSelectable(true)
     }
 
@@ -77,6 +71,7 @@ class DescriptionView @JvmOverloads constructor(
 
     fun setModel(model: DescriptionModel) {
         binding.pidDesc.text = model.description
+        manualLink(binding.pidDesc)
         binding.pidTitle.text = model.title
         binding.pidPubDate.text = model.pubDate
         binding.pidAuthorTitle.text = model.channelTitle
@@ -110,6 +105,63 @@ class DescriptionView @JvmOverloads constructor(
         }
     }
 
+    private fun manualLink(tv: TextView) {
+        val text = tv.text.toString()
+        val links = linkExtractor.extractLinks(text)
+        val timecodes = timecodeExtractor.extractTimecodes(text)
+        val textWithLinks = SpannableString(tv.text)
+        links
+            .forEach { link ->
+                val span = InternalURLSpan(link) {
+                    when (it) {
+                        is LinkDomain.UrlLinkDomain -> interactions.onLinkClick(it)
+                        is LinkDomain.CryptoLinkDomain -> interactions.onCryptoClick(it)
+                    }
+                }
+                textWithLinks.setSpan(
+                    span,
+                    link.extractRegion!!.first,
+                    link.extractRegion!!.second + 1,
+                    Spanned.SPAN_EXCLUSIVE_INCLUSIVE
+                )
+            }
+        timecodes
+            .forEach { timecode ->
+                val span = InternalTimecodeSpan(timecode) {
+                    interactions.onTimecodeClick(it)
+                }
+                textWithLinks.setSpan(
+                    span,
+                    timecode.extractRegion!!.first,
+                    timecode.extractRegion!!.second + 1,
+                    Spanned.SPAN_EXCLUSIVE_INCLUSIVE
+                )
+            }
+
+        tv.text = textWithLinks
+        tv.linksClickable = true
+        tv.movementMethod = LinkMovementMethod.getInstance()
+        tv.isFocusable = false
+    }
+
+    class InternalURLSpan(
+        private var link: LinkDomain,
+        private var clickInterface: (LinkDomain) -> Unit
+    ) : ClickableSpan() {
+        override fun onClick(widget: View) {
+            clickInterface(link)
+        }
+    }
+
+    class InternalTimecodeSpan(
+        private var timecode: TimecodeDomain,
+        private var clickInterface: (TimecodeDomain) -> Unit
+    ) : ClickableSpan() {
+        override fun onClick(widget: View) {
+            clickInterface(timecode)
+        }
+    }
+
     fun channelImageVisible(b: Boolean) {
         binding.pidAuthorImage.isVisible = b
     }
@@ -117,7 +169,7 @@ class DescriptionView @JvmOverloads constructor(
     companion object {
         val viewModule = module {
             scope<DescriptionView> {
-                scoped { ChipCreator((getSource() as View).context, get(), get()) }
+                scoped { ChipCreator((get() as View).context, get(), get()) }
             }
         }
     }

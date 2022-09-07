@@ -25,6 +25,7 @@
         <package android:name="net.bitstamp.app" />
         <package android:name="com.revolut.revolut" />
     </queries>
+
     <application
         android:name="uk.co.sentinelweb.cuer.app.CuerApp"
         android:allowBackup="true"

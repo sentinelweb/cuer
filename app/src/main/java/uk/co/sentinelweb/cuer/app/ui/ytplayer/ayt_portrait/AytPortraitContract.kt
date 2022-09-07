@@ -1,11 +1,12 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait
 
-import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
+import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
@@ -37,7 +38,7 @@ interface AytPortraitContract {
                         queueConsumer = get(),
                         modelMapper = get(),
                         coroutines = get(),
-                        lifecycle = getSource<AytPortraitActivity>().lifecycle.asMviLifecycle(),
+                        lifecycle = get<AytPortraitActivity>().lifecycle.asEssentyLifecycle(),
                         log = get(),
                         playControls = get(),
                         store = get()
@@ -46,7 +47,7 @@ interface AytPortraitContract {
                 scoped {
                     PlayerStoreFactory(
                         //storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        storeFactory = DefaultStoreFactory,
+                        storeFactory = DefaultStoreFactory(),
                         itemLoader = get(),
                         queueConsumer = get(),
                         queueProducer = get(),
@@ -58,18 +59,18 @@ interface AytPortraitContract {
                         playerControls = get(),
                     ).create()
                 }
-                scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
+                scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(get<AytPortraitActivity>(), get()) }
                 scoped {
-                    (getSource<AytPortraitActivity>()
+                    (get<AytPortraitActivity>()
                         .supportFragmentManager
                         .findFragmentById(R.id.portrait_player_controls) as CastPlayerMviFragment)
                 }
                 scoped {
-                    (getSource<AytPortraitActivity>()
+                    (get<AytPortraitActivity>()
                         .supportFragmentManager
                         .findFragmentById(R.id.portrait_player_playlist) as PlaylistFragment)
                 }
-                scoped { navigationRouter(false, getSource(), withNavHost = false) }
+                scoped { navigationRouter(false, get<AytPortraitActivity>(), withNavHost = false) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = get(),
@@ -82,13 +83,14 @@ interface AytPortraitContract {
                 scoped<SkipContract.View> {
                     SkipView(
                         selectDialogCreator = SelectDialogCreator(
-                            context = getSource<AytPortraitActivity>()
+                            context = get<AytPortraitActivity>()
                         )
                     )
                 }
-                scoped { LocalPlayerCastListener(getSource(), get()) }
+                scoped { LocalPlayerCastListener(get<AytPortraitActivity>(), get()) }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<CommitHost> { EmptyCommitHost() }
+                scoped { AlertDialogCreator(get<AytPortraitActivity>()) }
             }
         }
     }
