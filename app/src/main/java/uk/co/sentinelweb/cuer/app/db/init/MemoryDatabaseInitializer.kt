@@ -2,9 +2,9 @@ package uk.co.sentinelweb.cuer.app.db.init
 
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer.Companion.DEFAULT_PLAYLIST_TEMPLATE
+import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.RoomMediaDatabaseRepository
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -16,7 +16,7 @@ class MemoryDatabaseInitializer constructor(
     private val contextProvider: CoroutineContextProvider,
     private val playlistRepository: PlaylistDatabaseRepository,
     private val playlistItemRepository: PlaylistItemDatabaseRepository,
-    private val roomMediaRepository: RoomMediaDatabaseRepository,
+    private val mediaRepository: MediaDatabaseRepository,
     private val timeProvider: TimeProvider,
     private val log: LogWrapper,
 ) : DatabaseInitializer {
@@ -28,7 +28,7 @@ class MemoryDatabaseInitializer constructor(
 
     override fun initDatabase() {
         contextProvider.ioScope.launch {
-            (roomMediaRepository.count()
+            (mediaRepository.count()
                 .takeIf { it.isSuccessful && it.data == 0 }
                 ?: let { return@launch })
                 .let { initPlaylists() }
@@ -39,7 +39,7 @@ class MemoryDatabaseInitializer constructor(
                 }
                 .takeIf { (_, result) -> result.isSuccessful }
                 ?.let { (playlist, result) ->
-                    playlist to result.data?.let { roomMediaRepository.save(it) }
+                    playlist to result.data?.let { mediaRepository.save(it) }
                 }
                 ?.let { (playlist, result) -> makePlaylistItems(playlist, result?.data!!) }
                 ?.let {
