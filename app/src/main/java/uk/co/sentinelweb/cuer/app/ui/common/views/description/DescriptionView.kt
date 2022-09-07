@@ -169,7 +169,7 @@ class DescriptionView @JvmOverloads constructor(
     companion object {
         val viewModule = module {
             scope<DescriptionView> {
-                scoped { ChipCreator((getSource() as View).context, get(), get()) }
+                scoped { ChipCreator((get() as View).context, get(), get()) }
             }
         }
     }

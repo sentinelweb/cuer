@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl
 
 class SupportStoreFactory constructor(
-    private val storeFactory: StoreFactory = DefaultStoreFactory,
+    private val storeFactory: StoreFactory = DefaultStoreFactory(),
     log: LogWrapper,
     private val prefs: MultiPlatformPreferencesWrapper,
     private val linkExtractor: LinkExtractor,

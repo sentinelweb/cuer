@@ -93,7 +93,7 @@ interface PlaylistsContract {
         @JvmStatic
         val fragmentModule = module {
             scope(named<PlaylistsFragment>()) {
-                scoped<View> { getSource() }
+                scoped<View> { get<PlaylistsFragment>() }
                 scoped<Presenter> {
                     PlaylistsPresenter(
                         view = get(),
@@ -118,8 +118,8 @@ interface PlaylistsContract {
                     )
                 }
                 scoped { PlaylistsModelMapper(get()) }
-                scoped { PlaylistsAdapter(get(), getSource()) }
-                scoped { ItemTouchHelperCallback(getSource()) }
+                scoped { PlaylistsAdapter(get(), get<PlaylistsFragment>()) }
+                scoped { ItemTouchHelperCallback(get<PlaylistsFragment>()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(

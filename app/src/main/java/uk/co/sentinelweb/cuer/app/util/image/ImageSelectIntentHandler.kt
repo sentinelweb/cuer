@@ -62,7 +62,7 @@ class ImageSelectIntentHandler(
                     } else throw IllegalStateException("scheme not supported: $selectedImageUri")
                     runBlocking {
                         callback(
-                            ImageDomain(fileUri.toString())
+                            ImageDomain(url = fileUri.toString())
                         )
                     }
                 }

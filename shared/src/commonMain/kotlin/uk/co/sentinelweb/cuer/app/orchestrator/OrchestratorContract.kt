@@ -44,17 +44,33 @@ interface OrchestratorContract<Domain> {
 
     class IdListFilter(val ids: List<Long>) : Filter
     class MediaIdListFilter(val ids: List<Long>) : Filter
-    class PlatformIdListFilter(val ids: List<String>, @Suppress("UNUSED_PARAMETER") platform: PlatformDomain = PlatformDomain.YOUTUBE) : Filter
+    class PlatformIdListFilter(
+        val ids: List<String>,
+        @Suppress("UNUSED_PARAMETER") platform: PlatformDomain = PlatformDomain.YOUTUBE
+    ) : Filter
+
     class DefaultFilter() : Filter
     class AllFilter() : Filter
     class ChannelPlatformIdFilter(val platformId: String) : Filter
     class NewMediaFilter() : Filter
     class RecentMediaFilter() : Filter
     class TitleFilter(val title: String) : Filter
-    class SearchFilter(val text: String, val isWatched: Boolean, val isNew: Boolean, val isLive: Boolean, val playlistIds: List<Long>?) :
+    class SearchFilter(
+        val text: String,
+        val isWatched: Boolean,
+        val isNew: Boolean,
+        val isLive: Boolean,
+        val playlistIds: List<Long>?
+    ) :
         Filter
 
-    class InvalidOperationException(clazz: KClass<out OrchestratorContract<out Any>>, filter: Filter?, options: Options) :
+    class PlaylistIdLFilter(val id: Long) : Filter
+
+    class InvalidOperationException(
+        clazz: KClass<out OrchestratorContract<out Any>>,
+        filter: Filter?,
+        options: Options
+    ) :
         UnsupportedOperationException("class = ${clazz.simpleName} filter = $filter options = $options")
 
     class NotImplementedException(msg: String? = null) : Exception(msg)

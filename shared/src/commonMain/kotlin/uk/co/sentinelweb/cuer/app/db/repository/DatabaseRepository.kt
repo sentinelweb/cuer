@@ -35,3 +35,4 @@ interface ChannelDatabaseRepository : DatabaseRepository<ChannelDomain, Nothing>
 interface MediaDatabaseRepository : DatabaseRepository<MediaDomain, Nothing>
 interface PlaylistDatabaseRepository : DatabaseRepository<PlaylistDomain, PlaylistStatDomain>
 interface PlaylistItemDatabaseRepository : DatabaseRepository<PlaylistItemDomain, Nothing>
+interface ImageDatabaseRepository : DatabaseRepository<ImageDomain, Nothing>

@@ -37,7 +37,7 @@ class CastPlayerFragment() :
     CastPlayerContract.View,
     AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<CastPlayerFragment>()
     private val presenter: CastPlayerContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val imageProvider: ImageProvider by inject()

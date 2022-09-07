@@ -20,18 +20,16 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistItemEditBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SHARED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_BACK
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
@@ -53,7 +51,7 @@ import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
 class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<PlaylistItemEditFragment>()
     private val viewModel: PlaylistItemEditViewModel by inject()
     private val log: LogWrapper by inject()
     private val navRouter: NavigationRouter by inject()

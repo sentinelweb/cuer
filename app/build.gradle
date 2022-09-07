@@ -123,6 +123,7 @@ dependencies {
     implementation project(":shared")
     implementation project(":net")
     implementation project(":remote")
+    implementation project(":database")
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // deps
@@ -171,11 +172,6 @@ dependencies {
     // koin
     implementation "io.insert-koin:koin-core:$ver_koin"
     implementation "io.insert-koin:koin-android:$ver_koin"
-
-    // room
-    implementation "androidx.room:room-runtime:$ver_room"
-    kapt "androidx.room:room-compiler:$ver_room"
-    implementation "androidx.room:room-ktx:$ver_room"
 
     // debug
     implementation "com.facebook.stetho:stetho:$ver_stetho"
@@ -242,8 +238,7 @@ dependencies {
     testImplementation "org.mockito:mockito-inline:$ver_mockito_inline"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$ver_mockito_kotlin"
     testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
-    testImplementation "androidx.room:room-testing:$ver_room"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_kotlinx_coroutines_test"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines"
     testImplementation "org.robolectric:robolectric:$ver_robolectric"
     testImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"
     testImplementation "androidx.test:core:$ver_androidx_test"

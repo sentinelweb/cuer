@@ -90,6 +90,7 @@ class SkipPresenter constructor(
     override fun stateChange(playState: PlayerStateDomain) {
         if (playState == UNSTARTED) {
             state.videoReady = false
+            state.accumulator = 0
         }
         if (playState == PLAYING) {
             state.videoReady = true
@@ -111,7 +112,11 @@ class SkipPresenter constructor(
     }
 
     private fun sendAccumulation() {
-        if (state.videoReady && state.accumulator != 0L && state.targetPosition == null) {
+        if (state.videoReady &&
+            state.accumulator != 0L &&
+            state.position > 0 &&
+            state.targetPosition == null
+        ) {
             state.targetPosition = (state.position + state.accumulator).apply {
                 onSkipAvailable(this)
             }

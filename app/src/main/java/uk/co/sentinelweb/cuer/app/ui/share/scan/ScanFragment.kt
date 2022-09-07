@@ -17,7 +17,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
 class ScanFragment : Fragment(R.layout.fragment_scan), ScanContract.View, AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<ScanFragment>()
     override lateinit var listener: ScanContract.Listener
 
     private val presenter: ScanContract.Presenter by inject()

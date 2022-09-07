@@ -38,7 +38,7 @@ class CastPlayerMviFragment() :
     Fragment(),
     AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<CastPlayerMviFragment>()
 
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val imageProvider: FirebaseImageProvider by inject()

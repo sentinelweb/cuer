@@ -1,0 +1,81 @@
+PRAGMA foreign_keys = 'ON';
+
+CREATE TABLE playlist (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    flags INTEGER  NOT NULL DEFAULT 0,
+    title TEXT NOT NULL,
+    currentIndex INTEGER  NOT NULL DEFAULT -1,
+    mode TEXT AS uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain NOT NULL DEFAULT "SINGLE",
+    type TEXT AS uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain NOT NULL DEFAULT "USER",
+    platform TEXT AS uk.co.sentinelweb.cuer.domain.PlatformDomain,
+    platform_id TEXT,
+    channel_id INTEGER,
+    parent_id INTEGER,
+    thumb_id INTEGER,
+    image_id INTEGER,
+    config_json TEXT AS uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistConfigDomain NOT NULL DEFAULT "{}",
+    FOREIGN KEY (channel_id) REFERENCES channel(id),
+    FOREIGN KEY (parent_id) REFERENCES playlist(id),
+    FOREIGN KEY (thumb_id) REFERENCES image(id),
+    FOREIGN KEY (image_id) REFERENCES image(id)
+);
+
+CREATE INDEX playlist_flags_index ON playlist(flags);
+
+CREATE INDEX playlist_type_index ON playlist(type);
+
+CREATE UNIQUE INDEX playlist_platform_platform_id_index ON channel(platform, platform_id);
+
+create:
+INSERT INTO playlist (
+flags, title, currentIndex, mode, type, platform, platform_id, channel_id,
+parent_id, thumb_id, image_id, config_json
+) VALUES ?;
+
+getInsertId:
+SELECT last_insert_rowid() FROM playlist LIMIT 1;
+
+update:
+REPLACE INTO playlist (
+id, flags, title, currentIndex, mode, type, platform, platform_id, channel_id,
+parent_id, thumb_id, image_id, config_json
+) VALUES ?;
+
+load:
+SELECT * FROM playlist WHERE id = ?;
+
+loadAll:
+SELECT * FROM playlist;
+
+loadAllByIds:
+SELECT * FROM playlist WHERE id IN :playlistIds;
+
+loadAllByPlatformIds:
+SELECT * FROM playlist WHERE platform_id IN :platformIds;
+
+loadAllByFlags:
+SELECT * FROM playlist WHERE flags & :flags == :flags;
+
+delete:
+DELETE FROM playlist WHERE id = ?;
+
+deleteAll:
+DELETE FROM playlist;
+
+updateIndex:
+UPDATE playlist SET currentIndex=:index WHERE id=:id;
+
+findPlaylistsForChannelPlatformId:
+SELECT DISTINCT playlist.*
+FROM playlist, playlist_item, media, channel
+WHERE
+    playlist.id==playlist_item.playlist_id
+    AND playlist_item.media_id==media.id
+    AND media.channel_id==channel.id
+    AND channel.platform_id=:channelId;
+
+findPlaylistsWithTitle:
+SELECT * FROM playlist WHERE INSTR(LOWER(title), LOWER(:title));
+
+count:
+SELECT count() FROM playlist;

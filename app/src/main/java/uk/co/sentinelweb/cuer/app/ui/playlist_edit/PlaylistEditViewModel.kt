@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.PLAY_START
@@ -14,7 +15,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
-import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseImageProvider
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.PINNED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
@@ -34,7 +34,6 @@ class PlaylistEditViewModel constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
     private val log: LogWrapper,
-    private val imageProvider: FirebaseImageProvider,
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : ViewModel() {
@@ -154,7 +153,7 @@ class PlaylistEditViewModel constructor(
     fun onCommitClick() {
         if (state.model?.validation?.valid ?: false) {
             viewModelScope.launch {
-                if (state.playlistEdit.default && state.source == Source.LOCAL) {
+                if (state.playlistEdit.default && state.source == LOCAL) {
                     playlistOrchestrator.loadList(
                         OrchestratorContract.DefaultFilter(),
                         state.source.flatOptions()
@@ -261,11 +260,12 @@ class PlaylistEditViewModel constructor(
     fun onParentSelected(parent: PlaylistDomain?, checked: Boolean) = viewModelScope.launch {
         if (state.treeLookup.isEmpty()) {
             state.treeLookup = playlistOrchestrator
-                .loadList(OrchestratorContract.AllFilter(), state.source.flatOptions())
+                .loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
                 .buildTree()
                 .buildLookup()
         }
         state.playlistEdit.id
+            ?.takeIf { state.source == LOCAL }
             ?.let { state.treeLookup[state.playlistEdit.id]!! }
             ?.also { childNode ->
                 val parentNode = state.treeLookup[parent?.id]

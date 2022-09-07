@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
@@ -21,7 +20,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.AppListBuilder
 
 class AppSelectorBottomSheet : BottomSheetDialogFragment(), AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<AppSelectorBottomSheet>()
     private val appLauncher: AppLauncherWrapper by inject()
     private val appListBuilder: AppListBuilder by inject()
 

@@ -10,7 +10,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
@@ -183,7 +182,7 @@ interface PlaylistContract {
             factory { ItemFactory(get(), get(), get()) }
             factory { ItemModelMapper(get(), get(), get(), get()) }
             scope(named<PlaylistFragment>()) {
-                scoped<View> { getSource() }
+                scoped<View> { get<PlaylistFragment>() }
                 scoped<Presenter> {
                     PlaylistPresenter(
                         view = get(),
@@ -215,9 +214,9 @@ interface PlaylistContract {
                 }
                 scoped { get<Presenter>() as External }
                 scoped { PlaylistModelMapper(itemModelMapper = get(), iconMapper = get()) }
-                scoped { PlaylistAdapter(get(), getSource()) }
+                scoped { PlaylistAdapter(get(), get<PlaylistFragment>()) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped { ItemTouchHelperCallback(getSource()) }
+                scoped { ItemTouchHelperCallback(get<PlaylistFragment>()) }
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }
@@ -236,7 +235,7 @@ interface PlaylistContract {
                 }
                 scoped {
                     PlayDialog(
-                        getSource(),
+                        get<PlaylistFragment>(),
                         itemFactory = get(),
                         itemModelMapper = get(),
                         navigationRouter = get(),

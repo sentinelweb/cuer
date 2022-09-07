@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import org.koin.android.ext.android.getKoin
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.android.scope.createScope
 import org.koin.android.scope.getScopeOrNull
@@ -20,10 +21,10 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 /** copied from org.koin.androidx.scope.FragmentExt but scope wont link as fragment is not attached */
-fun ComponentActivity.activityScopeWithSource() = LifecycleScopeWithSourceDelegate(this)
+fun <T> ComponentActivity.activityScopeWithSource() = LifecycleScopeWithSourceDelegate<T>(this)
 
 /** copied from org.koin.androidx.scope.FragmentExt but scope wont link as fragment is not attached */
-fun Fragment.fragmentScopeWithSource() = LifecycleScopeDelegate(this) { koin: Koin ->
+fun <T> Fragment.fragmentScopeWithSource() = LifecycleScopeDelegate<T>(this, getKoin()) { koin: Koin ->
     koin.createScope(getScopeId(), getScopeName(), this)
 }
 
@@ -39,7 +40,7 @@ fun Service.serviceScopeWithSource() = lazy { getScopeOrNull() ?: createScope(th
 fun Activity.activityLegacyScopeWithSource() = lazy { getScopeOrNull() ?: createScope(this) }
 
 /** wraps org.koin.androidx.scope.LifecycleScopeDelegate - to add source  */
-class LifecycleScopeWithSourceDelegate(
+class LifecycleScopeWithSourceDelegate<T>(
     val lifecycleOwner: LifecycleOwner,
     koinContext: KoinContext = GlobalContext,
     createScope: (Koin) -> Scope = { koin: Koin ->
@@ -52,7 +53,7 @@ class LifecycleScopeWithSourceDelegate(
 ) : ReadOnlyProperty<LifecycleOwner, Scope> {
 
     private val _lifecycleDelegate =
-        LifecycleScopeDelegate(lifecycleOwner, koinContext, createScope)
+        LifecycleScopeDelegate<T>(lifecycleOwner, koinContext.get(), createScope)
 
     override fun getValue(thisRef: LifecycleOwner, property: KProperty<*>): Scope {
         return _lifecycleDelegate.getValue(thisRef, property)
@@ -60,4 +61,4 @@ class LifecycleScopeWithSourceDelegate(
 }
 
 fun Scope.getFragmentActivity(): AppCompatActivity =
-    (this.getSource() as Fragment).requireActivity() as AppCompatActivity
+    (this.get() as Fragment).requireActivity() as AppCompatActivity

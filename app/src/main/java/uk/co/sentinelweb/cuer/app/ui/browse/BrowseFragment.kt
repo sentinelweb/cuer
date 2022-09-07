@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
+import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -23,9 +23,9 @@ import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnResume
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnUpClicked
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
@@ -45,7 +45,7 @@ import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 
 class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<BrowseFragment>()
     private val controller: BrowseController by inject()
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
@@ -74,7 +74,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        controller.onViewCreated(listOf(browseMviView), lifecycle.asMviLifecycle())
+        controller.onViewCreated(listOf(browseMviView), lifecycle.asEssentyLifecycle())
     }
 
     override fun onCreateView(
@@ -175,14 +175,14 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                     BrowseController(
                         storeFactory = get(),
                         modelMapper = get(),
-                        lifecycle = getSource<BrowseFragment>().lifecycle.asMviLifecycle(),
+                        lifecycle = get<BrowseFragment>().lifecycle.asEssentyLifecycle(),
                         log = get()
                     )
                 }
                 scoped {
                     BrowseStoreFactory(
 //                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        storeFactory = DefaultStoreFactory,
+                        storeFactory = DefaultStoreFactory(),
                         repository = get(),
                         playlistOrchestrator = get(),
                         browseStrings = get(),

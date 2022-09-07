@@ -7,7 +7,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -91,7 +90,7 @@ interface CastPlayerContract {
             factory { CompactPlayerScroll() }
             scope(named<CastPlayerFragment>()) {
                 viewModel { State() }
-                scoped<View> { getSource() }
+                scoped<View> { get<CastPlayerFragment>() }
                 scoped<Presenter> {
                     CastPlayerPresenter(
                         view = get(),
@@ -135,7 +134,7 @@ interface CastPlayerContract {
                 }
                 scoped {
                     PlayDialog(
-                        getSource(),
+                        get<CastPlayerFragment>(),
                         itemFactory = get(),
                         itemModelMapper = get(),
                         navigationRouter = get(),

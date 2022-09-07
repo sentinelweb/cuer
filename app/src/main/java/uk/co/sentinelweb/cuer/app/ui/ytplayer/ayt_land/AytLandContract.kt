@@ -1,9 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land
 
-import com.arkivanov.mvikotlin.core.lifecycle.asMviLifecycle
+import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
@@ -33,7 +32,7 @@ interface AytLandContract {
                         queueConsumer = get(),
                         modelMapper = get(),
                         coroutines = get(),
-                        lifecycle = getSource<AytLandActivity>().lifecycle.asMviLifecycle(),
+                        lifecycle = get<AytLandActivity>().lifecycle.asEssentyLifecycle(),
                         log = get(),
                         playControls = get(),
                         store = get()
@@ -42,7 +41,7 @@ interface AytLandContract {
                 scoped {
                     PlayerStoreFactory(
                         // storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        storeFactory = DefaultStoreFactory,
+                        storeFactory = DefaultStoreFactory(),
                         itemLoader = get(),
                         queueConsumer = get(),
                         queueProducer = get(),
@@ -54,9 +53,9 @@ interface AytLandContract {
                         playerControls = get(),
                     ).create()
                 }
-                scoped { ShowHideUi(getSource()) }
-                scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(getSource(), get()) }
-                scoped { navigationRouter(false, getSource(), withNavHost = false) }
+                scoped { ShowHideUi(get<AytLandActivity>()) }
+                scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(get(), get()) }
+                scoped { navigationRouter(false, get<AytLandActivity>(), withNavHost = false) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = get(),
@@ -69,12 +68,12 @@ interface AytLandContract {
                 scoped<SkipContract.View> {
                     SkipView(
                         selectDialogCreator = SelectDialogCreator(
-                            context = getSource<AytLandActivity>()
+                            context = get<AytLandActivity>()
                         )
                     )
                 }
-                scoped { AlertDialogCreator(getSource()) }
-                scoped { LocalPlayerCastListener(getSource(), get()) }
+                scoped { AlertDialogCreator(get()) }
+                scoped { LocalPlayerCastListener(get(), get()) }
             }
         }
     }

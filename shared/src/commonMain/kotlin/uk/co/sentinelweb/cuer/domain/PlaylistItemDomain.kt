@@ -14,4 +14,8 @@ data class PlaylistItemDomain(
     val order: Long,
     val archived: Boolean = false,
     val playlistId: Long? = null
-) : Domain
+) : Domain {
+    companion object {
+        const val FLAG_ARCHIVED = 1L
+    }
+}

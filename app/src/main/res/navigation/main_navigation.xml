@@ -113,13 +113,27 @@
             android:name="PLAYLIST_ITEM"
             app:argType="string"
             app:nullable="false"
-            />
+        />
 
         <argument
             android:name="SOURCE"
             app:argType="string"
             app:nullable="false"
-            />
+        />
+
+        <argument
+            android:name="PLAYLIST_PARENT"
+            android:defaultValue="-1L"
+            app:argType="long"
+            app:nullable="false"
+        />
+
+        <argument
+            android:name="ALLOW_PLAY"
+            android:defaultValue="true"
+            app:argType="boolean"
+            app:nullable="false"
+        />
 
     </fragment>
 

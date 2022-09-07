@@ -1,0 +1,75 @@
+PRAGMA foreign_keys = 'ON';
+
+CREATE TABLE media (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    flags INTEGER NOT NULL DEFAULT 0,
+    type TEXT AS uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain NOT NULL,
+    url TEXT NOT NULL,
+    title TEXT,
+    duration INTEGER,
+    position INTEGER,
+    date_last_played TEXT AS kotlinx.datetime.Instant,
+    description TEXT,
+    platform  TEXT AS uk.co.sentinelweb.cuer.domain.PlatformDomain NOT NULL,
+    platform_id TEXT NOT NULL,
+    published TEXT AS kotlinx.datetime.LocalDateTime,
+    channel_id INTEGER,
+    thumb_id INTEGER,
+    image_id INTEGER,
+    FOREIGN KEY (channel_id) REFERENCES channel(id)
+);
+
+CREATE UNIQUE INDEX media_platform_platform_id_index ON channel(platform, platform_id);
+
+CREATE INDEX media_type_index ON media(type);
+
+CREATE INDEX media_flags_index ON media(flags);
+
+CREATE INDEX media_channel_id_index ON media(channel_id);
+
+CREATE INDEX media_title_index ON media(title);
+
+CREATE INDEX media_description_index ON media(description);
+
+create:
+INSERT INTO media ( flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,
+published, channel_id, thumb_id, image_id ) VALUES ?;
+
+getInsertId:
+SELECT last_insert_rowid() FROM media LIMIT 1;
+
+update:
+REPLACE INTO media ( id, flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,
+published, channel_id, thumb_id, image_id ) VALUES ?;
+
+updatePosition:
+UPDATE media SET date_last_played=:dateLastPlayed, position=:position, duration=:duration, flags=:flags WHERE id=:id;
+
+loadById:
+SELECT * FROM media WHERE id = ?;
+
+loadAll:
+SELECT * FROM media;
+
+loadAllByFlags:
+SELECT * FROM media WHERE flags & :flags == :flags;
+
+loadAllByIds:
+SELECT * FROM media WHERE id IN ?;
+
+loadByPlatformId:
+SELECT * FROM media WHERE platform_id LIKE :platformId AND platform==:platform LIMIT 1;
+
+loadFlags:
+SELECT flags FROM media WHERE id == :id;
+
+count:
+SELECT count() FROM media;
+
+delete:
+DELETE FROM media WHERE id = ?;
+
+deleteAll:
+DELETE FROM media;
+
+

@@ -42,7 +42,7 @@ interface FloatingPlayerContract {
             scope(named<FloatingPlayerService>()) {
                 scoped<Controller> {
                     FloatingPlayerController(
-                        service = getSource(),
+                        service = get(),
                         playerController = get(),
                         playerMviViw = get(),
                         windowManagement = get(),
@@ -65,7 +65,7 @@ interface FloatingPlayerContract {
                 scoped {
                     PlayerStoreFactory(
                         // storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        storeFactory = DefaultStoreFactory,
+                        storeFactory = DefaultStoreFactory(),
                         itemLoader = get(),
                         queueConsumer = get(),
                         queueProducer = get(),
@@ -77,8 +77,8 @@ interface FloatingPlayerContract {
                         playerControls = get(),
                     ).create()
                 }
-                scoped { FloatingWindowMviView(getSource(), get(), get(), get()) }
-                scoped { FloatingWindowManagement(getSource(), get(), get(), get()) }
+                scoped { FloatingWindowMviView(get(), get(), get(), get()) }
+                scoped { FloatingWindowManagement(get(), get(), get(), get()) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = EmptySkipView(),
@@ -108,7 +108,7 @@ interface FloatingPlayerContract {
                 }
                 scoped<PlayerControlsNotificationContract.View> {
                     PlayerControlsNotificationMedia(
-                        service = getSource(),
+                        service = get(),
                         appState = get(),
                         timeProvider = get(),
                         log = get(),

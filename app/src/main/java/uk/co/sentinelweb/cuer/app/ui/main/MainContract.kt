@@ -56,9 +56,9 @@ interface MainContract {
         @JvmStatic
         val activityModule = module {
             scope(named<MainActivity>()) {
-                scoped<View> { getSource() }
-                scoped<PlayerViewControl> { getSource() }
-                scoped<NavigationProvider> { getSource() }
+                scoped<View> { get<MainActivity>() }
+                scoped<PlayerViewControl> { get<MainActivity>() }
+                scoped<NavigationProvider> { get<MainActivity>() }
                 scoped<Presenter> {
                     MainPresenter(
                         view = get(),
@@ -71,18 +71,18 @@ interface MainContract {
                     )
                 }
                 scoped {
-                    (getSource<MainActivity>()
+                    (get<MainActivity>()
                         .supportFragmentManager
                         .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).playerControls
                 }
-                scoped { navigationRouter(false, getSource()) }
+                scoped { navigationRouter(false, get<MainActivity>()) }
                 viewModel { State() }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(getSource(), get()) }
-                scoped<DoneNavigation> { getSource() }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<MainActivity>(), get()) }
+                scoped<DoneNavigation> { get<MainActivity>() }
                 scoped<PlaylistContract.Interactions?> { null }
                 scoped<CommitHost> { EmptyCommitHost() }
-                scoped { FloatingPlayerCastListener(getSource(), get(), get()) }
-                scoped { AlertDialogCreator(getSource()) }
+                scoped { FloatingPlayerCastListener(get(), get(), get()) }
+                scoped { AlertDialogCreator(get<MainActivity>()) }
             }
         }
     }

@@ -29,7 +29,7 @@ interface PrefRootContract {
         @JvmStatic
         val fragmentModule = module {
             scope(named<PrefRootFragment>()) {
-                scoped<View> { getSource() }
+                scoped<View> { get<PrefRootFragment>() }
                 scoped<Presenter> {
                     PrefRootPresenter(
                         view = get(),

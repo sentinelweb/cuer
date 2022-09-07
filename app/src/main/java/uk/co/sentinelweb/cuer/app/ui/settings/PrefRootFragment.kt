@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
 class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContract.View, AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource()
+    override val scope: Scope by fragmentScopeWithSource<PrefRootFragment>()
     private val presenter: PrefRootContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
 
