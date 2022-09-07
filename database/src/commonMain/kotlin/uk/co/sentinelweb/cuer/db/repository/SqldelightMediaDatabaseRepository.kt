@@ -91,11 +91,11 @@ class SqldelightMediaDatabaseRepository(
 
                         is PlatformIdListFilter ->
                             filter.ids
-                                // todo make query to load all
-                                .map {
+                                // todo make query to load all at once
+                                .mapNotNull {
                                     database.mediaEntityQueries
                                         .loadByPlatformId(it, YOUTUBE)
-                                        .executeAsOne()
+                                        .executeAsOneOrNull()
                                 }
                                 .map { fillAndMapEntity(it) }
                                 .let { RepoResult.Data.dataOrEmpty(it) }

@@ -19,7 +19,7 @@ CREATE INDEX playlist_item_playlist_id_index ON playlist_item(playlist_id);
 
 CREATE INDEX playlist_item_media_id_index ON playlist_item(media_id);
 
-CREATE UNIQUE INDEX playlist_item_media_id_playlist_id_index ON playlist_item(media_id, playlist_id);
+CREATE INDEX playlist_item_media_id_playlist_id_index ON playlist_item(media_id, playlist_id);
 
 create:
 INSERT INTO playlist_item (flags, media_id, ordering, playlist_id, date_added) VALUES ?;

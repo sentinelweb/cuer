@@ -46,17 +46,21 @@ class SqldelightPlaylistDatabaseRepository(
         flat: Boolean,
         emit: Boolean
     ): RepoResult<PlaylistDomain> = withContext(coProvider.IO) {
-        try {
-            saveInternal(domain, flat)
-                .let { RepoResult.Data(load(id = it, flat).data) }
-                .also {
-                    if (emit) it.data
-                        ?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
-                }
-        } catch (e: Exception) {
-            val msg = "couldn't save playlist: ${domain}"
-            log.e(msg, e)
-            RepoResult.Error<PlaylistDomain>(e, msg)
+        database.playlistItemEntityQueries.transactionWithResult<RepoResult<PlaylistDomain>> {
+            try {
+                saveInternal(domain, flat)
+                    .let { RepoResult.Data(loadPlaylistInternal(id = it, flat).data) }
+
+            } catch (e: Exception) {
+                val msg = "couldn't save playlist: ${domain}"
+                log.e(msg, e)
+                rollback(RepoResult.Error<PlaylistDomain>(e, msg))
+            }
+        }.also {
+            it
+                .takeIf { it.isSuccessful && emit }
+                ?.data
+                ?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
         }
     }
 
@@ -65,9 +69,7 @@ class SqldelightPlaylistDatabaseRepository(
         flat: Boolean,
         emit: Boolean
     ): RepoResult<List<PlaylistDomain>> = withContext(coProvider.IO) {
-        // todo should be transactional - but its a lot of work ..
         database.playlistItemEntityQueries.transactionWithResult<RepoResult<List<PlaylistDomain>>> {
-
             try {
                 domains
                     .map { saveInternal(it, flat) }
@@ -75,13 +77,14 @@ class SqldelightPlaylistDatabaseRepository(
             } catch (e: Exception) {
                 val msg = "couldn't save playlists: ${domains}"
                 log.e(msg, e)
-                RepoResult.Error<List<PlaylistDomain>>(e, msg)
+                rollback(RepoResult.Error<List<PlaylistDomain>>(e, msg))
             }
+        }.also {
+            it
+                .takeIf { it.isSuccessful && emit }
+                ?.data
+                ?.forEach { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
         }
-            .also {
-                if (emit) it.data
-                    ?.forEach { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
-            }
     }
 
     override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistDomain> = loadPlaylist(id, flat)
@@ -90,7 +93,7 @@ class SqldelightPlaylistDatabaseRepository(
         filter: Filter?,
         flat: Boolean
     ): RepoResult<List<PlaylistDomain>> = withContext(coProvider.IO) {
-        database.playlistItemEntityQueries.transactionWithResult<RepoResult<List<PlaylistDomain>>> {
+        database.playlistItemEntityQueries.transactionWithResult {
             try {
                 with(database.playlistEntityQueries) {
                     when (filter) {

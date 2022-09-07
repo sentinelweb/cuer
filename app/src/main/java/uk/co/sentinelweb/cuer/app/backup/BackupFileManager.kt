@@ -52,6 +52,7 @@ class BackupFileManager constructor(
         return "v$VERSION-$timeStamp-cuer_backup-$device.zip"
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun makeBackupZipFile(): File = withContext(contextProvider.IO) {
         val f = File(context.cacheDir, makeFileName())
         try {
@@ -116,22 +117,21 @@ class BackupFileManager constructor(
                 ?.data
                 ?.let { savedMedias ->
                     val idLookup = savedMedias.map { it.platformId to it }.toMap()
-                    playlistRepository.save(
-                        backupFileModel.playlists.map {
-                            it.copy(
-                                items = it.items.map {
+                    backupFileModel.playlists.fold(
+                        true
+                    ) { acc, playlist ->
+                        playlistRepository.save(
+                            playlist.copy(
+                                items = playlist.items.map {
                                     it.copy(
                                         media = idLookup.get(it.media.platformId)
-                                            ?: throw IllegalArgumentException("media ID lookup failed: ${it.media.platformId}")
+                                            ?: throw IllegalArgumentException("Media ID lookup failed: ${it.media.platformId}")
                                     )
                                 }
                             )
-                        }
-                    )
-                }
-                ?.takeIf { it.isSuccessful }
-                ?.isSuccessful
-                ?: false
+                        ).isSuccessful && acc
+                    }
+                } ?: false
         } else {
             return@withContext mediaRepository.deleteAll()
                 .takeIf { it.isSuccessful }
@@ -143,7 +143,7 @@ class BackupFileManager constructor(
                 ?.takeIf { it.isSuccessful }
                 ?.let {
                     playlistRepository.save(backupFileModel.playlists).let {
-                        if (it.isSuccessful && it.data?.filter { it.default }?.size ?: 0 == 0) {
+                        if (it.isSuccessful && (it.data?.filter { it.default }?.size ?: 0) == 0) {
                             playlistRepository.save(DEFAULT_PLAYLIST_TEMPLATE)
                         } else it
                     }
@@ -152,7 +152,7 @@ class BackupFileManager constructor(
                 ?.let {
                     playlistRepository
                         .loadList(OrchestratorContract.DefaultFilter())
-                        .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
+                        .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
                         ?.let { defPlaylistResult ->
                             val orderBase = timeProvider.currentTimeMillis()
                             backupFileModel.medias.mapIndexedNotNull { idx, item ->
@@ -171,6 +171,7 @@ class BackupFileManager constructor(
         }
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun restoreDataZip(f: File): Boolean = withContext(contextProvider.IO) {
         imageFileRepository.removeAll(false)
         ZipFile(f).use { zip ->
@@ -180,6 +181,7 @@ class BackupFileManager constructor(
                         DB_FILE_JSON -> {
                             restoreData(input.readBytes().decodeToString())
                         }
+
                         else -> { // assume image
                             File(imageFileRepository._dir.path, entry.name).outputStream()
                                 .use { output ->

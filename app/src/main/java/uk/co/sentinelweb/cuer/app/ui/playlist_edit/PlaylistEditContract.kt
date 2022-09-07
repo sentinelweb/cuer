@@ -81,7 +81,6 @@ interface PlaylistEditContract {
                         playlistOrchestrator = get(),
                         mediaOrchestrator = get(),
                         log = get(),
-                        imageProvider = get(),
                         prefsWrapper = get(),
                         recentLocalPlaylists = get()
                     )

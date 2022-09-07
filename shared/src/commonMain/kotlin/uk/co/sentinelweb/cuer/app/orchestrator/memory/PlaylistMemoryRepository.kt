@@ -56,7 +56,8 @@ class PlaylistMemoryRepository constructor(
             .filter { filter.ids.contains(it) }
             .map { data[it] }
             .filterNotNull()
-        else -> throw NotImplementedException()
+
+        else -> throw NotImplementedException("$filter")
     }
 
     override fun save(domain: PlaylistDomain, options: Options): PlaylistDomain =
