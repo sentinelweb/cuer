@@ -8,11 +8,12 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 
 val urlMediaMappers = listOf(
-    YoutubeShortUrlMediaMapper(),
-    YoutubeUrlMediaMapper(),
-    YoutubeUrlPlaylistMapper(),
-    YoutubeUrlChannelUserMapper(),
-    YoutubeUrlChannelMapper()
+    YoutubeShortUrlMapper(),
+    YoutubeMediaUrlMapper(),
+    YoutubePlaylistUrlMapper(),
+    YoutubeChannelUrlUserMapper(),
+    YoutubeChannelUrlMapper(),
+    YoutubeShortsUrlMapper()
 )
 
 interface UrlMediaMapper {
@@ -20,7 +21,7 @@ interface UrlMediaMapper {
     fun map(uri: Uri): Pair<ObjectTypeDomain, Domain>
 }
 
-private class YoutubeShortUrlMediaMapper : UrlMediaMapper {
+private class YoutubeShortUrlMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean = uri.host?.endsWith("youtu.be") ?: false
 
@@ -30,7 +31,7 @@ private class YoutubeShortUrlMediaMapper : UrlMediaMapper {
             ?: throw IllegalArgumentException("Link format error: $uri")
 }
 
-private class YoutubeUrlMediaMapper : UrlMediaMapper {
+private class YoutubeMediaUrlMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
         uri.host?.contains("youtube.") ?: false
@@ -42,7 +43,7 @@ private class YoutubeUrlMediaMapper : UrlMediaMapper {
 }
 
 // https://www.youtube.com/playlist?list=<playlist ID>.
-private class YoutubeUrlPlaylistMapper : UrlMediaMapper {
+private class YoutubePlaylistUrlMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
         uri.host?.contains("youtube.") ?: false
@@ -74,7 +75,7 @@ private class YoutubeUrlPlaylistMapper : UrlMediaMapper {
 // https://youtube.com/c/customUrl
 // https://youtube.com/channel/customUrl also?? - might be more work to do to differentiate from simple channel id
 // todo need to exec https://developers.google.com/youtube/v3/docs/channels/list#forUsername to get platformID
-private class YoutubeUrlChannelUserMapper : UrlMediaMapper {
+private class YoutubeChannelUrlUserMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
         uri.host?.contains("youtube.") ?: false
@@ -91,7 +92,7 @@ private class YoutubeUrlChannelUserMapper : UrlMediaMapper {
 }
 
 // https://youtube.com/channel/<platformId>.
-private class YoutubeUrlChannelMapper : UrlMediaMapper {
+private class YoutubeChannelUrlMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
         uri.host?.contains("youtube.") ?: false
@@ -103,6 +104,19 @@ private class YoutubeUrlChannelMapper : UrlMediaMapper {
             platform = YOUTUBE,
             platformId = uri.path?.let { it.substring(it.lastIndexOf('/')) }
         )
+}
+
+// https://www.youtube.com/shorts/lq9hzALa4Po.
+private class YoutubeShortsUrlMapper : UrlMediaMapper {
+
+    override fun check(uri: Uri): Boolean =
+        uri.host?.contains("youtube.") ?: false
+                && uri.path?.let { it.indexOf("shorts") > 0 } ?: false
+
+    override fun map(uri: Uri): Pair<ObjectTypeDomain, MediaDomain> =
+        uri.path
+            ?.let { MEDIA to MediaDomain.createYoutube(uri.toString(), it.substring(it.lastIndexOf('/'))) }
+            ?: throw IllegalArgumentException("Link format error: $uri")
 }
 
 const val NO_PLATFORM_ID = "NoPlatformId"
