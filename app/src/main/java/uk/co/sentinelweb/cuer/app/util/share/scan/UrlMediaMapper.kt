@@ -79,15 +79,11 @@ private class YoutubeChannelUrlUserMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
         uri.host?.contains("youtube.") ?: false
-                && uri.path?.let { it.indexOf("c") > 0 } ?: false
+                && uri.path?.let { it.indexOf("c/") == 1 } ?: false
 
     override fun map(uri: Uri): Pair<ObjectTypeDomain, ChannelDomain> =
-        CHANNEL to ChannelDomain(
-            id = null,
-            platform = YOUTUBE,
-            platformId = NO_PLATFORM_ID,
-            // todo make full url to match YoutubeChannelDomainMapper
-            customUrl = uri.path?.let { it.substring(it.lastIndexOf('/')) }
+        CHANNEL to ChannelDomain.createYoutubeCustomUrl(
+            uri.path ?: throw IllegalArgumentException("Bad channel url: $uri")
         )
 }
 
@@ -96,13 +92,11 @@ private class YoutubeChannelUrlMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
         uri.host?.contains("youtube.") ?: false
-                && uri.path?.let { it.indexOf("c") > 0 } ?: false
+                && uri.path?.let { it.indexOf("channel") == 1 } ?: false
 
     override fun map(uri: Uri): Pair<ObjectTypeDomain, ChannelDomain> =
-        CHANNEL to ChannelDomain(
-            id = null,
-            platform = YOUTUBE,
-            platformId = uri.path?.let { it.substring(it.lastIndexOf('/')) }
+        CHANNEL to ChannelDomain.createYoutube(
+            uri.path ?: throw IllegalArgumentException("Bad channel url: $uri")
         )
 }
 
@@ -115,8 +109,11 @@ private class YoutubeShortsUrlMapper : UrlMediaMapper {
 
     override fun map(uri: Uri): Pair<ObjectTypeDomain, MediaDomain> =
         uri.path
-            ?.let { MEDIA to MediaDomain.createYoutube(uri.toString(), it.substring(it.lastIndexOf('/'))) }
+            ?.let {
+                MEDIA to MediaDomain.createYoutube(
+                    uri.toString(),
+                    it.substring(it.lastIndexOf('/') + 1)
+                )
+            }
             ?: throw IllegalArgumentException("Link format error: $uri")
 }
-
-const val NO_PLATFORM_ID = "NoPlatformId"

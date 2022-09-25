@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.db.update
 
+import kotlinx.datetime.Clock
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 import uk.co.sentinelweb.cuer.domain.ext.setFlag
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
@@ -10,8 +11,8 @@ class MediaUpdateMapper() {
         updateObject.id,
         updateObject.duration,
         updateObject.positon,
-        updateObject.dateLastPlayed!!,
-        flags.setFlag( FLAG_WATCHED, updateObject.watched)
+        updateObject.dateLastPlayed ?: Clock.System.now(),
+        flags.setFlag(FLAG_WATCHED, updateObject.watched)
     )
 
 }

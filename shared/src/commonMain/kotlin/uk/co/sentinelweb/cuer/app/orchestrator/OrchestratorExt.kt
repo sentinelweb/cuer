@@ -7,57 +7,57 @@ import uk.co.sentinelweb.cuer.net.NetResult
 
 inline fun <reified T> RepoResult<List<T>>.forceDatabaseListResultNotEmpty(msg: String): List<T> = this.let {
     (it.takeIf { it.isSuccessful }
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DatabaseException(it))
+        ?: throw OrchestratorContract.DatabaseException(it))
         .takeIf { (it.data?.size ?: 0) > 0 }
         ?.data
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DoesNotExistException(msg)
+        ?: throw OrchestratorContract.DoesNotExistException(msg)
 }
 
 inline fun <reified T> NetResult<List<T>>.forceNetListResultNotEmpty(msg: String): List<T> = this.let {
     (it.takeIf { it.isSuccessful }
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.NetException(it))
+        ?: throw OrchestratorContract.NetException(it))
         .takeIf { (it.data?.size ?: 0) > 0 }
         ?.data
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DoesNotExistException(msg)
+        ?: throw OrchestratorContract.DoesNotExistException(msg)
 }
 
 inline fun <reified T> RepoResult<List<T>>.allowDatabaseListResultEmpty(): List<T> = this.let {
     (it.takeIf { it.isSuccessful }
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DatabaseException(it))
+        ?: throw OrchestratorContract.DatabaseException(it))
         .data
         ?: listOf()
 }
 
 inline fun <reified T> NetResult<List<T>>.allowNetListResultEmpty(): List<T> = this.let {
     (it.takeIf { it.isSuccessful }
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.NetException(it))
+        ?: throw OrchestratorContract.NetException(it))
         .data
         ?: listOf()
 }
 
 inline fun <reified T> NetResult<T>.forceNetSuccessNotNull(msg: String): T = this.let {
     (it.takeIf { it.isSuccessful }
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.NetException(it))
+        ?: throw OrchestratorContract.NetException(it))
         .data
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DoesNotExistException(msg)
+        ?: throw OrchestratorContract.DoesNotExistException(msg)
 }
 
 inline fun <reified T> RepoResult<T>.forceDatabaseSuccessNotNull(msg: String): T = this.let {
     (it.takeIf { it.isSuccessful }
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DatabaseException(it))
+        ?: throw OrchestratorContract.DatabaseException(it))
         .data
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DoesNotExistException(msg)
+        ?: throw OrchestratorContract.DoesNotExistException(msg)
 }
 
 inline fun <reified T> RepoResult<T>.forceDatabaseSuccess(): T? = this.let {
     (it.takeIf { it.isSuccessful }
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DatabaseException(it))
+        ?: throw OrchestratorContract.DatabaseException(it))
         .data
 }
 
 inline fun <reified T> NetResult<T>.forceNetSuccess(): T? = this.let {
     (it.takeIf { it.isSuccessful }
-        ?: throw uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.NetException(it)
+        ?: throw OrchestratorContract.NetException(it)
             ).data
 }
 

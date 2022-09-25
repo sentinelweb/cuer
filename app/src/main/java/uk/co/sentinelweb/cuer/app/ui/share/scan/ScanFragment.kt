@@ -37,7 +37,7 @@ class ScanFragment : Fragment(R.layout.fragment_scan), ScanContract.View, Androi
         playYangProgress.init(binding.scanProgress, R.color.white)
     }
 
-    override fun fromShareUrl(uriString: String) {// called from activity
+    override fun fromShareUrl(uriString: String) { // called from activity
         binding.scanProgress.isVisible = true
         binding.scanResult.isVisible = false
         presenter.fromShareUrl(uriString)
