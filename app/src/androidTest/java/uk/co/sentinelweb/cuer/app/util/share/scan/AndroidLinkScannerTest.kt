@@ -89,5 +89,4 @@ class AndroidLinkScannerTest {
         val actualMedia = actual!!.second as MediaDomain
         assertThat(actualMedia.platformId).isEqualTo("JqsQ_JjiFmg")
     }
-
 }
