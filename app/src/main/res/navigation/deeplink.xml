@@ -22,15 +22,20 @@
 
     <deepLink
         android:id="@+id/deepLinkShort"
-        app:uri="https://youtu.be/{id}"
-        />
+        app:uri="https://youtu.be/{id}" />
 
     <deepLink
         android:id="@+id/wwwYoutubePlaylist"
-        app:uri="https://www.youtube.com/playlist?list={id}"
-        />
+        app:uri="https://www.youtube.com/playlist?list={id}" />
     <deepLink
         android:id="@+id/youtubePlaylist"
-        app:uri="https://youtube.com/playlist?list={id}"
-        />
+        app:uri="https://youtube.com/playlist?list={id}" />
+
+    <deepLink
+        android:id="@+id/wwwYoutubeShorts"
+        app:uri="https://www.youtube.com/shorts/{id}" />
+    <deepLink
+        android:id="@+id/youtubeShorts"
+        app:uri="https://youtube.com/shorts/{id}" />
+
 </navigation>

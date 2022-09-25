@@ -70,4 +70,18 @@ by "hitherejoe" (https://www.youtube.com/channel/585
         assertThat(actual?.first).isEqualTo(MEDIA)
         assertThat(actual?.second).isEqualTo(expectedMedia)
     }
+
+    @Test
+    fun `scan - shorts url`() {
+        val expectedLink = "https://www.youtube.com/shorts/lq9hzALa4Po"
+        val expectedMedia = MediaDomain.createYoutube("https://www.youtube.com/shorts/lq9hzALa4Po", "lq9hzALa4Po")
+        every { mockUrlMediaMapper.check(Uri.parse(expectedLink)) } returns true
+        every { mockUrlMediaMapper.map(Uri.parse(expectedLink)) } returns (MEDIA to expectedMedia)
+
+        val actual = sut.scan(expectedLink)
+
+        assertThat(actual).isNotNull()
+        assertThat(actual?.first).isEqualTo(MEDIA)
+        assertThat(actual?.second).isEqualTo(expectedMedia)
+    }
 }
