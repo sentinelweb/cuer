@@ -5,10 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
-import uk.co.sentinelweb.cuer.domain.ChannelDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.NO_PLATFORM_ID
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
+import uk.co.sentinelweb.cuer.domain.*
 
 @RunWith(AndroidJUnit4::class)
 class AndroidLinkScannerTest {
@@ -88,5 +85,20 @@ class AndroidLinkScannerTest {
         assertThat(actual?.second).isEqualTo(expectedMedia)
         val actualMedia = actual!!.second as MediaDomain
         assertThat(actualMedia.platformId).isEqualTo("JqsQ_JjiFmg")
+    }
+
+    @Test
+    fun playlist_url() {
+        val expectedLink =
+            "https://www.youtube.com/playlist?list=PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe"
+
+        val actual = sut.scan(expectedLink)
+        val expectedPlaylist =
+            PlaylistDomain.createYoutube(expectedLink, "PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe")
+        assertThat(actual).isNotNull()
+        assertThat(actual?.first).isEqualTo(ObjectTypeDomain.PLAYLIST)
+        assertThat(actual?.second).isEqualTo(expectedPlaylist)
+        val actualPlaylist = actual!!.second as PlaylistDomain
+        assertThat(actualPlaylist.platformId).isEqualTo("PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe")
     }
 }

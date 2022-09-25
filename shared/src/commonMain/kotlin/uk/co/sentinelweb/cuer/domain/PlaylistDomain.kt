@@ -60,6 +60,26 @@ data class PlaylistDomain constructor(
         const val FLAG_ARCHIVED = 2L
         const val FLAG_DEFAULT = 4L
         const val FLAG_PLAY_ITEMS_FROM_START = 8L
+
+        fun createYoutube(url: String, platformId: String) = PlaylistDomain(
+            id = null,
+            config = PlaylistConfigDomain(
+                platformUrl = url
+            ),
+            type = PlaylistTypeDomain.PLATFORM,
+            platform = PlatformDomain.YOUTUBE,
+            platformId = platformId,
+            starred = false,
+            items = listOf(),
+            currentIndex = -1,
+            title = "",
+            mode = SINGLE,
+            parentId = null,
+            default = false,
+            archived = false,
+            image = null,
+            thumb = null
+        )
     }
 }
 
