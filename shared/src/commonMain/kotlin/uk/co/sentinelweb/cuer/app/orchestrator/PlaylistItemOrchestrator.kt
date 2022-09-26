@@ -28,7 +28,6 @@ class PlaylistItemOrchestrator constructor(
                 .takeIf { it.isSuccessful }
                 ?: throw DoesNotExistException("PlaylistItemDomain($id)"))
                 .data
-
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -39,7 +38,6 @@ class PlaylistItemOrchestrator constructor(
             MEMORY -> playlistItemMemoryRepository.loadList(filter, options)
             LOCAL -> playlistItemDatabaseRepository.loadList(filter)
                 .allowDatabaseListResultEmpty()
-
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, filter, options)
@@ -67,7 +65,6 @@ class PlaylistItemOrchestrator constructor(
             MEMORY -> playlistItemMemoryRepository.save(domain, options)
             LOCAL -> playlistItemDatabaseRepository.save(domain, emit = options.emit, flat = options.flat)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
-
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -78,7 +75,6 @@ class PlaylistItemOrchestrator constructor(
             MEMORY -> domains.map {
                 playlistItemMemoryRepository.save(it, options)
             }
-
             LOCAL -> playlistItemDatabaseRepository.save(domains, emit = options.emit)
                 .forceDatabaseSuccessNotNull("Save failed $domains")
 
@@ -86,7 +82,6 @@ class PlaylistItemOrchestrator constructor(
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
-
 
     override suspend fun count(filter: Filter, options: Options): Int =
         when (options.source) {
@@ -103,7 +98,6 @@ class PlaylistItemOrchestrator constructor(
             MEMORY -> playlistItemMemoryRepository.delete(domain, options)
             LOCAL -> playlistItemDatabaseRepository.delete(domain, options.emit)
                 .forceDatabaseSuccessNotNull("Delete failed $domain")
-
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -112,5 +106,4 @@ class PlaylistItemOrchestrator constructor(
     override suspend fun update(update: UpdateDomain<PlaylistItemDomain>, options: Options): PlaylistItemDomain? {
         TODO("Not yet implemented")
     }
-
 }

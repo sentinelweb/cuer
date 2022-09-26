@@ -10,7 +10,6 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -36,7 +35,6 @@ class YouTubePlayerListener(
         var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
         var positionSec: Float = 0f,
         var durationSec: Float = 0f,
-        //var durationObtainedTime: Long = -1,
         var currentMedia: MediaDomain? = null,
         var lastUpdateMedia: Long = -1L,
         var lastUpdateUI: Long = -1L,
