@@ -3,10 +3,9 @@ package uk.co.sentinelweb.cuer.app.ui.player
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
-import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
+import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
+import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -18,11 +17,11 @@ import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContra
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.startPosition
 
 class PlayerStoreFactory(
     private val storeFactory: StoreFactory,
@@ -64,6 +63,7 @@ class PlayerStoreFactory(
                     item = result.item,
                     playlist = result.playlist ?: playlist
                 )
+
                 is Result.Playlist -> copy(playlist = result.playlist)
                 is Result.NoVideo -> copy(item = null)
                 is Result.Screen -> copy(screen = result.screen)
@@ -71,13 +71,14 @@ class PlayerStoreFactory(
                     skipFwdText = result.fwd ?: skipFwdText,
                     skipBackText = result.back ?: skipBackText
                 )
+
                 is Result.Position -> copy(position = result.pos)
             }
     }
 
     private class BootstrapperImpl(private val queueConsumer: QueueMediatorContract.Consumer) :
-        SuspendBootstrapper<Action>() {
-        override suspend fun bootstrap() {
+        CoroutineBootstrapper<Action>() {
+        override fun invoke() {
             dispatch(Init)
             queueConsumer.playlist?.apply { dispatch(Playlist(this)) }
             dispatch(InitSkipTimes)
@@ -87,20 +88,20 @@ class PlayerStoreFactory(
     private inner class ExecutorImpl(
         private val itemLoader: PlayerContract.PlaylistItemLoader,
         private val skip: SkipContract.External,
-    ) : SuspendExecutor<Intent, Action, State, Result, Label>(), SkipContract.Listener {
+    ) : CoroutineExecutor<Intent, Action, State, Result, Label>(), SkipContract.Listener {
 
         init {
             skip.listener = this
         }
 
-        override suspend fun executeAction(action: Action, getState: () -> State) =
+        override fun executeAction(action: Action, getState: () -> State) =
             when (action) {
                 is Playlist -> dispatch(Result.Playlist(action.playlist))
                 InitSkipTimes -> dispatch(Result.SkipTimes(skip.skipForwardText, skip.skipBackText))
                 Init -> init()
             }
 
-        override suspend fun executeIntent(intent: Intent, getState: () -> State) =
+        override fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
                 is Intent.PlayState -> playStateChange(intent.state, getState().item)
                 is Intent.TrackChange -> trackChange(intent)
@@ -114,6 +115,7 @@ class PlayerStoreFactory(
                     getState().item,
                     getState().playerState
                 )
+
                 is Intent.SkipFwdSelect -> skip.onSelectSkipTime(true)
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> playPause(intent, getState().playerState)
@@ -125,6 +127,7 @@ class PlayerStoreFactory(
                     getState().item?.media?.channelData
                         ?.let { publish(Label.ChannelOpen(it)) }
                         ?: Unit
+
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
                 is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
                 is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
@@ -135,33 +138,34 @@ class PlayerStoreFactory(
                     log.d("SeekToPosition: ${intent.ms}")
                     publish(Label.Command(SeekTo(ms = intent.ms)))
                 }
+
                 is Intent.InitFromService -> {
                     loadItem(intent.item)
                     queueConsumer.playlist
                         ?.also { dispatch(Result.Playlist(it)) }
                     Unit
                 }
+
                 is Intent.PlayItemFromService -> {
                     loadItem(intent.item)
                     queueConsumer.playlist
                         ?.also { dispatch(Result.Playlist(it)) }
                     Unit
                 }
+
                 Intent.Support -> getState().item
                     ?.let { publish(Label.ShowSupport(it)) }
                     ?: Unit
             }
 
-        private suspend fun init() {
-            withContext(coroutines.Computation) {
-                itemLoader.load()?.also { item ->
-                    log.d("itemLoader.load(${item.media.title}))")
-                    loadItem(item)
-                }
+        private fun init() {
+            itemLoader.load()?.also { item ->
+                log.d("itemLoader.load(${item.media.title}))")
+                loadItem(item)
             }
         }
 
-        private suspend fun loadItem(item: PlaylistItemDomain) = coroutines.mainScope.launch {
+        private fun loadItem(item: PlaylistItemDomain) = coroutines.mainScope.launch {
             item.playlistId
                 ?.toIdentifier(LOCAL)
                 ?.apply { mediaSessionManager.checkCreateMediaSession(playerControls) }
@@ -171,9 +175,7 @@ class PlayerStoreFactory(
 
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {
             publish(
-                Label.Command(
-                    if (intent.isPlaying ?: (playerState == PLAYING)) Pause else Play
-                )
+                Label.Command(if (intent.isPlaying ?: (playerState == PLAYING)) Pause else Play)
             )
         }
 
@@ -189,9 +191,7 @@ class PlayerStoreFactory(
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
             publish(
                 Label.Command(
-                    Load(
-                        intent.item.media.platformId, intent.item.media.startPosition()
-                    )
+                    Load(intent.item.media.platformId, intent.item.media.startPosition())
                 )
             )
             mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
@@ -226,9 +226,11 @@ class PlayerStoreFactory(
                     }
                     Unit
                 }
+
                 ENDED -> {
                     queueConsumer.onTrackEnded()
                 }
+
                 else -> Unit
             }.also {
                 item?.apply {
@@ -248,15 +250,11 @@ class PlayerStoreFactory(
             )
         }
 
-        private suspend fun trackSelected(item: PlaylistItemDomain, resetPosition: Boolean) {
-            withContext(coroutines.Computation) {
-                item.also { item ->
-                    item.playlistId
-                        ?.toIdentifier(LOCAL)
-                        ?.apply { livePlaybackController.clear(item.media.platformId) }
-                        ?.apply { queueProducer.onItemSelected(item, false, resetPosition) }
-                }
-            }
+        private fun trackSelected(item: PlaylistItemDomain, resetPosition: Boolean) {
+            item.playlistId
+                ?.toIdentifier(LOCAL)
+                ?.apply { livePlaybackController.clear(item.media.platformId) }
+                ?.apply { queueProducer.onItemSelected(item, false, resetPosition) }
         }
 
         override fun skipSeekTo(target: Long) {
@@ -271,17 +269,6 @@ class PlayerStoreFactory(
         override fun skipSetFwdText(text: String) {
             dispatch(Result.SkipTimes(fwd = text))
         }
-
-        fun MediaDomain.startPosition() = run {
-            val position = positon ?: -1
-            val duration = duration ?: -1
-            if (position > 0 && (duration > 0 && position < duration - 20000)) {
-                position
-            } else {
-                0
-            }
-        }
-
     }
 
     fun create(): PlayerContract.MviStore =
