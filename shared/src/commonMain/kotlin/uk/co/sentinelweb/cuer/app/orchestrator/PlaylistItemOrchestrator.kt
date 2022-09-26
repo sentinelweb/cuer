@@ -12,19 +12,19 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistItemOrchestrator constructor(
-    private val roomPlaylistItemDatabaseRepository: PlaylistItemDatabaseRepository,
+    private val playlistItemDatabaseRepository: PlaylistItemDatabaseRepository,
     private val playlistItemMemoryRepository: PlaylistMemoryRepository.PlayListItemMemoryRepository,
     private val log: LogWrapper
 ) : OrchestratorContract<PlaylistItemDomain> {
 
     override val updates: Flow<Triple<Operation, Source, PlaylistItemDomain>>
-        get() = roomPlaylistItemDatabaseRepository.updates
+        get() = playlistItemDatabaseRepository.updates
             .map { it.first to LOCAL then it.second }
 
     suspend override fun load(id: Long, options: Options): PlaylistItemDomain? =
         when (options.source) {
             MEMORY -> TODO()
-            LOCAL -> (roomPlaylistItemDatabaseRepository.load(id)
+            LOCAL -> (playlistItemDatabaseRepository.load(id)
                 .takeIf { it.isSuccessful }
                 ?: throw DoesNotExistException("PlaylistItemDomain($id)"))
                 .data
@@ -37,8 +37,9 @@ class PlaylistItemOrchestrator constructor(
     suspend override fun loadList(filter: Filter, options: Options): List<PlaylistItemDomain> =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.loadList(filter, options)
-            LOCAL -> roomPlaylistItemDatabaseRepository.loadList(filter)
+            LOCAL -> playlistItemDatabaseRepository.loadList(filter)
                 .allowDatabaseListResultEmpty()
+
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, filter, options)
@@ -52,7 +53,7 @@ class PlaylistItemOrchestrator constructor(
         when (options.source) {
             MEMORY -> TODO()
             LOCAL -> domain.id?.let {
-                roomPlaylistItemDatabaseRepository.load(it)
+                playlistItemDatabaseRepository.load(it)
                     .forceDatabaseSuccess()
             }
 
@@ -64,8 +65,9 @@ class PlaylistItemOrchestrator constructor(
     suspend override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.save(domain, options)
-            LOCAL -> roomPlaylistItemDatabaseRepository.save(domain, emit = options.emit, flat = options.flat)
+            LOCAL -> playlistItemDatabaseRepository.save(domain, emit = options.emit, flat = options.flat)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
+
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -76,8 +78,10 @@ class PlaylistItemOrchestrator constructor(
             MEMORY -> domains.map {
                 playlistItemMemoryRepository.save(it, options)
             }
-            LOCAL -> roomPlaylistItemDatabaseRepository.save(domains, emit = options.emit)
+
+            LOCAL -> playlistItemDatabaseRepository.save(domains, emit = options.emit)
                 .forceDatabaseSuccessNotNull("Save failed $domains")
+
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -97,8 +101,9 @@ class PlaylistItemOrchestrator constructor(
     override suspend fun delete(domain: PlaylistItemDomain, options: Options): Boolean =
         when (options.source) {
             MEMORY -> playlistItemMemoryRepository.delete(domain, options)
-            LOCAL -> roomPlaylistItemDatabaseRepository.delete(domain, options.emit)
+            LOCAL -> playlistItemDatabaseRepository.delete(domain, options.emit)
                 .forceDatabaseSuccessNotNull("Delete failed $domain")
+
             LOCAL_NETWORK -> TODO()
             REMOTE -> TODO()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
