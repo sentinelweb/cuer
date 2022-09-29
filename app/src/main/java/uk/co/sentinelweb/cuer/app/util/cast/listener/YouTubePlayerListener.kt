@@ -10,13 +10,13 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.startPosition
 import uk.co.sentinelweb.cuer.domain.ext.stringMedia
 import kotlin.math.max
 import kotlin.math.min
@@ -36,7 +36,6 @@ class YouTubePlayerListener(
         var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
         var positionSec: Float = 0f,
         var durationSec: Float = 0f,
-        //var durationObtainedTime: Long = -1,
         var currentMedia: MediaDomain? = null,
         var lastUpdateMedia: Long = -1L,
         var lastUpdateUI: Long = -1L,
@@ -97,13 +96,12 @@ class YouTubePlayerListener(
         state.durationSec = duration
         state.currentMedia
             ?.takeIf { it.isLiveBroadcast }
-            ?.apply {
-                livePlaybackController.gotDuration((duration * 1000).toLong())
-            }
+            ?.apply { livePlaybackController.gotDuration((duration * 1000).toLong()) }
         playerUi?.setDuration(duration)
         updateMedia(false, durSec = duration)
 
-        state.currentMedia?.apply { mediaSessionManager.setMedia(this, queue.playlist) }
+        state.currentMedia
+            ?.apply { mediaSessionManager.setMedia(this, queue.playlist) }
     }
 
     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
@@ -280,20 +278,10 @@ class YouTubePlayerListener(
 
     private fun loadVideo(item: PlaylistItemDomain?) {
         item?.apply {
-            val startPos = media.run {
-                val position = positon ?: -1
-                val duration = duration ?: -1
-                if (position > 0 &&
-                    duration > 0 && position < duration - 10000
-                ) {
-                    position / 1000f
-                } else {
-                    0f
-                }
-            }
+            val startPos = media.startPosition()
             livePlaybackController.clear(media.platformId)
             log.d("loadVideo: play position: pos =  $startPos sec")
-            youTubePlayer?.loadVideo(media.platformId, startPos)
+            youTubePlayer?.loadVideo(media.platformId, startPos.toFloat())
             state.currentMedia = media
             playerUi?.setPlaylistItem(queue.currentItem, queue.source)
             playerUi?.setPlaylistName(queue.playlist?.title ?: "none")

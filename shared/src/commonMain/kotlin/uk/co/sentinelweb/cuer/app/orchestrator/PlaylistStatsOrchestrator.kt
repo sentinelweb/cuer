@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistStatsOrchestrator constructor(
-    private val roomPlaylistDatabaseRepository: PlaylistDatabaseRepository,
+    private val playlistDatabaseRepository: PlaylistDatabaseRepository,
 ) : OrchestratorContract<PlaylistStatDomain> {
     override val updates: Flow<Triple<Operation, Source, PlaylistStatDomain>>
         get() = TODO()
@@ -27,8 +27,9 @@ class PlaylistStatsOrchestrator constructor(
     suspend override fun loadList(filter: Filter, options: Options): List<PlaylistStatDomain> =
         when (options.source) {
             Source.MEMORY -> throw NotImplementedException()
-            Source.LOCAL -> roomPlaylistDatabaseRepository.loadStatsList(filter)
+            Source.LOCAL -> playlistDatabaseRepository.loadStatsList(filter)
                 .allowDatabaseListResultEmpty()
+
             Source.LOCAL_NETWORK -> throw NotImplementedException()
             Source.REMOTE -> throw NotImplementedException()
             Source.PLATFORM -> throw InvalidOperationException(this::class, filter, options)

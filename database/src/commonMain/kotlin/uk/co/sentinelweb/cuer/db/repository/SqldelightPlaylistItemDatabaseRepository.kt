@@ -58,9 +58,10 @@ class SqldelightPlaylistItemDatabaseRepository(
                 .let { (domain, itemEntity) ->
                     with(database.playlistItemEntityQueries) {
                         domain to if (domain.id != null) {
-                            load(itemEntity.id)// check record exists
+                            load(itemEntity.id) // check record exists
                                 .executeAsOneOrNull()
-                                ?.also { update(it) }
+                                ?.also { update(itemEntity) }
+                                ?.let { itemEntity }
                                 ?: let {
                                     create(itemEntity)
                                     itemEntity.copy(id = getInsertId().executeAsOne())

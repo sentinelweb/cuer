@@ -556,9 +556,7 @@ class PlaylistPresenter(
                                     .flatOptions()
                             }
                             // updates order
-                            ?.let {
-                                playlistItemOrchestrator.save(it.first, it.second)
-                            }
+                            ?.let { playlistItemOrchestrator.save(it.first, it.second) }
                     }
                 }?.also {
                     modelMapper.map(
@@ -605,12 +603,12 @@ class PlaylistPresenter(
                                 .toIdentifier()
                         executeRefresh(scrollToCurrent = notLoaded)
                     } else {
-                        dbInit.addListener({ b: Boolean ->
+                        dbInit.addListener { b: Boolean ->
                             if (b) {
                                 state.playlistIdentifier = 3L.toIdentifier(LOCAL) // philosophy
                                 refreshPlaylist()
                             }
-                        })
+                        }
                     }
                 }
         }
@@ -643,7 +641,7 @@ class PlaylistPresenter(
     }
 
     override fun checkToSave() {
-        if (state.playlist?.id ?: 0 <= 0 && state.isModified) {
+        if ((state.playlist?.id ?: 0) <= 0 && state.isModified) {
             view.showAlertDialog(modelMapper.mapSaveConfirmAlert(
                 {
                     coroutines.mainScope.launch {
