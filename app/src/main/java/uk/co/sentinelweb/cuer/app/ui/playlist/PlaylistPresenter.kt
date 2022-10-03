@@ -29,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
@@ -267,6 +268,7 @@ class PlaylistPresenter(
                 multi = true,
                 itemClick = { which: PlaylistDomain?, _ ->
                     which
+                        ?.takeIf { it != ADD_PLAYLIST_DUMMY }
                         ?.let { moveItemToPlaylist(it) }
                         ?: view.showPlaylistCreateDialog()
                 },

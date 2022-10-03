@@ -74,6 +74,7 @@ interface PlaylistsDialogContract {
     )
 
     companion object {
+        val ADD_PLAYLIST_DUMMY = PlaylistDomain.createDummy("Add Playlist")
 
         @JvmStatic
         val fragmentModule = module {

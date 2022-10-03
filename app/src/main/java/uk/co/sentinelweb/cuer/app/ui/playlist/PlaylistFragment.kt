@@ -478,7 +478,8 @@ class PlaylistFragment :
         dialogFragment = PlaylistEditFragment.newInstance().apply {
             listener = object : PlaylistEditFragment.Listener {
                 override fun onPlaylistCommit(domain: PlaylistDomain?) {
-                    domain?.apply { presenter.onPlaylistSelected(this, true) }
+                    domain
+                        ?.apply { presenter.onPlaylistSelected(this, true) }
                     dialogFragment?.dismissAllowingStateLoss()
                 }
             }

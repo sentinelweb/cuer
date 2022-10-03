@@ -10,7 +10,8 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -20,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -205,7 +207,7 @@ class PlaylistItemEditViewModel constructor(
             ?.also { update() }
     }
 
-    override fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
+    override fun onSelectPlaylistChipClick(model: ChipModel) {
         _dialogModelLiveData.value =
             PlaylistsDialogContract.Config(
                 state.selectedPlaylists,
@@ -222,6 +224,7 @@ class PlaylistItemEditViewModel constructor(
     fun onPlaylistSelected(playlist: PlaylistDomain?, checked: Boolean) {
         state.isPlaylistsChanged = true
         playlist
+            ?.takeIf { playlist != ADD_PLAYLIST_DUMMY }
             ?.apply {
                 if (checked) {
                     state.selectedPlaylists.add(this)
