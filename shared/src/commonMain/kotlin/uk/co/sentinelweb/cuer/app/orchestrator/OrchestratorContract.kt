@@ -85,6 +85,7 @@ interface OrchestratorContract<Domain> {
 //        class IdString(id:String)
 //    }
     // @Serializable
+    // todo make a data class - no need to subclass
     open class Identifier<IdType>(
         open val id: IdType,
         val source: Source,
@@ -103,6 +104,8 @@ interface OrchestratorContract<Domain> {
             result = 31 * result + source.hashCode()
             return result
         }
+
+        override fun toString(): String = "${this::class.simpleName}(id=$id, source=$source)"
     }
 
     data class LocalIdentifier(override val id: Long) : Identifier<Long>(id, LOCAL) {

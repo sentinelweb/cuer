@@ -80,7 +80,7 @@ class PlaylistEditViewModel constructor(
                             state.playlistEdit = it.copy(items = listOf())
                             it.parentId?.also {
                                 state.playlistParent =
-                                    playlistOrchestrator.load(it, source.deepOptions())
+                                    playlistOrchestrator.load(it, LOCAL.flatOptions())
                             }
                         } ?: makeCreateModel()
                 } ?: makeCreateModel()
@@ -162,7 +162,7 @@ class PlaylistEditViewModel constructor(
                 playlistOrchestrator.save(state.playlistEdit, state.source.flatOptions())
                     .also {
                         it.apply { state.playlistEdit = this }
-                        _domainLiveData.value = it
+                        _domainLiveData.value = it // this calls navigate back / listener in fragment
                         recentLocalPlaylists.addRecent(it)
                     }
                     .takeIf { state.isCreate }

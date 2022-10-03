@@ -209,9 +209,8 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         bindObserver(viewModel.getNavigationObservable(), ::observeNavigation)
 
         imageUrlArg?.also { setImage(it) }
-        (playlistIdArg to (SOURCE.getEnum(arguments) ?: Source.LOCAL)).apply {
-            viewModel.setData(first, second)
-        }
+        (playlistIdArg to (SOURCE.getEnum(arguments) ?: Source.LOCAL))
+            .apply { viewModel.setData(first, second) }
     }
 
     override fun onAttach(context: Context) {
