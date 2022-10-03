@@ -209,9 +209,8 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         bindObserver(viewModel.getNavigationObservable(), ::observeNavigation)
 
         imageUrlArg?.also { setImage(it) }
-        (playlistIdArg to (SOURCE.getEnum(arguments) ?: Source.LOCAL)).apply {
-            viewModel.setData(first, second)
-        }
+        (playlistIdArg to (SOURCE.getEnum(arguments) ?: Source.LOCAL))
+            .apply { viewModel.setData(first, second) }
     }
 
     override fun onAttach(context: Context) {
@@ -313,7 +312,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     }
 
     private fun observeDialog(model: DialogModel) {
-        dialog?.dismiss()
+        //dialog?.dismiss() // removed 278
         hideDialogFragment()
         when (model) {
             is PlaylistsDialogContract.Config -> {
@@ -335,7 +334,8 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
     private fun observeDomain(domain: PlaylistDomain) {
         softKeyboard.hideSoftKeyboard(binding.peTitleEdit)
-        listener?.onPlaylistCommit(domain)
+        listener
+            ?.onPlaylistCommit(domain)
             ?: findNavController().popBackStack()
     }
 

@@ -63,6 +63,7 @@ interface PlaylistsContract {
         fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
         fun repaint()
         fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?)
+        fun notifyItemRemoved(model: ItemContract.Model)
     }
 
     data class State constructor(

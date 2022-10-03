@@ -68,7 +68,6 @@ interface PlaylistContract {
         fun onFilterNewItems(): Boolean
         fun onEdit(): Boolean
         fun onFilterPlaylistItems(): Boolean
-        fun onShowChildren(): Boolean
         fun onResume()
         fun onPause()
         suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit? = null)

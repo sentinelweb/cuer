@@ -24,11 +24,12 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
@@ -267,6 +268,7 @@ class PlaylistPresenter(
                 multi = true,
                 itemClick = { which: PlaylistDomain?, _ ->
                     which
+                        ?.takeIf { it != ADD_PLAYLIST_DUMMY }
                         ?.let { moveItemToPlaylist(it) }
                         ?: view.showPlaylistCreateDialog()
                 },
@@ -435,17 +437,6 @@ class PlaylistPresenter(
 
     override fun onFilterPlaylistItems(): Boolean {
         log.d("onFilterPlaylistItems")
-        return true
-    }
-
-    override fun onShowChildren(): Boolean {
-        state.playlist?.id?.also {
-            view.navigate(
-                NavigationModel(
-                    PLAYLISTS, mapOf(PLAYLIST_ID to it)
-                )
-            )
-        }
         return true
     }
 

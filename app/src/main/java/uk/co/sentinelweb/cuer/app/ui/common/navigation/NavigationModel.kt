@@ -46,7 +46,7 @@ data class NavigationModel constructor(
         YOUTUBE_CHANNEL(listOf(CHANNEL_ID)),
         PLAYLIST(listOf(PLAYLIST_ID, SOURCE), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
         PLAYLIST_ITEM(listOf(Param.PLAYLIST_ITEM, SOURCE), listOf(FRAGMENT_NAV_EXTRAS)),
-        PLAYLISTS(listOf(), listOf(PLAYLIST_ID)),
+        PLAYLISTS(listOf()),
         PLAYLIST_EDIT(listOf(PLAYLIST_ID, SOURCE), listOf()),
         PLAYLIST_CREATE(listOf(SOURCE), listOf()),
         BROWSE,

@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.PL
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.ERROR
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.MESSAGE
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.PINNED_PLAYLIST
@@ -79,7 +80,7 @@ class PlaylistEditViewModel constructor(
                             state.playlistEdit = it.copy(items = listOf())
                             it.parentId?.also {
                                 state.playlistParent =
-                                    playlistOrchestrator.load(it, source.deepOptions())
+                                    playlistOrchestrator.load(it, LOCAL.flatOptions())
                             }
                         } ?: makeCreateModel()
                 } ?: makeCreateModel()
@@ -121,22 +122,16 @@ class PlaylistEditViewModel constructor(
     }
 
     fun onImageClick(forward: Boolean) {
-//        imageProvider.getNextImage(state.playlistEdit.image, forward) { next ->
-//            if (next != null) {
-//                state.playlistEdit = state.playlistEdit.copy(image = next, thumb = next)
-//                update()
-//            }
+        // removed in 278
+//        if (!state.isDialog) {
+        _dialogModelLiveData.value = SearchImageContract.Config(
+            state.playlistEdit.title,
+            this::onImageSelected
+        )
 //        }
-        if (!state.isDialog) {
-            _dialogModelLiveData.value = SearchImageContract.Config(
-                state.playlistEdit.title,
-                this::onImageSelected
-            )
-        }
     }
 
     fun onImageSelected(image: ImageDomain) {
-        log.d(image.toString())
         state.playlistEdit = state.playlistEdit.copy(image = image, thumb = image)
         update()
         _dialogModelLiveData.value = DialogModel.DismissDialogModel()
@@ -151,7 +146,7 @@ class PlaylistEditViewModel constructor(
     }
 
     fun onCommitClick() {
-        if (state.model?.validation?.valid ?: false) {
+        if ((state.model?.validation?.valid) == true) {
             viewModelScope.launch {
                 if (state.playlistEdit.default && state.source == LOCAL) {
                     playlistOrchestrator.loadList(
@@ -167,9 +162,10 @@ class PlaylistEditViewModel constructor(
                 playlistOrchestrator.save(state.playlistEdit, state.source.flatOptions())
                     .also {
                         it.apply { state.playlistEdit = this }
-                        _domainLiveData.value = it
+                        _domainLiveData.value = it // this calls navigate back / listener in fragment
                         recentLocalPlaylists.addRecent(it)
-                    }.takeIf { state.isCreate }
+                    }
+                    .takeIf { state.isCreate }
                     ?.also {
                         prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!)
                     }
@@ -258,6 +254,9 @@ class PlaylistEditViewModel constructor(
     }
 
     fun onParentSelected(parent: PlaylistDomain?, checked: Boolean) = viewModelScope.launch {
+        if (parent == ADD_PLAYLIST_DUMMY) {
+            return@launch
+        }
         if (state.treeLookup.isEmpty()) {
             state.treeLookup = playlistOrchestrator
                 .loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())

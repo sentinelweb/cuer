@@ -28,6 +28,7 @@ class PlaylistsAdapter constructor(
     var currentPlaylistId: OrchestratorContract.Identifier<*>? = null
 
     fun setData(data: List<ItemContract.Model>, animate: Boolean = true) {
+        // todo something in diffutil fails here deleting a parent playlist shog the child after it fails
         if (animate) {
             DiffUtil.calculateDiff(
                 ItemDiffCallback(

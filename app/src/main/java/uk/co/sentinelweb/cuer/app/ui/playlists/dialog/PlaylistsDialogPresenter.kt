@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
@@ -16,10 +17,8 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.ext.buildLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildTree
 import uk.co.sentinelweb.cuer.domain.ext.sort
-import java.util.Locale.getDefault
 
 class PlaylistsDialogPresenter(
     private val view: PlaylistsDialogContract.View,
@@ -87,7 +86,7 @@ class PlaylistsDialogPresenter(
                     { !it.starred },
                     { it.title.lowercase() })
             ).toMutableList()
-            .apply { if (state.config.showRoot) add(0, makeRootPlaylist()) else this }
+            .apply { if (state.config.showRoot) add(0, makeRootPlaylist()) }
 
         val playlistStats = playlistStatsOrchestrator
             .loadList(IdListFilter(state.playlists.mapNotNull { it.id }), LOCAL.flatOptions())
@@ -135,7 +134,7 @@ class PlaylistsDialogPresenter(
 
     override fun onAddPlaylist() {
         (state.playlists.size + 1)
-            .apply { state.config.itemClick(null, true) }
+            .apply { state.config.itemClick(ADD_PLAYLIST_DUMMY, true) }
             .also { view.dismiss() }
     }
 
