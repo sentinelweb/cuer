@@ -132,7 +132,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         val toCreate =
             fixture<PlaylistItemDomain>()
                 .run { copy(playlistId = playlistEntity.id, media = media.copy(id = null)) }
-        val created = sut.save(toCreate, flat = true, emit = true)
+        val created = sut.save(toCreate, flat = true, emit = false)
         assertTrue(created.isSuccessful)
         assertNotNull(created.data)
 

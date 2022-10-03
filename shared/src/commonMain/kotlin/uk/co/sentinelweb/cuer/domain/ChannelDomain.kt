@@ -18,7 +18,26 @@ data class ChannelDomain constructor(
     val image: ImageDomain? = null,
     val starred: Boolean = false
 ) : Domain {
+
     companion object {
         const val FLAG_STARRED = 1L
+
+        fun createYoutube(uriPath: String) = ChannelDomain(
+            id = null,
+            platform = PlatformDomain.YOUTUBE,
+            platformId = uriPath.lastIndexOf('/')
+                .takeIf { it > 0 && it < uriPath.length - 2 }
+                ?.let { uriPath.substring(it + 1) }
+        )
+
+        fun createYoutubeCustomUrl(uriPath: String) = ChannelDomain(
+            id = null,
+            platform = PlatformDomain.YOUTUBE,
+            platformId = NO_PLATFORM_ID,
+            // todo make full url to match YoutubeChannelDomainMapper
+            customUrl = uriPath.lastIndexOf('/')
+                .takeIf { it > 0 && it < uriPath.length - 2 }
+                ?.let { uriPath.substring(it + 1) }
+        )
     }
 }

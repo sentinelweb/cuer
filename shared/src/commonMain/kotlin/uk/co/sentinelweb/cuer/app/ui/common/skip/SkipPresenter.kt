@@ -153,10 +153,12 @@ class SkipPresenter constructor(
             state.forwardJumpInterval = time
             prefsWrapper.putInt(GeneralPreferences.SKIP_FWD_TIME, time)
             listener.skipSetFwdText(skipForwardText)
+            skipFwd()
         } else {
             state.backJumpInterval = time
             prefsWrapper.putInt(GeneralPreferences.SKIP_BACK_TIME, time)
             listener.skipSetBackText(skipBackText)
+            skipBack()
         }
     }
 

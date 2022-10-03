@@ -198,6 +198,7 @@ class CastPlayerPresenter(
             view.setDurationColors(R.color.text_primary, R.color.transparent)
             view.setSeekEnabled(false)
             view.updateSeekPosition(0f)
+            view.setLiveTime(null)
         }
     }
 

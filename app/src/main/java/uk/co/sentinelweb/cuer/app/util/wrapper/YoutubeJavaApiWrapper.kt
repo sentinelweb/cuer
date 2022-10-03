@@ -8,9 +8,9 @@ import com.google.android.youtube.player.YouTubeApiServiceUtil.isYouTubeApiServi
 import com.google.android.youtube.player.YouTubeInitializationResult.SUCCESS
 import com.google.android.youtube.player.YouTubeIntents.*
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
-import uk.co.sentinelweb.cuer.app.util.share.scan.NO_PLATFORM_ID
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.NO_PLATFORM_ID
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.channelUrl
