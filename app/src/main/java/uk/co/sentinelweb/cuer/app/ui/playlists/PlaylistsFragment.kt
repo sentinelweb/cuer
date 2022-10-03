@@ -249,6 +249,7 @@ class PlaylistsFragment :
             else -> navRouter.navigate(nav)
         }
     }
+
     //endregion
 
     // region ItemContract.ItemMoveInteractions
@@ -307,8 +308,11 @@ class PlaylistsFragment :
     }
 
     override fun onDelete(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
-        adapter.notifyItemRemoved(adapter.data.indexOf(item))
         presenter.performDelete(item) // delays for animation
+    }
+
+    override fun notifyItemRemoved(model: ItemContract.Model) {
+        adapter.notifyItemRemoved(adapter.data.indexOf(model))
     }
     //endregion
 }

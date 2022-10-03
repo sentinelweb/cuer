@@ -142,6 +142,7 @@ class PlaylistsPresenter(
                                 ?.let { playlistOrchestrator.load(it, LOCAL.deepOptions()) }
                                 ?.apply {
                                     playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
+                                    view.notifyItemRemoved(item)
                                     view.showUndo(
                                         "Deleted playlist: ${playlist.title}",
                                         this@PlaylistsPresenter::undoDelete
