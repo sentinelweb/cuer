@@ -371,7 +371,7 @@ class PlaylistsPresenter(
                     playlist.id?.toIdentifier(LOCAL)?.also { recent.add(it) }
                 }
 
-            modelMapper.map2(
+            modelMapper.map(
                 state.playlists
                     .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } },
                 queue.playlistId,

@@ -22,7 +22,7 @@ class PlaylistsModelMapper constructor(
     private val res: ResourceWrapper
 ) {
 
-    fun map2(
+    fun map(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         current: OrchestratorContract.Identifier<*>?,
         appPlaylists: Map<PlaylistDomain, PlaylistStatDomain?>,
