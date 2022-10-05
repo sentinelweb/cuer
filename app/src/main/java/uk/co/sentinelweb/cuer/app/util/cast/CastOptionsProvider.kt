@@ -9,12 +9,12 @@ import com.google.android.gms.cast.framework.media.MediaIntentReceiver
 import com.google.android.gms.cast.framework.media.NotificationOptions
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 
-
+// used by manifest
 class CastOptionsProvider : OptionsProvider {
 
     override fun getCastOptions(appContext: Context): CastOptions {
 
-        val receiverId = "24471AF3"
+        val receiverId = RECEIVER_ID
         val buttonActions: MutableList<String> = ArrayList()
 
         buttonActions.add(MediaIntentReceiver.ACTION_TOGGLE_PLAYBACK)
@@ -39,5 +39,9 @@ class CastOptionsProvider : OptionsProvider {
 
     override fun getAdditionalSessionProviders(context: Context): List<SessionProvider>? {
         return null
+    }
+
+    companion object {
+        const val RECEIVER_ID = "24471AF3"
     }
 }
