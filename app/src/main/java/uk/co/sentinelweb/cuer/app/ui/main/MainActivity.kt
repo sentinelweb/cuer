@@ -22,11 +22,11 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract.LastTab.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -114,6 +114,8 @@ class MainActivity :
             )
         }
 
+        volumeControl.controlView = binding.castPlayerVolume
+
         prefs.getInt(LAST_BOTTOM_TAB, 0)
             .takeIf { it > 0 }
             ?.also {
@@ -121,6 +123,7 @@ class MainActivity :
                     PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
                         navController.navigate(R.id.navigation_playlists)
                     }
+
                     PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
                         navController.navigate(R.id.navigation_playlist)
                     }
@@ -134,6 +137,7 @@ class MainActivity :
 
     override fun onDestroy() {
         presenter.onDestroy()
+        volumeControl.controlView = null
         super.onDestroy()
     }
 

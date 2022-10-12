@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.cast
 
 import android.view.KeyEvent
+import uk.co.sentinelweb.cuer.app.ui.common.views.CastVolumeControlView
 
 /**
  * This isn't great but it (just) works
@@ -10,6 +11,8 @@ import android.view.KeyEvent
 class CuerSimpleVolumeController constructor(
     private val cuerCastSessionListener: CuerCastSessionListener
 ) {
+    var controlView: CastVolumeControlView? = null
+
     fun handleVolumeKey(event: KeyEvent): Boolean {
         val action: Int = event.getAction()
         val keyCode: Int = event.getKeyCode()
@@ -18,12 +21,14 @@ class CuerSimpleVolumeController constructor(
                 KeyEvent.KEYCODE_VOLUME_UP -> {
                     if (action == KeyEvent.ACTION_DOWN) {
                         castSession.volume = castSession.volume + VOL_INCREMENT
+                        controlView?.updateValue()
                     }
                     true
                 }
                 KeyEvent.KEYCODE_VOLUME_DOWN -> {
                     if (action == KeyEvent.ACTION_DOWN) {
                         castSession.volume = castSession.volume - VOL_INCREMENT
+                        controlView?.updateValue()
                     }
                     true
                 }
