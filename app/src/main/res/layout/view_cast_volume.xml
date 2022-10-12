@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="48dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/black_transparent_background"
+    android:padding="8dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cv_volume_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        app:srcCompat="@drawable/ic_volume_up_24"
+        app:tint="?colorOnSurface"
+    />
+
+    <uk.co.sentinelweb.cuer.app.ui.common.views.VerticalSeekBar
+        android:id="@+id/cv_volume"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:max="1000"
+        android:layout_gravity="center_horizontal"
+        android:progressTint="?colorProgress"
+        android:thumbTint="?colorPrimary"
+    />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        app:srcCompat="@drawable/ic_cast_connected_24"
+        app:tint="?colorOnSurface"
+    />
+
+</LinearLayout>

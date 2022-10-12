@@ -9,14 +9,10 @@ import android.view.View
 import androidx.annotation.IdRes
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaMetadata
-import com.google.android.gms.cast.framework.CastButtonFactory
-import com.google.android.gms.cast.framework.CastContext
-import com.google.android.gms.cast.framework.CastSession
-import com.google.android.gms.cast.framework.SessionManagerListener
+import com.google.android.gms.cast.framework.*
 import com.google.android.gms.common.images.WebImage
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.utils.PlayServicesUtils
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import kotlin.math.min
 
 
 class ChromeCastWrapper(private val application: Application) {
@@ -51,9 +47,9 @@ class ChromeCastWrapper(private val application: Application) {
         metadata.putString(MediaMetadata.KEY_TITLE, media.title ?: "No title")
         metadata.putString(
             MediaMetadata.KEY_SUBTITLE,
-            media.description ?: "".substring(0, min(media.description?.length ?: 0, 50))
+            media.description ?: "No description"
         )
-        metadata.addImage(WebImage(Uri.parse("https://www.stateofdigital.com/wp-content/uploads/2012/01/slap-on-wrist.jpg")))
+        metadata.addImage(WebImage(Uri.parse((media.thumbNail ?: media.image)?.url)))
 
         return MediaInfo.Builder(media.url)
             .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
@@ -61,4 +57,9 @@ class ChromeCastWrapper(private val application: Application) {
             .setMetadata(metadata)
             .build()
     }
+
+    fun isCastConnected() = getCastContext().castState == CastState.CONNECTED
+
+    fun getCastSession() = getCastContext().sessionManager.currentCastSession
+
 }

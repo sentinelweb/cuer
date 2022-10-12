@@ -14,7 +14,6 @@ class AndroidLinkScanner constructor(
     override fun scan(link: LinkDomain.UrlLinkDomain) = scan(link.address)
 
     override fun scan(uriString: String): Pair<ObjectTypeDomain, Domain>? {
-
         try {
             val uri = Uri.parse(clean(uriString))
             mappers.forEach {

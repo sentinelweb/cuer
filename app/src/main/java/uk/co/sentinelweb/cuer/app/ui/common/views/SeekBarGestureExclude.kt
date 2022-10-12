@@ -6,7 +6,6 @@ import android.os.Build
 import android.util.AttributeSet
 import androidx.core.view.ViewCompat
 
-//from : https://codelabs.developers.google.com/codelabs/gesture-navigation#5
 class SeekBarGestureExclude @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
