@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/black_transparent_background">
+    android:background="@color/black_transparent_background"
+    android:padding="8dp">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cv_volume_icon"
