@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -40,6 +41,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.CryptoLauncher
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -73,6 +75,7 @@ class AytPortraitActivity : AppCompatActivity(),
     private val queueConsumer: QueueMediatorContract.Consumer by inject()
     private val cryptoLauncher: CryptoLauncher by inject()
     private val linkScanner: LinkScanner by inject()
+    private val shareWrapper: ShareWrapper by inject()
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl
     private lateinit var binding: ActivityAytPortraitBinding
@@ -132,6 +135,22 @@ class AytPortraitActivity : AppCompatActivity(),
 
             override fun onRemovePlaylist(chipModel: ChipModel) = Unit
 
+            override fun onRibbonItemClick(ribbonItem: RibbonModel) = when (ribbonItem.type) {
+                RibbonModel.Type.STAR -> mviView.dispatch(StarClick)
+                RibbonModel.Type.UNSTAR -> mviView.dispatch(StarClick)
+                RibbonModel.Type.SHARE -> mviView.dispatch(ShareClick)
+                RibbonModel.Type.SUPPORT -> mviView.dispatch(Support)
+                RibbonModel.Type.FULL -> mviView.dispatch(FullScreenClick)
+                RibbonModel.Type.PIP -> mviView.dispatch(PipClick)
+                RibbonModel.Type.LIKE -> mviView.dispatch(OpenClick)
+                RibbonModel.Type.COMMENT -> mviView.dispatch(OpenClick)
+                RibbonModel.Type.LAUNCH -> mviView.dispatch(OpenClick)
+                else -> log.e(
+                    "Unsupported ribbon action",
+                    IllegalStateException("Unsupported ribbon action: $ribbonItem")
+                )
+            }
+
         }
         val playlistItem = itemLoader.load()
             ?: queueConsumer.currentItem
@@ -143,8 +162,6 @@ class AytPortraitActivity : AppCompatActivity(),
             PLAYLIST_ITEM_ID.name to (playlistItem.id),
         )
         playlistFragment.external.interactions = playlistInteractions
-        binding.portraitPlayerFullscreen.setOnClickListener { mviView.dispatch(FullScreenClick) }
-        binding.portraitPlayerPip.setOnClickListener { mviView.dispatch(PipClick); }
     }
 
     // region MVI view
@@ -161,12 +178,23 @@ class AytPortraitActivity : AppCompatActivity(),
                 log.d("set description")
                 binding.portraitPlayerDescription.setModel(it)
             })
+            diff(get = Model::playlistItem, set = {
+                it?.media?.also {
+                    binding.portraitPlayerDescription.ribbonItems
+                        .find { it.item.type == RibbonModel.Type.STAR }
+                        ?.isVisible = !it.starred
+                    binding.portraitPlayerDescription.ribbonItems
+                        .find { it.item.type == RibbonModel.Type.UNSTAR }
+                        ?.isVisible = it.starred
+                }
+            })
             diff(get = Model::screen, set = {
                 when (it) {
                     DESCRIPTION -> {
                         binding.portraitPlayerDescription.isVisible = true
                         binding.portraitPlayerPlaylist.isVisible = false
                     }
+
                     PLAYLIST -> {
                         binding.portraitPlayerDescription.isVisible = false
                         binding.portraitPlayerPlaylist.isVisible = true
@@ -214,11 +242,21 @@ class AytPortraitActivity : AppCompatActivity(),
                         finish()
                     }
                 }
+
                 is PortraitPlayerOpen -> toast.show("Already in portrait mode - shouldn't get here")
                 is ShowSupport -> SupportDialogFragment.show(
                     this@AytPortraitActivity,
                     label.item.media
                 )
+
+                is ItemOpen -> navRouter.navigate(
+                    NavigationModel(
+                        YOUTUBE_VIDEO,
+                        mapOf(NavigationModel.Param.PLATFORM_ID to label.item.media.platformId)
+                    )
+                )
+
+                is Share -> shareWrapper.share(label.item.media)
             }
         }
 

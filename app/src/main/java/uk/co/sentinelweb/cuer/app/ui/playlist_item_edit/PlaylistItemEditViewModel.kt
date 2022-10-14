@@ -310,6 +310,7 @@ class PlaylistItemEditViewModel constructor(
         RibbonModel.Type.COMMENT -> onLaunchVideo()
         RibbonModel.Type.LAUNCH -> onLaunchVideo()
         RibbonModel.Type.EDIT -> onEditClick()
+        else -> log.e("Unsupported ribbon action", IllegalStateException("Unsupported ribbon action: $ribbonItem"))
     }
 
     override fun onChannelClick() {

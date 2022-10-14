@@ -25,6 +25,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 
 interface AytPortraitContract {
     companion object {
@@ -57,6 +58,8 @@ interface AytPortraitContract {
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
                         playerControls = get(),
+                        mediaOrchestrator = get(),
+                        playlistItemOrchestrator = get()
                     ).create()
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(get<AytPortraitActivity>(), get()) }
@@ -91,6 +94,7 @@ interface AytPortraitContract {
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<CommitHost> { EmptyCommitHost() }
                 scoped { AlertDialogCreator(get<AytPortraitActivity>()) }
+                scoped { ShareWrapper(get<AytPortraitActivity>()) }
             }
         }
     }

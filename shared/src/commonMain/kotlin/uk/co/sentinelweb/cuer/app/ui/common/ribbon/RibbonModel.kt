@@ -6,6 +6,6 @@ data class RibbonModel(
     val icon: Int
 ) {
     enum class Type {
-        LIKE, STAR, UNSTAR, SHARE, SUPPORT, COMMENT, LAUNCH, EDIT
+        LIKE, STAR, UNSTAR, SHARE, SUPPORT, COMMENT, LAUNCH, EDIT, PIP, FULL
     }
 }

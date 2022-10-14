@@ -40,7 +40,7 @@ class PlayerModelMapper constructor(
                             it,
                             playlist?.let { p -> setOf(p) },
                             false,
-                            ribbonCreator.createRibbon(it)
+                            ribbonCreator.createPlayerRibbon(it)
                         )
                     }
                     ?: descriptionMapper.mapEmpty(),

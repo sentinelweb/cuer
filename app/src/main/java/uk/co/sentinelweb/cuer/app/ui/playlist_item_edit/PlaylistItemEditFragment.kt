@@ -251,7 +251,6 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         binding.plieTitleBg.isVisible = true
         binding.plieTitlePos.isVisible = !model.empty
         binding.plieDuration.isVisible = !model.empty
-        binding.plieSupportFab.isVisible = !model.empty
         if (menuState.scrolledDown) {
             playMenuItem.isVisible = !model.empty
         } else {
