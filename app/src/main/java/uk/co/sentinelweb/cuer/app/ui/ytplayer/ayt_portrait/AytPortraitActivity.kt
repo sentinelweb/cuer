@@ -199,6 +199,7 @@ class AytPortraitActivity : AppCompatActivity(),
                         binding.portraitPlayerDescription.isVisible = false
                         binding.portraitPlayerPlaylist.isVisible = true
                     }
+
                     else -> Unit
                 }
             })
@@ -219,12 +220,14 @@ class AytPortraitActivity : AppCompatActivity(),
                             }
                         } ?: navLink(label.url)
                     )
+
                 is ChannelOpen ->
                     label.channel.platformId?.let { id ->
                         navRouter.navigate(
                             NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))
                         )
                     }
+
                 is FullScreenPlayerOpen -> label.also {
                     aytViewHolder.switchView()
                     navRouter.navigate(
@@ -232,6 +235,7 @@ class AytPortraitActivity : AppCompatActivity(),
                     )
                     finish()
                 }
+
                 is PipPlayerOpen -> {
                     val hasPermission = floatingService.hasPermission(this@AytPortraitActivity)
                     if (hasPermission) {
@@ -250,10 +254,7 @@ class AytPortraitActivity : AppCompatActivity(),
                 )
 
                 is ItemOpen -> navRouter.navigate(
-                    NavigationModel(
-                        YOUTUBE_VIDEO,
-                        mapOf(NavigationModel.Param.PLATFORM_ID to label.item.media.platformId)
-                    )
+                    NavigationModel(YOUTUBE_VIDEO_POS, mapOf(PLAYLIST_ITEM to label.item))
                 )
 
                 is Share -> shareWrapper.share(label.item.media)
