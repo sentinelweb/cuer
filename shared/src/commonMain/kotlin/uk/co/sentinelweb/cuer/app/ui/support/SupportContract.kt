@@ -10,7 +10,7 @@ interface SupportContract {
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
 
         sealed class Intent {
-            data class Load(val media: MediaDomain) : MviStore.Intent()
+            data class Load(val media: MediaDomain) : Intent()
             data class Open(val link: LinkDomain) : Intent()
         }
 
@@ -49,7 +49,7 @@ interface SupportContract {
         }
 
         companion object {
-            val CATEGORY_ORDER = listOf(DONATE, CRYPTO, VIDEO, SOCIAL, PODCAST, OTHER)
+            val CATEGORY_ORDER = listOf(DONATE, CRYPTO, SOCIAL, PODCAST, VIDEO, OTHER)
         }
     }
 
