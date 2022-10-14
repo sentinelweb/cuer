@@ -351,7 +351,8 @@ class PlaylistItemEditViewModel constructor(
 
     private fun onLaunchVideo() {
         state.editingPlaylistItem?.let {
-            NavigationModel(YOUTUBE_VIDEO_POS, mapOf(NavigationModel.Param.PLAYLIST_ITEM to it))
+            _navigateLiveData.value =
+                NavigationModel(YOUTUBE_VIDEO_POS, mapOf(NavigationModel.Param.PLAYLIST_ITEM to it))
         }
     }
 
