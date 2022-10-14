@@ -43,6 +43,7 @@ data class NavigationModel constructor(
         SHARE(listOf(LINK)),
         CRYPTO_LINK(listOf(CRYPTO_ADDRESS)),
         YOUTUBE_VIDEO(listOf(PLATFORM_ID)),
+        YOUTUBE_VIDEO_POS(listOf(Param.PLAYLIST_ITEM)),
         YOUTUBE_CHANNEL(listOf(CHANNEL_ID)),
         PLAYLIST(listOf(PLAYLIST_ID, SOURCE), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
         PLAYLIST_ITEM(listOf(Param.PLAYLIST_ITEM, SOURCE), listOf(FRAGMENT_NAV_EXTRAS)),

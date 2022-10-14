@@ -3,14 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
-    <item
-        android:id="@+id/plie_edit"
-        android:icon="@drawable/ic_edit_24"
-        android:orderInCategory="50"
-        android:title="@string/menu_edit"
-        app:iconTint="@color/white"
-        app:showAsAction="ifRoom"
-        />
 
     <item
         android:id="@+id/plie_play"
@@ -21,30 +13,4 @@
         android:visible="false"
         android:orderInCategory="100"
         />
-
-
-    <item
-        android:id="@+id/plie_launch"
-        android:icon="@drawable/ic_launch_black"
-        android:orderInCategory="150"
-        android:title="@string/menu_launch"
-        app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/plie_star"
-        android:icon="@drawable/ic_starred_off"
-        android:title="@string/menu_star"
-        app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="ifRoom"
-        android:orderInCategory="200"
-        android:visible="true" />
-
-    <item
-        android:id="@+id/plie_share"
-        android:icon="@drawable/ic_share_black"
-        android:orderInCategory="250"
-        android:title="@string/menu_share"
-        app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="ifRoom" />
 </menu>

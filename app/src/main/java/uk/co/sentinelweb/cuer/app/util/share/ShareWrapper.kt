@@ -19,7 +19,7 @@ class ShareWrapper(
             data = Uri.parse(media.url)
             putExtra(
                 Intent.EXTRA_TEXT,
-                shortMessage(media).trimMargin()
+                fullMessage(media).trimMargin()
             )
             putExtra(Intent.EXTRA_SUBJECT, "Watch '${media.title}' by '${media.channelData.title}'")
             type = "text/plain"
@@ -50,15 +50,15 @@ class ShareWrapper(
     }
 
     private fun fullMessage(media: MediaDomain): String {
-        return """Yo cheez, Check out this vid:
+        return """Check out this vid:
                     |
                     |${media.title}
                     |${media.url}
                     |
                     |by "${media.channelData.title}" (${channelUrl(media)})
                     | 
-                    |Sent via Cuer @cuerapp (https://twitter.com/cuerapp) 
-                    |
+                    |Sent via Cuer (https://cuer.app)
+                    |Twitter: @cuerapp (https://twitter.com/cuerapp) 
                     """
     }
 
@@ -95,7 +95,8 @@ class ShareWrapper(
             }
         }
 
-        sb.append("Sent via Cuer @cuerapp (https://twitter.com/cuerapp)").append("\n\n")
+        sb.append("Sent via Cuer (https://cuer.app)").append("\n\n")
+        sb.append("Twitter: @cuerapp (https://twitter.com/cuerapp) ").append("\n\n")
         return sb.toString()
     }
 

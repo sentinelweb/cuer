@@ -5,24 +5,30 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.Format.SECS
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistItemEditModelMapper(
     private val timeFormater: TimeFormatter,
     private val descriptionMapper: DescriptionMapper,
     private val res: ResourceWrapper,
-    private val backgroundMapper: BackgroundMapper
+    private val backgroundMapper: BackgroundMapper,
+    private val ribbonCreator: RibbonCreator,
 ) {
 
     fun map(state: PlaylistItemEditContract.State) = with(state) {
         media?.let { media ->
             PlaylistItemEditContract.Model(
-                description = descriptionMapper.map(media, selectedPlaylists, !isOnSharePlaylist),
+                description = descriptionMapper.map(
+                    domain = media,
+                    selectedPlaylists = selectedPlaylists,
+                    editablePlaylists = !isOnSharePlaylist,
+                    ribbonActions = ribbonCreator.createRibbon(media)
+                ),
                 imageUrl = (media.image ?: media.thumbNail)?.url,
                 starred = media.starred,
                 canPlay = media.platformId.isNotEmpty(),

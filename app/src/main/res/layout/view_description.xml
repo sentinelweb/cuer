@@ -7,7 +7,23 @@
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
     tools:context=".ui.playlist_item_edit.PlaylistItemEditFragment"
+>
+    <HorizontalScrollView
+        android:id="@+id/pid_ribbon_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingBottom="8dp"
     >
+        <LinearLayout
+            android:id="@+id/pid_ribbon_ctnr"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            tools:ignore="UselessLeaf"
+        />
+    </HorizontalScrollView>
 
     <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
         android:id="@+id/pid_author_image"
@@ -15,9 +31,9 @@
         android:layout_height="64dp"
         android:contentDescription="@null"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pid_ribbon_scroll"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.Item.Icon"
-        />
+    />
 
     <TextView
         android:id="@+id/pid_author_title"
@@ -30,9 +46,9 @@
         android:textIsSelectable="true"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
         app:layout_constraintStart_toEndOf="@id/pid_author_image"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pid_ribbon_scroll"
         tools:text="Channel title"
-        />
+    />
 
     <TextView
         android:id="@+id/pid_pub_date"
@@ -44,7 +60,7 @@
         app:layout_constraintStart_toEndOf="@id/pid_author_image"
         app:layout_constraintTop_toBottomOf="@id/pid_author_title"
         tools:text="23 Aug 2012"
-        />
+    />
 
     <TextView
         android:id="@+id/pid_author_desc"
@@ -63,7 +79,7 @@
         app:layout_constraintStart_toEndOf="@id/pid_author_image"
         app:layout_constraintTop_toBottomOf="@id/pid_pub_date"
         tools:text="Channel description http://www.yahoo.com descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel description"
-        />
+    />
 
     <HorizontalScrollView
         android:id="@+id/pid_chips_scroll"
@@ -73,14 +89,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pid_author_desc"
-        >
+    >
 
         <LinearLayout
             android:id="@+id/pid_chips"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            >
+        >
 
         </LinearLayout>
 
@@ -98,7 +114,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pid_chips_scroll"
         tools:text="Playlist Item Edit Title"
-        />
+    />
 
     <TextView
         android:id="@+id/pid_desc"
@@ -112,6 +128,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pid_title"
         tools:text="Playlist Item http://www.google.com Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description"
-        />
+    />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -75,6 +75,8 @@ interface FloatingPlayerContract {
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
                         playerControls = get(),
+                        mediaOrchestrator = get(),
+                        playlistItemOrchestrator = get()
                     ).create()
                 }
                 scoped { FloatingWindowMviView(get(), get(), get(), get()) }

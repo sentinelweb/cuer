@@ -46,6 +46,7 @@ class NavigationRouter constructor(
                     AytLandActivity.start(activity, it)
                 }
                     ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
+
             LOCAL_PLAYER -> {
                 log.d("YoutubePortraitActivity.NavigationMapper")
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
@@ -53,22 +54,35 @@ class NavigationRouter constructor(
                     log.d("YoutubePortraitActivity.start called")
                 } ?: throw IllegalArgumentException("$LOCAL_PLAYER: $PLAYLIST_ITEM param required")
             }
+
             WEB_LINK ->
                 nav.params[LINK]?.let {
                     urlLauncher.launchWithChooser(it.toString())
                 } ?: throw IllegalArgumentException("$WEB_LINK: $LINK param required")
+
             CRYPTO_LINK ->
                 nav.getParam<LinkDomain.CryptoLinkDomain>(CRYPTO_ADDRESS)
                     ?.let { cryptoLauncher.launch(it) }
                     ?: throw IllegalArgumentException("$CRYPTO_LINK: $CRYPTO_ADDRESS param required")
+
             NAV_BACK -> navController?.popBackStack()
             NAV_FINISH -> activity.finish()
             YOUTUBE_CHANNEL -> if (!ytJavaApi.launchChannel(nav.params[CHANNEL_ID] as String)) {
                 toastWrapper.show("can't launch channel")
             }
+
             YOUTUBE_VIDEO -> if (!ytJavaApi.launchVideoSystem(nav.params[PLATFORM_ID] as String)) {
                 toastWrapper.show("can't launch channel")
             }
+
+            YOUTUBE_VIDEO_POS ->
+                (nav.params[PLAYLIST_ITEM] as? PlaylistItemDomain)?.media
+                    ?.also {
+                        if (!ytJavaApi.launchVideoWithTimeSystem(it)) {
+                            toastWrapper.show("can't launch media with time")
+                        }
+                    }
+
             PLAYLIST -> navController?.navigate(
                 R.id.navigation_playlist,
                 bundleOf(
@@ -83,6 +97,7 @@ class NavigationRouter constructor(
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+
             PLAYLISTS -> navController?.navigate(
                 R.id.navigation_playlists,
                 bundleOf(
@@ -104,6 +119,7 @@ class NavigationRouter constructor(
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+
             PLAYLIST_EDIT -> navController?.navigate(
                 R.id.navigation_playlist_edit,
                 bundleOf(
@@ -116,6 +132,7 @@ class NavigationRouter constructor(
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+
             PLAYLIST_CREATE -> navController?.navigate(
                 R.id.navigation_playlist_edit,
                 bundleOf(
@@ -127,6 +144,7 @@ class NavigationRouter constructor(
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+
             SHARE -> nav.getParam<String>(LINK)
                 ?.let { activity.startActivity(ShareActivity.urlIntent(activity, it)) }
                 ?: throw IllegalArgumentException("$SHARE: $LINK param required")
@@ -148,6 +166,7 @@ class NavigationRouter constructor(
                         intent.removeExtra(PLAY_NOW.toString())
                         intent.removeExtra(SOURCE.name)
                     }
+
                     else -> Unit
                 }
             }

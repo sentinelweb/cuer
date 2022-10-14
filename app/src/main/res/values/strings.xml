@@ -35,6 +35,15 @@
     <string name="menu_filter">Filter</string>
     <string name="menu_merge">Merge with &#8230;</string>
     <string name="menu_support">Support</string>
+    <string name="menu_like">Like</string>
+    <string name="menu_comment">Comment</string>
+    <string name="menu_pip">Floating</string>
+    <string name="menu_full">Fullscreen</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_playlist_add">Create playlist</string>
+    <string name="menu_sort_alpha">Alphabetical</string>
+    <string name="menu_sort_category">Categories</string>
+    <string name="menu_launch">Launch</string>
 
     <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>
@@ -76,6 +85,7 @@
     <string name="playlist_item_menu_star">Star</string>
     <string name="playlist_item_menu_share">Share</string>
     <string name="playlist_item_menu_related">Related</string>
+    <string name="playlist_item_menu_goto_playlist">Goto playlist</string>
     <string name="playlist_msg_deleted">This playlist was deleted</string>
     <string name="playlist_play_items_from_start">Play items from start</string>
     <string name="playlist_error_moveitem_already_exists">Item already exists on this playlist …</string>
@@ -157,6 +167,9 @@
     <string name="search_watched">Watched</string>
     <string name="search_live">Live</string>
     <string name="search_select_dates">Select Dates …</string>
+    <string name="imagesearch_dialog_title">Image Search</string>
+    <string name="imagesearch_term">Search Term</string>
+    <string name="title_select_picture">Select Picture</string>
 
     <!-- browse -->
     <string name="browse_error_no_playlist">No playlist configured</string>
@@ -166,6 +179,28 @@
     <!-- player -->
     <string name="player_fab_fullscreen">Fullscreen</string>
     <string name="player_fab_pip">Picture in Picture</string>
+    <string name="dialog_play_chromecast">Chromecast</string>
+    <string name="dialog_play_portrait">Portrait</string>
+    <string name="dialog_play_fullscreen">Fullscreen</string>
+    <string name="dialog_play_floating">Floating</string>
+    <string name="dialog_play_remember_my_decision">Remember my decision</string>
+    <string name="play_dialog_title">Play Item</string>
+    <string name="dialog_play_youtube">Launch youtube</string>
+
+    <!-- support -->
+    <string name="support_no_links">No links in the description</string>
+    <string name="support_links_loading">Loading …</string>
+    <string name="support_crypto_warning_title">About crypto</string>
+    <string name="support_crypto_warning_message">TRANSACTIONS ARE NON REVERSIBLE
+        \n\n・ These addresses are just scanned from the description and NOT VALIDATED.
+        \n・ETH style addresses (starting 0x) can represent lots of different tokens.
+        \n・Please check the address with the channel first.
+        \n・Consider making a small payment first to check it goes through properly.
+        \n\nSelected address was copied to the clipboard, the following apps are the whitelisted apps but you can use
+        any on your device.
+    </string>
+    <string name="support_crypto_warning_ok">OK</string>
+    <string name="support_crypto_warning_dont_show">I know don\'t show this</string>
 
     <!-- misc -->
     <string name="ok">OK</string>
@@ -178,35 +213,6 @@
     <string name="live">LIVE</string>
     <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
-    <string name="imagesearch_dialog_title">Image Search</string>
-    <string name="searchimage_term">Search Term</string>
-    <string name="menu_show_children">Show children</string>
-    <string name="playlist_item_menu_goto_playlist">Goto playlist</string>
-    <string name="menu_launch">Launch</string>
-    <string name="title_select_picture">Select Picture</string>
-    <string name="menu_search">Search</string>
-    <string name="menu_playlist_add">Create playlist</string>
     <string name="playlist_empty">No Items</string>
-    <string name="dialog_play_chromecast">Chromecast</string>
-    <string name="dialog_play_portrait">Portrait</string>
-    <string name="dialog_play_fullscreen">Fullscreen</string>
-    <string name="dialog_play_floating">Floating</string>
-    <string name="dialog_play_remember_my_decision">Remember my decision</string>
-    <string name="play_dialog_title">Play Item</string>
-    <string name="dialog_play_youtube">Launch youtube</string>
-    <string name="menu_sort_alpha">Alphabetical</string>
-    <string name="menu_sort_category">Categories</string>
-    <string name="support_no_links">No links in the description</string>
-    <string name="support_links_loading">Loading …</string>
-    <string name="support_crypto_warning_title">About crypto</string>
-    <string name="support_crypto_warning_message">TRANSACTIONS ARE NON REVERSIBLE
-\n\n・ These addresses are just scanned from the description and NOT VALIDATED.
-\n・ETH style addresses (starting 0x) can represent lots of different tokens.
-\n・Please check the address with the channel first.
-\n・Consider making a small payment first to check it goes through properly.
-\n\nSelected address was copied to the clipboard, the following apps are the whitelisted apps but you can use any on your device.
-    </string>
-    <string name="support_crypto_warning_ok">OK</string>
-    <string name="support_crypto_warning_dont_show">I know don\'t show this</string>
 
 </resources>

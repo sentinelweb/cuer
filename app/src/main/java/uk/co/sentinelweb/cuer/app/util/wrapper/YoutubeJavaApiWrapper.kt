@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.channelUrl
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.videoUrl
+import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.videoUrlWithTime
 
 @Suppress("TooManyFunctions")
 class YoutubeJavaApiWrapper(
@@ -107,6 +108,11 @@ class YoutubeJavaApiWrapper(
 
     fun launchVideoSystem(platformId: String): Boolean = runCatching {
         Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl(platformId)))
+            .apply { activity.startActivity(this) }
+    }.isSuccess
+
+    fun launchVideoWithTimeSystem(media: MediaDomain): Boolean = runCatching {
+        Intent(Intent.ACTION_VIEW, Uri.parse(videoUrlWithTime(media)))
             .apply { activity.startActivity(this) }
     }.isSuccess
 

@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.player
 
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionMapper
 import uk.co.sentinelweb.cuer.core.mappers.Format.SECS
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
@@ -13,6 +14,7 @@ class PlayerModelMapper constructor(
     private val timeProvider: TimeProvider,
     private val descriptionMapper: DescriptionMapper,
     private val logWrapper: LogWrapper,
+    private val ribbonCreator: RibbonCreator,
 ) {
 
     init {
@@ -33,7 +35,14 @@ class PlayerModelMapper constructor(
                     skipBackText = skipBackText
                 ),
                 description = item?.media
-                    ?.let { descriptionMapper.map(it, playlist?.let { setOf(it) }, false) }
+                    ?.let {
+                        descriptionMapper.map(
+                            it,
+                            playlist?.let { p -> setOf(p) },
+                            false,
+                            ribbonCreator.createPlayerRibbon(it)
+                        )
+                    }
                     ?: descriptionMapper.mapEmpty(),
                 nextTrackEnabled = playlist?.run { currentIndex < playlist.items.size - 1 } ?: false,
                 prevTrackEnabled = playlist?.run { currentIndex > 0 } ?: false,
