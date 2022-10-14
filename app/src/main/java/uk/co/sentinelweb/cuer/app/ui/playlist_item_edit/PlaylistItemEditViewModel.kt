@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -48,7 +49,7 @@ class PlaylistItemEditViewModel constructor(
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val shareWrapper: ShareWrapper,
     private val playUseCase: PlayUseCase,
-    private val linkScanner: LinkScanner
+    private val linkScanner: LinkScanner,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -199,7 +200,7 @@ class PlaylistItemEditViewModel constructor(
         } ?: run { toast.show("Please save the item first ...") }
     }
 
-    fun onStarClick() {
+    private fun onStarClick() {
         state.media
             ?.let { it.copy(starred = !it.starred) }
             ?.also { state.media = it }
@@ -257,7 +258,7 @@ class PlaylistItemEditViewModel constructor(
         update()
     }
 
-    fun onEditClick() {
+    private fun onEditClick() {
         state.media?.let { originalMedia ->
             state.editSettings.watched = null
             state.editSettings.playFromStart = null
@@ -300,6 +301,17 @@ class PlaylistItemEditViewModel constructor(
         update()
     }
 
+    override fun onRibbonItemClick(ribbonItem: RibbonModel) = when (ribbonItem.type) {
+        RibbonModel.Type.LIKE -> onLaunchVideo()
+        RibbonModel.Type.STAR -> onStarClick()
+        RibbonModel.Type.UNSTAR -> onStarClick()
+        RibbonModel.Type.SHARE -> onShare()
+        RibbonModel.Type.SUPPORT -> onSupport()
+        RibbonModel.Type.COMMENT -> onLaunchVideo()
+        RibbonModel.Type.LAUNCH -> onLaunchVideo()
+        RibbonModel.Type.EDIT -> onEditClick()
+    }
+
     override fun onChannelClick() {
         state.media?.channelData?.platformId?.let { channelId ->
             _navigateLiveData.value = NavigationModel(
@@ -322,10 +334,10 @@ class PlaylistItemEditViewModel constructor(
     }
 
     private fun navLink(link: LinkDomain.UrlLinkDomain): NavigationModel =
-            NavigationModel(WEB_LINK, mapOf(NavigationModel.Param.LINK to link.address))
+        NavigationModel(WEB_LINK, mapOf(NavigationModel.Param.LINK to link.address))
 
-    private fun navShare(link: LinkDomain.UrlLinkDomain): NavigationModel  =
-            NavigationModel(SHARE, mapOf(NavigationModel.Param.LINK to link.address))
+    private fun navShare(link: LinkDomain.UrlLinkDomain): NavigationModel =
+        NavigationModel(SHARE, mapOf(NavigationModel.Param.LINK to link.address))
 
     override fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain) {
         _navigateLiveData.value =
@@ -336,7 +348,7 @@ class PlaylistItemEditViewModel constructor(
         _uiLiveData.value = UiEvent(JUMPTO, timecode.position)
     }
 
-    fun onLaunchVideo() {
+    private fun onLaunchVideo() {
         state.media?.platformId?.let { platformId ->
             _navigateLiveData.value = NavigationModel(
                 YOUTUBE_VIDEO,
@@ -345,7 +357,7 @@ class PlaylistItemEditViewModel constructor(
         }
     }
 
-    fun onShare() {
+    private fun onShare() {
         state.media
             ?.apply { shareWrapper.share(this) }
             ?: toast.show("No item to share ...")
@@ -473,7 +485,7 @@ class PlaylistItemEditViewModel constructor(
             }
     }
 
-    fun onSupport() {
+    private fun onSupport() {
         state.media
             ?.also { media ->
                 _dialogModelLiveData.value = ArgumentDialogModel(

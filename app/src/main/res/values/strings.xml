@@ -35,6 +35,8 @@
     <string name="menu_filter">Filter</string>
     <string name="menu_merge">Merge with &#8230;</string>
     <string name="menu_support">Support</string>
+    <string name="menu_like">Like</string>
+    <string name="menu_comment">Comment</string>
 
     <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>
@@ -208,5 +210,4 @@
     </string>
     <string name="support_crypto_warning_ok">OK</string>
     <string name="support_crypto_warning_dont_show">I know don\'t show this</string>
-
 </resources>

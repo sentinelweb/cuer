@@ -81,11 +81,11 @@ interface PlaylistItemEditContract {
                         prefsWrapper = get(),
                         shareWrapper = get(),
                         playUseCase = get(),
-                        linkScanner = get()
+                        linkScanner = get(),
                     )
                 }
                 scoped { State() }
-                scoped { PlaylistItemEditModelMapper(get(), get(), get(), get()) }
+                scoped { PlaylistItemEditModelMapper(get(), get(), get(), get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { SelectDialogCreator(this.getFragmentActivity()) }
                 scoped { this.getFragmentActivity() }

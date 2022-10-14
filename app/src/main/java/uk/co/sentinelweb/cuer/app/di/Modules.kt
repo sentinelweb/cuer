@@ -23,6 +23,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialog
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.AndroidRibbonCreator
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
@@ -116,6 +118,7 @@ object Modules {
         factory { BackgroundMapper(get()) }
         single { AytViewHolder(get(), get(), get()) }
         factory { PlayYangProgress(get()) }
+        factory<RibbonCreator> { AndroidRibbonCreator(get()) }
     }
 
     private val utilModule = module {

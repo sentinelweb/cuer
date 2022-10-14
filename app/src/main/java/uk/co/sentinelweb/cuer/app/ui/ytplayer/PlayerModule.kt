@@ -26,7 +26,7 @@ object PlayerModule {
                 log = get()
             )
         }
-        factory { PlayerModelMapper(get(), get(), get(), get()) }
+        factory { PlayerModelMapper(get(), get(), get(), get(), get()) }
         single { PlayerListener(get(), get()) }
     }
 }

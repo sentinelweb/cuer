@@ -30,6 +30,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel.Type.STAR
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel.Type.UNSTAR
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
@@ -67,17 +69,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val playerControls: PlayerContract.PlayerControls by inject()
 
     private lateinit var binding: FragmentPlaylistItemEditBinding
-
-    private val starMenuItem: MenuItem
-        get() = binding.plieToolbar.menu.findItem(R.id.plie_star)
     private val playMenuItem: MenuItem
         get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
-    private val editMenuItem: MenuItem
-        get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
-    private val launchMenuItem: MenuItem
-        get() = binding.plieToolbar.menu.findItem(R.id.plie_launch)
-    private val shareMenuItem: MenuItem
-        get() = binding.plieToolbar.menu.findItem(R.id.plie_share)
 
     private var dialog: AppCompatDialog? = null
     private var dialogFragment: DialogFragment? = null
@@ -146,26 +139,12 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         }
         binding.pliePlayFab.setOnClickListener { viewModel.onPlayVideo() }
         binding.pliePlayFab.isVisible = allowPlayArg
-        binding.plieSupportFab.setOnClickListener { viewModel.onSupport() }
-        starMenuItem.isVisible = true
         playMenuItem.isVisible = false
         binding.plieDescription.interactions = viewModel
         binding.plieToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.plie_star -> {
-                    viewModel.onStarClick(); true
-                }
-                R.id.plie_edit -> {
-                    viewModel.onEditClick(); true
-                }
                 R.id.plie_play -> {
                     viewModel.onPlayVideo(); true
-                }
-                R.id.plie_launch -> {
-                    viewModel.onLaunchVideo(); true
-                }
-                R.id.plie_share -> {
-                    viewModel.onShare(); true
                 }
                 else -> false
             }
@@ -184,12 +163,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    //starMenuItem.isVisible = !menuState.modelEmpty
                     playMenuItem.isVisible = !menuState.modelEmpty
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
-                    //starMenuItem.isVisible = false
                     playMenuItem.isVisible = false
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
@@ -276,10 +253,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         binding.plieDuration.isVisible = !model.empty
         binding.plieSupportFab.isVisible = !model.empty
         if (menuState.scrolledDown) {
-            //starMenuItem.isVisible = !model.empty
             playMenuItem.isVisible = !model.empty
         } else {
-            //starMenuItem.isVisible = false
             playMenuItem.isVisible = false
         }
         val imageUrl = model.imageUrl
@@ -303,10 +278,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             binding.plieTitlePos.layoutParams.width =
                 (ratio * binding.plieTitleBg.width).toInt()
         } ?: binding.plieTitlePos.apply { isVisible = false }
-        val starIconResource =
-            if (model.starred) R.drawable.ic_starred
-            else R.drawable.ic_starred_off
-        starMenuItem.setIcon(starIconResource)
+        binding.plieDescription.ribbonItems.find { it.item.type == STAR }?.isVisible = !model.starred
+        binding.plieDescription.ribbonItems.find { it.item.type == UNSTAR }?.isVisible = model.starred
     }
 
 
