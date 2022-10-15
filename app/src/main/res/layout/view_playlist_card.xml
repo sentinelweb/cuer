@@ -29,7 +29,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/listitem"
         style="@style/ItemCard.Container"
-        android:layout_width="match_parent">
+        android:layout_width="match_parent"
+        android:layout_marginBottom="4dp">
 
         <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
             android:id="@+id/listitem_icon"
@@ -138,5 +139,11 @@
             app:layout_constraintRight_toRightOf="parent"
         />
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@color/grey_400"
+    />
 </uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemCardView>
