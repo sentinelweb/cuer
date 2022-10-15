@@ -55,7 +55,7 @@ class ItemRowView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fram
     override val leftSwipeView: View
         get() = binding.swipeLabelLeft
 
-    fun isViewForId(id: Long): Boolean = presenter.isViewForId(id)
+    override fun isViewForId(id: Long): Boolean = presenter.isViewForId(id)
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -162,11 +162,11 @@ class ItemRowView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fram
         binding.listitemIcon.transitionName = url
     }
 
-    override fun setAuthorImageResource(iconRes: Int) {
+    override fun setChannelImageResource(iconRes: Int) {
         // do nothing
     }
 
-    override fun setAuthorImageUrl(url: String) {
+    override fun setChannelImageUrl(url: String) {
         // do nothing
     }
 

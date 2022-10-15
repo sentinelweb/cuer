@@ -27,7 +27,7 @@ class ItemModelMapper constructor(
         playlistText: String?,
         showOverflow: Boolean,
     ): ItemContract.Model {
-        val top = "${item.media.title} : ${item.media.channelData.title}" ?: "No title"
+        val top = "${item.media.title} : ${item.media.channelData.title}"
         val pos = item.media.positon?.toFloat() ?: 0f
         val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f
         return ItemContract.Model(
@@ -53,7 +53,7 @@ class ItemModelMapper constructor(
                 .toString() + "%",
             thumbUrl = (item.media.thumbNail ?: item.media.image)?.url,
             imageUrl = (item.media.image ?: item.media.thumbNail)?.url,
-            authorImageUrl = item.media.channelData.thumbNail?.url,
+            channelImageUrl = item.media.channelData.thumbNail?.url,
             progress = progress,
             starred = item.media.starred,
             watchedSince = item.media.dateLastPlayed?.let { timeSinceFormatter.formatTimeSince(it.toEpochMilliseconds()) }

@@ -22,8 +22,8 @@ interface ItemContract {
         fun setImageUrl(url: String)
         fun setThumbResource(@DrawableRes iconRes: Int)
         fun setThumbUrl(url: String)
-        fun setAuthorImageResource(@DrawableRes iconRes: Int)
-        fun setAuthorImageUrl(url: String)
+        fun setChannelImageResource(@DrawableRes iconRes: Int)
+        fun setChannelImageUrl(url: String)
         fun setCheckedVisible(checked: Boolean)
         fun setPresenter(itemPresenter: Presenter)
         fun setBackground(@ColorRes backgroundColor: Int)
@@ -35,6 +35,7 @@ interface ItemContract {
         fun setPlayIcon(@DrawableRes icon: Int)
         fun dismissMenu()
         fun setShowOverflow(showOverflow: Boolean)
+        fun isViewForId(id: Long): Boolean
     }
 
     interface Presenter {
@@ -51,6 +52,7 @@ interface ItemContract {
         fun isViewForId(id: Long): Boolean
         fun isStarred(): Boolean
         fun isCompositePlaylist(): Boolean
+        fun doAuthorClick()
     }
 
     interface External : ItemBaseContract.ItemPresenterBase {
@@ -83,7 +85,7 @@ interface ItemContract {
         val positon: String,
         val imageUrl: String?,
         val thumbUrl: String?,
-        val authorImageUrl: String?,
+        val channelImageUrl: String?,
         val progress: Float, // 0..1
         val published: String,
         val watchedSince: String,

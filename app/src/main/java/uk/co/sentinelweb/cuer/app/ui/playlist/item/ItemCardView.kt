@@ -56,7 +56,7 @@ class ItemCardView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fra
     override val leftSwipeView: View
         get() = binding.swipeLabelLeft
 
-    fun isViewForId(id: Long): Boolean = presenter.isViewForId(id)
+    override fun isViewForId(id: Long): Boolean = presenter.isViewForId(id)
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -65,7 +65,7 @@ class ItemCardView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fra
         binding.listitemTop.setOnClickListener { presenter.doClick() }
         binding.listitemBottom.setOnClickListener { presenter.doClick() }
         // todo implement author click
-//        binding.listitemAuthorImage.setOnClickListener { presenter.doAuthorClick() }
+        binding.listitemAuthorImage.setOnClickListener { presenter.doAuthorClick() }
         binding.listitem.setOnClickListener { presenter.doClick() }
         binding.listitemOverflowClick.setOnClickListener { showContextualMenu() }
         binding.listitemIcon.setOnClickListener { presenter.doIconClick() }
@@ -168,11 +168,11 @@ class ItemCardView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fra
         // do nothing
     }
 
-    override fun setAuthorImageResource(iconRes: Int) {
+    override fun setChannelImageResource(iconRes: Int) {
         binding.listitemAuthorImage.setImageResource(iconRes)
     }
 
-    override fun setAuthorImageUrl(url: String) {
+    override fun setChannelImageUrl(url: String) {
         Glide.with(context)
             .load(url)
             .transition(DrawableTransitionOptions.withCrossFade())

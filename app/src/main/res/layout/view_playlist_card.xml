@@ -67,13 +67,15 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/list_item_progress_height"
             android:layout_marginLeft="0dp"
-            android:layout_marginRight="@dimen/medium_corner_cut"
+            android:layout_marginRight="0dp"
             android:layout_marginBottom="0dp"
             android:padding="0dp"
             android:progressDrawable="@drawable/item_progress_bar"
             app:layout_constraintBottom_toBottomOf="@+id/listitem_icon"
             app:layout_constraintLeft_toLeftOf="@+id/listitem_icon"
             app:layout_constraintRight_toRightOf="@+id/listitem_icon"
+            android:background="@color/transparent"
+            android:progressBackgroundTint="@color/transparent"
             tools:ignore="RtlHardcoded"
             tools:progress="50"/>
 
@@ -124,7 +126,8 @@
             android:contentDescription="@string/cd_overflow"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/listitem_icon"/>
+            app:layout_constraintTop_toBottomOf="@+id/listitem_icon"
+        />
 
         <ImageView
             android:id="@+id/listitem_overflow_img"
@@ -132,7 +135,8 @@
             android:layout_height="0dp"
             android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"/>
+            app:layout_constraintRight_toRightOf="parent"
+        />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemCardView>
