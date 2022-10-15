@@ -124,7 +124,7 @@
             android:contentDescription="@string/cd_overflow"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/listitem_icon"/>
 
         <ImageView
             android:id="@+id/listitem_overflow_img"

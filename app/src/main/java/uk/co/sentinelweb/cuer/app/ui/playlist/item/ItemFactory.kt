@@ -17,7 +17,7 @@ class ItemFactory constructor(
         parent: ViewGroup,
         interactions: ItemContract.Interactions
     ): ItemViewHolder {
-        val createView = createView(parent)
+        val createView = createView(parent, true) // todo pass from pref
         return ItemViewHolder(
             createPresenter(createView, interactions),
             createView
@@ -39,9 +39,9 @@ class ItemFactory constructor(
         return itemPresenter
     }
 
-    fun createView(parent: ViewGroup): ItemContract.View {
+    fun createView(parent: ViewGroup, card: Boolean): ItemContract.View {
         val inflate = LayoutInflater.from(parent.context)
-            .inflate(R.layout.view_playlist_card, parent, false)
+            .inflate(if (card) R.layout.view_playlist_card else R.layout.view_playlist_row, parent, false)
         return inflate as ItemContract.View
     }
 

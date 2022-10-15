@@ -92,7 +92,7 @@ class PlayDialog constructor(
             }
         }
         item?.apply {
-            val createView = itemFactory.createView(binding.dpItemLayout)
+            val createView = itemFactory.createView(binding.dpItemLayout, false)
             binding.dpItemLayout.addView(createView as ItemRowView)
             itemFactory
                 .createPresenter(createView, emptyInteractions)
