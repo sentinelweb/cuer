@@ -64,8 +64,7 @@ class ItemCardView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fra
         binding.listitem.setOnClickListener { presenter.doClick() }
         binding.listitemTop.setOnClickListener { presenter.doClick() }
         binding.listitemBottom.setOnClickListener { presenter.doClick() }
-        // todo implement author click
-        binding.listitemAuthorImage.setOnClickListener { presenter.doAuthorClick() }
+        binding.listitemChannelImage.setOnClickListener { presenter.doAuthorClick() }
         binding.listitem.setOnClickListener { presenter.doClick() }
         binding.listitemOverflowClick.setOnClickListener { showContextualMenu() }
         binding.listitemIcon.setOnClickListener { presenter.doIconClick() }
@@ -169,14 +168,14 @@ class ItemCardView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fra
     }
 
     override fun setChannelImageResource(iconRes: Int) {
-        binding.listitemAuthorImage.setImageResource(iconRes)
+        binding.listitemChannelImage.setImageResource(iconRes)
     }
 
     override fun setChannelImageUrl(url: String) {
         Glide.with(context)
             .load(url)
             .transition(DrawableTransitionOptions.withCrossFade())
-            .into(binding.listitemAuthorImage)
+            .into(binding.listitemChannelImage)
         // todo transition image?
         // binding.listitemAuthorImage.transitionName = url
     }

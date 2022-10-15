@@ -89,8 +89,10 @@
         />
 
         <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
-            style="@style/ItemCard.AuthorImage"
-            android:id="@+id/listitem_author_image"
+            android:id="@+id/listitem_channel_image"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_margin="8dp"
             android:contentDescription="@null"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/listitem_icon"
@@ -103,8 +105,9 @@
             style="@style/ItemCard.TopText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             app:layout_constraintTop_toBottomOf="@id/listitem_icon"
-            app:layout_constraintLeft_toRightOf="@+id/listitem_author_image"
+            app:layout_constraintLeft_toRightOf="@+id/listitem_channel_image"
             app:layout_constraintRight_toRightOf="parent"
             tools:text="hello here is some very long bottom text to test the wrapping"
         />
@@ -114,8 +117,9 @@
             style="@style/ItemCard.BottomText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             app:layout_constraintTop_toBottomOf="@+id/listitem_top"
-            app:layout_constraintLeft_toRightOf="@+id/listitem_author_image"
+            app:layout_constraintLeft_toRightOf="@+id/listitem_channel_image"
             app:layout_constraintRight_toRightOf="parent"
             tools:text="hello here is some very long text to rest the wrapping"
         />
