@@ -361,8 +361,62 @@
         <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
     <!-- end ItemTile =========================== -->
+    <!-- ItemCard =========================== -->
+    <style name="ItemCard"/>
+
+    <style name="ItemCard.Root">
+        <item name="cardBackgroundColor">@color/transparent</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="ItemCard.Container">
+        <item name="android:background">@color/surface</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="ItemCard.OverflowButtonClick">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+    </style>
+
+    <style name="ItemCard.TopText" parent="@style/TextAppearance.MaterialComponents.Body1">
+        <item name="android:textAppearance">@style/TextAppearance.App.Subtitle2</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+
+    <style name="ItemCard.BottomText" parent="@style/TextAppearance.AppCompat.Small">
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="ItemCard.Image">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">200dp</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <style name="ItemCard.AuthorImage">
+        <item name="android:layout_width">64dp</item>
+        <item name="android:layout_height">64dp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <!-- end ItemCard =========================== -->
     <!-- CompactPlayer =========================== -->
-    <style name="CompactPlayer" />
+    <style name="CompactPlayer"/>
 
     <style name="CompactPlayer.Button">
         <item name="android:background">@drawable/ic_ripple_play_background</item>

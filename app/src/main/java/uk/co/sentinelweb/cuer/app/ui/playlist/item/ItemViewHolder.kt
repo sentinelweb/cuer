@@ -6,8 +6,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 
 class ItemViewHolder(
     val itemPresenter: ItemContract.External,
-    private val view: ItemView
-) : RecyclerView.ViewHolder(view),
+    private val view: ItemContract.View
+) : RecyclerView.ViewHolder(view as View),
     ItemBaseContract.ItemTouchHelperViewHolder {
 
     // region ItemTouchHelperViewHolder

@@ -1,42 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemView xmlns:android="http://schemas.android.com/apk/res/android"
+<uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_item_height">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/swipe_label_right"
         style="@style/ItemView.Background.Right"
         android:layout_marginBottom="4dp"
+        android:paddingLeft="8dp"
         android:background="?colorMove"
         android:text="@string/pl_item_move"
         app:drawableLeftCompat="@drawable/ic_item_playlist_move_white"
-        tools:ignore="RtlHardcoded,RtlSymmetry" />
+        tools:ignore="RtlHardcoded,RtlSymmetry"/>
 
     <TextView
         android:id="@+id/swipe_label_left"
         style="@style/ItemView.Background.Left"
         android:layout_marginBottom="4dp"
+        android:paddingRight="8dp"
         android:background="?colorDelete"
         android:text="@string/pl_item_delete"
         app:drawableRightCompat="@drawable/ic_delete_white"
-        tools:ignore="RtlHardcoded,RtlSymmetry" />
+        tools:ignore="RtlHardcoded,RtlSymmetry"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/listitem"
-        style="@style/ItemView.Container"
+        style="@style/ItemCard.Container"
         android:layout_width="match_parent">
 
         <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
             android:id="@+id/listitem_icon"
-            style="@style/ItemView.Thumb.Row"
+            style="@style/ItemCard.Image"
             android:contentDescription="@null"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription"
-            tools:src="@drawable/ic_player_play_black" />
+            tools:src="@drawable/im_test_nietzche"/>
 
         <ImageView
             android:id="@+id/listitem_play_icon"
@@ -47,7 +50,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/listitem_icon"
             app:layout_constraintLeft_toLeftOf="@+id/listitem_icon"
             app:tint="@color/white"
-            android:contentDescription="@null" />
+            android:contentDescription="@null"/>
 
         <TextView
             android:id="@+id/listitem_duration"
@@ -56,7 +59,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintRight_toRightOf="@+id/listitem_icon"
             app:layout_constraintTop_toTopOf="@+id/listitem_icon"
-            tools:text="0:00" />
+            tools:text="0:00"/>
 
         <ProgressBar
             android:id="@+id/listitem_progress"
@@ -72,7 +75,7 @@
             app:layout_constraintLeft_toLeftOf="@+id/listitem_icon"
             app:layout_constraintRight_toRightOf="@+id/listitem_icon"
             tools:ignore="RtlHardcoded"
-            tools:progress="50" />
+            tools:progress="50"/>
 
         <ImageView
             android:id="@+id/listitem_icon_check"
@@ -80,35 +83,48 @@
             android:contentDescription="@string/cd_check"
             app:layout_constraintBottom_toBottomOf="@id/listitem_icon"
             app:layout_constraintLeft_toLeftOf="@id/listitem_icon"
+        />
 
-            />
+        <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
+            style="@style/ItemCard.AuthorImage"
+            android:id="@+id/listitem_author_image"
+            android:contentDescription="@null"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/listitem_icon"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Item.Icon"
+            tools:src="@drawable/im_test_nietzche"
+        />
+
+        <TextView
+            android:id="@+id/listitem_top"
+            style="@style/ItemCard.TopText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/listitem_icon"
+            app:layout_constraintLeft_toRightOf="@+id/listitem_author_image"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="hello here is some very long bottom text to test the wrapping"
+        />
+
+        <TextView
+            android:id="@+id/listitem_bottom"
+            style="@style/ItemCard.BottomText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/listitem_top"
+            app:layout_constraintLeft_toRightOf="@+id/listitem_author_image"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="hello here is some very long text to rest the wrapping"
+        />
 
         <View
             android:id="@+id/listitem_overflow_click"
-            style="@style/ItemView.OverflowButtonClick"
+            style="@style/ItemCard.OverflowButtonClick"
             android:layout_height="0dp"
             android:contentDescription="@string/cd_overflow"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/listitem_top"
-            style="@style/ItemView.TopText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toRightOf="@id/listitem_icon"
-            app:layout_constraintRight_toLeftOf="@id/listitem_overflow_img"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/listitem_bottom"
-            style="@style/ItemView.BottomText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/listitem_icon"
-            app:layout_constraintRight_toLeftOf="@id/listitem_overflow_img" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <ImageView
             android:id="@+id/listitem_overflow_img"
@@ -116,8 +132,7 @@
             android:layout_height="0dp"
             android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintRight_toRightOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemView>
+</uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemCardView>

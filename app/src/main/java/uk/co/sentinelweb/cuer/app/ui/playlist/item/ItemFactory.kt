@@ -20,7 +20,7 @@ class ItemFactory constructor(
         val createView = createView(parent)
         return ItemViewHolder(
             createPresenter(createView, interactions),
-            createView as ItemView
+            createView
         )
     }
 
@@ -41,7 +41,7 @@ class ItemFactory constructor(
 
     fun createView(parent: ViewGroup): ItemContract.View {
         val inflate = LayoutInflater.from(parent.context)
-            .inflate(R.layout.view_playlist_item, parent, false)
+            .inflate(R.layout.view_playlist_card, parent, false)
         return inflate as ItemContract.View
     }
 

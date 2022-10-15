@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemView
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemRowView
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemViewHolder
 
 
@@ -67,9 +67,9 @@ class PlaylistAdapter constructor(
 
     override fun getItemCount(): Int = _data.size
 
-    fun getItemViewForId(id: Long): ItemView? {
+    fun getItemViewForId(id: Long): ItemRowView? {
         recyclerView.children.forEach { childView ->
-            if (childView is ItemView) {
+            if (childView is ItemRowView) {
                 if (childView.isViewForId(id)) {
                     return@getItemViewForId childView
                 }
