@@ -44,6 +44,8 @@
     <string name="menu_sort_alpha">Alphabetical</string>
     <string name="menu_sort_category">Categories</string>
     <string name="menu_launch">Launch</string>
+    <string name="menu_list">List</string>
+    <string name="menu_card">Cards</string>
 
     <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>

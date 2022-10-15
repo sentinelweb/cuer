@@ -9,7 +9,8 @@ enum class MultiPlatformPrefences constructor(
     BROWSE_CAT_TITLE("browseNodeId"),
     BROWSE_RECENT_TITLES("browseRecent"),
     RECENT_PLAYLISTS("recentPlaylists"),
-    FLOATING_PLAYER_RECT("floatingPlayerRect")
+    FLOATING_PLAYER_RECT("floatingPlayerRect"),
+    SHOW_VIDEO_CARDS("showVideoCards")
 }
 
 interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPrefences>

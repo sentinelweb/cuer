@@ -11,7 +11,7 @@
         android:orderInCategory="150"
         android:title="@string/menu_edit"
         app:iconTint="@color/white"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         />
 
     <item
@@ -42,7 +42,7 @@
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="never"
         android:visible="false"
-        />
+    />
 
     <item
         android:id="@+id/playlist_play"
@@ -52,7 +52,27 @@
         android:visible="false"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="always"
-        />
+    />
+
+    <item
+        android:id="@+id/playlist_view_cards"
+        android:icon="@drawable/ic_view_card"
+        android:orderInCategory="150"
+        android:title="@string/menu_card"
+        android:visible="false"
+        app:iconTint="@color/menu_button_icon_tint"
+        app:showAsAction="always"
+    />
+
+    <item
+        android:id="@+id/playlist_view_rows"
+        android:icon="@drawable/ic_view_list"
+        android:orderInCategory="150"
+        android:title="@string/menu_list"
+        android:visible="false"
+        app:iconTint="@color/menu_button_icon_tint"
+        app:showAsAction="always"
+    />
 
     <item
         android:id="@+id/playlist_mode_shuffle"
@@ -62,7 +82,7 @@
         android:visible="false"
         app:iconTint="@color/menu_button_icon_tint"
         app:showAsAction="always"
-        />
+    />
 
     <item
         android:id="@+id/playlist_mode_single"

@@ -12,7 +12,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemViewHolder
 
 class PlaylistAdapter constructor(
     private val itemFactory: ItemFactory,
-    private val interactions: ItemContract.Interactions
+    private val interactions: ItemContract.Interactions,
+    private val showCards: Boolean
 ) : RecyclerView.Adapter<ItemViewHolder>() {
 
     private lateinit var recyclerView: RecyclerView
@@ -54,7 +55,7 @@ class PlaylistAdapter constructor(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemViewHolder {
-        return itemFactory.createItemViewHolder(parent, interactions)
+        return itemFactory.createItemViewHolder(parent, showCards, interactions)
     }
 
     @Override
