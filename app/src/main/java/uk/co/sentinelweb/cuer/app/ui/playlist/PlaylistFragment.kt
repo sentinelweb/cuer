@@ -172,7 +172,11 @@ class PlaylistFragment :
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = PlaylistAdapter(get(), this, presenter.isCards)
+        if (this::adapter.isInitialized.not()) {
+            adapter = get()
+        }
+        binding.playlistList.layoutManager = LinearLayoutManager(context)
+        binding.playlistList.adapter = adapter
         saveCallback.isEnabled = (commitHost !is EmptyCommitHost)
         binding.playlistList.doOnPreDraw {
             startPostponedEnterTransition()
@@ -181,8 +185,6 @@ class PlaylistFragment :
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
         presenter.initialise()
-        binding.playlistList.layoutManager = LinearLayoutManager(context)
-        binding.playlistList.adapter = adapter
         binding.playlistList.addItemDecoration(
             HeaderFooterDecoration(0, resources.getDimensionPixelSize(R.dimen.recyclerview_footer))
         )
@@ -374,8 +376,8 @@ class PlaylistFragment :
     }
 
     override fun newAdapter() {
-        adapter = PlaylistAdapter(get(), this, presenter.isCards)
-        binding.playlistList.adapter = adapter
+        adapter = get<PlaylistAdapter>()
+            .also { binding.playlistList.adapter = it }
     }
 
     override fun getScrollIndex(): Int =
