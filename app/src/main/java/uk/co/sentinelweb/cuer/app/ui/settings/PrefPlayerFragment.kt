@@ -30,7 +30,7 @@ class PrefPlayerFragment : PreferenceFragmentCompat(), PrefPlayerContract.View, 
 
     private val playerFloatAutoCheckBox get() = findCheckbox(R.string.prefs_player_auto_float_key)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
         (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
             (onCreateView as ViewGroup).addView(it, 0)

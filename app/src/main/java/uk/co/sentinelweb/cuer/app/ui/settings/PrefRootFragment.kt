@@ -22,7 +22,7 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     private val presenter: PrefRootContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
         (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
             (onCreateView as ViewGroup).addView(it, 0)
