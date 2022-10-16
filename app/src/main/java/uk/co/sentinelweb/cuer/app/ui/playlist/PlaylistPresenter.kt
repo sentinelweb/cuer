@@ -100,7 +100,7 @@ class PlaylistPresenter(
         get() = state.playlistIdentifier == queue.playlistId
 
     override val isCards: Boolean
-        get() = multiPrefs.getBoolean(SHOW_VIDEO_CARDS, true)
+        get() = multiPrefs.getBoolean(SHOW_VIDEO_CARDS, true) && !view.isHeadless
 
 
     private fun canPlayPlaylist() = (state.playlist?.id ?: 0) > 0

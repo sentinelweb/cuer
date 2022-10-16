@@ -121,7 +121,7 @@ class PlaylistFragment :
             binding.playlistToolbar.menu.findItem(R.id.playlist_mode_loop),
             binding.playlistToolbar.menu.findItem(R.id.playlist_mode_shuffle)
         )
-    private val isHeadless: Boolean
+    override val isHeadless: Boolean
         get() = HEADLESS.getBoolean(arguments)
 
     private var snackbar: Snackbar? = null
@@ -173,22 +173,11 @@ class PlaylistFragment :
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (this::adapter.isInitialized.not()) {
-            adapter = get()
-        }
-        binding.playlistList.layoutManager = LinearLayoutManager(context)
-        binding.playlistList.adapter = adapter
         saveCallback.isEnabled = (commitHost !is EmptyCommitHost)
-        binding.playlistList.doOnPreDraw {
-            startPostponedEnterTransition()
-        }
         binding.playlistToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
         presenter.initialise()
-        binding.playlistList.addItemDecoration(
-            HeaderFooterDecoration(0, resources.getDimensionPixelSize(R.dimen.recyclerview_footer))
-        )
         cardsMenuItem.isVisible = !presenter.isCards
         rowsMenuItem.isVisible = presenter.isCards
         itemTouchHelper.attachToRecyclerView(binding.playlistList)
@@ -230,8 +219,27 @@ class PlaylistFragment :
             binding.playlistFabPlay.isVisible = false
             binding.playlistFabPlaymode.isVisible = false
         }
+        setupRecyclerView()
+
         imageUrlArg?.also { setImage(it) }
     }
+
+    private fun setupRecyclerView() {
+        if (this::adapter.isInitialized.not()) {
+            adapter = createAdapter()
+        }
+        binding.playlistList.layoutManager = LinearLayoutManager(context)
+        binding.playlistList.adapter = adapter
+        binding.playlistList.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
+        binding.playlistList.addItemDecoration(
+            HeaderFooterDecoration(0, resources.getDimensionPixelSize(R.dimen.recyclerview_footer))
+        )
+    }
+
+    private fun createAdapter() =
+        PlaylistAdapter(get(), this, presenter.isCards)
 
     private fun updatePlayModeMenuItems() {
         val shouldShow = menuState.isShow && menuState.isPlayable
@@ -277,6 +285,7 @@ class PlaylistFragment :
             binding.playlistAppbar.isVisible = false
             binding.playlistFabPlay.isVisible = false
             binding.playlistFabPlaymode.isVisible = false
+            newAdapter()
         }
         activity?.apply { makeNavFromArguments()?.setPlaylistData() }
     }
@@ -378,7 +387,7 @@ class PlaylistFragment :
     }
 
     override fun newAdapter() {
-        adapter = get<PlaylistAdapter>()
+        adapter = createAdapter()
             .also { binding.playlistList.adapter = it }
     }
 
