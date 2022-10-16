@@ -108,7 +108,9 @@ class DescriptionView @JvmOverloads constructor(
                 }
             }
         }
-        if (!this::ribbonItems.isInitialized || ribbonItems.map { it.item.type } != model.ribbonActions.map { it.type }) {
+        if (!this::ribbonItems.isInitialized ||
+            ribbonItems.map { it.item.type } != model.ribbonActions.map { it.type }
+        ) {
             binding.pidRibbonCtnr.removeAllViews()
             ribbonItems = model.ribbonActions.map {
                 RibbonItemView(it, binding.pidRibbonCtnr)

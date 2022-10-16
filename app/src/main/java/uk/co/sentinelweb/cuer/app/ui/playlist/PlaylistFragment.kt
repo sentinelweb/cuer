@@ -93,10 +93,11 @@ class PlaylistFragment :
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     private lateinit var adapter: PlaylistAdapter
+    val linearLayoutManager get() = binding.playlistList.layoutManager as LinearLayoutManager
 
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
     private var _binding: FragmentPlaylistBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw Exception("FragmentPlaylistBinding not bound")
 
     private val starMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_star)
@@ -380,8 +381,9 @@ class PlaylistFragment :
             .also { binding.playlistList.adapter = it }
     }
 
-    override fun getScrollIndex(): Int =
-        (binding.playlistList.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+    override fun getScrollIndex(): Int {
+        return linearLayoutManager.findFirstCompletelyVisibleItemPosition()
+    }
 
     override fun hideRefresh() {
         commitHost.isReady(true)
@@ -437,7 +439,7 @@ class PlaylistFragment :
     }
 
     override fun scrollTo(direction: PlaylistContract.ScrollDirection) {
-        (binding.playlistList.layoutManager as LinearLayoutManager).run {
+        linearLayoutManager.run {
             val itemsOnScreen =
                 this.findLastCompletelyVisibleItemPosition() - this.findFirstCompletelyVisibleItemPosition()
 
@@ -461,7 +463,7 @@ class PlaylistFragment :
     }
 
     override fun scrollToItem(index: Int) {
-        (binding.playlistList.layoutManager as LinearLayoutManager).run {
+        linearLayoutManager.run {
             val useIndex = if (index > 0 && index < adapter.data.size) {
                 index
             } else 0

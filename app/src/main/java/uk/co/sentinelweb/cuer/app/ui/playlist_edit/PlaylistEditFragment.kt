@@ -72,7 +72,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     internal var listener: Listener? = null
 
     private var _binding: FragmentPlaylistEditBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException("FragmentPlaylistEditBinding not bound")
 
     private var dialogFragment: DialogFragment? = null
 
