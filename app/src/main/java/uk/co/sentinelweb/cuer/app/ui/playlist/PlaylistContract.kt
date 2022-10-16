@@ -112,6 +112,7 @@ interface PlaylistContract {
         fun navigate(nav: NavigationModel)
         fun newAdapter()
         fun getScrollIndex(): Int
+        val isHeadless: Boolean
     }
 
     interface External {
@@ -218,7 +219,6 @@ interface PlaylistContract {
                 }
                 scoped { get<Presenter>() as External }
                 scoped { PlaylistModelMapper(itemModelMapper = get(), iconMapper = get()) }
-                scoped { PlaylistAdapter(get(), get<PlaylistFragment>(), get<Presenter>().isCards) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { ItemTouchHelperCallback(get<PlaylistFragment>()) }
                 scoped<SnackbarWrapper> {

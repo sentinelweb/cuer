@@ -10,7 +10,15 @@ enum class MultiPlatformPrefences constructor(
     BROWSE_RECENT_TITLES("browseRecent"),
     RECENT_PLAYLISTS("recentPlaylists"),
     FLOATING_PLAYER_RECT("floatingPlayerRect"),
-    SHOW_VIDEO_CARDS("showVideoCards")
+    SHOW_VIDEO_CARDS("showVideoCards"),
+    PLAYER_AUTO_FLOAT("playerAutoFloat"),
+    ;
+
+    companion object {
+        const val PLAYER_AUTO_FLOAT_DEFAULT = true
+    }
 }
+
+
 
 interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPrefences>

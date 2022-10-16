@@ -433,6 +433,15 @@
         <item name="android:layout_margin">@dimen/controls_button_margin</item>
     </style>
 
+    <style name="YoutubePlayer.MenuButton">
+        <item name="android:background">@drawable/ic_ripple_play_background</item>
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:tint">@color/white</item>
+        <item name="android:layout_margin">@dimen/controls_button_margin</item>
+    </style>
+
     <style name="YoutubePlayer.InfoText" parent="TextAppearance.App.Body1">
         <item name="android:textColor">@color/white</item>
         <item name="android:layout_width">wrap_content</item>

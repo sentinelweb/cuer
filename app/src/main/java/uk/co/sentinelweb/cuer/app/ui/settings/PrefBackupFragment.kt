@@ -24,14 +24,15 @@ import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import java.io.File
 
-class PrefBackupFragment constructor() : PreferenceFragmentCompat(), PrefBackupContract.View, AndroidScopeComponent {
+@Suppress("TooManyFunctions")
+class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<PrefBackupFragment>()
     private val presenter: PrefBackupContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private lateinit var progress: ProgressBar
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
         (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
             (onCreateView as ViewGroup).addView(it, 0)

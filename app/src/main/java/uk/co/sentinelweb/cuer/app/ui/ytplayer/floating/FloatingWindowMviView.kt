@@ -33,7 +33,7 @@ class FloatingWindowMviView(
     fun init() {
 //        notification.setIcon(R.drawable.ic_picture_in_picture)
         notification.setIcon(R.drawable.ic_play_yang_combined)
-        aytViewHolder.addView(service.baseContext, windowManagement.binding!!.playerContainer, this)
+        aytViewHolder.addView(service.baseContext, windowManagement.binding!!.playerContainer, this, false)
     }
 
     override val renderer: ViewRenderer<Model> = diff {
@@ -60,6 +60,8 @@ class FloatingWindowMviView(
             is Command -> {
                 label.command.let { aytViewHolder.processCommand(it) }
             }
+
+            else -> Unit
         }
     }
 

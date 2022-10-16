@@ -11,11 +11,14 @@ import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityAytFullsreenBinding
+import uk.co.sentinelweb.cuer.app.databinding.FullscreenControlsOverlayBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -29,14 +32,10 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.ShowHideUi
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
-import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -45,6 +44,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
+
 
 @ExperimentalCoroutinesApi
 class AytLandActivity : AppCompatActivity(),
@@ -58,7 +58,6 @@ class AytLandActivity : AppCompatActivity(),
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val toast: ToastWrapper by inject()
-    private val showHideUi: ShowHideUi by inject()
     private val res: ResourceWrapper by inject()
     private val castListener: LocalPlayerCastListener by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
@@ -67,6 +66,9 @@ class AytLandActivity : AppCompatActivity(),
 
     private lateinit var mviView: AytLandActivity.MviViewImpl
     private lateinit var binding: ActivityAytFullsreenBinding
+    private lateinit var controlsBinding: FullscreenControlsOverlayBinding
+
+    private var currentItem: PlaylistItemDomain? = null
 
     init {
         log.tag(this)
@@ -78,6 +80,17 @@ class AytLandActivity : AppCompatActivity(),
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         castListener.listen()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // this POS restores the ayt player to the mvi kotlin state after returning from a home press
+        if (this::mviView.isInitialized) {
+            coroutines.mainScope.launch {
+                delay(50)
+                mviView.dispatch(PlayerStateChanged(aytViewHolder.playerState))
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -98,58 +111,49 @@ class AytLandActivity : AppCompatActivity(),
         aytViewHolder.playerView
             ?.apply { getLifecycle().addObserver(this) }
             ?: throw IllegalStateException("Player is not created")
-        controller.onViewCreated(listOf(mviView), lifecycle.asEssentyLifecycle())
-        showHideUi.showElements = {
-            log.d("showElements")
-            binding.controls.root.fadeIn()
-            binding.controls.root.requestFocus()
-        }
-        showHideUi.hideElements = {
-            log.d("hideElements")
-            binding.controls.root.fadeOut()
-        }
-        binding.fullscreenVideoWrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
-            override fun touched() {
-                log.d("fullscreenVideoWrapper -  touched visible:${binding.controls.root.isVisible}")
-                if (!binding.controls.root.isVisible) {
-                    showHideUi.showUiIfNotVisible()
-                }
-            }
-        }
-        showHideUi.hide()
+        controller.onViewCreated(
+            listOf(mviView),
+            lifecycle.asEssentyLifecycle()
+        )
+        controlsBinding = FullscreenControlsOverlayBinding.bind(
+            aytViewHolder.playerView!!
+                .inflateCustomPlayerUi(R.layout.fullscreen_controls_overlay)
+                .findViewById(R.id.controls_video_root)
+        )
+        aytViewHolder.controlsView = controlsBinding.root
 
-        binding.controls.controlsTrackNext.setOnClickListener { mviView.dispatch(TrackFwdClicked);showHideUi.delayedHide() }
-        binding.controls.controlsTrackLast.setOnClickListener { mviView.dispatch(TrackBackClicked);showHideUi.delayedHide() }
-        binding.controls.controlsSeekBack.setOnClickListener {
+        controlsBinding.controlsTrackNext.setOnClickListener {
+            mviView.dispatch(TrackFwdClicked)
+        }
+        controlsBinding.controlsTrackLast.setOnClickListener {
+            mviView.dispatch(TrackBackClicked)
+        }
+        controlsBinding.controlsSeekBack.setOnClickListener {
             mviView.dispatch(SkipBackClicked)
-            showHideUi.delayedHide()
         }
-        binding.controls.controlsSeekForward.setOnClickListener {
+        controlsBinding.controlsSeekForward.setOnClickListener {
             mviView.dispatch(SkipFwdClicked)
-            showHideUi.delayedHide()
         }
-        binding.controls.controlsSeekBack.setOnLongClickListener { mviView.dispatch(SkipBackSelectClicked);true }
-        binding.controls.controlsSeekForward.setOnLongClickListener { mviView.dispatch(SkipFwdSelectClicked);true }
-        binding.controls.controlsPlayFab.setOnClickListener { mviView.dispatch(PlayPauseClicked()) }
-        binding.controls.controlsPortraitFab.setOnClickListener { mviView.dispatch(PortraitClick); }
-        binding.controls.controlsPipFab.setOnClickListener { mviView.dispatch(PipClick); }
-        binding.controls.controlsSupportFab.setOnClickListener { mviView.dispatch(Support); }
-        binding.controls.controlsSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        controlsBinding.controlsSeekBack.setOnLongClickListener { mviView.dispatch(SkipBackSelectClicked);true }
+        controlsBinding.controlsSeekForward.setOnLongClickListener { mviView.dispatch(SkipFwdSelectClicked);true }
+        controlsBinding.controlsPlayFab.setOnClickListener { mviView.dispatch(PlayPauseClicked()) }
+//        controlsBinding.controlsPortraitFab.setOnClickListener { mviView.dispatch(PortraitClick); }
+//        controlsBinding.controlsPipFab.setOnClickListener { mviView.dispatch(PipClick); }
+        controlsBinding.controlsSupport.setOnClickListener { mviView.dispatch(Support); }
+        controlsBinding.controlsClose.setOnClickListener { finish() }
+        controlsBinding.controlsSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    showHideUi.delayedHide()
-                }
             }
 
             override fun onStartTrackingTouch(view: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                mviView.dispatch(SeekBarChanged(seekBar.progress / seekBar.max.toFloat()));showHideUi.delayedHide()
+                mviView.dispatch(SeekBarChanged(seekBar.progress / seekBar.max.toFloat()))
             }
         })
-        chromeCastWrapper.initMediaRouteButton(binding.controls.controlsMediaRouteButton)
+        chromeCastWrapper.initMediaRouteButton(controlsBinding.controlsMediaRouteButton)
         // defaults
-        binding.controls.controlsPlayFab.isVisible = false
-        binding.controls.controlsSeek.isVisible = false
+        controlsBinding.controlsPlayFab.isVisible = false
+        controlsBinding.controlsSeek.isVisible = false
     }
 
     // region MVI view
@@ -158,26 +162,31 @@ class AytLandActivity : AppCompatActivity(),
         PlayerContract.View {
 
         init {
-            aytViewHolder.addView(this@AytLandActivity, binding.playerContainer, this)
+            aytViewHolder.addView(this@AytLandActivity, binding.playerContainer, this, true)
         }
 
         override val renderer: ViewRenderer<Model> = diff {
             diff(get = Model::playState, set = {
                 when (it) {
-                    BUFFERING -> binding.controls.controlsPlayFab.showProgress(true)
+                    BUFFERING -> controlsBinding.controlsPlayFab.showProgress(true)
                     PLAYING -> {
                         updatePlayingIcon(true)
-                        binding.controls.controlsPlayFab.showProgress(false)
+                        controlsBinding.controlsPlayFab.showProgress(false)
                     }
+
                     PAUSED -> {
                         updatePlayingIcon(false)
-                        binding.controls.controlsPlayFab.showProgress(false)
+                        controlsBinding.controlsPlayFab.showProgress(false)
                     }
+
                     else -> Unit
                 }
             })
+            diff(get = Model::playlistItem, set = {
+                currentItem = it
+            })
             diff(get = Model::texts, set = { texts ->
-                binding.controls.apply {
+                controlsBinding.apply {
                     controlsVideoTitle.text = texts.title
                     controlsVideoPlaylist.text = texts.playlistTitle
                     controlsVideoPlaylistData.text = texts.playlistData
@@ -190,7 +199,7 @@ class AytLandActivity : AppCompatActivity(),
                 }
             })
             diff(get = Model::times, set = { times ->
-                binding.controls.apply {
+                controlsBinding.apply {
                     controlsSeek.progress = (times.seekBarFraction * controlsSeek.max).toInt()
                     controlsCurrentTime.text = times.positionText
 
@@ -238,14 +247,15 @@ class AytLandActivity : AppCompatActivity(),
 
         fun updatePlayingIcon(isPlaying: Boolean) {
             if (isPlaying) {
-                binding.controls.controlsPlayFab.setImageState(intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked),
-                    false)
+                controlsBinding.controlsPlayFab.setImageState(
+                    intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked),
+                    false
+                )
             } else {
-                binding.controls.controlsPlayFab.setImageState(intArrayOf(android.R.attr.state_enabled), false)
+                controlsBinding.controlsPlayFab.setImageState(intArrayOf(android.R.attr.state_enabled), false)
             }
         }
     }
-
 
     companion object {
 
@@ -254,6 +264,5 @@ class AytLandActivity : AppCompatActivity(),
                 putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
             })
     }
-
 
 }

@@ -91,10 +91,11 @@ class NavigationRouter constructor(
                     PLAY_NOW.name to nav.params[PLAY_NOW],
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                nav.navOpts ?: navOptions(optionsBuilder = {// todo remove
-                    launchSingleTop = true
-                    popUpTo(R.id.navigation_playlist, { inclusive = true })
-                }),
+                nav.navOpts,
+//                navOptions(optionsBuilder = {// todo remove
+//                    launchSingleTop = true
+//                    popUpTo(R.id.navigation_playlist, { inclusive = true })
+//                }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
 

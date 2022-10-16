@@ -9,9 +9,12 @@
     <string name="playlist_trans_title">playlistHeaderTitle</string>
 
     <!-- prefs -->
-    <string name="prefs_root_remote_service_key">remote_service</string>
-    <string name="prefs_root_debug_send_reports_key">send_reports</string>
+    <string name="prefs_root_remote_service_key">root_remote_service</string>
+    <string name="prefs_root_backup_key">root_backup</string>
+    <string name="prefs_root_player_key">root_player</string>
+    <string name="prefs_root_debug_send_reports_key">root_send_reports</string>
     <string name="prefs_backup_backup_key">backup</string>
     <string name="prefs_backup_restore_key">restore</string>
+    <string name="prefs_player_auto_float_key">auto_float_player</string>
 
 </resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <CheckBoxPreference
+        app:icon="@drawable/ic_picture_in_picture"
+        app:key="@string/prefs_player_auto_float_key"
+        app:summary="@string/prefs_player_auto_float_summary"
+        app:title="@string/prefs_player_auto_float_title"
+    />
+
+</PreferenceScreen>
