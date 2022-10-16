@@ -38,6 +38,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
+import uk.co.sentinelweb.cuer.app.ui.settings.PrefPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
@@ -97,6 +98,7 @@ object Modules {
         YoutubeCastServiceContract.serviceModule,
         PrefBackupContract.fragmentModule,
         PrefRootContract.fragmentModule,
+        PrefPlayerContract.fragmentModule,
         SearchContract.fragmentModule,
         SearchImageContract.fragmentModule,
         RemoteContract.serviceModule,
@@ -108,7 +110,7 @@ object Modules {
         BrowseFragment.fragmentModule,
         FloatingPlayerContract.serviceModule,
         SupportDialogFragment.fragmentModule,
-        AppSelectorBottomSheet.fragmentModule
+        AppSelectorBottomSheet.fragmentModule,
     )
 
     private val uiModule = module {

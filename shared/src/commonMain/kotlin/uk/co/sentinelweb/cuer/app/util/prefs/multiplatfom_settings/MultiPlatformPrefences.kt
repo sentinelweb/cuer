@@ -10,7 +10,8 @@ enum class MultiPlatformPrefences constructor(
     BROWSE_RECENT_TITLES("browseRecent"),
     RECENT_PLAYLISTS("recentPlaylists"),
     FLOATING_PLAYER_RECT("floatingPlayerRect"),
-    SHOW_VIDEO_CARDS("showVideoCards")
+    SHOW_VIDEO_CARDS("showVideoCards"),
+    PLAYER_FLOAT_AUTO("playerFloatAuto"),
 }
 
 interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPrefences>

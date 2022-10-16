@@ -208,8 +208,9 @@ class MainActivity :
         caller: PreferenceFragmentCompat,
         pref: Preference,
     ): Boolean {
-        when (pref.title) {
-            getString(R.string.prefs_root_backup_item_title) -> navController.navigate(R.id.navigation_settings_backup)
+        when (pref.key) {
+            getString(R.string.prefs_root_backup_key) -> navController.navigate(R.id.navigation_settings_backup)
+            getString(R.string.prefs_root_player_key) -> navController.navigate(R.id.navigation_settings_player)
         }
         return true
     }

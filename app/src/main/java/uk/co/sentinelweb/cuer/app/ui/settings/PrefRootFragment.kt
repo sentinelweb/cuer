@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.koin.android.ext.android.inject
@@ -17,7 +16,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
-class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContract.View, AndroidScopeComponent {
+class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<PrefRootFragment>()
     private val presenter: PrefRootContract.Presenter by inject()
@@ -46,12 +45,11 @@ class PrefRootFragment constructor() : PreferenceFragmentCompat(), PrefRootContr
             getString(R.string.prefs_root_debug_send_reports_key) -> presenter.sendDebugReports()
             getString(R.string.prefs_root_remote_service_key) -> presenter.toggleRemoteService()
         }
-
         return super.onPreferenceTreeClick(preference)
     }
 
     override fun setRemoteServiceRunning(running: Boolean, address: String?) {
-        (findPreference(getString(R.string.prefs_root_remote_service_key)) as CheckBoxPreference?)
+        findCheckbox(R.string.prefs_root_remote_service_key)
             ?.apply {
                 setChecked(running)
                 val summary =

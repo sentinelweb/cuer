@@ -6,7 +6,6 @@
     <string name="bottomnav_title_playlists">Playlists</string>
     <string name="bottomnav_title_playlist">Playlist</string>
     <string name="bottomnav_title_player">Player</string>
-    <string name="nav_title_backup_settings">Backup settings</string>
     <string name="nav_playlist_item_edit_title">View Item</string>
 
     <string name="sharenav_title_scan">Scaning …</string>
@@ -128,11 +127,19 @@
     <string name="prefs_root_remote_service_not_running">Not running</string>
     <string name="prefs_root_remote_service_running">Running</string>
     <string name="prefs_root_remote_service_title">Remote service</string>
+    <string name="prefs_root_player_cat_title">Player section</string>
+    <string name="prefs_root_player_summary">Player settings</string>
+    <string name="prefs_root_player_title">Player</string>
 
     <string name="pref_backup_backup_summary">Back up data to a ZIP file</string>
     <string name="pref_backup_backup_title">Backup database</string>
     <string name="pref_backup_restore_summary">Restore the DB from a ZIP/JSON file</string>
     <string name="pref_backup_restore_title">Restore database</string>
+
+    <string name="prefs_player_floating_auto_launch_summary">When the in app player is playing and is minimised then
+        launch the floating player
+    </string>
+    <string name="prefs_player_floating_auto_launch_title">Auto launch floating player</string>
 
     <!-- playlist edit -->
     <string name="pe_default_display_title">Enter a title …</string>
