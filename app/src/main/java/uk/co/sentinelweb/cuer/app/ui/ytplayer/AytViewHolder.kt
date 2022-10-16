@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import kotlin.math.abs
 import com.pierfrancescosoffritti.androidyoutubeplayer.R as aytR
@@ -48,6 +49,9 @@ class AytViewHolder(
     private var _isSwitching: Boolean = false
 
     private var _fadeViewHelper: FadeViewHelper? = null
+
+    private var _playerState: PlayerStateDomain = UNKNOWN
+    val isPlaying get() = _playerState == PLAYING
 
     val playerView: YouTubePlayerView?
         get() = _playerView
@@ -147,7 +151,7 @@ class AytViewHolder(
                 state: PlayerConstants.PlayerState
             ) {
                 _player = youTubePlayer
-                val playStateDomain = when (state) {
+                _playerState = when (state) {
                     PlayerConstants.PlayerState.ENDED -> ENDED
                     PlayerConstants.PlayerState.PAUSED -> PAUSED
                     PlayerConstants.PlayerState.PLAYING -> PLAYING
@@ -156,10 +160,11 @@ class AytViewHolder(
                     PlayerConstants.PlayerState.UNKNOWN -> UNKNOWN
                     PlayerConstants.PlayerState.VIDEO_CUED -> VIDEO_CUED
                 }
-                _mviView?.dispatch(Event.PlayerStateChanged(playStateDomain))
+
+                _mviView?.dispatch(Event.PlayerStateChanged(_playerState))
                 _progressBar?.isVisible =
-                    (playStateDomain == UNKNOWN || playStateDomain == VIDEO_CUED ||
-                            playStateDomain == BUFFERING || playStateDomain == UNSTARTED)
+                    (_playerState == UNKNOWN || _playerState == VIDEO_CUED ||
+                            _playerState == BUFFERING || _playerState == UNSTARTED)
             }
 
             override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {

@@ -37,6 +37,9 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.Companion.PLAYER_AUTO_FLOAT_DEFAULT
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -64,9 +67,12 @@ class AytLandActivity : AppCompatActivity(),
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val floatingService: FloatingPlayerServiceManager by inject()
     private val aytViewHolder: AytViewHolder by inject()
+    private val multiPrefs: MultiPlatformPreferencesWrapper by inject()
 
     private lateinit var mviView: AytLandActivity.MviViewImpl
     private lateinit var binding: ActivityAytFullsreenBinding
+
+    private var currentItem: PlaylistItemDomain? = null
 
     init {
         log.tag(this)
@@ -78,6 +84,20 @@ class AytLandActivity : AppCompatActivity(),
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         castListener.listen()
+    }
+
+    override fun onStop() {
+        if (multiPrefs.getBoolean(MultiPlatformPrefences.PLAYER_AUTO_FLOAT, PLAYER_AUTO_FLOAT_DEFAULT)
+            && aytViewHolder.isPlaying
+            && floatingService.hasPermission(this@AytLandActivity)
+            && currentItem != null
+        ) {
+            log.d("launch pip")
+            aytViewHolder.switchView()
+            aytViewHolder.processCommand(PlayerContract.PlayerCommand.Play)
+            floatingService.start(this@AytLandActivity, currentItem!!)
+        }
+        super.onStop()
     }
 
     override fun onDestroy() {
@@ -169,12 +189,17 @@ class AytLandActivity : AppCompatActivity(),
                         updatePlayingIcon(true)
                         binding.controls.controlsPlayFab.showProgress(false)
                     }
+
                     PAUSED -> {
                         updatePlayingIcon(false)
                         binding.controls.controlsPlayFab.showProgress(false)
                     }
+
                     else -> Unit
                 }
+            })
+            diff(get = Model::playlistItem, set = {
+                currentItem = it
             })
             diff(get = Model::texts, set = { texts ->
                 binding.controls.apply {

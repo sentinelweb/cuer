@@ -28,7 +28,7 @@ class PrefPlayerFragment : PreferenceFragmentCompat(), PrefPlayerContract.View, 
         log.tag(this)
     }
 
-    private val playerFloatAutoCheckBox get() = findCheckbox(R.string.prefs_player_floating_auto_launch_key)
+    private val playerFloatAutoCheckBox get() = findCheckbox(R.string.prefs_player_auto_float_key)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
@@ -46,13 +46,13 @@ class PrefPlayerFragment : PreferenceFragmentCompat(), PrefPlayerContract.View, 
 
     override fun onStart() {
         super.onStart()
-        playerFloatAutoCheckBox?.isChecked = presenter.playerFloatAuto
+        playerFloatAutoCheckBox?.isChecked = presenter.playerAutoFloat
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         when (preference.key) {
-            getString(R.string.prefs_player_floating_auto_launch_key) -> {
-                presenter.playerFloatAuto = playerFloatAutoCheckBox?.isChecked ?: false
+            getString(R.string.prefs_player_auto_float_key) -> {
+                presenter.playerAutoFloat = playerFloatAutoCheckBox?.isChecked ?: false
             }
 
             else -> Unit

@@ -41,6 +41,9 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.Companion.PLAYER_AUTO_FLOAT_DEFAULT
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.CryptoLauncher
@@ -76,9 +79,12 @@ class AytPortraitActivity : AppCompatActivity(),
     private val cryptoLauncher: CryptoLauncher by inject()
     private val linkScanner: LinkScanner by inject()
     private val shareWrapper: ShareWrapper by inject()
+    private val multiPrefs: MultiPlatformPreferencesWrapper by inject()
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl
     private lateinit var binding: ActivityAytPortraitBinding
+
+    private var currentItem: PlaylistItemDomain? = null
 
     init {
         log.tag(this)
@@ -90,6 +96,20 @@ class AytPortraitActivity : AppCompatActivity(),
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         castListener.listen()
+    }
+
+    override fun onStop() {
+        if (multiPrefs.getBoolean(MultiPlatformPrefences.PLAYER_AUTO_FLOAT, PLAYER_AUTO_FLOAT_DEFAULT)
+            && aytViewHolder.isPlaying
+            && floatingService.hasPermission(this@AytPortraitActivity)
+            && currentItem != null
+        ) {
+            log.d("launch pip")
+            aytViewHolder.switchView()
+            aytViewHolder.processCommand(PlayerContract.PlayerCommand.Play)
+            floatingService.start(this@AytPortraitActivity, currentItem!!)
+        }
+        super.onStop()
     }
 
     override fun onDestroy() {
@@ -179,6 +199,7 @@ class AytPortraitActivity : AppCompatActivity(),
                 binding.portraitPlayerDescription.setModel(it)
             })
             diff(get = Model::playlistItem, set = {
+                currentItem = it
                 it?.media?.also {
                     binding.portraitPlayerDescription.ribbonItems
                         .find { it.item.type == RibbonModel.Type.STAR }

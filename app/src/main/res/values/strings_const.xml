@@ -15,6 +15,6 @@
     <string name="prefs_root_debug_send_reports_key">root_send_reports</string>
     <string name="prefs_backup_backup_key">backup</string>
     <string name="prefs_backup_restore_key">restore</string>
-    <string name="prefs_player_floating_auto_launch_key">auto_launch_floating_player</string>
+    <string name="prefs_player_auto_float_key">auto_float_player</string>
 
 </resources>

@@ -74,8 +74,8 @@
     <string name="playlist_fab_up_contentdesc">Up</string>
     <string name="playlist_fab_down_contentdesc">Down</string>
     <string name="playlist_fab_refresh_contentdesc">Refresh</string>
-    <string name="pl_item_delete"> Delete </string>
-    <string name="pl_item_move"> Move </string>
+    <string name="pl_item_delete">Delete</string>
+    <string name="pl_item_move">Move</string>
     <string name="playlist_change_dialog_title">Change playlist?</string>
     <string name="playlist_change_dialog_message">This will change the current playlist …</string>
     <string name="playlist_item_menu_view">View</string>
@@ -136,10 +136,10 @@
     <string name="pref_backup_restore_summary">Restore the DB from a ZIP/JSON file</string>
     <string name="pref_backup_restore_title">Restore database</string>
 
-    <string name="prefs_player_floating_auto_launch_summary">When the in app player is playing and is minimised then
-        launch the floating player
+    <string name="prefs_player_auto_float_summary">When the in-app player is playing and is minimised then launch the
+        floating player
     </string>
-    <string name="prefs_player_floating_auto_launch_title">Auto launch floating player</string>
+    <string name="prefs_player_auto_float_title">Auto float player</string>
 
     <!-- playlist edit -->
     <string name="pe_default_display_title">Enter a title …</string>

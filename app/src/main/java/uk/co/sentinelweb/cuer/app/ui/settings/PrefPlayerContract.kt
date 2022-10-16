@@ -8,7 +8,7 @@ import org.koin.dsl.module
 interface PrefPlayerContract {
 
     interface Presenter {
-        var playerFloatAuto: Boolean
+        var playerAutoFloat: Boolean
     }
 
     interface View {
