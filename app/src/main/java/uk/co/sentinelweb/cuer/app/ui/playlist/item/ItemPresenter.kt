@@ -18,9 +18,15 @@ class ItemPresenter(
         view.setTopText(textMapper.mapTopText(item, highlightPlaying))
         view.setBottomText(textMapper.mapBottomText(item))
         view.setCheckedVisible(false)
-        item.thumbNailUrl
-            ?.apply { view.setIconUrl(this) }
-            ?: view.setIconResource(R.drawable.ic_platform_youtube)
+        item.imageUrl
+            ?.apply { view.setImageUrl(this) }
+            ?: view.setImageResource(R.drawable.ic_platform_youtube)
+        item.thumbUrl
+            ?.apply { view.setThumbUrl(this) }
+            ?: view.setThumbResource(R.drawable.ic_platform_youtube)
+        item.channelImageUrl
+            ?.apply { view.setChannelImageUrl(this) }
+            ?: view.setChannelImageResource(R.drawable.ic_platform_youtube)
         view.setDuration(item.duration)
         view.setDurationBackground(item.infoTextBackgroundColor)
         view.showProgress(!item.isLive)
@@ -41,6 +47,10 @@ class ItemPresenter(
 
     override fun doClick() {
         interactions.onClick(state.item!!)
+    }
+
+    override fun doAuthorClick() {
+        interactions.onShowChannel(state.item!!)
     }
 
     override fun doLeft() {

@@ -45,7 +45,7 @@ class CastPlayerFragment() :
     private val navigationProvider: NavigationProvider by inject()
 
     private var _binding: CastPlayerViewBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException("CastPlayerViewBinding not bound")
 
     override val playerControls: PlayerContract.PlayerControls
         get() = presenter as PlayerContract.PlayerControls

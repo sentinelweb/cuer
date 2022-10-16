@@ -36,6 +36,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 interface PlaylistContract {
 
     interface Presenter {
+        val isCards: Boolean
         fun initialise()
         fun destroy()
         fun refreshPlaylist()
@@ -75,6 +76,7 @@ interface PlaylistContract {
         fun undoMoveItem()
         fun setAddPlaylistParent(id: Long)
         fun checkToSave()
+        fun onShowCards(cards: Boolean): Boolean
     }
 
     interface Interactions {
@@ -108,6 +110,8 @@ interface PlaylistContract {
         fun showError(message: String)
         fun updateItemModel(model: ItemContract.Model)
         fun navigate(nav: NavigationModel)
+        fun newAdapter()
+        fun getScrollIndex(): Int
     }
 
     interface External {
@@ -208,12 +212,13 @@ interface PlaylistContract {
                         dbInit = get(),
                         recentLocalPlaylists = get(),
                         itemMapper = get(),
-                        playUseCase = get()
+                        playUseCase = get(),
+                        multiPrefs = get(),
                     )
                 }
                 scoped { get<Presenter>() as External }
                 scoped { PlaylistModelMapper(itemModelMapper = get(), iconMapper = get()) }
-                scoped { PlaylistAdapter(get(), get<PlaylistFragment>()) }
+                scoped { PlaylistAdapter(get(), get<PlaylistFragment>(), get<Presenter>().isCards) }
                 scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped { ItemTouchHelperCallback(get<PlaylistFragment>()) }
                 scoped<SnackbarWrapper> {

@@ -37,6 +37,8 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.SHOW_VIDEO_CARDS
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -80,7 +82,8 @@ class PlaylistPresenter(
     private val res: ResourceWrapper,
     private val dbInit: DatabaseInitializer,
     private val recentLocalPlaylists: RecentLocalPlaylists,
-    private val playUseCase: PlayUseCase
+    private val playUseCase: PlayUseCase,
+    private val multiPrefs: MultiPlatformPreferencesWrapper,
 ) : PlaylistContract.Presenter, PlaylistContract.External {
 
     override var interactions: PlaylistContract.Interactions? = null
@@ -95,6 +98,10 @@ class PlaylistPresenter(
 
     private val isQueuedPlaylist: Boolean
         get() = state.playlistIdentifier == queue.playlistId
+
+    override val isCards: Boolean
+        get() = multiPrefs.getBoolean(SHOW_VIDEO_CARDS, true)
+
 
     private fun canPlayPlaylist() = (state.playlist?.id ?: 0) > 0
 
@@ -636,7 +643,7 @@ class PlaylistPresenter(
             view.showAlertDialog(modelMapper.mapSaveConfirmAlert(
                 {
                     coroutines.mainScope.launch {
-                        commitPlaylist() // fixme: this doesn't go thru sharePrestent after commit after
+                        commitPlaylist() // fixme: this doesn't go thru sharePresenter after commit after
                         view.navigate(NavigationModel(NAV_DONE))
                     }
                 },
@@ -645,6 +652,16 @@ class PlaylistPresenter(
         } else {
             view.navigate(NavigationModel(NAV_DONE))
         }
+    }
+
+    override fun onShowCards(cards: Boolean): Boolean {
+        multiPrefs.putBoolean(SHOW_VIDEO_CARDS, cards)
+        coroutines.mainScope.launch {
+            state.focusIndex = view.getScrollIndex()
+            view.newAdapter()
+            executeRefresh(false)
+        }
+        return true
     }
 
     override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit?) {

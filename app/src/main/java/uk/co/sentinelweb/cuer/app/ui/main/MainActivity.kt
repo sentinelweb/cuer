@@ -68,7 +68,7 @@ class MainActivity :
 
     private var _binding: ActivityMainBinding? = null
     private val binding: ActivityMainBinding
-        get() = _binding ?: throw Exception("Main view not bound")
+        get() = _binding ?: throw IllegalStateException("ActivityMainBinding not bound")
 
     private val playerFragment: Fragment
         get() = supportFragmentManager.findFragmentById(R.id.cast_player_fragment)

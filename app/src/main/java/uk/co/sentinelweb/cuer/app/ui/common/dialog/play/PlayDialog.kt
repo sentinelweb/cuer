@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemView
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemRowView
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
@@ -92,8 +92,8 @@ class PlayDialog constructor(
             }
         }
         item?.apply {
-            val createView = itemFactory.createView(binding.dpItemLayout)
-            binding.dpItemLayout.addView(createView as ItemView)
+            val createView = itemFactory.createView(binding.dpItemLayout, false)
+            binding.dpItemLayout.addView(createView as ItemRowView)
             itemFactory
                 .createPresenter(createView, emptyInteractions)
                 .update(
