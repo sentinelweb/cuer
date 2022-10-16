@@ -11,6 +11,7 @@ interface PrefPlayerContract {
         var playerAutoFloat: Boolean
     }
 
+    @Suppress("EmptyClassBlock")
     interface View {
 
     }

@@ -69,7 +69,7 @@ class ShowHideUi constructor(private val a: Activity) {
     }
 
     companion object {
-        private val AUTO_HIDE_DELAY_MILLIS = 3000
-        private val UI_ANIMATION_DELAY = 300
+        private const val AUTO_HIDE_DELAY_MILLIS = 3000
+        private const val UI_ANIMATION_DELAY = 300
     }
 }

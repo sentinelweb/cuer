@@ -13,5 +13,4 @@ class PrefPlayerPresenter constructor(
     override var playerAutoFloat: Boolean
         get() = multiPrefs.getBoolean(PLAYER_AUTO_FLOAT, PLAYER_AUTO_FLOAT_DEFAULT)
         set(value) = multiPrefs.putBoolean(PLAYER_AUTO_FLOAT, value)
-
 }

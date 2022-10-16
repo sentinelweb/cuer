@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import java.io.File
 
+@Suppress("TooManyFunctions")
 class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<PrefBackupFragment>()
