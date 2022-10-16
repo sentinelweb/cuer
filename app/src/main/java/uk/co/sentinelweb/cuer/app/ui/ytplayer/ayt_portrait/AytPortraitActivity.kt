@@ -11,6 +11,8 @@ import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
@@ -98,7 +100,19 @@ class AytPortraitActivity : AppCompatActivity(),
         castListener.listen()
     }
 
+    override fun onStart() {
+        super.onStart()
+        // this POS restores the ayt player to the mvi kotlin state after returning from a home press
+        if (this::mviView.isInitialized) {
+            coroutines.mainScope.launch {
+                delay(50)
+                mviView.dispatch(PlayerStateChanged(aytViewHolder.playerState))
+            }
+        }
+    }
+
     override fun onStop() {
+        // check to launch the floating player
         if (multiPrefs.getBoolean(MultiPlatformPrefences.PLAYER_AUTO_FLOAT, PLAYER_AUTO_FLOAT_DEFAULT)
             && aytViewHolder.isPlaying
             && floatingService.hasPermission(this@AytPortraitActivity)
@@ -126,6 +140,7 @@ class AytPortraitActivity : AppCompatActivity(),
             aytViewHolder.switchView()
             floatingService.stop()
         }
+        log.d("onPostCreate")
         mviView = MviViewImpl(aytViewHolder)
         playerFragment.initMediaRouteButton()
         controller.onViewCreated(

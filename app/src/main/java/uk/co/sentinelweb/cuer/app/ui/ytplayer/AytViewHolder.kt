@@ -50,8 +50,9 @@ class AytViewHolder(
 
     private var _fadeViewHelper: FadeViewHelper? = null
 
-    private var _playerState: PlayerStateDomain = UNKNOWN
-    val isPlaying get() = _playerState == PLAYING
+    var playerState: PlayerStateDomain = UNKNOWN
+        private set
+    val isPlaying get() = playerState == PLAYING
 
     val playerView: YouTubePlayerView?
         get() = _playerView
@@ -151,7 +152,7 @@ class AytViewHolder(
                 state: PlayerConstants.PlayerState
             ) {
                 _player = youTubePlayer
-                _playerState = when (state) {
+                playerState = when (state) {
                     PlayerConstants.PlayerState.ENDED -> ENDED
                     PlayerConstants.PlayerState.PAUSED -> PAUSED
                     PlayerConstants.PlayerState.PLAYING -> PLAYING
@@ -160,11 +161,10 @@ class AytViewHolder(
                     PlayerConstants.PlayerState.UNKNOWN -> UNKNOWN
                     PlayerConstants.PlayerState.VIDEO_CUED -> VIDEO_CUED
                 }
-
-                _mviView?.dispatch(Event.PlayerStateChanged(_playerState))
+                _mviView?.dispatch(Event.PlayerStateChanged(playerState))
                 _progressBar?.isVisible =
-                    (_playerState == UNKNOWN || _playerState == VIDEO_CUED ||
-                            _playerState == BUFFERING || _playerState == UNSTARTED)
+                    (playerState == UNKNOWN || playerState == VIDEO_CUED ||
+                            playerState == BUFFERING || playerState == UNSTARTED)
             }
 
             override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {
