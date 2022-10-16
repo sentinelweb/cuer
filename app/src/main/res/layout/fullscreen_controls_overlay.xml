@@ -8,7 +8,8 @@
     android:background="@color/controls_overlay_background"
     tools:background="@color/black"
     tools:visibility="visible"
-    >
+    android:id="@+id/controls_video_root"
+>
 
     <TextView
         android:id="@+id/controls_video_title"
@@ -23,7 +24,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="RtlHardcoded"
         tools:text="The title of the video which can be quite long"
-        />
+    />
 
     <TextView
         android:id="@+id/controls_video_playlist"
@@ -38,7 +39,7 @@
         app:layout_constraintTop_toTopOf="@id/controls_track_last"
         tools:ignore="RtlHardcoded"
         tools:text="Burn list"
-        />
+    />
 
     <TextView
         android:id="@+id/controls_video_playlist_data"
@@ -52,7 +53,7 @@
         app:layout_constraintTop_toBottomOf="@id/controls_video_playlist"
         tools:ignore="RtlHardcoded"
         tools:text="120/333"
-        />
+    />
 
     <!-- back -->
     <androidx.appcompat.widget.AppCompatImageButton
@@ -61,7 +62,7 @@
         android:src="@drawable/ic_player_fast_rewind_black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        />
+    />
 
     <TextView
         android:id="@+id/controls_skipback_text"
@@ -74,7 +75,7 @@
         app:layout_constraintTop_toTopOf="@id/controls_seek_back"
         app:layout_constraintLeft_toLeftOf="@id/controls_seek_back"
         tools:text="-30s"
-        tools:ignore="RtlHardcoded" />
+        tools:ignore="RtlHardcoded"/>
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/controls_track_last"
@@ -82,7 +83,7 @@
         android:src="@drawable/ic_player_track_b_black"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
+    />
 
     <TextView
         android:id="@+id/controls_track_last_text"
@@ -95,7 +96,7 @@
         app:layout_constraintBottom_toBottomOf="@id/controls_track_last"
         app:layout_constraintLeft_toLeftOf="@id/controls_track_last"
         tools:text="Prev Track with a very long title"
-        />
+    />
 
     <!-- fwd -->
     <androidx.appcompat.widget.AppCompatImageButton
@@ -104,7 +105,7 @@
         android:src="@drawable/ic_player_fast_forward_black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        />
+    />
 
     <TextView
         android:id="@+id/controls_skipfwd_text"
@@ -118,7 +119,7 @@
         app:layout_constraintRight_toRightOf="@id/controls_seek_forward"
         tools:ignore="RtlHardcoded"
         tools:text="+30s"
-        />
+    />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/controls_track_next"
@@ -126,7 +127,7 @@
         android:src="@drawable/ic_player_track_f_black"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
+    />
 
     <TextView
         android:id="@+id/controls_track_next_text"
@@ -140,7 +141,7 @@
         app:layout_constraintBottom_toBottomOf="@id/controls_track_next"
         app:layout_constraintRight_toRightOf="@id/controls_track_next"
         tools:text="Next Track with a very long title"
-        />
+    />
 
     <uk.co.sentinelweb.cuer.app.ui.common.views.FABProgress
         android:id="@+id/controls_play_fab"
@@ -154,7 +155,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
+    />
 
     <TextView
         android:id="@+id/controls_current_time"
@@ -167,7 +168,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         tools:ignore="RtlHardcoded"
         tools:text="11:22:33"
-        />
+    />
 
     <TextView
         android:id="@+id/controls_duration"
@@ -180,7 +181,7 @@
         app:layout_constraintRight_toRightOf="parent"
         tools:ignore="RtlHardcoded"
         tools:text="44:44:44"
-        />
+    />
 
     <uk.co.sentinelweb.cuer.app.ui.common.views.SeekBarGestureExclude
         android:id="@+id/controls_seek"
@@ -193,59 +194,70 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/controls_current_time"
         app:layout_constraintRight_toLeftOf="@id/controls_duration"
-        />
+    />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/controls_portrait_fab"
-        style="@style/FabButton"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginRight="8dp"
-        android:contentDescription="@string/player_fab_fullscreen"
-        app:fabSize="mini"
+        android:background="@color/black_transparent_background"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_portrait"
-        tools:ignore="RtlHardcoded" />
+        android:orientation="horizontal"
+    >
+        <androidx.mediarouter.app.MediaRouteButton
+            style="@style/YoutubePlayer.MenuButton"
+            android:id="@+id/controls_media_route_button"
+            android:layout_width="@dimen/player_button_size"
+            android:layout_height="@dimen/player_button_size"
+            app:mediaRouteButtonTint="@color/white"
+            tools:ignore="RtlHardcoded"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/controls_pip_fab"
-        style="@style/FabButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginRight="8dp"
-        android:contentDescription="@string/player_fab_pip"
-        app:fabSize="mini"
-        app:layout_constraintRight_toLeftOf="@id/controls_portrait_fab"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_picture_in_picture"
-        tools:ignore="RtlHardcoded" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/controls_support"
+            style="@style/YoutubePlayer.MenuButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/menu_support"
+            app:srcCompat="@drawable/ic_support"
+            tools:ignore="RtlHardcoded"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/controls_support_fab"
-        style="@style/FabButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginRight="8dp"
-        android:contentDescription="@string/menu_support"
-        app:fabSize="mini"
-        app:layout_constraintRight_toLeftOf="@id/controls_pip_fab"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_support"
-        tools:ignore="RtlHardcoded" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/controls_close"
+            style="@style/YoutubePlayer.MenuButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/menu_exit"
+            app:srcCompat="@drawable/ic_clear_24"
+            tools:ignore="RtlHardcoded"/>
 
-    <androidx.mediarouter.app.MediaRouteButton
-        android:id="@+id/controls_media_route_button"
-        android:layout_width="@dimen/player_button_size"
-        android:layout_height="@dimen/player_button_size"
-        android:layout_marginTop="24dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toLeftOf="@id/controls_support_fab"
-        app:layout_constraintTop_toTopOf="parent"
-        app:mediaRouteButtonTint="@color/white"
-        tools:ignore="RtlHardcoded" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+    <!--        android:id="@+id/controls_portrait_fab"-->
+    <!--        style="@style/FabButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="24dp"-->
+    <!--        android:layout_marginRight="8dp"-->
+    <!--        android:contentDescription="@string/player_fab_fullscreen"-->
+    <!--        app:fabSize="mini"-->
+    <!--        app:layout_constraintRight_toRightOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:srcCompat="@drawable/ic_portrait"-->
+    <!--        tools:ignore="RtlHardcoded" />-->
+
+    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+    <!--        android:id="@+id/controls_pip_fab"-->
+    <!--        style="@style/FabButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="24dp"-->
+    <!--        android:layout_marginRight="8dp"-->
+    <!--        android:contentDescription="@string/player_fab_pip"-->
+    <!--        app:fabSize="mini"-->
+    <!--        app:layout_constraintRight_toLeftOf="@id/controls_portrait_fab"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:srcCompat="@drawable/ic_picture_in_picture"-->
+    <!--        tools:ignore="RtlHardcoded" />-->

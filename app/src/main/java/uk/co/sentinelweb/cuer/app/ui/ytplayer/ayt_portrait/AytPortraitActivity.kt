@@ -205,7 +205,7 @@ class AytPortraitActivity : AppCompatActivity(),
         PlayerContract.View {
 
         init {
-            aytViewHolder.addView(this@AytPortraitActivity, binding.playerContainer, this)
+            aytViewHolder.addView(this@AytPortraitActivity, binding.playerContainer, this, false)
         }
 
         override val renderer: ViewRenderer<Model> = diff {

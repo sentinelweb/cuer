@@ -24,9 +24,9 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityYoutubeFullsreenBinding
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
@@ -106,8 +106,8 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
         binding.controls.controlsSeekBack.setOnLongClickListener { mviView.dispatch(SkipBackSelectClicked);true }
         binding.controls.controlsSeekForward.setOnLongClickListener { mviView.dispatch(SkipFwdSelectClicked);true }
         binding.controls.controlsPlayFab.setOnClickListener { mviView.playPause() }
-        binding.controls.controlsPortraitFab.setOnClickListener { mviView.dispatch(PortraitClick); }
-        binding.controls.controlsPipFab.setOnClickListener { mviView.dispatch(PipClick); }
+//        binding.controls.controlsPortraitFab.setOnClickListener { mviView.dispatch(PortraitClick); }
+//        binding.controls.controlsPipFab.setOnClickListener { mviView.dispatch(PipClick); }
         binding.controls.controlsSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
