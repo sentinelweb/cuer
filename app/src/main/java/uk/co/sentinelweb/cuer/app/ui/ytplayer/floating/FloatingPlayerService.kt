@@ -8,6 +8,8 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.CuerAppState
+import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PAUSE
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -21,6 +23,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
     private val notificationWrapper: NotificationWrapper by inject()
     private val appState: CuerAppState by inject()
     private val log: LogWrapper by inject()
+    private val screenStateReceiver: ScreenStateReceiver by inject()
 
     override val external: FloatingPlayerContract.External
         get() = controller.external
@@ -32,6 +35,10 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         log.d("Service created")
         appState.castNotificationChannelId = notificationWrapper.createChannelId(CHANNEL_ID, CHANNEL_NAME)
         controller.initialise()
+        screenStateReceiver.register(this)
+        screenStateReceiver.screenOffCallback = {
+            controller.handleAction(Intent(ACTION_PAUSE))
+        }
     }
 
     override fun onDestroy() {
@@ -39,6 +46,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         log.d("Service destroyed")
         controller.destroy()
         scope.close()
+        screenStateReceiver.unregister(this)
         _instance = null
     }
 

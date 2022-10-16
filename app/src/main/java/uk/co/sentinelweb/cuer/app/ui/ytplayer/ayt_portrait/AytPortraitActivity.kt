@@ -19,6 +19,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.ActivityAytPortraitBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -33,6 +34,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.Play
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
@@ -43,8 +45,8 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.Companion.PLAYER_AUTO_FLOAT_DEFAULT
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.PLAYER_AUTO_FLOAT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
@@ -82,6 +84,7 @@ class AytPortraitActivity : AppCompatActivity(),
     private val linkScanner: LinkScanner by inject()
     private val shareWrapper: ShareWrapper by inject()
     private val multiPrefs: MultiPlatformPreferencesWrapper by inject()
+    private val screenStateReceiver: ScreenStateReceiver by inject()
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl
     private lateinit var binding: ActivityAytPortraitBinding
@@ -98,11 +101,16 @@ class AytPortraitActivity : AppCompatActivity(),
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         castListener.listen()
+        screenStateReceiver.register(this)
+        screenStateReceiver.screenOffCallback = {
+            floatingService.stop()
+            finish()
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        // this POS restores the ayt player to the mvi kotlin state after returning from a home press
+        // this POS restores the AYT player to the mvi kotlin state after returning from a home press
         if (this::mviView.isInitialized) {
             coroutines.mainScope.launch {
                 delay(50)
@@ -113,15 +121,18 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onStop() {
         // check to launch the floating player
-        if (multiPrefs.getBoolean(MultiPlatformPrefences.PLAYER_AUTO_FLOAT, PLAYER_AUTO_FLOAT_DEFAULT)
+        log.d("stop: ${screenStateReceiver.isScreenOn}")
+        if (multiPrefs.getBoolean(PLAYER_AUTO_FLOAT, PLAYER_AUTO_FLOAT_DEFAULT)
             && aytViewHolder.isPlaying
             && floatingService.hasPermission(this@AytPortraitActivity)
             && currentItem != null
+            && screenStateReceiver.isScreenOn
         ) {
             log.d("launch pip")
             aytViewHolder.switchView()
-            aytViewHolder.processCommand(PlayerContract.PlayerCommand.Play)
+            aytViewHolder.processCommand(Play)
             floatingService.start(this@AytPortraitActivity, currentItem!!)
+            finish()
         }
         super.onStop()
     }
@@ -131,6 +142,7 @@ class AytPortraitActivity : AppCompatActivity(),
         controller.onViewDestroyed()
         controller.onDestroy(aytViewHolder.willFinish())
         aytViewHolder.cleanupIfNotSwitching()
+        screenStateReceiver.unregister(this)
         super.onDestroy()
     }
 
