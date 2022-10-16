@@ -242,6 +242,7 @@ class PlaylistFragment :
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
+
         inflater.inflate(R.menu.playlist_actionbar, menu)
         modeMenuItems.forEach { it.isVisible = false }
         modeMenuItems.forEach { it.setOnMenuItemClickListener { presenter.onPlayModeChange() } }
@@ -272,7 +273,7 @@ class PlaylistFragment :
 
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
-        if (isHeadless) {
+        if (isHeadless && isAdded) {
             binding.playlistAppbar.isVisible = false
             binding.playlistFabPlay.isVisible = false
             binding.playlistFabPlaymode.isVisible = false
@@ -387,7 +388,7 @@ class PlaylistFragment :
 
     override fun hideRefresh() {
         commitHost.isReady(true)
-        binding.playlistSwipe.isRefreshing = false
+        _binding?.apply { playlistSwipe.isRefreshing = false }
     }
 
     override fun showRefresh() {
@@ -561,7 +562,9 @@ class PlaylistFragment :
     }
 
     override fun showError(message: String) {
-        snackbarWrapper.makeError(message).show()
+        if (isAdded) {
+            snackbarWrapper.makeError(message).show()
+        }
     }
 
     override fun exit() = TODO()
