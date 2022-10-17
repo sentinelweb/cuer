@@ -15,15 +15,21 @@ actual class DateTimeFormatter {
         .getLocalizedDateTimePattern(
             FormatStyle.SHORT, FormatStyle.SHORT, IsoChronology.INSTANCE, Locale.getDefault()
         )
+
     private val pubDateTimeFormatter = DateTimeFormatter.ofPattern(patternDateTime)
 
-    private val patternDate: String = "dd/MM/yyyy"
+    private val patternDate: String = DateTimeFormatterBuilder
+        .getLocalizedDateTimePattern(
+            FormatStyle.SHORT, null, IsoChronology.INSTANCE, Locale.getDefault()
+        )
     private val pubDateFormatter = DateTimeFormatter.ofPattern(patternDate)
 
     actual fun formatDateTime(d: LocalDateTime) = pubDateTimeFormatter.format(d.toJavaLocalDateTime())
 
     actual fun formatDate(d: LocalDate) = pubDateFormatter.format(d.toJavaLocalDate())
 
-    actual fun formatDateTimeNullable(d: LocalDateTime?) = d?.let { pubDateTimeFormatter.format(it.toJavaLocalDateTime()) } ?: "-"
-
+    actual fun formatDateTimeNullable(dateTime: LocalDateTime?) =
+        dateTime
+            ?.let { pubDateTimeFormatter.format(it.toJavaLocalDateTime()) }
+            ?: "-"
 }

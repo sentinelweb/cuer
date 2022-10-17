@@ -58,14 +58,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                 .let { (domain, itemEntity) ->
                     with(database.playlistItemEntityQueries) {
                         domain to if (domain.id != null) {
-                            load(itemEntity.id) // check record exists
-                                .executeAsOneOrNull()
-                                ?.also { update(itemEntity) }
-                                ?.let { itemEntity }
-                                ?: let {
-                                    create(itemEntity)
-                                    itemEntity.copy(id = getInsertId().executeAsOne())
-                                }
+                            itemEntity.also { update(it) }
                         } else {
                             create(itemEntity)
                             itemEntity.copy(id = getInsertId().executeAsOne())
@@ -132,6 +125,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                     is NewMediaFilter -> loadAllPlaylistItemsWithNewMedia(200)
                     is RecentMediaFilter -> loadAllPlaylistItemsRecent(200)
                     is PlatformIdListFilter -> loadAllByPlatformIds(filter.ids)
+                    is ChannelPlatformIdFilter -> findPlaylistItemsForChannelPlatformId(filter.platformId)
                     is SearchFilter -> {
                         val playlistIds = filter.playlistIds
                         if (playlistIds.isNullOrEmpty()) {
@@ -142,7 +136,6 @@ class SqldelightPlaylistItemDatabaseRepository(
                     }
 
                     else -> loadAll()
-
                 }.executeAsList()
                     .map {
                         playlistItemMapper.map(
@@ -235,14 +228,8 @@ class SqldelightPlaylistItemDatabaseRepository(
             .let { (domains, entities) ->
                 with(database.playlistItemEntityQueries) {
                     domains to entities.map { itemEntity ->
-                        if (itemEntity.id == 0L) {
-                            load(itemEntity.id)// check record exists
-                                .executeAsOneOrNull()
-                                ?.also { update(it) }
-                                ?: let {
-                                    create(itemEntity)
-                                    itemEntity.copy(id = getInsertId().executeAsOne())
-                                }
+                        if (itemEntity.id > 0L) {
+                            itemEntity.also { update(it) }
                         } else {
                             create(itemEntity)
                             itemEntity.copy(id = getInsertId().executeAsOne())

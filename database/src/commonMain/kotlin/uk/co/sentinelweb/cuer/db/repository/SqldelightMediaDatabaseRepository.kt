@@ -239,16 +239,14 @@ class SqldelightMediaDatabaseRepository(
             }
             .let {
                 val mediaEntity = mediaMapper.map(it)
-                if (mediaEntity.id > 0) {
-                    database.mediaEntityQueries
-                        .update(mediaEntity)
-                    mediaDomain.id!!
-                } else {
-                    database.mediaEntityQueries
-                        .create(mediaEntity)
-                    database.mediaEntityQueries
-                        .getInsertId()
-                        .executeAsOne()
+                with(database.mediaEntityQueries) {
+                    if (mediaEntity.id > 0) {
+                        update(mediaEntity)
+                        mediaDomain.id!!
+                    } else {
+                        create(mediaEntity)
+                        getInsertId().executeAsOne()
+                    }
                 }
             }
 }

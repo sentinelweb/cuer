@@ -12,13 +12,13 @@ CREATE TABLE playlist_item (
 );
 
 CREATE INDEX playlist_item_flags_index ON playlist_item(flags);
-
+-- todo UNIQUE
 CREATE INDEX playlist_item_ordering_playlist_id_index ON playlist_item(ordering, playlist_id);
 
 CREATE INDEX playlist_item_playlist_id_index ON playlist_item(playlist_id);
 
 CREATE INDEX playlist_item_media_id_index ON playlist_item(media_id);
-
+-- todo UNIQUE
 CREATE INDEX playlist_item_media_id_playlist_id_index ON playlist_item(media_id, playlist_id);
 
 create:
@@ -37,7 +37,7 @@ loadAll:
 SELECT * FROM playlist_item;
 
 loadPlaylist:
-SELECT * FROM playlist_item WHERE playlist_id = :playlistId;
+SELECT * FROM playlist_item WHERE playlist_id = :playlistId ORDER BY ordering;
 
 loadAllByIds:
 SELECT * FROM playlist_item WHERE id IN :playlistItemIds;
@@ -74,3 +74,11 @@ SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),
 
 loadAllByPlatformIds:
 SELECT playlist_item.* FROM playlist_item, media WHERE media.platform_id IN :platformIds AND media.id = playlist_item.media_id;
+
+findPlaylistItemsForChannelPlatformId:
+SELECT DISTINCT playlist_item.*
+FROM playlist_item, media, channel
+WHERE
+    playlist_item.media_id==media.id
+    AND media.channel_id==channel.id
+    AND channel.platform_id=:channelId;

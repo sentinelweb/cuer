@@ -6,14 +6,17 @@ import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.ItemType.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.header.HeaderViewHolder
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.list.ListViewHolder
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.row.ItemRowViewHolder
 
 
 class PlaylistsDialogAdapter constructor(
     private val itemFactory: ItemFactory,
     private val interactions: ItemContract.Interactions
-) : RecyclerView.Adapter<ItemRowViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private lateinit var recyclerView: RecyclerView
 
@@ -25,6 +28,7 @@ class PlaylistsDialogAdapter constructor(
     var currentPlaylistId: OrchestratorContract.Identifier<*>? = null
 
     fun setData(data: List<ItemContract.Model>, animate: Boolean = true) {
+        // todo something in diffutil fails here deleting a parent playlist shog the child after it fails
         if (animate) {
             DiffUtil.calculateDiff(
                 ItemDiffCallback(
@@ -42,20 +46,51 @@ class PlaylistsDialogAdapter constructor(
             this@PlaylistsDialogAdapter._data = data
             notifyDataSetChanged()
         }
+
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemRowViewHolder {
-        return itemFactory.createItemViewHolder(parent, interactions)
+    override fun onCreateViewHolder(parent: ViewGroup, type: Int): RecyclerView.ViewHolder {
+        return when (type) {
+            ROW.ordinal -> itemFactory.createItemViewHolder(parent, interactions)
+            HEADER.ordinal -> itemFactory.createHeaderViewHolder(parent)
+            LIST.ordinal -> itemFactory.createListViewHolder(parent, interactions)
+            else -> throw IllegalArgumentException("Tile not supported")
+        }
     }
 
+    override fun getItemViewType(position: Int): Int =
+        when (data[position]) {
+            is ItemContract.Model.ItemModel -> ROW.ordinal
+            is ItemContract.Model.HeaderModel -> HEADER.ordinal
+            is ItemContract.Model.ListModel -> LIST.ordinal
+        }
+
     @Override
-    override fun onBindViewHolder(holderRow: ItemRowViewHolder, position: Int) {
-        _data.get(position).apply {
-            holderRow.itemPresenter.update(this as ItemContract.Model.ItemModel,  currentPlaylistId)
+    override fun onBindViewHolder(holderRow: RecyclerView.ViewHolder, position: Int) {
+        when (holderRow) {
+            is ItemRowViewHolder -> _data[position].apply {
+                holderRow.itemPresenter.update(
+                    this as ItemContract.Model.ItemModel,
+                    currentPlaylistId
+                )
+            }
+
+            is HeaderViewHolder -> _data[position].apply {
+                holderRow.update(
+                    this as ItemContract.Model.HeaderModel
+                )
+            }
+
+            is ListViewHolder -> _data[position].apply {
+                holderRow.listPresenter.update(
+                    this as ItemContract.Model.ListModel,
+                    currentPlaylistId
+                )
+            }
         }
     }
 

@@ -91,7 +91,8 @@ interface PlaylistsDialogContract {
                         toastWrapper = get(),
                         prefsWrapper = get(),
                         coroutines = get(),
-                        dialogModelMapper = get()
+                        dialogModelMapper = get(),
+                        recentLocalPlaylists = get()
                     )
                 }
                 scoped { PlaylistsModelMapper(get()) }

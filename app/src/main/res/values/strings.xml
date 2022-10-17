@@ -155,6 +155,7 @@
     <string name="playlists_section_starred">Starred</string>
     <string name="playlists_section_recent">Recent</string>
     <string name="playlists_section_all">All</string>
+    <string name="playlists_section_channel">For this channel</string>
 
     <!-- dialogs -->
     <string name="playlist_dialog_add_playlist">Add playlist …</string>

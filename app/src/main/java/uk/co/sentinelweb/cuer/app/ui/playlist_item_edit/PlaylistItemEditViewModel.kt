@@ -75,13 +75,6 @@ class PlaylistItemEditViewModel constructor(
     private val isNew: Boolean
         get() = state.editingPlaylistItem?.id == null
 
-    @Suppress("RedundantOverride") // for note
-    override fun onCleared() {
-        super.onCleared()
-        // https://developer.android.com/topic/libraries/architecture/coroutines
-        // coroutines cancel via viewModelScope
-    }
-
     fun setData(
         item: PlaylistItemDomain,
         source: Source,
@@ -154,10 +147,25 @@ class PlaylistItemEditViewModel constructor(
     private suspend fun checkToAutoSelectPlaylists() {
         if (state.selectedPlaylists.isEmpty() && !state.isOnSharePlaylist) {
             state.media?.apply {
+                val channelFilter = ChannelPlatformIdFilter(channelData.platformId!!)
                 playlistOrchestrator.loadList(
-                    ChannelPlatformIdFilter(channelData.platformId!!),
+                    channelFilter,
                     LOCAL.flatOptions()
-                ).forEach { state.selectedPlaylists.add(it) }
+                ).also {
+                    if (it.size == 1) {
+                        state.selectedPlaylists.add(it[0])
+                    } else if (it.size > 1) {
+                        playlistItemOrchestrator
+                            .loadList(channelFilter, LOCAL.flatOptions())
+                            .groupBy { it.playlistId }
+                            .values
+                            .maxByOrNull { it.size } // should get the largest list of items
+                            ?.get(0)
+                            ?.playlistId
+                            ?.let { playlistOrchestrator.load(it, LOCAL.flatOptions()) }
+                            ?.also { state.selectedPlaylists.add(it) }
+                    }
+                }
             }
         }
     }

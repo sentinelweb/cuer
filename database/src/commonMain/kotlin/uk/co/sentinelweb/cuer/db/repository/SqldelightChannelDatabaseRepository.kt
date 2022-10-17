@@ -3,15 +3,15 @@ package uk.co.sentinelweb.cuer.db.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.database.entity.Channel
+import uk.co.sentinelweb.cuer.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
@@ -58,16 +58,14 @@ class SqldelightChannelDatabaseRepository(
                     }
                     .let {
                         val channel = channelMapper.map(it)
-                        val id = if (channel.id > 0) {
-                            database.channelEntityQueries
-                                .update(channel)
-                            domain.id!!
-                        } else {
-                            database.channelEntityQueries
-                                .create(channel)
-                            database.channelEntityQueries
-                                .getInsertId()
-                                .executeAsOne()
+                        val id = with(database.channelEntityQueries) {
+                            if (channel.id > 0) {
+                                update(channel)
+                                domain.id!!
+                            } else {
+                                create(channel)
+                                getInsertId().executeAsOne()
+                            }
                         }
                         it.copy(id = id)
                     }
@@ -191,27 +189,25 @@ class SqldelightChannelDatabaseRepository(
                 }
 
                 val entity = channelMapper.map(toCheckImages)
-                database.channelEntityQueries
-                    .findByPlatformId(entity.platform_id, entity.platform)
-                    .executeAsOneOrNull()
-                    ?.let { saved ->
-                        // check for updated channel data + save
-                        if (entity.image_id != saved.image_id ||
-                            entity.thumb_id != saved.thumb_id ||
-                            entity.published != saved.published ||
-                            entity.description != saved.description
-                        ) {
-                            database.channelEntityQueries.update(entity.copy(id = saved.id))
+                with(database.channelEntityQueries) {
+                    findByPlatformId(entity.platform_id, entity.platform)
+                        .executeAsOneOrNull()
+                        ?.let { saved ->
+                            // check for updated channel data + save
+                            if (entity.image_id != saved.image_id ||
+                                entity.thumb_id != saved.thumb_id ||
+                                entity.published != saved.published ||
+                                entity.description != saved.description
+                            ) {
+                                update(entity.copy(id = saved.id))
+                            }
+                            saved.id
                         }
-                        saved.id
-                    }
-                    ?: let {
-                        database.channelEntityQueries
-                            .create(entity)
-                        database.channelEntityQueries
-                            .getInsertId()
-                            .executeAsOne()
-                    }
+                        ?: let {
+                            create(entity)
+                            getInsertId().executeAsOne()
+                        }
+                }
             }
             .let { loadChannelInternal(it).data!! }
 
