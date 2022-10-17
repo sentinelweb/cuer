@@ -228,6 +228,26 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         assertEquals(saved.filter { platformIds.contains(it.media.platformId) }, actual)
     }
 
+    @Test
+    fun loadListByChannelId() = runTest {
+        val (_, itemEntity1) = dataCreation.createPlaylistAndItem()
+        val (_, itemEntity2) = dataCreation.createPlaylistAndItem()
+        val (_, itemEntity3) = dataCreation.createPlaylistAndItem()
+        val (_, itemEntity4) = dataCreation.createPlaylistAndItem()
+
+        val itemIds = listOf(itemEntity1.id, itemEntity2.id, itemEntity3.id) // 0, 1, 2
+        val listItems = sut
+            .loadList(OrchestratorContract.IdListFilter(ids = itemIds))
+            .data!!
+        val channelDomain = listItems[0].media.channelData
+        val listItemsModified = listItems.map { it.copy(media = it.media.copy(channelData = channelDomain)) }
+        val listItemsSaved = sut.save(listItemsModified).data!!
+        assertEquals(listItemsModified, listItemsSaved)
+        val actual =
+            sut.loadList(OrchestratorContract.ChannelPlatformIdFilter(platformId = channelDomain.platformId!!)).data!!
+        assertEquals(listItemsModified, actual)
+    }
+
     // todo test NewMediaFilter RecentMediaFilter SearchFilter
 
     @Test

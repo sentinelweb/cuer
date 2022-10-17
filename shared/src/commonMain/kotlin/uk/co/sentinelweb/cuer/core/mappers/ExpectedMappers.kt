@@ -16,5 +16,5 @@ expect class TimeFormatter() {
 expect class DateTimeFormatter() {
     fun formatDateTime(d: LocalDateTime): String
     fun formatDate(d: LocalDate): String
-    fun formatDateTimeNullable(d: LocalDateTime?): String
+    fun formatDateTimeNullable(dateTime: LocalDateTime?): String
 }
