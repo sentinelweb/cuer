@@ -37,7 +37,7 @@ loadAll:
 SELECT * FROM playlist_item;
 
 loadPlaylist:
-SELECT * FROM playlist_item WHERE playlist_id = :playlistId;
+SELECT * FROM playlist_item WHERE playlist_id = :playlistId ORDER BY ordering;
 
 loadAllByIds:
 SELECT * FROM playlist_item WHERE id IN :playlistItemIds;

@@ -233,7 +233,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         val (_, itemEntity1) = dataCreation.createPlaylistAndItem()
         val (_, itemEntity2) = dataCreation.createPlaylistAndItem()
         val (_, itemEntity3) = dataCreation.createPlaylistAndItem()
-        val (_, itemEntity4) = dataCreation.createPlaylistAndItem()
+        val (_, _) = dataCreation.createPlaylistAndItem()
 
         val itemIds = listOf(itemEntity1.id, itemEntity2.id, itemEntity3.id) // 0, 1, 2
         val listItems = sut
@@ -267,6 +267,18 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
             assertFalse(check.isSuccessful)
         }
     }
+
+    @Test
+    fun deleteAndUndo() = runTest {
+        val (_, i) = dataCreation.createPlaylistAndItem()
+
+        val item = sut.load(i.id).data!!
+        sut.delete(item, false)
+        val saved = sut.save(item, true, false).data!!
+        assertEquals(item, saved)
+    }
+
+
 //    @Test
 //    fun loadStatsList() {
 //    }

@@ -58,14 +58,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                 .let { (domain, itemEntity) ->
                     with(database.playlistItemEntityQueries) {
                         domain to if (domain.id != null) {
-                            load(itemEntity.id) // check record exists
-                                .executeAsOneOrNull()
-                                ?.also { update(itemEntity) }
-                                ?.let { itemEntity }
-                                ?: let {
-                                    create(itemEntity)
-                                    itemEntity.copy(id = getInsertId().executeAsOne())
-                                }
+                            itemEntity.also { update(it) }
                         } else {
                             create(itemEntity)
                             itemEntity.copy(id = getInsertId().executeAsOne())
@@ -236,14 +229,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                 with(database.playlistItemEntityQueries) {
                     domains to entities.map { itemEntity ->
                         if (itemEntity.id > 0L) {
-                            load(itemEntity.id)// check record exists
-                                .executeAsOneOrNull()
-                                ?.also { update(it) }
-                                ?.let { itemEntity }
-                                ?: let {
-                                    create(itemEntity)
-                                    itemEntity.copy(id = getInsertId().executeAsOne())
-                                }
+                            itemEntity.also { update(it) }
                         } else {
                             create(itemEntity)
                             itemEntity.copy(id = getInsertId().executeAsOne())
