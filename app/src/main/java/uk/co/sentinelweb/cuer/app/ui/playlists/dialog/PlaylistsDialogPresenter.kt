@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -30,7 +31,8 @@ class PlaylistsDialogPresenter(
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
     private val prefsWrapper: GeneralPreferencesWrapper,
-    private val coroutines: CoroutineContextProvider
+    private val coroutines: CoroutineContextProvider,
+    private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : PlaylistsDialogContract.Presenter {
 
     init {
@@ -91,11 +93,16 @@ class PlaylistsDialogPresenter(
         val playlistStats = playlistStatsOrchestrator
             .loadList(IdListFilter(state.playlists.mapNotNull { it.id }), LOCAL.flatOptions())
 
+        val recentLocalPlaylists = recentLocalPlaylists
+            .getRecent()
+            .subList(0, 10)
+            .mapNotNull { recentId -> state.playlists.find { it.id == recentId } }
+
         state.playlists.map { it.id }
             .associateWith { id -> playlistStats.find { it.playlistId == id } }
             .let {
                 state.playlistsModel =
-                    modelMapper.map(priorityPlaylists, null, pinnedId, state.treeRoot, it)
+                    modelMapper.map(priorityPlaylists, recentLocalPlaylists, null, pinnedId, state.treeRoot, it)
                 dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
             }
             .takeIf { coroutines.mainScopeActive }

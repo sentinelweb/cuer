@@ -57,7 +57,7 @@ class PlaylistsPresenter(
     private val searchMapper: SearchMapper,
     private val merge: PlaylistMergeOrchestrator,
     private val shareWrapper: ShareWrapper,
-    private val recentLocalPlaylists: RecentLocalPlaylists
+    private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : PlaylistsContract.Presenter {
 
     init {
