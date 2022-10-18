@@ -10,8 +10,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -64,25 +62,22 @@ class PlaylistsDialogPresenter(
     }
 
     private suspend fun executeRefresh(animate: Boolean = false) {
-        dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
-        if (!state.channelSearchApplied) {
-            state.config.suggestionsMedia?.apply {
-                playlistOrchestrator.loadList(
-                    ChannelPlatformIdFilter(this.channelData.platformId!!),
-                    LOCAL.flatOptions()
-                )
-                    .apply { state.priorityPlaylistIds.addAll(this.map { it.id!! }) }
-            }
-            state.channelSearchApplied = true
+        state.channelPlaylistIds.clear()
+        state.config.suggestionsMedia?.apply {
+            playlistOrchestrator.loadList(
+                ChannelPlatformIdFilter(this.channelData.platformId!!),
+                LOCAL.flatOptions()
+            )
+                .apply { state.channelPlaylistIds.addAll(this.map { it.id!! }) }
         }
 
         val pinnedId = prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
         state.playlists = playlistOrchestrator.loadList(AllFilter(), LOCAL.flatOptions())
             .filter { it.config.editableItems }
-            .apply { state.treeRoot = buildTree().sort(compareBy{it.node?.title?.lowercase()}) }
+            .apply { state.treeRoot = buildTree().sort(compareBy { it.node?.title?.lowercase() }) }
             .let { if (state.config.showRoot) it.plus(makeRootPlaylist()) else it }
 
-        val priorityPlaylists = state.playlists.filter { state.priorityPlaylistIds.contains(it.id) }
+        val channelPlaylists = state.playlists.filter { state.channelPlaylistIds.contains(it.id) }
             .sortedWith(
                 compareBy(
                     { it.id != pinnedId },
@@ -103,7 +98,7 @@ class PlaylistsDialogPresenter(
             .associateWith { id -> playlistStats.find { it.playlistId == id } }
             .let {
                 state.playlistsModel =
-                    modelMapper.map(priorityPlaylists, recentLocalPlaylists, null, pinnedId, state.treeRoot, it)
+                    modelMapper.map(channelPlaylists, recentLocalPlaylists, null, pinnedId, state.treeRoot, it)
                 dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
             }
             .takeIf { coroutines.mainScopeActive }
@@ -133,11 +128,6 @@ class PlaylistsDialogPresenter(
 
     override fun setConfig(config: PlaylistsDialogContract.Config) {
         state.config = config
-        prefsWrapper.getLong(LAST_PLAYLIST_ADDED_TO)
-            ?.apply { state.priorityPlaylistIds.add(this) }
-        prefsWrapper.getLong(LAST_PLAYLIST_CREATED)
-            ?.takeIf { !state.priorityPlaylistIds.contains(it) }
-            ?.apply { state.priorityPlaylistIds.add(this) }
     }
 
     override fun onAddPlaylist() {
