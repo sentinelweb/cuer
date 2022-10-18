@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.ext.summarise
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
@@ -52,7 +53,7 @@ class SqldelightPlaylistDatabaseRepository(
                     .let { RepoResult.Data(loadPlaylistInternal(id = it, flat).data) }
 
             } catch (e: Exception) {
-                val msg = "couldn't save playlist: ${domain.pretty()}"
+                val msg = "couldn't save playlist: ${domain.summarise()}"
                 log.e(msg, e)
                 rollback(RepoResult.Error<PlaylistDomain>(e, msg))
             }
@@ -75,7 +76,7 @@ class SqldelightPlaylistDatabaseRepository(
                     .map { saveInternal(it, flat) }
                     .let { RepoResult.Data(it.map { loadPlaylistInternal(id = it, flat).data!! }) }
             } catch (e: Exception) {
-                val msg = "couldn't save playlists: ${domains}"
+                val msg = "couldn't save playlists: ${domains.map { it.summarise() }}"
                 log.e(msg, e)
                 rollback(RepoResult.Error<List<PlaylistDomain>>(e, msg))
             }
@@ -295,12 +296,11 @@ class SqldelightPlaylistDatabaseRepository(
             }.also { playlistId ->
                 if (!flat) {
                     itemDatabaseRepository.saveListInternal(
-                        domain.items.map { it.copy(playlistId = playlistId) }, flat
+                        domain.items.map { it.copy(playlistId = playlistId) },
+                        true
                     )
                 }
             }
 }
 
-private fun PlaylistDomain.pretty(): String {
-    TODO("Not yet implemented")
-}
+

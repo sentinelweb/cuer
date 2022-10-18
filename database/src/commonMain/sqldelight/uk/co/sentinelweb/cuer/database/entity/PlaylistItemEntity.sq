@@ -12,15 +12,15 @@ CREATE TABLE playlist_item (
 );
 
 CREATE INDEX playlist_item_flags_index ON playlist_item(flags);
--- todo
-CREATE UNIQUE INDEX playlist_item_ordering_playlist_id_index ON playlist_item(ordering, playlist_id);
+
+CREATE UNIQUE INDEX playlist_item_ordering_media_id_playlist_id_index ON playlist_item(ordering, media_id, playlist_id);
 
 CREATE INDEX playlist_item_playlist_id_index ON playlist_item(playlist_id);
 
 CREATE INDEX playlist_item_media_id_index ON playlist_item(media_id);
--- todo
+
 CREATE UNIQUE INDEX playlist_item_media_id_playlist_id_index ON playlist_item(media_id, playlist_id);
---  ON CONFLICT DO UPDATE
+
 create:
 INSERT INTO playlist_item (flags, media_id, ordering, playlist_id, date_added) VALUES ?
     ON CONFLICT (media_id, ordering, playlist_id) DO UPDATE

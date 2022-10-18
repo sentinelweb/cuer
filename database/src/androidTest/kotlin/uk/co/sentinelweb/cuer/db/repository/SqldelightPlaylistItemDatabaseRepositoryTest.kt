@@ -17,7 +17,6 @@ import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
@@ -25,7 +24,10 @@ import uk.co.sentinelweb.cuer.db.util.DataCreation
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
     private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
@@ -179,20 +181,20 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         }
     }
 
-    @Test
-    fun saveListOrderUniqueError() = runTest {
-        val playlistEntity = dataCreation.createPlaylist()
-        val toCreate =
-            fixture<List<PlaylistItemDomain>>()
-                .map { it.copy(playlistId = playlistEntity.id, media = it.media.copy(id = null), order = 5L) }
-        sut.updates.test {
-            val created = sut.save(toCreate, flat = true, emit = true)
-            assertFalse(created.isSuccessful)
-            assertNull(created.data)
-            assertTrue(created is RepoResult.Error)
-            expectNoEvents()
-        }
-    }
+//    @Test
+//    fun saveListOrderOverwrite() = runTest {
+//        val playlistEntity = dataCreation.createPlaylist()
+//        val toCreate =
+//            fixture<List<PlaylistItemDomain>>()
+//                .map { it.copy(playlistId = playlistEntity.id, media = it.media.copy(id = null), order = 5L) }
+//        sut.updates.test {
+//            val created = sut.save(toCreate, flat = true, emit = true)
+//            val expected = playlistEntity.
+//            assertTrue(created.isSuccessful)
+//            assertEquals(expected, created.data!![0])
+//            expectNoEvents()
+//        }
+//    }
 
     @Test
     fun loadListByIds() = runTest {

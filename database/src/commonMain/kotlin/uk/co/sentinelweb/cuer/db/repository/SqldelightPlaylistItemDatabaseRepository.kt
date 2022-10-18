@@ -195,18 +195,18 @@ class SqldelightPlaylistItemDatabaseRepository(
         domains: List<PlaylistItemDomain>,
         flat: Boolean
     ): RepoResult<List<PlaylistItemDomain>> {
-        val checkOrderAndPlaylist: MutableSet<String> = mutableSetOf()
+//        val checkOrderAndPlaylist: MutableSet<String> = mutableSetOf()
         return domains
-            .let { list ->
-                list.forEachIndexed { i, it ->
-                    val key: (PlaylistItemDomain) -> String = { "${it.order}:${it.playlistId}" }
-                    if (checkOrderAndPlaylist.contains(key(it))) {
-                        val orderString = "$i:\n" + domains.map { item -> key(item) + "\n" }
-                        throw IllegalStateException("Order / playlist is not unique: $orderString")
-                    } else checkOrderAndPlaylist.add(key(it))
-                }
-                list
-            }
+//            .let { list ->
+//                list.forEachIndexed { i, it ->
+//                    val key: (PlaylistItemDomain) -> String = { "${it.order}:${it.playlistId}" }
+//                    if (checkOrderAndPlaylist.contains(key(it))) {
+//                        val orderString = "$i:\n" + domains.map { item -> key(item) + "\n" }
+//                        throw IllegalStateException("Order / playlist is not unique: $orderString")
+//                    } else checkOrderAndPlaylist.add(key(it))
+//                }
+//                list
+//            }
             .let { itemDomains ->
                 itemDomains
                     .filter { it.media.id == null || !flat }
@@ -256,10 +256,10 @@ class SqldelightPlaylistItemDatabaseRepository(
         database.playlistItemEntityQueries
             .loadPlaylist(playlistId)
             .executeAsList()
-            .map {
-                playlistItemMapper.map(
-                    it,
-                    mediaDatabaseRepository.loadMediaInternal(it.media_id).data!!
-                )
+            .mapNotNull { itemEntity ->
+                mediaDatabaseRepository
+                    .loadMediaInternal(itemEntity.media_id).data
+                    ?.let { mediaDomain -> playlistItemMapper.map(itemEntity, mediaDomain) }
+                    ?: let { log.e("failed to load Media:id ${itemEntity.media_id}"); null }
             }
 }

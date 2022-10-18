@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.domain.ext
 
+import summarise
 import uk.co.sentinelweb.cuer.domain.*
 
 fun PlaylistDomain.currentItem() =
@@ -183,3 +184,12 @@ fun PlaylistTreeDomain.isDescendent(check: PlaylistTreeDomain): Boolean {
     }
     return false
 }
+
+fun PlaylistDomain.summarise(): String = """
+    id: $id, title: $title, type: $type, platform: $platform - $platformId
+    items:${items.map { it.summarise() }.joinToString("\n")}
+""".trimIndent()
+
+
+
+
