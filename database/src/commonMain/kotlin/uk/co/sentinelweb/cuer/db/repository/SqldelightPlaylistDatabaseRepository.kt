@@ -52,7 +52,7 @@ class SqldelightPlaylistDatabaseRepository(
                     .let { RepoResult.Data(loadPlaylistInternal(id = it, flat).data) }
 
             } catch (e: Exception) {
-                val msg = "couldn't save playlist: ${domain}"
+                val msg = "couldn't save playlist: ${domain.pretty()}"
                 log.e(msg, e)
                 rollback(RepoResult.Error<PlaylistDomain>(e, msg))
             }
@@ -299,4 +299,8 @@ class SqldelightPlaylistDatabaseRepository(
                     )
                 }
             }
+}
+
+private fun PlaylistDomain.pretty(): String {
+    TODO("Not yet implemented")
 }
