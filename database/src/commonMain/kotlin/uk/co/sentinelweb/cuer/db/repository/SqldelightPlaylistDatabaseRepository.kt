@@ -158,7 +158,7 @@ class SqldelightPlaylistDatabaseRepository(
                 database.playlistEntityQueries.count().executeAsOne().toInt()
             }.let { RepoResult.Data(it) }
         } catch (e: Exception) {
-            val msg = "couldn't count ${filter}"
+            val msg = "couldn't count playlists ${filter}"
             log.e(msg, e)
             RepoResult.Error<Int>(e, msg)
         }

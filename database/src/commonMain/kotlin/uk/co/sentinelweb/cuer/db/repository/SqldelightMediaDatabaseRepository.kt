@@ -144,7 +144,7 @@ class SqldelightMediaDatabaseRepository(
 
     override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
         var result: RepoResult<Boolean> = RepoResult.Data(false)
-        database.channelEntityQueries.transaction {
+        database.mediaEntityQueries.transaction {
             result = try {
                 database.mediaEntityQueries
                     .deleteAll()

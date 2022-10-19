@@ -12,12 +12,12 @@ import org.koin.core.module.Module
 import org.koin.test.KoinTest
 import org.koin.test.KoinTestRule
 import org.koin.test.inject
-import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.app.db.Database
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.database.entity.Media
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
-import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 import uk.co.sentinelweb.cuer.domain.ext.hasFlag
 import kotlin.test.assertEquals
@@ -197,6 +197,10 @@ class MediaEntityTest : KoinTest {
             .count()
             .executeAsOne()
         assertEquals(0L, actual)
+    }
+
+    fun onConflict() {
+        TODO()
     }
 
     private fun media(): Pair<Media, Channel> {

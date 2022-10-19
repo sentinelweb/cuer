@@ -113,8 +113,20 @@ class SqldelightChannelDatabaseRepository(
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> {
-        TODO("Not yet implemented")
+    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> = withContext(coProvider.IO) {
+        try {
+            when (filter) {
+                is OrchestratorContract.AllFilter, null -> RepoResult.Data(
+                    database.channelEntityQueries.count().executeAsOne().toInt()
+                )
+
+                else -> throw IllegalArgumentException("$filter not implemented")
+            }
+        } catch (e: Exception) {
+            val msg = "couldn't count medias"
+            log.e(msg, e)
+            RepoResult.Error<Int>(e, msg)
+        }
     }
 
     override suspend fun delete(domain: ChannelDomain, emit: Boolean): RepoResult<Boolean> {

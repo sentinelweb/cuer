@@ -30,8 +30,11 @@ INSERT INTO playlist_item (flags, media_id, ordering, playlist_id, date_added) V
 getInsertId:
 SELECT last_insert_rowid() FROM playlist_item LIMIT 1;
 
+-- fixme on conflict clause
 update:
-REPLACE INTO playlist_item (id, flags, media_id, ordering, playlist_id, date_added) VALUES ?;
+REPLACE INTO playlist_item (id, flags, media_id, ordering, playlist_id, date_added) VALUES ?
+  ON CONFLICT (media_id, ordering, playlist_id) DO NOTHING
+;
 
 load:
 SELECT * FROM playlist_item WHERE id = ?;
@@ -62,6 +65,9 @@ SELECT count() FROM playlist_item,media WHERE playlist_item.playlist_id=:playlis
 
 countItemsInPlaylist:
 SELECT count() FROM playlist_item WHERE playlist_id ==:playlistId;
+
+count:
+SELECT count() FROM playlist_item;
 
 loadAllPlaylistItemsWithNewMedia:
 SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 0 AND media.id=playlist_item.media_id ORDER BY playlist_item.date_added DESC LIMIT :limit;

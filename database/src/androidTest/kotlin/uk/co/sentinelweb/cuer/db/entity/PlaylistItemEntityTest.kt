@@ -281,4 +281,8 @@ class PlaylistItemEntityTest : KoinTest {
         assertEquals(item1, actual[1])
         assertEquals(item2, actual[2])
     }
+
+    fun onConflict() {
+        TODO()
+    }
 }

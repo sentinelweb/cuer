@@ -59,6 +59,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                     with(database.playlistItemEntityQueries) {
                         domain to if (domain.id != null) {
                             itemEntity.also { update(it) }
+                            load(itemEntity.id).executeAsOne()
                         } else {
                             create(itemEntity)
                             itemEntity.copy(id = getInsertId().executeAsOne())
@@ -119,6 +120,7 @@ class SqldelightPlaylistItemDatabaseRepository(
         try {
             with(database.playlistItemEntityQueries) {
                 when (filter) {
+                    is AllFilter -> loadAll()
                     is IdListFilter -> loadAllByIds(filter.ids)
                     is PlaylistIdLFilter -> loadPlaylist(filter.id)
                     is MediaIdListFilter -> loadItemsByMediaId(filter.ids)
@@ -156,8 +158,17 @@ class SqldelightPlaylistItemDatabaseRepository(
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: Filter?): RepoResult<Int> {
-        TODO("Not yet implemented")
+    override suspend fun count(filter: Filter?): RepoResult<Int> = withContext(coProvider.IO) {
+        try {
+            when (filter) {
+                is AllFilter, null -> RepoResult.Data(database.playlistItemEntityQueries.count().executeAsOne().toInt())
+                else -> throw IllegalArgumentException("$filter not implemented")
+            }
+        } catch (e: Exception) {
+            val msg = "couldn't count medias"
+            log.e(msg, e)
+            RepoResult.Error<Int>(e, msg)
+        }
     }
 
     override suspend fun delete(domain: PlaylistItemDomain, emit: Boolean): RepoResult<Boolean> =
@@ -179,8 +190,20 @@ class SqldelightPlaylistItemDatabaseRepository(
             }
         }
 
-    override suspend fun deleteAll(): RepoResult<Boolean> {
-        TODO("Not yet implemented")
+    override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
+        var result: RepoResult<Boolean> = RepoResult.Data(false)
+        database.playlistItemEntityQueries.transaction {
+            result = try {
+                database.playlistItemEntityQueries
+                    .deleteAll()
+                RepoResult.Data(true)
+            } catch (e: Throwable) {
+                val msg = "couldn't deleteAll medias"
+                log.e(msg, e)
+                RepoResult.Error<Boolean>(e, msg)
+            }
+        }
+        result
     }
 
     override suspend fun update(

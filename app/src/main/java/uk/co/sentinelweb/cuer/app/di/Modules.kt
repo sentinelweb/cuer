@@ -147,6 +147,7 @@ object Modules {
                 mediaRepository = get(),
                 playlistRepository = get(),
                 playlistItemRepository = get(),
+                imageDatabaseRepository = get(),
                 contextProvider = get(),
                 parserFactory = get(),
                 playlistItemCreator = get(),

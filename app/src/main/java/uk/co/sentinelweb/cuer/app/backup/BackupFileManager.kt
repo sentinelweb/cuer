@@ -31,6 +31,7 @@ class BackupFileManager constructor(
     private val mediaRepository: MediaDatabaseRepository,
     private val playlistRepository: PlaylistDatabaseRepository,
     private val playlistItemRepository: PlaylistItemDatabaseRepository,
+    private val imageDatabaseRepository: ImageDatabaseRepository,
     private val contextProvider: CoroutineContextProvider,
     private val parserFactory: ParserFactory,
     private val playlistItemCreator: PlaylistItemCreator,
@@ -103,6 +104,10 @@ class BackupFileManager constructor(
                 ?.takeIf { it.isSuccessful }
                 ?.let { playlistRepository.deleteAll() }
                 ?.takeIf { it.isSuccessful }
+                ?.let { playlistItemRepository.deleteAll() }
+                ?.takeIf { it.isSuccessful }
+                ?.let { imageDatabaseRepository.deleteAll() }
+                ?.takeIf { it.isSuccessful }
                 ?.let {
                     backupFileModel.medias.chunked(CHUNK_SIZE)
                         .map { mediaRepository.save(it) }
@@ -131,6 +136,18 @@ class BackupFileManager constructor(
                             )
                         ).isSuccessful && acc
                     }
+                }
+                ?.also {
+                    log.d("--- file -----")
+                    log.d("medias: " + backupFileModel.medias.size)
+                    log.d("items: " + backupFileModel.playlists.fold(0) { acc, p -> acc + p.items.size })
+                    log.d("playlists: " + backupFileModel.playlists.size)
+                    log.d("--- db -----")
+                    log.d("images: " + imageDatabaseRepository.count().data)
+                    log.d("channels: " + channelRepository.count().data)
+                    log.d("medias: " + mediaRepository.count().data)
+                    log.d("items: " + playlistItemRepository.count().data)
+                    log.d("playlists: " + playlistRepository.count().data)
                 } ?: false
         } else {
             return@withContext mediaRepository.deleteAll()

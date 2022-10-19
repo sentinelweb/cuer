@@ -3,13 +3,13 @@ package uk.co.sentinelweb.cuer.db.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
-import uk.co.sentinelweb.cuer.database.entity.Image
 import uk.co.sentinelweb.cuer.app.db.repository.ImageDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.db.mapper.ImageMapper
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.database.entity.Image
+import uk.co.sentinelweb.cuer.db.mapper.ImageMapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
@@ -86,8 +86,20 @@ class SqldelightImageDatabaseRepository(
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> {
-        TODO("Not yet implemented")
+    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> = withContext(coProvider.IO) {
+        try {
+            when (filter) {
+                is OrchestratorContract.AllFilter, null -> RepoResult.Data(
+                    database.imageEntityQueries.count().executeAsOne().toInt()
+                )
+
+                else -> throw IllegalArgumentException("$filter not implemented")
+            }
+        } catch (e: Exception) {
+            val msg = "couldn't count medias"
+            log.e(msg, e)
+            RepoResult.Error<Int>(e, msg)
+        }
     }
 
     override suspend fun delete(domain: ImageDomain, emit: Boolean): RepoResult<Boolean> {
@@ -95,16 +107,19 @@ class SqldelightImageDatabaseRepository(
     }
 
     override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
-        database.imageEntityQueries.transactionWithResult {
-            try {
-                database.imageEntityQueries.deleteAll()
+        var result: RepoResult<Boolean> = RepoResult.Data(false)
+        database.imageEntityQueries.transaction {
+            result = try {
+                database.imageEntityQueries
+                    .deleteAll()
                 RepoResult.Data(true)
             } catch (e: Throwable) {
-                val msg = "couldn't deleteAll images"
+                val msg = "couldn't deleteAll medias"
                 log.e(msg, e)
                 RepoResult.Error<Boolean>(e, msg)
             }
         }
+        result
     }
 
     override suspend fun update(
