@@ -224,7 +224,12 @@ class PlaylistItemEntityTest : KoinTest {
         val (_, item0) = dataCreation.createPlaylistAndItem()
         val (_, item1) = dataCreation.createPlaylistAndItem()
         val media0 = database.mediaEntityQueries.loadById(item0.media_id).executeAsOne()
-        database.mediaEntityQueries.update(media0.copy(id = item1.media_id)) // media0 == media1
+        database.mediaEntityQueries.update(
+            media0.copy(
+                id = item1.media_id,
+                platform_id = "platformId"
+            )
+        ) // media0 == media1
 
         val actual = database.playlistItemEntityQueries
             .searchPlaylists(media0.title!!.substring(2, 10), listOf(item0.playlist_id), 2)
@@ -244,9 +249,9 @@ class PlaylistItemEntityTest : KoinTest {
             .loadAllByPlatformIds(medias.map { it.platform_id })
             .executeAsList()
         assertEquals(3, actual.size)
-        assertEquals(item0, actual[0])
-        assertEquals(item1, actual[1])
-        assertEquals(item2, actual[2])
+        assertEquals(item0, actual.find { it.id == item0.id })
+        assertEquals(item1, actual.find { it.id == item1.id })
+        assertEquals(item2, actual.find { it.id == item2.id })
     }
 
     @Test
@@ -254,7 +259,7 @@ class PlaylistItemEntityTest : KoinTest {
         val (_, item0) = dataCreation.createPlaylistAndItem()
         val (_, item1) = dataCreation.createPlaylistAndItem()
         val (_, item2) = dataCreation.createPlaylistAndItem()
-        val (_, item3) = dataCreation.createPlaylistAndItem()
+        val (_, _) = dataCreation.createPlaylistAndItem()
 
         // save first media channel_id to first 3 medias
         val channel = listOf(item0, item1, item2)

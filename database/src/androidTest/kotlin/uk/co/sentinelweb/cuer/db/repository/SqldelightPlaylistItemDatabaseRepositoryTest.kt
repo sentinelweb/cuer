@@ -221,12 +221,17 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
     @Test
     fun loadListByPlatformIds() = runTest {
         val playlistEntity = dataCreation.createPlaylist()
-        val list =
-            fixture<List<PlaylistItemDomain>>()
-                .map { it.copy(playlistId = playlistEntity.id, media = it.media.copy(id = null)) }
+        val list = fixture<List<PlaylistItemDomain>>()
+            .mapIndexed { i, item ->
+                item.copy(
+                    playlistId = playlistEntity.id,
+                    media = item.media.copy(id = null, platformId = "platformId_$i")
+                )
+            }
         val saved = sut.save(list, true, false).data!!
         val platformIds = saved.filter { it.id == 1L || it.id == 3L }.map { it.media.platformId }
         val actual = sut.loadList(OrchestratorContract.PlatformIdListFilter(platformIds)).data!!
+        assertEquals(platformIds.size, actual.size)
         assertEquals(saved.filter { platformIds.contains(it.media.platformId) }, actual)
     }
 
