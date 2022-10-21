@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ROOT_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Model
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Model.HeaderModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -20,21 +21,32 @@ class PlaylistsModelMapper constructor(
 ) {
 
     fun map(
-        priorityPlaylists: List<PlaylistDomain>,
+        channelPlaylists: List<PlaylistDomain>,
         recentPlaylists: List<PlaylistDomain>,
         current: OrchestratorContract.Identifier<*>?,
         pinnedId: Long?,
         tree: PlaylistTreeDomain,
         playlistStats: Map<Long?, PlaylistStatDomain?>,
+        showRoot: Boolean,
     ): PlaylistsContract.Model {
 
         val items = mutableListOf<Model>()
-        items.add(HeaderModel(-1L, res.getString(R.string.playlists_section_channel)))
-        items.addAll(priorityPlaylists.map { itemModel(it, playlistStats[it.id], pinnedId, 0) })
+        if (showRoot) {
+            items.add(itemModel(ROOT_PLAYLIST_DUMMY, null, pinnedId, 0))
+        }
+        channelPlaylists
+            .takeIf { it.isNotEmpty() }
+            ?.let { list ->
+                items.add(HeaderModel(-1L, res.getString(R.string.playlists_section_channel)))
+                items.addAll(channelPlaylists.map { itemModel(it, playlistStats[it.id], pinnedId, 0) })
+            }
 
-        items.add(HeaderModel(-2L, res.getString(R.string.playlists_section_recent)))
-        items.addAll(recentPlaylists.map { itemModel(it, playlistStats[it.id], pinnedId, 0) })
-
+        recentPlaylists
+            .takeIf { it.isNotEmpty() }
+            ?.let { list ->
+                items.add(HeaderModel(-2L, res.getString(R.string.playlists_section_recent)))
+                items.addAll(list.map { itemModel(it, playlistStats[it.id], pinnedId, 0) })
+            }
         items.add(HeaderModel(-3L, res.getString(R.string.playlists_section_all)))
         tree.iterate { treeNode, depth ->
             treeNode.node?.also {

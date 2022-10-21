@@ -57,8 +57,7 @@ interface PlaylistsDialogContract {
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
         var playlistStats: List<PlaylistStatDomain> = listOf(),
-        var priorityPlaylistIds: MutableList<Long> = mutableListOf(),
-        var channelSearchApplied: Boolean = false,
+        var channelPlaylistIds: MutableList<Long> = mutableListOf(),
         var pinWhenSelected: Boolean = false,
         var playlistsModel: PlaylistsContract.Model? = null
     ) : ViewModel() {
@@ -75,6 +74,7 @@ interface PlaylistsDialogContract {
 
     companion object {
         val ADD_PLAYLIST_DUMMY = PlaylistDomain.createDummy("Add Playlist")
+        val ROOT_PLAYLIST_DUMMY = PlaylistDomain.createDummy("Top level")
 
         @JvmStatic
         val fragmentModule = module {
