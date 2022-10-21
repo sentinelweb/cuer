@@ -84,7 +84,10 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment(), AndroidScopeCompo
 
     private fun observeNavigation(nav: NavigationModel) {
         when (nav.target) {
-            else -> navRouter.navigate(nav)
+            else -> {
+                navRouter.navigate(nav)
+                dismissAllowingStateLoss() // hides the search fragment
+            }
         }
     }
 

@@ -11,6 +11,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
@@ -112,6 +113,10 @@ class MainActivity :
             view.updatePadding(
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
+        }
+        navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, bundle: Bundle? ->
+            log.d("navigation change: dest: $navDestination bundle:$bundle")
+            //Exception().printStackTrace()
         }
 
         volumeControl.controlView = binding.castPlayerVolume
