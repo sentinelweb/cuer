@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ROOT_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Model
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Model.HeaderModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -26,9 +27,13 @@ class PlaylistsModelMapper constructor(
         pinnedId: Long?,
         tree: PlaylistTreeDomain,
         playlistStats: Map<Long?, PlaylistStatDomain?>,
+        showRoot: Boolean,
     ): PlaylistsContract.Model {
 
         val items = mutableListOf<Model>()
+        if (showRoot) {
+            items.add(itemModel(ROOT_PLAYLIST_DUMMY, null, pinnedId, 0))
+        }
         channelPlaylists
             .takeIf { it.isNotEmpty() }
             ?.let { list ->
