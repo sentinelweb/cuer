@@ -140,7 +140,11 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                 copy(
                     id = created.data!!.id!!,
                     playlistId = playlistEntity.id,
-                    media = media.copy(created.data!!.media.id)// should update the media in the db
+                    media = media.copy(
+                        id = created.data!!.media.id,
+                        platformId = created.data!!.media.platformId,
+                        platform = created.data!!.media.platform
+                    )// should update the media in the db
                 )
             }
 
@@ -295,14 +299,13 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         val itemDomain1 = sut.load(itemEntity1.id).data!!
         val itemConflict =
             fixture<PlaylistItemDomain>()
-                .let {
-                    it.copy(
-                        id = null,
-                        playlistId = itemDomain1.playlistId,
-                        media = itemDomain1.media.copy(id = null),
-                        order = itemDomain1.order
-                    )
-                }
+                .copy(
+                    id = null,
+                    playlistId = itemDomain1.playlistId,
+                    media = itemDomain1.media.copy(id = null),
+                    order = itemDomain1.order
+                )
+
         // itemConflict should overwrite the original
         val savedConflict = sut.save(itemConflict).data!!
         assertEquals(itemDomain1.id, savedConflict.id)
@@ -313,15 +316,15 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         val (_, itemEntity1) = dataCreation.createPlaylistAndItem()
         val itemDomain1 = sut.load(itemEntity1.id).data!!
         val itemConflict =
-            listOf(fixture<PlaylistItemDomain>()
-                .let {
-                    it.copy(
+            listOf(
+                fixture<PlaylistItemDomain>()
+                    .copy(
                         id = null,
                         playlistId = itemDomain1.playlistId,
                         media = itemDomain1.media.copy(id = null),
                         order = itemDomain1.order
                     )
-                })
+            )
         // itemConflict should overwrite the original
         val savedConflict = sut.save(itemConflict).data!!
         assertEquals(itemDomain1.id, savedConflict[0].id)
@@ -334,13 +337,12 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         val itemDomain1 = sut.load(itemEntity1.id).data!!
         val itemConflict =
             fixture<PlaylistItemDomain>()
-                .let {
-                    it.copy(
-                        id = null,
-                        playlistId = itemDomain1.playlistId,
-                        media = itemDomain1.media.copy(id = null)
-                    )
-                }
+                .copy(
+                    id = null,
+                    playlistId = itemDomain1.playlistId,
+                    media = itemDomain1.media.copy(id = null)
+                )
+
         val actual = sut.save(itemConflict)
         assertFalse(actual.isSuccessful)
     }
@@ -353,14 +355,13 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         val itemDomain2 = sut.load(itemEntity2.id).data!!
         val itemConflict =
             fixture<PlaylistItemDomain>()
-                .let {
-                    it.copy(
-                        id = 2, // call update on 2nd item
-                        playlistId = itemDomain1.playlistId,
-                        media = itemDomain1.media,
-                        order = itemDomain1.order
-                    )
-                }
+                .copy(
+                    id = 2, // call update on 2nd item
+                    playlistId = itemDomain1.playlistId,
+                    media = itemDomain1.media,
+                    order = itemDomain1.order
+                )
+
 
         // save is successful but data isn't written REPLACE .. DO NOTHING
         val saved = sut.save(itemConflict)
@@ -385,7 +386,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
 
     @Test
     fun deleteAll() = runTest {
-        val toCreate = (1..5).map { dataCreation.createPlaylistAndItem() }
+        (1..5).map { dataCreation.createPlaylistAndItem() }
 
         val deleted = sut.deleteAll()
         assertTrue(deleted.isSuccessful)

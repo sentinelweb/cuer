@@ -44,7 +44,7 @@ update:
 REPLACE INTO media ( id, flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,
 published, channel_id, thumb_id, image_id ) VALUES ?
 --   ON CONFLICT (platform, platform_id) DO NOTHING
-  ;
+;
 
 updatePosition:
 UPDATE media SET date_last_played=:dateLastPlayed, position=:position, duration=:duration, flags=:flags WHERE id=:id;

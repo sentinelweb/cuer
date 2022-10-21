@@ -36,3 +36,5 @@ interface MediaDatabaseRepository : DatabaseRepository<MediaDomain, Nothing>
 interface PlaylistDatabaseRepository : DatabaseRepository<PlaylistDomain, PlaylistStatDomain>
 interface PlaylistItemDatabaseRepository : DatabaseRepository<PlaylistItemDomain, Nothing>
 interface ImageDatabaseRepository : DatabaseRepository<ImageDomain, Nothing>
+
+class ConflictException(msg: String) : Exception(msg)

@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
+import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
@@ -245,6 +246,16 @@ class SqldelightMediaDatabaseRepository(
                 val mediaEntity = mediaMapper.map(it)
                 with(database.mediaEntityQueries) {
                     if (mediaEntity.id > 0) {
+                        // manual check for platform-platformId duplication
+                        // throw ConflictException if id is different for same platform-platformId
+                        val platformCheck = try {
+                            loadByPlatformId(mediaEntity.platform_id, mediaEntity.platform).executeAsOne()
+                        } catch (n: NullPointerException) {
+                            null
+                        }
+                        if (platformCheck != null && platformCheck.id != mediaEntity.id) {
+                            throw ConflictException("incorrect id for ${mediaEntity.platform} - ${mediaEntity.platform_id} existing: ${platformCheck.id}  thisid:${mediaEntity.id} ")
+                        }
                         update(mediaEntity)
                         loadById(mediaDomain.id!!).executeAsOne().id
                     } else {
