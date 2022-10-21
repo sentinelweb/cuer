@@ -96,7 +96,7 @@ class SqldelightImageDatabaseRepository(
                 else -> throw IllegalArgumentException("$filter not implemented")
             }
         } catch (e: Exception) {
-            val msg = "couldn't count medias"
+            val msg = "couldn't count images"
             log.e(msg, e)
             RepoResult.Error<Int>(e, msg)
         }
@@ -114,7 +114,7 @@ class SqldelightImageDatabaseRepository(
                     .deleteAll()
                 RepoResult.Data(true)
             } catch (e: Throwable) {
-                val msg = "couldn't deleteAll medias"
+                val msg = "couldn't deleteAll images"
                 log.e(msg, e)
                 RepoResult.Error<Boolean>(e, msg)
             }

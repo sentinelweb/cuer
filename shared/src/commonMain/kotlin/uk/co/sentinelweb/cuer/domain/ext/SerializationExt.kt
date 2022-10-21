@@ -161,4 +161,3 @@ val domainJsonSerializer = Json {
     }
     )
 }
-

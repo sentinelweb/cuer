@@ -189,7 +189,3 @@ fun PlaylistDomain.summarise(): String = """
     id: $id, title: $title, type: $type, platform: $platform - $platformId
     items:${items.map { it.summarise() }.joinToString("\n")}
 """.trimIndent()
-
-
-
-

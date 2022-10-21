@@ -182,21 +182,6 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         }
     }
 
-//    @Test
-//    fun saveListOrderOverwrite() = runTest {
-//        val playlistEntity = dataCreation.createPlaylist()
-//        val toCreate =
-//            fixture<List<PlaylistItemDomain>>()
-//                .map { it.copy(playlistId = playlistEntity.id, media = it.media.copy(id = null), order = 5L) }
-//        sut.updates.test {
-//            val created = sut.save(toCreate, flat = true, emit = true)
-//            val expected = playlistEntity.
-//            assertTrue(created.isSuccessful)
-//            assertEquals(expected, created.data!![0])
-//            expectNoEvents()
-//        }
-//    }
-
     @Test
     fun loadListByIds() = runTest {
         val playlistEntity = dataCreation.createPlaylist()

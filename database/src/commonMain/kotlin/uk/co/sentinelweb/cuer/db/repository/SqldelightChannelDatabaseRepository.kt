@@ -123,7 +123,7 @@ class SqldelightChannelDatabaseRepository(
                 else -> throw IllegalArgumentException("$filter not implemented")
             }
         } catch (e: Exception) {
-            val msg = "couldn't count medias"
+            val msg = "couldn't count channels"
             log.e(msg, e)
             RepoResult.Error<Int>(e, msg)
         }
