@@ -15,6 +15,7 @@ import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
@@ -214,6 +215,21 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
             image = initial.image?.copy(id = initial.thumbNail?.let { 2L } ?: 1L),
         )
         assertEquals(expected, actual)
+    }
+
+    @Test
+    fun count() = runTest {
+        val initial = fixture<List<ChannelDomain>>().map {
+            it.copy(
+                id = null,
+                thumbNail = it.thumbNail?.copy(id = null),
+                image = it.image?.copy(id = null),
+            )
+        }
+        initial.forEach { sut.save(it) }
+        val actual = sut.count(OrchestratorContract.AllFilter()).data!!
+
+        assertEquals(initial.size, actual)
     }
 
 //    @Test

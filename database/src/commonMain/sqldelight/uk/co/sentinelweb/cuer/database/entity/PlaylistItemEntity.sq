@@ -12,23 +12,28 @@ CREATE TABLE playlist_item (
 );
 
 CREATE INDEX playlist_item_flags_index ON playlist_item(flags);
--- todo UNIQUE
-CREATE INDEX playlist_item_ordering_playlist_id_index ON playlist_item(ordering, playlist_id);
+
+CREATE UNIQUE INDEX playlist_item_ordering_media_id_playlist_id_index ON playlist_item(ordering, media_id, playlist_id);
 
 CREATE INDEX playlist_item_playlist_id_index ON playlist_item(playlist_id);
 
 CREATE INDEX playlist_item_media_id_index ON playlist_item(media_id);
--- todo UNIQUE
-CREATE INDEX playlist_item_media_id_playlist_id_index ON playlist_item(media_id, playlist_id);
+
+CREATE UNIQUE INDEX playlist_item_media_id_playlist_id_index ON playlist_item(media_id, playlist_id);
 
 create:
-INSERT INTO playlist_item (flags, media_id, ordering, playlist_id, date_added) VALUES ?;
+INSERT INTO playlist_item (flags, media_id, ordering, playlist_id, date_added) VALUES ?
+    ON CONFLICT (media_id, ordering, playlist_id) DO UPDATE
+        SET flags = excluded.flags, ordering = excluded.ordering, date_added = excluded.date_added
+        WHERE media_id = excluded.media_id AND playlist_id = excluded.playlist_id;
 
 getInsertId:
 SELECT last_insert_rowid() FROM playlist_item LIMIT 1;
 
 update:
-REPLACE INTO playlist_item (id, flags, media_id, ordering, playlist_id, date_added) VALUES ?;
+REPLACE INTO playlist_item (id, flags, media_id, ordering, playlist_id, date_added) VALUES ?
+  ON CONFLICT (media_id, ordering, playlist_id) DO NOTHING
+;
 
 load:
 SELECT * FROM playlist_item WHERE id = ?;
@@ -59,6 +64,9 @@ SELECT count() FROM playlist_item,media WHERE playlist_item.playlist_id=:playlis
 
 countItemsInPlaylist:
 SELECT count() FROM playlist_item WHERE playlist_id ==:playlistId;
+
+count:
+SELECT count() FROM playlist_item;
 
 loadAllPlaylistItemsWithNewMedia:
 SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 0 AND media.id=playlist_item.media_id ORDER BY playlist_item.date_added DESC LIMIT :limit;

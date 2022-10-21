@@ -182,7 +182,18 @@ class PlaylistEntityTest : KoinTest {
         assertEquals(playlist1, actual[0])
     }
 
-    private fun createPlaylist(channelId:Long? = null): Playlist {
+    @Test
+    fun count() {
+        val initial = (1..4).map { createPlaylist() }
+
+        val actual = database.playlistEntityQueries
+            .count()
+            .executeAsOne()
+
+        assertEquals(initial.size.toLong(), actual)
+    }
+
+    private fun createPlaylist(channelId: Long? = null): Playlist {
         val initial =
             fixture<Playlist>().copy(id = 0, parent_id = null, channel_id = channelId, image_id = null, thumb_id = null)
         database.playlistEntityQueries.create(initial)
