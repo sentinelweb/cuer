@@ -18,7 +18,9 @@ class YoutubeJavaApiWrapperTest {
 
     private var mockActivity: AppCompatActivity = mockk(relaxUnitFun = true)
     private var mockLinkScanner: LinkScanner = mockk(relaxUnitFun = true)
-    private var mockIntent: Intent = mockk(relaxUnitFun = true)
+    private var mockIntent: Intent = mockk(relaxUnitFun = true) {
+        every { setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK) } returns this
+    }
     private var mockUri: Uri = mockk(relaxUnitFun = true)
     private val fixture: JFixture = JFixture()
     private val fixtMedia: MediaDomain = fixture.create(MediaDomain::class.java)
