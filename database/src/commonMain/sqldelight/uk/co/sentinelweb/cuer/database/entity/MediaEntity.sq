@@ -11,7 +11,7 @@ CREATE TABLE media (
     date_last_played TEXT AS kotlinx.datetime.Instant,
     description TEXT,
     platform TEXT AS uk.co.sentinelweb.cuer.domain.PlatformDomain NOT NULL,
-    platform_id TEXT NOT NULL UNIQUE ,
+    platform_id TEXT NOT NULL ,
     published TEXT AS kotlinx.datetime.LocalDateTime,
     channel_id INTEGER,
     thumb_id INTEGER,
@@ -34,7 +34,7 @@ CREATE INDEX media_description_index ON media(description);
 create:
 INSERT INTO media ( flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,
 published, channel_id, thumb_id, image_id ) VALUES ?
-ON CONFLICT (platform_id) DO NOTHING
+ON CONFLICT (platform, platform_id) DO NOTHING
 ;
 
 getInsertId:
@@ -42,7 +42,9 @@ SELECT last_insert_rowid() FROM media LIMIT 1;
 
 update:
 REPLACE INTO media ( id, flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,
-published, channel_id, thumb_id, image_id ) VALUES ?;
+published, channel_id, thumb_id, image_id ) VALUES ?
+--   ON CONFLICT (platform, platform_id) DO NOTHING
+  ;
 
 updatePosition:
 UPDATE media SET date_last_played=:dateLastPlayed, position=:position, duration=:duration, flags=:flags WHERE id=:id;

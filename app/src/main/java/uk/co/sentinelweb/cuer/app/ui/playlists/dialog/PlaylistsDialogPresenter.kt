@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.ext.buildTree
 import uk.co.sentinelweb.cuer.domain.ext.sort
+import java.lang.Math.min
 
 class PlaylistsDialogPresenter(
     private val view: PlaylistsDialogContract.View,
@@ -95,7 +96,7 @@ class PlaylistsDialogPresenter(
 
         val recentLocalPlaylists = recentLocalPlaylists
             .getRecent()
-            .subList(0, 10)
+            .let { it.subList(0, min(10, it.size)) }
             .mapNotNull { recentId -> state.playlists.find { it.id == recentId } }
 
         state.playlists.map { it.id }

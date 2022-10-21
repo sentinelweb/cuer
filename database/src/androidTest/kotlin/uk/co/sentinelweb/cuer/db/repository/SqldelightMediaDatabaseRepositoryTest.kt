@@ -27,9 +27,7 @@ import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 class SqldelightMediaDatabaseRepositoryTest : KoinTest {
     private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
@@ -287,14 +285,96 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
         }
         val saved = sut.save(initial).data!!
         sut.updates.test {
-            val update = fixture<MediaPositionUpdateDomain>().copy(id=saved.id!!)
+            val update = fixture<MediaPositionUpdateDomain>().copy(id = saved.id!!)
             val actual = sut.update(update, emit = true)
             val expected = sut.load(saved.id!!)
-            assertEquals(expected.data!!, actual.data!! )
+            assertEquals(expected.data!!, actual.data!!)
             assertEquals(FULL to actual.data!!, awaitItem())
             expectNoEvents()
         }
     }
 
+    @Test
+    fun onConflict_insert() = runTest {
+        val initialSaved = addMediaToDb()
+        val duplicatePlatformId = fixture<MediaDomain>().run {
+            copy(
+                id = null,
+                platform = initialSaved[0].platform,
+                platformId = initialSaved[0].platformId,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        }
 
+        val actual = sut.save(duplicatePlatformId)
+        assertFalse(actual.isSuccessful)
+    }
+
+    @Test
+    fun onConflict_insert_list() = runTest {
+        val initialSaved = addMediaToDb()
+        val duplicatePlatformIdList = listOf(fixture<MediaDomain>().run {
+            copy(
+                id = null,
+                platform = initialSaved[0].platform,
+                platformId = initialSaved[0].platformId,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        })
+
+        val actual = sut.save(duplicatePlatformIdList)
+        assertFalse(actual.isSuccessful)
+    }
+
+    @Test
+    fun onConflict_update() = runTest {
+        val initialSaved = addMediaToDb()
+        val duplicatePlatformId = fixture<MediaDomain>().run {
+            copy(
+                title = "duplicate title",
+                id = 2,
+                platform = initialSaved[0].platform,
+                platformId = initialSaved[0].platformId,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        }
+
+        val actual = sut.save(duplicatePlatformId)
+//        println("--- to save")
+//        println(duplicatePlatformId.summarise())
+//        println("--- actual")
+//        println(actual.isSuccessful)
+//        println(actual.data?.summarise())
+//        println("--- db")
+//        println(sut.loadList(AllFilter()).data?.map { it.summarise() }?.joinToString("\n"))
+
+        val load = sut.load(duplicatePlatformId.id!!).data!!
+        // The item won't save as it do nothing - but the db record won't be changed
+        assertTrue(actual.isSuccessful)
+        assertNotEquals(load, duplicatePlatformId)
+    }
+
+    @Test
+    fun onConflict_list_update() = runTest {
+        val initialSaved = addMediaToDb()
+        val duplicatePlatformId = listOf(fixture<MediaDomain>().run {
+            copy(
+                title = "duplicate title",
+                id = 2,
+                platform = initialSaved[0].platform,
+                platformId = initialSaved[0].platformId,
+                thumbNail = thumbNail?.copy(id = null),
+                image = image?.copy(id = null),
+            )
+        })
+
+        val actual = sut.save(duplicatePlatformId)
+        val load = sut.load(duplicatePlatformId[0].id!!).data!!
+        // The item won't save as it do nothing - but the db record won't be changed
+        assertTrue(actual.isSuccessful)
+        assertNotEquals(load, duplicatePlatformId[0])
+    }
 }

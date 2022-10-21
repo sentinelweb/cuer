@@ -44,12 +44,15 @@ class SqldelightMediaDatabaseRepository(
     override suspend fun save(domain: MediaDomain, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             try {
-                saveInternal(domain, flat)
-                    .let { RepoResult.Data(load(id = it, flat).data) }
-                    .also {
-                        if (emit) it.data
-                            ?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
-                    }
+                val id = saveInternal(domain, flat)
+                val loadResult = load(id = id, flat)
+                if (loadResult.isSuccessful)
+                    RepoResult.Data(loadResult.data)
+                        .also {
+                            if (emit) it.data
+                                ?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
+                        }
+                else loadResult
             } catch (e: Exception) {
                 val msg = "couldn't save media: ${domain}"
                 log.e(msg, e)
@@ -81,27 +84,28 @@ class SqldelightMediaDatabaseRepository(
         withContext(coProvider.IO) {
             database.mediaEntityQueries.transactionWithResult<RepoResult<List<MediaDomain>>> {
                 try {
-                    when (filter) {
-                        is IdListFilter ->
-                            database.mediaEntityQueries
-                                .loadAllByIds(filter.ids)
-                                .executeAsList()
-                                .map { fillAndMapEntity(it) }
-                                .let { RepoResult.Data(it) }
+                    with(database.mediaEntityQueries) {
+                        when (filter) {
+                            is AllFilter ->
+                                loadAll().executeAsList()
 
-                        is PlatformIdListFilter ->
-                            filter.ids
-                                // todo make query to load all at once
-                                .mapNotNull {
-                                    database.mediaEntityQueries
-                                        .loadByPlatformId(it, YOUTUBE)
-                                        .executeAsOneOrNull()
-                                }
-                                .map { fillAndMapEntity(it) }
-                                .let { RepoResult.Data.dataOrEmpty(it) }
+                            is IdListFilter ->
+                                loadAllByIds(filter.ids).executeAsList()
 
-                        is ChannelPlatformIdFilter -> TODO()
-                        else -> throw IllegalArgumentException("$filter not implemented")
+                            is PlatformIdListFilter ->
+                                filter.ids
+                                    // todo make query to load all at once
+                                    .mapNotNull {
+                                        database.mediaEntityQueries
+                                            .loadByPlatformId(it, YOUTUBE)
+                                            .executeAsOneOrNull()
+                                    }
+
+                            is ChannelPlatformIdFilter -> TODO()
+                            else -> throw IllegalArgumentException("$filter not implemented")
+                        }
+                            .map { fillAndMapEntity(it) }
+                            .let { RepoResult.Data.dataOrEmpty(it) }
                     }
                 } catch (e: Exception) {
                     val msg = "couldn't load medias"
@@ -242,7 +246,7 @@ class SqldelightMediaDatabaseRepository(
                 with(database.mediaEntityQueries) {
                     if (mediaEntity.id > 0) {
                         update(mediaEntity)
-                        mediaDomain.id!!
+                        loadById(mediaDomain.id!!).executeAsOne().id
                     } else {
                         create(mediaEntity)
                         getInsertId().executeAsOne()

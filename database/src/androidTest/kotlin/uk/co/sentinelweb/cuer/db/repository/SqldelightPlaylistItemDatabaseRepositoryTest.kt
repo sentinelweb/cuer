@@ -24,10 +24,7 @@ import uk.co.sentinelweb.cuer.db.util.DataCreation
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
     private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
@@ -311,6 +308,25 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         assertEquals(itemDomain1.id, savedConflict.id)
     }
 
+    @Test
+    fun onConflict_list_insert() = runTest {
+        val (_, itemEntity1) = dataCreation.createPlaylistAndItem()
+        val itemDomain1 = sut.load(itemEntity1.id).data!!
+        val itemConflict =
+            listOf(fixture<PlaylistItemDomain>()
+                .let {
+                    it.copy(
+                        id = null,
+                        playlistId = itemDomain1.playlistId,
+                        media = itemDomain1.media.copy(id = null),
+                        order = itemDomain1.order
+                    )
+                })
+        // itemConflict should overwrite the original
+        val savedConflict = sut.save(itemConflict).data!!
+        assertEquals(itemDomain1.id, savedConflict[0].id)
+    }
+
     // if we try to save the same media on same playlist with different ordering then it will be an exception which is ok
     @Test
     fun onConflict_insert_differentOrder() = runTest {
@@ -325,49 +341,57 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                         media = itemDomain1.media.copy(id = null)
                     )
                 }
-        // save itemConflict should throw exeption
-        try { // this isnt the right way to do it but in a rush
-            sut.save(itemConflict).data!!
-            throw Exception("Test failure: onConflict_diffferentOrder")
-        } catch (e: NullPointerException) {
-        }// for some reason on conflict throws nullpointer
+        val actual = sut.save(itemConflict)
+        assertFalse(actual.isSuccessful)
     }
 
     @Test
     fun onConflict_update() = runTest {
         val (_, itemEntity1) = dataCreation.createPlaylistAndItem()
+        val (_, itemEntity2) = dataCreation.createPlaylistAndItem()
         val itemDomain1 = sut.load(itemEntity1.id).data!!
+        val itemDomain2 = sut.load(itemEntity2.id).data!!
         val itemConflict =
             fixture<PlaylistItemDomain>()
                 .let {
                     it.copy(
-                        id = 4, // call update
+                        id = 2, // call update on 2nd item
                         playlistId = itemDomain1.playlistId,
                         media = itemDomain1.media,
                         order = itemDomain1.order
                     )
                 }
-        // save itemConflict should throw exeption
-        try { // this isn't the right way to do it but in a rush
-            sut.save(itemConflict).data!!
-            throw Exception("Test failure: onConflict_update")
-        } catch (e: NullPointerException) {
-        }// for some reason on conflict throws nullpointer
+
+        // save is successful but data isn't written REPLACE .. DO NOTHING
+        val saved = sut.save(itemConflict)
+        assertTrue(saved.isSuccessful) //
+        assertNotEquals(itemConflict, saved.data)
+
+        // the item with the id (2) won't be changed
+        val conflictingItemIdLoad = sut.load(itemEntity2.id)
+        assertTrue(conflictingItemIdLoad.isSuccessful)
+        assertEquals(itemDomain2, conflictingItemIdLoad.data)
+
+        // also the item with conflicting data (1) won't be changed
+        val load = sut.load(itemDomain1.id!!) // load previous record
+        assertTrue(load.isSuccessful)
+        assertEquals(itemDomain1, load.data)
     }
 
 //    @Test
 //    fun loadStatsList() {
 //    }
 //
-//    @Test
-//    fun count() {
-//    }
 
-//    @Test
-//    fun deleteAll() {
-//    }
-//
-//    @Test
-//    fun update() {
-//    }
+    @Test
+    fun deleteAll() = runTest {
+        val toCreate = (1..5).map { dataCreation.createPlaylistAndItem() }
+
+        val deleted = sut.deleteAll()
+        assertTrue(deleted.isSuccessful)
+
+        val check = sut.count()
+        assertTrue(check.isSuccessful)
+        assertEquals(0, check.data!!)
+    }
 }
