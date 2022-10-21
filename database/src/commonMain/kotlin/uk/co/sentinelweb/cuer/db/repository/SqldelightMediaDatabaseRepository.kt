@@ -254,7 +254,10 @@ class SqldelightMediaDatabaseRepository(
                             null
                         }
                         if (platformCheck != null && platformCheck.id != mediaEntity.id) {
-                            throw ConflictException("incorrect id for ${mediaEntity.platform} - ${mediaEntity.platform_id} existing: ${platformCheck.id}  thisid:${mediaEntity.id} ")
+                            throw ConflictException(
+                                "conflicting id for ${mediaEntity.platform}-${mediaEntity.platform_id}" +
+                                        " existing: ${platformCheck.id}  thisid:${mediaEntity.id} "
+                            )
                         }
                         update(mediaEntity)
                         loadById(mediaDomain.id!!).executeAsOne().id
