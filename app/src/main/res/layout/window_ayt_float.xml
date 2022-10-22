@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+>
 
     <uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
         android:id="@+id/fullscreen_video_wrapper"
@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        >
+    >
 
         <FrameLayout
             android:id="@+id/player_container"
@@ -39,17 +39,17 @@
 
         <ImageView
             android:id="@+id/floating_player_close"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
             android:background="@drawable/circle_gradient_top_left"
             android:contentDescription="Close"
             android:paddingStart="4dp"
             android:paddingTop="4dp"
-            android:paddingEnd="32dp"
-            android:paddingBottom="32dp"
+            android:paddingEnd="50dp"
+            android:paddingBottom="50dp"
             android:src="@drawable/ic_notif_close_white"
             app:tint="@color/white"
-            />
+            tools:ignore="HardcodedText"/>
 
         <ImageView
             android:id="@+id/floating_player_resize"
@@ -64,6 +64,7 @@
             android:paddingBottom="32dp"
             android:src="@drawable/ic_resize_24"
             app:tint="@color/white"
+            tools:ignore="HardcodedText"
             />
 
         <ImageView
@@ -79,6 +80,7 @@
             android:paddingBottom="4dp"
             android:src="@drawable/ic_move_24"
             app:tint="@color/white"
+            tools:ignore="HardcodedText"
             />
 
 
