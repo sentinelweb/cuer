@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer.floating
 
 import android.content.Intent
+import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_DISCONNECT
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PAUSE
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PLAY
@@ -16,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService.Companion.ACTION_INIT
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService.Companion.ACTION_PLAY_ITEM
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
@@ -26,6 +28,8 @@ class FloatingPlayerController constructor(
     private val windowManagement: FloatingWindowManagement,
     private val aytViewHolder: AytViewHolder,
     private val log: LogWrapper,
+    private val screenStateReceiver: ScreenStateReceiver,
+    private val toastWrapper: ToastWrapper
 ) : FloatingPlayerContract.Controller, FloatingPlayerContract.External {
 
     init {
@@ -80,21 +84,44 @@ class FloatingPlayerController constructor(
                     ?.let { deserialisePlaylistItem(it) }
                     ?.also { playerMviViw.dispatch(OnInitFromService(it)) }
             }
+
             ACTION_SKIPF ->
                 playerMviViw.dispatch(SkipFwdClicked)
+
             ACTION_SKIPB ->
                 playerMviViw.dispatch(SkipBackClicked)
+
             ACTION_PAUSE ->
                 playerMviViw.dispatch(PlayPauseClicked(true))
+
             ACTION_PLAY ->
-                playerMviViw.dispatch(PlayPauseClicked(false))
+                if (!screenStateReceiver.isLocked) {
+                    playerMviViw.dispatch(PlayPauseClicked(false))
+                } else {
+                    toastWrapper.show("Unlock to play")
+                }
+
             ACTION_TRACKB ->
-                playerMviViw.dispatch(TrackBackClicked)
+                if (!screenStateReceiver.isLocked) {
+                    playerMviViw.dispatch(TrackBackClicked)
+                } else {
+                    toastWrapper.show("Unlock to play")
+                }
+
             ACTION_TRACKF ->
-                playerMviViw.dispatch(TrackFwdClicked)
+                if (!screenStateReceiver.isLocked) {
+                    playerMviViw.dispatch(TrackFwdClicked)
+                } else {
+                    toastWrapper.show("Unlock to play")
+                }
+
             else -> {
                 log.d("intent.action = ${intent.action}")
             }
         }
+    }
+
+    override fun setTitlePrefix(prefix: String?) {
+        playerMviViw.setTitlePrefix(prefix)
     }
 }

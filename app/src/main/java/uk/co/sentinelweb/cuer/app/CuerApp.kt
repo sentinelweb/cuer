@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.di.Modules
 import uk.co.sentinelweb.cuer.app.exception.TerminatedWhilePlayingError
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.CuerCastSessionListener
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
@@ -32,6 +33,7 @@ class CuerApp : Application() {
     private val serviceWrapper: ServiceWrapper by inject()
     private val castSessionListener: CuerCastSessionListener by inject()
     private val queue: QueueMediatorContract.Producer by inject()
+    private val screenStateReceiver: ScreenStateReceiver by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -75,6 +77,7 @@ class CuerApp : Application() {
             )
         }
         queue.destroy()
+        screenStateReceiver.unregister(this) // registered in module
     }
 
     private var oldHandler: Thread.UncaughtExceptionHandler? = null

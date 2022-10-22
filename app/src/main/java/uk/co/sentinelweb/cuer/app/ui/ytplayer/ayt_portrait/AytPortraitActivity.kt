@@ -19,7 +19,6 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.ActivityAytPortraitBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -84,7 +83,6 @@ class AytPortraitActivity : AppCompatActivity(),
     private val linkScanner: LinkScanner by inject()
     private val shareWrapper: ShareWrapper by inject()
     private val multiPrefs: MultiPlatformPreferencesWrapper by inject()
-    private val screenStateReceiver: ScreenStateReceiver by inject()
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl
     private lateinit var binding: ActivityAytPortraitBinding
@@ -101,11 +99,6 @@ class AytPortraitActivity : AppCompatActivity(),
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         castListener.listen()
-        screenStateReceiver.register(this)
-        screenStateReceiver.screenOffCallback = {
-            floatingService.stop()
-            finish()
-        }
     }
 
     override fun onStart() {
@@ -121,12 +114,10 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onStop() {
         // check to launch the floating player
-        log.d("stop: ${screenStateReceiver.isScreenOn}")
         if (multiPrefs.getBoolean(PLAYER_AUTO_FLOAT, PLAYER_AUTO_FLOAT_DEFAULT)
             && aytViewHolder.isPlaying
             && floatingService.hasPermission(this@AytPortraitActivity)
             && currentItem != null
-            && screenStateReceiver.isScreenOn
         ) {
             log.d("launch pip")
             aytViewHolder.switchView()
@@ -142,7 +133,6 @@ class AytPortraitActivity : AppCompatActivity(),
         controller.onViewDestroyed()
         controller.onDestroy(aytViewHolder.willFinish())
         aytViewHolder.cleanupIfNotSwitching()
-        screenStateReceiver.unregister(this)
         super.onDestroy()
     }
 

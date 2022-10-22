@@ -126,7 +126,9 @@ object Modules {
     }
 
     private val receiverModule = module {
-        factory { ScreenStateReceiver(log = get(), context = androidContext()) }
+        single {
+            ScreenStateReceiver().apply { register(androidContext()) }
+        }
     }
 
     private val utilModule = module {

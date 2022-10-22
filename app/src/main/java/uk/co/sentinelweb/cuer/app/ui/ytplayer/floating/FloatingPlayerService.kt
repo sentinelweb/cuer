@@ -10,6 +10,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PAUSE
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PLAY
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -28,6 +29,18 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
     override val external: FloatingPlayerContract.External
         get() = controller.external
 
+    private val lockHandler = {
+        log.d("Screen off -> ACTION_PAUSE")
+        controller.setTitlePrefix("[locked]")
+        controller.handleAction(Intent(ACTION_PAUSE))
+    }
+
+    private val unlockHandler = {
+        log.d("Unlock -> ACTION_PLAY")
+        controller.setTitlePrefix(null)
+        controller.handleAction(Intent(ACTION_PLAY))
+    }
+
     override fun onCreate() {
         super.onCreate()
         log.tag(this)
@@ -35,10 +48,8 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         log.d("Service created")
         appState.castNotificationChannelId = notificationWrapper.createChannelId(CHANNEL_ID, CHANNEL_NAME)
         controller.initialise()
-        screenStateReceiver.register(this)
-        screenStateReceiver.screenOffCallback = {
-            controller.handleAction(Intent(ACTION_PAUSE))
-        }
+        screenStateReceiver.screenOffCallbacks.add(lockHandler)
+        screenStateReceiver.unlockCallbacks.add(unlockHandler)
     }
 
     override fun onDestroy() {
@@ -46,7 +57,8 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         log.d("Service destroyed")
         controller.destroy()
         scope.close()
-        screenStateReceiver.unregister(this)
+        screenStateReceiver.screenOffCallbacks.remove(lockHandler)
+        screenStateReceiver.unlockCallbacks.remove(unlockHandler)
         _instance = null
     }
 
@@ -62,10 +74,6 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
     }
 
     override fun onBind(p0: Intent?): IBinder? = null
-
-    fun cleanup() {
-
-    }
 
     companion object {
         const val ACTION_INIT: String = "init"

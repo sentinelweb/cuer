@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Intent
-import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
@@ -16,8 +15,6 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_SKIPF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 
 class PlayerControlsNotificationBasic constructor(
@@ -33,13 +30,11 @@ class PlayerControlsNotificationBasic constructor(
     }
 
     override fun showNotification(
-        state: PlayerStateDomain,
-        media: MediaDomain?,
-        bitmap: Bitmap?
+        state: PlayerControlsNotificationContract.State
     ) {
         service.startForeground(
             PlayerControlsNotificationMedia.FOREGROUND_ID,
-            buildNotification(state, media, bitmap)
+            buildNotification(state)
         )
     }
 
@@ -50,9 +45,7 @@ class PlayerControlsNotificationBasic constructor(
     // todo try this (media notif) https://developer.android.com/training/notify-user/expanded#media-style
     // or this (custom layout) https://stackoverflow.com/questions/41888161/how-to-create-a-custom-notification-layout-in-android
     private fun buildNotification(
-        state: PlayerStateDomain,
-        media: MediaDomain?,
-        bitmap: Bitmap?
+        state: PlayerControlsNotificationContract.State
     ): Notification {
         if (icon == -1) {
             throw IllegalStateException("Dont forget to set the icon")
@@ -75,27 +68,31 @@ class PlayerControlsNotificationBasic constructor(
         )
             .setDefaults(Notification.DEFAULT_ALL)
             .setSmallIcon(icon)
-            .setContentTitle(media?.title ?: "No title")
-            .setContentText(media?.description ?: "No description")
+            .setContentTitle(state.media?.title ?: "No title")
+            .setContentText(state.media?.description ?: "No description")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(timeProvider.currentTimeMillis())
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
-        bitmap?.apply { builder.setLargeIcon(this) }
+        state.bitmap?.apply { builder.setLargeIcon(this) }
 
         builder.addAction(R.drawable.ic_player_pause_black, "+30s", skipfPendingIntent)
 
-        when (state) {
+        when (state.playState) {
             PLAYING ->
                 builder.addAction(R.drawable.ic_notif_pause_black, "Pause", pausePendingIntent)
+
             PAUSED ->
                 builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
+
             BUFFERING ->
                 builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", playPendingIntent)
+
             ERROR ->
                 builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
+
             else -> Unit
         }
         builder.addAction(R.drawable.ic_player_pause_black, "-30s", skipbPendingIntent)

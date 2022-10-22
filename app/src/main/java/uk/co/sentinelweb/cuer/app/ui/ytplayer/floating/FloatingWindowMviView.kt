@@ -36,6 +36,11 @@ class FloatingWindowMviView(
         aytViewHolder.addView(service.baseContext, windowManagement.binding!!.playerContainer, this, false)
     }
 
+
+    fun setTitlePrefix(prefix: String?) {
+        notification.setTitlePrefix(prefix)
+    }
+
     override val renderer: ViewRenderer<Model> = diff {
         diff(get = Model::playState, set = {
             notification.setPlayerState(it)
