@@ -185,6 +185,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         storeFactory = DefaultStoreFactory(),
                         repository = get(),
                         playlistOrchestrator = get(),
+                        playlistStatsOrchestrator = get(),
                         browseStrings = get(),
                         log = get(),
                         prefs = get(),

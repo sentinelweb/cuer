@@ -7,10 +7,12 @@ import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import io.ktor.http.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.TitleFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.*
@@ -19,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.ext.allPlatformIds
 import uk.co.sentinelweb.cuer.domain.ext.buildIdLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildParentLookup
@@ -27,6 +30,7 @@ class BrowseStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
     private val repository: BrowseRepository,
     private val playlistOrchestrator: PlaylistOrchestrator,
+    private val playlistStatsOrchestrator: PlaylistStatsOrchestrator,
     private val browseStrings: BrowseContract.Strings,
     private val log: LogWrapper,
     private val prefs: MultiPlatformPreferencesWrapper,
@@ -40,7 +44,12 @@ class BrowseStoreFactory constructor(
     private sealed class Result {
         data class SetCategory(val category: CategoryDomain) : Result()
         data class SetCategoryByTitle(val title: String) : Result()
-        data class LoadCatgeories(val root: CategoryDomain, val existingPlaylists: List<PlaylistDomain>) : Result()
+        data class LoadCatgeories(
+            val root: CategoryDomain,
+            val existingPlaylists: List<PlaylistDomain>,
+            val existingPlaylistStats: List<PlaylistStatDomain>
+        ) : Result()
+
         object Display : Result()
         data class SetOrder(val order: BrowseContract.Order) : Result()
     }
@@ -69,6 +78,7 @@ class BrowseStoreFactory constructor(
                         categoryLookup = categoryLookup1,
                         parentLookup = result.root.buildParentLookup(),
                         existingPlaylists = result.existingPlaylists,
+                        existingPlaylistStats = result.existingPlaylistStats,
                         recent = recentCategories
                             .getRecent()
                             .reversed()
@@ -187,11 +197,16 @@ class BrowseStoreFactory constructor(
             repository.loadAll()
             // .apply { log.d(root.buildIdLookup().values.joinToString("\n") { "${it.title} - ${it.image?.url}" })*/ }
         }.onSuccess {
+            val existingPlaylists = playlistOrchestrator.loadList(
+                PlatformIdListFilter(it.allPlatformIds()),
+                LOCAL.flatOptions()
+            )
             dispatch(
                 Result.LoadCatgeories(
                     it,
-                    existingPlaylists = playlistOrchestrator.loadList(
-                        PlatformIdListFilter(it.allPlatformIds()),
+                    existingPlaylists = existingPlaylists,
+                    existingPlaylistStats = playlistStatsOrchestrator.loadList(
+                        OrchestratorContract.IdListFilter(existingPlaylists.mapNotNull { it.id }),
                         LOCAL.flatOptions()
                     )
                 )

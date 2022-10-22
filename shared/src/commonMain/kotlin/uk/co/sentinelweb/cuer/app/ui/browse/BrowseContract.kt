@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.CategoryDomain.Companion.EMPTY_CATEGORY
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class BrowseContract {
 
@@ -42,6 +43,7 @@ class BrowseContract {
             val recent: List<CategoryDomain> = listOf(),
             val order: Order = Order.CATEGORIES,
             val existingPlaylists: List<PlaylistDomain> = listOf(),
+            val existingPlaylistStats: List<PlaylistStatDomain> = listOf()
         )
     }
 
@@ -66,7 +68,7 @@ class BrowseContract {
             val subCount: Int,
             val isPlaylist: Boolean,
             val forceItem: Boolean,
-            val existingPlaylist: PlaylistDomain?
+            val existingPlaylist: Pair<PlaylistDomain, PlaylistStatDomain>?
         )
 
         sealed class Event {

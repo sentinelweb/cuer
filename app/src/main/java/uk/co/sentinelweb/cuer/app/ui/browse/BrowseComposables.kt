@@ -56,6 +56,7 @@ object BrowseComposables {
                                 CATEGORIES -> Action(CuerMenuItem.SortAlpha,
                                     { view.dispatch(Event.OnSetOrder(A_TO_Z)) }
                                 )
+
                                 A_TO_Z -> Action(CuerMenuItem.SortCategory,
                                     { view.dispatch(Event.OnSetOrder(CATEGORIES)) }
                                 )
@@ -203,9 +204,9 @@ object BrowseComposables {
                                 )
                                 if (category.existingPlaylist != null) {
                                     Text(
-                                        text = category.existingPlaylist!!.currentIndex.toString(),
+                                        text = category.existingPlaylist!!.let { "${it.first.currentIndex}/${it.second.itemCount} (${it.second.watchedItemCount})" },
                                         style = MaterialTheme.typography.caption,
-                                        modifier = Modifier.padding(start = 8.dp)
+                                        modifier = Modifier.padding(start = 8.dp, end = 16.dp)
                                     )
                                 }
                             }

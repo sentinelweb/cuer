@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.CategoryDomain.Companion.ROOT_ID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class BrowseModelMapper constructor(
     private val strings: BrowseContract.Strings,
@@ -22,14 +23,21 @@ class BrowseModelMapper constructor(
                 categories = state.currentCategory.subCategories
                     .filter { it.visible }
                     .sortedBy { it.title }
-                    .map { categoryModel(it, existingPlaylists = state.existingPlaylists) }
+                    .map {
+                        categoryModel(
+                            it,
+                            existingPlaylists = state.existingPlaylists,
+                            existingPlaylistStats = state.existingPlaylistStats
+                        )
+                    }
                     .let {
                         if (state.currentCategory.platformId?.isNotEmpty() ?: false)
                             listOf(
                                 categoryModel(
                                     state.currentCategory,
                                     true,
-                                    existingPlaylists = state.existingPlaylists
+                                    existingPlaylists = state.existingPlaylists,
+                                    existingPlaylistStats = state.existingPlaylistStats
                                 )
                             )
                                 .plus(it)
@@ -46,7 +54,14 @@ class BrowseModelMapper constructor(
                     .distinctBy { it.platformId }
                     .sortedBy { it.title }
                     .filter { it.platformId?.isNotEmpty() ?: false }
-                    .map { categoryModel(it, true, existingPlaylists = state.existingPlaylists) },
+                    .map {
+                        categoryModel(
+                            it,
+                            true,
+                            existingPlaylists = state.existingPlaylists,
+                            existingPlaylistStats = state.existingPlaylistStats
+                        )
+                    },
                 title = strings.allCatsTitle,
                 isRoot = false,
                 recent = makeRecent(state),
@@ -66,7 +81,13 @@ class BrowseModelMapper constructor(
                     title = strings.recent,
                     description = null,
                     thumbNailUrl = null,
-                    subCategories = state.recent.map { categoryModel(it, existingPlaylists = state.existingPlaylists) },
+                    subCategories = state.recent.map {
+                        categoryModel(
+                            it,
+                            existingPlaylists = state.existingPlaylists,
+                            existingPlaylistStats = state.existingPlaylistStats
+                        )
+                    },
                     subCount = state.recent.size,
                     isPlaylist = false,
                     forceItem = true,
@@ -78,18 +99,20 @@ class BrowseModelMapper constructor(
     private fun categoryModel(
         it: CategoryDomain,
         forceItem: Boolean = false,
-        existingPlaylists: List<PlaylistDomain>
+        existingPlaylists: List<PlaylistDomain>,
+        existingPlaylistStats: List<PlaylistStatDomain>
     ): BrowseContract.View.CategoryModel = BrowseContract.View.CategoryModel(
         id = it.id,
         title = it.title,
         description = it.description,
         thumbNailUrl = it.image?.url,
         subCategories = it.subCategories.map {
-            categoryModel(it, existingPlaylists = existingPlaylists)
+            categoryModel(it, existingPlaylists = existingPlaylists, existingPlaylistStats = existingPlaylistStats)
         },
         subCount = if (!forceItem) it.subCategories.size else 0,
         isPlaylist = it.platformId != null,
         forceItem = forceItem,
         existingPlaylist = existingPlaylists.find { pl -> it.platformId == pl.platformId }
+            ?.let { pl -> pl to existingPlaylistStats.find { it.playlistId == pl.id }!! }
     )
 }
