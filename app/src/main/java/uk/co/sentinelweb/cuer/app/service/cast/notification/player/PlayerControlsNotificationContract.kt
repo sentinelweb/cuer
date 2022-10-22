@@ -12,7 +12,7 @@ interface PlayerControlsNotificationContract {
         fun handleAction(action: String?)
         fun destroy()
         fun setIcon(@DrawableRes icon: Int)
-        fun setTitlePrefix(prefix: String?)
+        fun setBlocked(blocked: Boolean)
     }
 
     interface Controller {
@@ -37,6 +37,6 @@ interface PlayerControlsNotificationContract {
         var media: MediaDomain? = null,
         var bitmap: Bitmap? = null,
         var playlistName: String = "none",
-        var titlePrefix: String? = null
+        var blocked: Boolean = false
     )
 }

@@ -105,22 +105,26 @@ class PlayerControlsNotificationMedia constructor(
         //builder.addAction(R.drawable.ic_notif_track_b_black, "Prev", trackbPendingIntent) // #0
         builder.addAction(R.drawable.ic_notif_close_white, "Close", disconnectPendingIntent) // #0
         builder.addAction(R.drawable.ic_notif_fast_rewind_black, "-30s", skipbPendingIntent) // #1
-        when (state.playState) {
-            PLAYING ->
-                builder.addAction(R.drawable.ic_notif_pause_black, "Pause", pausePendingIntent)
+        if (state.blocked) {
+            builder.addAction(R.drawable.ic_lock_24, "Locked", contentPendingIntent)
+        } else {
+            when (state.playState) {
+                PLAYING ->
+                    builder.addAction(R.drawable.ic_notif_pause_black, "Pause", pausePendingIntent)
 
-            PAUSED ->
-                builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
+                PAUSED ->
+                    builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
 
-            BUFFERING ->
-                builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", pausePendingIntent)
+                BUFFERING ->
+                    builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", pausePendingIntent)
 
-            ERROR ->
-                builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
+                ERROR ->
+                    builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
 
-            else -> {
-                log.d("state: $state")
-                builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
+                else -> {
+                    log.d("state: $state")
+                    builder.addAction(R.drawable.ic_error, "Unknown", contentPendingIntent)
+                }
             }
         }
         builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent) // #3
@@ -130,9 +134,7 @@ class PlayerControlsNotificationMedia constructor(
         return builder.build()
     }
 
-    private fun buildTitle(state: PlayerControlsNotificationContract.State) =
-        ((state.titlePrefix ?: "") + (state.media?.title ?: "No title"))
-    //.apply { log.d("showNotification: buildTitle:$this") }
+    private fun buildTitle(state: PlayerControlsNotificationContract.State) = (state.media?.title ?: "No title")
 
     private fun pendingIntent(action: String): PendingIntent {
         val intent = Intent(service, service::class.java).apply {

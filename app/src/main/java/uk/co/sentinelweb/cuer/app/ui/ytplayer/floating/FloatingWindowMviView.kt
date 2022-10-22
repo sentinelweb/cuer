@@ -6,11 +6,14 @@ import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class FloatingWindowMviView(
     private val service: FloatingPlayerService,
@@ -19,6 +22,9 @@ class FloatingWindowMviView(
     private val notification: PlayerControlsNotificationContract.External,
 ) : BaseMviView<Model, Event>(),
     PlayerContract.View {
+
+    private var currentItem: PlaylistItemDomain? = null
+
     var mainPlayControls: PlayerContract.PlayerControls? = null
         get() = field
         set(value) {
@@ -37,8 +43,8 @@ class FloatingWindowMviView(
     }
 
 
-    fun setTitlePrefix(prefix: String?) {
-        notification.setTitlePrefix(prefix)
+    fun setBlocked(blocked: Boolean) {
+        notification.setBlocked(blocked)
     }
 
     override val renderer: ViewRenderer<Model> = diff {
@@ -48,6 +54,7 @@ class FloatingWindowMviView(
                 ?.apply { setPlayerState(it) }
         })
         diff(get = Model::playlistItem, set = { item ->
+            currentItem = item
             notification.setPlaylistItem(item, LOCAL)
             mainPlayControls?.apply {
                 item?.also { item ->
@@ -74,6 +81,13 @@ class FloatingWindowMviView(
         mainPlayControls?.disconnectSource()
         mainPlayControls?.removeListener(controlsListener)
         mainPlayControls = null
+    }
+
+    fun launchActivity() {
+        // fixme invert deps
+        currentItem
+            ?.apply { AytPortraitActivity.startFromService(service, this) }
+            ?: MainActivity.startFromService(service)
     }
 
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {
