@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PAUSE
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PLAY
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -25,20 +26,27 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
     private val appState: CuerAppState by inject()
     private val log: LogWrapper by inject()
     private val screenStateReceiver: ScreenStateReceiver by inject()
+    private val multiPrefs: MultiPlatformPreferencesWrapper by inject()
 
     override val external: FloatingPlayerContract.External
         get() = controller.external
+
+    private var wasPausedScreenLocked: Boolean = false
 
     private val lockHandler = {
         log.d("Screen off -> ACTION_PAUSE")
         controller.setTitlePrefix("[locked]")
         controller.handleAction(Intent(ACTION_PAUSE))
+        wasPausedScreenLocked = true
     }
 
     private val unlockHandler = {
         log.d("Unlock -> ACTION_PLAY")
         controller.setTitlePrefix(null)
-        controller.handleAction(Intent(ACTION_PLAY))
+        if (wasPausedScreenLocked && multiPrefs.restartAfterUnlock) {
+            controller.handleAction(Intent(ACTION_PLAY))
+        }
+        wasPausedScreenLocked = false
     }
 
     override fun onCreate() {

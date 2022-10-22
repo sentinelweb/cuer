@@ -9,6 +9,7 @@ interface PrefPlayerContract {
 
     interface Presenter {
         var playerAutoFloat: Boolean
+        var restartAfterUnlock: Boolean
     }
 
     @Suppress("EmptyClassBlock")

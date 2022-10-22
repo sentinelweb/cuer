@@ -44,8 +44,6 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.Companion.PLAYER_AUTO_FLOAT_DEFAULT
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.PLAYER_AUTO_FLOAT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
@@ -114,7 +112,7 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onStop() {
         // check to launch the floating player
-        if (multiPrefs.getBoolean(PLAYER_AUTO_FLOAT, PLAYER_AUTO_FLOAT_DEFAULT)
+        if (multiPrefs.playerAutoFloat
             && aytViewHolder.isPlaying
             && floatingService.hasPermission(this@AytPortraitActivity)
             && currentItem != null

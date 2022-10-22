@@ -9,41 +9,41 @@ class MultiPlatformPreferencesWrapperImpl constructor(
         Settings()
     }
 
-    override fun getLong(field: MultiPlatformPrefences, def: Long): Long = prefs.getLong(field.fname, def)
+    override fun getLong(field: MultiPlatformPreferences, def: Long): Long = prefs.getLong(field.fname, def)
 
-    override fun getLong(field: MultiPlatformPrefences): Long? =
+    override fun getLong(field: MultiPlatformPreferences): Long? =
         if (prefs.hasKey(field.fname)) prefs.getLong(field.fname, 0)
         else null
 
-    override fun putLong(field: MultiPlatformPrefences, value: Long) {
+    override fun putLong(field: MultiPlatformPreferences, value: Long) {
         prefs.putLong(field.fname, value)
     }
 
-    override fun getInt(field: MultiPlatformPrefences, def: Int): Int =
+    override fun getInt(field: MultiPlatformPreferences, def: Int): Int =
         prefs.getInt(field.fname, def)
 
-    override fun getInt(field: MultiPlatformPrefences): Int? =
+    override fun getInt(field: MultiPlatformPreferences): Int? =
         if (prefs.hasKey(field.fname)) prefs.getInt(field.fname, 0)
         else null
 
-    override fun putInt(field: MultiPlatformPrefences, value: Int) {
+    override fun putInt(field: MultiPlatformPreferences, value: Int) {
         prefs.putInt(field.fname, value)
     }
 
-    override fun getString(field: MultiPlatformPrefences, def: String?): String? =
+    override fun getString(field: MultiPlatformPreferences, def: String?): String? =
         prefs.getStringOrNull(field.fname) ?: def
 
-    override fun putString(field: MultiPlatformPrefences, value: String) {
+    override fun putString(field: MultiPlatformPreferences, value: String) {
         prefs.putString(field.fname, value)
     }
 
     // todo use serialization to implement enum
-    override fun putEnum(field: MultiPlatformPrefences, value: Enum<*>) {
+    override fun putEnum(field: MultiPlatformPreferences, value: Enum<*>) {
         throw UnsupportedOperationException("need to implement enum")
         //prefs.putString(field.fname, value.toString())
     }
 
-    override fun <E : Enum<E>> getEnum(field: MultiPlatformPrefences, def: E): E =
+    override fun <E : Enum<E>> getEnum(field: MultiPlatformPreferences, def: E): E =
         throw UnsupportedOperationException("need to implement enum")
 //        getString(field, null)
 //            ?.let { pref -> def::class.java.enumConstants.find { it.name == pref } }
@@ -60,31 +60,35 @@ class MultiPlatformPreferencesWrapperImpl constructor(
 //            ?.let { pref -> def::class.java.enumConstants.find { it.name == pref } }
 //            ?: def
 
-    override fun getBoolean(field: MultiPlatformPrefences, def: Boolean): Boolean =
+    override fun getBoolean(field: MultiPlatformPreferences, def: Boolean): Boolean =
         prefs.getBoolean(field.fname, def)
 
-    override fun putBoolean(field: MultiPlatformPrefences, value: Boolean) {
+    override fun putBoolean(field: MultiPlatformPreferences, value: Boolean) {
         prefs.putBoolean(field.fname, value)
     }
 
-    override fun remove(field: MultiPlatformPrefences) {
+    override fun remove(field: MultiPlatformPreferences) {
         prefs.remove(field.fname)
         prefs.remove(field.fname + PAIR_FIRST)
         prefs.remove(field.fname + PAIR_SECOND)
     }
 
-    override fun has(field: MultiPlatformPrefences): Boolean = prefs.hasKey(field.fname) || prefs.hasKey(field.fname + PAIR_FIRST)
+    override fun has(field: MultiPlatformPreferences): Boolean =
+        prefs.hasKey(field.fname) || prefs.hasKey(field.fname + PAIR_FIRST)
 
-    override fun <T1 : Any?, T2 : Any?> putPair(field: MultiPlatformPrefences, pair: Pair<T1, T2>) {
+    override fun <T1 : Any?, T2 : Any?> putPair(field: MultiPlatformPreferences, pair: Pair<T1, T2>) {
         putValue(field.fname + PAIR_FIRST, pair.first)
         putValue(field.fname + PAIR_SECOND, pair.second)
     }
 
-    override fun <T1 : Any?, T2 : Any?> getPair(field: MultiPlatformPrefences, def: Pair<T1, T2>): Pair<T1, T2> =
+    override fun <T1 : Any?, T2 : Any?> getPair(field: MultiPlatformPreferences, def: Pair<T1, T2>): Pair<T1, T2> =
         getVal(field.fname + PAIR_FIRST, def.first) to
                 getVal(field.fname + PAIR_SECOND, def.second)
 
-    override fun <T1 : Any?, T2 : Any?> getPairNonNull(field: MultiPlatformPrefences, def: Pair<T1, T2>): Pair<T1, T2>? =
+    override fun <T1 : Any?, T2 : Any?> getPairNonNull(
+        field: MultiPlatformPreferences,
+        def: Pair<T1, T2>
+    ): Pair<T1, T2>? =
         if (has(field))
             getPair(field, def)
                 .takeIf { it.first != null && it.second != null }

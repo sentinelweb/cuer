@@ -17,7 +17,7 @@ import uk.co.sentinelweb.cuer.app.databinding.WindowAytFloatBinding
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.FLOATING_PLAYER_RECT
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.FLOATING_PLAYER_RECT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
