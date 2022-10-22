@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.CategoryDomain.Companion.EMPTY_CATEGORY
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class BrowseContract {
 
@@ -39,7 +40,8 @@ class BrowseContract {
             val categoryLookup: Map<Long, CategoryDomain> = mapOf(),
             val parentLookup: Map<CategoryDomain, CategoryDomain> = mapOf(),
             val recent: List<CategoryDomain> = listOf(),
-            val order: Order = Order.CATEGORIES
+            val order: Order = Order.CATEGORIES,
+            val existingPlaylists: List<PlaylistDomain> = listOf(),
         )
     }
 
@@ -52,7 +54,7 @@ class BrowseContract {
             val categories: List<CategoryModel>,
             val recent: CategoryModel?,
             val isRoot: Boolean,
-            val order: Order,
+            val order: Order
         )
 
         data class CategoryModel(
@@ -64,6 +66,7 @@ class BrowseContract {
             val subCount: Int,
             val isPlaylist: Boolean,
             val forceItem: Boolean,
+            val existingPlaylist: PlaylistDomain?
         )
 
         sealed class Event {

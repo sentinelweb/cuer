@@ -73,10 +73,10 @@ object BrowseComposables {
                     ) {
                         if (model.isRoot) {
                             if (model.recent != null) {
-                                Category(model.recent!!, view, 1)
+                                CategoryWithTitle(model.recent!!, view, 1)
                             }
                             model.categories.forEach {
-                                Category(it, view, 3)
+                                CategoryWithTitle(it, view, 3)
                             }
                         } else {
                             CategoryGrid(8, model.categories, view)
@@ -88,7 +88,7 @@ object BrowseComposables {
     }
 
     @Composable
-    private fun Category(model: CategoryModel, view: BaseMviView<Model, Event>, rows: Int) {
+    private fun CategoryWithTitle(model: CategoryModel, view: BaseMviView<Model, Event>, rows: Int) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = model.title,
@@ -136,7 +136,7 @@ object BrowseComposables {
 
     @Composable
     fun CatChip(
-        subCategory: CategoryModel,
+        category: CategoryModel,
         view: BaseMviView<Model, Event>,
     ) {
         Surface(
@@ -147,10 +147,10 @@ object BrowseComposables {
 
             Row(
                 modifier = Modifier
-                    .clickable(onClick = { view.dispatch(OnCategoryClicked(subCategory)) })
+                    .clickable(onClick = { view.dispatch(OnCategoryClicked(category)) })
             ) {
                 Box {
-                    subCategory.thumbNailUrl?.let {
+                    category.thumbNailUrl?.let {
                         NetworkImage(
                             url = it,
                             contentDescription = null,
@@ -169,7 +169,7 @@ object BrowseComposables {
                 }
                 Column {
                     Text(
-                        text = subCategory.title,
+                        text = category.title,
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier.padding(
                             start = 16.dp,
@@ -180,7 +180,7 @@ object BrowseComposables {
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                            if (subCategory.subCount > 0) {
+                            if (category.subCount > 0) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_tree_24),
                                     contentDescription = null,
@@ -189,11 +189,11 @@ object BrowseComposables {
                                         .size(16.dp)
                                 )
                                 Text(
-                                    text = subCategory.subCount.toString(),
+                                    text = category.subCount.toString(),
                                     style = MaterialTheme.typography.caption,
                                     modifier = Modifier.padding(start = 8.dp)
                                 )
-                            } else if (subCategory.isPlaylist) {
+                            } else if (category.isPlaylist) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_playlist_black),
                                     contentDescription = null,
@@ -201,6 +201,13 @@ object BrowseComposables {
                                         .padding(start = 16.dp)
                                         .size(16.dp)
                                 )
+                                if (category.existingPlaylist != null) {
+                                    Text(
+                                        text = category.existingPlaylist!!.currentIndex.toString(),
+                                        style = MaterialTheme.typography.caption,
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    )
+                                }
                             }
                         }
                     }
