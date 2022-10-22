@@ -118,6 +118,7 @@ class AytPortraitActivity : AppCompatActivity(),
             && aytViewHolder.isPlaying
             && floatingService.hasPermission(this@AytPortraitActivity)
             && currentItem != null
+            && !castListener.castStarting
         ) {
             log.d("launch pip")
             aytViewHolder.switchView()

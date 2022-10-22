@@ -280,8 +280,8 @@ class YouTubePlayerListener(
         item?.apply {
             val startPos = media.startPosition()
             livePlaybackController.clear(media.platformId)
-            log.d("loadVideo: play position: pos =  $startPos sec")
-            youTubePlayer?.loadVideo(media.platformId, startPos.toFloat())
+            log.d("loadVideo: play position: pos =  $startPos ms")
+            youTubePlayer?.loadVideo(media.platformId, (startPos / 1000).toFloat())
             state.currentMedia = media
             playerUi?.setPlaylistItem(queue.currentItem, queue.source)
             playerUi?.setPlaylistName(queue.playlist?.title ?: "none")
