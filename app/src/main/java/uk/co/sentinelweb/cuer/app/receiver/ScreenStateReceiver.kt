@@ -1,21 +1,15 @@
 package uk.co.sentinelweb.cuer.app.receiver
 
-import android.app.Application
 import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 
-class ScreenStateReceiver(
-) : KoinComponent, BroadcastReceiver() {
+class ScreenStateReceiver : BroadcastReceiver() {
 
-    private val log: LogWrapper by inject()
-    private val application: Application by inject()
+    private lateinit var context: Context
 
     var isScreenOn = true
         private set
@@ -30,29 +24,24 @@ class ScreenStateReceiver(
     val screenOnCallbacks: MutableList<(() -> Unit)> = mutableListOf()
     val unlockCallbacks: MutableList<(() -> Unit)> = mutableListOf()
 
-    var keyguardManager = application.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-
-    init {
-        log.tag(this)
-    }
+    private val keyguardManager: KeyguardManager
+        get() = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_SCREEN_OFF) {
-            log.d("ACTION_SCREEN_OFF")
             isScreenOn = false
             screenOffCallbacks.map { it() }
         } else if (intent.action == Intent.ACTION_SCREEN_ON) {
-            log.d("ACTION_SCREEN_ON")
             isScreenOn = true
             screenOnCallbacks.map { it() }
         } else if (intent.action == Intent.ACTION_USER_PRESENT) {
-            log.d("ACTION_USER_PRESENT")
             isScreenOn = true
             unlockCallbacks.map { it() }
         }
     }
 
     fun register(context: Context) {
+        this.context = context
         val filter = IntentFilter(Intent.ACTION_SCREEN_ON)
         filter.addAction(Intent.ACTION_SCREEN_OFF)
         filter.addAction(Intent.ACTION_USER_PRESENT)

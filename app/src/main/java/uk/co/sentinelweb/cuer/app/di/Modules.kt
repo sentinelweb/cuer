@@ -5,7 +5,6 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.koin.androidApplication
-import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.BuildConfig
@@ -126,9 +125,7 @@ object Modules {
     }
 
     private val receiverModule = module {
-        single {
-            ScreenStateReceiver().apply { register(androidContext()) }
-        }
+        single { ScreenStateReceiver() }
     }
 
     private val utilModule = module {

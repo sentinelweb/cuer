@@ -61,6 +61,7 @@ class CuerApp : Application() {
         firebaseWrapper.init()
         firebaseWrapper.sendUnsentReports()
         setDefaultExceptionHander()
+        screenStateReceiver.register(this)
     }
 
     override fun onTerminate() {
