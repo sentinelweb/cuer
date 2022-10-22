@@ -74,6 +74,7 @@ interface PlayerContract {
 
     interface View : MviView<View.Model, View.Event> {
         suspend fun processLabel(label: Label)
+
         data class Model(
             val texts: Texts,
             val playState: PlayerStateDomain,

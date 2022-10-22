@@ -9,4 +9,11 @@
         app:title="@string/prefs_player_auto_float_title"
     />
 
+    <CheckBoxPreference
+        app:icon="@drawable/ic_lock_24"
+        app:key="@string/prefs_player_restart_after_unlock_key"
+        app:summary="@string/prefs_player_restart_after_unlock_summary"
+        app:title="@string/prefs_player_restart_after_unlock_title"
+    />
+
 </PreferenceScreen>

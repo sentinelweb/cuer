@@ -33,6 +33,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.Play
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
@@ -43,8 +44,6 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.Companion.PLAYER_AUTO_FLOAT_DEFAULT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
@@ -102,7 +101,7 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onStart() {
         super.onStart()
-        // this POS restores the ayt player to the mvi kotlin state after returning from a home press
+        // this POS restores the AYT player to the mvi kotlin state after returning from a home press
         if (this::mviView.isInitialized) {
             coroutines.mainScope.launch {
                 delay(50)
@@ -113,15 +112,16 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onStop() {
         // check to launch the floating player
-        if (multiPrefs.getBoolean(MultiPlatformPrefences.PLAYER_AUTO_FLOAT, PLAYER_AUTO_FLOAT_DEFAULT)
+        if (multiPrefs.playerAutoFloat
             && aytViewHolder.isPlaying
             && floatingService.hasPermission(this@AytPortraitActivity)
             && currentItem != null
         ) {
             log.d("launch pip")
             aytViewHolder.switchView()
-            aytViewHolder.processCommand(PlayerContract.PlayerCommand.Play)
+            aytViewHolder.processCommand(Play)
             floatingService.start(this@AytPortraitActivity, currentItem!!)
+            finish()
         }
         super.onStop()
     }

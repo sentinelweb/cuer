@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabaseModule
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
+import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
@@ -123,6 +124,10 @@ object Modules {
         factory<RibbonCreator> { AndroidRibbonCreator(get()) }
     }
 
+    private val receiverModule = module {
+        single { ScreenStateReceiver() }
+    }
+
     private val utilModule = module {
         factory<LinkScanner> { AndroidLinkScanner(log = get(), mappers = urlMediaMappers) }
         single { CuerAppState() }
@@ -202,6 +207,7 @@ object Modules {
         .plus(wrapperModule)
         .plus(scopedModules)
         .plus(appNetModule)
+        .plus(receiverModule)
         .plus(DatabaseModule.modules)
         .plus(AppDatabaseModule.module)
         .plus(AndroidDatabaseModule.modules)

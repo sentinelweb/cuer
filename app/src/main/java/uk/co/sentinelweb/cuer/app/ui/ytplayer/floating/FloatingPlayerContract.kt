@@ -48,6 +48,9 @@ interface FloatingPlayerContract {
                         windowManagement = get(),
                         aytViewHolder = get(),
                         log = get(),
+                        screenStateReceiver = get(),
+                        toastWrapper = get(),
+                        multiPrefs = get(),
                     )
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { NoItemLoader() }

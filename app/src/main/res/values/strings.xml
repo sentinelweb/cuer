@@ -141,6 +141,10 @@
         floating player
     </string>
     <string name="prefs_player_auto_float_title">Auto float player</string>
+    <string name="prefs_player_restart_after_unlock_summary">When the in-app player is playing and is paused with screen
+        lock - autoplay after unlock
+    </string>
+    <string name="prefs_player_restart_after_unlock_title">Restart after unlock</string>
 
     <!-- playlist edit -->
     <string name="pe_default_display_title">Enter a title …</string>

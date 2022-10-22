@@ -70,6 +70,11 @@ class PlayerControlsNotificationController constructor(
         view.setIcon(icon)
     }
 
+    override fun setTitlePrefix(prefix: String?) {
+        state.titlePrefix = prefix
+        view.showNotification(state)
+    }
+
     override fun setPlayerState(playState: PlayerStateDomain) {
         state.playState = playState
         skipControl.stateChange(playState)
@@ -90,16 +95,16 @@ class PlayerControlsNotificationController constructor(
         listener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
         state.media?.apply {
             state.bitmap
-                ?.let { view.showNotification(state.playState, state.media, it) }
+                ?.let { view.showNotification(state) }
                 ?: state.media?.image?.let { image ->
                     Glide.with(context).asBitmap()
                         .load(image.url)
                         .into(BitmapLoadTarget())
                 }
-                ?: view.showNotification(state.playState, state.media, null)
+                ?: view.showNotification(state)
         } ?: run {
             state.bitmap = null
-            view.showNotification(state.playState, null, null)
+            view.showNotification(state)
         }
     }
 
@@ -119,7 +124,7 @@ class PlayerControlsNotificationController constructor(
             } else {
                 bitmap
             }
-            view.showNotification(state.playState, state.media, bitmap)
+            view.showNotification(state)
         }
 
         override fun onLoadCleared(placeholder: Drawable?) {}

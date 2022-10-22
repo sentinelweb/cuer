@@ -16,5 +16,6 @@
     <string name="prefs_backup_backup_key">backup</string>
     <string name="prefs_backup_restore_key">restore</string>
     <string name="prefs_player_auto_float_key">auto_float_player</string>
+    <string name="prefs_player_restart_after_unlock_key">restart_after_unlock</string>
 
 </resources>
