@@ -32,6 +32,7 @@ class FloatingWindowManagement(
 
     interface Callbacks {
         fun onClose()
+        fun onLaunch()
     }
 
     private var _binding: WindowAytFloatBinding? = null
@@ -74,6 +75,9 @@ class FloatingWindowManagement(
         addResizeTouchListener()
         binding?.floatingPlayerClose?.setOnClickListener {
             callbacks.onClose()
+        }
+        binding?.floatingPlayerLaunch?.setOnClickListener {
+            callbacks.onLaunch()
         }
 
         binding?.floatingPlayerBlockTitle?.setOnClickListener {}

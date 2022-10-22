@@ -28,7 +28,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
@@ -194,14 +193,7 @@ class ShareActivity : AppCompatActivity(),
     }
 
     override fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean) {
-        startActivity( // todo map in NavigationMapper
-            Intent(this, MainActivity::class.java).apply {
-                putExtra(Target.KEY, PLAYLIST.name)
-                putExtra(PLAYLIST_ID.name, plId)
-                plItemId?.also { putExtra(PLAYLIST_ITEM_ID.name, it) }
-                putExtra(PLAY_NOW.name, play)
-                putExtra(SOURCE.name, source.toString())
-            })
+        MainActivity.start(this, plId, plItemId, source, play)
     }
 
     override fun setData(model: ShareContract.Model) {

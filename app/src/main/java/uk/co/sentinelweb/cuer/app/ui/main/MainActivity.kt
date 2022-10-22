@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
@@ -305,5 +306,21 @@ class MainActivity :
         val TOP_LEVEL_DESTINATIONS =
             setOf(R.id.navigation_browse, R.id.navigation_playlists, R.id.navigation_playlist)
         private const val SERVICES_REQUEST_CODE = 1
+
+        fun start(c: Context, plId: Long, plItemId: Long?, source: Source, play: Boolean) {
+            c.startActivity( // todo map in NavigationMapper
+                Intent(c, MainActivity::class.java).apply {
+                    putExtra(Target.KEY, Target.PLAYLIST.name)
+                    putExtra(PLAYLIST_ID.name, plId)
+                    plItemId?.also { putExtra(PLAYLIST_ITEM_ID.name, it) }
+                    putExtra(PLAY_NOW.name, play)
+                    putExtra(SOURCE.name, source.toString())
+                })
+        }
+
+        fun startFromService(c: Context) {
+            c.startActivity(Intent(c, MainActivity::class.java)
+                .apply { setFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+        }
     }
 }

@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait
 
+import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -93,6 +94,7 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager).requestDismissKeyguard(this, null)
         binding = ActivityAytPortraitBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
@@ -116,6 +118,7 @@ class AytPortraitActivity : AppCompatActivity(),
             && aytViewHolder.isPlaying
             && floatingService.hasPermission(this@AytPortraitActivity)
             && currentItem != null
+            && !castListener.castStarting
         ) {
             log.d("launch pip")
             aytViewHolder.switchView()
@@ -327,6 +330,12 @@ class AytPortraitActivity : AppCompatActivity(),
         fun start(c: Context, playlistItem: PlaylistItemDomain) = c.startActivity(
             Intent(c, AytPortraitActivity::class.java).apply {
                 putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
+            })
+
+        fun startFromService(c: Context, playlistItem: PlaylistItemDomain) = c.startActivity(
+            Intent(c, AytPortraitActivity::class.java).apply {
+                putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
+                setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             })
     }
 

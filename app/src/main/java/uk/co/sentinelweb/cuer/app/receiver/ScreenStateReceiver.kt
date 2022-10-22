@@ -52,4 +52,17 @@ class ScreenStateReceiver : BroadcastReceiver() {
         context.unregisterReceiver(this)
     }
 
+    fun requestUnlockKeyGuard() {
+        // https://stackoverflow.com/questions/3873659/android-how-can-i-get-the-current-foreground-activity-from-a-service
+//        val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+//        val cuerActivityComponentName = am.appTasks
+//            .first { it.taskInfo.topActivity?.packageName == this.context.packageName }
+//            ?.taskInfo?.topActivity
+        // want to have the currnet activity instance here might need to use the
+        //     registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+        // from the above link to keep a reference
+        // then
+        // keyguardManager.requestDismissKeyguard(activity)
+    }
+
 }

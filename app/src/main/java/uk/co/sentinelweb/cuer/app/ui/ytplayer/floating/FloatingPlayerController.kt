@@ -52,14 +52,14 @@ class FloatingPlayerController constructor(
 
     private val lockHandler = {
         log.d("Screen off -> ACTION_PAUSE")
-        playerMviViw.setTitlePrefix("[locked]")
+        playerMviViw.setBlocked(true)
         handleAction(Intent(ACTION_PAUSE))
         wasPausedScreenLocked = true
     }
 
     private val unlockHandler = {
         log.d("Unlock -> ACTION_PLAY")
-        playerMviViw.setTitlePrefix(null)
+        playerMviViw.setBlocked(false)
         if (wasPausedScreenLocked && multiPrefs.restartAfterUnlock) {
             handleAction(Intent(ACTION_PLAY))
         }
@@ -70,6 +70,10 @@ class FloatingPlayerController constructor(
         windowManagement.makeWindowWithView()
         windowManagement.callbacks = object : FloatingWindowManagement.Callbacks {
             override fun onClose() = service.stopSelf()
+            override fun onLaunch() {
+                playerMviViw.launchActivity()
+                service.stopSelf()
+            }
         }
         if (!BuildConfig.backgroundPlay) {
             screenStateReceiver.screenOffCallbacks.add(lockHandler)
@@ -143,6 +147,7 @@ class FloatingPlayerController constructor(
                 if (allowPlayInBackground()) {
                     playerMviViw.dispatch(TrackFwdClicked)
                 } else {
+                    screenStateReceiver.requestUnlockKeyGuard()
                     toastWrapper.show("Unlock to play")
                 }
 

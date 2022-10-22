@@ -70,8 +70,8 @@ class PlayerControlsNotificationController constructor(
         view.setIcon(icon)
     }
 
-    override fun setTitlePrefix(prefix: String?) {
-        state.titlePrefix = prefix
+    override fun setBlocked(blocked: Boolean) {
+        state.blocked = blocked
         view.showNotification(state)
     }
 

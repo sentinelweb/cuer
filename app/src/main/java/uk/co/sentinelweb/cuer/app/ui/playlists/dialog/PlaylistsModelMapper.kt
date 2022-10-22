@@ -29,7 +29,6 @@ class PlaylistsModelMapper constructor(
         playlistStats: Map<Long?, PlaylistStatDomain?>,
         showRoot: Boolean,
     ): PlaylistsContract.Model {
-
         val items = mutableListOf<Model>()
         if (showRoot) {
             items.add(itemModel(ROOT_PLAYLIST_DUMMY, null, pinnedId, 0))
