@@ -28,7 +28,6 @@ interface FloatingPlayerContract {
         fun initialise()
         fun destroy()
         fun handleAction(intent: Intent)
-        fun setTitlePrefix(prefix: String?)
     }
 
     interface External {
@@ -51,6 +50,7 @@ interface FloatingPlayerContract {
                         log = get(),
                         screenStateReceiver = get(),
                         toastWrapper = get(),
+                        multiPrefs = get(),
                     )
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { NoItemLoader() }

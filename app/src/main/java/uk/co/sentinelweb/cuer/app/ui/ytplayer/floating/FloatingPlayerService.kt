@@ -8,11 +8,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.CuerAppState
-import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PAUSE
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PLAY
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -25,29 +21,9 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
     private val notificationWrapper: NotificationWrapper by inject()
     private val appState: CuerAppState by inject()
     private val log: LogWrapper by inject()
-    private val screenStateReceiver: ScreenStateReceiver by inject()
-    private val multiPrefs: MultiPlatformPreferencesWrapper by inject()
 
     override val external: FloatingPlayerContract.External
         get() = controller.external
-
-    private var wasPausedScreenLocked: Boolean = false
-
-    private val lockHandler = {
-        log.d("Screen off -> ACTION_PAUSE")
-        controller.setTitlePrefix("[locked]")
-        controller.handleAction(Intent(ACTION_PAUSE))
-        wasPausedScreenLocked = true
-    }
-
-    private val unlockHandler = {
-        log.d("Unlock -> ACTION_PLAY")
-        controller.setTitlePrefix(null)
-        if (wasPausedScreenLocked && multiPrefs.restartAfterUnlock) {
-            controller.handleAction(Intent(ACTION_PLAY))
-        }
-        wasPausedScreenLocked = false
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -56,8 +32,6 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         log.d("Service created")
         appState.castNotificationChannelId = notificationWrapper.createChannelId(CHANNEL_ID, CHANNEL_NAME)
         controller.initialise()
-        screenStateReceiver.screenOffCallbacks.add(lockHandler)
-        screenStateReceiver.unlockCallbacks.add(unlockHandler)
     }
 
     override fun onDestroy() {
@@ -65,8 +39,6 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         log.d("Service destroyed")
         controller.destroy()
         scope.close()
-        screenStateReceiver.screenOffCallbacks.remove(lockHandler)
-        screenStateReceiver.unlockCallbacks.remove(unlockHandler)
         _instance = null
     }
 
