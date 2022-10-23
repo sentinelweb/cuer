@@ -83,6 +83,7 @@ data class NavigationModel constructor(
         MEDIA(MediaDomain::class),
         APP_LIST(List::class),
         ALLOW_PLAY(Boolean::class),
+        AUTO_BACKUP(Boolean::class),
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)

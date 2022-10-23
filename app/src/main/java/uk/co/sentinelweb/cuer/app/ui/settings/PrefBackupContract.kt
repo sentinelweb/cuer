@@ -13,10 +13,14 @@ import java.time.Instant
 interface PrefBackupContract {
 
     interface Presenter {
-        fun backupDatabaseToJson()
+        fun manualBackupDatabaseToJson()
         fun saveWriteData(uri: String)
         fun restoreFile(uriString: String)
         fun openRestoreFile()
+        fun autoBackupDatabaseToJson()
+        fun gotAutoBackupLocation(uri: String)
+        fun clearAutoBackup()
+        fun buildAutoSummary()
     }
 
     interface View {
@@ -24,6 +28,9 @@ interface PrefBackupContract {
         fun showProgress(b: Boolean)
         fun showMessage(msg: String)
         fun openRestoreFile()
+        fun promptForAutoBackupLocation(fileName: String)
+        fun goBack()
+        fun setAutoSummary(summary: String)
     }
 
     data class State constructor(
@@ -45,7 +52,8 @@ interface PrefBackupContract {
                         timeProvider = get(),
                         fileWrapper = get(),
                         log = get(),
-                        contentUriUtil = get()
+                        contentUriUtil = get(),
+                        backupCheck = get()
                     )
                 }
                 scoped<SnackbarWrapper> {

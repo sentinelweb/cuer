@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
+import uk.co.sentinelweb.cuer.app.backup.BackupCheck
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -13,6 +14,7 @@ class MainPresenter(
     private val floatingPlayerServiceManager: FloatingPlayerServiceManager,
     private val castListener: FloatingPlayerCastListener,
     private val log: LogWrapper,
+    private val backupCheck: BackupCheck,
 ) : MainContract.Presenter {
     // todo add connection listener and close floating player if connectioned
     init {
@@ -57,6 +59,10 @@ class MainPresenter(
         ytContextHolder.playerUi = view.playerControls
         if (!ytContextHolder.isConnected()) {
             floatingPlayerServiceManager.get()?.external?.mainPlayerControls = view.playerControls
+        }
+
+        if (backupCheck.checkToBackup()) {
+            view.promptToBackup()
         }
     }
 

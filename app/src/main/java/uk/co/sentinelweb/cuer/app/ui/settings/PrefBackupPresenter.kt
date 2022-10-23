@@ -1,11 +1,15 @@
 package uk.co.sentinelweb.cuer.app.ui.settings
 
+import android.os.Build
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.toJavaInstant
+import uk.co.sentinelweb.cuer.app.BuildConfig
+import uk.co.sentinelweb.cuer.app.backup.BackupCheck
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
+import uk.co.sentinelweb.cuer.app.backup.BackupFileManager.Companion.BACKUP_VERSION
 import uk.co.sentinelweb.cuer.app.util.wrapper.ContentUriUtil
 import uk.co.sentinelweb.cuer.app.util.wrapper.FileWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -22,9 +26,10 @@ class PrefBackupPresenter constructor(
     private val fileWrapper: FileWrapper,
     private val log: LogWrapper,
     private val contentUriUtil: ContentUriUtil,
+    private val backupCheck: BackupCheck,
 ) : PrefBackupContract.Presenter {
 
-    override fun backupDatabaseToJson() {
+    override fun manualBackupDatabaseToJson() {
         state.viewModelScope.launch {
             view.showProgress(true)
             backupManager
@@ -35,6 +40,29 @@ class PrefBackupPresenter constructor(
                     view.showProgress(false)
                 }
             state.lastBackedUp = timeProvider.instant().toJavaInstant()
+        }
+    }
+
+    override fun autoBackupDatabaseToJson() {
+        state.viewModelScope.launch {
+            view.showProgress(true)
+            backupManager
+                .makeBackupZipFile()
+                .also {
+                    state.zipFile = it
+                    if (backupCheck.hasAutoBackupLocation()) {
+                        saveAutoBackup(backupCheck.getAutoBackupLocation()!!)
+                        view.goBack()
+                    } else {
+                        val fileName = backupCheck.makeCurrentBackupFileName(
+                            Build.MODEL,
+                            BACKUP_VERSION.toString(),
+                            BuildConfig.DEBUG
+                        )
+                        view.promptForAutoBackupLocation(fileName)
+                    }
+                    view.showProgress(false)
+                }
         }
     }
 
@@ -88,5 +116,35 @@ class PrefBackupPresenter constructor(
             ?.apply { fileWrapper.copyFileToUri(this, uri) }
             ?.apply { state.zipFile?.delete() }
             ?: toastWrapper.show("No Data!!!")
+    }
+
+    override fun gotAutoBackupLocation(uri: String) {
+        backupCheck.saveAutoBackupLocation(uri)
+        saveAutoBackup(uri)
+    }
+
+    private fun saveAutoBackup(uri: String) {
+        (state.zipFile
+            ?.apply { fileWrapper.overwriteFileToUri(this, uri) }
+            ?.apply { state.zipFile?.delete() }
+            ?.apply { view.showMessage("Backup succeeded ...") }
+            ?.apply { backupCheck.setLastBackupNow() }
+            ?: toastWrapper.show("No Data!!!"))
+    }
+
+    override fun clearAutoBackup() {
+        backupCheck.clearLastBackupData()
+        buildAutoSummary()
+    }
+
+    override fun buildAutoSummary() {
+        if (backupCheck.hasAutoBackupLocation()) {
+            view.setAutoSummary(
+                backupCheck.getLastBackupTime().toString() + "\n\n" +
+                        fileWrapper.getFileUriDescriptorSummary(backupCheck.getAutoBackupLocation()!!)
+            )
+        } else {
+            view.setAutoSummary("No auto backup")
+        }
     }
 }

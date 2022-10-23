@@ -39,6 +39,7 @@ interface MainContract {
         fun checkPlayServices()
         fun isRecreating(): Boolean
         fun showMessage(msg: String)
+        fun promptToBackup()
     }
 
     interface PlayerViewControl {
@@ -67,7 +68,8 @@ interface MainContract {
                         ytContextHolder = get(),
                         log = get(),
                         floatingPlayerServiceManager = get(),
-                        castListener = get()
+                        castListener = get(),
+                        backupCheck = get()
                     )
                 }
                 scoped {

@@ -132,10 +132,17 @@
     <string name="prefs_root_player_summary">Player settings</string>
     <string name="prefs_root_player_title">Player</string>
 
+
+    <string name="prefs_backup_manual_cat_title">Manual backup</string>
     <string name="pref_backup_backup_summary">Back up data to a ZIP file</string>
     <string name="pref_backup_backup_title">Backup database</string>
     <string name="pref_backup_restore_summary">Restore the DB from a ZIP/JSON file</string>
     <string name="pref_backup_restore_title">Restore database</string>
+
+    <string name="prefs_backup_auto_cat_title">Auto backup</string>
+    <string name="pref_backup_clear_auto_summary">Clear auto backup settings and choose another location</string>
+    <string name="pref_backup_clear_auto_title">Clear settings</string>
+    <string name="pref_backup_summary_auto_title">Auto backup data</string>
 
     <string name="prefs_player_auto_float_summary">When the in-app player is playing and is minimised then launch the
         floating player

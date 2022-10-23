@@ -8,6 +8,7 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -133,12 +134,23 @@ class MainActivity :
                     PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
                         navController.navigate(R.id.navigation_playlist)
                     }
+
                     else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
                         navController.navigate(R.id.navigation_browse)
                     }
                 }
             }
         presenter.initialise()
+    }
+
+    override fun promptToBackup() {
+        snackBarWrapper.make("It's time to backup", actionText = "BACKUP") {
+            navController.navigate(
+                R.id.navigation_settings_backup, bundleOf(
+                    AUTO_BACKUP.name to true
+                )
+            )
+        }.show()
     }
 
     override fun onDestroy() {
@@ -245,6 +257,7 @@ class MainActivity :
                         ).apply {
                             log.d("got nav:$this")
                         }
+
                     else -> null
                 }
             }

@@ -50,7 +50,7 @@ class BackupFileManager constructor(
         val timeStamp = timeStampMapper.mapDateTimeSimple(
             timeProvider.localDateTime().toJavaLocalDateTime()
         )
-        return "v$VERSION-$timeStamp-cuer_backup-$device.zip"
+        return "v$BACKUP_VERSION-$timeStamp-cuer_backup-$device.zip"
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
@@ -213,7 +213,7 @@ class BackupFileManager constructor(
     }
 
     companion object {
-        const val VERSION = 3
+        const val BACKUP_VERSION = 3
         const val CHUNK_SIZE = 400
         const val DB_FILE_JSON = "database.json"
     }
