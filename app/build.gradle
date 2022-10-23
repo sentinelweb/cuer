@@ -77,7 +77,8 @@ android {
                 // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
 //                "-P",
 //                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
-                "-Xopt-in=kotlin.time.ExperimentalTime"
+                "-Xopt-in=kotlin.time.ExperimentalTime",
+                "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi"
         ]
     }
 

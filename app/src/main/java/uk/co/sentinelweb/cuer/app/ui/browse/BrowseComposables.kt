@@ -40,13 +40,11 @@ object BrowseComposables {
 //    }
 
     @Composable
-    @ExperimentalAnimationApi
     fun BrowseUi(view: BrowseMviView) {
         BrowseView(view.observableModel, view)
     }
 
     @Composable
-    @ExperimentalAnimationApi
     fun BrowseView(model: Model, view: BaseMviView<Model, Event>) {
         CuerBrowseTheme {
             Surface {
@@ -95,7 +93,6 @@ object BrowseComposables {
     }
 
     @Composable
-    @ExperimentalAnimationApi
     private fun CategoryWithTitle(
         model: CategoryModel,
         view: BaseMviView<Model, Event>,
@@ -143,7 +140,6 @@ object BrowseComposables {
     }
 
     @Composable
-    @ExperimentalAnimationApi
     private fun CategoryGrid(
         rows: Int,
         list: List<CategoryModel>,
@@ -164,7 +160,6 @@ object BrowseComposables {
     }
 
     @Composable
-    @ExperimentalAnimationApi
     fun CatChip(
         category: CategoryModel,
         seq: Int = 0,
