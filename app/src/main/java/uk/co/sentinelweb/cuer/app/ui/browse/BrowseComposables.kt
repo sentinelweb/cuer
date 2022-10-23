@@ -204,9 +204,25 @@ object BrowseComposables {
                                 )
                                 if (category.existingPlaylist != null) {
                                     Text(
-                                        text = category.existingPlaylist!!.let { "${it.first.currentIndex}/${it.second.itemCount} (${it.second.watchedItemCount})" },
+                                        text = category.existingPlaylist
+                                            ?.let { "${it.first.currentIndex} / ${it.second.itemCount}" }
+                                            ?: "",
                                         style = MaterialTheme.typography.caption,
-                                        modifier = Modifier.padding(start = 8.dp, end = 16.dp)
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_visibility_24),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .padding(end = 4.dp)
+                                            .size(16.dp)
+                                    )
+                                    Text(
+                                        text = category.existingPlaylist
+                                            ?.let { "${it.second.watchedItemCount}" }
+                                            ?: "",
+                                        style = MaterialTheme.typography.caption,
+                                        modifier = Modifier.padding(end = 16.dp)
                                     )
                                 }
                             }
@@ -234,7 +250,7 @@ object BrowseComposables {
             val rowHeights = IntArray(rows) { 0 } // Keep track of the height of each row
 
             // Don't constrain child views further, measure them with given constraints
-            val cols = measurables.size / rows + 1
+            val cols = measurables.size / rows + if (measurables.size % rows > 0) 1 else 0
             val placeables = measurables.mapIndexed { index, measurable ->
                 val placeable = measurable.measure(constraints)
 
