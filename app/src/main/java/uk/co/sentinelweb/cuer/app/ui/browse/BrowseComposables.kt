@@ -225,6 +225,7 @@ object BrowseComposables {
         rows: Int = 3,
         content: @Composable () -> Unit,
     ) {
+
         Layout(
             content = content,
             modifier = modifier
@@ -233,11 +234,12 @@ object BrowseComposables {
             val rowHeights = IntArray(rows) { 0 } // Keep track of the height of each row
 
             // Don't constrain child views further, measure them with given constraints
+            val cols = measurables.size / rows + 1
             val placeables = measurables.mapIndexed { index, measurable ->
                 val placeable = measurable.measure(constraints)
 
                 // Track the width and max height of each row
-                val row = index % rows
+                val row = index / cols
                 rowWidths[row] += placeable.width
                 rowHeights[row] = max(rowHeights[row], placeable.height)
 
@@ -259,7 +261,7 @@ object BrowseComposables {
                 // x co-ord we have placed up to, per row
                 val rowX = IntArray(rows) { 0 }
                 placeables.forEachIndexed { index, placeable ->
-                    val row = index % rows
+                    val row = index / cols
                     placeable.place(
                         x = rowX[row],
                         y = rowY[row]
@@ -269,7 +271,6 @@ object BrowseComposables {
             }
         }
     }
-
 }
 
 class TestStrings : BrowseContract.Strings {
