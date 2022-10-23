@@ -16,3 +16,7 @@ fun CategoryDomain.buildIdLookup(): Map<Long, CategoryDomain> =
 fun CategoryDomain.buildParentLookup(): Map<CategoryDomain, CategoryDomain> =
     this.subCategories.associate { it to this }.toMutableMap()
         .also { map -> this.subCategories.forEach { map.putAll(it.buildParentLookup()) } }
+
+fun CategoryDomain.allPlatformIds(): List<String> =
+    this.subCategories.mapNotNull { it.platformId }.toMutableList()
+        .also { map -> this.subCategories.forEach { map.addAll(it.allPlatformIds()) } }

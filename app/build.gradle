@@ -77,7 +77,8 @@ android {
                 // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
 //                "-P",
 //                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
-                "-Xopt-in=kotlin.time.ExperimentalTime"
+                "-Xopt-in=kotlin.time.ExperimentalTime",
+                "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi"
         ]
     }
 
@@ -145,6 +146,7 @@ dependencies {
     implementation "androidx.preference:preference-ktx:$ver_preference"
 
     // Compose
+    implementation "androidx.compose.animation:animation:$ver_compose"
     implementation "androidx.compose.runtime:runtime:$ver_compose"
     implementation "androidx.compose.ui:ui:$ver_compose"
     implementation "androidx.compose.foundation:foundation:$ver_compose"

@@ -51,7 +51,7 @@ loadAllByIds:
 SELECT * FROM playlist WHERE id IN :playlistIds;
 
 loadAllByPlatformIds:
-SELECT * FROM playlist WHERE platform_id IN :platformIds;
+SELECT * FROM playlist WHERE platform_id IN :platformIds AND playlist.platform == :platform;
 
 loadAllByFlags:
 SELECT * FROM playlist WHERE flags & :flags == :flags;

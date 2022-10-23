@@ -46,7 +46,7 @@ interface OrchestratorContract<Domain> {
     class MediaIdListFilter(val ids: List<Long>) : Filter
     class PlatformIdListFilter(
         val ids: List<String>,
-        @Suppress("UNUSED_PARAMETER") platform: PlatformDomain = PlatformDomain.YOUTUBE
+        val platform: PlatformDomain = PlatformDomain.YOUTUBE
     ) : Filter
 
     class DefaultFilter() : Filter

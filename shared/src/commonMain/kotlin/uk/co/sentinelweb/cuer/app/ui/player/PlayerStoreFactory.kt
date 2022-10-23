@@ -43,13 +43,13 @@ class PlayerStoreFactory(
 
     private sealed class Result {
         object NoVideo : Result()
-        class State(val state: PlayerStateDomain) : Result()
-        class SetVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) : Result()
+        data class State(val state: PlayerStateDomain) : Result()
+        data class SetVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) : Result()
 
-        class Playlist(val playlist: PlaylistDomain) : Result()
-        class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
-        class Screen(val screen: PlayerContract.MviStore.Screen) : Result()
-        class Position(val pos: Long) : Result()
+        data class Playlist(val playlist: PlaylistDomain) : Result()
+        data class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
+        data class Screen(val screen: PlayerContract.MviStore.Screen) : Result()
+        data class Position(val pos: Long) : Result()
     }
 
     private sealed class Action {

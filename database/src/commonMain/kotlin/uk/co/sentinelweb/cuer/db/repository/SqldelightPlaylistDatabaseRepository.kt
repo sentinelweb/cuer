@@ -101,7 +101,7 @@ class SqldelightPlaylistDatabaseRepository(
                         is IdListFilter -> loadAllByIds(filter.ids)
                         is DefaultFilter -> loadAllByFlags(PlaylistDomain.FLAG_DEFAULT)
                         is AllFilter -> loadAll()
-                        is PlatformIdListFilter -> loadAllByPlatformIds(filter.ids)
+                        is PlatformIdListFilter -> loadAllByPlatformIds(filter.ids, filter.platform)
                         is ChannelPlatformIdFilter -> findPlaylistsForChannelPlatformId(filter.platformId)
                         is TitleFilter -> findPlaylistsWithTitle(filter.title)
                         else ->// todo return empty for else
