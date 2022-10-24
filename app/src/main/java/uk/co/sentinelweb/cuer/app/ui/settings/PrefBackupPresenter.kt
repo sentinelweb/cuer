@@ -8,22 +8,24 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.toJavaInstant
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.backup.BackupCheck
-import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager.Companion.BACKUP_VERSION
+import uk.co.sentinelweb.cuer.app.backup.IBackupManager
+import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
+import uk.co.sentinelweb.cuer.app.util.wrapper.ContentProviderFileWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ContentUriUtil
-import uk.co.sentinelweb.cuer.app.util.wrapper.FileWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.ext.getFileName
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import java.io.File
 
 class PrefBackupPresenter constructor(
     private val view: PrefBackupContract.View,
     private val state: PrefBackupContract.State,
     private val toastWrapper: ToastWrapper,
-    private val backupManager: BackupFileManager,
+    private val backupManager: IBackupManager,
     private val timeProvider: TimeProvider,
-    private val fileWrapper: FileWrapper,
+    private val contentProviderFileWrapper: ContentProviderFileWrapper,
     private val log: LogWrapper,
     private val contentUriUtil: ContentUriUtil,
     private val backupCheck: BackupCheck,
@@ -35,8 +37,8 @@ class PrefBackupPresenter constructor(
             backupManager
                 .makeBackupZipFile()
                 .also {
-                    state.zipFile = it
-                    view.promptForSaveLocation(it.name)
+                    state.zipFile = File(it.path)
+                    view.promptForSaveLocation(state.zipFile!!.name)
                     view.showProgress(false)
                 }
             state.lastBackedUp = timeProvider.instant().toJavaInstant()
@@ -50,13 +52,13 @@ class PrefBackupPresenter constructor(
                 val name = contentUriUtil.getFileName(uriString)
                     ?: throw IllegalArgumentException("invalid file chosen: url = $uriString")
                 if (name.endsWith(".json")) {
-                    fileWrapper.readDataFromUri(uriString)
+                    contentProviderFileWrapper.readDataFromUri(uriString)
                         ?.let { backupManager.restoreData(it) }
                         ?.let { success -> showResult(success) }
                 } else if (name.endsWith(".zip")) {
-                    fileWrapper.copyFileFromUri(uriString)
+                    contentProviderFileWrapper.copyFileFromUri(uriString)
                         .takeIf { it.exists() }
-                        ?.let { it to backupManager.restoreDataZip(it) }
+                        ?.let { it to backupManager.restoreDataZip(AFile(it.absolutePath)) }
                         ?.let { (file, success) -> file.delete(); success }
                         ?.let { success -> showResult(success) }
                 } else {
@@ -78,7 +80,7 @@ class PrefBackupPresenter constructor(
 
     override fun saveWriteData(uri: String) {
         state.zipFile
-            ?.apply { fileWrapper.copyFileToUri(this, uri) }
+            ?.apply { contentProviderFileWrapper.copyFileToUri(this, uri) }
             ?.apply { state.zipFile?.delete() }
             ?: toastWrapper.show("No Data !!!")
     }
@@ -91,7 +93,7 @@ class PrefBackupPresenter constructor(
             backupManager
                 .makeBackupZipFile()
                 .also {
-                    state.zipFile = it
+                    state.zipFile = File(it.path)
                     if (backupCheck.hasAutoBackupLocation()) {
                         saveAutoBackup()
                             .takeIf { success -> success }
@@ -121,9 +123,9 @@ class PrefBackupPresenter constructor(
             view.showProgress(true)
             state.viewModelScope.launch {
                 try {
-                    fileWrapper.copyFileFromUri(backupCheck.getAutoBackupLocation()!!)
+                    contentProviderFileWrapper.copyFileFromUri(backupCheck.getAutoBackupLocation()!!)
                         .takeIf { it.exists() }
-                        ?.let { it to backupManager.restoreDataZip(it) }
+                        ?.let { it to backupManager.restoreDataZip(AFile(it.absolutePath)) }
                         ?.let { (file, success) -> file.delete(); success }
                         ?.let { success -> showResult(success) }
 //                        ?.apply { view.goBack() }
@@ -146,7 +148,7 @@ class PrefBackupPresenter constructor(
 
     private fun saveAutoBackup(): Boolean = try {
         state.zipFile
-            ?.apply { fileWrapper.overwriteFileToUri(this, backupCheck.getAutoBackupLocation()!!) }
+            ?.apply { contentProviderFileWrapper.overwriteFileToUri(this, backupCheck.getAutoBackupLocation()!!) }
             ?.apply { state.zipFile?.delete() }
             ?.apply { view.showMessage("Backup succeeded ...") }
             ?.apply { backupCheck.setLastBackupNow() }
@@ -167,7 +169,7 @@ class PrefBackupPresenter constructor(
     override fun updateSummaryForAutoBackup() {
         if (backupCheck.hasAutoBackupLocation()) {
             val (valid, summary) =
-                fileWrapper.getFileUriDescriptorSummary(backupCheck.getAutoBackupLocation()!!)
+                contentProviderFileWrapper.getFileUriDescriptorSummary(backupCheck.getAutoBackupLocation()!!)
             view.setAutoSummary(
                 backupCheck.getLastBackupTimeFormatted() + "\n\n" + summary
             )

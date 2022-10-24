@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.init
 
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
+import uk.co.sentinelweb.cuer.app.backup.IBackupManager
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class JsonDatabaseInitializer constructor(
     private val res: ResourceWrapper,
-    private val backup: BackupFileManager,
+    private val backup: IBackupManager,
     private val preferences: GeneralPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,

@@ -33,7 +33,6 @@
     <!--    custom colors-->
     <color name="fab_disabled">@color/grey_400</color>
     <color name="divider">@color/grey_400</color>
-    <color name="error_snackbar">@color/deep_orange_700</color>
     <color name="dark_red">#961717</color>
     <color name="dark_indigo">#1e245f</color>
     <color name="black_transparent_background">#8a000000</color>
@@ -47,5 +46,9 @@
     <color name="build_primary_variant">@color/secondary_variant</color>
     <color name="build_secondary">@color/primary</color>
     <color name="build_secondary_variant">@color/primary_variant</color>
+
+    <!--    snackbar colors-->
+    <color name="error_snackbar">@color/red_800</color>
+    <color name="snackbar_info_background">@color/red_100</color>
 
 </resources>

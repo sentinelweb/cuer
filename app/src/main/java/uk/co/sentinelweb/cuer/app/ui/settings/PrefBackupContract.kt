@@ -58,7 +58,7 @@ interface PrefBackupContract {
                         toastWrapper = get(),
                         backupManager = get(),
                         timeProvider = get(),
-                        fileWrapper = get(),
+                        contentProviderFileWrapper = get(),
                         log = get(),
                         contentUriUtil = get(),
                         backupCheck = get()

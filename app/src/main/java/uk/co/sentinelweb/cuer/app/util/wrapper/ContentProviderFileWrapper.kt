@@ -5,7 +5,7 @@ import android.net.Uri
 import java.io.*
 import java.lang.Integer.max
 
-class FileWrapper constructor(
+class ContentProviderFileWrapper constructor(
     private val app: Application
 ) {
 
