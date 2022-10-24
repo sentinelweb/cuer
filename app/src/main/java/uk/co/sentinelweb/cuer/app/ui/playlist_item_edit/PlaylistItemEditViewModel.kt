@@ -17,6 +17,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
@@ -74,6 +76,10 @@ class PlaylistItemEditViewModel constructor(
 
     private val isNew: Boolean
         get() = state.editingPlaylistItem?.id == null
+
+    fun setInShare(isInShare: Boolean) {
+        state.isInShare = isInShare
+    }
 
     fun setData(
         item: PlaylistItemDomain,
@@ -172,6 +178,14 @@ class PlaylistItemEditViewModel constructor(
 
     fun refreshMediaBackground() = viewModelScope.launch {
         refreshMedia()
+    }
+
+    override fun onPlaylistChipClick(chipModel: ChipModel) {
+        if (!state.isInShare) {
+            val plId = chipModel.value?.toLong()
+            _navigateLiveData.value = NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to plId, SOURCE to LOCAL))
+            _navigateLiveData.value = NavigationModel(NAV_NONE)
+        }
     }
 
     private suspend fun refreshMedia() =

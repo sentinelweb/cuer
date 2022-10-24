@@ -54,7 +54,9 @@ interface PlaylistItemEditContract {
         var allowPlay: Boolean = false,
         val deletedPlayLists: MutableSet<PlaylistDomain> = mutableSetOf(),
         var isOnSharePlaylist: Boolean = false,
+        var isInShare: Boolean = false
     ) {
+
         lateinit var source: OrchestratorContract.Source
 
         @Serializable

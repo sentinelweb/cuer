@@ -104,6 +104,7 @@ class DescriptionView @JvmOverloads constructor(
 
                     ChipModel.Type.PLAYLIST -> {
                         setOnCloseIconClickListener { interactions.onRemovePlaylist(chipModel) }
+                        setOnClickListener { interactions.onPlaylistChipClick(chipModel) }
                     }
                 }
             }

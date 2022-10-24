@@ -40,6 +40,7 @@ class NavigationRouter constructor(
 
     fun navigate(nav: NavigationModel) {
         when (nav.target) {
+            NAV_NONE -> Unit
             LOCAL_PLAYER_FULL ->
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
                     //YoutubeFullScreenActivity.start(activity, it)
@@ -88,7 +89,7 @@ class NavigationRouter constructor(
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
                     PLAYLIST_ITEM_ID.name to nav.params[PLAYLIST_ITEM_ID],
-                    PLAY_NOW.name to nav.params[PLAY_NOW],
+                    PLAY_NOW.name to (nav.params[PLAY_NOW] ?: false),
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
                 nav.navOpts,

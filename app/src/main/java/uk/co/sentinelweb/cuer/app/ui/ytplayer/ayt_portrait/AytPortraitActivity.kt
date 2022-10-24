@@ -189,6 +189,8 @@ class AytPortraitActivity : AppCompatActivity(),
                 )
             }
 
+            override fun onPlaylistChipClick(chipModel: ChipModel) = Unit
+
         }
         val playlistItem = itemLoader.load()
             ?: queueConsumer.currentItem

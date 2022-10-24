@@ -49,6 +49,7 @@ class ChipCreator(
                         .transform(CropTransformation(it.url))
                         .into(ChipLoadTarget(this))
                 }
+
             }
         }
     }

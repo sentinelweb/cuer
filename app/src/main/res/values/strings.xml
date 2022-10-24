@@ -253,5 +253,6 @@
     <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
     <string name="playlist_empty">No Items</string>
+    <string name="action_unpin">UNPIN</string>
 
 </resources>

@@ -28,6 +28,7 @@ interface DescriptionContract {
         fun onSelectPlaylistChipClick(model: ChipModel)
         fun onRemovePlaylist(chipModel: ChipModel)
         fun onRibbonItemClick(ribbonItem: RibbonModel)
+        fun onPlaylistChipClick(chipModel: ChipModel)
     }
 
     companion object {

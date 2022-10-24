@@ -38,6 +38,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -98,6 +99,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     private val isOnSharePlaylist: Boolean by lazy {
         itemArg?.playlistId == SHARED_PLAYLIST
+    }
+
+    private val isInShare: Boolean by lazy {
+        (activity as? ShareActivity) != null
     }
 
     init {
@@ -205,6 +210,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback(this, saveCallback)
         linkScopeToActivity()
+        viewModel.setInShare(isInShare)
     }
 
     override fun onStart() {
@@ -235,7 +241,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         UNPIN -> snackbarWrapper
             .make(
                 getString(R.string.pie_unpin_playlist),
-                actionText = "UNPIN",
+                actionText = getString(R.string.action_unpin),
                 action = { viewModel.onUnPin() })
             .show()
         JUMPTO -> {
