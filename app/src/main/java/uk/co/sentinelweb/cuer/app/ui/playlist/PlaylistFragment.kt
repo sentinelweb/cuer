@@ -55,7 +55,6 @@ import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -85,7 +84,7 @@ class PlaylistFragment :
     private val alertDialogCreator: AlertDialogCreator by inject()
     private val imageProvider: ImageProvider by inject()
     private val castDialogWrapper: CastDialogWrapper by inject()
-    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+//    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val doneNavigation: DoneNavigation by inject()// from activity (see onAttach)
@@ -200,12 +199,12 @@ class PlaylistFragment :
                     //modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == menuState.lastPlayModeIndex }
                     updatePlayModeMenuItems()
                     playMenuItem.isVisible = menuState.isPlayable
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+//                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (menuState.isShow) {
                     menuState.isShow = false
                     updatePlayModeMenuItems()
                     playMenuItem.isVisible = false
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+//                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
             }
         })
@@ -303,7 +302,7 @@ class PlaylistFragment :
 
     override fun onResume() {
         super.onResume()
-        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+//        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         // todo clean up after im sure it works for all cases
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
         (navigationProvider.checkForPendingNavigation(PLAYLIST)

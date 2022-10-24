@@ -42,7 +42,6 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -63,7 +62,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val alertDialogCreator: AlertDialogCreator by inject()
     private val doneNavigation: DoneNavigation by inject()// from activity (see onAttach)
     private val snackbarWrapper: SnackbarWrapper by inject()
-    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+//    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val commitHost: CommitHost by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val playerControls: PlayerContract.PlayerControls by inject()
@@ -164,11 +163,11 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                     isShow = true
                     // only show the menu items for the non-empty state
                     playMenuItem.isVisible = !menuState.modelEmpty
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+//                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
                     playMenuItem.isVisible = false
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+//                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
                 menuState.scrolledDown = isShow
             }
@@ -214,7 +213,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     override fun onResume() {
         super.onResume()
-        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+//        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
     }
 
     override fun onStop() {

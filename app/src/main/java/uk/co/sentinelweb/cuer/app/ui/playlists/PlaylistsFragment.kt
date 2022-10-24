@@ -35,7 +35,6 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -53,7 +52,7 @@ class PlaylistsFragment :
     private val itemTouchHelper: ItemTouchHelper by inject()
     private val imageProvider: ImageProvider by inject()
     private val log: LogWrapper by inject()
-    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+//    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
@@ -137,7 +136,7 @@ class PlaylistsFragment :
 
     override fun onResume() {
         super.onResume()
-        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+//        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         presenter.onResume(PLAYLIST_ID.getLong(arguments))
     }
 

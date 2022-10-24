@@ -36,7 +36,6 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -53,7 +52,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     private val playerView: MainContract.PlayerViewControl by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val navRouter: NavigationRouter by inject()
-    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+//    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
@@ -111,7 +110,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
 
     override fun onResume() {
         super.onResume()
-        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+        //edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
     }
 
     override fun onStop() {

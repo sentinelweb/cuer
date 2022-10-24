@@ -43,7 +43,6 @@ import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -57,7 +56,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val log: LogWrapper by inject()
     private val imageProvider: ImageProvider by inject()
     private val softKeyboard: SoftKeyboardWrapper by inject()
-    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+//    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
     private val navRouter: NavigationRouter by inject()
@@ -180,12 +179,12 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                     // only show the menu items for the non-empty state
                     starMenuItem.isVisible = binding.peStarFab.isVisible
                     pinMenuItem.isVisible = binding.pePinFab.isVisible
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+//                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
                     starMenuItem.isVisible = false
                     pinMenuItem.isVisible = false
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+//                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
             }
         })
@@ -225,7 +224,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
     override fun onResume() {
         super.onResume()
-        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+//        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
     }
 
     override fun onStop() {

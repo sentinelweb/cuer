@@ -10,7 +10,6 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -42,7 +41,6 @@ import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_BOTTOM_TAB
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -66,7 +64,7 @@ class MainActivity :
     private val log: LogWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
-    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+//    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val res: ResourceWrapper by inject()
     private val prefs: GeneralPreferencesWrapper by inject()
     private lateinit var navController: NavController
@@ -94,7 +92,7 @@ class MainActivity :
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
+        //edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
@@ -113,11 +111,11 @@ class MainActivity :
             true
         }
 
-        edgeToEdgeWrapper.doOnApplyWindowInsets(binding.bottomNavView) { view, insets, padding ->
-            view.updatePadding(
-                bottom = padding.bottom + insets.systemWindowInsetBottom
-            )
-        }
+//        edgeToEdgeWrapper.doOnApplyWindowInsets(binding.bottomNavView) { view, insets, padding ->
+//            view.updatePadding(
+//                bottom = padding.bottom + insets.systemWindowInsetBottom
+//            )
+//        }
         navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, bundle: Bundle? ->
             log.d("navigation change: dest: $navDestination bundle:$bundle")
             //Exception().printStackTrace()
@@ -219,7 +217,7 @@ class MainActivity :
 
     override fun onStart() {
         super.onStart()
-        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
+//        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         presenter.onStart()
         //checkIntent(intent)
         checkForPendingNavigation(null)?.apply { navRouter.navigate(this) }

@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
@@ -38,7 +37,6 @@ import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
@@ -58,7 +56,7 @@ class ShareActivity : AppCompatActivity(),
     private val shareWrapper: ShareWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
-    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+//    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
 
     private lateinit var navController: NavController
@@ -100,17 +98,17 @@ class ShareActivity : AppCompatActivity(),
         savedInstanceState
             ?.getString(STATE_KEY)
             ?.apply { presenter.restoreState(this) }
-        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
+//        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         _binding = ActivityShareBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        edgeToEdgeWrapper.doOnApplyWindowInsets(binding.shareRoot) { view, insets, padding ->
-            view.updatePadding(
-                bottom = padding.bottom + insets.systemWindowInsetBottom
-            )
-        }
+//        edgeToEdgeWrapper.doOnApplyWindowInsets(binding.shareRoot) { view, insets, padding ->
+//            view.updatePadding(
+//                bottom = padding.bottom + insets.systemWindowInsetBottom
+//            )
+//        }
         navController.addOnDestinationChangedListener { _: NavController, _: NavDestination, _: Bundle? ->
             presenter.onDestinationChange()
         }
