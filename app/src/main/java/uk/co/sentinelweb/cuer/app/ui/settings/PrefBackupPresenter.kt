@@ -28,7 +28,7 @@ class PrefBackupPresenter constructor(
     private val contentUriUtil: ContentUriUtil,
     private val backupCheck: BackupCheck,
 ) : PrefBackupContract.Presenter {
-
+    // region manual-backup
     override fun manualBackupDatabaseToJson() {
         state.viewModelScope.launch {
             view.showProgress(true)
@@ -40,29 +40,6 @@ class PrefBackupPresenter constructor(
                     view.showProgress(false)
                 }
             state.lastBackedUp = timeProvider.instant().toJavaInstant()
-        }
-    }
-
-    override fun autoBackupDatabaseToJson() {
-        state.viewModelScope.launch {
-            view.showProgress(true)
-            backupManager
-                .makeBackupZipFile()
-                .also {
-                    state.zipFile = it
-                    if (backupCheck.hasAutoBackupLocation()) {
-                        saveAutoBackup(backupCheck.getAutoBackupLocation()!!)
-                        view.goBack()
-                    } else {
-                        val fileName = backupCheck.makeCurrentBackupFileName(
-                            Build.MODEL,
-                            BACKUP_VERSION.toString(),
-                            BuildConfig.DEBUG
-                        )
-                        view.promptForAutoBackupLocation(fileName)
-                    }
-                    view.showProgress(false)
-                }
         }
     }
 
@@ -79,7 +56,8 @@ class PrefBackupPresenter constructor(
                 } else if (name.endsWith(".zip")) {
                     fileWrapper.copyFileFromUri(uriString)
                         .takeIf { it.exists() }
-                        ?.let { backupManager.restoreDataZip(it) }
+                        ?.let { it to backupManager.restoreDataZip(it) }
+                        ?.let { (file, success) -> file.delete(); success }
                         ?.let { success -> showResult(success) }
                 } else {
                     log.e("invalid file chosen: url = $uriString")
@@ -97,54 +75,121 @@ class PrefBackupPresenter constructor(
         view.openRestoreFile()
     }
 
+
+    override fun saveWriteData(uri: String) {
+        state.zipFile
+            ?.apply { fileWrapper.copyFileToUri(this, uri) }
+            ?.apply { state.zipFile?.delete() }
+            ?: toastWrapper.show("No Data !!!")
+    }
+    // endregion manual-backup
+
+    // region auto-backup
+    override fun autoBackupDatabaseToJson() {
+        state.viewModelScope.launch {
+            view.showProgress(true)
+            backupManager
+                .makeBackupZipFile()
+                .also {
+                    state.zipFile = it
+                    if (backupCheck.hasAutoBackupLocation()) {
+                        saveAutoBackup()
+                            .takeIf { success -> success }
+                            ?.apply { view.goBack() }
+                    } else {
+                        val fileName = backupCheck.makeCurrentBackupFileName(
+                            Build.MODEL,
+                            BACKUP_VERSION.toString(),
+                            BuildConfig.DEBUG
+                        )
+                        view.promptForCreateAutoBackupLocation(fileName)
+                    }
+                    view.showProgress(false)
+                }
+        }
+    }
+
+    override fun restoreAutoBackupLocation(uri: String) {
+        backupCheck.clearLastBackupData()
+        backupCheck.saveAutoBackupLocation(uri)
+        updateSummaryForAutoBackup()
+        view.askToRestoreAutoBackup()
+    }
+
+    override fun onConfirmRestoreAutoBackup() {
+        if (backupCheck.hasAutoBackupLocation()) {
+            view.showProgress(true)
+            state.viewModelScope.launch {
+                try {
+                    fileWrapper.copyFileFromUri(backupCheck.getAutoBackupLocation()!!)
+                        .takeIf { it.exists() }
+                        ?.let { it to backupManager.restoreDataZip(it) }
+                        ?.let { (file, success) -> file.delete(); success }
+                        ?.let { success -> showResult(success) }
+//                        ?.apply { view.goBack() }
+                } catch (e: Exception) {
+                    log.e("Restore failed: url = ${backupCheck.getAutoBackupLocation()!!}", e)
+                    showResult(false, e.message ?: e::class.java.simpleName)
+                }
+            }
+        }
+    }
+
+    override fun onChooseAutoBackupFile() {
+        view.promptForOpenAutoBackupLocation()
+    }
+
+    override fun gotAutoBackupLocation(uri: String) {
+        backupCheck.saveAutoBackupLocation(uri)
+        saveAutoBackup()
+    }
+
+    private fun saveAutoBackup(): Boolean = try {
+        state.zipFile
+            ?.apply { fileWrapper.overwriteFileToUri(this, backupCheck.getAutoBackupLocation()!!) }
+            ?.apply { state.zipFile?.delete() }
+            ?.apply { view.showMessage("Backup succeeded ...") }
+            ?.apply { backupCheck.setLastBackupNow() }
+            ?.let { true }
+            ?: let { view.showBackupError("Data was null or invalid"); false }
+    } catch (e: java.io.FileNotFoundException) {
+        // seems to happen after restart at least for dropbox
+        log.e("Could not backup data", e)
+        view.showBackupError(e.message)
+        false
+    }
+
+    override fun onClearAutoBackup() {
+        backupCheck.clearLastBackupData()
+        updateSummaryForAutoBackup()
+    }
+
+    override fun updateSummaryForAutoBackup() {
+        if (backupCheck.hasAutoBackupLocation()) {
+            val (valid, summary) =
+                fileWrapper.getFileUriDescriptorSummary(backupCheck.getAutoBackupLocation()!!)
+            view.setAutoSummary(
+                backupCheck.getLastBackupTimeFormatted() + "\n\n" + summary
+            )
+            view.setAutoBackupValid(valid)
+        } else {
+            view.setAutoSummary("No auto backup")
+            view.setAutoBackupValid(false)
+        }
+    }
+    // endregion auto-backup
+
     private fun CoroutineScope.showResult(success: Boolean?, message: String = "") {
         val msg = if (success ?: false) {
             "Restore successful"
         } else {
-            "Restore did NOT succceed : $message"
+            "Restore did NOT succeed : $message"
         }
         if (isActive) {
             view.showMessage(msg)
             view.showProgress(false)
         } else {
             toastWrapper.show(msg)
-        }
-    }
-
-    override fun saveWriteData(uri: String) {
-        state.zipFile
-            ?.apply { fileWrapper.copyFileToUri(this, uri) }
-            ?.apply { state.zipFile?.delete() }
-            ?: toastWrapper.show("No Data!!!")
-    }
-
-    override fun gotAutoBackupLocation(uri: String) {
-        backupCheck.saveAutoBackupLocation(uri)
-        saveAutoBackup(uri)
-    }
-
-    private fun saveAutoBackup(uri: String) {
-        (state.zipFile
-            ?.apply { fileWrapper.overwriteFileToUri(this, uri) }
-            ?.apply { state.zipFile?.delete() }
-            ?.apply { view.showMessage("Backup succeeded ...") }
-            ?.apply { backupCheck.setLastBackupNow() }
-            ?: toastWrapper.show("No Data!!!"))
-    }
-
-    override fun clearAutoBackup() {
-        backupCheck.clearLastBackupData()
-        buildAutoSummary()
-    }
-
-    override fun buildAutoSummary() {
-        if (backupCheck.hasAutoBackupLocation()) {
-            view.setAutoSummary(
-                backupCheck.getLastBackupTime().toString() + "\n\n" +
-                        fileWrapper.getFileUriDescriptorSummary(backupCheck.getAutoBackupLocation()!!)
-            )
-        } else {
-            view.setAutoSummary("No auto backup")
         }
     }
 }

@@ -78,12 +78,11 @@ object SharedAppModule {
         factory { PlatformFileOperation() }
         factory { LinkExtractor() }
         factory { TimecodeExtractor() }
-        factory { BackupCheck(get(), get()) }
+        factory { BackupCheck(get(), get(), get()) }
     }
 
     val modules = listOf(objectModule)
         .plus(orchestratorModule)
         .plus(queueModule)
         .plus(DescriptionContract.viewModule)
-
 }

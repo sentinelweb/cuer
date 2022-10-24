@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -19,8 +20,11 @@ interface PrefBackupContract {
         fun openRestoreFile()
         fun autoBackupDatabaseToJson()
         fun gotAutoBackupLocation(uri: String)
-        fun clearAutoBackup()
-        fun buildAutoSummary()
+        fun onClearAutoBackup()
+        fun updateSummaryForAutoBackup()
+        fun restoreAutoBackupLocation(uri: String)
+        fun onChooseAutoBackupFile()
+        fun onConfirmRestoreAutoBackup()
     }
 
     interface View {
@@ -28,9 +32,13 @@ interface PrefBackupContract {
         fun showProgress(b: Boolean)
         fun showMessage(msg: String)
         fun openRestoreFile()
-        fun promptForAutoBackupLocation(fileName: String)
+        fun promptForCreateAutoBackupLocation(fileName: String)
         fun goBack()
         fun setAutoSummary(summary: String)
+        fun promptForOpenAutoBackupLocation()
+        fun setAutoBackupValid(first: Boolean)
+        fun askToRestoreAutoBackup()
+        fun showBackupError(message: String?)
     }
 
     data class State constructor(
@@ -56,12 +64,8 @@ interface PrefBackupContract {
                         backupCheck = get()
                     )
                 }
-                scoped<SnackbarWrapper> {
-                    AndroidSnackbarWrapper(
-                        this.getFragmentActivity(),
-                        get()
-                    )
-                }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
+                scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 viewModel { State() }
             }
         }

@@ -7,10 +7,21 @@
             app:key="@string/prefs_backup_clear_auto_key"
             app:summary="@string/pref_backup_clear_auto_summary"
             app:title="@string/pref_backup_clear_auto_title"
-            app:icon="@drawable/ic_auto_backup"/>
+            app:icon="@drawable/ic_auto_backup"
+        />
 
-        <Preference app:key="@string/prefs_backup_summary_auto_key"
-                    app:title="@string/pref_backup_summary_auto_title"/>
+        <Preference
+            app:key="@string/prefs_backup_set_auto_key"
+            app:summary="@string/pref_backup_set_auto_summary"
+            app:title="@string/pref_backup_set_auto_title"
+            app:icon="@drawable/ic_set_auto_backup"
+        />
+
+        <Preference
+            app:key="@string/prefs_backup_summary_auto_key"
+            app:title="@string/pref_backup_summary_auto_title"
+            app:icon="@drawable/ic_info"
+        />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/prefs_backup_manual_cat_title">

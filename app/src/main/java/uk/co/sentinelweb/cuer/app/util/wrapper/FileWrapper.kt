@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.util.wrapper
 import android.app.Application
 import android.net.Uri
 import java.io.*
+import java.lang.Integer.max
 
 class FileWrapper constructor(
     private val app: Application
@@ -38,27 +39,31 @@ class FileWrapper constructor(
         }
     }
 
-    fun getFileUriDescriptorSummary(uri: String): String {
+    fun getFileUriDescriptorSummary(uri: String): Pair<Boolean, String> {
         return try {
             app.contentResolver.openFileDescriptor(Uri.parse(uri), "w")
                 ?.use {
-                    "size: ${it.statSize / 1024}k valid: ${it.fileDescriptor.valid()} canDetectErrors: ${it.canDetectErrors()} "
-                } ?: "null descriptor on opening"
+                    it.fileDescriptor.valid() to
+                            "size: ${it.statSize / 1024}k valid: ${it.fileDescriptor.valid()}"
+                } ?: let { false to "Couldn't open file descriptor" }
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
-            "error: ${e.message}"
+            false to "error: ${e.message}"
         } catch (e: IOException) {
             e.printStackTrace()
-            "error: ${e.message}"
+            false to "error: ${e.message}"
         } catch (e: SecurityException) {
             e.printStackTrace()
-            "error: Permission denial: ${e.message}"
+            false to "error: Permission denial: ${e.message}"
         }
     }
 
     fun copyFileFromUri(uri: String): File {
         val pathSegments = Uri.parse(uri).pathSegments
-        val file = File(app.cacheDir, pathSegments.last())
+        val fileName = pathSegments.last().run {
+            substring(max(length - 30, 0))
+        }
+        val file = File(app.cacheDir, fileName)
         file.outputStream().use { outputStream ->
             app.contentResolver.openInputStream(Uri.parse(uri))?.use { inputStream ->
                 outputStream.write(inputStream.readBytes())

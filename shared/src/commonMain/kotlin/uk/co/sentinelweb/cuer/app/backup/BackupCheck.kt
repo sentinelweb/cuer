@@ -1,11 +1,15 @@
 package uk.co.sentinelweb.cuer.app.backup
 
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
+import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 
 class BackupCheck(
     val prefs: MultiPlatformPreferencesWrapper,
-    val timeProvider: TimeProvider
+    val timeProvider: TimeProvider,
+    val dateTimeFormatter: DateTimeFormatter
 ) {
 
     fun checkToBackup(): Boolean = prefs.lastBackupInstant
@@ -16,7 +20,9 @@ class BackupCheck(
         prefs.lastBackupInstant = timeProvider.instant()
     }
 
-    fun getLastBackupTime() = prefs.lastBackupInstant
+    fun getLastBackupTimeFormatted() = prefs.lastBackupInstant
+        ?.let { dateTimeFormatter.formatDateTime(it.toLocalDateTime(TimeZone.currentSystemDefault())) }
+        ?: "Not backed up"
 
     fun clearLastBackupData() {
         prefs.removeLastBackupData
@@ -44,6 +50,6 @@ class BackupCheck(
 
     companion object {
         //const val BACKUP_INTERVAL_SECS = 24 * 60 * 60
-        const val BACKUP_INTERVAL_SECS = 5 * 60
+        const val BACKUP_INTERVAL_SECS = 2 * 60
     }
 }

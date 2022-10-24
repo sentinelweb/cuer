@@ -142,7 +142,15 @@
     <string name="prefs_backup_auto_cat_title">Auto backup</string>
     <string name="pref_backup_clear_auto_summary">Clear auto backup settings and choose another location</string>
     <string name="pref_backup_clear_auto_title">Clear settings</string>
-    <string name="pref_backup_summary_auto_title">Auto backup data</string>
+    <string name="pref_backup_summary_auto_title">Auto backup info</string>
+    <string name="pref_backup_set_auto_summary">Choose an existing backup file from storage to sync with</string>
+    <string name="pref_backup_set_auto_title">Choose existing auto backup file</string>
+    <string name="pref_backup_restore_auto_title">Restore data?</string>
+    <string name="pref_backup_restore_auto_message">Do you want to restore the data from this auto backup file (existing
+        data will be lost)
+    </string>
+    <string name="pref_backup_restore_auto_confirm">Clear and Restore</string>
+    <string name="pref_backup_error_title">Backup error</string>
 
     <string name="prefs_player_auto_float_summary">When the in-app player is playing and is minimised then launch the
         floating player
