@@ -49,7 +49,7 @@ class BackupCheck(
     }
 
     companion object {
-        //const val BACKUP_INTERVAL_SECS = 24 * 60 * 60
-        const val BACKUP_INTERVAL_SECS = 2 * 60
+        const val BACKUP_INTERVAL_SECS = 12 * 60 * 60
+        //const val BACKUP_INTERVAL_SECS = 2 * 60
     }
 }
