@@ -223,10 +223,6 @@ class MainActivity :
         presenter.onStart()
         //checkIntent(intent)
         checkForPendingNavigation(null)?.apply { navRouter.navigate(this) }
-        snackBarWrapper.makeError(
-            msg = "Error message to display",
-            actionText = "ACTION"
-        ) {}.show()
     }
 
     override fun onStop() {
