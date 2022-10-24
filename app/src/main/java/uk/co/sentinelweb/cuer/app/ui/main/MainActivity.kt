@@ -8,6 +8,7 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -21,6 +22,8 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
+import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter.BackupResult.*
 import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
@@ -133,12 +136,35 @@ class MainActivity :
                     PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
                         navController.navigate(R.id.navigation_playlist)
                     }
+
                     else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
                         navController.navigate(R.id.navigation_browse)
                     }
                 }
             }
         presenter.initialise()
+    }
+
+    override fun promptToBackup(result: AutoBackupFileExporter.BackupResult) {
+        when (result) {
+            SUCCESS -> snackBarWrapper.make(getString(R.string.backup_success_message)).show()
+            SETUP -> snackBarWrapper.make(
+                msg = getString(R.string.backup_setup_message),
+                actionText = getString(R.string.backup_setup_action)
+            ) {
+                navController.navigate(
+                    R.id.navigation_settings_backup, bundleOf(AUTO_BACKUP.name to true)
+                )
+            }.show()
+
+            FAIL -> snackBarWrapper.makeError(
+                msg = getString(R.string.backup_fix_message),
+                actionText = getString(R.string.backup_fix_action)
+            ) {
+                navController.navigate(R.id.navigation_settings_backup)
+            }.show()
+        }
+
     }
 
     override fun onDestroy() {
@@ -207,7 +233,7 @@ class MainActivity :
     override fun isRecreating() = isChangingConfigurations
 
     override fun showMessage(msg: String) {
-        snackBarWrapper.make(msg)
+        snackBarWrapper.make(msg).show()
     }
 
     override fun onPreferenceStartFragment(
@@ -245,6 +271,7 @@ class MainActivity :
                         ).apply {
                             log.d("got nav:$this")
                         }
+
                     else -> null
                 }
             }

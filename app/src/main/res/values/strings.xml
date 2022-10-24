@@ -132,10 +132,27 @@
     <string name="prefs_root_player_summary">Player settings</string>
     <string name="prefs_root_player_title">Player</string>
 
+
+    <string name="prefs_backup_manual_cat_title">Manual backup</string>
     <string name="pref_backup_backup_summary">Back up data to a ZIP file</string>
     <string name="pref_backup_backup_title">Backup database</string>
     <string name="pref_backup_restore_summary">Restore the DB from a ZIP/JSON file</string>
     <string name="pref_backup_restore_title">Restore database</string>
+
+    <string name="prefs_backup_auto_cat_title">Auto backup</string>
+    <string name="pref_backup_clear_auto_summary">Clear auto backup settings and choose another location</string>
+    <string name="pref_backup_clear_auto_title">Clear settings</string>
+    <string name="pref_backup_summary_auto_title">Auto backup info</string>
+    <string name="pref_backup_set_auto_summary">Choose an existing backup file from storage to sync with - use something
+        like drive or dropbox so that it is backed up off device.
+    </string>
+    <string name="pref_backup_set_auto_title">Choose existing auto backup file</string>
+    <string name="pref_backup_restore_auto_title">Restore data?</string>
+    <string name="pref_backup_restore_auto_message">Do you want to restore the data from this auto backup file (existing
+        data will be lost)
+    </string>
+    <string name="pref_backup_restore_auto_confirm">Clear and Restore</string>
+    <string name="pref_backup_error_title">Backup error</string>
 
     <string name="prefs_player_auto_float_summary">When the in-app player is playing and is minimised then launch the
         floating player
@@ -216,6 +233,13 @@
     </string>
     <string name="support_crypto_warning_ok">OK</string>
     <string name="support_crypto_warning_dont_show">I know don\'t show this</string>
+
+    <!-- backup -->
+    <string name="backup_success_message">Your data was backed up …</string>
+    <string name="backup_setup_message">It\'s time to backup</string>
+    <string name="backup_setup_action">SETUP</string>
+    <string name="backup_fix_message">There was a problem backing up</string>
+    <string name="backup_fix_action">FIX</string>
 
     <!-- misc -->
     <string name="ok">OK</string>

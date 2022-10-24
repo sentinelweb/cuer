@@ -2,16 +2,41 @@
 <PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Preference
-        app:key="@string/prefs_backup_backup_key"
-        app:summary="@string/pref_backup_backup_summary"
-        app:title="@string/pref_backup_backup_title"
-        app:icon="@drawable/ic_pref_backup_normal" />
+    <PreferenceCategory app:title="@string/prefs_backup_auto_cat_title">
+        <Preference
+            app:key="@string/prefs_backup_clear_auto_key"
+            app:summary="@string/pref_backup_clear_auto_summary"
+            app:title="@string/pref_backup_clear_auto_title"
+            app:icon="@drawable/ic_auto_backup"
+        />
 
-    <Preference
-        app:key="@string/prefs_backup_restore_key"
-        app:summary="@string/pref_backup_restore_summary"
-        app:title="@string/pref_backup_restore_title"
-        app:icon="@drawable/ic_pref_restore_normal" />
+        <Preference
+            app:key="@string/prefs_backup_set_auto_key"
+            app:summary="@string/pref_backup_set_auto_summary"
+            app:title="@string/pref_backup_set_auto_title"
+            app:icon="@drawable/ic_set_auto_backup"
+        />
+
+        <Preference
+            app:key="@string/prefs_backup_summary_auto_key"
+            app:title="@string/pref_backup_summary_auto_title"
+            app:icon="@drawable/ic_info"
+        />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/prefs_backup_manual_cat_title">
+        <Preference
+            app:key="@string/prefs_backup_backup_key"
+            app:summary="@string/pref_backup_backup_summary"
+            app:title="@string/pref_backup_backup_title"
+            app:icon="@drawable/ic_backup"/>
+
+        <Preference
+            app:key="@string/prefs_backup_restore_key"
+            app:summary="@string/pref_backup_restore_summary"
+            app:title="@string/pref_backup_restore_title"
+            app:icon="@drawable/ic_restore"/>
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

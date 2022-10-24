@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.di
 
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.backup.BackupCheck
 import uk.co.sentinelweb.cuer.app.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.db.repository.file.PlatformFileOperation
 import uk.co.sentinelweb.cuer.app.orchestrator.*
@@ -77,11 +78,11 @@ object SharedAppModule {
         factory { PlatformFileOperation() }
         factory { LinkExtractor() }
         factory { TimecodeExtractor() }
+        factory { BackupCheck(get(), get(), get()) }
     }
 
     val modules = listOf(objectModule)
         .plus(orchestratorModule)
         .plus(queueModule)
         .plus(DescriptionContract.viewModule)
-
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -13,10 +14,17 @@ import java.time.Instant
 interface PrefBackupContract {
 
     interface Presenter {
-        fun backupDatabaseToJson()
+        fun manualBackupDatabaseToJson()
         fun saveWriteData(uri: String)
         fun restoreFile(uriString: String)
         fun openRestoreFile()
+        fun autoBackupDatabaseToJson()
+        fun gotAutoBackupLocation(uri: String)
+        fun onClearAutoBackup()
+        fun updateSummaryForAutoBackup()
+        fun restoreAutoBackupLocation(uri: String)
+        fun onChooseAutoBackupFile()
+        fun onConfirmRestoreAutoBackup()
     }
 
     interface View {
@@ -24,6 +32,13 @@ interface PrefBackupContract {
         fun showProgress(b: Boolean)
         fun showMessage(msg: String)
         fun openRestoreFile()
+        fun promptForCreateAutoBackupLocation(fileName: String)
+        fun goBack()
+        fun setAutoSummary(summary: String)
+        fun promptForOpenAutoBackupLocation()
+        fun setAutoBackupValid(first: Boolean)
+        fun askToRestoreAutoBackup()
+        fun showBackupError(message: String?)
     }
 
     data class State constructor(
@@ -43,17 +58,14 @@ interface PrefBackupContract {
                         toastWrapper = get(),
                         backupManager = get(),
                         timeProvider = get(),
-                        fileWrapper = get(),
+                        contentProviderFileWrapper = get(),
                         log = get(),
-                        contentUriUtil = get()
+                        contentUriUtil = get(),
+                        backupCheck = get()
                     )
                 }
-                scoped<SnackbarWrapper> {
-                    AndroidSnackbarWrapper(
-                        this.getFragmentActivity(),
-                        get()
-                    )
-                }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
+                scoped { AlertDialogCreator(this.getFragmentActivity()) }
                 viewModel { State() }
             }
         }

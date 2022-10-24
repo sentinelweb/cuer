@@ -13,9 +13,12 @@
     <string name="prefs_root_backup_key">root_backup</string>
     <string name="prefs_root_player_key">root_player</string>
     <string name="prefs_root_debug_send_reports_key">root_send_reports</string>
-    <string name="prefs_backup_backup_key">backup</string>
-    <string name="prefs_backup_restore_key">restore</string>
-    <string name="prefs_player_auto_float_key">auto_float_player</string>
-    <string name="prefs_player_restart_after_unlock_key">restart_after_unlock</string>
+    <string name="prefs_backup_backup_key">manual_backup</string>
+    <string name="prefs_backup_restore_key">manual_restore</string>
+    <string name="prefs_player_auto_float_key">player_auto_float</string>
+    <string name="prefs_player_restart_after_unlock_key">player_restart_after_unlock</string>
+    <string name="prefs_backup_clear_auto_key">backup_auto_clear</string>
+    <string name="prefs_backup_summary_auto_key">backup_auto_summary</string>
+    <string name="prefs_backup_set_auto_key">backup_auto_set</string>
 
 </resources>

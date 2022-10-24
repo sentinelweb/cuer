@@ -4,7 +4,8 @@ import androidx.annotation.StringRes
 
 data class AlertDialogModel constructor(
     @StringRes override val title: Int,
-    @StringRes val message: Int,
+    @StringRes val message: Int = 0,
+    var messageString: String? = null,
     val confirm: Button,
     val neutral: Button? = null,
     val cancel: Button? = null,
@@ -13,7 +14,6 @@ data class AlertDialogModel constructor(
 
     data class Button(
         @StringRes val label: Int,
-        val action: () -> Unit
+        val action: () -> Unit = {}
     )
-
 }

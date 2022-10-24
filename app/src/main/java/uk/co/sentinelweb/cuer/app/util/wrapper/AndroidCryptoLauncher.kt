@@ -35,17 +35,13 @@ class AndroidCryptoLauncher(
     private fun showWarningDialog() {
         alertDialogCreator.create(
             AlertDialogModel(
-                R.string.support_crypto_warning_title,
-                R.string.support_crypto_warning_message,
-                AlertDialogModel.Button(
+                title = R.string.support_crypto_warning_title,
+                message = R.string.support_crypto_warning_message,
+                confirm = AlertDialogModel.Button(
                     R.string.support_crypto_warning_ok,
                     { showCryptoAppLauncher() }
                 ),
-//                                        AlertDialogModel.Button(
-//                                            R.string.support_crypto_warning_dont_show,
-//                                            { showCryptoAppLauncher() }
-//                                        ),
-                AlertDialogModel.Button(R.string.cancel, {})
+                cancel = AlertDialogModel.Button(R.string.cancel)
             )
         ).show()
     }

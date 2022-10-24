@@ -10,7 +10,7 @@ fun MediaDomain.isLiveOrUpcoming() = isLiveBroadcastUpcoming || isLiveBroadcast
 fun MediaDomain.startPosition(): Long {
     val position = positon ?: -1L
     val duration = duration ?: -1L
-    return if (position > 0 && (duration > 0 && position < duration - 20000)) {
+    return if (!isLiveOrUpcoming() && position > 0 && (duration > 0 && position < duration - 20000)) {
         position
     } else {
         0L

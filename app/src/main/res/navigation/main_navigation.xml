@@ -146,8 +146,15 @@
     <fragment
         android:id="@+id/navigation_settings_backup"
         android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment"
-        android:label="@string/prefs_root_backup_item_title"
-    />
+        android:label="@string/prefs_root_backup_item_title">
+        <argument
+            android:name="AUTO_BACKUP"
+            android:defaultValue="false"
+            app:argType="boolean"
+            app:nullable="false"
+        />
+    </fragment>
+
 
     <fragment
         android:id="@+id/navigation_settings_player"

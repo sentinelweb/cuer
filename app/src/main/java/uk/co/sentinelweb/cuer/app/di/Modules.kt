@@ -9,7 +9,9 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
+import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
+import uk.co.sentinelweb.cuer.app.backup.IBackupManager
 import uk.co.sentinelweb.cuer.app.db.AppDatabaseModule
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
@@ -146,7 +148,7 @@ object Modules {
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
-        factory {
+        factory<IBackupManager> {
             BackupFileManager(
                 channelRepository = get(),
                 mediaRepository = get(),
@@ -163,6 +165,7 @@ object Modules {
                 log = get()
             )
         }
+        factory { AutoBackupFileExporter(get(), get(), get(), get(), get()) }
         factory { ImageProvider(get(), get()) }
         single {
             ImageFileRepository(
@@ -186,7 +189,7 @@ object Modules {
         factory<LogWrapper> { CompositeLogWrapper(get(), get()) }
         factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication()) }
         factory { AndroidLogWrapper() }
-        factory { FileWrapper(androidApplication()) }
+        factory { ContentProviderFileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
         single<GeneralPreferencesWrapper> {
             SharedPrefsWrapper(androidApplication(), get())

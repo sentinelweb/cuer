@@ -17,8 +17,8 @@ interface PrefPlayerContract {
 
     }
 
-    data class State constructor(
-        var x: Boolean = false
+    /*data*/ class State constructor(
+
     ) : ViewModel()
 
     companion object {

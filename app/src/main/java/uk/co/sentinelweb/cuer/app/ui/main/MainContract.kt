@@ -5,6 +5,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
@@ -39,6 +40,7 @@ interface MainContract {
         fun checkPlayServices()
         fun isRecreating(): Boolean
         fun showMessage(msg: String)
+        fun promptToBackup(result: AutoBackupFileExporter.BackupResult)
     }
 
     interface PlayerViewControl {
@@ -67,7 +69,8 @@ interface MainContract {
                         ytContextHolder = get(),
                         log = get(),
                         floatingPlayerServiceManager = get(),
-                        castListener = get()
+                        castListener = get(),
+                        autoBackupFileExporter = get()
                     )
                 }
                 scoped {
