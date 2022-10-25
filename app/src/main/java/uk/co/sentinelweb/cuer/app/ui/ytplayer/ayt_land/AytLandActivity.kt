@@ -227,8 +227,16 @@ class AytLandActivity : AppCompatActivity(),
                 is LinkOpen ->
                     navRouter.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
                 is ChannelOpen ->
-                    label.channel.platformId?.let { id -> navRouter.navigate(NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))) }
-                is FullScreenPlayerOpen -> toast.show("Already in protrait mode - shouldnt get here")
+                    label.channel.platformId?.let { id ->
+                        navRouter.navigate(
+                            NavigationModel(
+                                YOUTUBE_CHANNEL,
+                                mapOf(CHANNEL_ID to id)
+                            )
+                        )
+                    }
+
+                is FullScreenPlayerOpen -> toast.show("Already in landscape mode - shouldn't get here")
                 is PipPlayerOpen -> {
                     val hasPermission = floatingService.hasPermission(this@AytLandActivity)
                     if (hasPermission) {
