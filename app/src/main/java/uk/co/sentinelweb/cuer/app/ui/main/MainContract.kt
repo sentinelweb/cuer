@@ -88,7 +88,7 @@ interface MainContract {
                 // ALL SHARE HACKS
                 scoped<DoneNavigation> { get<MainActivity>() }
                 scoped<CommitHost> { EmptyCommitHost() }
-                scoped<ShareNavigationHack?> { null }
+                scoped { ShareNavigationHack() }
             }
         }
     }

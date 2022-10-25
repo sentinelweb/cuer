@@ -139,7 +139,7 @@ interface ShareContract {
                 // SHARE HACKS
                 scoped<CommitHost> { get<ShareActivity>() }
                 scoped<DoneNavigation> { get<ShareActivity>() }
-                scoped<ShareNavigationHack?> { ShareNavigationHack() }
+                scoped { ShareNavigationHack() }
             }
         }
     }

@@ -45,6 +45,7 @@ import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseCategory
 import uk.co.sentinelweb.cuer.domain.ext.serialise
+import java.io.File
 
 class ShareActivity : AppCompatActivity(),
     ShareContract.View,
@@ -60,7 +61,7 @@ class ShareActivity : AppCompatActivity(),
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
-    private val shareNavigationHack: ShareNavigationHack? by inject()
+    private val shareNavigationHack: ShareNavigationHack by inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
@@ -150,7 +151,7 @@ class ShareActivity : AppCompatActivity(),
 // but if finish causes problems here then play with getting the nav in the right state
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        if ((shareNavigationHack?.isNavigatingInApp ?: false).not()) {
+        if (shareNavigationHack.isNavigatingInApp.not()) {
             finish()
         }
         // this could be used to reset the nav controller when home is pressed.
@@ -295,7 +296,11 @@ class ShareActivity : AppCompatActivity(),
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(STATE_KEY, presenter.serializeState())
+        val serializeState = presenter.serializeState()
+        getFilesDir()
+            ?.let { File(it, "shareactivity.json") }
+            ?.apply { writeText(serializeState ?: "") }
+        outState.putString(STATE_KEY, serializeState)
     }
 
     companion object {

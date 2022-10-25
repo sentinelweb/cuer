@@ -69,7 +69,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val commitHost: CommitHost by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val playerControls: PlayerContract.PlayerControls by inject()
-    private val shareNavigationHack: ShareNavigationHack? by inject()
+    private val shareNavigationHack: ShareNavigationHack by inject()
 
     private lateinit var binding: FragmentPlaylistItemEditBinding
     private val playMenuItem: MenuItem
@@ -301,7 +301,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     }
 
     private fun observeNavigation(nav: NavigationModel) {
-        shareNavigationHack?.isNavigatingInApp = true
+        shareNavigationHack.isNavigatingInApp = true
         when (nav.target) {
             NAV_DONE -> doneNavigation.navigateDone()
             else -> navRouter.navigate(nav)
