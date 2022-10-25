@@ -71,7 +71,9 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val playerControls: PlayerContract.PlayerControls by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
 
-    private lateinit var binding: FragmentPlaylistItemEditBinding
+    private val binding: FragmentPlaylistItemEditBinding
+        get() = _binding ?: throw IllegalStateException("FragmentPlaylistItemEditBinding not bound")
+    private var _binding: FragmentPlaylistItemEditBinding? = null
     private val playMenuItem: MenuItem
         get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
 
@@ -135,7 +137,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPlaylistItemEditBinding.inflate(inflater)
+        _binding = FragmentPlaylistItemEditBinding.inflate(inflater)
         return binding.root
     }
 
@@ -202,6 +204,13 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         bindObserver(viewModel.getNavigationObservable(), this::observeNavigation)
         bindObserver(viewModel.getModelObservable(), this::observeModel)
         bindObserver(viewModel.getUiObservable(), this::observeUi)
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        dialog = null
+        dialogFragment = null
+        super.onDestroyView()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

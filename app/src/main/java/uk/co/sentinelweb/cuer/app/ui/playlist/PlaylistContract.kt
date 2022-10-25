@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.ItemTouchHelper
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -12,7 +11,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
-import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
@@ -219,8 +217,6 @@ interface PlaylistContract {
                 }
                 scoped { get<Presenter>() as External }
                 scoped { PlaylistModelMapper(itemModelMapper = get(), iconMapper = get()) }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped { ItemTouchHelperCallback(get<PlaylistFragment>()) }
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }

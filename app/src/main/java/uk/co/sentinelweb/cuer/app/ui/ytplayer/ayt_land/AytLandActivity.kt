@@ -65,7 +65,9 @@ class AytLandActivity : AppCompatActivity(),
     private val aytViewHolder: AytViewHolder by inject()
 
     private lateinit var mviView: AytLandActivity.MviViewImpl
-    private lateinit var binding: ActivityAytFullsreenBinding
+    private val binding: ActivityAytFullsreenBinding
+        get() = _binding ?: throw IllegalStateException("AytLandActivity not bound")
+    private var _binding: ActivityAytFullsreenBinding? = null
     private lateinit var controlsBinding: FullscreenControlsOverlayBinding
 
     private var currentItem: PlaylistItemDomain? = null
@@ -76,7 +78,7 @@ class AytLandActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAytFullsreenBinding.inflate(layoutInflater)
+        _binding = ActivityAytFullsreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         castListener.listen()
@@ -98,6 +100,7 @@ class AytLandActivity : AppCompatActivity(),
         controller.onViewDestroyed()
         controller.onDestroy(aytViewHolder.willFinish())
         aytViewHolder.cleanupIfNotSwitching()
+        _binding = null
         super.onDestroy()
     }
 
@@ -241,7 +244,9 @@ class AytLandActivity : AppCompatActivity(),
                     navRouter.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))
                     finish()
                 }
+
                 is ShowSupport -> SupportDialogFragment.show(this@AytLandActivity, label.item.media)
+                else -> Unit
             }
         }
 

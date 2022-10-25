@@ -1,13 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.ItemTouchHelper
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
@@ -98,8 +96,6 @@ interface PlaylistsDialogContract {
                 scoped { PlaylistsModelMapper(get()) }
                 scoped { PlaylistsDialogModelMapper() }
                 scoped { PlaylistsDialogAdapter(get(), get()) }
-                scoped { ItemTouchHelperCallback(get()) }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }

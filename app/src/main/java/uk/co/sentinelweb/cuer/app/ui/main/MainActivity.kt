@@ -167,6 +167,7 @@ class MainActivity :
     override fun onDestroy() {
         presenter.onDestroy()
         volumeControl.controlView = null
+        _binding = null
         super.onDestroy()
     }
 

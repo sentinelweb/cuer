@@ -121,6 +121,8 @@ class ShareActivity : AppCompatActivity(),
 
     override fun onDestroy() {
         volumeControl.controlView = null
+        _binding = null
+        snackbar = null
         super.onDestroy()
     }
 

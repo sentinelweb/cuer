@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -26,7 +25,6 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     override val scope: Scope by fragmentScopeWithSource<PlaylistsDialogFragment>()
     private val presenter: PlaylistsDialogContract.Presenter by inject()
     private val adapter: PlaylistsDialogAdapter by inject()
-    private val itemTouchHelper: ItemTouchHelper by inject()
     private val log: LogWrapper by inject()
 
     private var _binding: FragmentPlaylistsDialogBinding? = null
@@ -66,6 +64,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     override fun onDestroyView() {
         presenter.destroy()
+        _binding = null
         super.onDestroyView()
     }
 

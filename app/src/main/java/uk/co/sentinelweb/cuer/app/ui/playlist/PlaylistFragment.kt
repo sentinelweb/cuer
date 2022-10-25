@@ -32,6 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -80,7 +81,6 @@ class PlaylistFragment :
 
     private val presenter: PlaylistContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
-    private val itemTouchHelper: ItemTouchHelper by inject()
     private val log: LogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
     private val imageProvider: ImageProvider by inject()
@@ -92,7 +92,10 @@ class PlaylistFragment :
     private val commitHost: CommitHost by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
-    private lateinit var adapter: PlaylistAdapter
+    private var _adapter: PlaylistAdapter? = null
+    private val adapter: PlaylistAdapter
+        get() = _adapter ?: throw IllegalStateException("PlaylistFragment.adapter not bound")
+
     val linearLayoutManager get() = binding.playlistList.layoutManager as LinearLayoutManager
 
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
@@ -180,7 +183,9 @@ class PlaylistFragment :
         presenter.initialise()
         cardsMenuItem.isVisible = !presenter.isCards
         rowsMenuItem.isVisible = presenter.isCards
-        itemTouchHelper.attachToRecyclerView(binding.playlistList)
+        ItemTouchHelper(ItemTouchHelperCallback(this)).apply {
+            attachToRecyclerView(binding.playlistList)
+        }
         binding.playlistFabUp.setOnClickListener { presenter.scroll(Up) }
         binding.playlistFabUp.setOnLongClickListener { presenter.scroll(Top);true }
         binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }
@@ -225,8 +230,8 @@ class PlaylistFragment :
     }
 
     private fun setupRecyclerView() {
-        if (this::adapter.isInitialized.not()) {
-            adapter = createAdapter()
+        if (_adapter == null) {
+            _adapter = createAdapter()
         }
         binding.playlistList.layoutManager = LinearLayoutManager(context)
         binding.playlistList.adapter = adapter
@@ -293,6 +298,7 @@ class PlaylistFragment :
     override fun onDestroyView() {
         presenter.destroy()
         _binding = null
+        _adapter = null
         super.onDestroyView()
     }
 
@@ -387,7 +393,7 @@ class PlaylistFragment :
     }
 
     override fun newAdapter() {
-        adapter = createAdapter()
+        _adapter = createAdapter()
             .also { binding.playlistList.adapter = it }
     }
 
