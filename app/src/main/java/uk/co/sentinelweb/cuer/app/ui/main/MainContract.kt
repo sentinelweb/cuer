@@ -61,7 +61,6 @@ interface MainContract {
             scope(named<MainActivity>()) {
                 scoped<View> { get<MainActivity>() }
                 scoped<PlayerViewControl> { get<MainActivity>() }
-                scoped<NavigationProvider> { get<MainActivity>() }
                 scoped<Presenter> {
                     MainPresenter(
                         view = get(),
@@ -86,9 +85,10 @@ interface MainContract {
                 scoped { FloatingPlayerCastListener(get(), get(), get()) }
                 scoped { AlertDialogCreator(get<MainActivity>()) }
                 // ALL SHARE HACKS
-                scoped<DoneNavigation> { get<MainActivity>() }
+                scoped<DoneNavigation> { MainDoneNavigation(get<MainActivity>()) }
                 scoped<CommitHost> { EmptyCommitHost() }
                 scoped { ShareNavigationHack() }
+                scoped<NavigationProvider> { MainNavigationProvider(get<MainActivity>(), get(), get()) }
             }
         }
     }
