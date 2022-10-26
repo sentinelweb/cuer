@@ -9,7 +9,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYING_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -55,7 +55,7 @@ class QueueMediator constructor(
     init {
         log.tag(this)
         state.playlistIdentifier =
-            prefsWrapper.getPair(GeneralPreferences.CURRENT_PLAYLIST, NO_PLAYLIST.toPair())
+            prefsWrapper.getPair(CURRENT_PLAYING_PLAYLIST, NO_PLAYLIST.toPair())
                 .toIdentifier()
         _currentItemFlow = MutableStateFlow(state.currentItem)
         coroutines.computationScope.launch {
@@ -205,7 +205,7 @@ class QueueMediator constructor(
     }
 
     override fun updateCurrentMediaItem(updatedMedia: MediaDomain) {
-        val currentItemIsInPlaylist = currentItemIndex ?: -1 > -1
+        val currentItemIsInPlaylist = (currentItemIndex ?: -1) > -1
         if (currentItemIsInPlaylist) {
             coroutines.computationScope.launch {
                 updateCurrentItemFromMedia(updatedMedia)
@@ -256,7 +256,7 @@ class QueueMediator constructor(
     override fun nextItem() = coroutines.computationScope.launch {
         state.playlist?.let { currentPlaylist ->
             state.playlist = playlistMutator.gotoNextItem(currentPlaylist)
-            if (state.playlist?.currentIndex ?: 0 < currentPlaylist.items.size) {
+            if ((state.playlist?.currentIndex ?: 0) < currentPlaylist.items.size) {
                 updateCurrentItem(false)
             }
         }
@@ -280,12 +280,7 @@ class QueueMediator constructor(
             state.playlistIdentifier = playlistIdentifier
                 ?: throw IllegalStateException("No playlist ID")
             state.currentItem = playlistDomain.currentItemOrStart()
-            playlistIdentifier.apply {
-                prefsWrapper.putPair(
-                    GeneralPreferences.CURRENT_PLAYLIST,
-                    this.toPair()
-                )
-            }
+            playlistIdentifier.apply { prefsWrapper.putPair(CURRENT_PLAYING_PLAYLIST, this.toPair()) }
         } else {
             state.currentItem = playlistDomain.currentItem()
         }

@@ -55,7 +55,7 @@ class PlayUseCase constructor(
                 val toIdentifier = itemDomain.playlistId!!.toIdentifier(LOCAL)
 
                 prefsWrapper.putPair(
-                    GeneralPreferences.CURRENT_PLAYLIST,
+                    GeneralPreferences.CURRENT_PLAYING_PLAYLIST,
                     toIdentifier.toPairType<Long>()
                 )
                 coroutines.computationScope.launch {

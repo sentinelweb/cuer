@@ -30,6 +30,7 @@ import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -52,6 +53,7 @@ class PlaylistItemEditViewModel constructor(
     private val shareWrapper: ShareWrapper,
     private val playUseCase: PlayUseCase,
     private val linkScanner: LinkScanner,
+    private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -467,10 +469,8 @@ class PlaylistItemEditViewModel constructor(
                                         Options(saveSource)
                                     ).takeIf { saveSource == LOCAL && isNew }
                                         ?.also {
-                                            prefsWrapper.putLong(
-                                                LAST_PLAYLIST_ADDED_TO,
-                                                it.playlistId!!
-                                            )
+                                            prefsWrapper.putLong(LAST_PLAYLIST_ADDED_TO, it.playlistId!!)
+                                            recentLocalPlaylists.addRecentId(it.playlistId!!)
                                         }
                                 }
                         }

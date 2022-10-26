@@ -243,7 +243,7 @@ class PlaylistPresenter(
 
     override fun initialise() {
         state.playlistIdentifier =
-            prefsWrapper.getPair(CURRENT_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
+            prefsWrapper.getPair(CURRENT_PLAYING_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
 
     }
 
@@ -697,7 +697,7 @@ class PlaylistPresenter(
                 ?.also { state.playlist = it }
                 ?.also { updateView() }
                 ?.also { onCommit?.onCommit(PLAYLIST, listOf(it)) }
-                ?.also { prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!) }
+                ?.also { recentLocalPlaylists.addRecentId(it.id!!) }
         } else {
             throw IllegalStateException("Can't save non Memory playlist")
         }

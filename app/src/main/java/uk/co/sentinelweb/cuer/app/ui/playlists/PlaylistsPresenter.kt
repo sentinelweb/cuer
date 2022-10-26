@@ -352,31 +352,12 @@ class PlaylistsPresenter(
                     }
                 }
 
-            val recent = mutableListOf<OrchestratorContract.Identifier<Long>>()
-            recentLocalPlaylists.getRecent().reversed().forEach { id ->
-                id.toIdentifier(LOCAL).also { recent.add(it) }
-            }
-            prefsWrapper.getLong(LAST_PLAYLIST_ADDED_TO)
-                ?.toIdentifier(LOCAL)
-                ?.also { recent.add(it) }
-            prefsWrapper.getLong(LAST_PLAYLIST_CREATED)
-                ?.toIdentifier(LOCAL)
-                ?.also { recent.add(it) }
-            prefsWrapper.getLong(PINNED_PLAYLIST)
-                ?.toIdentifier(LOCAL)
-                ?.also { recent.add(0, it) }
-            localSearch.search()
-                ?.playlists
-                ?.forEach { playlist ->
-                    playlist.id?.toIdentifier(LOCAL)?.also { recent.add(it) }
-                }
-
             modelMapper.map(
                 state.playlists
                     .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } },
                 queue.playlistId,
                 appLists,
-                recent.toSet().toList(),
+                recentLocalPlaylists.buildRecentSelectionList(),
                 prefsWrapper.getLong(PINNED_PLAYLIST),
                 state.treeRoot
             ).takeIf { coroutines.mainScopeActive }
