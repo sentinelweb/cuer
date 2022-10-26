@@ -4,8 +4,7 @@ enum class GeneralPreferences constructor(
     override val fname: String
 ) : Field {
     DB_INITIALISED("dbInitialised"),
-    CURRENT_PLAYLIST("currentPlaylist"),
-    LAST_PLAYLIST_CREATED("lastPlaylistCreated"),
+    CURRENT_PLAYING_PLAYLIST("currentPlaylist"),
     LAST_PLAYLIST_VIEWED("lastViewedPlaylist"),
     LAST_PLAYLIST_ADDED_TO("lastPlaylistAddedTo"),
     SKIP_FWD_TIME("skipFwdTime"),

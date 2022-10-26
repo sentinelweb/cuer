@@ -74,7 +74,7 @@ object SharedAppModule {
         single { get<PlaylistMemoryRepository>().mediaMemoryRepository }
         single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperImpl() }
         factory { BrowseRecentCategories(get(), get()) }
-        factory { RecentLocalPlaylists(get(), get()) }
+        factory { RecentLocalPlaylists(get(), get(), get(), get()) }
         factory { PlatformFileOperation() }
         factory { LinkExtractor() }
         factory { TimecodeExtractor() }

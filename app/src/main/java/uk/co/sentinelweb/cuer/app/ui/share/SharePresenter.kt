@@ -218,13 +218,14 @@ class SharePresenter constructor(
     ) {
         try {
             val isConnected = ytContextHolder.isConnected()
-            val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYLIST)
+            val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYING_PLAYLIST)
             val playId: Pair<Long, Long?> = when (type) {
                 PLAYLIST -> (data as List<PlaylistDomain>).let {
                     (if (it.size > 0) {
                         it[0].id!!
                     } else currentPlaylistId!!) to (null as Long?)
                 }
+
                 PLAYLIST_ITEM -> (data as List<PlaylistItemDomain>)
                     .let { playlistItemList ->
                         val playlistItem: PlaylistItemDomain? =

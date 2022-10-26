@@ -29,7 +29,7 @@ class JsonDatabaseInitializer constructor(
             res.getAssetString("default-080721.json")
                 ?.apply { backup.restoreData(this) }
                 ?.apply { preferences.putBoolean(DB_INITIALISED, true) }
-                ?.apply { preferences.putPair(CURRENT_PLAYLIST, 3L to LOCAL) /* philosophy */ }
+                ?.apply { preferences.putPair(CURRENT_PLAYING_PLAYLIST, 3L to LOCAL) /* philosophy */ }
                 ?.apply { preferences.putPair(LAST_PLAYLIST_VIEWED, 3L to LOCAL) /* philosophy */ }
                 ?.apply { log.d("DB initialised") }
                 ?.apply { listeners.forEach { it.invoke(true) } }

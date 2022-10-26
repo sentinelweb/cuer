@@ -16,7 +16,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_CREATED
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.PINNED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
@@ -166,9 +165,7 @@ class PlaylistEditViewModel constructor(
                         recentLocalPlaylists.addRecent(it)
                     }
                     .takeIf { state.isCreate }
-                    ?.also {
-                        prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!)
-                    }
+                    ?.also { recentLocalPlaylists.addRecentId(it.id!!) }
             }
         }
     }

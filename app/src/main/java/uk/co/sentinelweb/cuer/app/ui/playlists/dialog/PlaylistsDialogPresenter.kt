@@ -93,9 +93,9 @@ class PlaylistsDialogPresenter(
             .loadList(IdListFilter(state.playlists.mapNotNull { it.id }), LOCAL.flatOptions())
 
         val recentLocalPlaylists = recentLocalPlaylists
-            .getRecent()
+            .buildRecentSelectionList()
             .let { it.subList(0, min(10, it.size)) }
-            .mapNotNull { recentId -> state.playlists.find { it.id == recentId } }
+            .mapNotNull { recentId -> state.playlists.find { it.id == recentId.id } }
 
         state.playlists.map { it.id }
             .associateWith { id -> playlistStats.find { it.playlistId == id } }

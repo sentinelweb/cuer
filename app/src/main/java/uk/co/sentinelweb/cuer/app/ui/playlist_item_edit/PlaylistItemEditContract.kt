@@ -84,6 +84,7 @@ interface PlaylistItemEditContract {
                         shareWrapper = get(),
                         playUseCase = get(),
                         linkScanner = get(),
+                        recentLocalPlaylists = get(),
                     )
                 }
                 scoped { State() }

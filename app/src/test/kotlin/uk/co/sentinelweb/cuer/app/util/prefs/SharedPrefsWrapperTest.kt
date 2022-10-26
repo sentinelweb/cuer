@@ -13,7 +13,7 @@ import org.junit.Ignore
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYING_PLAYLIST
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.tools.ext.build
 
@@ -55,50 +55,50 @@ class SharedPrefsWrapperTest {
     fun getLong() {
         val fixtValue: Long = fixture.build()
         val fixtDefault: Long = fixture.build()
-        every { mockPrefs.getLong(CURRENT_PLAYLIST.fname, fixtDefault) } returns fixtValue
+        every { mockPrefs.getLong(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) } returns fixtValue
 
-        assertThat(sut.getLong(CURRENT_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
-        verify { mockPrefs.getLong(CURRENT_PLAYLIST.fname, fixtDefault) }
+        assertThat(sut.getLong(CURRENT_PLAYING_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
+        verify { mockPrefs.getLong(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) }
     }
 
     @Test
     fun getLongDefault() {
         val fixtDefault: Long = fixture.build()
-        every { mockPrefs.getLong(CURRENT_PLAYLIST.fname, fixtDefault) } returns fixtDefault
+        every { mockPrefs.getLong(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) } returns fixtDefault
 
-        assertThat(sut.getLong(CURRENT_PLAYLIST, fixtDefault)).isEqualTo(fixtDefault)
-        verify { mockPrefs.getLong(CURRENT_PLAYLIST.fname, fixtDefault) }
+        assertThat(sut.getLong(CURRENT_PLAYING_PLAYLIST, fixtDefault)).isEqualTo(fixtDefault)
+        verify { mockPrefs.getLong(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) }
     }
 
     @Test
     fun getLongNullable() {
         val fixtValue: Long = fixture.build()
-        every { mockPrefs.contains(CURRENT_PLAYLIST.fname) } returns true
-        every { mockPrefs.getLong(CURRENT_PLAYLIST.fname, 0) } returns fixtValue
+        every { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) } returns true
+        every { mockPrefs.getLong(CURRENT_PLAYING_PLAYLIST.fname, 0) } returns fixtValue
 
-        assertThat(sut.getLong(CURRENT_PLAYLIST)).isEqualTo(fixtValue)
-        verify { mockPrefs.getLong(CURRENT_PLAYLIST.fname, 0L) }
-        verify { mockPrefs.contains(CURRENT_PLAYLIST.fname) }
+        assertThat(sut.getLong(CURRENT_PLAYING_PLAYLIST)).isEqualTo(fixtValue)
+        verify { mockPrefs.getLong(CURRENT_PLAYING_PLAYLIST.fname, 0L) }
+        verify { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) }
     }
 
     @Test
     fun getLongNullable_isNull() {
         val fixtDefault: Long = fixture.build()
-        every { mockPrefs.contains(CURRENT_PLAYLIST.fname) } returns false
-        every { mockPrefs.getLong(CURRENT_PLAYLIST.fname, fixtDefault) } returns fixtDefault
+        every { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) } returns false
+        every { mockPrefs.getLong(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) } returns fixtDefault
 
-        assertThat(sut.getLong(CURRENT_PLAYLIST)).isNull()
-        verify { mockPrefs.contains(CURRENT_PLAYLIST.fname) }
+        assertThat(sut.getLong(CURRENT_PLAYING_PLAYLIST)).isNull()
+        verify { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) }
     }
 
     @Test
     fun putLong() {
         val fixtValue: Long = fixture.build()
-        every { mockPrefsEditor.putLong(CURRENT_PLAYLIST.fname, fixtValue) } returns mockPrefsEditor
+        every { mockPrefsEditor.putLong(CURRENT_PLAYING_PLAYLIST.fname, fixtValue) } returns mockPrefsEditor
 
-        sut.putLong(CURRENT_PLAYLIST, fixtValue)
+        sut.putLong(CURRENT_PLAYING_PLAYLIST, fixtValue)
 
-        verify { mockPrefsEditor.putLong(CURRENT_PLAYLIST.fname, fixtValue) }
+        verify { mockPrefsEditor.putLong(CURRENT_PLAYING_PLAYLIST.fname, fixtValue) }
         verify { mockPrefsEditor.commit() }
     }
 
@@ -106,50 +106,50 @@ class SharedPrefsWrapperTest {
     fun getInt() {
         val fixtValue: Long = fixture.build()
         val fixtDefault: Long = fixture.build()
-        every { mockPrefs.getLong(CURRENT_PLAYLIST.fname, fixtDefault) } returns fixtValue
+        every { mockPrefs.getLong(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) } returns fixtValue
 
-        assertThat(sut.getLong(CURRENT_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
-        verify { mockPrefs.getLong(CURRENT_PLAYLIST.fname, fixtDefault) }
+        assertThat(sut.getLong(CURRENT_PLAYING_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
+        verify { mockPrefs.getLong(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) }
     }
 
     @Test
     fun getIntDefault() {
         val fixtDefault: Int = fixture.build()
-        every { mockPrefs.getInt(CURRENT_PLAYLIST.fname, fixtDefault) } returns fixtDefault
+        every { mockPrefs.getInt(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) } returns fixtDefault
 
-        assertThat(sut.getInt(CURRENT_PLAYLIST, fixtDefault)).isEqualTo(fixtDefault)
-        verify { mockPrefs.getInt(CURRENT_PLAYLIST.fname, fixtDefault) }
+        assertThat(sut.getInt(CURRENT_PLAYING_PLAYLIST, fixtDefault)).isEqualTo(fixtDefault)
+        verify { mockPrefs.getInt(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) }
     }
 
     @Test
     fun getIntNullable() {
         val fixtValue: Int = fixture.build()
-        every { mockPrefs.contains(CURRENT_PLAYLIST.fname) } returns true
-        every { mockPrefs.getInt(CURRENT_PLAYLIST.fname, 0) } returns fixtValue
+        every { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) } returns true
+        every { mockPrefs.getInt(CURRENT_PLAYING_PLAYLIST.fname, 0) } returns fixtValue
 
-        assertThat(sut.getInt(CURRENT_PLAYLIST)).isEqualTo(fixtValue)
-        verify { mockPrefs.getInt(CURRENT_PLAYLIST.fname, 0) }
-        verify { mockPrefs.contains(CURRENT_PLAYLIST.fname) }
+        assertThat(sut.getInt(CURRENT_PLAYING_PLAYLIST)).isEqualTo(fixtValue)
+        verify { mockPrefs.getInt(CURRENT_PLAYING_PLAYLIST.fname, 0) }
+        verify { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) }
     }
 
     @Test
     fun getIntNullable_isNull() {
         val fixtDefault: Int = fixture.build()
-        every { mockPrefs.contains(CURRENT_PLAYLIST.fname) } returns false
-        every { mockPrefs.getInt(CURRENT_PLAYLIST.fname, fixtDefault) } returns fixtDefault
+        every { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) } returns false
+        every { mockPrefs.getInt(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) } returns fixtDefault
 
-        assertThat(sut.getInt(CURRENT_PLAYLIST)).isNull()
-        verify { mockPrefs.contains(CURRENT_PLAYLIST.fname) }
+        assertThat(sut.getInt(CURRENT_PLAYING_PLAYLIST)).isNull()
+        verify { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) }
     }
 
     @Test
     fun putInt() {
         val fixtValue: Int = fixture.build()
-        every { mockPrefsEditor.putInt(CURRENT_PLAYLIST.fname, fixtValue) } returns mockPrefsEditor
+        every { mockPrefsEditor.putInt(CURRENT_PLAYING_PLAYLIST.fname, fixtValue) } returns mockPrefsEditor
 
-        sut.putInt(CURRENT_PLAYLIST, fixtValue)
+        sut.putInt(CURRENT_PLAYING_PLAYLIST, fixtValue)
 
-        verify { mockPrefsEditor.putInt(CURRENT_PLAYLIST.fname, fixtValue) }
+        verify { mockPrefsEditor.putInt(CURRENT_PLAYING_PLAYLIST.fname, fixtValue) }
         verify { mockPrefsEditor.apply() }
     }
 
@@ -157,31 +157,36 @@ class SharedPrefsWrapperTest {
     fun getString() {
         val fixtValue: String = fixture.build()
         val fixtDefault: String = fixture.build()
-        every { mockPrefs.getString(CURRENT_PLAYLIST.fname, fixtDefault) } returns fixtValue
+        every { mockPrefs.getString(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) } returns fixtValue
 
-        assertThat(sut.getString(CURRENT_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
-        verify { mockPrefs.getString(CURRENT_PLAYLIST.fname, fixtDefault) }
+        assertThat(sut.getString(CURRENT_PLAYING_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
+        verify { mockPrefs.getString(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) }
     }
 
     @Test
     fun putString() {
         val fixtValue: String = fixture.build()
-        every { mockPrefsEditor.putString(CURRENT_PLAYLIST.fname, fixtValue) } returns mockPrefsEditor
+        every { mockPrefsEditor.putString(CURRENT_PLAYING_PLAYLIST.fname, fixtValue) } returns mockPrefsEditor
 
-        sut.putString(CURRENT_PLAYLIST, fixtValue)
+        sut.putString(CURRENT_PLAYING_PLAYLIST, fixtValue)
 
-        verify { mockPrefsEditor.putString(CURRENT_PLAYLIST.fname, fixtValue) }
+        verify { mockPrefsEditor.putString(CURRENT_PLAYING_PLAYLIST.fname, fixtValue) }
         verify { mockPrefsEditor.apply() }
     }
 
     @Test
     fun putEnum() {
         val fixtValue: GeneralPreferences = fixture.build()
-        every { mockPrefsEditor.putString(CURRENT_PLAYLIST.fname, fixtValue.toString()) } returns mockPrefsEditor
+        every {
+            mockPrefsEditor.putString(
+                CURRENT_PLAYING_PLAYLIST.fname,
+                fixtValue.toString()
+            )
+        } returns mockPrefsEditor
 
-        sut.putEnum(CURRENT_PLAYLIST, fixtValue)
+        sut.putEnum(CURRENT_PLAYING_PLAYLIST, fixtValue)
 
-        verify { mockPrefsEditor.putString(CURRENT_PLAYLIST.fname, fixtValue.toString()) }
+        verify { mockPrefsEditor.putString(CURRENT_PLAYING_PLAYLIST.fname, fixtValue.toString()) }
         verify { mockPrefsEditor.apply() }
     }
 
@@ -189,61 +194,61 @@ class SharedPrefsWrapperTest {
     fun getEnum() {
         val fixtValue: GeneralPreferences = fixture.build()
         val fixtDefault: GeneralPreferences = fixture.build()
-        every { mockPrefs.getString(CURRENT_PLAYLIST.fname, null) } returns fixtValue.toString()
+        every { mockPrefs.getString(CURRENT_PLAYING_PLAYLIST.fname, null) } returns fixtValue.toString()
 
-        assertThat(sut.getEnum(CURRENT_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
+        assertThat(sut.getEnum(CURRENT_PLAYING_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
 
-        verify { mockPrefs.getString(CURRENT_PLAYLIST.fname, null) }
+        verify { mockPrefs.getString(CURRENT_PLAYING_PLAYLIST.fname, null) }
     }
 
     @Test
     fun getEnumDefault() {
         val fixtDefault: GeneralPreferences = fixture.build()
-        every { mockPrefs.getString(CURRENT_PLAYLIST.fname, null) } returns fixtDefault.toString()
+        every { mockPrefs.getString(CURRENT_PLAYING_PLAYLIST.fname, null) } returns fixtDefault.toString()
 
-        assertThat(sut.getEnum(CURRENT_PLAYLIST, fixtDefault)).isEqualTo(fixtDefault)
+        assertThat(sut.getEnum(CURRENT_PLAYING_PLAYLIST, fixtDefault)).isEqualTo(fixtDefault)
 
-        verify { mockPrefs.getString(CURRENT_PLAYLIST.fname, null) }
+        verify { mockPrefs.getString(CURRENT_PLAYING_PLAYLIST.fname, null) }
     }
 
     @Test
     fun getBoolean() {
         val fixtValue: Boolean = fixture.build()
         val fixtDefault: Boolean = !fixtValue
-        every { mockPrefs.getBoolean(CURRENT_PLAYLIST.fname, fixtDefault) } returns fixtValue
+        every { mockPrefs.getBoolean(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) } returns fixtValue
 
-        assertThat(sut.getBoolean(CURRENT_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
-        verify { mockPrefs.getBoolean(CURRENT_PLAYLIST.fname, fixtDefault) }
+        assertThat(sut.getBoolean(CURRENT_PLAYING_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
+        verify { mockPrefs.getBoolean(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) }
     }
 
     @Test
     fun getBooleanDefault() {
         val fixtValue: Boolean = fixture.build()
         val fixtDefault: Boolean = !fixtValue
-        every { mockPrefs.getBoolean(CURRENT_PLAYLIST.fname, fixtDefault) } returns fixtValue
+        every { mockPrefs.getBoolean(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) } returns fixtValue
 
-        assertThat(sut.getBoolean(CURRENT_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
-        verify { mockPrefs.getBoolean(CURRENT_PLAYLIST.fname, fixtDefault) }
+        assertThat(sut.getBoolean(CURRENT_PLAYING_PLAYLIST, fixtDefault)).isEqualTo(fixtValue)
+        verify { mockPrefs.getBoolean(CURRENT_PLAYING_PLAYLIST.fname, fixtDefault) }
     }
 
     @Test
     fun putBoolean() {
         val fixtValue: Boolean = fixture.build()
-        every { mockPrefsEditor.putBoolean(CURRENT_PLAYLIST.fname, fixtValue) } returns mockPrefsEditor
+        every { mockPrefsEditor.putBoolean(CURRENT_PLAYING_PLAYLIST.fname, fixtValue) } returns mockPrefsEditor
 
-        sut.putBoolean(CURRENT_PLAYLIST, fixtValue)
+        sut.putBoolean(CURRENT_PLAYING_PLAYLIST, fixtValue)
 
-        verify { mockPrefsEditor.putBoolean(CURRENT_PLAYLIST.fname, fixtValue) }
+        verify { mockPrefsEditor.putBoolean(CURRENT_PLAYING_PLAYLIST.fname, fixtValue) }
         verify { mockPrefsEditor.apply() }
     }
 
     @Test
     fun remove() {
-        every { mockPrefsEditor.remove(CURRENT_PLAYLIST.fname) } returns mockPrefsEditor
+        every { mockPrefsEditor.remove(CURRENT_PLAYING_PLAYLIST.fname) } returns mockPrefsEditor
         every { mockPrefsEditor.remove(CP_FIRST) } returns mockPrefsEditor
         every { mockPrefsEditor.remove(CP_SECOND) } returns mockPrefsEditor
-        sut.remove(CURRENT_PLAYLIST)
-        verify { mockPrefsEditor.remove(CURRENT_PLAYLIST.fname) }
+        sut.remove(CURRENT_PLAYING_PLAYLIST)
+        verify { mockPrefsEditor.remove(CURRENT_PLAYING_PLAYLIST.fname) }
         verify { mockPrefsEditor.remove(CP_FIRST) }
         verify { mockPrefsEditor.remove(CP_SECOND) }
         verify { mockPrefsEditor.apply() }
@@ -251,31 +256,31 @@ class SharedPrefsWrapperTest {
 
     @Test
     fun has() {
-        every { mockPrefs.contains(CURRENT_PLAYLIST.fname) } returns true
+        every { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) } returns true
         every { mockPrefs.contains(CP_FIRST) } returns false
 
-        assertThat(sut.has(CURRENT_PLAYLIST)).isTrue()
+        assertThat(sut.has(CURRENT_PLAYING_PLAYLIST)).isTrue()
     }
 
     @Test
     fun hasPair() {
-        every { mockPrefs.contains(CURRENT_PLAYLIST.fname) } returns false
+        every { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) } returns false
         every { mockPrefs.contains(CP_FIRST) } returns true
 
-        assertThat(sut.has(CURRENT_PLAYLIST)).isTrue()
+        assertThat(sut.has(CURRENT_PLAYING_PLAYLIST)).isTrue()
     }
 
     @Test
     fun hasNone() {
-        every { mockPrefs.contains(CURRENT_PLAYLIST.fname) } returns false
+        every { mockPrefs.contains(CURRENT_PLAYING_PLAYLIST.fname) } returns false
         every { mockPrefs.contains(CP_FIRST) } returns false
 
-        assertThat(sut.has(CURRENT_PLAYLIST)).isFalse()
+        assertThat(sut.has(CURRENT_PLAYING_PLAYLIST)).isFalse()
     }
 
     @Test
     fun putPair() {
-        sut.putPair(CURRENT_PLAYLIST, 1L to MEMORY)
+        sut.putPair(CURRENT_PLAYING_PLAYLIST, 1L to MEMORY)
         verify { mockPrefsEditor.putLong(CP_FIRST, 1L) }
         verify { mockPrefsEditor.putString(CP_SECOND, MEMORY.toString()) }
         verify(exactly = 2) { mockPrefsEditor.apply() }
@@ -283,7 +288,7 @@ class SharedPrefsWrapperTest {
 
     @Test
     fun putPairNulls() {
-        sut.putPair(CURRENT_PLAYLIST, (null as String?) to (null as Source?))
+        sut.putPair(CURRENT_PLAYING_PLAYLIST, (null as String?) to (null as Source?))
         verify { mockPrefsEditor.remove(CP_FIRST) }
         verify { mockPrefsEditor.remove(CP_SECOND) }
         verify(exactly = 2) { mockPrefsEditor.apply() }
@@ -298,7 +303,7 @@ class SharedPrefsWrapperTest {
         every { mockPrefs.getString(CP_FIRST, fixtFirstDefault) } returns fixtFirst
         every { mockPrefs.getString(CP_SECOND, null) } returns fixtSecond.toString()
 
-        val pair = sut.getPair(CURRENT_PLAYLIST, fixtFirstDefault to fixtSecondDefault)
+        val pair = sut.getPair(CURRENT_PLAYING_PLAYLIST, fixtFirstDefault to fixtSecondDefault)
 
         assertThat(pair.first).isEqualTo(fixtFirst)
         assertThat(pair.second).isEqualTo(fixtSecond)
@@ -312,7 +317,7 @@ class SharedPrefsWrapperTest {
         every { mockPrefs.getString(CP_FIRST, fixtFirstDefault) } returns null
         every { mockPrefs.getString(CP_SECOND, null) } returns null
 
-        val pair = sut.getPair(CURRENT_PLAYLIST, fixtFirstDefault to fixtSecondDefault)
+        val pair = sut.getPair(CURRENT_PLAYING_PLAYLIST, fixtFirstDefault to fixtSecondDefault)
 
         assertThat(pair.first).isEqualTo(fixtFirstDefault)
         assertThat(pair.second).isEqualTo(fixtSecondDefault)
