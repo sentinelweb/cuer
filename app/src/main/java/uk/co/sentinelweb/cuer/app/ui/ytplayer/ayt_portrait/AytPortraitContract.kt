@@ -97,7 +97,7 @@ interface AytPortraitContract {
                 scoped<CommitHost> { EmptyCommitHost() }
                 scoped { AlertDialogCreator(get<AytPortraitActivity>()) }
                 scoped { ShareWrapper(get<AytPortraitActivity>()) }
-                scoped { LinkNavigator(get(), get(), get(), false) }
+                scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 scoped { ShareNavigationHack() }
             }
         }

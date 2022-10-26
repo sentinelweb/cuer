@@ -4,7 +4,7 @@ sealed class LinkDomain constructor(
     open val address: String,
     open val title: String? = null,
     open val category: Category = Category.OTHER,
-    open val extractRegion: Pair<Int, Int>? = null
+    open val extractRegion: Pair<Int, Int>? = null,
 ) {
 
     data class UrlLinkDomain(

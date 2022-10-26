@@ -350,12 +350,6 @@ class PlaylistItemEditViewModel constructor(
         linkNavigator.navigateLink(link)
     }
 
-//    private fun navLink(link: LinkDomain.UrlLinkDomain): NavigationModel =
-//        NavigationModel(WEB_LINK, mapOf(NavigationModel.Param.LINK to link.address))
-//
-//    private fun navShare(link: LinkDomain.UrlLinkDomain): NavigationModel =
-//        NavigationModel(SHARE, mapOf(NavigationModel.Param.LINK to link.address))
-
     override fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain) {
         _navigateLiveData.value =
             NavigationModel(CRYPTO_LINK, mapOf(NavigationModel.Param.CRYPTO_ADDRESS to cryptoAddress))

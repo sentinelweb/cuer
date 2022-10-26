@@ -85,7 +85,7 @@ interface MainContract {
                 scoped<PlaylistContract.Interactions?> { null }
                 scoped { FloatingPlayerCastListener(get(), get(), get()) }
                 scoped { AlertDialogCreator(get<MainActivity>()) }
-                scoped { LinkNavigator(get(), get(), get(), true) }
+                scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), true) }
                 // ALL SHARE HACKS
                 scoped<DoneNavigation> { MainDoneNavigation(get<MainActivity>()) }
                 scoped<CommitHost> { EmptyCommitHost() }
