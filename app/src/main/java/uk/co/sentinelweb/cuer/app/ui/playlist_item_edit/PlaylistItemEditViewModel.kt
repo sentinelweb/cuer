@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
@@ -32,7 +33,6 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_AD
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
-import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
@@ -52,7 +52,7 @@ class PlaylistItemEditViewModel constructor(
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val shareWrapper: ShareWrapper,
     private val playUseCase: PlayUseCase,
-    private val linkScanner: LinkScanner,
+    private val linkNavigator: LinkNavigator,
     private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
@@ -347,22 +347,14 @@ class PlaylistItemEditViewModel constructor(
     }
 
     override fun onLinkClick(link: LinkDomain.UrlLinkDomain) {
-        _navigateLiveData.value = linkScanner.scan(link)?.let { scanned ->
-            when (scanned.first) {
-                ObjectTypeDomain.MEDIA -> navShare(link)
-                ObjectTypeDomain.PLAYLIST -> navShare(link)
-                ObjectTypeDomain.PLAYLIST_ITEM -> navShare(link)
-                ObjectTypeDomain.CHANNEL -> navLink(link)
-                else -> navLink(link)
-            }
-        } ?: let { navLink(link) }
+        linkNavigator.navigateLink(link)
     }
 
-    private fun navLink(link: LinkDomain.UrlLinkDomain): NavigationModel =
-        NavigationModel(WEB_LINK, mapOf(NavigationModel.Param.LINK to link.address))
-
-    private fun navShare(link: LinkDomain.UrlLinkDomain): NavigationModel =
-        NavigationModel(SHARE, mapOf(NavigationModel.Param.LINK to link.address))
+//    private fun navLink(link: LinkDomain.UrlLinkDomain): NavigationModel =
+//        NavigationModel(WEB_LINK, mapOf(NavigationModel.Param.LINK to link.address))
+//
+//    private fun navShare(link: LinkDomain.UrlLinkDomain): NavigationModel =
+//        NavigationModel(SHARE, mapOf(NavigationModel.Param.LINK to link.address))
 
     override fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain) {
         _navigateLiveData.value =

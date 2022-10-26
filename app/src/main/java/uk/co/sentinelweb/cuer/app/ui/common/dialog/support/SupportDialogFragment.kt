@@ -19,9 +19,8 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract
@@ -33,13 +32,10 @@ import uk.co.sentinelweb.cuer.app.ui.support.SupportStoreFactory
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
-import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.LinkDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseMedia
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
@@ -53,10 +49,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     private val cryptoLauncher: CryptoLauncher by inject()
     private val toast: ToastWrapper by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
-    private val navRouter: NavigationRouter by inject()
-    private val linkScanner: LinkScanner by inject()
-//    private val urlLauncher: UrlLauncherWrapper by inject()
-//    private val ytLauncher: YoutubeJavaApiWrapper by inject()
+    private val linkNavigator: LinkNavigator by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
@@ -111,38 +104,12 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                     is Open, is Crypto -> shareNavigationHack.isNavigatingInApp = true
                 }
                 when (label) {
-                    is Open -> (
-                            linkScanner.scan(label.link.address)
-                                ?.let { scanned ->
-                                    when (scanned.first) {
-                                        ObjectTypeDomain.MEDIA -> navShare(label.link)
-                                        ObjectTypeDomain.PLAYLIST -> navShare(label.link)
-                                        ObjectTypeDomain.PLAYLIST_ITEM -> navShare(label.link)
-                                        ObjectTypeDomain.CHANNEL -> navLink(label.link)
-                                        else -> navLink(label.link)
-                                    }
-                                }
-                                ?: let { navLink(label.link) }
-                            ).apply { navRouter.navigate(this) }
-
-//                        when (label.link.domain) {
-//                            YOUTUBE -> ytLauncher.launch(label.link.address)
-//                            else -> urlLauncher.launchUrl(label.link.address)
-//                        }
-
+                    is Open -> linkNavigator.navigateLink(label.link)
                     is Crypto -> cryptoLauncher.launch(label.link)
                 }
             }
         })
     }
-
-
-    private fun navLink(link: LinkDomain.UrlLinkDomain): NavigationModel =
-        NavigationModel(NavigationModel.Target.WEB_LINK, mapOf(NavigationModel.Param.LINK to link.address))
-
-    private fun navShare(link: LinkDomain.UrlLinkDomain): NavigationModel =
-        NavigationModel(NavigationModel.Target.SHARE, mapOf(NavigationModel.Param.LINK to link.address))
-
 
     class SupportStrings(private val res: ResourceWrapper) : SupportContract.Strings
 

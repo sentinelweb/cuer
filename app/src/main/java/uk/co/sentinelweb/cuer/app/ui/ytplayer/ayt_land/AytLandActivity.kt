@@ -21,9 +21,10 @@ import uk.co.sentinelweb.cuer.app.databinding.ActivityAytFullsreenBinding
 import uk.co.sentinelweb.cuer.app.databinding.FullscreenControlsOverlayBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.CHANNEL_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.YOUTUBE_CHANNEL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
@@ -224,8 +225,6 @@ class AytLandActivity : AppCompatActivity(),
                 is Command -> label.command.let { command ->
                     aytViewHolder.processCommand(command)
                 }
-                is LinkOpen ->
-                    navRouter.navigate(NavigationModel(WEB_LINK, mapOf(LINK to label.url)))
                 is ChannelOpen ->
                     label.channel.platformId?.let { id ->
                         navRouter.navigate(

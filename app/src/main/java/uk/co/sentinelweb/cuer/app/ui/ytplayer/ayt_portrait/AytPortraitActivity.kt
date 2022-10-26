@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
@@ -47,14 +48,12 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceMana
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
-import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.CryptoLauncher
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LinkDomain
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.TimecodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -79,7 +78,7 @@ class AytPortraitActivity : AppCompatActivity(),
     private val floatingService: FloatingPlayerServiceManager by inject()
     private val queueConsumer: QueueMediatorContract.Consumer by inject()
     private val cryptoLauncher: CryptoLauncher by inject()
-    private val linkScanner: LinkScanner by inject()
+    private val linkNavigator: LinkNavigator by inject()
     private val shareWrapper: ShareWrapper by inject()
     private val multiPrefs: MultiPlatformPreferencesWrapper by inject()
 
@@ -154,7 +153,7 @@ class AytPortraitActivity : AppCompatActivity(),
         binding.portraitPlayerDescription.interactions = object : DescriptionContract.Interactions {
 
             override fun onLinkClick(link: LinkDomain.UrlLinkDomain) {
-                mviView.dispatch(LinkClick(link.address))
+                mviView.dispatch(LinkClick(link))
             }
 
             override fun onChannelClick() {
@@ -162,7 +161,7 @@ class AytPortraitActivity : AppCompatActivity(),
             }
 
             override fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain) {
-                cryptoLauncher.launch(cryptoAddress)
+                cryptoLauncher.launch(cryptoAddress)// todo route mvi
             }
 
             override fun onTimecodeClick(timecode: TimecodeDomain) {
@@ -249,18 +248,7 @@ class AytPortraitActivity : AppCompatActivity(),
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
             when (label) {
                 is Command -> label.command.let { aytViewHolder.processCommand(it) }
-                is LinkOpen ->
-                    navRouter.navigate(
-                        linkScanner.scan(label.url)?.let { scanned ->
-                            when (scanned.first) {
-                                ObjectTypeDomain.MEDIA -> navShare(label.url)
-                                ObjectTypeDomain.PLAYLIST -> navShare(label.url)
-                                ObjectTypeDomain.PLAYLIST_ITEM -> navShare(label.url)
-                                ObjectTypeDomain.CHANNEL -> navLink(label.url)
-                                else -> navLink(label.url)
-                            }
-                        } ?: navLink(label.url)
-                    )
+                is LinkOpen -> linkNavigator.navigateLink(label.link)
 
                 is ChannelOpen ->
                     label.channel.platformId?.let { id ->
@@ -301,10 +289,6 @@ class AytPortraitActivity : AppCompatActivity(),
                 is Share -> shareWrapper.share(label.item.media)
             }
         }
-
-        private fun navLink(link: String) = NavigationModel(WEB_LINK, mapOf(LINK to link))
-
-        private fun navShare(link: String) = NavigationModel(SHARE, mapOf(LINK to link))
     }
 
     private val playlistInteractions = object : PlaylistContract.Interactions {

@@ -125,7 +125,7 @@ class PlayerStoreFactory(
                 is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
                 is Intent.PlaylistView -> dispatch(Result.Screen(Screen.PLAYLIST))
                 is Intent.PlaylistItemView -> dispatch(Result.Screen(Screen.DESCRIPTION))
-                is Intent.LinkOpen -> publish(Label.LinkOpen(intent.url))
+                is Intent.LinkOpen -> publish(Label.LinkOpen(intent.link))
                 is Intent.ChannelOpen ->
                     getState().item?.media?.channelData
                         ?.let { publish(Label.ChannelOpen(it)) }
