@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.common.dialog.support
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
+import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.Label.Crypto
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.Label.Open
@@ -28,6 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.support.SupportModelMapper
 import uk.co.sentinelweb.cuer.app.ui.support.SupportStoreFactory
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -47,6 +50,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     private val cryptoLauncher: CryptoLauncher by inject()
     private val ytLauncher: YoutubeJavaApiWrapper by inject()
     private val toast: ToastWrapper by inject()
+    private val shareNavigationHack: ShareNavigationHack by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
@@ -95,16 +99,25 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
             }
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        linkScopeToActivity()
+    }
+
     private fun observeLabels() {
         mviView.labelObservable().observe(
             this.viewLifecycleOwner,
             object : Observer<SupportContract.MviStore.Label> {
                 override fun onChanged(label: SupportContract.MviStore.Label) {
                     when (label) {
+                        is Open, is Crypto -> shareNavigationHack.isNavigatingInApp = true
+                    }
+                    when (label) {
                         is Open -> when (label.link.domain) {
                             YOUTUBE -> ytLauncher.launch(label.link.address)
                             else -> urlLauncher.launchUrl(label.link.address)
                         }
+
                         is Crypto -> cryptoLauncher.launch(label.link)
                     }
                 }

@@ -235,6 +235,11 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         }
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
     private fun observeUi(model: PlaylistEditViewModel.UiEvent) =
         when (model.type) {
             ERROR -> snackbarWrapper.makeError(model.data as String).show()

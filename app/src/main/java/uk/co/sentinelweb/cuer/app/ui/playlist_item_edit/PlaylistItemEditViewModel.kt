@@ -117,7 +117,7 @@ class PlaylistItemEditViewModel constructor(
                                 .also {
                                     playlistOrchestrator.loadList(
                                         IdListFilter(it),
-                                        Options(state.source)
+                                        state.source.flatOptions()
                                     )
                                         .also { state.selectedPlaylists.addAll(it) }
                                 }
@@ -427,7 +427,7 @@ class PlaylistItemEditViewModel constructor(
             val selectedPlaylists = if (state.selectedPlaylists.size > 0) {
                 state.selectedPlaylists
             } else {
-                playlistOrchestrator.loadList(DefaultFilter(), Options(LOCAL))
+                playlistOrchestrator.loadList(DefaultFilter(), LOCAL.flatOptions())
                     .takeIf { it.size > 0 }
                     ?: throw NoDefaultPlaylistException()
             }

@@ -18,7 +18,10 @@ class PlaylistsAdapter constructor(
     private val interactions: ItemContract.Interactions
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private lateinit var recyclerView: RecyclerView
+    private var _recyclerView: RecyclerView? = null
+    private val recyclerView: RecyclerView
+        get() = _recyclerView ?: throw IllegalStateException("PlaylistsAdapter._recyclerView not bound")
+
 
     private var _data: List<ItemContract.Model> = listOf()
 
@@ -50,7 +53,11 @@ class PlaylistsAdapter constructor(
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        this.recyclerView = recyclerView
+        this._recyclerView = recyclerView
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        this._recyclerView = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, type: Int): RecyclerView.ViewHolder {

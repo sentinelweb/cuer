@@ -52,7 +52,6 @@ class SqldelightPlaylistItemDatabaseRepository(
                     } else item
                 }
                 .let { item ->
-                    log.d("Item media : ${item.media}")
                     item to playlistItemMapper.map(item)
                 }
                 .let { (domain, itemEntity) ->

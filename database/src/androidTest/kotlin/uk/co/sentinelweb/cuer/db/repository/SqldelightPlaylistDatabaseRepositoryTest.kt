@@ -198,6 +198,20 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
+    fun loadList_IdListFilter_flat() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>().map { it.resetIds() }
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val loaded = sut.loadList(IdListFilter(listOf(1, 2)), flat = true)
+        assertTrue(loaded.isSuccessful)
+        val expected = saved.data!!
+            .filter { listOf(1L, 2L).contains(it.id) }
+            .map { it.copy(items = listOf()) }
+        assertEquals(expected, loaded.data!!)
+        loaded.data!!.forEach { assertEquals(0, it.items.size) }
+    }
+
+    @Test
     fun loadList_DefaultFilter() = runTest {
         val toCreate = fixture<List<PlaylistDomain>>()
             .map { it.resetIds() }

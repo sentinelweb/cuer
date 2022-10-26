@@ -45,6 +45,7 @@ import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseCategory
 import uk.co.sentinelweb.cuer.domain.ext.serialise
+import java.io.File
 
 class ShareActivity : AppCompatActivity(),
     ShareContract.View,
@@ -60,6 +61,7 @@ class ShareActivity : AppCompatActivity(),
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
+    private val shareNavigationHack: ShareNavigationHack by inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
@@ -73,7 +75,6 @@ class ShareActivity : AppCompatActivity(),
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.run { (getChildFragmentManager().getFragments().get(0) as? ScanContract.View) }
             ?: throw IllegalStateException("Not a scan fragment")
-
 
     private val commitFragment: ShareContract.Committer
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
@@ -120,6 +121,8 @@ class ShareActivity : AppCompatActivity(),
 
     override fun onDestroy() {
         volumeControl.controlView = null
+        _binding = null
+        snackbar = null
         super.onDestroy()
     }
 
@@ -150,7 +153,9 @@ class ShareActivity : AppCompatActivity(),
 // but if finish causes problems here then play with getting the nav in the right state
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        finish()
+        if (shareNavigationHack.isNavigatingInApp.not()) {
+            finish()
+        }
         // this could be used to reset the nav controller when home is pressed.
         // so in onNewIntent can get scanFragment
         // but need to stop it for things like link launch - whichmans setting up the descriptionView to parse links
@@ -293,7 +298,11 @@ class ShareActivity : AppCompatActivity(),
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(STATE_KEY, presenter.serializeState())
+        val serializeState = presenter.serializeState()
+        getFilesDir()
+            ?.let { File(it, "shareactivity.json") }
+            ?.apply { writeText(serializeState ?: "") }
+        outState.putString(STATE_KEY, serializeState)
     }
 
     companion object {

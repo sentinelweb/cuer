@@ -28,6 +28,7 @@ class MediaOrchestrator constructor(
             LOCAL -> mediaDatabaseRepository
                 .load(id, options.flat)
                 .forceDatabaseSuccess()
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)// no platform id available
@@ -39,6 +40,7 @@ class MediaOrchestrator constructor(
             LOCAL -> mediaDatabaseRepository
                 .loadList(filter, options.flat)
                 .allowDatabaseListResultEmpty()
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> when (filter) {
@@ -46,6 +48,7 @@ class MediaOrchestrator constructor(
                     ytInteractor
                         .videos(filter.ids, listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS))
                         .forceNetListResultNotEmpty("Youtube ${filter.ids} does not exist")
+
                 else -> throw InvalidOperationException(this::class, filter, options)
             }
         }
@@ -58,6 +61,7 @@ class MediaOrchestrator constructor(
                 .takeIf { it.isSuccessful && it.data?.size == 1 }
                 ?.data
                 ?.get(0)
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM ->
@@ -77,6 +81,7 @@ class MediaOrchestrator constructor(
             LOCAL -> mediaDatabaseRepository
                 .save(domain, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> throw NotImplementedException()
@@ -89,14 +94,24 @@ class MediaOrchestrator constructor(
             LOCAL -> mediaDatabaseRepository
                 .save(domains, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed ${domains.map { it.platformId }}")
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> throw NotImplementedException()
         }
 
-    override suspend fun count(filter: Filter, options: Options): Int {
-        throw NotImplementedException()
-    }
+    override suspend fun count(filter: Filter, options: Options): Int =
+        when (options.source) {
+            MEMORY -> mediaMemoryRepository.count(filter, options)
+            LOCAL ->
+                mediaDatabaseRepository.count(filter)
+                    .forceDatabaseSuccessNotNull("Count failed $filter")
+
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)
+        }
+
 
     override suspend fun delete(domain: MediaDomain, options: Options): Boolean {
         throw NotImplementedException()
@@ -108,6 +123,7 @@ class MediaOrchestrator constructor(
             LOCAL -> mediaDatabaseRepository
                 .update(update, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Update failed: ${update}")
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> throw NotImplementedException()

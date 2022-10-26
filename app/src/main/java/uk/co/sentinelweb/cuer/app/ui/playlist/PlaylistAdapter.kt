@@ -16,7 +16,10 @@ class PlaylistAdapter constructor(
     private val showCards: Boolean
 ) : RecyclerView.Adapter<ItemViewHolder>() {
 
-    private lateinit var recyclerView: RecyclerView
+    private var _recyclerView: RecyclerView? = null
+    private val recyclerView: RecyclerView
+        get() = _recyclerView ?: throw IllegalStateException("PlaylistAdapter._recyclerView not bound")
+
 
     private var _data: MutableList<ItemContract.Model> = mutableListOf()
 
@@ -47,11 +50,14 @@ class PlaylistAdapter constructor(
             this@PlaylistAdapter._data = data.toMutableList()
             notifyDataSetChanged()
         }
-
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        this.recyclerView = recyclerView
+        this._recyclerView = recyclerView
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        this._recyclerView = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemViewHolder {

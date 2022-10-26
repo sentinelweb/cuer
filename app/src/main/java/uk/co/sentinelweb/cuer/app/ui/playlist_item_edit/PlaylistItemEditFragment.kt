@@ -40,6 +40,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
@@ -68,8 +69,11 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val commitHost: CommitHost by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val playerControls: PlayerContract.PlayerControls by inject()
+    private val shareNavigationHack: ShareNavigationHack by inject()
 
-    private lateinit var binding: FragmentPlaylistItemEditBinding
+    private val binding: FragmentPlaylistItemEditBinding
+        get() = _binding ?: throw IllegalStateException("FragmentPlaylistItemEditBinding not bound")
+    private var _binding: FragmentPlaylistItemEditBinding? = null
     private val playMenuItem: MenuItem
         get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
 
@@ -133,7 +137,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPlaylistItemEditBinding.inflate(inflater)
+        _binding = FragmentPlaylistItemEditBinding.inflate(inflater)
         return binding.root
     }
 
@@ -151,6 +155,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 R.id.plie_play -> {
                     viewModel.onPlayVideo(); true
                 }
+
                 else -> false
             }
         }
@@ -201,6 +206,13 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         bindObserver(viewModel.getUiObservable(), this::observeUi)
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        dialog = null
+        dialogFragment = null
+        super.onDestroyView()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
@@ -237,6 +249,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             }
             Unit
         }
+
         ERROR -> snackbarWrapper.makeError(model.data as String).show()
         UNPIN -> snackbarWrapper
             .make(
@@ -244,6 +257,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 actionText = getString(R.string.action_unpin),
                 action = { viewModel.onUnPin() })
             .show()
+
         JUMPTO -> {
             playerControls.getPlaylistItem()?.media?.platformId
                 ?.takeIf { it == itemArg?.media?.platformId }
@@ -295,9 +309,12 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             .into(binding.plieImage)
     }
 
-    private fun observeNavigation(nav: NavigationModel) = when (nav.target) {
-        NAV_DONE -> doneNavigation.navigateDone()
-        else -> navRouter.navigate(nav)
+    private fun observeNavigation(nav: NavigationModel) {
+        shareNavigationHack.isNavigatingInApp = true
+        when (nav.target) {
+            NAV_DONE -> doneNavigation.navigateDone()
+            else -> navRouter.navigate(nav)
+        }
     }
 
     private fun observeDialog(model: DialogModel) {
@@ -309,6 +326,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                     PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
                 dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
             }
+
             DialogModel.Type.PLAYLIST_ADD -> {
                 // todo need a callback to select the parent in the add dialog i.e. another type DialogModel.Type.PLAYLIST_SELECT_PARENT ??
                 // todo also to select the image
@@ -324,26 +342,32 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                     }
                 dialogFragment?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
             }
+
             DialogModel.Type.SELECT_ROUTE -> {
                 castDialogWrapper.showRouteSelector(childFragmentManager)
             }
+
             DialogModel.Type.CONFIRM -> {
                 alertDialogCreator.create(model as AlertDialogModel).show()
             }
+
             DialogModel.Type.PLAYLIST -> {
                 selectDialogCreator
                     .createMulti(model as SelectDialogModel)
                     .apply { show() }
             }
+
             DialogModel.Type.PLAYLIST_ITEM_SETTNGS -> {
                 selectDialogCreator
                     .createMulti(model as SelectDialogModel)
                     .apply { show() }
             }
+
             DialogModel.Type.SUPPORT -> SupportDialogFragment.show(
                 requireActivity(),
                 (model as ArgumentDialogModel).args[MEDIA.toString()] as MediaDomain
             )
+
             else -> Unit
         }
     }
