@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
@@ -84,6 +85,7 @@ interface MainContract {
                 scoped<PlaylistContract.Interactions?> { null }
                 scoped { FloatingPlayerCastListener(get(), get(), get()) }
                 scoped { AlertDialogCreator(get<MainActivity>()) }
+                scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), true) }
                 // ALL SHARE HACKS
                 scoped<DoneNavigation> { MainDoneNavigation(get<MainActivity>()) }
                 scoped<CommitHost> { EmptyCommitHost() }

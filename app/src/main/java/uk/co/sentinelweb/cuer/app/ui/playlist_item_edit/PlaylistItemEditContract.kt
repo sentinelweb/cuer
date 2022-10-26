@@ -83,7 +83,7 @@ interface PlaylistItemEditContract {
                         prefsWrapper = get(),
                         shareWrapper = get(),
                         playUseCase = get(),
-                        linkScanner = get(),
+                        linkNavigator = get(),
                         recentLocalPlaylists = get(),
                     )
                 }

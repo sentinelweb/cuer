@@ -19,6 +19,7 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.MEDIA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
@@ -34,7 +35,6 @@ import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.LinkDomain.DomainHost.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseMedia
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -46,19 +46,16 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     private val mviView: SupportMviView by inject()
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
-    private val urlLauncher: UrlLauncherWrapper by inject()
     private val cryptoLauncher: CryptoLauncher by inject()
-    private val ytLauncher: YoutubeJavaApiWrapper by inject()
     private val toast: ToastWrapper by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
+    private val linkNavigator: LinkNavigator by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding!!
 
     private val media: MediaDomain? by lazy {
-        arguments
-            ?.getString(MEDIA.toString())
-            ?.let { deserialiseMedia(it) }
+        arguments?.getString(MEDIA.toString())?.let { deserialiseMedia(it) }
     }
 
     init {
@@ -72,9 +69,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentComposeBinding.inflate(layoutInflater)
         return binding.root
@@ -86,17 +81,15 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
             SupportComposables.SupportUi(mviView)
         }
         observeLabels()
-        media
-            ?.also {
-                coroutines.mainScope.launch {
-                    delay(300)
-                    mviView.dispatch(SupportContract.View.Event.Load(it))
-                }
+        media?.also {
+            coroutines.mainScope.launch {
+                delay(300)
+                mviView.dispatch(SupportContract.View.Event.Load(it))
             }
-            ?: run {
-                toast.show("Can't load media")
-                dismissAllowingStateLoss()
-            }
+        } ?: run {
+            toast.show("Can't load media")
+            dismissAllowingStateLoss()
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -105,23 +98,17 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     }
 
     private fun observeLabels() {
-        mviView.labelObservable().observe(
-            this.viewLifecycleOwner,
-            object : Observer<SupportContract.MviStore.Label> {
-                override fun onChanged(label: SupportContract.MviStore.Label) {
-                    when (label) {
-                        is Open, is Crypto -> shareNavigationHack.isNavigatingInApp = true
-                    }
-                    when (label) {
-                        is Open -> when (label.link.domain) {
-                            YOUTUBE -> ytLauncher.launch(label.link.address)
-                            else -> urlLauncher.launchUrl(label.link.address)
-                        }
-
-                        is Crypto -> cryptoLauncher.launch(label.link)
-                    }
+        mviView.labelObservable().observe(this.viewLifecycleOwner, object : Observer<SupportContract.MviStore.Label> {
+            override fun onChanged(label: SupportContract.MviStore.Label) {
+                when (label) {
+                    is Open, is Crypto -> shareNavigationHack.isNavigatingInApp = true
                 }
-            })
+                when (label) {
+                    is Open -> linkNavigator.navigateLink(label.link)
+                    is Crypto -> cryptoLauncher.launch(label.link)
+                }
+            }
+        })
     }
 
     class SupportStrings(private val res: ResourceWrapper) : SupportContract.Strings
@@ -131,8 +118,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
 
         // todo use navigation?
         fun show(a: FragmentActivity, m: MediaDomain) {
-            SupportDialogFragment()
-                .apply { arguments = bundleOf(MEDIA.toString() to m.serialise()) }
+            SupportDialogFragment().apply { arguments = bundleOf(MEDIA.toString() to m.serialise()) }
                 .show(a.supportFragmentManager, TAG)
         }
 
@@ -141,17 +127,13 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
             scope(named<SupportDialogFragment>()) {
                 scoped {
                     SupportController(
-                        storeFactory = get(),
-                        modelMapper = get()
+                        storeFactory = get(), modelMapper = get()
                     )
                 }
                 scoped {
                     SupportStoreFactory(
 //                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-                        storeFactory = DefaultStoreFactory(),
-                        log = get(),
-                        prefs = get(),
-                        linkExtractor = get()
+                        storeFactory = DefaultStoreFactory(), log = get(), prefs = get(), linkExtractor = get()
                     )
                 }
                 scoped<SupportContract.Strings> { SupportStrings(get()) }

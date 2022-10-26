@@ -42,14 +42,14 @@ interface PlayerContract {
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
             data class SeekTo(val fraction: Float) : Intent()
             data class SeekToPosition(val ms: Long) : Intent()
-            data class LinkOpen(val url: String) : Intent()
+            data class LinkOpen(val link: LinkDomain.UrlLinkDomain) : Intent()
             data class Duration(val ms: Long) : Intent()
             data class Id(val videoId: String) : Intent()
         }
 
         sealed class Label {
             data class Command(val command: PlayerCommand) : Label()
-            data class LinkOpen(val url: String) : Label()
+            data class LinkOpen(val link: LinkDomain.UrlLinkDomain) : Label()
             data class ChannelOpen(val channel: ChannelDomain) : Label()
             data class FullScreenPlayerOpen(val item: PlaylistItemDomain) : Label()
             data class PortraitPlayerOpen(val item: PlaylistItemDomain) : Label()
@@ -128,7 +128,7 @@ interface PlayerContract {
             data class PositionReceived(val ms: Long) : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
             data class TrackClick(val item: PlaylistItemDomain, val resetPosition: Boolean) : Event()
-            data class LinkClick(val url: String) : Event()
+            data class LinkClick(val link: LinkDomain.UrlLinkDomain) : Event()
             data class DurationReceived(val ms: Long) : Event()
             data class IdReceived(val videoId: String) : Event()
             data class OnInitFromService(val item: PlaylistItemDomain) : Event()
