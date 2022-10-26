@@ -49,7 +49,7 @@ interface SupportContract {
         }
 
         companion object {
-            val CATEGORY_ORDER = listOf(DONATE, CRYPTO, SOCIAL, PODCAST, VIDEO, OTHER)
+            val CATEGORY_ORDER = listOf(SUPPORT, CRYPTO, SOCIAL, PODCAST, VIDEO, OTHER)
         }
     }
 

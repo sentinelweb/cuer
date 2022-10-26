@@ -49,7 +49,7 @@ sealed class LinkDomain constructor(
     }
 
     enum class Category(val hosts: List<DomainHost>) {
-        DONATE(
+        SUPPORT(
             DomainHost.PATREON, DomainHost.PAYPAL, DomainHost.AMAZON, DomainHost.KO_FI,
             DomainHost.BUY_ME_A_COFFEE, DomainHost.TEESPRING
         ),
