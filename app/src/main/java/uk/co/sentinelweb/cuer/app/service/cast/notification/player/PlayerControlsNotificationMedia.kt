@@ -6,10 +6,10 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.Service
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
+import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_DISCONNECT
@@ -22,8 +22,6 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import androidx.media.app.NotificationCompat as MediaNotificationCompat
 
@@ -43,11 +41,9 @@ class PlayerControlsNotificationMedia constructor(
     }
 
     override fun showNotification(
-        state: PlayerStateDomain,
-        media: MediaDomain?,
-        bitmap: Bitmap?
+        state: PlayerControlsNotificationContract.State
     ) {
-        service.startForeground(FOREGROUND_ID, buildNotification(state, media, bitmap))
+        service.startForeground(FOREGROUND_ID, buildNotification(state))
     }
 
     override fun stopSelf() {
@@ -55,9 +51,7 @@ class PlayerControlsNotificationMedia constructor(
     }
 
     private fun buildNotification(
-        state: PlayerStateDomain,
-        media: MediaDomain?,
-        bitmap: Bitmap?
+        state: PlayerControlsNotificationContract.State
     ): Notification {
         if (icon == -1) {
             throw IllegalStateException("Dont forget to set the icon")
@@ -101,26 +95,37 @@ class PlayerControlsNotificationMedia constructor(
                         }
                     }
             )
-            .setContentTitle(media?.title ?: "No title")
-            .setContentText(media?.description ?: "No description")
+            .setContentTitle(buildTitle(state))
+            .setContentText(state.media?.description ?: "No description")
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
-        bitmap?.apply { builder.setLargeIcon(this) }
+        state.bitmap?.apply { builder.setLargeIcon(this) }
 
         //builder.addAction(R.drawable.ic_notif_track_b_black, "Prev", trackbPendingIntent) // #0
         builder.addAction(R.drawable.ic_notif_close_white, "Close", disconnectPendingIntent) // #0
         builder.addAction(R.drawable.ic_notif_fast_rewind_black, "-30s", skipbPendingIntent) // #1
-        when (state) {
-            PLAYING ->
-                builder.addAction(R.drawable.ic_notif_pause_black, "Pause", pausePendingIntent)
-            PAUSED ->
-                builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
-            BUFFERING ->
-                builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", pausePendingIntent)
-            ERROR ->
-                builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
-            else -> Unit // todo if some other state change notif
+        if (state.blocked) {
+            builder.addAction(R.drawable.ic_lock_24, "Locked", contentPendingIntent)
+        } else {
+            when (state.playState) {
+                PLAYING ->
+                    builder.addAction(R.drawable.ic_notif_pause_black, "Pause", pausePendingIntent)
+
+                PAUSED ->
+                    builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
+
+                BUFFERING ->
+                    builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", pausePendingIntent)
+
+                ERROR ->
+                    builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
+
+                else -> {
+                    log.d("state: $state")
+                    builder.addAction(R.drawable.ic_error, "Unknown", contentPendingIntent)
+                }
+            }
         }
         builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent) // #3
         builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
@@ -128,6 +133,8 @@ class PlayerControlsNotificationMedia constructor(
         builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #5
         return builder.build()
     }
+
+    private fun buildTitle(state: PlayerControlsNotificationContract.State) = (state.media?.title ?: "No title")
 
     private fun pendingIntent(action: String): PendingIntent {
         val intent = Intent(service, service::class.java).apply {
@@ -138,6 +145,6 @@ class PlayerControlsNotificationMedia constructor(
     }
 
     companion object {
-        const val FOREGROUND_ID = 34563
+        val FOREGROUND_ID = if (BuildConfig.DEBUG) 34563 else 34564
     }
 }

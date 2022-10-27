@@ -9,11 +9,14 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
+import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
+import uk.co.sentinelweb.cuer.app.backup.IBackupManager
 import uk.co.sentinelweb.cuer.app.db.AppDatabaseModule
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
+import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
@@ -23,6 +26,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialog
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.AndroidRibbonCreator
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
@@ -36,6 +41,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
+import uk.co.sentinelweb.cuer.app.ui.settings.PrefPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
@@ -95,6 +101,7 @@ object Modules {
         YoutubeCastServiceContract.serviceModule,
         PrefBackupContract.fragmentModule,
         PrefRootContract.fragmentModule,
+        PrefPlayerContract.fragmentModule,
         SearchContract.fragmentModule,
         SearchImageContract.fragmentModule,
         RemoteContract.serviceModule,
@@ -106,7 +113,7 @@ object Modules {
         BrowseFragment.fragmentModule,
         FloatingPlayerContract.serviceModule,
         SupportDialogFragment.fragmentModule,
-        AppSelectorBottomSheet.fragmentModule
+        AppSelectorBottomSheet.fragmentModule,
     )
 
     private val uiModule = module {
@@ -114,8 +121,13 @@ object Modules {
         factory { DatePickerCreator() }
         factory { IconMapper() }
         factory { BackgroundMapper(get()) }
-        single { AytViewHolder(get(), get(), get()) }
+        single { AytViewHolder(get(), get()) }
         factory { PlayYangProgress(get()) }
+        factory<RibbonCreator> { AndroidRibbonCreator(get()) }
+    }
+
+    private val receiverModule = module {
+        single { ScreenStateReceiver() }
     }
 
     private val utilModule = module {
@@ -136,12 +148,13 @@ object Modules {
         factory { PlaybackStateMapper() }
         factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
-        factory {
+        factory<IBackupManager> {
             BackupFileManager(
                 channelRepository = get(),
                 mediaRepository = get(),
                 playlistRepository = get(),
                 playlistItemRepository = get(),
+                imageDatabaseRepository = get(),
                 contextProvider = get(),
                 parserFactory = get(),
                 playlistItemCreator = get(),
@@ -152,6 +165,7 @@ object Modules {
                 log = get()
             )
         }
+        factory { AutoBackupFileExporter(get(), get(), get(), get(), get()) }
         factory { ImageProvider(get(), get()) }
         single {
             ImageFileRepository(
@@ -175,7 +189,7 @@ object Modules {
         factory<LogWrapper> { CompositeLogWrapper(get(), get()) }
         factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication()) }
         factory { AndroidLogWrapper() }
-        factory { FileWrapper(androidApplication()) }
+        factory { ContentProviderFileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
         single<GeneralPreferencesWrapper> {
             SharedPrefsWrapper(androidApplication(), get())
@@ -196,6 +210,7 @@ object Modules {
         .plus(wrapperModule)
         .plus(scopedModules)
         .plus(appNetModule)
+        .plus(receiverModule)
         .plus(DatabaseModule.modules)
         .plus(AppDatabaseModule.module)
         .plus(AndroidDatabaseModule.modules)

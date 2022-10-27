@@ -55,10 +55,6 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
 
     override fun onBind(p0: Intent?): IBinder? = null
 
-    fun cleanup() {
-
-    }
-
     companion object {
         const val ACTION_INIT: String = "init"
         const val ACTION_PLAY_ITEM: String = "playitem"

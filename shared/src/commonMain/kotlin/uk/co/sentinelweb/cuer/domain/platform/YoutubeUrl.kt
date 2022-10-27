@@ -17,10 +17,20 @@ class YoutubeUrl {
             "https://youtube.com/channel/${channel.let { it.customUrl ?: it.platformId }}"
 
         fun channelPlatformIdUrl(channel: ChannelDomain) =
-            "https://youtube.com/channel/${channel.platformId }"
+            "https://youtube.com/channel/${channel.platformId}"
 
         fun videoUrl(media: MediaDomain) = "https://www.youtube.com/watch?v=${media.platformId}"
+
         fun videoUrl(platformId: String) = "https://www.youtube.com/watch?v=$platformId"
+
+        fun videoUrlWithTime(media: MediaDomain): String {
+            val duration = media.duration ?: -1L
+            val position = media.positon
+                ?.let { if (duration <= 0) 0 else if ((duration - it) > 1000) it / 1000 else 0 }
+                ?: 0
+            return "https://www.youtube.com/watch?v=${media.platformId}&t=$position"
+        }
+
         fun videoShortUrl(media: MediaDomain) = "https://youtu.be/${media.platformId}"
 
         fun playlistUrl(playlist: PlaylistDomain) =

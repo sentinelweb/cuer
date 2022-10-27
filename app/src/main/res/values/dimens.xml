@@ -41,6 +41,7 @@
     <dimen name="app_bar_header_height_playlist">282dp</dimen>
     <dimen name="app_bar_header_height_playlists">144dp</dimen>
     <dimen name="search_height">300dp</dimen>
+    <dimen name="snackbar_icon">15sp</dimen>
     <dimen name="flag_size">20dp</dimen>
 
     <dimen name="itemview_icon_height">72dp</dimen>

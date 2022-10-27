@@ -1,13 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.ItemTouchHelper
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
@@ -57,8 +55,7 @@ interface PlaylistsDialogContract {
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
         var playlistStats: List<PlaylistStatDomain> = listOf(),
-        var priorityPlaylistIds: MutableList<Long> = mutableListOf(),
-        var channelSearchApplied: Boolean = false,
+        var channelPlaylistIds: MutableList<Long> = mutableListOf(),
         var pinWhenSelected: Boolean = false,
         var playlistsModel: PlaylistsContract.Model? = null
     ) : ViewModel() {
@@ -74,6 +71,8 @@ interface PlaylistsDialogContract {
     )
 
     companion object {
+        val ADD_PLAYLIST_DUMMY = PlaylistDomain.createDummy("Add Playlist")
+        val ROOT_PLAYLIST_DUMMY = PlaylistDomain.createDummy("Top level")
 
         @JvmStatic
         val fragmentModule = module {
@@ -90,14 +89,13 @@ interface PlaylistsDialogContract {
                         toastWrapper = get(),
                         prefsWrapper = get(),
                         coroutines = get(),
-                        dialogModelMapper = get()
+                        dialogModelMapper = get(),
+                        recentLocalPlaylists = get()
                     )
                 }
                 scoped { PlaylistsModelMapper(get()) }
                 scoped { PlaylistsDialogModelMapper() }
                 scoped { PlaylistsDialogAdapter(get(), get()) }
-                scoped { ItemTouchHelperCallback(get()) }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }

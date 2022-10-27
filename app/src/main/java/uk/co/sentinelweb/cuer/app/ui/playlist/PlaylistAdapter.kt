@@ -7,16 +7,19 @@ import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemView
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemViewHolder
 
 
 class PlaylistAdapter constructor(
     private val itemFactory: ItemFactory,
-    private val interactions: ItemContract.Interactions
+    private val interactions: ItemContract.Interactions,
+    private val showCards: Boolean
 ) : RecyclerView.Adapter<ItemViewHolder>() {
 
-    private lateinit var recyclerView: RecyclerView
+    private var _recyclerView: RecyclerView? = null
+    private val recyclerView: RecyclerView
+        get() = _recyclerView ?: throw IllegalStateException("PlaylistAdapter._recyclerView not bound")
+
 
     private var _data: MutableList<ItemContract.Model> = mutableListOf()
 
@@ -47,15 +50,18 @@ class PlaylistAdapter constructor(
             this@PlaylistAdapter._data = data.toMutableList()
             notifyDataSetChanged()
         }
-
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        this.recyclerView = recyclerView
+        this._recyclerView = recyclerView
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        this._recyclerView = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ItemViewHolder {
-        return itemFactory.createItemViewHolder(parent, interactions)
+        return itemFactory.createItemViewHolder(parent, showCards, interactions)
     }
 
     @Override
@@ -67,9 +73,9 @@ class PlaylistAdapter constructor(
 
     override fun getItemCount(): Int = _data.size
 
-    fun getItemViewForId(id: Long): ItemView? {
+    fun getItemViewForId(id: Long): ItemContract.View? {
         recyclerView.children.forEach { childView ->
-            if (childView is ItemView) {
+            if (childView is ItemContract.View) {
                 if (childView.isViewForId(id)) {
                     return@getItemViewForId childView
                 }

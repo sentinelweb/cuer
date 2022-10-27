@@ -54,7 +54,9 @@ interface PlaylistItemEditContract {
         var allowPlay: Boolean = false,
         val deletedPlayLists: MutableSet<PlaylistDomain> = mutableSetOf(),
         var isOnSharePlaylist: Boolean = false,
+        var isInShare: Boolean = false
     ) {
+
         lateinit var source: OrchestratorContract.Source
 
         @Serializable
@@ -81,11 +83,12 @@ interface PlaylistItemEditContract {
                         prefsWrapper = get(),
                         shareWrapper = get(),
                         playUseCase = get(),
-                        linkScanner = get()
+                        linkNavigator = get(),
+                        recentLocalPlaylists = get(),
                     )
                 }
                 scoped { State() }
-                scoped { PlaylistItemEditModelMapper(get(), get(), get(), get()) }
+                scoped { PlaylistItemEditModelMapper(get(), get(), get(), get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { SelectDialogCreator(this.getFragmentActivity()) }
                 scoped { this.getFragmentActivity() }

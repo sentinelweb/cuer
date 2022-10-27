@@ -55,7 +55,7 @@ class PlayUseCase constructor(
                 val toIdentifier = itemDomain.playlistId!!.toIdentifier(LOCAL)
 
                 prefsWrapper.putPair(
-                    GeneralPreferences.CURRENT_PLAYLIST,
+                    GeneralPreferences.CURRENT_PLAYING_PLAYLIST,
                     toIdentifier.toPairType<Long>()
                 )
                 coroutines.computationScope.launch {
@@ -69,10 +69,10 @@ class PlayUseCase constructor(
 
     private fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel =
         AlertDialogModel(
-            R.string.playlist_change_dialog_title,
-            R.string.playlist_change_dialog_message,
-            AlertDialogModel.Button(R.string.ok, confirm),
-            AlertDialogModel.Button(R.string.dialog_button_view_info, info)
+            title = R.string.playlist_change_dialog_title,
+            message = R.string.playlist_change_dialog_message,
+            confirm = AlertDialogModel.Button(R.string.ok, confirm),
+            neutral = AlertDialogModel.Button(R.string.dialog_button_view_info, info)
         )
 
     fun setQueueItem(item: PlaylistItemDomain) {

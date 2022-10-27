@@ -108,6 +108,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/bottom_left_button"
         android:visibility="gone"
-        />
+    />
 
+    <uk.co.sentinelweb.cuer.app.ui.common.views.CastVolumeControlView
+        android:id="@+id/cast_player_volume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="0dp"
+        android:layout_margin="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:visibility="gone"
+    />
 </androidx.constraintlayout.widget.ConstraintLayout>

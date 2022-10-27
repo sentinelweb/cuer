@@ -7,7 +7,7 @@ function YouTubePlayer(communicationConstants, communicationChannel) {
     const PAUSED = "PAUSED"
     const BUFFERING = "BUFFERING"
     const CUED = "CUED"
-
+    const UPDATE_TIME = 5000
     const YouTubePlayerBridge = new YouTubePlayerRemoteBridge(communicationConstants, communicationChannel)
 
     let player
@@ -69,7 +69,7 @@ function YouTubePlayer(communicationConstants, communicationChannel) {
 
             case YT.PlayerState.PLAYING:
                 sendStateChange(PLAYING)
-                timerTaskId = setInterval( () => YouTubePlayerBridge.sendVideoCurrentTime( player.getCurrentTime() ), 100 )
+                timerTaskId = setInterval( () => YouTubePlayerBridge.sendVideoCurrentTime( player.getCurrentTime() ), 2000 )
                 sendVideoData(player)
                 return
 

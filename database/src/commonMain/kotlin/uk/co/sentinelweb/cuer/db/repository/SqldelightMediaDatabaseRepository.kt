@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
+import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
@@ -44,12 +45,15 @@ class SqldelightMediaDatabaseRepository(
     override suspend fun save(domain: MediaDomain, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             try {
-                saveInternal(domain, flat)
-                    .let { RepoResult.Data(load(id = it, flat).data) }
-                    .also {
-                        if (emit) it.data
-                            ?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
-                    }
+                val id = saveInternal(domain, flat)
+                val loadResult = load(id = id, flat)
+                if (loadResult.isSuccessful)
+                    RepoResult.Data(loadResult.data)
+                        .also {
+                            if (emit) it.data
+                                ?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
+                        }
+                else loadResult
             } catch (e: Exception) {
                 val msg = "couldn't save media: ${domain}"
                 log.e(msg, e)
@@ -81,27 +85,28 @@ class SqldelightMediaDatabaseRepository(
         withContext(coProvider.IO) {
             database.mediaEntityQueries.transactionWithResult<RepoResult<List<MediaDomain>>> {
                 try {
-                    when (filter) {
-                        is IdListFilter ->
-                            database.mediaEntityQueries
-                                .loadAllByIds(filter.ids)
-                                .executeAsList()
-                                .map { fillAndMapEntity(it) }
-                                .let { RepoResult.Data(it) }
+                    with(database.mediaEntityQueries) {
+                        when (filter) {
+                            is AllFilter ->
+                                loadAll().executeAsList()
 
-                        is PlatformIdListFilter ->
-                            filter.ids
-                                // todo make query to load all at once
-                                .mapNotNull {
-                                    database.mediaEntityQueries
-                                        .loadByPlatformId(it, YOUTUBE)
-                                        .executeAsOneOrNull()
-                                }
-                                .map { fillAndMapEntity(it) }
-                                .let { RepoResult.Data.dataOrEmpty(it) }
+                            is IdListFilter ->
+                                loadAllByIds(filter.ids).executeAsList()
 
-                        is ChannelPlatformIdFilter -> TODO()
-                        else -> throw IllegalArgumentException("$filter not implemented")
+                            is PlatformIdListFilter ->
+                                filter.ids
+                                    // todo make query to load all at once
+                                    .mapNotNull {
+                                        database.mediaEntityQueries
+                                            .loadByPlatformId(it, YOUTUBE)
+                                            .executeAsOneOrNull()
+                                    }
+
+                            is ChannelPlatformIdFilter -> TODO()
+                            else -> throw IllegalArgumentException("$filter not implemented")
+                        }
+                            .map { fillAndMapEntity(it) }
+                            .let { RepoResult.Data.dataOrEmpty(it) }
                     }
                 } catch (e: Exception) {
                     val msg = "couldn't load medias"
@@ -144,7 +149,7 @@ class SqldelightMediaDatabaseRepository(
 
     override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
         var result: RepoResult<Boolean> = RepoResult.Data(false)
-        database.channelEntityQueries.transaction {
+        database.mediaEntityQueries.transaction {
             result = try {
                 database.mediaEntityQueries
                     .deleteAll()
@@ -239,16 +244,27 @@ class SqldelightMediaDatabaseRepository(
             }
             .let {
                 val mediaEntity = mediaMapper.map(it)
-                if (mediaEntity.id > 0) {
-                    database.mediaEntityQueries
-                        .update(mediaEntity)
-                    mediaDomain.id!!
-                } else {
-                    database.mediaEntityQueries
-                        .create(mediaEntity)
-                    database.mediaEntityQueries
-                        .getInsertId()
-                        .executeAsOne()
+                with(database.mediaEntityQueries) {
+                    if (mediaEntity.id > 0) {
+                        // manual check for platform-platformId duplication
+                        // throw ConflictException if id is different for same platform-platformId
+                        val platformCheck = try {
+                            loadByPlatformId(mediaEntity.platform_id, mediaEntity.platform).executeAsOne()
+                        } catch (n: NullPointerException) {
+                            null
+                        }
+                        if (platformCheck != null && platformCheck.id != mediaEntity.id) {
+                            throw ConflictException(
+                                "conflicting id for ${mediaEntity.platform}-${mediaEntity.platform_id}" +
+                                        " existing: ${platformCheck.id}  thisid:${mediaEntity.id} "
+                            )
+                        }
+                        update(mediaEntity)
+                        loadById(mediaDomain.id!!).executeAsOne().id
+                    } else {
+                        create(mediaEntity)
+                        getInsertId().executeAsOne()
+                    }
                 }
             }
 }

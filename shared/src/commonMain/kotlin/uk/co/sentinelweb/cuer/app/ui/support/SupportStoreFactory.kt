@@ -25,7 +25,7 @@ class SupportStoreFactory constructor(
     }
 
     private sealed class Result {
-        class Load(val media: MediaDomain, val links: List<LinkDomain>?) : Result()
+        data class Load(val media: MediaDomain, val links: List<LinkDomain>?) : Result()
     }
 
     private sealed class Action

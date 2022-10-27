@@ -14,6 +14,9 @@ class LocalPlayerCastListener constructor(
     private val wrapper: ChromeCastWrapper,
 ) : SessionManagerListener<CastSession> {
 
+    var castStarting = false
+        private set
+
     fun observeConnection() {
         if (activity is AppCompatActivity) {
             activity.lifecycle.addObserver(object : LifecycleObserver {
@@ -40,6 +43,7 @@ class LocalPlayerCastListener constructor(
     }
 
     override fun onSessionStarted(p0: CastSession, p1: String) {
+        castStarting = true
         activity.finish()
     }
 

@@ -12,12 +12,20 @@ import uk.co.sentinelweb.cuer.domain.PlatformDomain
 interface ItemContract {
 
     interface View {
+        val itemView: android.view.View
+        val rightSwipeView: android.view.View
+        val leftSwipeView: android.view.View
+        fun resetBackground()
         fun setTopText(text: SpannableString)
         fun setBottomText(text: SpannableString)
-        fun setIconResource(@DrawableRes iconRes: Int)
+        fun setImageResource(@DrawableRes iconRes: Int)
+        fun setImageUrl(url: String)
+        fun setThumbResource(@DrawableRes iconRes: Int)
+        fun setThumbUrl(url: String)
+        fun setChannelImageResource(@DrawableRes iconRes: Int)
+        fun setChannelImageUrl(url: String)
         fun setCheckedVisible(checked: Boolean)
         fun setPresenter(itemPresenter: Presenter)
-        fun setIconUrl(url: String)
         fun setBackground(@ColorRes backgroundColor: Int)
         fun setDuration(text: String)
         fun setProgress(ratio: Float)
@@ -27,6 +35,7 @@ interface ItemContract {
         fun setPlayIcon(@DrawableRes icon: Int)
         fun dismissMenu()
         fun setShowOverflow(showOverflow: Boolean)
+        fun isViewForId(id: Long): Boolean
     }
 
     interface Presenter {
@@ -43,6 +52,7 @@ interface ItemContract {
         fun isViewForId(id: Long): Boolean
         fun isStarred(): Boolean
         fun isCompositePlaylist(): Boolean
+        fun doAuthorClick()
     }
 
     interface External : ItemBaseContract.ItemPresenterBase {
@@ -73,7 +83,9 @@ interface ItemContract {
         val title: String,
         val duration: String,
         val positon: String,
-        val thumbNailUrl: String?,
+        val imageUrl: String?,
+        val thumbUrl: String?,
+        val channelImageUrl: String?,
         val progress: Float, // 0..1
         val published: String,
         val watchedSince: String,

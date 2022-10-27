@@ -7,17 +7,22 @@ import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import io.ktor.http.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.TitleFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.MviStore.*
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.BROWSE_CAT_TITLE
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.BROWSE_CAT_TITLE
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.ext.allPlatformIds
 import uk.co.sentinelweb.cuer.domain.ext.buildIdLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildParentLookup
 
@@ -25,6 +30,7 @@ class BrowseStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
     private val repository: BrowseRepository,
     private val playlistOrchestrator: PlaylistOrchestrator,
+    private val playlistStatsOrchestrator: PlaylistStatsOrchestrator,
     private val browseStrings: BrowseContract.Strings,
     private val log: LogWrapper,
     private val prefs: MultiPlatformPreferencesWrapper,
@@ -36,11 +42,16 @@ class BrowseStoreFactory constructor(
     }
 
     private sealed class Result {
-        class SetCategory(val category: CategoryDomain) : Result()
-        class SetCategoryByTitle(val title: String) : Result()
-        class LoadCatgeories(val root: CategoryDomain) : Result()
+        data class SetCategory(val category: CategoryDomain) : Result()
+        data class SetCategoryByTitle(val title: String) : Result()
+        data class LoadCatgeories(
+            val root: CategoryDomain,
+            val existingPlaylists: List<PlaylistDomain>,
+            val existingPlaylistStats: List<PlaylistStatDomain>
+        ) : Result()
+
         object Display : Result()
-        class SetOrder(val order: BrowseContract.Order) : Result()
+        data class SetOrder(val order: BrowseContract.Order) : Result()
     }
 
     private sealed class Action {
@@ -59,19 +70,22 @@ class BrowseStoreFactory constructor(
                         ?.let { copy(currentCategory = it) }
                         ?: this
                 }
+
                 is Result.LoadCatgeories -> {
                     val categoryLookup1 = result.root.buildIdLookup()
                     copy(
                         currentCategory = result.root,
                         categoryLookup = categoryLookup1,
                         parentLookup = result.root.buildParentLookup(),
+                        existingPlaylists = result.existingPlaylists,
+                        existingPlaylistStats = result.existingPlaylistStats,
                         recent = recentCategories
                             .getRecent()
                             .reversed()
                             .mapNotNull { recentTitle ->
                                 categoryLookup1.values
                                     .find { it.title == recentTitle }
-                            }
+                            },
                     )
                 }
             }
@@ -114,6 +128,7 @@ class BrowseStoreFactory constructor(
                         ?: apply { publish(Label.Error(browseStrings.errorNoCatWithID(intent.id))) }
                     Unit
                 }
+
                 is Intent.Display -> dispatch(Result.Display)
                 is Intent.SetOrder -> dispatch(Result.SetOrder(intent.order))
                 is Intent.Up -> {
@@ -128,6 +143,7 @@ class BrowseStoreFactory constructor(
                         }
                     Unit
                 }
+
                 Intent.ActionSettings -> publish(Label.ActionSettings)
                 Intent.ActionSearch -> publish(Label.ActionSearch)
             }
@@ -181,7 +197,20 @@ class BrowseStoreFactory constructor(
             repository.loadAll()
             // .apply { log.d(root.buildIdLookup().values.joinToString("\n") { "${it.title} - ${it.image?.url}" })*/ }
         }.onSuccess {
-            dispatch(Result.LoadCatgeories(it))
+            val existingPlaylists = playlistOrchestrator.loadList(
+                PlatformIdListFilter(it.allPlatformIds()),
+                LOCAL.flatOptions()
+            )
+            dispatch(
+                Result.LoadCatgeories(
+                    it,
+                    existingPlaylists = existingPlaylists,
+                    existingPlaylistStats = playlistStatsOrchestrator.loadList(
+                        OrchestratorContract.IdListFilter(existingPlaylists.mapNotNull { it.id }),
+                        LOCAL.flatOptions()
+                    )
+                )
+            )
             prefs.getString(BROWSE_CAT_TITLE, null)
                 ?.also { dispatch(Result.SetCategoryByTitle(it)) }
         }

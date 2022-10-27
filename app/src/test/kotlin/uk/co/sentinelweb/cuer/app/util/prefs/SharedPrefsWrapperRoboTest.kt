@@ -97,7 +97,7 @@ class SharedPrefsWrapperRoboTest {
 
     @Test
     fun putPair() {
-        sut.putPair(GeneralPreferences.CURRENT_PLAYLIST, 1L to MEMORY)
+        sut.putPair(GeneralPreferences.CURRENT_PLAYING_PLAYLIST, 1L to MEMORY)
 
         assertThat(prefs.getLong(X1_FIRST, 0L)).isEqualTo(1L)
         assertThat(prefs.getString(X1_SECOND, null)).isEqualTo(MEMORY.toString())
@@ -110,7 +110,7 @@ class SharedPrefsWrapperRoboTest {
         prefs.edit().putLong(X1_FIRST, fixtFirst).commit()
         prefs.edit().putString(X1_SECOND, fixtSecond.toString()).commit()
 
-        sut.putPair(GeneralPreferences.CURRENT_PLAYLIST, (null as String?) to (null as Source?))
+        sut.putPair(GeneralPreferences.CURRENT_PLAYING_PLAYLIST, (null as String?) to (null as Source?))
 
         assertThat(prefs.contains(X1_FIRST)).isFalse()
         assertThat(prefs.contains(X1_SECOND)).isFalse()
@@ -125,7 +125,7 @@ class SharedPrefsWrapperRoboTest {
         prefs.edit().putString(X1_FIRST, fixtFirst).commit()
         prefs.edit().putString(X1_SECOND, fixtSecond.toString()).commit()
 
-        val pair = sut.getPair(GeneralPreferences.CURRENT_PLAYLIST, fixtFirstDefault to fixtSecondDefault)
+        val pair = sut.getPair(GeneralPreferences.CURRENT_PLAYING_PLAYLIST, fixtFirstDefault to fixtSecondDefault)
 
         assertThat(pair.first).isEqualTo(fixtFirst)
         assertThat(pair.second).isEqualTo(fixtSecond)
@@ -136,7 +136,7 @@ class SharedPrefsWrapperRoboTest {
         val fixtFirstDefault: String = fixture.build()
         val fixtSecondDefault: Source = fixture.build()
 
-        val pair = sut.getPair(GeneralPreferences.CURRENT_PLAYLIST, fixtFirstDefault to fixtSecondDefault)
+        val pair = sut.getPair(GeneralPreferences.CURRENT_PLAYING_PLAYLIST, fixtFirstDefault to fixtSecondDefault)
 
         assertThat(pair.first).isEqualTo(fixtFirstDefault)
         assertThat(pair.second).isEqualTo(fixtSecondDefault)

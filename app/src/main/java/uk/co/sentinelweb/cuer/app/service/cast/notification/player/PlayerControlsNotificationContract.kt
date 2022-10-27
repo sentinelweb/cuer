@@ -12,6 +12,7 @@ interface PlayerControlsNotificationContract {
         fun handleAction(action: String?)
         fun destroy()
         fun setIcon(@DrawableRes icon: Int)
+        fun setBlocked(blocked: Boolean)
     }
 
     interface Controller {
@@ -20,9 +21,7 @@ interface PlayerControlsNotificationContract {
 
     interface View {
         fun showNotification(
-            state: PlayerStateDomain,
-            media: MediaDomain?,
-            bitmap: Bitmap?
+            state: State
         )
 
         fun stopSelf()
@@ -37,6 +36,7 @@ interface PlayerControlsNotificationContract {
         var title: String = "",
         var media: MediaDomain? = null,
         var bitmap: Bitmap? = null,
-        var playlistName: String = "none"
+        var playlistName: String = "none",
+        var blocked: Boolean = false
     )
 }

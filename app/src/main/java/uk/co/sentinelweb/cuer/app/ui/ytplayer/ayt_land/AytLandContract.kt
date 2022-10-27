@@ -7,6 +7,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
@@ -15,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
+import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
@@ -51,6 +53,8 @@ interface AytLandContract {
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
                         playerControls = get(),
+                        mediaOrchestrator = get(),
+                        playlistItemOrchestrator = get()
                     ).create()
                 }
                 scoped { ShowHideUi(get<AytLandActivity>()) }
@@ -74,6 +78,8 @@ interface AytLandContract {
                 }
                 scoped { AlertDialogCreator(get()) }
                 scoped { LocalPlayerCastListener(get(), get()) }
+                scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
+                scoped { ShareNavigationHack() }
             }
         }
     }

@@ -5,15 +5,18 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
@@ -39,6 +42,7 @@ interface MainContract {
         fun checkPlayServices()
         fun isRecreating(): Boolean
         fun showMessage(msg: String)
+        fun promptToBackup(result: AutoBackupFileExporter.BackupResult)
     }
 
     interface PlayerViewControl {
@@ -58,7 +62,6 @@ interface MainContract {
             scope(named<MainActivity>()) {
                 scoped<View> { get<MainActivity>() }
                 scoped<PlayerViewControl> { get<MainActivity>() }
-                scoped<NavigationProvider> { get<MainActivity>() }
                 scoped<Presenter> {
                     MainPresenter(
                         view = get(),
@@ -67,7 +70,8 @@ interface MainContract {
                         ytContextHolder = get(),
                         log = get(),
                         floatingPlayerServiceManager = get(),
-                        castListener = get()
+                        castListener = get(),
+                        autoBackupFileExporter = get()
                     )
                 }
                 scoped {
@@ -78,11 +82,15 @@ interface MainContract {
                 scoped { navigationRouter(false, get<MainActivity>()) }
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<MainActivity>(), get()) }
-                scoped<DoneNavigation> { get<MainActivity>() }
                 scoped<PlaylistContract.Interactions?> { null }
-                scoped<CommitHost> { EmptyCommitHost() }
                 scoped { FloatingPlayerCastListener(get(), get(), get()) }
                 scoped { AlertDialogCreator(get<MainActivity>()) }
+                scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), true) }
+                // ALL SHARE HACKS
+                scoped<DoneNavigation> { MainDoneNavigation(get<MainActivity>()) }
+                scoped<CommitHost> { EmptyCommitHost() }
+                scoped { ShareNavigationHack() }
+                scoped<NavigationProvider> { MainNavigationProvider(get<MainActivity>(), get(), get()) }
             }
         }
     }

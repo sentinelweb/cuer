@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.snackbar.Snackbar
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
@@ -22,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
@@ -48,9 +50,10 @@ class PlaylistsFragment :
 
     override val scope: Scope by fragmentScopeWithSource<PlaylistsFragment>()
     private val presenter: PlaylistsContract.Presenter by inject()
-    private val adapter: PlaylistsAdapter by inject()
+    private val adapter: PlaylistsAdapter
+        get() = _adapter ?: throw IllegalStateException("FragmentPlaylistEditBinding not bound")
+    private var _adapter: PlaylistsAdapter? = null
     private val snackbarWrapper: SnackbarWrapper by inject()
-    private val itemTouchHelper: ItemTouchHelper by inject()
     private val imageProvider: ImageProvider by inject()
     private val log: LogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
@@ -67,7 +70,6 @@ class PlaylistsFragment :
 
     private var snackbar: Snackbar? = null
     private var dialogFragment: DialogFragment? = null
-
     init {
         log.tag(this)
     }
@@ -91,6 +93,7 @@ class PlaylistsFragment :
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        _adapter = PlaylistsAdapter(get(), this)
         binding.playlistsToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
@@ -100,7 +103,8 @@ class PlaylistsFragment :
         binding.playlistsList.addItemDecoration(
             HeaderFooterDecoration(0, resources.getDimensionPixelSize(R.dimen.recyclerview_footer))
         )
-        itemTouchHelper.attachToRecyclerView(binding.playlistsList)
+        ItemTouchHelper(ItemTouchHelperCallback(this))
+            .apply { attachToRecyclerView(binding.playlistsList) }
         binding.playlistsSwipe.setColorSchemeColors(
             ContextCompat.getColor(
                 requireContext(),
@@ -149,6 +153,14 @@ class PlaylistsFragment :
     override fun onStop() {
         super.onStop()
         dialogFragment?.dismissAllowingStateLoss()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        snackbar = null
+        _adapter = null
+        dialogFragment = null
     }
     // endregion
 
@@ -237,6 +249,7 @@ class PlaylistsFragment :
                     )
                         .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
                 }
+
             NavigationModel.Target.PLAYLIST_EDIT ->
                 sourceView?.let { view ->
                     PlaylistsFragmentDirections.actionEditPlaylist(
@@ -246,9 +259,11 @@ class PlaylistsFragment :
                     )
                         .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
                 }
+
             else -> navRouter.navigate(nav)
         }
     }
+
     //endregion
 
     // region ItemContract.ItemMoveInteractions
@@ -307,8 +322,11 @@ class PlaylistsFragment :
     }
 
     override fun onDelete(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
-        adapter.notifyItemRemoved(adapter.data.indexOf(item))
         presenter.performDelete(item) // delays for animation
+    }
+
+    override fun notifyItemRemoved(model: ItemContract.Model) {
+        adapter.notifyItemRemoved(adapter.data.indexOf(model))
     }
     //endregion
 }

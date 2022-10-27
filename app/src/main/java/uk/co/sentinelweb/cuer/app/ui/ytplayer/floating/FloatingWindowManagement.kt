@@ -17,7 +17,7 @@ import uk.co.sentinelweb.cuer.app.databinding.WindowAytFloatBinding
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPrefences.FLOATING_PLAYER_RECT
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.FLOATING_PLAYER_RECT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -32,6 +32,7 @@ class FloatingWindowManagement(
 
     interface Callbacks {
         fun onClose()
+        fun onLaunch()
     }
 
     private var _binding: WindowAytFloatBinding? = null
@@ -75,6 +76,12 @@ class FloatingWindowManagement(
         binding?.floatingPlayerClose?.setOnClickListener {
             callbacks.onClose()
         }
+        binding?.floatingPlayerLaunch?.setOnClickListener {
+            callbacks.onLaunch()
+        }
+
+        binding?.floatingPlayerBlockTitle?.setOnClickListener {}
+        binding?.floatingPlayerBlockTitle?.setOnTouchListener { _, _ -> true }
 
         binding?.fullscreenVideoWrapper?.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
             override fun touched() {
@@ -185,11 +192,11 @@ class FloatingWindowManagement(
             }
         }
 
-    private fun defaultWindowParams(dwidth: Int, dheight: Int): WindowManager.LayoutParams {
-        val width = (dwidth * 0.55f).toInt()
+    private fun defaultWindowParams(dWidth: Int, dHeight: Int): WindowManager.LayoutParams {
+        val width = (dWidth * 0.55f).toInt()
         val height = (width * 3f / 4).toInt()
         val top = 0
-        val left = dwidth - width
+        val left = dWidth - width
         return WindowManager.LayoutParams(
             width,
             height,

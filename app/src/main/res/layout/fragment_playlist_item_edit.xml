@@ -112,16 +112,4 @@
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_player_play_black" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/plie_support_fab"
-        style="@style/FabButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="80dp"
-        android:contentDescription="@string/menu_support"
-        app:fabSize="mini"
-        app:layout_anchor="@id/plie_appbar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_support" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

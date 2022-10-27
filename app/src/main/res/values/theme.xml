@@ -75,6 +75,9 @@
         <item name="textAppearanceOverline">@style/TextAppearance.App.Overline</item>
 
         <item name="materialAlertDialogTheme">@style/Cuer.MaterialAlertDialog</item>
+        <item name="snackbarTextViewStyle">@style/Cuer.Snackbar.Text</item>
+        <item name="snackbarButtonStyle">@style/Cuer.Snackbar.Button</item>
+        <item name="snackbarStyle">@style/Cuer.Snackbar</item>
     </style>
 
     <style name="AppSplash" parent="Theme.SplashScreen">

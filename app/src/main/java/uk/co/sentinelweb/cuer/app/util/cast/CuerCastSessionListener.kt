@@ -67,5 +67,4 @@ class CuerCastSessionListener constructor(
         //log.d("onSessionSuspended $castSession")
         _currentCastSession = null
     }
-
 }

@@ -1,14 +1,12 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.ItemTouchHelper
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.GlobalContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
-import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -63,6 +61,7 @@ interface PlaylistsContract {
         fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
         fun repaint()
         fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?)
+        fun notifyItemRemoved(model: ItemContract.Model)
     }
 
     data class State constructor(
@@ -118,9 +117,6 @@ interface PlaylistsContract {
                     )
                 }
                 scoped { PlaylistsModelMapper(get()) }
-                scoped { PlaylistsAdapter(get(), get<PlaylistsFragment>()) }
-                scoped { ItemTouchHelperCallback(get<PlaylistsFragment>()) }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(
                         this.getFragmentActivity(),

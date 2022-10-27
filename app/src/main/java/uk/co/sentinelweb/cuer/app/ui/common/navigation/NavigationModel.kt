@@ -43,16 +43,18 @@ data class NavigationModel constructor(
         SHARE(listOf(LINK)),
         CRYPTO_LINK(listOf(CRYPTO_ADDRESS)),
         YOUTUBE_VIDEO(listOf(PLATFORM_ID)),
+        YOUTUBE_VIDEO_POS(listOf(Param.PLAYLIST_ITEM)),
         YOUTUBE_CHANNEL(listOf(CHANNEL_ID)),
         PLAYLIST(listOf(PLAYLIST_ID, SOURCE), listOf(PLAYLIST_ITEM_ID, PLAY_NOW)),
         PLAYLIST_ITEM(listOf(Param.PLAYLIST_ITEM, SOURCE), listOf(FRAGMENT_NAV_EXTRAS)),
-        PLAYLISTS(listOf(), listOf(PLAYLIST_ID)),
+        PLAYLISTS(listOf()),
         PLAYLIST_EDIT(listOf(PLAYLIST_ID, SOURCE), listOf()),
         PLAYLIST_CREATE(listOf(SOURCE), listOf()),
         BROWSE,
         NAV_BACK, // use navigation to go back
         NAV_FINISH, // use navigation to finish activity
         NAV_DONE, // nav after operation is finished
+        NAV_NONE // use to clear navigation e.g. in live data state
         ;
 
 
@@ -82,6 +84,7 @@ data class NavigationModel constructor(
         MEDIA(MediaDomain::class),
         APP_LIST(List::class),
         ALLOW_PLAY(Boolean::class),
+        AUTO_BACKUP(Boolean::class),
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)

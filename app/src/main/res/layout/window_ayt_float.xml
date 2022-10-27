@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+>
 
     <uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
         android:id="@+id/fullscreen_video_wrapper"
@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        >
+    >
 
         <FrameLayout
             android:id="@+id/player_container"
@@ -23,7 +23,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            />
+        />
     </uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout>
 
     <FrameLayout
@@ -35,21 +35,42 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        >
+    >
+        <View
+            android:id="@+id/floating_player_block_title"
+            android:layout_width="match_parent"
+            android:layout_height="88dp"/>
 
         <ImageView
             android:id="@+id/floating_player_close"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
             android:background="@drawable/circle_gradient_top_left"
             android:contentDescription="Close"
             android:paddingStart="4dp"
             android:paddingTop="4dp"
-            android:paddingEnd="32dp"
-            android:paddingBottom="32dp"
+            android:paddingEnd="50dp"
+            android:paddingBottom="50dp"
             android:src="@drawable/ic_notif_close_white"
             app:tint="@color/white"
-            />
+            tools:ignore="HardcodedText"
+        />
+
+        <ImageView
+            android:id="@+id/floating_player_launch"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:layout_gravity="bottom|start"
+            android:background="@drawable/circle_gradient_bottom_left"
+            android:contentDescription="Launch"
+            android:paddingStart="4dp"
+            android:paddingBottom="4dp"
+            android:paddingEnd="50dp"
+            android:paddingTop="50dp"
+            android:src="@drawable/ic_portrait"
+            app:tint="@color/white"
+            tools:ignore="HardcodedText"
+        />
 
         <ImageView
             android:id="@+id/floating_player_resize"
@@ -64,7 +85,8 @@
             android:paddingBottom="32dp"
             android:src="@drawable/ic_resize_24"
             app:tint="@color/white"
-            />
+            tools:ignore="HardcodedText"
+        />
 
         <ImageView
             android:id="@+id/floating_player_move"
@@ -79,8 +101,8 @@
             android:paddingBottom="4dp"
             android:src="@drawable/ic_move_24"
             app:tint="@color/white"
-            />
-
+            tools:ignore="HardcodedText"
+        />
 
     </FrameLayout>
 

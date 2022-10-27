@@ -27,7 +27,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
-import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
@@ -50,7 +49,6 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
     private val browseMviView: BrowseMviView by inject()
-    private val playerView: MainContract.PlayerViewControl by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
@@ -119,6 +117,11 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
         //playerView.showPlayer()
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
     private fun observeLabels() {
         browseMviView.labelObservable().observe(
             this.viewLifecycleOwner,
@@ -185,6 +188,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                         storeFactory = DefaultStoreFactory(),
                         repository = get(),
                         playlistOrchestrator = get(),
+                        playlistStatsOrchestrator = get(),
                         browseStrings = get(),
                         log = get(),
                         prefs = get(),

@@ -80,6 +80,24 @@ data class PlaylistDomain constructor(
             image = null,
             thumb = null
         )
+
+        fun createDummy(title: String) = PlaylistDomain(
+            id = null,
+            config = PlaylistConfigDomain(),
+            type = PlaylistTypeDomain.APP,
+            platform = PlatformDomain.OTHER,
+            platformId = null,
+            starred = false,
+            items = listOf(),
+            currentIndex = -1,
+            title = title,
+            mode = SINGLE,
+            parentId = null,
+            default = false,
+            archived = false,
+            image = null,
+            thumb = null
+        )
     }
 }
 

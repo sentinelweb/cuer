@@ -31,9 +31,12 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.*
-import uk.co.sentinelweb.cuer.domain.ext.*
-import java.util.*
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
+import uk.co.sentinelweb.cuer.domain.ext.buildLookup
+import uk.co.sentinelweb.cuer.domain.ext.buildTree
+import uk.co.sentinelweb.cuer.domain.ext.isAncestor
+import uk.co.sentinelweb.cuer.domain.ext.sort
 
 class PlaylistsPresenter(
     private val view: PlaylistsContract.View,
@@ -54,7 +57,7 @@ class PlaylistsPresenter(
     private val searchMapper: SearchMapper,
     private val merge: PlaylistMergeOrchestrator,
     private val shareWrapper: ShareWrapper,
-    private val recentLocalPlaylists: RecentLocalPlaylists
+    private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : PlaylistsContract.Presenter {
 
     init {
@@ -105,13 +108,15 @@ class PlaylistsPresenter(
                                 dismiss = { view.repaint() },
                                 suggestionsMedia = null,
                                 showPin = false,
-                                showRoot = true
+                                showRoot = true,
+                                showAdd = false
                             )
                         )
                     }
             }
     }
 
+    // todo review this
     private fun setParent(parent: PlaylistDomain, child: PlaylistDomain) {
         val childNode = state.treeLookup[child.id]!!
         val parentNode = state.treeLookup[parent.id]
@@ -137,6 +142,7 @@ class PlaylistsPresenter(
                                 ?.let { playlistOrchestrator.load(it, LOCAL.deepOptions()) }
                                 ?.apply {
                                     playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
+                                    view.notifyItemRemoved(item)
                                     view.showUndo(
                                         "Deleted playlist: ${playlist.title}",
                                         this@PlaylistsPresenter::undoDelete
@@ -218,7 +224,7 @@ class PlaylistsPresenter(
     override fun performStar(item: ItemContract.Model) {
         state.viewModelScope.launch {
             findPlaylist(item)
-                ?.takeIf { it.id != null && it.id ?: 0 > 0 }
+                ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 }
                 ?.let { it.copy(starred = !it.starred) }
                 ?.also { playlistOrchestrator.save(it, LOCAL.flatOptions()) }
         }
@@ -226,7 +232,7 @@ class PlaylistsPresenter(
 
     override fun performShare(item: ItemContract.Model) {
         findPlaylist(item)
-            ?.takeIf { it.id != null && it.id ?: 0 > 0 && it.type != APP }
+            ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 && it.type != APP }
             ?.let { itemDomain ->
                 coroutines.mainScope.launch {
                     playlistOrchestrator.load(itemDomain.id!!, LOCAL.deepOptions())
@@ -264,6 +270,7 @@ class PlaylistsPresenter(
                             dismiss = { },
                             suggestionsMedia = null,
                             showPin = false,
+                            showAdd = false
                         )
                     )
                 }
@@ -345,31 +352,12 @@ class PlaylistsPresenter(
                     }
                 }
 
-            val recent = mutableListOf<OrchestratorContract.Identifier<Long>>()
-            recentLocalPlaylists.getRecent().reversed().forEach { id ->
-                id.toIdentifier(LOCAL).also { recent.add(it) }
-            }
-            prefsWrapper.getLong(LAST_PLAYLIST_ADDED_TO)
-                ?.toIdentifier(LOCAL)
-                ?.also { recent.add(it) }
-            prefsWrapper.getLong(LAST_PLAYLIST_CREATED)
-                ?.toIdentifier(LOCAL)
-                ?.also { recent.add(it) }
-            prefsWrapper.getLong(PINNED_PLAYLIST)
-                ?.toIdentifier(LOCAL)
-                ?.also { recent.add(0, it) }
-            localSearch.search()
-                ?.playlists
-                ?.forEach { playlist ->
-                    playlist.id?.toIdentifier(LOCAL)?.also { recent.add(it) }
-                }
-
-            modelMapper.map2(
+            modelMapper.map(
                 state.playlists
                     .associateWith { pl -> state.playlistStats.find { it.playlistId == pl.id } },
                 queue.playlistId,
                 appLists,
-                recent.toSet().toList(),
+                recentLocalPlaylists.buildRecentSelectionList(),
                 prefsWrapper.getLong(PINNED_PLAYLIST),
                 state.treeRoot
             ).takeIf { coroutines.mainScopeActive }

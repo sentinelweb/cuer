@@ -30,13 +30,17 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel.Type.STAR
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel.Type.UNSTAR
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
@@ -65,19 +69,13 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val commitHost: CommitHost by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val playerControls: PlayerContract.PlayerControls by inject()
+    private val shareNavigationHack: ShareNavigationHack by inject()
 
-    private lateinit var binding: FragmentPlaylistItemEditBinding
-
-    private val starMenuItem: MenuItem
-        get() = binding.plieToolbar.menu.findItem(R.id.plie_star)
+    private val binding: FragmentPlaylistItemEditBinding
+        get() = _binding ?: throw IllegalStateException("FragmentPlaylistItemEditBinding not bound")
+    private var _binding: FragmentPlaylistItemEditBinding? = null
     private val playMenuItem: MenuItem
         get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
-    private val editMenuItem: MenuItem
-        get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
-    private val launchMenuItem: MenuItem
-        get() = binding.plieToolbar.menu.findItem(R.id.plie_launch)
-    private val shareMenuItem: MenuItem
-        get() = binding.plieToolbar.menu.findItem(R.id.plie_share)
 
     private var dialog: AppCompatDialog? = null
     private var dialogFragment: DialogFragment? = null
@@ -105,6 +103,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     private val isOnSharePlaylist: Boolean by lazy {
         itemArg?.playlistId == SHARED_PLAYLIST
+    }
+
+    private val isInShare: Boolean by lazy {
+        (activity as? ShareActivity) != null
     }
 
     init {
@@ -135,7 +137,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPlaylistItemEditBinding.inflate(inflater)
+        _binding = FragmentPlaylistItemEditBinding.inflate(inflater)
         return binding.root
     }
 
@@ -146,27 +148,14 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         }
         binding.pliePlayFab.setOnClickListener { viewModel.onPlayVideo() }
         binding.pliePlayFab.isVisible = allowPlayArg
-        binding.plieSupportFab.setOnClickListener { viewModel.onSupport() }
-        starMenuItem.isVisible = true
         playMenuItem.isVisible = false
         binding.plieDescription.interactions = viewModel
         binding.plieToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.plie_star -> {
-                    viewModel.onStarClick(); true
-                }
-                R.id.plie_edit -> {
-                    viewModel.onEditClick(); true
-                }
                 R.id.plie_play -> {
                     viewModel.onPlayVideo(); true
                 }
-                R.id.plie_launch -> {
-                    viewModel.onLaunchVideo(); true
-                }
-                R.id.plie_share -> {
-                    viewModel.onShare(); true
-                }
+
                 else -> false
             }
         }
@@ -184,12 +173,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    //starMenuItem.isVisible = !menuState.modelEmpty
                     playMenuItem.isVisible = !menuState.modelEmpty
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
-                    //starMenuItem.isVisible = false
                     playMenuItem.isVisible = false
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
@@ -219,6 +206,13 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         bindObserver(viewModel.getUiObservable(), this::observeUi)
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        dialog = null
+        dialogFragment = null
+        super.onDestroyView()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
@@ -228,6 +222,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback(this, saveCallback)
         linkScopeToActivity()
+        viewModel.setInShare(isInShare)
     }
 
     override fun onStart() {
@@ -254,13 +249,15 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             }
             Unit
         }
+
         ERROR -> snackbarWrapper.makeError(model.data as String).show()
         UNPIN -> snackbarWrapper
             .make(
                 getString(R.string.pie_unpin_playlist),
-                actionText = "UNPIN",
+                actionText = getString(R.string.action_unpin),
                 action = { viewModel.onUnPin() })
             .show()
+
         JUMPTO -> {
             playerControls.getPlaylistItem()?.media?.platformId
                 ?.takeIf { it == itemArg?.media?.platformId }
@@ -274,12 +271,9 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         binding.plieTitleBg.isVisible = true
         binding.plieTitlePos.isVisible = !model.empty
         binding.plieDuration.isVisible = !model.empty
-        binding.plieSupportFab.isVisible = !model.empty
         if (menuState.scrolledDown) {
-            //starMenuItem.isVisible = !model.empty
             playMenuItem.isVisible = !model.empty
         } else {
-            //starMenuItem.isVisible = false
             playMenuItem.isVisible = false
         }
         val imageUrl = model.imageUrl
@@ -303,10 +297,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             binding.plieTitlePos.layoutParams.width =
                 (ratio * binding.plieTitleBg.width).toInt()
         } ?: binding.plieTitlePos.apply { isVisible = false }
-        val starIconResource =
-            if (model.starred) R.drawable.ic_starred
-            else R.drawable.ic_starred_off
-        starMenuItem.setIcon(starIconResource)
+        binding.plieDescription.ribbonItems.find { it.item.type == STAR }?.isVisible = !model.starred
+        binding.plieDescription.ribbonItems.find { it.item.type == UNSTAR }?.isVisible = model.starred
     }
 
 
@@ -317,9 +309,12 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             .into(binding.plieImage)
     }
 
-    private fun observeNavigation(nav: NavigationModel) = when (nav.target) {
-        NAV_DONE -> doneNavigation.navigateDone()
-        else -> navRouter.navigate(nav)
+    private fun observeNavigation(nav: NavigationModel) {
+        shareNavigationHack.isNavigatingInApp = true
+        when (nav.target) {
+            NAV_DONE -> doneNavigation.navigateDone()
+            else -> navRouter.navigate(nav)
+        }
     }
 
     private fun observeDialog(model: DialogModel) {
@@ -331,6 +326,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                     PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
                 dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
             }
+
             DialogModel.Type.PLAYLIST_ADD -> {
                 // todo need a callback to select the parent in the add dialog i.e. another type DialogModel.Type.PLAYLIST_SELECT_PARENT ??
                 // todo also to select the image
@@ -346,26 +342,32 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                     }
                 dialogFragment?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
             }
+
             DialogModel.Type.SELECT_ROUTE -> {
                 castDialogWrapper.showRouteSelector(childFragmentManager)
             }
+
             DialogModel.Type.CONFIRM -> {
                 alertDialogCreator.create(model as AlertDialogModel).show()
             }
+
             DialogModel.Type.PLAYLIST -> {
                 selectDialogCreator
                     .createMulti(model as SelectDialogModel)
                     .apply { show() }
             }
+
             DialogModel.Type.PLAYLIST_ITEM_SETTNGS -> {
                 selectDialogCreator
                     .createMulti(model as SelectDialogModel)
                     .apply { show() }
             }
+
             DialogModel.Type.SUPPORT -> SupportDialogFragment.show(
                 requireActivity(),
                 (model as ArgumentDialogModel).args[MEDIA.toString()] as MediaDomain
             )
+
             else -> Unit
         }
     }

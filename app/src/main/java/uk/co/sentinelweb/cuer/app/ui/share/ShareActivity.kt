@@ -25,11 +25,10 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
@@ -46,6 +45,7 @@ import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseCategory
 import uk.co.sentinelweb.cuer.domain.ext.serialise
+import java.io.File
 
 class ShareActivity : AppCompatActivity(),
     ShareContract.View,
@@ -61,6 +61,7 @@ class ShareActivity : AppCompatActivity(),
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
+    private val shareNavigationHack: ShareNavigationHack by inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
@@ -74,7 +75,6 @@ class ShareActivity : AppCompatActivity(),
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.run { (getChildFragmentManager().getFragments().get(0) as? ScanContract.View) }
             ?: throw IllegalStateException("Not a scan fragment")
-
 
     private val commitFragment: ShareContract.Committer
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
@@ -113,9 +113,17 @@ class ShareActivity : AppCompatActivity(),
             )
         }
         navController.addOnDestinationChangedListener { _: NavController, _: NavDestination, _: Bundle? ->
-                   presenter.onDestinationChange()
+            presenter.onDestinationChange()
         }
+        volumeControl.controlView = binding.castPlayerVolume
         scanFragment.listener = this
+    }
+
+    override fun onDestroy() {
+        volumeControl.controlView = null
+        _binding = null
+        snackbar = null
+        super.onDestroy()
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
@@ -145,7 +153,9 @@ class ShareActivity : AppCompatActivity(),
 // but if finish causes problems here then play with getting the nav in the right state
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        finish()
+        if (shareNavigationHack.isNavigatingInApp.not()) {
+            finish()
+        }
         // this could be used to reset the nav controller when home is pressed.
         // so in onNewIntent can get scanFragment
         // but need to stop it for things like link launch - whichmans setting up the descriptionView to parse links
@@ -188,14 +198,7 @@ class ShareActivity : AppCompatActivity(),
     }
 
     override fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean) {
-        startActivity( // todo map in NavigationMapper
-            Intent(this, MainActivity::class.java).apply {
-                putExtra(Target.KEY, PLAYLIST.name)
-                putExtra(PLAYLIST_ID.name, plId)
-                plItemId?.also { putExtra(PLAYLIST_ITEM_ID.name, it) }
-                putExtra(PLAY_NOW.name, play)
-                putExtra(SOURCE.name, source.toString())
-            })
+        MainActivity.start(this, plId, plItemId, source, play)
     }
 
     override fun setData(model: ShareContract.Model) {
@@ -295,7 +298,11 @@ class ShareActivity : AppCompatActivity(),
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(STATE_KEY, presenter.serializeState())
+        val serializeState = presenter.serializeState()
+        getFilesDir()
+            ?.let { File(it, "shareactivity.json") }
+            ?.apply { writeText(serializeState ?: "") }
+        outState.putString(STATE_KEY, serializeState)
     }
 
     companion object {

@@ -34,6 +34,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_VIEWED
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -117,6 +118,9 @@ class PlaylistPresenterTest {
 
     @MockK
     lateinit var mockItemMapper: ItemModelMapper
+
+    @MockK
+    lateinit var mockMultiPrefs: MultiPlatformPreferencesWrapper
 
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())
@@ -244,7 +248,8 @@ class PlaylistPresenterTest {
             playlistOrDefaultOrchestrator = mockPlaylistOrDefaultOrchestrator,
             recentLocalPlaylists = mockRecentLocalPlaylists,
             playUseCase = mockPlayUseCase,
-            itemMapper = mockItemMapper
+            itemMapper = mockItemMapper,
+            multiPrefs = mockMultiPrefs
         )
         sut.onResume()
     }

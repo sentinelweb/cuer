@@ -12,7 +12,7 @@ actual class DateTimeFormatter actual constructor() {
         TODO("Not yet implemented")
     }
 
-    actual fun formatDateTimeNullable(d: LocalDateTime?): String {
+    actual fun formatDateTimeNullable(dateTime: LocalDateTime?): String {
         TODO("Not yet implemented")
     }
 }

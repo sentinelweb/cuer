@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.ItemTouchHelper
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -12,7 +11,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
-import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
@@ -36,6 +34,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 interface PlaylistContract {
 
     interface Presenter {
+        val isCards: Boolean
         fun initialise()
         fun destroy()
         fun refreshPlaylist()
@@ -68,7 +67,6 @@ interface PlaylistContract {
         fun onFilterNewItems(): Boolean
         fun onEdit(): Boolean
         fun onFilterPlaylistItems(): Boolean
-        fun onShowChildren(): Boolean
         fun onResume()
         fun onPause()
         suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit? = null)
@@ -76,6 +74,7 @@ interface PlaylistContract {
         fun undoMoveItem()
         fun setAddPlaylistParent(id: Long)
         fun checkToSave()
+        fun onShowCards(cards: Boolean): Boolean
     }
 
     interface Interactions {
@@ -109,6 +108,9 @@ interface PlaylistContract {
         fun showError(message: String)
         fun updateItemModel(model: ItemContract.Model)
         fun navigate(nav: NavigationModel)
+        fun newAdapter()
+        fun getScrollIndex(): Int
+        val isHeadless: Boolean
     }
 
     interface External {
@@ -209,14 +211,12 @@ interface PlaylistContract {
                         dbInit = get(),
                         recentLocalPlaylists = get(),
                         itemMapper = get(),
-                        playUseCase = get()
+                        playUseCase = get(),
+                        multiPrefs = get(),
                     )
                 }
                 scoped { get<Presenter>() as External }
                 scoped { PlaylistModelMapper(itemModelMapper = get(), iconMapper = get()) }
-                scoped { PlaylistAdapter(get(), get<PlaylistFragment>()) }
-                scoped { ItemTouchHelper(get<ItemTouchHelperCallback>()) }
-                scoped { ItemTouchHelperCallback(get<PlaylistFragment>()) }
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }

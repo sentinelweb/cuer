@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
@@ -31,6 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -56,7 +58,6 @@ import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -79,10 +80,7 @@ class PlaylistFragment :
         get() = presenter as PlaylistContract.External
 
     private val presenter: PlaylistContract.Presenter by inject()
-    private val adapter: PlaylistAdapter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
-    private val toastWrapper: ToastWrapper by inject()
-    private val itemTouchHelper: ItemTouchHelper by inject()
     private val log: LogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
     private val imageProvider: ImageProvider by inject()
@@ -94,15 +92,21 @@ class PlaylistFragment :
     private val commitHost: CommitHost by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
+    private var _adapter: PlaylistAdapter? = null
+    private val adapter: PlaylistAdapter
+        get() = _adapter ?: throw IllegalStateException("PlaylistFragment.adapter not bound")
+
+    val linearLayoutManager get() = binding.playlistList.layoutManager as LinearLayoutManager
+
     // todo consider making binding null - getting crashes - or tighten up coroutine scope
     private var _binding: FragmentPlaylistBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw Exception("FragmentPlaylistBinding not bound")
 
-    private val starMenuItem: MenuItem?
+    private val starMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_star)
-    private val playMenuItem: MenuItem?
+    private val playMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_play)
-    private val editMenuItem: MenuItem?
+    private val editMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_edit)
     private val newMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_new)
@@ -110,15 +114,17 @@ class PlaylistFragment :
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_filter)
     private val searchMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_search)
-    private val childrenMenuItem: MenuItem
-        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_children)
+    private val cardsMenuItem: MenuItem
+        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_view_cards)
+    private val rowsMenuItem: MenuItem
+        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_view_rows)
     private val modeMenuItems: List<MenuItem>
         get() = listOf( // same order as the enum in PlaylistDomain
             binding.playlistToolbar.menu.findItem(R.id.playlist_mode_single),
             binding.playlistToolbar.menu.findItem(R.id.playlist_mode_loop),
             binding.playlistToolbar.menu.findItem(R.id.playlist_mode_shuffle)
         )
-    private val isHeadless: Boolean
+    override val isHeadless: Boolean
         get() = HEADLESS.getBoolean(arguments)
 
     private var snackbar: Snackbar? = null
@@ -171,19 +177,15 @@ class PlaylistFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         saveCallback.isEnabled = (commitHost !is EmptyCommitHost)
-        binding.playlistList.doOnPreDraw {
-            startPostponedEnterTransition()
-        }
         binding.playlistToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
         presenter.initialise()
-        binding.playlistList.layoutManager = LinearLayoutManager(context)
-        binding.playlistList.adapter = adapter
-        binding.playlistList.addItemDecoration(
-            HeaderFooterDecoration(0, resources.getDimensionPixelSize(R.dimen.recyclerview_footer))
-        )
-        itemTouchHelper.attachToRecyclerView(binding.playlistList)
+        cardsMenuItem.isVisible = !presenter.isCards
+        rowsMenuItem.isVisible = presenter.isCards
+        ItemTouchHelper(ItemTouchHelperCallback(this)).apply {
+            attachToRecyclerView(binding.playlistList)
+        }
         binding.playlistFabUp.setOnClickListener { presenter.scroll(Up) }
         binding.playlistFabUp.setOnLongClickListener { presenter.scroll(Top);true }
         binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }
@@ -202,12 +204,12 @@ class PlaylistFragment :
                     // only show the menu items for the non-empty state
                     //modeMenuItems.forEachIndexed { i, item -> item.isVisible = i == menuState.lastPlayModeIndex }
                     updatePlayModeMenuItems()
-                    playMenuItem?.isVisible = menuState.isPlayable
+                    playMenuItem.isVisible = menuState.isPlayable
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (menuState.isShow) {
                     menuState.isShow = false
                     updatePlayModeMenuItems()
-                    playMenuItem?.isVisible = false
+                    playMenuItem.isVisible = false
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
             }
@@ -222,8 +224,27 @@ class PlaylistFragment :
             binding.playlistFabPlay.isVisible = false
             binding.playlistFabPlaymode.isVisible = false
         }
+        setupRecyclerView()
+
         imageUrlArg?.also { setImage(it) }
     }
+
+    private fun setupRecyclerView() {
+        if (_adapter == null) {
+            _adapter = createAdapter()
+        }
+        binding.playlistList.layoutManager = LinearLayoutManager(context)
+        binding.playlistList.adapter = adapter
+        binding.playlistList.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
+        binding.playlistList.addItemDecoration(
+            HeaderFooterDecoration(0, resources.getDimensionPixelSize(R.dimen.recyclerview_footer))
+        )
+    }
+
+    private fun createAdapter() =
+        PlaylistAdapter(get(), this, presenter.isCards)
 
     private fun updatePlayModeMenuItems() {
         val shouldShow = menuState.isShow && menuState.isPlayable
@@ -234,16 +255,18 @@ class PlaylistFragment :
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
+
         inflater.inflate(R.menu.playlist_actionbar, menu)
         modeMenuItems.forEach { it.isVisible = false }
         modeMenuItems.forEach { it.setOnMenuItemClickListener { presenter.onPlayModeChange() } }
-        playMenuItem?.isVisible = false
-        playMenuItem?.setOnMenuItemClickListener { presenter.onPlayPlaylist() }
-        starMenuItem?.setOnMenuItemClickListener { presenter.onStarPlaylist() }
+        playMenuItem.isVisible = false
+        playMenuItem.setOnMenuItemClickListener { presenter.onPlayPlaylist() }
+        starMenuItem.setOnMenuItemClickListener { presenter.onStarPlaylist() }
         newMenuItem.setOnMenuItemClickListener { presenter.onFilterNewItems() }
-        editMenuItem?.setOnMenuItemClickListener { presenter.onEdit() }
+        editMenuItem.setOnMenuItemClickListener { presenter.onEdit() }
         filterMenuItem.setOnMenuItemClickListener { presenter.onFilterPlaylistItems() }
-        childrenMenuItem.setOnMenuItemClickListener { presenter.onShowChildren() }
+        cardsMenuItem.setOnMenuItemClickListener { presenter.onShowCards(true) }
+        rowsMenuItem.setOnMenuItemClickListener { presenter.onShowCards(false) }
         if (menuState.reloadHeaderAfterMenuInit) {
             presenter.reloadHeader()
             menuState.reloadHeaderAfterMenuInit = false
@@ -263,10 +286,11 @@ class PlaylistFragment :
 
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
-        if (isHeadless) {
+        if (isHeadless && isAdded) {
             binding.playlistAppbar.isVisible = false
             binding.playlistFabPlay.isVisible = false
             binding.playlistFabPlaymode.isVisible = false
+            newAdapter()
         }
         activity?.apply { makeNavFromArguments()?.setPlaylistData() }
     }
@@ -274,6 +298,7 @@ class PlaylistFragment :
     override fun onDestroyView() {
         presenter.destroy()
         _binding = null
+        _adapter = null
         super.onDestroyView()
     }
 
@@ -367,9 +392,18 @@ class PlaylistFragment :
         }
     }
 
+    override fun newAdapter() {
+        _adapter = createAdapter()
+            .also { binding.playlistList.adapter = it }
+    }
+
+    override fun getScrollIndex(): Int {
+        return linearLayoutManager.findFirstCompletelyVisibleItemPosition()
+    }
+
     override fun hideRefresh() {
         commitHost.isReady(true)
-        binding.playlistSwipe.isRefreshing = false
+        _binding?.apply { playlistSwipe.isRefreshing = false }
     }
 
     override fun showRefresh() {
@@ -383,14 +417,15 @@ class PlaylistFragment :
         binding.playlistFabPlay.setImageResource(model.playIcon)
         binding.playlistFabPlay.isVisible = model.canPlay
         binding.playlistFabPlaymode.isVisible = model.canPlay
-        playMenuItem?.setIcon(model.playIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
-        playMenuItem?.setEnabled(model.canPlay)
-        starMenuItem?.setIcon(model.starredIcon) ?: run {
+        playMenuItem.setIcon(model.playIcon) ?: run { menuState.reloadHeaderAfterMenuInit = false }
+        playMenuItem.setEnabled(model.canPlay)
+        starMenuItem.setIcon(model.starredIcon) ?: run {
             menuState.reloadHeaderAfterMenuInit = false
         }
-        editMenuItem?.isVisible = model.canEdit
-        starMenuItem?.isVisible = model.canEdit
-        childrenMenuItem.isVisible = model.hasChildren > 0
+        editMenuItem.isVisible = model.canEdit
+        starMenuItem.isVisible = model.canEdit
+        cardsMenuItem.isVisible = !presenter.isCards
+        rowsMenuItem.isVisible = presenter.isCards
         binding.playlistFlags.isVisible =
             model.isDefault || model.isPlayFromStart || model.isPinned || model.hasChildren > 0
         binding.playlistFlagDefault.isVisible = model.isDefault
@@ -420,7 +455,7 @@ class PlaylistFragment :
     }
 
     override fun scrollTo(direction: PlaylistContract.ScrollDirection) {
-        (binding.playlistList.layoutManager as LinearLayoutManager).run {
+        linearLayoutManager.run {
             val itemsOnScreen =
                 this.findLastCompletelyVisibleItemPosition() - this.findFirstCompletelyVisibleItemPosition()
 
@@ -431,6 +466,7 @@ class PlaylistFragment :
                         this.findLastCompletelyVisibleItemPosition() + itemsOnScreen,
                         adapter.data.size - 1
                     )
+
                 Top -> 0
                 Bottom -> adapter.data.size - 1
             }
@@ -443,7 +479,7 @@ class PlaylistFragment :
     }
 
     override fun scrollToItem(index: Int) {
-        (binding.playlistList.layoutManager as LinearLayoutManager).run {
+        linearLayoutManager.run {
             val useIndex = if (index > 0 && index < adapter.data.size) {
                 index
             } else 0
@@ -478,7 +514,8 @@ class PlaylistFragment :
         dialogFragment = PlaylistEditFragment.newInstance().apply {
             listener = object : PlaylistEditFragment.Listener {
                 override fun onPlaylistCommit(domain: PlaylistDomain?) {
-                    domain?.apply { presenter.onPlaylistSelected(this, true) }
+                    domain
+                        ?.apply { presenter.onPlaylistSelected(this, true) }
                     dialogFragment?.dismissAllowingStateLoss()
                 }
             }
@@ -492,7 +529,7 @@ class PlaylistFragment :
                 item.serialise(),
                 source.toString(),
                 -1,
-                (item.playlistId ?: 0)>0
+                (item.playlistId ?: 0) > 0
             ).apply { findNavController().navigate(this, view.makeTransitionExtras()) }
         }
     }
@@ -523,22 +560,26 @@ class PlaylistFragment :
         when (state) {
             PLAYING -> {
                 binding.playlistFabPlay.setImageResource(R.drawable.ic_playlist_close)
-                playMenuItem?.setIcon(R.drawable.ic_playlist_close)
+                playMenuItem.setIcon(R.drawable.ic_playlist_close)
                 adapter.notifyDataSetChanged()
             }
+
             NOT_CONNECTED -> {
                 binding.playlistFabPlay.setImageResource(R.drawable.ic_playlist_play)
-                playMenuItem?.setIcon(R.drawable.ic_playlist_play)
+                playMenuItem.setIcon(R.drawable.ic_playlist_play)
                 adapter.notifyDataSetChanged()
             }
+
             CONNECTING -> {
-                playMenuItem?.setIcon(R.drawable.ic_notif_buffer_black)
+                playMenuItem.setIcon(R.drawable.ic_notif_buffer_black)
             }
         }
     }
 
     override fun showError(message: String) {
-        snackbarWrapper.makeError(message).show()
+        if (isAdded) {
+            snackbarWrapper.makeError(message).show()
+        }
     }
 
     override fun exit() = TODO()

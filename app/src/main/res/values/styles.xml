@@ -361,8 +361,56 @@
         <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
     <!-- end ItemTile =========================== -->
+    <!-- ItemCard =========================== -->
+    <style name="ItemCard"/>
+
+    <style name="ItemCard.Root">
+        <item name="cardBackgroundColor">@color/transparent</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Item.Icon</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="ItemCard.Container">
+        <item name="android:background">@color/surface</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:elevation">8dp</item>
+    </style>
+
+    <style name="ItemCard.OverflowButtonClick">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+    </style>
+
+    <style name="ItemCard.TopText" parent="@style/TextAppearance.MaterialComponents.Body1">
+        <item name="android:textAppearance">@style/TextAppearance.App.Subtitle2</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
+        <item name="android:textScaleX">?headlineFontXScaling</item>
+    </style>
+
+
+    <style name="ItemCard.BottomText" parent="@style/TextAppearance.AppCompat.Small">
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="ItemCard.Image">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">200dp</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <!-- end ItemCard =========================== -->
     <!-- CompactPlayer =========================== -->
-    <style name="CompactPlayer" />
+    <style name="CompactPlayer"/>
 
     <style name="CompactPlayer.Button">
         <item name="android:background">@drawable/ic_ripple_play_background</item>
@@ -385,6 +433,14 @@
         <item name="android:layout_margin">@dimen/controls_button_margin</item>
     </style>
 
+    <style name="YoutubePlayer.MenuButton">
+        <item name="android:background">@drawable/ic_ripple_play_background</item>
+        <item name="android:layout_width">56dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:tint">@color/white</item>
+    </style>
+
     <style name="YoutubePlayer.InfoText" parent="TextAppearance.App.Body1">
         <item name="android:textColor">@color/white</item>
         <item name="android:layout_width">wrap_content</item>
@@ -393,8 +449,30 @@
     </style>
     <!-- end CompactPlayer =========================== -->
 
+    <!-- Snackbar =========================== -->
+
+    <style name="Cuer.Snackbar" parent="@style/Widget.MaterialComponents.Snackbar">
+        <item name="android:layout_marginBottom">64dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Medium</item>
+    </style>
+
+    <style name="Cuer.Snackbar.Text" parent="@style/Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.App.Body2</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="Cuer.Snackbar.Button" parent="@style/Widget.MaterialComponents.Button">
+        <item name="android:textAppearance">@style/TextAppearance.App.Headline5</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontWeight">700</item>
+        <item name="android:elevation">8dp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
     <!-- Chips =========================== -->
-    <style name="Chip" />
+    <style name="Chip"/>
 
     <style name="Chip.SelectPlaylist" parent="Widget.MaterialComponents.Chip.Action">
         <item name="android:layout_marginHorizontal">4dp</item>

@@ -10,3 +10,7 @@ interface LogWrapper {
 }
 
 expect class SystemLogWrapper() : LogWrapper
+
+inline val <reified T> T.TAG: String
+    @Suppress("unused")
+    get() = T::class.simpleName ?: T::class.toString()

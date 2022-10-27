@@ -28,8 +28,9 @@ class PlaylistOrchestrator constructor(
 
     suspend override fun load(id: Long, options: Options): PlaylistDomain? = when (options.source) {
         MEMORY -> playlistMemoryRepository.load(id, options)
-        LOCAL -> playlistDatabaseRepository.load(id)
+        LOCAL -> playlistDatabaseRepository.load(id, options.flat)
             .forceDatabaseSuccess()
+
         LOCAL_NETWORK -> throw NotImplementedException()
         REMOTE -> throw NotImplementedException()
         PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -49,12 +50,15 @@ class PlaylistOrchestrator constructor(
         when (options.source) {
             MEMORY -> playlistMemoryRepository.loadList(PlatformIdListFilter(listOf(platformId)), options)
                 .firstOrNull()
-            LOCAL -> playlistDatabaseRepository.loadList(PlatformIdListFilter(listOf(platformId)))
+
+            LOCAL -> playlistDatabaseRepository.loadList(PlatformIdListFilter(listOf(platformId)), options.flat)
                 .allowDatabaseListResultEmpty()
                 .firstOrNull()
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> ytInteractor.playlist(platformId)
+                .also { if (options.flat) throw NotImplementedException() }
                 .forceNetSuccessNotNull("Youtube ${platformId} does not exist")
         }
 

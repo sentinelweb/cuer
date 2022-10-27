@@ -4,7 +4,7 @@ sealed class LinkDomain constructor(
     open val address: String,
     open val title: String? = null,
     open val category: Category = Category.OTHER,
-    open val extractRegion: Pair<Int, Int>? = null
+    open val extractRegion: Pair<Int, Int>? = null,
 ) {
 
     data class UrlLinkDomain(
@@ -49,7 +49,7 @@ sealed class LinkDomain constructor(
     }
 
     enum class Category(val hosts: List<DomainHost>) {
-        DONATE(
+        SUPPORT(
             DomainHost.PATREON, DomainHost.PAYPAL, DomainHost.AMAZON, DomainHost.KO_FI,
             DomainHost.BUY_ME_A_COFFEE, DomainHost.TEESPRING
         ),

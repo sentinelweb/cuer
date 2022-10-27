@@ -27,6 +27,10 @@ interface PlayerContract {
             object PortraitPlayerOpen : Intent()
             object PipPlayerOpen : Intent()
             object Support : Intent()
+            object StarClick : Intent()
+
+            object OpenInApp : Intent()
+            object Share : Intent()
 
             data class InitFromService(val item: PlaylistItemDomain) : Intent()
             data class PlayItemFromService(val item: PlaylistItemDomain) : Intent()
@@ -38,19 +42,21 @@ interface PlayerContract {
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
             data class SeekTo(val fraction: Float) : Intent()
             data class SeekToPosition(val ms: Long) : Intent()
-            data class LinkOpen(val url: String) : Intent()
+            data class LinkOpen(val link: LinkDomain.UrlLinkDomain) : Intent()
             data class Duration(val ms: Long) : Intent()
             data class Id(val videoId: String) : Intent()
         }
 
         sealed class Label {
             data class Command(val command: PlayerCommand) : Label()
-            data class LinkOpen(val url: String) : Label()
+            data class LinkOpen(val link: LinkDomain.UrlLinkDomain) : Label()
             data class ChannelOpen(val channel: ChannelDomain) : Label()
             data class FullScreenPlayerOpen(val item: PlaylistItemDomain) : Label()
             data class PortraitPlayerOpen(val item: PlaylistItemDomain) : Label()
             data class PipPlayerOpen(val item: PlaylistItemDomain) : Label()
             data class ShowSupport(val item: PlaylistItemDomain) : Label()
+            data class Share(val item: PlaylistItemDomain) : Label()
+            data class ItemOpen(val item: PlaylistItemDomain) : Label()
         }
 
         enum class Screen { DESCRIPTION, PLAYLIST, PLAYLISTS }
@@ -68,6 +74,7 @@ interface PlayerContract {
 
     interface View : MviView<View.Model, View.Event> {
         suspend fun processLabel(label: Label)
+
         data class Model(
             val texts: Texts,
             val playState: PlayerStateDomain,
@@ -112,14 +119,16 @@ interface PlayerContract {
             object PipClick : Event()
             object ChannelClick : Event()
             object Support : Event()
-            //object OnDestroy : Event()
+            object StarClick : Event()
+            object ShareClick : Event()
+            object OpenClick : Event()
 
             data class SeekBarChanged(val fraction: Float) : Event()
             data class PlayPauseClicked(val isPlaying: Boolean? = null) : Event()
             data class PositionReceived(val ms: Long) : Event()
             data class PlayerStateChanged(val state: PlayerStateDomain) : Event()
             data class TrackClick(val item: PlaylistItemDomain, val resetPosition: Boolean) : Event()
-            data class LinkClick(val url: String) : Event()
+            data class LinkClick(val link: LinkDomain.UrlLinkDomain) : Event()
             data class DurationReceived(val ms: Long) : Event()
             data class IdReceived(val videoId: String) : Event()
             data class OnInitFromService(val item: PlaylistItemDomain) : Event()

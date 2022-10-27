@@ -12,12 +12,12 @@ import org.koin.core.module.Module
 import org.koin.test.KoinTest
 import org.koin.test.KoinTestRule
 import org.koin.test.inject
-import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.app.db.Database
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.database.entity.Media
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
-import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 import uk.co.sentinelweb.cuer.domain.ext.hasFlag
 import kotlin.test.assertEquals
@@ -197,6 +197,37 @@ class MediaEntityTest : KoinTest {
             .count()
             .executeAsOne()
         assertEquals(0L, actual)
+    }
+
+    @Test
+    fun onConflictInsert() {
+        val initial = (1..4).map { media() }
+        val conflicting = initial[2].first.copy(id = 0)
+
+        // try to insert conflicting
+        database.mediaEntityQueries.create(conflicting)
+        // item is not inserted
+        assertEquals(4, database.mediaEntityQueries.getInsertId().executeAsOne())
+        assertEquals(4, database.mediaEntityQueries.count().executeAsOne())
+    }
+
+    @Test
+    fun onConflictUpdate() {
+        val initial = (1..4).map { media() }
+        println(database.mediaEntityQueries.count().executeAsOne())
+        println(
+            database.mediaEntityQueries.loadAll().executeAsList()
+                .map { "\nmedia:${it.id} ${it.title} ${it.platform} ${it.platform_id} flags=${it.flags}" })
+        val conflicting = initial[1].first.copy(id = 3, flags = 12345)
+
+        // try to insert conflicting
+        database.mediaEntityQueries.update(conflicting)
+        println(
+            database.mediaEntityQueries.loadAll().executeAsList()
+                .map { "\nmedia:${it.id} ${it.title} ${it.platform} ${it.platform_id} flags=${it.flags}" })
+        // item is replaceed into 3
+        assertEquals(3, database.mediaEntityQueries.getInsertId().executeAsOne())
+        assertEquals(3, database.mediaEntityQueries.count().executeAsOne())
     }
 
     private fun media(): Pair<Media, Channel> {

@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.database.entity.Playlist_item
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.domain.ext.hasFlag
 import kotlin.test.assertEquals
@@ -93,12 +94,19 @@ class PlaylistEntityTest : KoinTest {
         val playlist1 = createPlaylist()
         createPlaylist()
         val playlist3 = createPlaylist()
+        createPlaylist()
+        database.playlistEntityQueries
+            .update(playlist1.copy(platform = PlatformDomain.YOUTUBE))
+        val playlist1yt = database.playlistEntityQueries.load(playlist1.id).executeAsOne()
+        database.playlistEntityQueries
+            .update(playlist3.copy(platform = PlatformDomain.YOUTUBE))
+        val playlist3yt = database.playlistEntityQueries.load(playlist3.id).executeAsOne()
         val actual = database.playlistEntityQueries
-            .loadAllByPlatformIds(listOf(playlist1.platform_id, playlist3.platform_id))
+            .loadAllByPlatformIds(listOf(playlist1.platform_id, playlist3.platform_id), PlatformDomain.YOUTUBE)
             .executeAsList()
         assertEquals(2, actual.size)
-        assertEquals(playlist1, actual[0])
-        assertEquals(playlist3, actual[1])
+        assertEquals(playlist1yt, actual[0])
+        assertEquals(playlist3yt, actual[1])
     }
 
     @Test
@@ -182,7 +190,18 @@ class PlaylistEntityTest : KoinTest {
         assertEquals(playlist1, actual[0])
     }
 
-    private fun createPlaylist(channelId:Long? = null): Playlist {
+    @Test
+    fun count() {
+        val initial = (1..4).map { createPlaylist() }
+
+        val actual = database.playlistEntityQueries
+            .count()
+            .executeAsOne()
+
+        assertEquals(initial.size.toLong(), actual)
+    }
+
+    private fun createPlaylist(channelId: Long? = null): Playlist {
         val initial =
             fixture<Playlist>().copy(id = 0, parent_id = null, channel_id = channelId, image_id = null, thumb_id = null)
         database.playlistEntityQueries.create(initial)

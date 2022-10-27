@@ -6,7 +6,10 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -34,19 +37,19 @@ class PlayerStoreFactory(
     private val livePlaybackController: LivePlaybackContract.Controller,
     private val mediaSessionManager: MediaSessionContract.Manager,
     private val playerControls: PlayerListener,
-
-    ) {
+    private val mediaOrchestrator: MediaOrchestrator,
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+) {
 
     private sealed class Result {
         object NoVideo : Result()
-        class State(val state: PlayerStateDomain) : Result()
-        class SetVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) :
-            Result()
+        data class State(val state: PlayerStateDomain) : Result()
+        data class SetVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) : Result()
 
-        class Playlist(val playlist: PlaylistDomain) : Result()
-        class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
-        class Screen(val screen: PlayerContract.MviStore.Screen) : Result()
-        class Position(val pos: Long) : Result()
+        data class Playlist(val playlist: PlaylistDomain) : Result()
+        data class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
+        data class Screen(val screen: PlayerContract.MviStore.Screen) : Result()
+        data class Position(val pos: Long) : Result()
     }
 
     private sealed class Action {
@@ -122,7 +125,7 @@ class PlayerStoreFactory(
                 is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
                 is Intent.PlaylistView -> dispatch(Result.Screen(Screen.PLAYLIST))
                 is Intent.PlaylistItemView -> dispatch(Result.Screen(Screen.DESCRIPTION))
-                is Intent.LinkOpen -> publish(Label.LinkOpen(intent.url))
+                is Intent.LinkOpen -> publish(Label.LinkOpen(intent.link))
                 is Intent.ChannelOpen ->
                     getState().item?.media?.channelData
                         ?.let { publish(Label.ChannelOpen(it)) }
@@ -156,7 +159,29 @@ class PlayerStoreFactory(
                 Intent.Support -> getState().item
                     ?.let { publish(Label.ShowSupport(it)) }
                     ?: Unit
+
+                Intent.StarClick -> toggleStar(getState().item).let { Unit }
+                is Intent.OpenInApp -> getState().item
+                    ?.let { publish(Label.ItemOpen(it)) }
+                    ?: Unit
+
+                is Intent.Share -> getState().item
+                    ?.let { publish(Label.Share(it)) }
+                    ?: Unit
             }
+
+        private fun toggleStar(item: PlaylistItemDomain?) = coroutines.mainScope.launch {
+            item?.takeIf { it.id != null }
+                ?.also {
+                    // can do queueProducer.playlistId.deepOptions()
+                    mediaOrchestrator.save(
+                        it.media.copy(starred = it.media.starred.not()),
+                        LOCAL.deepOptions(true)
+                    )
+                    playlistItemOrchestrator.load(it.id!!, LOCAL.deepOptions(false))
+                        ?.apply { dispatch(Result.SetVideo(this)) }
+                }
+        }
 
         private fun init() {
             itemLoader.load()?.also { item ->

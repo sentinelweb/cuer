@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.db.util.DataCreation
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.db.util.resetIds
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 import kotlin.test.assertEquals
@@ -197,6 +198,20 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
+    fun loadList_IdListFilter_flat() = runTest {
+        val toCreate = fixture<List<PlaylistDomain>>().map { it.resetIds() }
+        val saved = sut.save(toCreate, flat = false, emit = false)
+        assertTrue(saved.isSuccessful)
+        val loaded = sut.loadList(IdListFilter(listOf(1, 2)), flat = true)
+        assertTrue(loaded.isSuccessful)
+        val expected = saved.data!!
+            .filter { listOf(1L, 2L).contains(it.id) }
+            .map { it.copy(items = listOf()) }
+        assertEquals(expected, loaded.data!!)
+        loaded.data!!.forEach { assertEquals(0, it.items.size) }
+    }
+
+    @Test
     fun loadList_DefaultFilter() = runTest {
         val toCreate = fixture<List<PlaylistDomain>>()
             .map { it.resetIds() }
@@ -226,18 +241,19 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
     fun loadList_PlatformIdListFilter() = runTest {
         val toCreate = fixture<List<PlaylistDomain>>()
             .map { it.resetIds() }
+            .map { it.copy(platform = PlatformDomain.PODCAST) }
 
         val saved = sut.save(toCreate, flat = false, emit = false)
         assertTrue(saved.isSuccessful)
         val platformIds = saved.data!!.take(2).mapNotNull { it.platformId }
-        val loaded = sut.loadList(PlatformIdListFilter(platformIds))
+        val loaded = sut.loadList(PlatformIdListFilter(platformIds, platform = PlatformDomain.PODCAST))
         assertTrue(loaded.isSuccessful)
         assertEquals(platformIds.size, loaded.data!!.size)
         assertEquals(saved.data!!.filter { platformIds.contains(it.platformId) }, loaded.data!!)
     }
 
     @Test
-    @Ignore // fixme doesnt load channel
+    @Ignore(value = "fixme doesnt load channel") // fixme doesnt load channel
     fun loadList_ChannelPlatformIdFilter() = runTest {
         val toCreate = fixture<List<PlaylistDomain>>()
             .map { it.resetIds() }

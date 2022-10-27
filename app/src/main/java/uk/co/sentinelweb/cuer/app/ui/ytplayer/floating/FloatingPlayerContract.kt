@@ -48,6 +48,9 @@ interface FloatingPlayerContract {
                         windowManagement = get(),
                         aytViewHolder = get(),
                         log = get(),
+                        screenStateReceiver = get(),
+                        toastWrapper = get(),
+                        multiPrefs = get(),
                     )
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { NoItemLoader() }
@@ -75,6 +78,8 @@ interface FloatingPlayerContract {
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
                         playerControls = get(),
+                        mediaOrchestrator = get(),
+                        playlistItemOrchestrator = get()
                     ).create()
                 }
                 scoped { FloatingWindowMviView(get(), get(), get(), get()) }

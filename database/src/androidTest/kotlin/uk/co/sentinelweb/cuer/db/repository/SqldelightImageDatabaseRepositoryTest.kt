@@ -15,6 +15,7 @@ import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ImageDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -173,7 +174,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
 
         val update = fixture<ImageDomain>().copy(id = saved.id, url = initial.url)
         val sutImpl = sut as SqldelightImageDatabaseRepository
-        with (sutImpl.checkToSaveImage(update)) {
+        with(sutImpl.checkToSaveImage(update)) {
             assertEquals(saved.id, id)
             assertEquals(update.url, url)
             assertEquals(update.width, width)
@@ -181,6 +182,16 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
         }
     }
 
+    @Test
+    fun count() = runTest {
+        val initial = fixture<List<ImageDomain>>().map {
+            it.copy(id = null)
+        }
+        initial.forEach { sut.save(it) }
+        val actual = sut.count(OrchestratorContract.AllFilter()).data!!
+
+        assertEquals(initial.size, actual)
+    }
 //    @Test
 //    fun loadList() {
 //    }

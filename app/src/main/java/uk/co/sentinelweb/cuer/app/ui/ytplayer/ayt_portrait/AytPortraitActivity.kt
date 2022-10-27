@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait
 
+import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +12,8 @@ import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
@@ -19,17 +22,20 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.Play
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
@@ -40,14 +46,14 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.CryptoLauncher
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LinkDomain
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.TimecodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -72,10 +78,14 @@ class AytPortraitActivity : AppCompatActivity(),
     private val floatingService: FloatingPlayerServiceManager by inject()
     private val queueConsumer: QueueMediatorContract.Consumer by inject()
     private val cryptoLauncher: CryptoLauncher by inject()
-    private val linkScanner: LinkScanner by inject()
+    private val linkNavigator: LinkNavigator by inject()
+    private val shareWrapper: ShareWrapper by inject()
+    private val multiPrefs: MultiPlatformPreferencesWrapper by inject()
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl
     private lateinit var binding: ActivityAytPortraitBinding
+
+    private var currentItem: PlaylistItemDomain? = null
 
     init {
         log.tag(this)
@@ -83,10 +93,39 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager).requestDismissKeyguard(this, null)
         binding = ActivityAytPortraitBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         castListener.listen()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // this POS restores the AYT player to the mvi kotlin state after returning from a home press
+        if (this::mviView.isInitialized) {
+            coroutines.mainScope.launch {
+                delay(50)
+                mviView.dispatch(PlayerStateChanged(aytViewHolder.playerState))
+            }
+        }
+    }
+
+    override fun onStop() {
+        // check to launch the floating player
+        if (multiPrefs.playerAutoFloat
+            && aytViewHolder.isPlaying
+            && floatingService.hasPermission(this@AytPortraitActivity)
+            && currentItem != null
+            && !castListener.castStarting
+        ) {
+            log.d("launch pip")
+            aytViewHolder.switchView()
+            aytViewHolder.processCommand(Play)
+            floatingService.start(this@AytPortraitActivity, currentItem!!)
+            finish()
+        }
+        super.onStop()
     }
 
     override fun onDestroy() {
@@ -103,6 +142,7 @@ class AytPortraitActivity : AppCompatActivity(),
             aytViewHolder.switchView()
             floatingService.stop()
         }
+        log.d("onPostCreate")
         mviView = MviViewImpl(aytViewHolder)
         playerFragment.initMediaRouteButton()
         controller.onViewCreated(
@@ -113,7 +153,7 @@ class AytPortraitActivity : AppCompatActivity(),
         binding.portraitPlayerDescription.interactions = object : DescriptionContract.Interactions {
 
             override fun onLinkClick(link: LinkDomain.UrlLinkDomain) {
-                mviView.dispatch(LinkClick(link.address))
+                mviView.dispatch(LinkClick(link))
             }
 
             override fun onChannelClick() {
@@ -121,7 +161,7 @@ class AytPortraitActivity : AppCompatActivity(),
             }
 
             override fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain) {
-                cryptoLauncher.launch(cryptoAddress)
+                cryptoLauncher.launch(cryptoAddress)// todo route mvi
             }
 
             override fun onTimecodeClick(timecode: TimecodeDomain) {
@@ -131,6 +171,24 @@ class AytPortraitActivity : AppCompatActivity(),
             override fun onSelectPlaylistChipClick(model: ChipModel) = Unit
 
             override fun onRemovePlaylist(chipModel: ChipModel) = Unit
+
+            override fun onRibbonItemClick(ribbonItem: RibbonModel) = when (ribbonItem.type) {
+                RibbonModel.Type.STAR -> mviView.dispatch(StarClick)
+                RibbonModel.Type.UNSTAR -> mviView.dispatch(StarClick)
+                RibbonModel.Type.SHARE -> mviView.dispatch(ShareClick)
+                RibbonModel.Type.SUPPORT -> mviView.dispatch(Support)
+                RibbonModel.Type.FULL -> mviView.dispatch(FullScreenClick)
+                RibbonModel.Type.PIP -> mviView.dispatch(PipClick)
+                RibbonModel.Type.LIKE -> mviView.dispatch(OpenClick)
+                RibbonModel.Type.COMMENT -> mviView.dispatch(OpenClick)
+                RibbonModel.Type.LAUNCH -> mviView.dispatch(OpenClick)
+                else -> log.e(
+                    "Unsupported ribbon action",
+                    IllegalStateException("Unsupported ribbon action: $ribbonItem")
+                )
+            }
+
+            override fun onPlaylistChipClick(chipModel: ChipModel) = Unit
 
         }
         val playlistItem = itemLoader.load()
@@ -143,8 +201,6 @@ class AytPortraitActivity : AppCompatActivity(),
             PLAYLIST_ITEM_ID.name to (playlistItem.id),
         )
         playlistFragment.external.interactions = playlistInteractions
-        binding.portraitPlayerFullscreen.setOnClickListener { mviView.dispatch(FullScreenClick) }
-        binding.portraitPlayerPip.setOnClickListener { mviView.dispatch(PipClick); }
     }
 
     // region MVI view
@@ -153,7 +209,7 @@ class AytPortraitActivity : AppCompatActivity(),
         PlayerContract.View {
 
         init {
-            aytViewHolder.addView(this@AytPortraitActivity, binding.playerContainer, this)
+            aytViewHolder.addView(this@AytPortraitActivity, binding.playerContainer, this, false)
         }
 
         override val renderer: ViewRenderer<Model> = diff {
@@ -161,16 +217,29 @@ class AytPortraitActivity : AppCompatActivity(),
                 log.d("set description")
                 binding.portraitPlayerDescription.setModel(it)
             })
+            diff(get = Model::playlistItem, set = {
+                currentItem = it
+                it?.media?.also {
+                    binding.portraitPlayerDescription.ribbonItems
+                        .find { it.item.type == RibbonModel.Type.STAR }
+                        ?.isVisible = !it.starred
+                    binding.portraitPlayerDescription.ribbonItems
+                        .find { it.item.type == RibbonModel.Type.UNSTAR }
+                        ?.isVisible = it.starred
+                }
+            })
             diff(get = Model::screen, set = {
                 when (it) {
                     DESCRIPTION -> {
                         binding.portraitPlayerDescription.isVisible = true
                         binding.portraitPlayerPlaylist.isVisible = false
                     }
+
                     PLAYLIST -> {
                         binding.portraitPlayerDescription.isVisible = false
                         binding.portraitPlayerPlaylist.isVisible = true
                     }
+
                     else -> Unit
                 }
             })
@@ -179,24 +248,15 @@ class AytPortraitActivity : AppCompatActivity(),
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
             when (label) {
                 is Command -> label.command.let { aytViewHolder.processCommand(it) }
-                is LinkOpen ->
-                    navRouter.navigate(
-                        linkScanner.scan(label.url)?.let { scanned ->
-                            when (scanned.first) {
-                                ObjectTypeDomain.MEDIA -> navShare(label.url)
-                                ObjectTypeDomain.PLAYLIST -> navShare(label.url)
-                                ObjectTypeDomain.PLAYLIST_ITEM -> navShare(label.url)
-                                ObjectTypeDomain.CHANNEL -> navLink(label.url)
-                                else -> navLink(label.url)
-                            }
-                        } ?: navLink(label.url)
-                    )
+                is LinkOpen -> linkNavigator.navigateLink(label.link)
+
                 is ChannelOpen ->
                     label.channel.platformId?.let { id ->
                         navRouter.navigate(
                             NavigationModel(YOUTUBE_CHANNEL, mapOf(CHANNEL_ID to id))
                         )
                     }
+
                 is FullScreenPlayerOpen -> label.also {
                     aytViewHolder.switchView()
                     navRouter.navigate(
@@ -204,6 +264,7 @@ class AytPortraitActivity : AppCompatActivity(),
                     )
                     finish()
                 }
+
                 is PipPlayerOpen -> {
                     val hasPermission = floatingService.hasPermission(this@AytPortraitActivity)
                     if (hasPermission) {
@@ -214,17 +275,20 @@ class AytPortraitActivity : AppCompatActivity(),
                         finish()
                     }
                 }
+
                 is PortraitPlayerOpen -> toast.show("Already in portrait mode - shouldn't get here")
                 is ShowSupport -> SupportDialogFragment.show(
                     this@AytPortraitActivity,
                     label.item.media
                 )
+
+                is ItemOpen -> navRouter.navigate(
+                    NavigationModel(YOUTUBE_VIDEO_POS, mapOf(PLAYLIST_ITEM to label.item))
+                )
+
+                is Share -> shareWrapper.share(label.item.media)
             }
         }
-
-        private fun navLink(link: String) = NavigationModel(WEB_LINK, mapOf(LINK to link))
-
-        private fun navShare(link: String) = NavigationModel(SHARE, mapOf(LINK to link))
     }
 
     private val playlistInteractions = object : PlaylistContract.Interactions {
@@ -252,6 +316,12 @@ class AytPortraitActivity : AppCompatActivity(),
         fun start(c: Context, playlistItem: PlaylistItemDomain) = c.startActivity(
             Intent(c, AytPortraitActivity::class.java).apply {
                 putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
+            })
+
+        fun startFromService(c: Context, playlistItem: PlaylistItemDomain) = c.startActivity(
+            Intent(c, AytPortraitActivity::class.java).apply {
+                putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
+                setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             })
     }
 

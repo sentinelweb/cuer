@@ -21,9 +21,9 @@ class AlertDialogCreator(
                     dialog?.dismiss()
                 }
             })
-        val msg = context.getString(model.message)
-        if (msg.indexOf("\n")>-1) {
-            TextView(context,null, 0, R.style.TextAppearance_App_Body1)
+        val msg = model.messageString ?: context.getString(model.message)
+        if (msg.indexOf("\n") > -1) {
+            TextView(context, null, 0, R.style.TextAppearance_App_Body1)
                 .apply {
                     text = msg
                     setPadding(context.resources.getDimensionPixelSize(R.dimen.page_margin))

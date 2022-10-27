@@ -32,6 +32,11 @@ class ScanFragment : Fragment(R.layout.fragment_scan), ScanContract.View, Androi
         return binding.root
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         playYangProgress.init(binding.scanProgress, R.color.white)

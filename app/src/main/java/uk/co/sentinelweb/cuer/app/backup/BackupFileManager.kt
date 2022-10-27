@@ -7,6 +7,7 @@ import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer.Companion.DEFAULT_PLAYLIST_TEMPLATE
 import uk.co.sentinelweb.cuer.app.db.repository.*
+import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository.Companion.REPO_SCHEME
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
@@ -31,6 +32,7 @@ class BackupFileManager constructor(
     private val mediaRepository: MediaDatabaseRepository,
     private val playlistRepository: PlaylistDatabaseRepository,
     private val playlistItemRepository: PlaylistItemDatabaseRepository,
+    private val imageDatabaseRepository: ImageDatabaseRepository,
     private val contextProvider: CoroutineContextProvider,
     private val parserFactory: ParserFactory,
     private val playlistItemCreator: PlaylistItemCreator,
@@ -39,7 +41,7 @@ class BackupFileManager constructor(
     private val imageFileRepository: ImageFileRepository,
     private val context: Context,
     private val log: LogWrapper,
-) {
+) : IBackupManager {
     init {
         log.tag(this)
     }
@@ -49,11 +51,11 @@ class BackupFileManager constructor(
         val timeStamp = timeStampMapper.mapDateTimeSimple(
             timeProvider.localDateTime().toJavaLocalDateTime()
         )
-        return "v$VERSION-$timeStamp-cuer_backup-$device.zip"
+        return "v$BACKUP_VERSION-$timeStamp-cuer_backup-$device.zip"
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun makeBackupZipFile(): File = withContext(contextProvider.IO) {
+    override suspend fun makeBackupZipFile(): AFile = withContext(contextProvider.IO) {
         val f = File(context.cacheDir, makeFileName())
         try {
             val out = ZipOutputStream(FileOutputStream(f))
@@ -81,7 +83,7 @@ class BackupFileManager constructor(
         } catch (t: Throwable) {
             log.e("Error backing up", t)
         }
-        f
+        AFile(f.absolutePath)
     }
 
     private suspend fun backupDataJson(playlists: List<PlaylistDomain>) =
@@ -93,7 +95,7 @@ class BackupFileManager constructor(
             ).serialise()
         }
 
-    suspend fun restoreData(data: String): Boolean = withContext(contextProvider.IO) {
+    override suspend fun restoreData(data: String): Boolean = withContext(contextProvider.IO) {
         val backupFileModel = parserFactory.create(data).parse(data)
 
         if (backupFileModel.version == 3) {
@@ -102,6 +104,10 @@ class BackupFileManager constructor(
                 ?.let { channelRepository.deleteAll() }
                 ?.takeIf { it.isSuccessful }
                 ?.let { playlistRepository.deleteAll() }
+                ?.takeIf { it.isSuccessful }
+                ?.let { playlistItemRepository.deleteAll() }
+                ?.takeIf { it.isSuccessful }
+                ?.let { imageDatabaseRepository.deleteAll() }
                 ?.takeIf { it.isSuccessful }
                 ?.let {
                     backupFileModel.medias.chunked(CHUNK_SIZE)
@@ -131,6 +137,18 @@ class BackupFileManager constructor(
                             )
                         ).isSuccessful && acc
                     }
+                }
+                ?.also {
+                    log.d("--- file -----")
+                    log.d("medias: " + backupFileModel.medias.size)
+                    log.d("items: " + backupFileModel.playlists.fold(0) { acc, p -> acc + p.items.size })
+                    log.d("playlists: " + backupFileModel.playlists.size)
+                    log.d("--- db -----")
+                    log.d("images: " + imageDatabaseRepository.count().data)
+                    log.d("channels: " + channelRepository.count().data)
+                    log.d("medias: " + mediaRepository.count().data)
+                    log.d("items: " + playlistItemRepository.count().data)
+                    log.d("playlists: " + playlistRepository.count().data)
                 } ?: false
         } else {
             return@withContext mediaRepository.deleteAll()
@@ -172,9 +190,9 @@ class BackupFileManager constructor(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun restoreDataZip(f: File): Boolean = withContext(contextProvider.IO) {
+    override suspend fun restoreDataZip(f: AFile): Boolean = withContext(contextProvider.IO) {
         imageFileRepository.removeAll(false)
-        ZipFile(f).use { zip ->
+        ZipFile(File(f.path)).use { zip ->
             zip.entries().asSequence().forEach { entry ->
                 zip.getInputStream(entry).use { input ->
                     when (entry.name) {
@@ -196,7 +214,7 @@ class BackupFileManager constructor(
     }
 
     companion object {
-        const val VERSION = 3
+        const val BACKUP_VERSION = 3
         const val CHUNK_SIZE = 400
         const val DB_FILE_JSON = "database.json"
     }

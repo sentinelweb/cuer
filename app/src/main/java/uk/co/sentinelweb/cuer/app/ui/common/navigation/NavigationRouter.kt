@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
@@ -39,12 +40,14 @@ class NavigationRouter constructor(
 
     fun navigate(nav: NavigationModel) {
         when (nav.target) {
+            NAV_NONE -> Unit
             LOCAL_PLAYER_FULL ->
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
                     //YoutubeFullScreenActivity.start(activity, it)
                     AytLandActivity.start(activity, it)
                 }
                     ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
+
             LOCAL_PLAYER -> {
                 log.d("YoutubePortraitActivity.NavigationMapper")
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
@@ -52,36 +55,51 @@ class NavigationRouter constructor(
                     log.d("YoutubePortraitActivity.start called")
                 } ?: throw IllegalArgumentException("$LOCAL_PLAYER: $PLAYLIST_ITEM param required")
             }
+
             WEB_LINK ->
                 nav.params[LINK]?.let {
                     urlLauncher.launchWithChooser(it.toString())
                 } ?: throw IllegalArgumentException("$WEB_LINK: $LINK param required")
+
             CRYPTO_LINK ->
                 nav.getParam<LinkDomain.CryptoLinkDomain>(CRYPTO_ADDRESS)
                     ?.let { cryptoLauncher.launch(it) }
                     ?: throw IllegalArgumentException("$CRYPTO_LINK: $CRYPTO_ADDRESS param required")
+
             NAV_BACK -> navController?.popBackStack()
             NAV_FINISH -> activity.finish()
             YOUTUBE_CHANNEL -> if (!ytJavaApi.launchChannel(nav.params[CHANNEL_ID] as String)) {
                 toastWrapper.show("can't launch channel")
             }
+
             YOUTUBE_VIDEO -> if (!ytJavaApi.launchVideoSystem(nav.params[PLATFORM_ID] as String)) {
                 toastWrapper.show("can't launch channel")
             }
+
+            YOUTUBE_VIDEO_POS ->
+                (nav.params[PLAYLIST_ITEM] as? PlaylistItemDomain)?.media
+                    ?.also {
+                        if (!ytJavaApi.launchVideoWithTimeSystem(it)) {
+                            toastWrapper.show("can't launch media with time")
+                        }
+                    }
+
             PLAYLIST -> navController?.navigate(
                 R.id.navigation_playlist,
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
                     PLAYLIST_ITEM_ID.name to nav.params[PLAYLIST_ITEM_ID],
-                    PLAY_NOW.name to nav.params[PLAY_NOW],
+                    PLAY_NOW.name to (nav.params[PLAY_NOW] ?: false),
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                nav.navOpts ?: navOptions(optionsBuilder = {// todo remove
-                    launchSingleTop = true
-                    popUpTo(R.id.navigation_playlist, { inclusive = true })
-                }),
+                nav.navOpts,
+//                navOptions(optionsBuilder = {// todo remove
+//                    launchSingleTop = true
+//                    popUpTo(R.id.navigation_playlist, { inclusive = true })
+//                }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+
             PLAYLISTS -> navController?.navigate(
                 R.id.navigation_playlists,
                 bundleOf(
@@ -97,24 +115,29 @@ class NavigationRouter constructor(
                     PLAYLIST_ITEM.name to (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain).serialise(),
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                nav.navOpts ?: navOptions(optionsBuilder = {
-                    launchSingleTop = true
-                    popUpTo(R.id.navigation_playlist_edit, { inclusive = true })
-                }),
+                nav.navOpts
+//                    ?: navOptions(optionsBuilder = {
+//                    launchSingleTop = true
+//                    popUpTo(R.id.navigation_playlist_edit, { inclusive = true })
+//                })
+                ,
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+
             PLAYLIST_EDIT -> navController?.navigate(
                 R.id.navigation_playlist_edit,
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
+                // todo check this
                 nav.navOpts ?: navOptions(optionsBuilder = {
                     launchSingleTop = true
                     popUpTo(R.id.navigation_playlists, { inclusive = false })
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+
             PLAYLIST_CREATE -> navController?.navigate(
                 R.id.navigation_playlist_edit,
                 bundleOf(
@@ -126,6 +149,7 @@ class NavigationRouter constructor(
                 }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+
             SHARE -> nav.getParam<String>(LINK)
                 ?.let { activity.startActivity(ShareActivity.urlIntent(activity, it)) }
                 ?: throw IllegalArgumentException("$SHARE: $LINK param required")
@@ -147,6 +171,7 @@ class NavigationRouter constructor(
                         intent.removeExtra(PLAY_NOW.toString())
                         intent.removeExtra(SOURCE.name)
                     }
+
                     else -> Unit
                 }
             }
@@ -178,5 +203,5 @@ fun Scope.navigationRouter(
     } else null,
     urlLauncher = UrlLauncherWrapper(sourceActivity),
     log = AndroidLogWrapper(),
-    cryptoLauncher = AndroidCryptoLauncher(sourceActivity, get(), get(), get())
+    cryptoLauncher = AndroidCryptoLauncher(sourceActivity, get(), AlertDialogCreator(sourceActivity), get())
 )

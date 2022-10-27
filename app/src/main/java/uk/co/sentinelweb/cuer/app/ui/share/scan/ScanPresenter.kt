@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SHARED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -80,10 +81,14 @@ class ScanPresenter(
                     playlistOrchestrator.load(it, Options(LOCAL))
                         ?.also { log.d("found playlist = $it") }
                         ?.let { it to false }
-                        ?: playlistOrchestrator.load(it, Options(PLATFORM))
+                        ?: playlistOrchestrator.load(it, PLATFORM.deepOptions(emit = false))
                             ?.copy(
                                 id = SHARED_PLAYLIST,
-                                config = scannedPlaylist.config.copy(playable = false, editableItems = false, deletableItems = false)
+                                config = scannedPlaylist.config.copy(
+                                    playable = false,
+                                    editableItems = false,
+                                    deletableItems = false
+                                )
                             )
                             //?.also { log.d("loaded playlist = ${it.title} id = ${it.id} platformId = ${it.id}") }
                             ?.let { playlistOrchestrator.save(it, Options(MEMORY, flat = false, emit = false)) to true }

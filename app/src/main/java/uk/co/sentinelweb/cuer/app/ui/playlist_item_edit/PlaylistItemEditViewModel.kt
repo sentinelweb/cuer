@@ -10,23 +10,29 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
-import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
@@ -46,7 +52,8 @@ class PlaylistItemEditViewModel constructor(
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val shareWrapper: ShareWrapper,
     private val playUseCase: PlayUseCase,
-    private val linkScanner: LinkScanner
+    private val linkNavigator: LinkNavigator,
+    private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -72,11 +79,8 @@ class PlaylistItemEditViewModel constructor(
     private val isNew: Boolean
         get() = state.editingPlaylistItem?.id == null
 
-    @Suppress("RedundantOverride") // for note
-    override fun onCleared() {
-        super.onCleared()
-        // https://developer.android.com/topic/libraries/architecture/coroutines
-        // coroutines cancel via viewModelScope
+    fun setInShare(isInShare: Boolean) {
+        state.isInShare = isInShare
     }
 
     fun setData(
@@ -115,7 +119,7 @@ class PlaylistItemEditViewModel constructor(
                                 .also {
                                     playlistOrchestrator.loadList(
                                         IdListFilter(it),
-                                        Options(state.source)
+                                        state.source.flatOptions()
                                     )
                                         .also { state.selectedPlaylists.addAll(it) }
                                 }
@@ -151,16 +155,39 @@ class PlaylistItemEditViewModel constructor(
     private suspend fun checkToAutoSelectPlaylists() {
         if (state.selectedPlaylists.isEmpty() && !state.isOnSharePlaylist) {
             state.media?.apply {
+                val channelFilter = ChannelPlatformIdFilter(channelData.platformId!!)
                 playlistOrchestrator.loadList(
-                    ChannelPlatformIdFilter(channelData.platformId!!),
+                    channelFilter,
                     LOCAL.flatOptions()
-                ).forEach { state.selectedPlaylists.add(it) }
+                ).also {
+                    if (it.size == 1) {
+                        state.selectedPlaylists.add(it[0])
+                    } else if (it.size > 1) {
+                        playlistItemOrchestrator
+                            .loadList(channelFilter, LOCAL.flatOptions())
+                            .groupBy { it.playlistId }
+                            .values
+                            .maxByOrNull { it.size } // should get the largest list of items
+                            ?.get(0)
+                            ?.playlistId
+                            ?.let { playlistOrchestrator.load(it, LOCAL.flatOptions()) }
+                            ?.also { state.selectedPlaylists.add(it) }
+                    }
+                }
             }
         }
     }
 
     fun refreshMediaBackground() = viewModelScope.launch {
         refreshMedia()
+    }
+
+    override fun onPlaylistChipClick(chipModel: ChipModel) {
+        if (!state.isInShare) {
+            val plId = chipModel.value?.toLong()
+            _navigateLiveData.value = NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to plId, SOURCE to LOCAL))
+            _navigateLiveData.value = NavigationModel(NAV_NONE)
+        }
     }
 
     private suspend fun refreshMedia() =
@@ -197,7 +224,7 @@ class PlaylistItemEditViewModel constructor(
         } ?: run { toast.show("Please save the item first ...") }
     }
 
-    fun onStarClick() {
+    private fun onStarClick() {
         state.media
             ?.let { it.copy(starred = !it.starred) }
             ?.also { state.media = it }
@@ -205,7 +232,7 @@ class PlaylistItemEditViewModel constructor(
             ?.also { update() }
     }
 
-    override fun onSelectPlaylistChipClick(@Suppress("UNUSED_PARAMETER") model: ChipModel) {
+    override fun onSelectPlaylistChipClick(model: ChipModel) {
         _dialogModelLiveData.value =
             PlaylistsDialogContract.Config(
                 state.selectedPlaylists,
@@ -222,6 +249,7 @@ class PlaylistItemEditViewModel constructor(
     fun onPlaylistSelected(playlist: PlaylistDomain?, checked: Boolean) {
         state.isPlaylistsChanged = true
         playlist
+            ?.takeIf { playlist != ADD_PLAYLIST_DUMMY }
             ?.apply {
                 if (checked) {
                     state.selectedPlaylists.add(this)
@@ -254,7 +282,7 @@ class PlaylistItemEditViewModel constructor(
         update()
     }
 
-    fun onEditClick() {
+    private fun onEditClick() {
         state.media?.let { originalMedia ->
             state.editSettings.watched = null
             state.editSettings.playFromStart = null
@@ -297,6 +325,18 @@ class PlaylistItemEditViewModel constructor(
         update()
     }
 
+    override fun onRibbonItemClick(ribbonItem: RibbonModel) = when (ribbonItem.type) {
+        RibbonModel.Type.LIKE -> onLaunchVideo()
+        RibbonModel.Type.STAR -> onStarClick()
+        RibbonModel.Type.UNSTAR -> onStarClick()
+        RibbonModel.Type.SHARE -> onShare()
+        RibbonModel.Type.SUPPORT -> onSupport()
+        RibbonModel.Type.COMMENT -> onLaunchVideo()
+        RibbonModel.Type.LAUNCH -> onLaunchVideo()
+        RibbonModel.Type.EDIT -> onEditClick()
+        else -> log.e("Unsupported ribbon action", IllegalStateException("Unsupported ribbon action: $ribbonItem"))
+    }
+
     override fun onChannelClick() {
         state.media?.channelData?.platformId?.let { channelId ->
             _navigateLiveData.value = NavigationModel(
@@ -307,22 +347,8 @@ class PlaylistItemEditViewModel constructor(
     }
 
     override fun onLinkClick(link: LinkDomain.UrlLinkDomain) {
-        _navigateLiveData.value = linkScanner.scan(link)?.let { scanned ->
-            when (scanned.first) {
-                ObjectTypeDomain.MEDIA -> navShare(link)
-                ObjectTypeDomain.PLAYLIST -> navShare(link)
-                ObjectTypeDomain.PLAYLIST_ITEM -> navShare(link)
-                ObjectTypeDomain.CHANNEL -> navLink(link)
-                else -> navLink(link)
-            }
-        } ?: let { navLink(link) }
+        linkNavigator.navigateLink(link)
     }
-
-    private fun navLink(link: LinkDomain.UrlLinkDomain): NavigationModel =
-            NavigationModel(WEB_LINK, mapOf(NavigationModel.Param.LINK to link.address))
-
-    private fun navShare(link: LinkDomain.UrlLinkDomain): NavigationModel  =
-            NavigationModel(SHARE, mapOf(NavigationModel.Param.LINK to link.address))
 
     override fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain) {
         _navigateLiveData.value =
@@ -333,16 +359,14 @@ class PlaylistItemEditViewModel constructor(
         _uiLiveData.value = UiEvent(JUMPTO, timecode.position)
     }
 
-    fun onLaunchVideo() {
-        state.media?.platformId?.let { platformId ->
-            _navigateLiveData.value = NavigationModel(
-                YOUTUBE_VIDEO,
-                mapOf(NavigationModel.Param.PLATFORM_ID to platformId)
-            )
+    private fun onLaunchVideo() {
+        state.editingPlaylistItem?.let {
+            _navigateLiveData.value =
+                NavigationModel(YOUTUBE_VIDEO_POS, mapOf(NavigationModel.Param.PLAYLIST_ITEM to it))
         }
     }
 
-    fun onShare() {
+    private fun onShare() {
         state.media
             ?.apply { shareWrapper.share(this) }
             ?: toast.show("No item to share ...")
@@ -391,7 +415,7 @@ class PlaylistItemEditViewModel constructor(
             val selectedPlaylists = if (state.selectedPlaylists.size > 0) {
                 state.selectedPlaylists
             } else {
-                playlistOrchestrator.loadList(DefaultFilter(), Options(LOCAL))
+                playlistOrchestrator.loadList(DefaultFilter(), LOCAL.flatOptions())
                     .takeIf { it.size > 0 }
                     ?: throw NoDefaultPlaylistException()
             }
@@ -431,10 +455,8 @@ class PlaylistItemEditViewModel constructor(
                                         Options(saveSource)
                                     ).takeIf { saveSource == LOCAL && isNew }
                                         ?.also {
-                                            prefsWrapper.putLong(
-                                                LAST_PLAYLIST_ADDED_TO,
-                                                it.playlistId!!
-                                            )
+                                            prefsWrapper.putLong(LAST_PLAYLIST_ADDED_TO, it.playlistId!!)
+                                            recentLocalPlaylists.addRecentId(it.playlistId!!)
                                         }
                                 }
                         }
@@ -470,7 +492,7 @@ class PlaylistItemEditViewModel constructor(
             }
     }
 
-    fun onSupport() {
+    private fun onSupport() {
         state.media
             ?.also { media ->
                 _dialogModelLiveData.value = ArgumentDialogModel(

@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewDescriptionBinding
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonItemView
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
 import uk.co.sentinelweb.cuer.app.util.glide.GlideFallbackLoadListener
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
@@ -49,6 +50,9 @@ class DescriptionView @JvmOverloads constructor(
     private val timecodeExtractor: TimecodeExtractor by scope.inject()
 
     private val binding: ViewDescriptionBinding
+
+    lateinit var ribbonItems: List<RibbonItemView>
+        private set
 
     private val ytDrawable: Drawable by lazy {
         res.getDrawable(R.drawable.ic_platform_youtube, R.color.primary)
@@ -97,10 +101,21 @@ class DescriptionView @JvmOverloads constructor(
                     ChipModel.Type.PLAYLIST_SELECT -> {
                         setOnClickListener { interactions.onSelectPlaylistChipClick(chipModel) }
                     }
+
                     ChipModel.Type.PLAYLIST -> {
                         setOnCloseIconClickListener { interactions.onRemovePlaylist(chipModel) }
+                        setOnClickListener { interactions.onPlaylistChipClick(chipModel) }
                     }
                 }
+            }
+        }
+        if (!this::ribbonItems.isInitialized ||
+            ribbonItems.map { it.item.type } != model.ribbonActions.map { it.type }
+        ) {
+            binding.pidRibbonCtnr.removeAllViews()
+            ribbonItems = model.ribbonActions.map {
+                RibbonItemView(it, binding.pidRibbonCtnr)
+                    .apply { setOnClickListener { item -> interactions.onRibbonItemClick(item) } }
             }
         }
     }

@@ -22,8 +22,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYLIST
+import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYING_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.ntuple.then
@@ -117,7 +116,7 @@ class QueueMediatorTest {
         } returns (fixtCurrentPlaylist to fixtSource)
         every { mockPlaylistItemOrchestrator.updates } returns fixtPlaylistItemOrchestratorFlow
         every {
-            mockPrefsWrapper.getPair(CURRENT_PLAYLIST, NO_PLAYLIST.toPair())
+            mockPrefsWrapper.getPair(CURRENT_PLAYING_PLAYLIST, NO_PLAYLIST.toPair())
         } returns (fixtCurrentIdentifier.id to fixtCurrentIdentifier.source)
     }
 
@@ -531,7 +530,7 @@ class QueueMediatorTest {
             assertThat(sut.currentItem).isEqualTo(expectedCurrentItem)
             assertThat(captureItemFlow.last()).isEqualTo(expectedCurrentItem)
             assertThat(capturePlaylistFlow.last()).isEqualTo(fixtSwitchPlaylist)
-            verify { mockPrefsWrapper.putPair(CURRENT_PLAYLIST, switchIdentifier.toPair()) }
+            verify { mockPrefsWrapper.putPair(CURRENT_PLAYING_PLAYLIST, switchIdentifier.toPair()) }
             verify { mockRecentLocalPlaylists.addRecent(sut.playlist!!) }
         }
     }

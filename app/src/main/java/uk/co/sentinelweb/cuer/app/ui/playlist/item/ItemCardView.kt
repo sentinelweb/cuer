@@ -1,7 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
-// todo view binding
-//import kotlinx.android.synthetic.main.view_playlist_item.view.*
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.SpannableString
@@ -22,7 +20,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistItemBinding
+import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistCardBinding
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_IMAGE
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_TITLE
 import uk.co.sentinelweb.cuer.app.util.extension.view.fade
@@ -30,7 +28,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 
-class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLayout(c, a, def),
+class ItemCardView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLayout(c, a, def),
     ItemContract.View, KoinComponent {
 
     constructor(c: Context, a: AttributeSet?) : this(c, a, 0)
@@ -40,8 +38,8 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
     private val res: ResourceWrapper by inject()
     private var popupMenu: PopupMenu? = null
 
-    private var _binding: ViewPlaylistItemBinding? = null
-    private val binding get() = _binding!!
+    private var _binding: ViewPlaylistCardBinding? = null
+    private val binding get() = _binding ?: throw Exception("ViewPlaylistCardBinding not bound")
 
     init {
         log.tag(this)
@@ -51,18 +49,22 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         presenter = itemPresenter
     }
 
-    val itemView: View
+    override val itemView: View
         get() = binding.listitem
-    val rightSwipeView: View
+    override val rightSwipeView: View
         get() = binding.swipeLabelRight
-    val leftSwipeView: View
+    override val leftSwipeView: View
         get() = binding.swipeLabelLeft
 
-    fun isViewForId(id: Long): Boolean = presenter.isViewForId(id)
+    override fun isViewForId(id: Long): Boolean = presenter.isViewForId(id)
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        _binding = ViewPlaylistItemBinding.bind(this)
+        _binding = ViewPlaylistCardBinding.bind(this)
+        binding.listitem.setOnClickListener { presenter.doClick() }
+        binding.listitemTop.setOnClickListener { presenter.doClick() }
+        binding.listitemBottom.setOnClickListener { presenter.doClick() }
+        binding.listitemChannelImage.setOnClickListener { presenter.doAuthorClick() }
         binding.listitem.setOnClickListener { presenter.doClick() }
         binding.listitemOverflowClick.setOnClickListener { showContextualMenu() }
         binding.listitemIcon.setOnClickListener { presenter.doIconClick() }
@@ -125,14 +127,14 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         binding.listitemOverflowImg.isVisible = showOverflow
     }
 
-    fun resetBackground() {
+    override fun resetBackground() {
         binding.swipeLabelRight.fade(false)
         binding.swipeLabelLeft.fade(false)
         binding.listitem.translationX = 0f
         binding.listitem.alpha = 1f
     }
 
-    override fun setIconResource(iconRes: Int) {
+    override fun setImageResource(iconRes: Int) {
         binding.listitemIcon.setImageResource(iconRes)
     }
 
@@ -149,12 +151,33 @@ class ItemView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLa
         binding.listitemBottom.setText(text)
     }
 
-    override fun setIconUrl(url: String) {
+    override fun setImageUrl(url: String) {
         Glide.with(context)
             .load(url)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.listitemIcon)
         binding.listitemIcon.transitionName = url
+    }
+
+    override fun setThumbResource(iconRes: Int) {
+        // do nothing
+    }
+
+    override fun setThumbUrl(url: String) {
+        // do nothing
+    }
+
+    override fun setChannelImageResource(iconRes: Int) {
+        binding.listitemChannelImage.setImageResource(iconRes)
+    }
+
+    override fun setChannelImageUrl(url: String) {
+        Glide.with(context)
+            .load(url)
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(binding.listitemChannelImage)
+        // todo transition image?
+        // binding.listitemAuthorImage.transitionName = url
     }
 
     override fun setBackground(@ColorRes backgroundColor: Int) {

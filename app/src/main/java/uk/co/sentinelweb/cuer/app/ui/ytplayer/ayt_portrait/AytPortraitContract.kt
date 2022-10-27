@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.EmptyNavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -22,9 +23,11 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 
 interface AytPortraitContract {
     companion object {
@@ -46,7 +49,7 @@ interface AytPortraitContract {
                 }
                 scoped {
                     PlayerStoreFactory(
-                        //storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+                        // storeFactory = LoggingStoreFactory(DefaultStoreFactory),
                         storeFactory = DefaultStoreFactory(),
                         itemLoader = get(),
                         queueConsumer = get(),
@@ -57,6 +60,8 @@ interface AytPortraitContract {
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
                         playerControls = get(),
+                        mediaOrchestrator = get(),
+                        playlistItemOrchestrator = get()
                     ).create()
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(get<AytPortraitActivity>(), get()) }
@@ -91,6 +96,9 @@ interface AytPortraitContract {
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<CommitHost> { EmptyCommitHost() }
                 scoped { AlertDialogCreator(get<AytPortraitActivity>()) }
+                scoped { ShareWrapper(get<AytPortraitActivity>()) }
+                scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
+                scoped { ShareNavigationHack() }
             }
         }
     }

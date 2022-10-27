@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.StarClick
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.Support
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -48,7 +49,7 @@ class PlayerController constructor(
             is SeekBarChanged -> SeekTo(fraction)
             is PlaylistClicked -> PlaylistView
             is ItemClicked -> PlaylistItemView
-            is LinkClick -> LinkOpen(url)
+            is LinkClick -> LinkOpen(link)
             is ChannelClick -> ChannelOpen
             is TrackClick -> TrackSelected(item, resetPosition)
             is DurationReceived -> Duration(ms)
@@ -61,6 +62,9 @@ class PlayerController constructor(
             is OnPlayItemFromService -> PlayItemFromService(item)
             is OnSeekToPosition -> SeekToPosition(ms)
             is Support -> Intent.Support
+            is StarClick -> Intent.StarClick
+            is OpenClick -> Intent.OpenInApp
+            is ShareClick -> Intent.Share
         }
     }
 

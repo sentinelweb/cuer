@@ -24,11 +24,12 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
@@ -36,6 +37,8 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.SHOW_VIDEO_CARDS
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -79,7 +82,8 @@ class PlaylistPresenter(
     private val res: ResourceWrapper,
     private val dbInit: DatabaseInitializer,
     private val recentLocalPlaylists: RecentLocalPlaylists,
-    private val playUseCase: PlayUseCase
+    private val playUseCase: PlayUseCase,
+    private val multiPrefs: MultiPlatformPreferencesWrapper,
 ) : PlaylistContract.Presenter, PlaylistContract.External {
 
     override var interactions: PlaylistContract.Interactions? = null
@@ -94,6 +98,10 @@ class PlaylistPresenter(
 
     private val isQueuedPlaylist: Boolean
         get() = state.playlistIdentifier == queue.playlistId
+
+    override val isCards: Boolean
+        get() = multiPrefs.getBoolean(SHOW_VIDEO_CARDS, true) && !view.isHeadless
+
 
     private fun canPlayPlaylist() = (state.playlist?.id ?: 0) > 0
 
@@ -235,7 +243,7 @@ class PlaylistPresenter(
 
     override fun initialise() {
         state.playlistIdentifier =
-            prefsWrapper.getPair(CURRENT_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
+            prefsWrapper.getPair(CURRENT_PLAYING_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
 
     }
 
@@ -267,6 +275,7 @@ class PlaylistPresenter(
                 multi = true,
                 itemClick = { which: PlaylistDomain?, _ ->
                     which
+                        ?.takeIf { it != ADD_PLAYLIST_DUMMY }
                         ?.let { moveItemToPlaylist(it) }
                         ?: view.showPlaylistCreateDialog()
                 },
@@ -435,17 +444,6 @@ class PlaylistPresenter(
 
     override fun onFilterPlaylistItems(): Boolean {
         log.d("onFilterPlaylistItems")
-        return true
-    }
-
-    override fun onShowChildren(): Boolean {
-        state.playlist?.id?.also {
-            view.navigate(
-                NavigationModel(
-                    PLAYLISTS, mapOf(PLAYLIST_ID to it)
-                )
-            )
-        }
         return true
     }
 
@@ -645,7 +643,7 @@ class PlaylistPresenter(
             view.showAlertDialog(modelMapper.mapSaveConfirmAlert(
                 {
                     coroutines.mainScope.launch {
-                        commitPlaylist() // fixme: this doesn't go thru sharePrestent after commit after
+                        commitPlaylist() // fixme: this doesn't go thru sharePresenter after commit after
                         view.navigate(NavigationModel(NAV_DONE))
                     }
                 },
@@ -654,6 +652,16 @@ class PlaylistPresenter(
         } else {
             view.navigate(NavigationModel(NAV_DONE))
         }
+    }
+
+    override fun onShowCards(cards: Boolean): Boolean {
+        multiPrefs.putBoolean(SHOW_VIDEO_CARDS, cards)
+        coroutines.mainScope.launch {
+            state.focusIndex = view.getScrollIndex()
+            view.newAdapter()
+            executeRefresh(false)
+        }
+        return true
     }
 
     override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit?) {
@@ -689,7 +697,7 @@ class PlaylistPresenter(
                 ?.also { state.playlist = it }
                 ?.also { updateView() }
                 ?.also { onCommit?.onCommit(PLAYLIST, listOf(it)) }
-                ?.also { prefsWrapper.putLong(LAST_PLAYLIST_CREATED, it.id!!) }
+                ?.also { recentLocalPlaylists.addRecentId(it.id!!) }
         } else {
             throw IllegalStateException("Can't save non Memory playlist")
         }
