@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
@@ -14,9 +16,9 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*
 
 class MediaOrchestrator constructor(
     private val mediaDatabaseRepository: MediaDatabaseRepository,
-    private val mediaMemoryRepository: PlaylistMemoryRepository.MediaMemoryRepository,
     private val ytInteractor: YoutubeInteractor
-) : OrchestratorContract<MediaDomain> {
+) : OrchestratorContract<MediaDomain>, KoinComponent {
+    private val mediaMemoryRepository: PlaylistMemoryRepository.MediaMemoryRepository by inject()
 
     override val updates: Flow<Triple<Operation, Source, MediaDomain>>
         get() = mediaDatabaseRepository.updates

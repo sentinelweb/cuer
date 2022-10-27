@@ -450,6 +450,7 @@ class PlaylistFragment :
         snackbar = snackbarWrapper.make(msg, length = Snackbar.LENGTH_LONG, actionText = "UNDO") {
             undoFunction()
             snackbar?.dismiss()
+            snackbar = null
         }
         snackbar?.show()
     }

@@ -9,11 +9,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.YOUTUBE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
@@ -52,12 +49,14 @@ class PlaylistsPresenter(
     private val newMedia: NewMediaPlayistInteractor,
     private val recentItems: RecentItemsPlayistInteractor,
     private val localSearch: LocalSearchPlayistInteractor,
-    private val remoteSearch: RemoteSearchPlayistOrchestrator,
+    private val remoteSearch: YoutubeSearchPlayistInteractor,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val searchMapper: SearchMapper,
     private val merge: PlaylistMergeOrchestrator,
     private val shareWrapper: ShareWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists,
+    private val starredItems: StarredItemsPlayistInteractor,
+    private val unfinishedItems: UnfinishedItemsPlayistInteractor,
 ) : PlaylistsContract.Presenter {
 
     init {
@@ -155,7 +154,7 @@ class PlaylistsPresenter(
                         } else {
                             view.showError("Please delete the children first")
                         }
-                    } else if (playlist.id == LOCAL_SEARCH_PLAYLIST || playlist.id == REMOTE_SEARCH_PLAYLIST) {
+                    } else if (playlist.id == LOCAL_SEARCH_PLAYLIST || playlist.id == YOUTUBE_SEARCH_PLAYLIST) {
                         val isLocal = playlist.id == LOCAL_SEARCH_PLAYLIST
                         val type = searchMapper.searchTypeText(isLocal)
                         val key = if (isLocal) LAST_LOCAL_SEARCH else LAST_REMOTE_SEARCH
@@ -171,7 +170,6 @@ class PlaylistsPresenter(
                         executeRefresh()
                     }
                 } ?: let { view.showError("Cannot delete playlist") }
-
         }
     }
 
@@ -337,20 +335,11 @@ class PlaylistsPresenter(
                 )
                 .toMutableList()
 
-            val appLists = mutableMapOf(
-                newMedia.makeNewItemsHeader() to newMedia.makeNewItemsStats(),
-                recentItems.makeRecentItemsHeader() to recentItems.makeRecentItemsStats()
-            )
-                .apply {
-                    if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
-                        put(localSearch.makeSearchHeader(), localSearch.makeSearchItemsStats())
-                    }
-                }
-                .apply {
-                    if (prefsWrapper.has(LAST_REMOTE_SEARCH)) {
-                        put(remoteSearch.makeSearchHeader(), remoteSearch.makeSearchItemsStats())
-                    }
-                }
+            val appLists = mutableListOf(newMedia, recentItems, starredItems, unfinishedItems)
+                .apply { if (prefsWrapper.has(LAST_LOCAL_SEARCH)) add(localSearch) }
+                .apply { if (prefsWrapper.has(LAST_REMOTE_SEARCH)) add(remoteSearch) }
+                .map { it.makeHeader() to it.makeStats() }
+                .toMap()
 
             modelMapper.map(
                 state.playlists

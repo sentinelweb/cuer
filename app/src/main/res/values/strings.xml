@@ -254,5 +254,7 @@
     <string name="clear">Clear</string>
     <string name="playlist_empty">No Items</string>
     <string name="action_unpin">UNPIN</string>
+    <string name="action_mark_watched">Mark watched</string>
+    <string name="action_mark_complete">Mark complete</string>
 
 </resources>

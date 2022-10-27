@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist.item
 import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
+import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.Format
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
@@ -26,6 +27,7 @@ class ItemModelMapper constructor(
         canReorder: Boolean,
         playlistText: String?,
         showOverflow: Boolean,
+        deleteResources: ActionResources?
     ): ItemContract.Model {
         val top = "${item.media.title} : ${item.media.channelData.title}"
         val pos = item.media.positon?.toFloat() ?: 0f
@@ -74,7 +76,8 @@ class ItemModelMapper constructor(
             canDelete = canDelete,
             playlistName = playlistText,
             canReorder = canReorder,
-            showOverflow = showOverflow
+            showOverflow = showOverflow,
+            deleteResources = deleteResources
         )
     }
 }

@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
@@ -13,9 +15,10 @@ import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistItemOrchestrator constructor(
     private val playlistItemDatabaseRepository: PlaylistItemDatabaseRepository,
-    private val playlistItemMemoryRepository: PlaylistMemoryRepository.PlayListItemMemoryRepository,
     private val log: LogWrapper
-) : OrchestratorContract<PlaylistItemDomain> {
+) : OrchestratorContract<PlaylistItemDomain>, KoinComponent {
+    // to stop a circular referecnce
+    private val playlistItemMemoryRepository: PlaylistMemoryRepository.PlayListItemMemoryRepository by inject()
 
     override val updates: Flow<Triple<Operation, Source, PlaylistItemDomain>>
         get() = playlistItemDatabaseRepository.updates

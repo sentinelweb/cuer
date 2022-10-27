@@ -3,6 +3,8 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
@@ -14,9 +16,10 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
 class PlaylistOrchestrator constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
-    private val playlistMemoryRepository: PlaylistMemoryRepository,
     private val ytInteractor: YoutubeInteractor
-) : OrchestratorContract<PlaylistDomain> {
+) : OrchestratorContract<PlaylistDomain>, KoinComponent {
+
+    private val playlistMemoryRepository: PlaylistMemoryRepository by inject()
 
     override val updates: Flow<Triple<Operation, Source, PlaylistDomain>>
         get() = merge(

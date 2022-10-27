@@ -17,7 +17,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.YOUTUBE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
@@ -84,6 +85,7 @@ class PlaylistPresenter(
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val playUseCase: PlayUseCase,
     private val multiPrefs: MultiPlatformPreferencesWrapper,
+    private val appPlaylistInteractors: Map<Long, AppPlaylistInteractor>,
 ) : PlaylistContract.Presenter, PlaylistContract.External {
 
     override var interactions: PlaylistContract.Interactions? = null
@@ -156,11 +158,13 @@ class PlaylistPresenter(
                                 state.playlist
                                     ?.apply { updateHeader() }
                             }
+
                         FULL ->
                             if (plist != state.playlist) {
                                 state.playlist = plist
                                 updateView()
                             }
+
                         DELETE -> {
                             toastWrapper.show(res.getString(R.string.playlist_msg_deleted))
                             view.exit() // todo exit or back
@@ -196,6 +200,7 @@ class PlaylistPresenter(
                             ?.also { state.playlist = it }
                             ?.also { updateView() }
                     }
+
                     DELETE ->
                         state.playlist
                             ?.let { playlistMutator.remove(it, plistItem) }
@@ -227,6 +232,7 @@ class PlaylistPresenter(
                             updatePlaylistItemByMediaId(null, media)
                         }
                     }
+
                     DELETE -> Unit
                 }
             }
@@ -377,12 +383,31 @@ class PlaylistPresenter(
                 ?.also { log.d("found item ${it.id}") }
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
-                    playlistItemOrchestrator.delete(deleteItem, LOCAL.flatOptions())
+                    val appPlaylistInteractor = appPlaylistInteractors[state.playlist?.id]
+                    val action = appPlaylistInteractor?.customResources?.customDelete?.label ?: "Deleted"
+                    if (state.playlist?.type != APP
+                        || !(appPlaylistInteractor?.hasCustomDeleteAction ?: false)
+                    ) {
+                        playlistItemOrchestrator.delete(deleteItem, LOCAL.flatOptions())
+                    } else {
+                        appPlaylistInteractor?.performCustomDeleteAction(deleteItem)
+                        executeRefresh()
+                    }
                     view.showUndo(
-                        "Deleted: ${deleteItem.media.title}",
+                        "$action: ${deleteItem.media.title}",
                         ::undoDelete
-                    ) // todo extract
+                    )
                 }
+        }
+    }
+
+    override fun undoDelete() {
+        state.deletedPlaylistItem?.let { itemDomain ->
+            state.viewModelScope.launch {
+                playlistItemOrchestrator.save(itemDomain, LOCAL.deepOptions())
+                state.deletedPlaylistItem = null
+                executeRefresh()
+            }
         }
     }
 
@@ -475,7 +500,7 @@ class PlaylistPresenter(
                 prefsWrapper.putEnum(LAST_SEARCH_TYPE, REMOTE)
 
                 view.navigate(
-                    PlaylistContract.makeNav(REMOTE_SEARCH_PLAYLIST, null, false, MEMORY)
+                    PlaylistContract.makeNav(YOUTUBE_SEARCH_PLAYLIST, null, false, MEMORY)
                 )
             }
     }
@@ -561,7 +586,8 @@ class PlaylistPresenter(
                         it, isPlaylistPlaying(),
                         id = state.playlistIdentifier,
                         playlists = state.playlistsTreeLookup,
-                        pinned = isPlaylistPinned()
+                        pinned = isPlaylistPinned(),
+                        appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] }
                     )
                         .also { view.setModel(it, false) }
                     view.highlightPlayingItem(it.currentIndex)
@@ -609,16 +635,6 @@ class PlaylistPresenter(
                         }
                     }
                 }
-        }
-    }
-
-    override fun undoDelete() {
-        state.deletedPlaylistItem?.let { itemDomain ->
-            state.viewModelScope.launch {
-                playlistItemOrchestrator.save(itemDomain, LOCAL.flatOptions())
-                state.deletedPlaylistItem = null
-                executeRefresh()
-            }
         }
     }
 
@@ -760,7 +776,8 @@ class PlaylistPresenter(
                     isPlaylistPlaying(),
                     id = state.playlistIdentifier,
                     playlists = state.playlistsTreeLookup,
-                    pinned = isPlaylistPinned()
+                    pinned = isPlaylistPinned(),
+                    appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] }
                 )
             }
             ?.also { state.model = it }
@@ -784,8 +801,13 @@ class PlaylistPresenter(
             ?.apply {
                 view.setHeaderModel(
                     modelMapper.map(
-                        this, isPlaylistPlaying(), false, id = state.playlistIdentifier,
-                        playlists = state.playlistsTreeLookup, pinned = isPlaylistPinned()
+                        this,
+                        isPlaylistPlaying(),
+                        false,
+                        id = state.playlistIdentifier,
+                        playlists = state.playlistsTreeLookup,
+                        pinned = isPlaylistPinned(),
+                        appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] }
                     )
                 )
                 state.playlist?.currentIndex?.also {
@@ -839,7 +861,8 @@ class PlaylistPresenter(
                 state.playlist,
                 state.playlistsTreeLookup
             ),
-            showOverflow = true
+            showOverflow = true,
+            deleteResources = state.playlist?.id?.let { appPlaylistInteractors[it] }?.customResources?.customDelete
         )
         state.model = state.model?.let {
             it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })

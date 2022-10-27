@@ -44,7 +44,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                 .let { item ->
                     if (item.media.id == null || !flat) {
                         log.d("Save media check: ${item.media.platformId}")
-                        val saved = mediaDatabaseRepository.save(item.media)
+                        val saved = mediaDatabaseRepository.save(item.media, emit = emit)
                             .takeIf { it.isSuccessful }
                             ?.data
                             ?: throw IllegalStateException("Save media failed ${item.media.platformId}")
@@ -123,8 +123,15 @@ class SqldelightPlaylistItemDatabaseRepository(
                     is IdListFilter -> loadAllByIds(filter.ids)
                     is PlaylistIdLFilter -> loadPlaylist(filter.id)
                     is MediaIdListFilter -> loadItemsByMediaId(filter.ids)
-                    is NewMediaFilter -> loadAllPlaylistItemsWithNewMedia(200)
-                    is RecentMediaFilter -> loadAllPlaylistItemsRecent(200)
+                    is NewMediaFilter -> loadAllPlaylistItemsWithNewMedia(filter.limit.toLong())
+                    is RecentMediaFilter -> loadAllPlaylistItemsRecent(filter.limit.toLong())
+                    is StarredMediaFilter -> loadAllPlaylistItemsStarred(filter.limit.toLong())
+                    is UnfinishedMediaFilter -> loadAllPlaylistItemsUnfinished(
+                        min_percent = filter.minPercent.toLong(),
+                        max_percent = filter.maxPercent.toLong(),
+                        limit = filter.limit.toLong()
+                    )
+
                     is PlatformIdListFilter -> loadAllByPlatformIds(filter.ids)
                     is ChannelPlatformIdFilter -> findPlaylistItemsForChannelPlatformId(filter.platformId)
                     is SearchFilter -> {

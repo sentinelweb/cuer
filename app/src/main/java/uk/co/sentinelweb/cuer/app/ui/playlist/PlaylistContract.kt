@@ -213,6 +213,7 @@ interface PlaylistContract {
                         itemMapper = get(),
                         playUseCase = get(),
                         multiPrefs = get(),
+                        appPlaylistInteractors = get()
                     )
                 }
                 scoped { get<Presenter>() as External }

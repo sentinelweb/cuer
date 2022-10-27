@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.database.entity.Playlist_item
 import uk.co.sentinelweb.cuer.db.util.DataCreation
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -284,5 +285,59 @@ class PlaylistItemEntityTest : KoinTest {
         assertEquals(item0, actual[0])
         assertEquals(item1, actual[1])
         assertEquals(item2, actual[2])
+    }
+
+    @Test
+    fun loadAllPlaylistItemsUnfinished() {
+        val (_, item0) = dataCreation.createPlaylistAndItem()
+        val item1 = dataCreation.createPlaylistItem(item0.playlist_id)
+        val item2 = dataCreation.createPlaylistItem(item0.playlist_id)
+        val item3 = dataCreation.createPlaylistItem(item0.playlist_id)
+        val dateLastPlayed = Clock.System.now()
+        with(database.mediaEntityQueries) {
+            updatePosition(dateLastPlayed.minus(1, SECOND), 22L, 1000, flags = FLAG_WATCHED, item0.media_id)
+            updatePosition(dateLastPlayed.minus(2, SECOND), 100L, 1000, flags = FLAG_WATCHED, item1.media_id)
+            updatePosition(dateLastPlayed.minus(3, SECOND), 500L, 1000, flags = FLAG_WATCHED, item2.media_id)
+            updatePosition(dateLastPlayed, 900L, 1000, flags = FLAG_WATCHED, item3.media_id)
+        }
+        val actual = database.playlistItemEntityQueries
+            .loadAllPlaylistItemsUnfinished(10, 80, 4).executeAsList()
+        assertEquals(2, actual.size)
+        assertEquals(item1, actual[0])
+        assertEquals(item2, actual[1])
+
+        val actual1 = database.playlistItemEntityQueries
+            .loadAllPlaylistItemsUnfinished(10, 95, 4).executeAsList()
+        assertEquals(3, actual1.size)
+        assertEquals(item3, actual1[0])
+        assertEquals(item1, actual1[1])
+        assertEquals(item2, actual1[2])
+
+        val actual2 = database.playlistItemEntityQueries
+            .loadAllPlaylistItemsUnfinished(20, 95, 4).executeAsList()
+        assertEquals(2, actual2.size)
+        assertEquals(item3, actual2[0])
+        assertEquals(item2, actual2[1])
+    }
+
+    @Test
+    fun loadAllPlaylistItemsStarred() {
+        val (_, item0) = dataCreation.createPlaylistAndItem()
+        val item1 = dataCreation.createPlaylistItem(item0.playlist_id)
+        val item2 = dataCreation.createPlaylistItem(item0.playlist_id)
+        val item3 = dataCreation.createPlaylistItem(item0.playlist_id)
+        val dateLastPlayed = Clock.System.now()
+        with(database.mediaEntityQueries) {
+            updatePosition(dateLastPlayed.minus(1, SECOND), 22L, 1000, flags = 0, item0.media_id)
+            updatePosition(dateLastPlayed.minus(2, SECOND), 100L, 1000, flags = FLAG_STARRED, item1.media_id)
+            updatePosition(dateLastPlayed.minus(3, SECOND), 500L, 1000, flags = FLAG_WATCHED, item2.media_id)
+            updatePosition(dateLastPlayed, 900L, 1000, flags = FLAG_WATCHED or FLAG_STARRED, item3.media_id)
+        }
+        val actual = database.playlistItemEntityQueries.loadAllPlaylistItemsStarred(4)
+            .executeAsList()
+            .sortedBy { it.date_added }
+        assertEquals(2, actual.size)
+        assertEquals(item1, actual[1])
+        assertEquals(item3, actual[0])
     }
 }

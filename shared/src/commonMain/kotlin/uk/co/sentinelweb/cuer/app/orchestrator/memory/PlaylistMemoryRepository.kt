@@ -5,10 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -22,7 +19,9 @@ class PlaylistMemoryRepository constructor(
     private val newItemsInteractor: NewMediaPlayistInteractor,
     private val recentItemsInteractor: RecentItemsPlayistInteractor,
     private val localSearchInteractor: LocalSearchPlayistInteractor,
-    private val remoteSearchOrchestrator: RemoteSearchPlayistOrchestrator
+    private val starredItemsInteractor: StarredItemsPlayistInteractor,
+    private val unfinishedItemsInteractor: UnfinishedItemsPlayistInteractor,
+    private val remoteSearchOrchestrator: YoutubeSearchPlayistInteractor
 ) : MemoryRepository<PlaylistDomain> {
 
     private val data: MutableMap<Long, PlaylistDomain> = mutableMapOf()
@@ -46,7 +45,9 @@ class PlaylistMemoryRepository constructor(
         NEWITEMS_PLAYLIST -> newItemsInteractor.getPlaylist()
         RECENT_PLAYLIST -> recentItemsInteractor.getPlaylist()
         LOCAL_SEARCH_PLAYLIST -> localSearchInteractor.getPlaylist()
-        REMOTE_SEARCH_PLAYLIST -> remoteSearchOrchestrator.getPlaylist()
+        YOUTUBE_SEARCH_PLAYLIST -> remoteSearchOrchestrator.getPlaylist()
+        STAR_PLAYLIST -> starredItemsInteractor.getPlaylist()
+        UNFINISHED_PLAYLIST -> unfinishedItemsInteractor.getPlaylist()
         SHARED_PLAYLIST -> data[id]
         else -> throw NotImplementedException("$id is invalid memory playlist")
     }
@@ -232,10 +233,13 @@ class PlaylistMemoryRepository constructor(
     }
 
     companion object {
+        // todo make enum
         const val SHARED_PLAYLIST: Long = -100
         const val NEWITEMS_PLAYLIST: Long = -101
         const val RECENT_PLAYLIST: Long = -102
         const val LOCAL_SEARCH_PLAYLIST: Long = -103
-        const val REMOTE_SEARCH_PLAYLIST: Long = -104
+        const val YOUTUBE_SEARCH_PLAYLIST: Long = -104
+        const val STAR_PLAYLIST: Long = -105
+        const val UNFINISHED_PLAYLIST: Long = -106
     }
 }

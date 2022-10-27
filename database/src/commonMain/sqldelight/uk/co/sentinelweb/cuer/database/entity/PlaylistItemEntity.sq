@@ -69,10 +69,32 @@ count:
 SELECT count() FROM playlist_item;
 
 loadAllPlaylistItemsWithNewMedia:
-SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 0 AND media.id=playlist_item.media_id ORDER BY playlist_item.date_added DESC LIMIT :limit;
+SELECT playlist_item.* FROM playlist_item, media
+WHERE media.flags & 1 == 0
+    AND media.id=playlist_item.media_id
+ORDER BY playlist_item.date_added DESC LIMIT :limit;
 
 loadAllPlaylistItemsRecent:
-SELECT playlist_item.* FROM playlist_item, media WHERE media.flags & 1 == 1 AND media.id = playlist_item.media_id AND media.date_last_played != 'null' ORDER BY media.date_last_played DESC LIMIT :limit;
+SELECT playlist_item.* FROM playlist_item, media
+WHERE media.flags & 1 == 1
+    AND media.id = playlist_item.media_id
+    AND media.date_last_played != 'null'
+ORDER BY media.date_last_played DESC LIMIT :limit;
+
+loadAllPlaylistItemsStarred:
+SELECT playlist_item.* FROM playlist_item, media
+WHERE media.flags & 2 == 2
+    AND media.id = playlist_item.media_id
+ORDER BY playlist_item.date_added DESC LIMIT :limit;
+
+loadAllPlaylistItemsUnfinished:
+SELECT playlist_item.* FROM playlist_item, media
+WHERE media.duration>0 AND media.position>0
+    AND (media.position*100)/media.duration>=:min_percent
+    AND (media.position*100)/media.duration<=:max_percent
+    AND media.date_last_played != 'null'
+    AND media.id = playlist_item.media_id
+ORDER BY media.date_last_played DESC LIMIT :limit;
 
 search:
 SELECT playlist_item.* FROM playlist_item, media WHERE INSTR(LOWER(media.title),:text) AND media.id = playlist_item.media_id ORDER BY media.date_last_played DESC LIMIT :limit;

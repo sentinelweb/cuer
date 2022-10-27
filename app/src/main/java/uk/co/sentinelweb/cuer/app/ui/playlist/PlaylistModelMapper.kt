@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
@@ -31,7 +32,8 @@ class PlaylistModelMapper constructor(
         mapItems: Boolean = true,
         id: OrchestratorContract.Identifier<*>,
         pinned: Boolean,
-        playlists: Map<Long, PlaylistTreeDomain>?
+        playlists: Map<Long, PlaylistTreeDomain>?,
+        appPlaylist: AppPlaylistInteractor?,
     ): PlaylistContract.Model {
         modelIdGenerator = 0
         val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
@@ -61,7 +63,8 @@ class PlaylistModelMapper constructor(
                         domain.config.deletableItems,
                         domain.config.editable,
                         mapPlaylistText(item, domain, playlists),
-                        true
+                        true,
+                        appPlaylist?.customResources?.customDelete
                     )
                 }
             } else {
