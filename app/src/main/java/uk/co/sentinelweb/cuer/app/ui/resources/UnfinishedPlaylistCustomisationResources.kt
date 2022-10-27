@@ -7,9 +7,9 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 class UnfinishedPlaylistCustomisationResources(
     private val res: ResourceWrapper
 ) : AppPlaylistInteractor.CustomisationResources {
-    override val customDelete = object : ActionResources {
-        override val label = res.getString(R.string.action_mark_complete)
-        override val icon = R.drawable.ic_button_tick_24_white
-        override val color = R.color.swipe_action_custom
-    }
+    override val customDelete = ActionResources(
+        label = res.getString(R.string.action_mark_complete),
+        icon = R.drawable.ic_button_tick_24_white,
+        color = R.color.swipe_action_custom,
+    )
 }

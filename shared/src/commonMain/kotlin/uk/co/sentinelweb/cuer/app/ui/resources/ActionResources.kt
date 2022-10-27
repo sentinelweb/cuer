@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.resources
 
-interface ActionResources {
-    val label: String?
-    val icon: Int?
-    val color: Int?
-}
+data class ActionResources(
+    val label: String? = null,
+    val icon: Int? = null,
+    val color: Int? = null,
+)
