@@ -10,18 +10,18 @@ import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class StarredItemsPlayistInteractor constructor(
     private val playlistItemDatabaseRepository: PlaylistItemDatabaseRepository,
-) {
-    suspend fun getPlaylist(): PlaylistDomain? =
+) : AppPlaylistInteractor {
+    override suspend fun getPlaylist(): PlaylistDomain? =
         playlistItemDatabaseRepository
             .loadList(OrchestratorContract.StarredMediaFilter(300))
             .takeIf { it.isSuccessful }
             ?.data
             ?.let {
-                makeStarredItemsHeader()
+                makeHeader()
                     .copy(items = it.mapIndexed { _, playlistItem -> playlistItem.copy() })
             }
 
-    fun makeStarredItemsHeader(): PlaylistDomain = PlaylistDomain(
+    override fun makeHeader(): PlaylistDomain = PlaylistDomain(
         id = STAR_PLAYLIST,
         title = "Starred items",
         type = APP,
@@ -32,7 +32,7 @@ class StarredItemsPlayistInteractor constructor(
     )
 
 
-    fun makeStarredItemsStats(): PlaylistStatDomain = PlaylistStatDomain(
+    override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
         playlistId = STAR_PLAYLIST,
         itemCount = -1, // todo log in a background process and save to pref
         watchedItemCount = -1 // todo log in a background process and save to pref

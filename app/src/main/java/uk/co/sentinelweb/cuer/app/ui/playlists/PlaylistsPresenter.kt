@@ -336,22 +336,11 @@ class PlaylistsPresenter(
                 )
                 .toMutableList()
 
-            val appLists = mutableMapOf(
-                newMedia.makeNewItemsHeader() to newMedia.makeNewItemsStats(),
-                recentItems.makeRecentItemsHeader() to recentItems.makeRecentItemsStats(),
-                starredItems.makeStarredItemsHeader() to starredItems.makeStarredItemsStats(),
-                unfinishedItems.makeUnfinishedItemsHeader() to unfinishedItems.makeUnfinishedItemsStats(),
-            )
-                .apply {
-                    if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
-                        put(localSearch.makeSearchHeader(), localSearch.makeSearchItemsStats())
-                    }
-                }
-                .apply {
-                    if (prefsWrapper.has(LAST_REMOTE_SEARCH)) {
-                        put(remoteSearch.makeSearchHeader(), remoteSearch.makeSearchItemsStats())
-                    }
-                }
+            val appLists = mutableListOf(newMedia, recentItems, starredItems, unfinishedItems)
+                .apply { if (prefsWrapper.has(LAST_LOCAL_SEARCH)) add(localSearch) }
+                .apply { if (prefsWrapper.has(LAST_REMOTE_SEARCH)) add(remoteSearch) }
+                .map { it.makeHeader() to it.makeStats() }
+                .toMap()
 
             modelMapper.map(
                 state.playlists

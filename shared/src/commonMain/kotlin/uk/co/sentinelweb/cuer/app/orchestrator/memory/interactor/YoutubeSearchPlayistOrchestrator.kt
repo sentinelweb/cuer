@@ -17,7 +17,7 @@ class YoutubeSearchPlayistOrchestrator constructor(
     private val ytInteractor: YoutubeInteractor,
     private val playlistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator,
     private val state: State
-) {
+) : AppPlaylistInteractor {
     data class State constructor(
         var playlist: PlaylistDomain? = null,
         var searchTerm: SearchRemoteDomain? = null
@@ -28,12 +28,12 @@ class YoutubeSearchPlayistOrchestrator constructor(
             .getString(LAST_REMOTE_SEARCH, null)
             ?.let { deserialiseSearchRemote(it) }
 
-    suspend fun getPlaylist(): PlaylistDomain? =
+    override suspend fun getPlaylist(): PlaylistDomain? =
         cachedOrSearch()
             ?.let { playlistMediaLookupOrchestrator.lookupPlaylistItemsAndReplace(it) }
             ?.items
             ?.let {
-                makeSearchHeader()
+                makeHeader()
                     .copy(
                         items = it.mapIndexed { _, playlistItem -> playlistItem.copy() } //i * 1000L
                     )
@@ -55,7 +55,7 @@ class YoutubeSearchPlayistOrchestrator constructor(
                 }
             }
 
-    fun makeSearchHeader(): PlaylistDomain = PlaylistDomain(
+    override fun makeHeader(): PlaylistDomain = PlaylistDomain(
         id = YOUTUBE_SEARCH_PLAYLIST,
         title = mapTitle(),
         type = APP,
@@ -73,7 +73,7 @@ class YoutubeSearchPlayistOrchestrator constructor(
         }
     } ?: "No Remote - shouldn't see this"
 
-    fun makeSearchItemsStats(): PlaylistStatDomain = PlaylistStatDomain(
+    override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
         playlistId = YOUTUBE_SEARCH_PLAYLIST,
         itemCount = -1,
         watchedItemCount = -1

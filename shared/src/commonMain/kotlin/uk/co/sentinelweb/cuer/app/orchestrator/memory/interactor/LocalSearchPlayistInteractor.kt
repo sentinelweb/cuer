@@ -15,13 +15,13 @@ import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
 class LocalSearchPlayistInteractor constructor(
     private val playlistItemDatabaseRepository: PlaylistItemDatabaseRepository,
     private val prefsWrapper: GeneralPreferencesWrapper
-) {
+) : AppPlaylistInteractor {
     fun search(): SearchLocalDomain? =
         prefsWrapper
             .getString(GeneralPreferences.LAST_LOCAL_SEARCH, null)
             ?.let { deserialiseSearchLocal(it) }
 
-    suspend fun getPlaylist(): PlaylistDomain? =
+    override suspend fun getPlaylist(): PlaylistDomain? =
         search()
             ?.let { mapToFilter(it) }
             ?.let {
@@ -30,7 +30,7 @@ class LocalSearchPlayistInteractor constructor(
                     .takeIf { it.isSuccessful }
                     ?.data
                     ?.let {
-                        makeSearchHeader()
+                        makeHeader()
                             .copy(items = it.mapIndexed { _, playlistItem -> playlistItem.copy() })
                     }
             }
@@ -44,7 +44,7 @@ class LocalSearchPlayistInteractor constructor(
         else searchDomain.playlists.mapNotNull { it.id }
     )
 
-    fun makeSearchHeader(): PlaylistDomain = PlaylistDomain(
+    override fun makeHeader(): PlaylistDomain = PlaylistDomain(
         id = LOCAL_SEARCH_PLAYLIST,
         title = mapTitle(),
         type = APP,
@@ -63,7 +63,7 @@ class LocalSearchPlayistInteractor constructor(
                 }
 
 
-    fun makeSearchItemsStats(): PlaylistStatDomain = PlaylistStatDomain(
+    override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
         playlistId = LOCAL_SEARCH_PLAYLIST,
         itemCount = -1,
         watchedItemCount = -1

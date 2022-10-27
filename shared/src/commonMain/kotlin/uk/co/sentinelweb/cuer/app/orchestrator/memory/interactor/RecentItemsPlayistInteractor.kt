@@ -10,18 +10,18 @@ import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
 class RecentItemsPlayistInteractor constructor(
     private val playlistItemDatabaseRepository: PlaylistItemDatabaseRepository,
-) {
-    suspend fun getPlaylist(): PlaylistDomain? =
+) : AppPlaylistInteractor {
+    override suspend fun getPlaylist(): PlaylistDomain? =
         playlistItemDatabaseRepository
             .loadList(RecentMediaFilter(300))
             .takeIf { it.isSuccessful }
             ?.data
             ?.let {
-                makeRecentItemsHeader()
+                makeHeader()
                     .copy(items = it.mapIndexed { _, playlistItem -> playlistItem.copy() })
             }
 
-    fun makeRecentItemsHeader(): PlaylistDomain = PlaylistDomain(
+    override fun makeHeader(): PlaylistDomain = PlaylistDomain(
         id = RECENT_PLAYLIST,
         title = "Recent",
         type = APP,
@@ -32,7 +32,7 @@ class RecentItemsPlayistInteractor constructor(
     )
 
 
-    fun makeRecentItemsStats(): PlaylistStatDomain = PlaylistStatDomain(
+    override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
         playlistId = RECENT_PLAYLIST,
         itemCount = -1, // todo log in a background process and save to pref
         watchedItemCount = -1 // todo log in a background process and save to pref
