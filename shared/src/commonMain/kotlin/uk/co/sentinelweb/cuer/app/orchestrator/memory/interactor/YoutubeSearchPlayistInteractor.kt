@@ -4,20 +4,21 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.C
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_REMOTE_SEARCH
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
-import uk.co.sentinelweb.cuer.domain.ImageDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
-import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
-import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
-class YoutubeSearchPlayistOrchestrator constructor(
+class YoutubeSearchPlayistInteractor constructor(
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val ytInteractor: YoutubeInteractor,
     private val playlistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator,
     private val state: State
 ) : AppPlaylistInteractor {
+
+    override val hasCustomDeleteAction = false
+    override val customResources = null
+
     data class State constructor(
         var playlist: PlaylistDomain? = null,
         var searchTerm: SearchRemoteDomain? = null
@@ -62,7 +63,11 @@ class YoutubeSearchPlayistOrchestrator constructor(
         currentIndex = -1,
         starred = true,
         image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/telescope-122960_640.jpg"),
-        config = PlaylistDomain.PlaylistConfigDomain(playable = false, editable = false, deletableItems = false)
+        config = PlaylistDomain.PlaylistConfigDomain(
+            playable = false,
+            editable = false,
+            deletableItems = false
+        )
     )
 
     private fun mapTitle() = searchPref()?.let {
@@ -83,4 +88,6 @@ class YoutubeSearchPlayistOrchestrator constructor(
         state.playlist = null
         state.searchTerm = null
     }
+
+    override suspend fun performCustomDeleteAction(item: PlaylistItemDomain) = Unit
 }

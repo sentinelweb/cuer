@@ -16,6 +16,10 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabaseModule
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.NEWITEMS_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.STAR_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.UNFINISHED_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor.CustomisationResources
 import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
@@ -38,6 +42,9 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.resources.NewPlaylistCustomisationResources
+import uk.co.sentinelweb.cuer.app.ui.resources.StarredPlaylistCustomisationResources
+import uk.co.sentinelweb.cuer.app.ui.resources.UnfinishedPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
@@ -124,6 +131,13 @@ object Modules {
         single { AytViewHolder(get(), get()) }
         factory { PlayYangProgress(get()) }
         factory<RibbonCreator> { AndroidRibbonCreator(get()) }
+        factory<CustomisationResources>(named(NEWITEMS_PLAYLIST.toString())) { NewPlaylistCustomisationResources(get()) }
+        factory<CustomisationResources>(named(STAR_PLAYLIST.toString())) { StarredPlaylistCustomisationResources(get()) }
+        factory<CustomisationResources>(named(UNFINISHED_PLAYLIST.toString())) {
+            UnfinishedPlaylistCustomisationResources(
+                get()
+            )
+        }
     }
 
     private val receiverModule = module {

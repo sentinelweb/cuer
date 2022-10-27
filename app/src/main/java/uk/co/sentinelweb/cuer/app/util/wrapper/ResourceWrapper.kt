@@ -6,11 +6,13 @@ import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
+import android.util.TypedValue
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.shape.ShapeAppearanceModel
 import java.io.InputStream
+
 
 class ResourceWrapper constructor(
     private val context: Context,
@@ -35,6 +37,13 @@ class ResourceWrapper constructor(
 
     @ColorInt
     fun getColor(@ColorRes id: Int) = ContextCompat.getColor(context, id)
+
+    @ColorRes
+    fun getColorAttr(@AttrRes id: Int): Int {
+        val typedValue = TypedValue()
+        context.getTheme().resolveAttribute(id, typedValue, true)
+        return typedValue.resourceId
+    }
 
     fun getDimensionPixelSize(@DimenRes id: Int): Int = context.resources.getDimensionPixelSize(id)
 

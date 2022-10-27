@@ -21,7 +21,7 @@ class PlaylistMemoryRepository constructor(
     private val localSearchInteractor: LocalSearchPlayistInteractor,
     private val starredItemsInteractor: StarredItemsPlayistInteractor,
     private val unfinishedItemsInteractor: UnfinishedItemsPlayistInteractor,
-    private val remoteSearchOrchestrator: YoutubeSearchPlayistOrchestrator
+    private val remoteSearchOrchestrator: YoutubeSearchPlayistInteractor
 ) : MemoryRepository<PlaylistDomain> {
 
     private val data: MutableMap<Long, PlaylistDomain> = mutableMapOf()
@@ -233,6 +233,7 @@ class PlaylistMemoryRepository constructor(
     }
 
     companion object {
+        // todo make enum
         const val SHARED_PLAYLIST: Long = -100
         const val NEWITEMS_PLAYLIST: Long = -101
         const val RECENT_PLAYLIST: Long = -102

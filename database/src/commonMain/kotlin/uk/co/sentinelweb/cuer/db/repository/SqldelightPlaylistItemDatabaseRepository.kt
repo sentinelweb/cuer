@@ -44,7 +44,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                 .let { item ->
                     if (item.media.id == null || !flat) {
                         log.d("Save media check: ${item.media.platformId}")
-                        val saved = mediaDatabaseRepository.save(item.media)
+                        val saved = mediaDatabaseRepository.save(item.media, emit = emit)
                             .takeIf { it.isSuccessful }
                             ?.data
                             ?: throw IllegalStateException("Save media failed ${item.media.platformId}")

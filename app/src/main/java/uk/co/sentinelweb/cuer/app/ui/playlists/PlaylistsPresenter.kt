@@ -49,7 +49,7 @@ class PlaylistsPresenter(
     private val newMedia: NewMediaPlayistInteractor,
     private val recentItems: RecentItemsPlayistInteractor,
     private val localSearch: LocalSearchPlayistInteractor,
-    private val remoteSearch: YoutubeSearchPlayistOrchestrator,
+    private val remoteSearch: YoutubeSearchPlayistInteractor,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val searchMapper: SearchMapper,
     private val merge: PlaylistMergeOrchestrator,
@@ -170,7 +170,6 @@ class PlaylistsPresenter(
                         executeRefresh()
                     }
                 } ?: let { view.showError("Cannot delete playlist") }
-
         }
     }
 

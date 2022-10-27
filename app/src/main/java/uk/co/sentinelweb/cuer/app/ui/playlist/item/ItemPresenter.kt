@@ -42,6 +42,7 @@ class ItemPresenter(
         )
         view.dismissMenu()
         view.setShowOverflow(item.showOverflow)
+        item.deleteResources?.apply { view.setDeleteResources(this) }
         state.item = item
     }
 

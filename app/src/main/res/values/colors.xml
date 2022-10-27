@@ -47,6 +47,8 @@
     <color name="build_secondary">@color/primary</color>
     <color name="build_secondary_variant">@color/primary_variant</color>
 
+    <color name="swipe_action_custom">@color/green_500</color><!-- links, etc -->
+
     <!--    snackbar colors-->
     <color name="error_snackbar">@color/red_800</color>
     <color name="snackbar_info_background">@color/red_100</color>
