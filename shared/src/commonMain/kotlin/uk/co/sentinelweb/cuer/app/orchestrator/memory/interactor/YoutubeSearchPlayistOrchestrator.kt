@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.YOUTUBE_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_REMOTE_SEARCH
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
@@ -12,7 +12,7 @@ import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
-class RemoteSearchPlayistOrchestrator constructor(
+class YoutubeSearchPlayistOrchestrator constructor(
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val ytInteractor: YoutubeInteractor,
     private val playlistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator,
@@ -56,7 +56,7 @@ class RemoteSearchPlayistOrchestrator constructor(
             }
 
     fun makeSearchHeader(): PlaylistDomain = PlaylistDomain(
-        id = REMOTE_SEARCH_PLAYLIST,
+        id = YOUTUBE_SEARCH_PLAYLIST,
         title = mapTitle(),
         type = APP,
         currentIndex = -1,
@@ -74,7 +74,7 @@ class RemoteSearchPlayistOrchestrator constructor(
     } ?: "No Remote - shouldn't see this"
 
     fun makeSearchItemsStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = REMOTE_SEARCH_PLAYLIST,
+        playlistId = YOUTUBE_SEARCH_PLAYLIST,
         itemCount = -1,
         watchedItemCount = -1
     )

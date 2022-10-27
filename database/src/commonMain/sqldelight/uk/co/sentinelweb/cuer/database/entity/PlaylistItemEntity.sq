@@ -85,13 +85,13 @@ loadAllPlaylistItemsStarred:
 SELECT playlist_item.* FROM playlist_item, media
 WHERE media.flags & 2 == 2
     AND media.id = playlist_item.media_id
-ORDER BY media.date_last_played DESC LIMIT :limit;
+ORDER BY playlist_item.date_added DESC LIMIT :limit;
 
 loadAllPlaylistItemsUnfinished:
 SELECT playlist_item.* FROM playlist_item, media
 WHERE media.duration>0 AND media.position>0
-    AND (media.position*100)/media.duration>=10
-    AND (media.position*100)/media.duration<=80
+    AND (media.position*100)/media.duration>=:min_percent
+    AND (media.position*100)/media.duration<=:max_percent
     AND media.date_last_played != 'null'
     AND media.id = playlist_item.media_id
 ORDER BY media.date_last_played DESC LIMIT :limit;

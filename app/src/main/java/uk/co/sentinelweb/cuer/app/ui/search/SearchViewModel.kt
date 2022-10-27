@@ -11,7 +11,7 @@ import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.YOUTUBE_SEARCH_PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
@@ -163,7 +163,7 @@ class SearchViewModel(
         _navigateLiveData.value = NavigationModel(
             NavigationModel.Target.PLAYLIST,
             mapOf(
-                NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LOCAL_SEARCH_PLAYLIST else REMOTE_SEARCH_PLAYLIST,
+                NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LOCAL_SEARCH_PLAYLIST else YOUTUBE_SEARCH_PLAYLIST,
                 NavigationModel.Param.PLAY_NOW to false,
                 NavigationModel.Param.SOURCE to OrchestratorContract.Source.MEMORY
             )

@@ -13,7 +13,7 @@ class NewMediaPlayistInteractor constructor(
 ) {
     suspend fun getPlaylist(): PlaylistDomain? =
         playlistItemDatabaseRepository
-            .loadList(NewMediaFilter())
+            .loadList(NewMediaFilter(300))
             .takeIf { it.isSuccessful }
             ?.data
             ?.let {
@@ -23,12 +23,17 @@ class NewMediaPlayistInteractor constructor(
 
     fun makeNewItemsHeader(): PlaylistDomain = PlaylistDomain(
         id = NEWITEMS_PLAYLIST,
-        title = "New items",
+        title = "New",
         type = APP,
         currentIndex = -1,
         starred = true,
         image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-pixabay-40663-600.jpg"),
-        config = PlaylistDomain.PlaylistConfigDomain(playable = false, editable = false, deletable = false, deletableItems = false)
+        config = PlaylistDomain.PlaylistConfigDomain(
+            playable = false,
+            editable = false,
+            deletable = false,
+            deletableItems = false
+        )
     )
 
     fun makeNewItemsStats(): PlaylistStatDomain = PlaylistStatDomain(

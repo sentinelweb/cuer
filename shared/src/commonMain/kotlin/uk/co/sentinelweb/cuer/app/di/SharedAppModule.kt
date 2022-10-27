@@ -6,10 +6,7 @@ import uk.co.sentinelweb.cuer.app.backup.version.ParserFactory
 import uk.co.sentinelweb.cuer.app.db.repository.file.PlatformFileOperation
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.orchestrator.util.*
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -53,14 +50,16 @@ object SharedAppModule {
         factory { PlaylistMediaLookupOrchestrator(get(), get()) }
         factory { NewMediaPlayistInteractor(get()) }
         factory { RecentItemsPlayistInteractor(get()) }
+        factory { StarredItemsPlayistInteractor(get()) }
+        factory { UnfinishedItemsPlayistInteractor(get()) }
         factory { AddLinkOrchestrator(get(), get(), get(), get(), get()) }
         factory { LocalSearchPlayistInteractor(get(), get()) }
         factory {
-            RemoteSearchPlayistOrchestrator(
+            YoutubeSearchPlayistOrchestrator(
                 get(),
                 get(),
                 get(),
-                RemoteSearchPlayistOrchestrator.State()
+                YoutubeSearchPlayistOrchestrator.State()
             )
         }
         factory { PlaylistMediaUpdateOrchestrator(get()) }
@@ -69,7 +68,7 @@ object SharedAppModule {
 
     private val objectModule = module {
         factory { ParserFactory() }
-        single { PlaylistMemoryRepository(get(), get(), get(), get(), get()) }
+        single { PlaylistMemoryRepository(get(), get(), get(), get(), get(), get(), get()) }
         single { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         single { get<PlaylistMemoryRepository>().mediaMemoryRepository }
         single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperImpl() }

@@ -113,7 +113,9 @@ interface PlaylistsContract {
                         searchMapper = get(),
                         merge = get(),
                         shareWrapper = get(),
-                        recentLocalPlaylists = get()
+                        recentLocalPlaylists = get(),
+                        starredItems = get(),
+                        unfinishedItems = get(),
                     )
                 }
                 scoped { PlaylistsModelMapper(get()) }

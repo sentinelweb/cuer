@@ -300,14 +300,24 @@ class PlaylistItemEntityTest : KoinTest {
             updatePosition(dateLastPlayed.minus(3, SECOND), 500L, 1000, flags = FLAG_WATCHED, item2.media_id)
             updatePosition(dateLastPlayed, 900L, 1000, flags = FLAG_WATCHED, item3.media_id)
         }
-        val actual = database.playlistItemEntityQueries.loadAllPlaylistItemsUnfinished(4).executeAsList()
-        println("items: ${actual.map { "${it.id}" }}")
-        database.mediaEntityQueries.loadAll().executeAsList().forEach {
-            println("media: ${it.id} ${it.date_last_played} ")
-        }
+        val actual = database.playlistItemEntityQueries
+            .loadAllPlaylistItemsUnfinished(10, 80, 4).executeAsList()
         assertEquals(2, actual.size)
         assertEquals(item1, actual[0])
         assertEquals(item2, actual[1])
+
+        val actual1 = database.playlistItemEntityQueries
+            .loadAllPlaylistItemsUnfinished(10, 95, 4).executeAsList()
+        assertEquals(3, actual1.size)
+        assertEquals(item3, actual1[0])
+        assertEquals(item1, actual1[1])
+        assertEquals(item2, actual1[2])
+
+        val actual2 = database.playlistItemEntityQueries
+            .loadAllPlaylistItemsUnfinished(20, 95, 4).executeAsList()
+        assertEquals(2, actual2.size)
+        assertEquals(item3, actual2[0])
+        assertEquals(item2, actual2[1])
     }
 
     @Test
@@ -323,11 +333,9 @@ class PlaylistItemEntityTest : KoinTest {
             updatePosition(dateLastPlayed.minus(3, SECOND), 500L, 1000, flags = FLAG_WATCHED, item2.media_id)
             updatePosition(dateLastPlayed, 900L, 1000, flags = FLAG_WATCHED or FLAG_STARRED, item3.media_id)
         }
-        val actual = database.playlistItemEntityQueries.loadAllPlaylistItemsStarred(4).executeAsList()
-        println("items: ${actual.map { "${it.id}" }}")
-        database.mediaEntityQueries.loadAll().executeAsList().forEach {
-            println("media: ${it.id} ${it.date_last_played}  ${it.flags} ${it.flags and FLAG_STARRED} ")
-        }
+        val actual = database.playlistItemEntityQueries.loadAllPlaylistItemsStarred(4)
+            .executeAsList()
+            .sortedBy { it.date_added }
         assertEquals(2, actual.size)
         assertEquals(item1, actual[1])
         assertEquals(item3, actual[0])
