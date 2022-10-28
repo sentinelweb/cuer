@@ -154,15 +154,14 @@ interface PlayerContract {
         CC_DISCONNECTED, CC_CONNECTING, CC_CONNECTED,
     }
 
-    // todo think about this maybe sub with android MediaControl interface
     interface PlayerControls {
         fun initMediaRouteButton()
         fun setConnectionState(connState: ConnectionState)
         fun setPlayerState(playState: PlayerStateDomain)
         fun addListener(l: Listener)
         fun removeListener(l: Listener)
-        fun setCurrentSecond(second: Float) // todo ms long
-        fun setDuration(duration: Float) // todo ms long
+        fun setCurrentSecond(secondsFloat: Float)
+        fun setDuration(durationFloat: Float)
         fun error(msg: String)
         fun setTitle(title: String)
         fun reset()

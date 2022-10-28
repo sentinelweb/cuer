@@ -98,7 +98,6 @@ class PlaylistFragment :
 
     val linearLayoutManager get() = binding.playlistList.layoutManager as LinearLayoutManager
 
-    // todo consider making binding null - getting crashes - or tighten up coroutine scope
     private var _binding: FragmentPlaylistBinding? = null
     private val binding get() = _binding ?: throw Exception("FragmentPlaylistBinding not bound")
 
@@ -310,7 +309,7 @@ class PlaylistFragment :
     override fun onResume() {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-        // todo clean up after im sure it works for all cases
+        // todo review with: https://github.com/sentinelweb/cuer/issues/279
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
         (navigationProvider.checkForPendingNavigation(PLAYLIST)
             ?: let { makeNavFromArguments() })
@@ -493,13 +492,13 @@ class PlaylistFragment :
 
     override fun highlightPlayingItem(currentItemIndex: Int?) {
         adapter.highlightItem = currentItemIndex
-        // todo map it properly
-        val text = "${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}"
-        _binding?.playlistItems?.setText(text)
+        _binding?.playlistItems?.setText(mapPlaylistIndexAndSize(currentItemIndex))
     }
 
+    private fun mapPlaylistIndexAndSize(currentItemIndex: Int?) =
+        "${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}"
+
     override fun setSubTitle(subtitle: String) {
-        // todo make better in ui upgrade
         (activity as AppCompatActivity?)?.supportActionBar?.setTitle(subtitle)
     }
 
@@ -583,7 +582,9 @@ class PlaylistFragment :
         }
     }
 
-    override fun exit() = TODO()
+    override fun exit() {
+        findNavController().popBackStack()
+    }
     //endregion
 
     // region ItemContract.ItemMoveInteractions

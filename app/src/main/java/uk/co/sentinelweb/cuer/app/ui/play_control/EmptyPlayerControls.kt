@@ -17,9 +17,9 @@ class EmptyPlayerControls : PlayerContract.PlayerControls {
 
     override fun removeListener(l: PlayerContract.PlayerControls.Listener) = Unit
 
-    override fun setCurrentSecond(second: Float) = Unit
+    override fun setCurrentSecond(secondsFloat: Float) = Unit
 
-    override fun setDuration(duration: Float) = Unit
+    override fun setDuration(durationFloat: Float) = Unit
 
     override fun error(msg: String) = Unit
 

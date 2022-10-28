@@ -19,9 +19,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.AllFilter
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
@@ -91,7 +89,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
     @Test
     fun saveCreateChannelExists() = runTest {
         val initial = fixture<MediaDomain>().copy(id = 0)
-        val savedChannel = channelDatabaseRepository.save(initial.channelData).data!!
+        val savedChannel = channelDatabaseRepository.save(initial.channelData, flat = false, emit = false).data!!
         val initialWithChannel = initial.copy(channelData = savedChannel)
         sut.updates.test {
             val saved = sut.save(initialWithChannel, emit = true, flat = false).data!!
@@ -211,7 +209,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
             .filterIndexed { index, _ -> index.mod(2) == 0 }
         val expectedIds = expected.map { it.id!! }
 
-        val actual = sut.loadList(filter = IdListFilter(expectedIds))
+        val actual = sut.loadList(filter = IdListFilter(expectedIds), flat = false)
 
         assertEquals(expected, actual.data)
     }
@@ -224,7 +222,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
             .filterIndexed { index, _ -> index.mod(2) == 0 }
         val expectedIds = expected.map { it.platformId }
 
-        val actual = sut.loadList(filter = OrchestratorContract.PlatformIdListFilter(expectedIds))
+        val actual = sut.loadList(filter = PlatformIdListFilter(expectedIds), flat = false)
 
         assertEquals(expected, actual.data)
     }
@@ -251,7 +249,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
     fun count() = runTest {
         val initialSaved = addMediaToDb()
 
-        val actual = sut.count(AllFilter()).data!!
+        val actual = sut.count(AllFilter).data!!
 
         assertEquals(initialSaved.size, actual)
     }
@@ -266,7 +264,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
             assertEquals(true, actual.data!!)
             assertEquals(DELETE to toDelete, awaitItem())
         }
-        val tryToLoadDeleted = sut.load(toDelete.id!!)
+        val tryToLoadDeleted = sut.load(toDelete.id!!, flat = false)
         assertFalse { tryToLoadDeleted.isSuccessful }
     }
 
@@ -279,7 +277,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                 image = image?.copy(id = null),
             )
         }
-        val saved = sut.save(initial).data
+        val saved = sut.save(initial, flat = false, emit = false).data
         assertNotNull(saved)
         val actual = sut.deleteAll()
         assertEquals(true, actual.data)
@@ -296,11 +294,11 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                 image = image?.copy(id = null),
             )
         }
-        val saved = sut.save(initial).data!!
+        val saved = sut.save(initial, flat = false, emit = false).data!!
         sut.updates.test {
             val update = fixture<MediaPositionUpdateDomain>().copy(id = saved.id!!)
-            val actual = sut.update(update, emit = true)
-            val expected = sut.load(saved.id!!)
+            val actual = sut.update(update, flat = false, emit = true)
+            val expected = sut.load(saved.id!!, flat = false)
             assertEquals(expected.data!!, actual.data!!)
             assertEquals(FULL to actual.data!!, awaitItem())
             expectNoEvents()
@@ -320,7 +318,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
             )
         }
 
-        val actual = sut.save(duplicatePlatformId)
+        val actual = sut.save(duplicatePlatformId, flat = false, emit = false)
         assertFalse(actual.isSuccessful)
     }
 
@@ -337,7 +335,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
             )
         })
 
-        val actual = sut.save(duplicatePlatformIdList)
+        val actual = sut.save(duplicatePlatformIdList, flat = false, emit = false)
         assertFalse(actual.isSuccessful)
     }
 
@@ -355,7 +353,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
             )
         }
 
-        val actual = sut.save(duplicatePlatformId)
+        val actual = sut.save(duplicatePlatformId, flat = false, emit = false)
 //        println("--- to save")
 //        println(duplicatePlatformId.summarise())
 //        println("--- actual")
@@ -364,10 +362,10 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 //        println("--- db")
 //        println(sut.loadList(AllFilter()).data?.map { it.summarise() }?.joinToString("\n"))
 
-        val load = sut.load(duplicatePlatformId.id!!).data!!
+        val load = sut.load(duplicatePlatformId.id!!, flat = false).data!!
         // The item won't save as it do nothing - but the db record won't be changed
         assertFalse(actual.isSuccessful)
-        assertEquals((actual as RepoResult.Error).t::class, ConflictException::class)
+        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
         assertNotEquals(load, duplicatePlatformId)
     }
 
@@ -385,11 +383,11 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
             )
         })
 
-        val actual = sut.save(duplicatePlatformId)
-        val load = sut.load(duplicatePlatformId[0].id!!).data!!
+        val actual = sut.save(duplicatePlatformId, flat = false, emit = false)
+        val load = sut.load(duplicatePlatformId[0].id!!, flat = false).data!!
         // The item won't save as it do nothing - but the db record won't be changed
         assertFalse(actual.isSuccessful)
-        assertEquals((actual as RepoResult.Error).t::class, ConflictException::class)
+        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
         assertNotEquals(load, duplicatePlatformId[0])
     }
 }

@@ -4,10 +4,10 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import uk.co.sentinelweb.cuer.app.R
 
+@Suppress("unused")
 class NavigationFragmentMapper constructor(
     private val activity: AppCompatActivity
 ) {
-    // todo args
     fun makeFragment(@IdRes itemId: Int): NavigationModel.Target = when (itemId) {
         R.id.navigation_browse -> NavigationModel.Target.BROWSE
         R.id.navigation_playlists -> NavigationModel.Target.PLAYLISTS

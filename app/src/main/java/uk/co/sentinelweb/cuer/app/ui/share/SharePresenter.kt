@@ -72,7 +72,7 @@ class SharePresenter constructor(
                     )
             }
             ?.let { mapper.mapShareModel(state, ::finish, view.canCommit(state.scanResult?.type)) }
-            ?: mapper.mapEmptyModel(::finish)) // todo fail result
+            ?: mapper.mapEmptyModel(::finish))
             .apply {
                 state.model = this
                 view.setData(this)
@@ -106,7 +106,6 @@ class SharePresenter constructor(
             PLAYLIST -> (result.result as PlaylistDomain).let { playlist ->
                 playlist.id?.let { id ->
                     coroutines.mainScope.launch {
-                        // fixme image is still replaced even is blank
                         if (result.isNew && state.category?.image?.url?.isNotEmpty() ?: false) {
                             playlist.copy(
                                 image = state.category?.image ?: playlist.image,

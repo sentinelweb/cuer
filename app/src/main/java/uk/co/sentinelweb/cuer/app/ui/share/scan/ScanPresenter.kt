@@ -62,7 +62,7 @@ class ScanPresenter(
         view.setModel(modelMapper.mapError(uriString))
     }
 
-    private suspend fun checkMedia(uriString: String, scannedMedia: MediaDomain): ScanContract.Result =// todo return playlistItem if exists
+    private suspend fun checkMedia(uriString: String, scannedMedia: MediaDomain): ScanContract.Result =
         scannedMedia.let {
             mediaOrchestrator.loadList(PlatformIdListFilter(listOf(scannedMedia.platformId)), Options(LOCAL))
         }.firstOrNull()
@@ -77,8 +77,9 @@ class ScanPresenter(
                 modelMapper.mapMediaResult(uriString, true, false, scannedMedia)
             }
 
+    // todo make orchestrator
     private suspend fun checkPlaylist(uriString: String, scannedPlaylist: PlaylistDomain): ScanContract.Result? {
-        try {// todo make orchestrator
+        try {
             return (scannedPlaylist.platformId
                 ?.let {
                     playlistOrchestrator.load(it, Options(LOCAL))

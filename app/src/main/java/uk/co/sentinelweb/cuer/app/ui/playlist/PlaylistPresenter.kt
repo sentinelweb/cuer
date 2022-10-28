@@ -169,7 +169,7 @@ class PlaylistPresenter(
 
                         DELETE -> {
                             toastWrapper.show(res.getString(R.string.playlist_msg_deleted))
-                            view.exit() // todo exit or back
+                            view.exit()
                         }
                     }
                 }
@@ -424,7 +424,7 @@ class PlaylistPresenter(
                             if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
                         view.showItemDescription(itemModel.id, this, source)
                     }
-            } // todo pass identifier?
+            }
     }
 
     override fun onItemPlayClicked(itemModel: ItemContract.Model) {
@@ -437,7 +437,7 @@ class PlaylistPresenter(
                 } else {
                     playUseCase.playLogic(itemDomain, state.playlist, false)
                 }
-            } // todo error
+            }
     }
 
     override fun onPlayStartClick(itemModel: ItemContract.Model) {
@@ -451,7 +451,7 @@ class PlaylistPresenter(
                     playUseCase.playLogic(itemDomain, state.playlist, false)
                 }
             }
-    } // todo error
+    }
 
     override fun onStarPlaylist(): Boolean {
         state.playlist
@@ -662,7 +662,7 @@ class PlaylistPresenter(
             view.showAlertDialog(modelMapper.mapSaveConfirmAlert(
                 {
                     coroutines.mainScope.launch {
-                        commitPlaylist() // fixme: this doesn't go thru sharePresenter after commit after
+                        commitPlaylist()
                         view.navigate(NavigationModel(NAV_DONE))
                     }
                 },

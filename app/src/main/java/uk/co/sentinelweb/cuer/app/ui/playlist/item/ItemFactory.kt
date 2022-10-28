@@ -18,7 +18,7 @@ class ItemFactory constructor(
         cards: Boolean,
         interactions: ItemContract.Interactions
     ): ItemViewHolder {
-        val createView = createView(parent, cards) // todo pass from pref
+        val createView = createView(parent, cards)
         return ItemViewHolder(
             createPresenter(createView, interactions),
             createView

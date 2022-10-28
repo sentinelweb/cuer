@@ -185,13 +185,10 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         })
         compactPlayerScroll.addScrollListener(binding.plieScroll, this)
 
-        // setup data for fragment transition
         itemArg?.apply {
             saveCallback.isEnabled = true
-            if (id != null) { // fixme needs new flag assumes transition
-                media.image?.apply {
-                    setImage(url)
-                }
+            if (id != null) {
+                media.image?.apply { setImage(url) }
                 binding.plieDescription.channelImageVisible(false)
                 binding.plieTitlePos.isVisible = false
                 binding.plieTitleBg.isVisible = false
@@ -328,8 +325,6 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
             }
 
             DialogModel.Type.PLAYLIST_ADD -> {
-                // todo need a callback to select the parent in the add dialog i.e. another type DialogModel.Type.PLAYLIST_SELECT_PARENT ??
-                // todo also to select the image
                 dialogFragment = PlaylistEditFragment.newInstance()
                     .apply {
                         listener = object : PlaylistEditFragment.Listener {

@@ -48,7 +48,7 @@ class CastPlayerMviFragment() :
     private val binding get() = _binding!!
 
     private lateinit var _mviView: CastPlayerViewImpl
-    val mviView: CastPlayerViewImpl // todo remove and inject into parent
+    val mviView: CastPlayerViewImpl
         get() = _mviView
 
     override fun onCreateView(
@@ -82,7 +82,6 @@ class CastPlayerMviFragment() :
 
             override fun onStartTrackingTouch(view: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                //presenter.onSeekFinished()
                 _mviView.dispatch(Event.SeekBarChanged(seekBar.progress / seekBar.max.toFloat()))
             }
         })

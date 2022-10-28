@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
@@ -61,13 +62,9 @@ class ItemModelMapper constructor(
             watchedSince = item.media.dateLastPlayed?.let { timeSinceFormatter.formatTimeSince(it.toEpochMilliseconds()) }
                 ?: "-",
             isWatched = item.media.watched,
-            published = item.media.published?.let {
-                timeSinceFormatter.formatTimeSince(
-                    // todo shorten this
-                    it.toJavaLocalDateTime().toInstant(OffsetDateTime.now().getOffset())
-                        .toEpochMilli()
-                )
-            } ?: "-",
+            published = item.media.published
+                ?.let { timeSinceFormatter.formatTimeSince(convertToLocalMillis(it)) }
+                ?: "-",
             platform = item.media.platform,
             isLive = item.media.isLiveBroadcast,
             isUpcoming = item.media.isLiveBroadcastUpcoming,
@@ -80,4 +77,8 @@ class ItemModelMapper constructor(
             deleteResources = deleteResources
         )
     }
+
+    private fun convertToLocalMillis(it: LocalDateTime) =
+        it.toJavaLocalDateTime().toInstant(OffsetDateTime.now().getOffset())
+            .toEpochMilli()
 }

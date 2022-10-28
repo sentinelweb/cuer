@@ -25,7 +25,7 @@ class FirebaseWrapper constructor(
     }
 
     fun hasUnsentReports() =
-        Firebase.crashlytics.checkForUnsentReports().result ?: false// todo check no db/net on main thread
+        Firebase.crashlytics.checkForUnsentReports().result ?: false
 
     fun addCrashlyticKey(k: String, v: String) {
         Firebase.crashlytics.setCustomKey(k, v)

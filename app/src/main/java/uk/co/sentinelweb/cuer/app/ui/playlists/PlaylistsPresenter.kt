@@ -85,7 +85,7 @@ class PlaylistsPresenter(
         // todo listen for stat changes
         playlistOrchestrator.updates
             .onEach { (op, source, plist) ->
-                log.d("playlist changed: $op, $source, id=${plist.id} items=${plist.items.size}")
+//                log.d("playlist changed: $op, $source, id=${plist.id} items=${plist.items.size}")
                 refreshPlaylists()
             }
             .launchIn(coroutines.mainScope)
@@ -123,7 +123,6 @@ class PlaylistsPresenter(
             }
     }
 
-    // todo review this
     private fun setParent(parent: PlaylistDomain, child: PlaylistDomain) {
         val childNode = state.treeLookup[child.id]!!
         val parentNode = state.treeLookup[parent.id]
@@ -303,9 +302,8 @@ class PlaylistsPresenter(
 
     override fun commitMove() {
         if (state.dragFrom != null && state.dragTo != null) {
-            //toastWrapper.show("todo save move ..")
+            //todo save move ..
         } else {
-            //toastWrapper.show("Move failed ..")
             refreshPlaylists()
         }
         state.dragFrom = null

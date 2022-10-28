@@ -16,7 +16,7 @@ class MainPresenter(
     private val log: LogWrapper,
     private val autoBackupFileExporter: AutoBackupFileExporter,
 ) : MainContract.Presenter {
-    // todo add connection listener and close floating player if connectioned
+
     init {
         log.tag(this)
     }
