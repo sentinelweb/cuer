@@ -22,7 +22,8 @@
         />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/prefs_root_remote_service_title">
+
+    <PreferenceCategory app:title="@string/prefs_root_remote_service_title" app:isPreferenceVisible="false">
         <CheckBoxPreference
             app:icon="@drawable/ic_remote_service_24"
             app:key="@string/prefs_root_remote_service_key"
@@ -40,7 +41,7 @@
         />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/prefs_root_debug_cat_title">
+    <PreferenceCategory app:title="@string/prefs_root_debug_cat_title" app:isPreferenceVisible="false">
         <Preference
             app:icon="@drawable/ic_bug_report"
             app:key="@string/prefs_root_debug_send_reports_key"
