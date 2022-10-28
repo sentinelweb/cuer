@@ -7,10 +7,8 @@ import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import io.ktor.http.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.TitleFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
@@ -206,7 +204,7 @@ class BrowseStoreFactory constructor(
                     it,
                     existingPlaylists = existingPlaylists,
                     existingPlaylistStats = playlistStatsOrchestrator.loadList(
-                        OrchestratorContract.IdListFilter(existingPlaylists.mapNotNull { it.id }),
+                        IdListFilter(existingPlaylists.mapNotNull { it.id }),
                         LOCAL.flatOptions()
                     )
                 )

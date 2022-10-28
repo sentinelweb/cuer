@@ -5,7 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -19,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.PINNED_PLAYLIST
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -36,6 +40,7 @@ class PlaylistEditViewModel constructor(
     private val log: LogWrapper,
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists,
+    private val res: ResourceWrapper,
 ) : ViewModel() {
     init {
         log.tag(this)
@@ -124,6 +129,7 @@ class PlaylistEditViewModel constructor(
         // removed in 278
 //        if (!state.isDialog) {
         _dialogModelLiveData.value = SearchImageContract.Config(
+            res.getString(R.string.imagesearch_dialog_title),
             state.playlistEdit.title,
             this::onImageSelected
         )
@@ -149,7 +155,7 @@ class PlaylistEditViewModel constructor(
             viewModelScope.launch {
                 if (state.playlistEdit.default && state.source == LOCAL) {
                     playlistOrchestrator.loadList(
-                        OrchestratorContract.DefaultFilter(),
+                        DefaultFilter,
                         state.source.flatOptions()
                     )
                         .takeIf { it.size > 0 }
@@ -238,6 +244,7 @@ class PlaylistEditViewModel constructor(
     fun onSelectParent() {
         _dialogModelLiveData.value =
             PlaylistsDialogContract.Config(
+                res.getString(R.string.playlist_dialog_title),
                 setOf(),
                 true,
                 this::onParentSelected,
@@ -250,13 +257,13 @@ class PlaylistEditViewModel constructor(
             )
     }
 
-    fun onParentSelected(parent: PlaylistDomain?, checked: Boolean) = viewModelScope.launch {
+    private fun onParentSelected(parent: PlaylistDomain?, checked: Boolean) = viewModelScope.launch {
         if (parent == ADD_PLAYLIST_DUMMY) {
             return@launch
         }
         if (state.treeLookup.isEmpty()) {
             state.treeLookup = playlistOrchestrator
-                .loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
+                .loadList(AllFilter, LOCAL.flatOptions())
                 .buildTree()
                 .buildLookup()
         }

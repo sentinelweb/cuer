@@ -6,7 +6,9 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -91,7 +93,7 @@ class SqldelightPlaylistDatabaseRepository(
     override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistDomain> = loadPlaylist(id, flat)
 
     override suspend fun loadList(
-        filter: Filter?,
+        filter: Filter,
         flat: Boolean
     ): RepoResult<List<PlaylistDomain>> = withContext(coProvider.IO) {
         database.playlistItemEntityQueries.transactionWithResult {
@@ -104,8 +106,7 @@ class SqldelightPlaylistDatabaseRepository(
                         is PlatformIdListFilter -> loadAllByPlatformIds(filter.ids, filter.platform)
                         is ChannelPlatformIdFilter -> findPlaylistsForChannelPlatformId(filter.platformId)
                         is TitleFilter -> findPlaylistsWithTitle(filter.title)
-                        else ->// todo return empty for else
-                            loadAll()
+                        else -> throw IllegalArgumentException("filter not supported $filter")
                     }
                 }.executeAsList()
                     .map { entity ->
@@ -124,7 +125,7 @@ class SqldelightPlaylistDatabaseRepository(
         }
     }
 
-    override suspend fun loadStatsList(filter: Filter?): RepoResult<List<PlaylistStatDomain>> =
+    override suspend fun loadStatsList(filter: Filter): RepoResult<List<PlaylistStatDomain>> =
         withContext(coProvider.IO) {
             database.playlistItemEntityQueries.transactionWithResult {
                 try {
@@ -152,7 +153,7 @@ class SqldelightPlaylistDatabaseRepository(
             }
         }
 
-    override suspend fun count(filter: Filter?): RepoResult<Int> =
+    override suspend fun count(filter: Filter): RepoResult<Int> =
         try {
             withContext(coProvider.IO) {
                 database.playlistEntityQueries.count().executeAsOne().toInt()

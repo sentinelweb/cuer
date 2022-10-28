@@ -12,12 +12,14 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.YOUTUBE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
@@ -167,7 +169,7 @@ class PlaylistPresenter(
 
                         DELETE -> {
                             toastWrapper.show(res.getString(R.string.playlist_msg_deleted))
-                            view.exit() // todo exit or back
+                            view.exit()
                         }
                     }
                 }
@@ -277,6 +279,7 @@ class PlaylistPresenter(
     private fun showPlaylistSelector() {
         view.showPlaylistSelector(
             PlaylistsDialogContract.Config(
+                res.getString(R.string.playlist_dialog_title),
                 selectedPlaylists = setOf(state.playlist!!),
                 multi = true,
                 itemClick = { which: PlaylistDomain?, _ ->
@@ -421,7 +424,7 @@ class PlaylistPresenter(
                             if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
                         view.showItemDescription(itemModel.id, this, source)
                     }
-            } // todo pass identifier?
+            }
     }
 
     override fun onItemPlayClicked(itemModel: ItemContract.Model) {
@@ -434,7 +437,7 @@ class PlaylistPresenter(
                 } else {
                     playUseCase.playLogic(itemDomain, state.playlist, false)
                 }
-            } // todo error
+            }
     }
 
     override fun onPlayStartClick(itemModel: ItemContract.Model) {
@@ -448,7 +451,7 @@ class PlaylistPresenter(
                     playUseCase.playLogic(itemDomain, state.playlist, false)
                 }
             }
-    } // todo error
+    }
 
     override fun onStarPlaylist(): Boolean {
         state.playlist
@@ -500,7 +503,7 @@ class PlaylistPresenter(
                 prefsWrapper.putEnum(LAST_SEARCH_TYPE, REMOTE)
 
                 view.navigate(
-                    PlaylistContract.makeNav(YOUTUBE_SEARCH_PLAYLIST, null, false, MEMORY)
+                    PlaylistContract.makeNav(YoutubeSearch.id, null, false, MEMORY)
                 )
             }
     }
@@ -659,7 +662,7 @@ class PlaylistPresenter(
             view.showAlertDialog(modelMapper.mapSaveConfirmAlert(
                 {
                     coroutines.mainScope.launch {
-                        commitPlaylist() // fixme: this doesn't go thru sharePresenter after commit after
+                        commitPlaylist()
                         view.navigate(NavigationModel(NAV_DONE))
                     }
                 },
@@ -705,7 +708,7 @@ class PlaylistPresenter(
                         }
                         ?: playlist
                 }
-                ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
+                ?.let { playlistOrchestrator.save(it, LOCAL.deepOptions(emit = true)) }
                 ?.also {
                     state.playlistIdentifier =
                         it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")
@@ -740,7 +743,7 @@ class PlaylistPresenter(
                 }
                 ?.also {
                     state.playlistsTree = playlistOrchestrator
-                        .loadList(AllFilter(), LOCAL.flatOptions())
+                        .loadList(AllFilter, LOCAL.flatOptions())
                         .buildTree()
                         .also {
                             state.playlistsTreeLookup = it.buildLookup()

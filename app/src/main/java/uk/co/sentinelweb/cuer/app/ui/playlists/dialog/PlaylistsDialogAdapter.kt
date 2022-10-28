@@ -30,7 +30,7 @@ class PlaylistsDialogAdapter constructor(
     var currentPlaylistId: OrchestratorContract.Identifier<*>? = null
 
     fun setData(data: List<ItemContract.Model>, animate: Boolean = true) {
-        // todo something in diffutil fails here deleting a parent playlist shog the child after it fails
+        // todo something in diffutil fails here deleting a parent playlist show the child after it fails
         if (animate) {
             DiffUtil.calculateDiff(
                 ItemDiffCallback(

@@ -297,7 +297,7 @@ class MainActivity :
         private const val SERVICES_REQUEST_CODE = 1
 
         fun start(c: Context, plId: Long, plItemId: Long?, source: Source, play: Boolean) {
-            c.startActivity( // todo map in NavigationMapper
+            c.startActivity(
                 Intent(c, MainActivity::class.java).apply {
                     putExtra(Target.KEY, Target.PLAYLIST.name)
                     putExtra(PLAYLIST_ID.name, plId)

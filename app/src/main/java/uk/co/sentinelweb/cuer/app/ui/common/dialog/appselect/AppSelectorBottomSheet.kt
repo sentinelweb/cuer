@@ -51,7 +51,6 @@ class AppSelectorBottomSheet : BottomSheetDialogFragment(), AndroidScopeComponen
     companion object {
         const val TAG = "AppSelectorBottomSheet"
 
-        // todo use navigation?
         fun show(a: FragmentActivity, appList: List<String>) {
             AppSelectorBottomSheet()
                 .apply {

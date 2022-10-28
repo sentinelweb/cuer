@@ -85,6 +85,7 @@ interface PlaylistItemEditContract {
                         playUseCase = get(),
                         linkNavigator = get(),
                         recentLocalPlaylists = get(),
+                        res = get()
                     )
                 }
                 scoped { State() }
@@ -103,6 +104,7 @@ interface PlaylistItemEditContract {
                         coroutines = get(),
                         floatingService = get(),
                         playDialog = get(),
+                        res = get()
                     )
                 }
                 scoped {

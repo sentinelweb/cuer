@@ -140,13 +140,13 @@ class PlayerControlsNotificationController constructor(
         }
     }
 
-    override fun setCurrentSecond(second: Float) {
-        state.positionMs = second.toLong() * 1000
+    override fun setCurrentSecond(secondsFloat: Float) {
+        state.positionMs = secondsFloat.toLong() * 1000
         skipControl.updatePosition(state.positionMs)
     }
 
-    override fun setDuration(duration: Float) {
-        state.durationMs = duration.toLong() * 1000
+    override fun setDuration(durationFloat: Float) {
+        state.durationMs = durationFloat.toLong() * 1000
         skipControl.duration = state.durationMs
     }
 
@@ -215,6 +215,5 @@ class PlayerControlsNotificationController constructor(
         const val ACTION_TRACKB = "trackb"
         const val ACTION_DISCONNECT = "disconnect"
         const val ACTION_STAR = "star"
-        const val ACTION_UNSTAR = "unstar"
     }
 }

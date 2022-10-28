@@ -6,11 +6,9 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import kotlin.random.Random
 
 class PlaylistMutator {
-    // do i have to change the current index? yes
     // if from,to both before or after then ok
     // if from behind current and to after current decrement
     // if to before and from after then increment
-    // todo update order
     fun moveItem(domain: PlaylistDomain, fromPosition: Int, toPosition: Int): PlaylistDomain {
         if (fromPosition != toPosition) {
             val items = domain.items.toMutableList()

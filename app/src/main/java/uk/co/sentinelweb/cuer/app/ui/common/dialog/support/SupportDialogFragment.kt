@@ -116,7 +116,6 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
     companion object {
         const val TAG = "SupportDialogFragment"
 
-        // todo use navigation?
         fun show(a: FragmentActivity, m: MediaDomain) {
             SupportDialogFragment().apply { arguments = bundleOf(MEDIA.toString() to m.serialise()) }
                 .show(a.supportFragmentManager, TAG)
@@ -142,7 +141,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                 scoped { UrlLauncherWrapper(this.getFragmentActivity()) }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped<CryptoLauncher> {
-                    AndroidCryptoLauncher(this.getFragmentActivity(), get(), get(), get())
+                    AndroidCryptoLauncher(this.getFragmentActivity(), get(), get(), get(), get())
                 }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
             }

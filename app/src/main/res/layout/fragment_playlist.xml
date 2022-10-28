@@ -25,9 +25,9 @@
             app:expandedTitleMarginEnd="16dp"
             app:expandedTitleMarginStart="16dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.ActionBar.Expanded"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways"
             app:statusBarScrim="?attr/colorPrimaryDark"
-            ><!-- todo find a way to make header appear when scrolling down adding |enterAlways seems to break it!  -->
+        >
 
             <ImageView
                 android:id="@+id/playlist_header_image"
@@ -192,6 +192,7 @@
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:srcCompat="@drawable/ic_button_up_black"
         android:visibility="gone"
+        android:alpha="@dimen/fab_navigation_alpha"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -207,6 +208,7 @@
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:srcCompat="@drawable/ic_button_down_black"
         android:visibility="gone"
+        android:alpha="@dimen/fab_navigation_alpha"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -225,6 +227,7 @@
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:srcCompat="@drawable/ic_refresh"
         android:visibility="gone"
+        android:alpha="@dimen/fab_navigation_alpha"
         />
 
     <uk.co.sentinelweb.cuer.app.ui.common.views.FABProgress
@@ -257,7 +260,8 @@
         app:srcCompat="@drawable/ic_playmode_shuffle"
         tools:ignore="RtlSymmetry"
         android:visibility="gone"
-        />
+
+    />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

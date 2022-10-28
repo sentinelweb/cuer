@@ -33,7 +33,7 @@ class CastPlayerPresenter(
         skipControl.listener = this
     }
 
-    private var listener: PlayerControls.Listener? = null // todo data only here move to presenter?
+    private var listener: PlayerControls.Listener? = null
 
     override fun initialise() {
         state.isDestroyed = false
@@ -142,6 +142,7 @@ class CastPlayerPresenter(
             UNKNOWN,
             UNSTARTED,
             BUFFERING -> view.showBuffering()
+
             VIDEO_CUED -> Unit
             ERROR -> {
                 view.setPaused(); view.showMessage("An error occurred")
@@ -150,8 +151,8 @@ class CastPlayerPresenter(
         view.setState(playState)
     }
 
-    override fun setCurrentSecond(second: Float) {
-        state.positionMs = (second * 1000).toLong()
+    override fun setCurrentSecond(secondsFloat: Float) {
+        state.positionMs = (secondsFloat * 1000).toLong()
         skipControl.updatePosition(state.positionMs)
         if (state.durationMs > 0) {
             if (!state.isLiveStream) {
@@ -171,8 +172,8 @@ class CastPlayerPresenter(
         }
     }
 
-    override fun setDuration(duration: Float) {
-        state.durationMs = (duration * 1000).toLong()
+    override fun setDuration(durationFloat: Float) {
+        state.durationMs = (durationFloat * 1000).toLong()
         skipControl.duration = state.durationMs
         if (!state.isLiveStream) {
             view.setDuration(mapper.formatTime(state.durationMs))
@@ -252,7 +253,7 @@ class CastPlayerPresenter(
         view.setPlaylistImage(image?.url)
     }
 
-    override fun onPlaylistClick() {// todo get source
+    override fun onPlaylistClick() {
         state.playlistItem?.playlistId?.let {
             view.navigate(
                 NavigationModel(
@@ -263,7 +264,7 @@ class CastPlayerPresenter(
         }
     }
 
-    override fun onPlaylistItemClick() {// todo get source
+    override fun onPlaylistItemClick() {
         state.playlistItem?.let {
             view.navigate(
                 NavigationModel(

@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInte
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
@@ -14,7 +15,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
 class PlaylistModelMapper constructor(
     private val itemModelMapper: ItemModelMapper,
-    private val iconMapper: IconMapper
+    private val iconMapper: IconMapper,
+    private val res: ResourceWrapper
 ) {
     private var _modelIdGenerator = 0L
     var modelIdGenerator: Long = 0
@@ -88,8 +90,8 @@ class PlaylistModelMapper constructor(
 
     fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel =
         AlertDialogModel(
-            title = R.string.dialog_title_save_check,
-            message = R.string.dialog_message_save_item_check,
+            title = res.getString(R.string.dialog_title_save_check),
+            message = res.getString(R.string.dialog_message_save_item_check),
             confirm = AlertDialogModel.Button(R.string.dialog_button_save, confirm),
             cancel = AlertDialogModel.Button(R.string.dialog_button_dont_save, cancel),
         )

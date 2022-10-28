@@ -82,7 +82,8 @@ interface PlaylistEditContract {
                         mediaOrchestrator = get(),
                         log = get(),
                         prefsWrapper = get(),
-                        recentLocalPlaylists = get()
+                        recentLocalPlaylists = get(),
+                        res = get()
                     )
                 }
                 scoped { State() }

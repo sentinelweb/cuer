@@ -54,10 +54,6 @@ class PlayerListener constructor(
     }
 
     override fun getLiveOffsetMs(): Long {
-        // fixme not sure this is even used properly - consider remove
-//        coroutines.mainScope.launch {
-//            _intentFlow.emit(SeekToPosition(positionMs))
-//        }
         return 0
     }
 

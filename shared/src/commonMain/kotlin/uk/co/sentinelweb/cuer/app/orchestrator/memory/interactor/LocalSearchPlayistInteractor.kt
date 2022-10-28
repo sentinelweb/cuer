@@ -1,10 +1,10 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.SearchFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -47,7 +47,7 @@ class LocalSearchPlayistInteractor constructor(
             null
         }
 
-    private fun mapToFilter(searchDomain: SearchLocalDomain) = OrchestratorContract.SearchFilter(
+    private fun mapToFilter(searchDomain: SearchLocalDomain) = SearchFilter(
         text = searchDomain.text,
         isWatched = searchDomain.isWatched,
         isNew = searchDomain.isNew,
@@ -57,7 +57,7 @@ class LocalSearchPlayistInteractor constructor(
     )
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
-        id = LOCAL_SEARCH_PLAYLIST,
+        id = LocalSearch.id,
         title = mapTitle(),
         type = APP,
         currentIndex = -1,
@@ -79,7 +79,7 @@ class LocalSearchPlayistInteractor constructor(
 
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = LOCAL_SEARCH_PLAYLIST,
+        playlistId = LocalSearch.id,
         itemCount = -1,
         watchedItemCount = -1
     )

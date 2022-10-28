@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -122,8 +122,8 @@ class PlaylistPresenterTest {
     @MockK
     lateinit var mockMultiPrefs: MultiPlatformPreferencesWrapper
 
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
-    private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())
+    private val testCoroutineDispatcher = TestCoroutineDispatcher()// use standard test dispatcher
+    private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())// use createCoroutineScope
 
     private val coroutines: CoroutineContextProvider =
         CoroutineContextTestProvider(testCoroutineDispatcher)
@@ -221,7 +221,7 @@ class PlaylistPresenterTest {
         //coEvery{mockPlaylistOrchestrator.loadList(AllFilter(), Options(Source.LOCAL))} returns listOf(fixtCurrentPlaylist)
 
         coEvery {
-            mockPlaylistOrchestrator.loadList(any<AllFilter>(), LOCAL.flatOptions())
+            mockPlaylistOrchestrator.loadList(any<Filter.AllFilter>(), LOCAL.flatOptions())
         } returns listOf()// fixme: problems building the tree will need pt play with data
 
         // orchestrator
@@ -297,7 +297,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlist header changed`() {
-        testCoroutineScope.runBlockingTest {
+        testCoroutineScope.runTest {
             createSut()
             val fixChangedHeader = fixtCurrentPlaylist.copy(currentIndex = 3)
 
@@ -321,7 +321,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlist changed`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val currentIndex = 3
             val fixChanged = fixture.build<PlaylistDomain>()
@@ -346,7 +346,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlist deleted`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             val fixtErrString: String = fixture.build()
             every { mockResources.getString(R.string.playlist_msg_deleted) } returns fixtErrString
             createSut()
@@ -363,7 +363,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlistitem changed not current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val replaceItemIndex = 3
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -390,7 +390,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow current playlistitem changed`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -417,7 +417,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow current playlistitem moved`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex
             val targetItemIndex = 5
@@ -445,7 +445,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow current playlistitem moved out of playlist`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -474,7 +474,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlistitem moved out of playlist before current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex - 1
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -501,7 +501,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlistitem added to playlist before current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val addItemIndex = fixtCurrentCurentIndex - 1
             val fixtAdded: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -530,7 +530,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlistitem deleted before current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val deleteItemIndex = fixtCurrentCurentIndex - 1
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -557,7 +557,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlistitem deleted is current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val deleteItemIndex = fixtCurrentCurentIndex
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -584,7 +584,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun onResume() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
 
             createSut()
 
@@ -597,7 +597,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun onPause() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
 
             sut.onPause()
@@ -698,7 +698,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `onItemSwipeLeft - delete item before current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val deletedItemIndex = 0
             val deletedItem = fixtCurrentPlaylist.items.get(deletedItemIndex)
@@ -743,7 +743,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `commitMove ahead to behind - current playlist`() {// todo behind -> ahead
-        testCoroutineScope.runBlockingTest {
+        runTest {
             fixtState = createDefaultState().copy(
                 dragFrom = 2, dragTo = 0
             )
@@ -783,7 +783,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `setPlaylistData no playlist id - no item - no playNow - is current queued `() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             fixtState = State()
             coEvery { mockDbInit.isInitialized() } returns true
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
@@ -810,7 +810,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `setPlaylistData playlist id - no item - no playNow`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             fixtState = State()
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
@@ -835,7 +835,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `setPlaylistData playlist id - has item - no playNow`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             fixtState = State()
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
@@ -866,7 +866,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `setPlaylistData playlist id - has item - playNow`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             fixtState = State()
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
@@ -897,7 +897,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `undoDelete - item before current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val deletedItem = fixture.build<PlaylistItemDomain>().copy(
                 id = idCounter,

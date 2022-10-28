@@ -15,7 +15,7 @@ import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ImageDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -53,7 +53,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     @Test
     fun create() = runTest {
         val initial = fixture<ImageDomain>().copy(id = null)
-        with(sut.save(initial)) {
+        with(sut.save(initial, flat = false, emit = false)) {
             assertTrue(isSuccessful)
             assertEquals(1L, data?.id)
             assertEquals(initial.url, data?.url)
@@ -65,14 +65,14 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     @Test
     fun updateImage() = runTest {
         val initial = fixture<ImageDomain>().copy(id = 10001)
-        val repoResult = sut.save(initial)
+        val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
 
         val update = fixture<ImageDomain>().copy(id = initial.id)
-        val repoResultUpdate = sut.save(update)
+        val repoResultUpdate = sut.save(update, flat = false, emit = false)
         assertTrue(repoResultUpdate.isSuccessful)
 
-        with(sut.load(initial.id!!)) {
+        with(sut.load(initial.id!!, flat = false)) {
             assertEquals(initial.id, data?.id)
             assertEquals(update.url, data?.url)
             assertEquals(update.width, data?.width)
@@ -85,7 +85,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     fun saveList() = runTest {
         val initial = fixture<List<ImageDomain>>()
             .map { it.copy(id = null) }
-        val repoResult = sut.save(initial)
+        val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
         repoResult.data!!.forEachIndexed { i, imageDomain ->
             assertEquals((i + 1).toLong(), imageDomain.id)
@@ -95,11 +95,11 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     @Test
     fun load() = runTest {
         val initial = fixture<ImageDomain>().copy(id = null)
-        val repoResult = sut.save(initial)
+        val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
         val saved = repoResult.data!!
 
-        with(sut.load(saved.id!!)) {
+        with(sut.load(saved.id!!, flat = false)) {
             assertEquals(saved.id, data?.id)
             assertEquals(saved.url, data?.url)
             assertEquals(saved.width, data?.width)
@@ -111,7 +111,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     fun deleteAll() = runTest {
         val initial = fixture<List<ImageDomain>>()
             .map { it.copy(id = null) }
-        val repoResult = sut.save(initial)
+        val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
 
         val deleteResult = sut.deleteAll()
@@ -123,7 +123,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     @Test
     fun `loadEntity$Cuer_database_commonMain`() = runTest {
         val initial = fixture<ImageDomain>().copy(id = null)
-        val repoResult = sut.save(initial)
+        val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
         val saved = repoResult.data!!
 
@@ -151,7 +151,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     @Test
     fun `checkToSaveImage$Cuer_database_commonMain_update_no_id_url`() = runTest {
         val initial = fixture<ImageDomain>().copy(id = null)
-        val repoResult = sut.save(initial)
+        val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
         val saved = repoResult.data!!
 
@@ -168,7 +168,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     @Test
     fun `checkToSaveImage$Cuer_database_commonMain_update_id`() = runTest {
         val initial = fixture<ImageDomain>().copy(id = null)
-        val repoResult = sut.save(initial)
+        val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
         val saved = repoResult.data!!
 
@@ -187,8 +187,8 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
         val initial = fixture<List<ImageDomain>>().map {
             it.copy(id = null)
         }
-        initial.forEach { sut.save(it) }
-        val actual = sut.count(OrchestratorContract.AllFilter()).data!!
+        initial.forEach { sut.save(it, flat = false, emit = false) }
+        val actual = sut.count(AllFilter).data!!
 
         assertEquals(initial.size, actual)
     }

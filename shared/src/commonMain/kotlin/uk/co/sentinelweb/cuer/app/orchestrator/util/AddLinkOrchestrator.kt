@@ -2,7 +2,8 @@ package uk.co.sentinelweb.cuer.app.orchestrator.util
 
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DefaultFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.MediaIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
@@ -19,7 +20,7 @@ class AddLinkOrchestrator constructor(
     private val linkScanner: LinkScanner,
     private val coProvider: CoroutineContextProvider,
 ) {
-    suspend fun scanUrl(uriString: String): Domain? = withContext(coProvider.IO) {
+    suspend fun scanUrl(uriString: String): Domain = withContext(coProvider.IO) {
         linkScanner
             .scan(uriString)
             ?.let { scannedMedia ->
@@ -31,7 +32,7 @@ class AddLinkOrchestrator constructor(
                                 ?.takeIf { it.id != null }
                                 ?.let {
                                     playlistItemOrchestrator
-                                        .loadList(OrchestratorContract.MediaIdListFilter(listOf(it.id!!)), LOCAL.flatOptions())
+                                        .loadList(MediaIdListFilter(listOf(it.id!!)), LOCAL.flatOptions())
                                         .takeIf { it.size > 0 }
                                         ?.get(0)
                                 }
@@ -50,7 +51,7 @@ class AddLinkOrchestrator constructor(
         item.playlistId
             ?.let { playlistItemOrchestrator.save(item, LOCAL.deepOptions()) }
             ?: let {
-                playlistOrchestrator.loadList(DefaultFilter(), LOCAL.flatOptions())
+                playlistOrchestrator.loadList(DefaultFilter, LOCAL.flatOptions())
                     .get(0)// throws exception if not found but should always be there
                     .let { item.copy(playlistId = it.id) }
                     .let { playlistItemOrchestrator.save(it, LOCAL.deepOptions()) }

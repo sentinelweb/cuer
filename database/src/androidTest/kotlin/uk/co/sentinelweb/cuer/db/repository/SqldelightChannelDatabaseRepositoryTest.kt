@@ -15,7 +15,7 @@ import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
@@ -60,7 +60,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
                 image = image?.copy(id = null),
             )
         }
-        with(sut.save(initial)) {
+        with(sut.save(initial, flat = false, emit = false)) {
             assertTrue(isSuccessful)
             assertEquals(1L, data?.id)
             assertEquals(initial.platform, data?.platform)
@@ -98,7 +98,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
                 image = fixt.image?.copy(id = null),
             )
         }
-        with(sut.save(initial)) {
+        with(sut.save(initial, flat = false, emit = false)) {
             assertTrue(isSuccessful)
             assertNotNull(data)
             data!!.forEachIndexed { i, savedChannel ->
@@ -139,9 +139,9 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
                 image = image?.copy(id = null),
             )
         }
-        val saved = sut.save(initial).data
+        val saved = sut.save(initial, flat = false, emit = false).data
         assertNotNull(saved)
-        val actual = sut.load(saved.id!!)
+        val actual = sut.load(saved.id!!, flat = false)
         assertEquals(saved, actual.data)
     }
 
@@ -154,7 +154,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
                 image = image?.copy(id = null),
             )
         }
-        val saved = sut.save(initial).data
+        val saved = sut.save(initial, flat = false, emit = false).data
         assertNotNull(saved)
         val updated = fixture<ChannelDomain>().run {
             copy(
@@ -168,7 +168,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
 
         val sutImpl = sut as SqldelightChannelDatabaseRepository
         val actual = sutImpl.checkToSaveChannel(updated)
-        val expected = sutImpl.load(saved.id!!).data
+        val expected = sutImpl.load(saved.id!!, flat = false).data
         assertEquals(expected, actual)
     }
 
@@ -181,7 +181,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
                 image = image?.copy(id = null),
             )
         }
-        val saved = sut.save(initial).data
+        val saved = sut.save(initial, flat = false, emit = false).data
         assertNotNull(saved)
         val updated = fixture<ChannelDomain>().run {
             copy(
@@ -193,7 +193,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
 
         val sutImpl = sut as SqldelightChannelDatabaseRepository
         val actual = sutImpl.checkToSaveChannel(updated)
-        val expected = sutImpl.load(saved.id!!).data
+        val expected = sutImpl.load(saved.id!!, flat = false).data
         assertEquals(expected, actual)
     }
 
@@ -226,8 +226,8 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
                 image = it.image?.copy(id = null),
             )
         }
-        initial.forEach { sut.save(it) }
-        val actual = sut.count(OrchestratorContract.AllFilter()).data!!
+        initial.forEach { sut.save(it, flat = false, emit = false) }
+        val actual = sut.count(AllFilter).data!!
 
         assertEquals(initial.size, actual)
     }
@@ -256,7 +256,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
                 image = image?.copy(id = null),
             )
         }
-        val saved = sut.save(initial).data
+        val saved = sut.save(initial, flat = false, emit = false).data
         assertNotNull(saved)
         val actual = sut.deleteAll()
         assertEquals(true, actual.data)

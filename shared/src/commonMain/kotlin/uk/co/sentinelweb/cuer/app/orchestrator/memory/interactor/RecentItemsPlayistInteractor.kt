@@ -1,10 +1,10 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.RecentMediaFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.RecentMediaFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.RECENT_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.Recent
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -39,7 +39,7 @@ class RecentItemsPlayistInteractor constructor(
         }
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
-        id = RECENT_PLAYLIST,
+        id = Recent.id,
         title = "Recent",
         type = APP,
         currentIndex = -1,
@@ -54,7 +54,7 @@ class RecentItemsPlayistInteractor constructor(
 
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = RECENT_PLAYLIST,
+        playlistId = Recent.id,
         itemCount = -1, // todo log in a background process and save to pref
         watchedItemCount = -1 // todo log in a background process and save to pref
     )

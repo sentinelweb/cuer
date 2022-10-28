@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.YOUTUBE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_REMOTE_SEARCH
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
@@ -57,7 +57,7 @@ class YoutubeSearchPlayistInteractor constructor(
             }
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
-        id = YOUTUBE_SEARCH_PLAYLIST,
+        id = YoutubeSearch.id,
         title = mapTitle(),
         type = APP,
         currentIndex = -1,
@@ -79,7 +79,7 @@ class YoutubeSearchPlayistInteractor constructor(
     } ?: "No Remote - shouldn't see this"
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = YOUTUBE_SEARCH_PLAYLIST,
+        playlistId = YoutubeSearch.id,
         itemCount = -1,
         watchedItemCount = -1
     )

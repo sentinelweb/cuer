@@ -52,12 +52,6 @@ internal class RetrofitBuilder constructor(
     internal fun buildPixabayClient() = Retrofit.Builder()
         .baseUrl(PIXABAY_BASE)
         .addConverterFactory(GsonConverterFactory.create())
-        // todo try this
-//        .addConverterFactory(
-//            Json{ignoreUnknownKeys = true; isLenient = true}.asConverterFactory(
-//                CONTENT_TYPE
-//            )
-//        )
         .client(buildOkHttpClient())
         .build()
 

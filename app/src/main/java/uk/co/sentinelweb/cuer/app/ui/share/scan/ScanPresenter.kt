@@ -3,12 +3,15 @@ package uk.co.sentinelweb.cuer.app.ui.share.scan
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.DoesNotExistException
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.MediaIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SHARED_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.Shared
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -59,7 +62,7 @@ class ScanPresenter(
         view.setModel(modelMapper.mapError(uriString))
     }
 
-    private suspend fun checkMedia(uriString: String, scannedMedia: MediaDomain): ScanContract.Result =// todo return playlistItem if exists
+    private suspend fun checkMedia(uriString: String, scannedMedia: MediaDomain): ScanContract.Result =
         scannedMedia.let {
             mediaOrchestrator.loadList(PlatformIdListFilter(listOf(scannedMedia.platformId)), Options(LOCAL))
         }.firstOrNull()
@@ -74,8 +77,9 @@ class ScanPresenter(
                 modelMapper.mapMediaResult(uriString, true, false, scannedMedia)
             }
 
+    // todo make orchestrator
     private suspend fun checkPlaylist(uriString: String, scannedPlaylist: PlaylistDomain): ScanContract.Result? {
-        try {// todo make orchestrator
+        try {
             return (scannedPlaylist.platformId
                 ?.let {
                     playlistOrchestrator.load(it, Options(LOCAL))
@@ -83,7 +87,7 @@ class ScanPresenter(
                         ?.let { it to false }
                         ?: playlistOrchestrator.load(it, PLATFORM.deepOptions(emit = false))
                             ?.copy(
-                                id = SHARED_PLAYLIST,
+                                id = Shared.id,
                                 config = scannedPlaylist.config.copy(
                                     playable = false,
                                     editableItems = false,

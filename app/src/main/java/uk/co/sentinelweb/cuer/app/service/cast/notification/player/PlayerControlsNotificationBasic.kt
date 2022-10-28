@@ -64,7 +64,7 @@ class PlayerControlsNotificationBasic constructor(
 
         val builder = NotificationCompat.Builder(
             service,
-            appState.castNotificationChannelId!! // todo show error
+            appState.castNotificationChannelId ?: throw IllegalStateException("No media session")
         )
             .setDefaults(Notification.DEFAULT_ALL)
             .setSmallIcon(icon)

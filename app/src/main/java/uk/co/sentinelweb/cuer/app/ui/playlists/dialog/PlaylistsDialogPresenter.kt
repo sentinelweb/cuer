@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
@@ -75,10 +75,9 @@ class PlaylistsDialogPresenter(
         }
 
         val pinnedId = prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
-        state.playlists = playlistOrchestrator.loadList(AllFilter(), LOCAL.flatOptions())
+        state.playlists = playlistOrchestrator.loadList(AllFilter, LOCAL.flatOptions())
             .filter { it.config.editableItems }
             .apply { state.treeRoot = buildTree().sort(compareBy { it.node?.title?.lowercase() }) }
-//            .let { if (state.config.showRoot) it.plus(ROOT_PLAYLIST_DUMMY) else it }
 
         val channelPlaylists = state.playlists.filter { state.channelPlaylistIds.contains(it.id) }
             .sortedWith(
@@ -87,7 +86,6 @@ class PlaylistsDialogPresenter(
                     { !it.starred },
                     { it.title.lowercase() })
             ).toMutableList()
-//            .apply { if (state.config.showRoot) add(0, ROOT_PLAYLIST_DUMMY) }
 
         val playlistStats = playlistStatsOrchestrator
             .loadList(IdListFilter(state.playlists.mapNotNull { it.id }), LOCAL.flatOptions())

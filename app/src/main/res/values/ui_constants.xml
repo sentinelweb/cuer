@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="fab_navigation_alpha" type="dimen" format="float">0.5</item>
+</resources>

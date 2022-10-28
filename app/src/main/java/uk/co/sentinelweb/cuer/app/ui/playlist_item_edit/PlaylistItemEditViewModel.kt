@@ -6,10 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import summarise
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
@@ -33,11 +36,13 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_AD
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
+import uk.co.sentinelweb.cuer.domain.ext.summarise
 
 
 class PlaylistItemEditViewModel constructor(
@@ -54,6 +59,7 @@ class PlaylistItemEditViewModel constructor(
     private val playUseCase: PlayUseCase,
     private val linkNavigator: LinkNavigator,
     private val recentLocalPlaylists: RecentLocalPlaylists,
+    private val res: ResourceWrapper,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -235,6 +241,7 @@ class PlaylistItemEditViewModel constructor(
     override fun onSelectPlaylistChipClick(model: ChipModel) {
         _dialogModelLiveData.value =
             PlaylistsDialogContract.Config(
+                res.getString(R.string.playlist_dialog_title),
                 state.selectedPlaylists,
                 true,
                 this@PlaylistItemEditViewModel::onPlaylistSelected,
@@ -262,7 +269,7 @@ class PlaylistItemEditViewModel constructor(
             ?.also { update() }
             ?: apply {
                 _dialogModelLiveData.value =
-                    DialogModel(PLAYLIST_ADD, R.string.create_playlist_dialog_title)
+                    DialogModel(PLAYLIST_ADD, res.getString(R.string.create_playlist_dialog_title))
             }
     }
 
@@ -415,7 +422,7 @@ class PlaylistItemEditViewModel constructor(
             val selectedPlaylists = if (state.selectedPlaylists.size > 0) {
                 state.selectedPlaylists
             } else {
-                playlistOrchestrator.loadList(DefaultFilter(), LOCAL.flatOptions())
+                playlistOrchestrator.loadList(DefaultFilter, LOCAL.flatOptions())
                     .takeIf { it.size > 0 }
                     ?: throw NoDefaultPlaylistException()
             }
@@ -441,19 +448,32 @@ class PlaylistItemEditViewModel constructor(
                                 if (state.isOnSharePlaylist) {
                                     mediaOrchestrator.save(it, state.source.flatOptions())
                                 } else {
+                                    log.d("b4 mediaOrchestrator.save")
+
                                     mediaOrchestrator.save(it, saveSource.deepOptions())
+                                        .also { log.d("after mediaOrchestrator.save") }
+
                                 }
                             } else it
                         }
                         ?.let { savedMedia ->
                             state.media = savedMedia
+                            log.d("editing item: ${state.editingPlaylistItem?.summarise()}")
+                            val existingPlaylistItems = playlistItemOrchestrator
+                                .loadList(PlatformIdListFilter(listOf(savedMedia.platformId)), LOCAL.flatOptions())
                             selectedPlaylists
-                                .filter { it.id != state.editingPlaylistItem?.playlistId } // todo need original playlists (not editingPlaylistItem)
+                                .filter { playlist -> existingPlaylistItems.find { it.playlistId == playlist.id } == null }
                                 .mapNotNull { playlist ->
+                                    log.d("b4 playlistItemOrchestrator.save")
+                                    log.d("playlist: ${playlist.summarise()}")
+
+                                    val domain = itemCreator.buildPlayListItem(savedMedia, playlist)
+                                    log.d("playlist item: ${domain.summarise()}")
                                     playlistItemOrchestrator.save(
-                                        itemCreator.buildPlayListItem(savedMedia, playlist),
-                                        Options(saveSource)
-                                    ).takeIf { saveSource == LOCAL && isNew }
+                                        domain,
+                                        saveSource.flatOptions()
+                                    ).also { log.d("after playlistItemOrchestrator.save") }
+                                        .takeIf { saveSource == LOCAL && isNew }
                                         ?.also {
                                             prefsWrapper.putLong(LAST_PLAYLIST_ADDED_TO, it.playlistId!!)
                                             recentLocalPlaylists.addRecentId(it.playlistId!!)
@@ -497,7 +517,7 @@ class PlaylistItemEditViewModel constructor(
             ?.also { media ->
                 _dialogModelLiveData.value = ArgumentDialogModel(
                     DialogModel.Type.SUPPORT,
-                    R.string.menu_support,
+                    res.getString(R.string.menu_support),
                     mapOf(NavigationModel.Param.MEDIA.toString() to media)
                 )
             }

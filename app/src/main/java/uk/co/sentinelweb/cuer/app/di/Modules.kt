@@ -16,9 +16,7 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabaseModule
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.NEWITEMS_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.STAR_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.UNFINISHED_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor.CustomisationResources
 import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
@@ -131,9 +129,9 @@ object Modules {
         single { AytViewHolder(get(), get()) }
         factory { PlayYangProgress(get()) }
         factory<RibbonCreator> { AndroidRibbonCreator(get()) }
-        factory<CustomisationResources>(named(NEWITEMS_PLAYLIST.toString())) { NewPlaylistCustomisationResources(get()) }
-        factory<CustomisationResources>(named(STAR_PLAYLIST.toString())) { StarredPlaylistCustomisationResources(get()) }
-        factory<CustomisationResources>(named(UNFINISHED_PLAYLIST.toString())) {
+        factory<CustomisationResources>(named(NewItems)) { NewPlaylistCustomisationResources(get()) }
+        factory<CustomisationResources>(named(Starred)) { StarredPlaylistCustomisationResources(get()) }
+        factory<CustomisationResources>(named(Unfinished)) {
             UnfinishedPlaylistCustomisationResources(
                 get()
             )

@@ -40,31 +40,33 @@ interface OrchestratorContract<Domain> {
 
     enum class Operation { FLAT, FULL, DELETE }
 
-    interface Filter
-    data class IdListFilter(val ids: List<Long>) : Filter
-    data class MediaIdListFilter(val ids: List<Long>) : Filter
-    data class PlatformIdListFilter(
-        val ids: List<String>,
-        val platform: PlatformDomain = PlatformDomain.YOUTUBE
-    ) : Filter
+    // todo sealed class
+    sealed class Filter {
+        object DefaultFilter : Filter()
+        object AllFilter : Filter()
+        data class IdListFilter(val ids: List<Long>) : Filter()
+        data class MediaIdListFilter(val ids: List<Long>) : Filter()
+        data class PlatformIdListFilter(
+            val ids: List<String>,
+            val platform: PlatformDomain = PlatformDomain.YOUTUBE
+        ) : Filter()
 
-    class DefaultFilter() : Filter
-    class AllFilter() : Filter
-    data class ChannelPlatformIdFilter(val platformId: String) : Filter
-    data class NewMediaFilter(val limit: Int) : Filter
-    data class RecentMediaFilter(val limit: Int) : Filter
-    data class StarredMediaFilter(val limit: Int) : Filter
-    data class UnfinishedMediaFilter(val minPercent: Int, val maxPercent: Int, val limit: Int) : Filter
-    data class TitleFilter(val title: String) : Filter
-    data class SearchFilter(
-        val text: String,
-        val isWatched: Boolean,
-        val isNew: Boolean,
-        val isLive: Boolean,
-        val playlistIds: List<Long>?
-    ) : Filter
+        data class ChannelPlatformIdFilter(val platformId: String) : Filter()
+        data class NewMediaFilter(val limit: Int) : Filter()
+        data class RecentMediaFilter(val limit: Int) : Filter()
+        data class StarredMediaFilter(val limit: Int) : Filter()
+        data class UnfinishedMediaFilter(val minPercent: Int, val maxPercent: Int, val limit: Int) : Filter()
+        data class TitleFilter(val title: String) : Filter()
+        data class SearchFilter(
+            val text: String,
+            val isWatched: Boolean,
+            val isNew: Boolean,
+            val isLive: Boolean,
+            val playlistIds: List<Long>?
+        ) : Filter()
 
-    data class PlaylistIdLFilter(val id: Long) : Filter
+        data class PlaylistIdLFilter(val id: Long) : Filter()
+    }
 
     class InvalidOperationException(
         clazz: KClass<out OrchestratorContract<out Any>>,
@@ -89,7 +91,6 @@ interface OrchestratorContract<Domain> {
     open class Identifier<IdType>(
         open val id: IdType,
         val source: Source,
-        // todo val type:ObjectType
     ) {
 
         override fun equals(other: Any?): Boolean {

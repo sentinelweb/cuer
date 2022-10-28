@@ -21,11 +21,11 @@ class AlertDialogCreator(
                     dialog?.dismiss()
                 }
             })
-        val msg = model.messageString ?: context.getString(model.message)
-        if (msg.indexOf("\n") > -1) {
+
+        if (model.message.indexOf("\n") > -1) {
             TextView(context, null, 0, R.style.TextAppearance_App_Body1)
                 .apply {
-                    text = msg
+                    text = model.message
                     setPadding(context.resources.getDimensionPixelSize(R.dimen.page_margin))
                 }
                 .apply { builder.setView(this) }

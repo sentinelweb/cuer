@@ -68,8 +68,8 @@ class PlaylistItemEditModelMapper(
 
     fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel =
         AlertDialogModel(
-            title = R.string.dialog_title_save_check,
-            message = R.string.dialog_message_save_item_check,
+            title = res.getString(R.string.dialog_title_save_check),
+            message = res.getString(R.string.dialog_message_save_item_check),
             confirm = AlertDialogModel.Button(R.string.dialog_button_save, confirm),
             cancel = AlertDialogModel.Button(R.string.dialog_button_dont_save, cancel),
         )
@@ -80,7 +80,7 @@ class PlaylistItemEditModelMapper(
         confirm: () -> Unit
     ): SelectDialogModel = SelectDialogModel(
         DialogModel.Type.PLAYLIST_ITEM_SETTNGS,
-        R.string.menu_settings,
+        res.getString(R.string.menu_settings),
         true,
         listOf(
             SelectDialogModel.Item(res.getString(R.string.pie_watched), item.watched, true),

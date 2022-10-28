@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.ItemType.ROW
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+
 // todo ditch this and just add the icons to the views
 class ItemModelMapper constructor(
     private val res: ResourceWrapper,
@@ -55,10 +56,6 @@ class ItemModelMapper constructor(
             R.dimen.list_item_bottom_text_size,
             SCALING
         )
-
-//    private val tree: Drawable by lazy {
-//        res.getDrawable(R.drawable.ic_tree_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-//    }
 
     private fun textColor(type:ItemContract.ItemType) = if (type==ItemContract.ItemType.TILE) {
         R.color.white

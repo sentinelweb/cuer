@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -35,6 +36,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
     private val log: LogWrapper by inject()
+    private val res: ResourceWrapper by inject()
     private lateinit var progress: ProgressBar
 
     init {
@@ -132,10 +134,10 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
         snackbarWrapper.make(msg).show()
     }
 
-    override fun showBackupError(message: String?) {
+    override fun showBackupError(message: String) {
         AlertDialogModel(
-            title = R.string.pref_backup_error_title,
-            messageString = message,
+            title = res.getString(R.string.pref_backup_error_title),
+            message = message,
             confirm = AlertDialogModel.Button(R.string.ok)
         ).apply {
             alertDialogCreator.create(this).show()
@@ -165,8 +167,8 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
     // region auto-backup
     override fun askToRestoreAutoBackup() {
         AlertDialogModel(
-            title = R.string.pref_backup_restore_auto_title,
-            message = R.string.pref_backup_restore_auto_message, // says existing data will be lost
+            title = res.getString(R.string.pref_backup_restore_auto_title),
+            message = res.getString(R.string.pref_backup_restore_auto_message), // says existing data will be lost
             confirm = AlertDialogModel.Button(
                 label = R.string.pref_backup_restore_auto_confirm,
                 action = { presenter.onConfirmRestoreAutoBackup() }

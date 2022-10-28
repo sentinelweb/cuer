@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
@@ -39,6 +38,7 @@ interface PlaylistsDialogContract {
     }
 
     data class Config(
+        override val title: String,
         val selectedPlaylists: Set<PlaylistDomain>,
         val multi: Boolean,
         val itemClick: (PlaylistDomain?, Boolean) -> Unit,
@@ -48,7 +48,7 @@ interface PlaylistsDialogContract {
         val showAdd: Boolean = true,
         val showPin: Boolean = true,
         val showRoot: Boolean = false
-    ) : DialogModel(Type.PLAYLIST_FULL, R.string.playlist_dialog_title)
+    ) : DialogModel(Type.PLAYLIST_FULL, title)// R.string.playlist_dialog_title
 
     data class State(
         var playlists: List<PlaylistDomain> = listOf(),
