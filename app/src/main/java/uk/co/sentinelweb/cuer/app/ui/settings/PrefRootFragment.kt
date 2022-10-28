@@ -22,6 +22,8 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     private val presenter: PrefRootContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
 
+    private val version get() = findPreference(R.string.prefs_root_version_key)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
         (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
@@ -34,6 +36,10 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     override fun onStart() {
         super.onStart()
         presenter.initialisePrefs()
+    }
+
+    override fun setVersion(versionString: String) {
+        version?.summary = versionString
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
