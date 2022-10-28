@@ -61,7 +61,7 @@ class BackupFileManager constructor(
             val out = ZipOutputStream(FileOutputStream(f))
             val e = ZipEntry(DB_FILE_JSON)
             out.putNextEntry(e)
-            val playlists = playlistRepository.loadList(OrchestratorContract.AllFilter()).data!!
+            val playlists = playlistRepository.loadList(OrchestratorContract.AllFilter(), flat = false).data!!
             val jsonDataBytes = backupDataJson(playlists).toByteArray()
             out.write(jsonDataBytes, 0, jsonDataBytes.size)
             out.closeEntry()
@@ -111,7 +111,7 @@ class BackupFileManager constructor(
                 ?.takeIf { it.isSuccessful }
                 ?.let {
                     backupFileModel.medias.chunked(CHUNK_SIZE)
-                        .map { mediaRepository.save(it) }
+                        .map { mediaRepository.save(it, flat = false, emit = false) }
                         .reduce { acc: RepoResult<List<MediaDomain>>, result: RepoResult<List<MediaDomain>> ->
                             RepoResult.Composite<List<MediaDomain>>(
                                 acc.isSuccessful && result.isSuccessful,
@@ -134,7 +134,8 @@ class BackupFileManager constructor(
                                             ?: throw IllegalArgumentException("Media ID lookup failed: ${it.media.platformId}")
                                     )
                                 }
-                            )
+                            ),
+                            flat = false, emit = false
                         ).isSuccessful && acc
                     }
                 }
@@ -144,32 +145,32 @@ class BackupFileManager constructor(
                     log.d("items: " + backupFileModel.playlists.fold(0) { acc, p -> acc + p.items.size })
                     log.d("playlists: " + backupFileModel.playlists.size)
                     log.d("--- db -----")
-                    log.d("images: " + imageDatabaseRepository.count().data)
-                    log.d("channels: " + channelRepository.count().data)
-                    log.d("medias: " + mediaRepository.count().data)
-                    log.d("items: " + playlistItemRepository.count().data)
-                    log.d("playlists: " + playlistRepository.count().data)
+                    log.d("images: " + imageDatabaseRepository.count(null).data)
+                    log.d("channels: " + channelRepository.count(null).data)
+                    log.d("medias: " + mediaRepository.count(null).data)
+                    log.d("items: " + playlistItemRepository.count(null).data)
+                    log.d("playlists: " + playlistRepository.count(null).data)
                 } ?: false
         } else {
             return@withContext mediaRepository.deleteAll()
                 .takeIf { it.isSuccessful }
                 ?.let { channelRepository.deleteAll() }
                 ?.takeIf { it.isSuccessful }
-                ?.let { mediaRepository.save(backupFileModel.medias) }
+                ?.let { mediaRepository.save(backupFileModel.medias, flat = false, emit = false) }
                 ?.takeIf { it.isSuccessful }
                 ?.let { playlistRepository.deleteAll() }
                 ?.takeIf { it.isSuccessful }
                 ?.let {
-                    playlistRepository.save(backupFileModel.playlists).let {
+                    playlistRepository.save(backupFileModel.playlists, flat = false, emit = false).let {
                         if (it.isSuccessful && (it.data?.filter { it.default }?.size ?: 0) == 0) {
-                            playlistRepository.save(DEFAULT_PLAYLIST_TEMPLATE)
+                            playlistRepository.save(DEFAULT_PLAYLIST_TEMPLATE, flat = false, emit = false)
                         } else it
                     }
                 }
                 ?.takeIf { it.isSuccessful }
                 ?.let {
                     playlistRepository
-                        .loadList(OrchestratorContract.DefaultFilter())
+                        .loadList(OrchestratorContract.DefaultFilter(), flat = false)
                         .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
                         ?.let { defPlaylistResult ->
                             val orderBase = timeProvider.currentTimeMillis()
@@ -182,7 +183,7 @@ class BackupFileManager constructor(
                                     )
                                 }
                             }.let {
-                                playlistItemRepository.save(it)
+                                playlistItemRepository.save(it, flat = false, emit = false)
                             }.isSuccessful
                         } ?: true
                 } ?: false

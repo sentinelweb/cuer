@@ -28,7 +28,7 @@ class MemoryDatabaseInitializer constructor(
 
     override fun initDatabase() {
         contextProvider.ioScope.launch {
-            (mediaRepository.count()
+            (mediaRepository.count(null)
                 .takeIf { it.isSuccessful && it.data == 0 }
                 ?: let { return@launch })
                 .let { initPlaylists() }
@@ -39,11 +39,11 @@ class MemoryDatabaseInitializer constructor(
                 }
                 .takeIf { (_, result) -> result.isSuccessful }
                 ?.let { (playlist, result) ->
-                    playlist to result.data?.let { mediaRepository.save(it) }
+                    playlist to result.data?.let { mediaRepository.save(it, flat = false, emit = false) }
                 }
                 ?.let { (playlist, result) -> makePlaylistItems(playlist, result?.data!!) }
                 ?.let {
-                    playlistItemRepository.save(it, emit = true)
+                    playlistItemRepository.save(it, emit = true, flat = false)
                 }
                 ?.takeIf { result -> result.isSuccessful }
                 ?: throw ExceptionInInitializerError("failed to init database")
@@ -68,7 +68,7 @@ class MemoryDatabaseInitializer constructor(
     }
 
     suspend fun initPlaylists(): List<PlaylistDomain> =
-        playlistRepository.count()
+        playlistRepository.count(null)
             .takeIf { it.isSuccessful && it.data == 0 }
             ?.let {
                 listOf(
@@ -95,9 +95,9 @@ class MemoryDatabaseInitializer constructor(
                     )
                 )
             }
-            ?.let { playlistRepository.save(it) }
+            ?.let { playlistRepository.save(it, flat = false, emit = false) }
             ?.takeIf { it.isSuccessful }?.data
-            ?: playlistRepository.loadList().data!!
+            ?: playlistRepository.loadList(null, flat = false).data!!
 
     private fun mapQueueToMedia(it: DefaultItem) = MediaDomain(
         url = it.url,
@@ -110,7 +110,7 @@ class MemoryDatabaseInitializer constructor(
         mediaType = MediaDomain.MediaTypeDomain.VIDEO,
         id = null,
         positon = null,
-        channelData = ChannelDomain(// todo add real data
+        channelData = ChannelDomain(
             platformId = null,
             platform = PlatformDomain.YOUTUBE
         )

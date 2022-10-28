@@ -44,7 +44,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                 .let { item ->
                     if (item.media.id == null || !flat) {
                         log.d("Save media check: ${item.media.platformId}")
-                        val saved = mediaDatabaseRepository.save(item.media, emit = emit)
+                        val saved = mediaDatabaseRepository.save(item.media, emit = emit, flat = false)
                             .takeIf { it.isSuccessful }
                             ?.data
                             ?: throw IllegalStateException("Save media failed ${item.media.platformId}")
@@ -103,7 +103,7 @@ class SqldelightPlaylistItemDatabaseRepository(
             try {
                 database.playlistItemEntityQueries.load(id)
                     .executeAsOne()
-                    .let { playlistItemMapper.map(it, mediaDatabaseRepository.load(it.media_id).data!!) }
+                    .let { playlistItemMapper.map(it, mediaDatabaseRepository.load(it.media_id, flat = false).data!!) }
                     .let { RepoResult.Data(it) }
             } catch (e: Throwable) {
                 val msg = "couldn't load playlist item $id"

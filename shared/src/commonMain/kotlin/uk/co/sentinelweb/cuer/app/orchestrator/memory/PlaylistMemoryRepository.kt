@@ -64,12 +64,10 @@ class PlaylistMemoryRepository constructor(
     override fun save(domain: PlaylistDomain, options: Options): PlaylistDomain =
         domain.id?.let { playlistId ->
             if (!options.flat || !data.containsKey(playlistId)) {
-                domain.copy(// todo fix this in share
+                domain.copy(
                     items = domain.items.mapIndexed { _, item ->
                         item.copy(
-                            //id = playlistItemMemoryRepository.idCounter,
                             playlistId = playlistId,
-                            //media = item.media.copy(id = playlistItemMemoryRepository.idCounter)
                         )
                     }
                 )

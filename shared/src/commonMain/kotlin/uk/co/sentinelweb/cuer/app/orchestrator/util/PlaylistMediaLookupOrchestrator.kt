@@ -30,7 +30,7 @@ class PlaylistMediaLookupOrchestrator constructor(
     suspend fun lookupPlaylistItemsAndReplace(playlist: PlaylistDomain): PlaylistDomain =
         buildMediaLookup(playlist)
             .let { it.values.mapNotNull { it.id } }
-            .let { playlistItemDatabaseRepository.loadList(MediaIdListFilter(it)) }
+            .let { playlistItemDatabaseRepository.loadList(MediaIdListFilter(it), flat = false) }
             .data
             ?.distinctBy { it.media.platformId }
             ?.associateBy { it.media.platformId }
@@ -41,8 +41,6 @@ class PlaylistMediaLookupOrchestrator constructor(
                     })
             } ?: playlist
 
-
-    // todo consider moving this to playlist save
     private suspend fun buildMediaLookup(
         playlist: PlaylistDomain
     ): Map<String, MediaDomain> =
@@ -56,7 +54,7 @@ class PlaylistMediaLookupOrchestrator constructor(
                 .toMutableList()
                 .apply { removeAll { existingMediaPlatformIds.contains(it.platformId) } }
                 .map { it.copy(id = null) }
-                .let { mediaDatabaseRepository.save(it, false).data!! }
+                .let { mediaDatabaseRepository.save(it, flat = false, emit = false).data!! }
                 .toMutableList()
                 .apply { addAll(existingMedia) }
                 .associate { it.platformId to it }

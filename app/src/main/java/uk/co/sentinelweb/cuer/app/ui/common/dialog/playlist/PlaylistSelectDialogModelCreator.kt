@@ -16,7 +16,7 @@ class PlaylistSelectDialogModelCreator constructor(
         block: (List<PlaylistDomain>) -> Unit
     ) {
         playlistRepo
-            .loadList(null)
+            .loadList(null, flat = false)
             .takeIf { it.isSuccessful }
             ?.data?.apply { block(this) }
     }
