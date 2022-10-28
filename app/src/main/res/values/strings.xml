@@ -256,5 +256,8 @@
     <string name="action_unpin">UNPIN</string>
     <string name="action_mark_watched">Mark watched</string>
     <string name="action_mark_complete">Mark complete</string>
+    <string name="prefs_root_info_cat_title">App Info</string>
+    <string name="prefs_root_version_title">Version</string>
+    <string name="prefs_root_version_summary">Version will appear here</string>
 
 </resources>
