@@ -50,7 +50,7 @@ class PlaylistItemEntityTest : KoinTest {
     @Before
     fun before() {
         Database.Schema.create(get())
-        dataCreation = DataCreation(database, fixture)
+        dataCreation = DataCreation(database, fixture, get())
     }
 
     @Test
@@ -335,9 +335,10 @@ class PlaylistItemEntityTest : KoinTest {
         }
         val actual = database.playlistItemEntityQueries.loadAllPlaylistItemsStarred(4)
             .executeAsList()
-            .sortedBy { it.date_added }
         assertEquals(2, actual.size)
-        assertEquals(item1, actual[1])
+        println(actual[0])
+        println(actual[1])
         assertEquals(item3, actual[0])
+        assertEquals(item1, actual[1])
     }
 }

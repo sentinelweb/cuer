@@ -67,7 +67,7 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
     @Before
     fun before() {
         Database.Schema.create(get())
-        dataCreation = DataCreation(database, fixture)
+        dataCreation = DataCreation(database, fixture, get())
     }
 
     @Test
