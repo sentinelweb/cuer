@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.SHARED_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.Shared
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -83,7 +83,7 @@ class ScanPresenter(
                         ?.let { it to false }
                         ?: playlistOrchestrator.load(it, PLATFORM.deepOptions(emit = false))
                             ?.copy(
-                                id = SHARED_PLAYLIST,
+                                id = Shared.id,
                                 config = scannedPlaylist.config.copy(
                                     playable = false,
                                     editableItems = false,

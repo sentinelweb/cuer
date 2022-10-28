@@ -17,7 +17,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.YOUTUBE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
@@ -500,7 +500,7 @@ class PlaylistPresenter(
                 prefsWrapper.putEnum(LAST_SEARCH_TYPE, REMOTE)
 
                 view.navigate(
-                    PlaylistContract.makeNav(YOUTUBE_SEARCH_PLAYLIST, null, false, MEMORY)
+                    PlaylistContract.makeNav(YoutubeSearch.id, null, false, MEMORY)
                 )
             }
     }

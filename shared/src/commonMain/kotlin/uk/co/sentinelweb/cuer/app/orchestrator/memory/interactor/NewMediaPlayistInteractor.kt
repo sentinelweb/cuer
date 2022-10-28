@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.NEWITEMS_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.NewItems
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -42,7 +42,7 @@ class NewMediaPlayistInteractor constructor(
         }
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
-        id = NEWITEMS_PLAYLIST,
+        id = NewItems.id,
         title = "New",
         type = APP,
         currentIndex = -1,
@@ -57,7 +57,7 @@ class NewMediaPlayistInteractor constructor(
     )
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = NEWITEMS_PLAYLIST,
+        playlistId = NewItems.id,
         itemCount = -1, // todo log in a background process and save to pref
         watchedItemCount = 0 // todo log in a background process and save to pref
     )

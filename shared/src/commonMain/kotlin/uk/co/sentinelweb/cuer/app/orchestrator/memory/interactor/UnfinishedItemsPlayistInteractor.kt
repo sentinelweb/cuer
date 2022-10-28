@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.UnfinishedMe
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.UNFINISHED_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.Unfinished
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -41,7 +41,7 @@ class UnfinishedItemsPlayistInteractor constructor(
         }
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
-        id = UNFINISHED_PLAYLIST,
+        id = Unfinished.id,
         title = "Unfinished",
         type = APP,
         currentIndex = -1,
@@ -55,7 +55,7 @@ class UnfinishedItemsPlayistInteractor constructor(
     )
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = UNFINISHED_PLAYLIST,
+        playlistId = Unfinished.id,
         itemCount = -1, // todo log in a background process and save to pref
         watchedItemCount = -1 // todo log in a background process and save to pref
     )

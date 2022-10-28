@@ -8,8 +8,8 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.YOUTUBE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -154,8 +154,8 @@ class PlaylistsPresenter(
                         } else {
                             view.showError("Please delete the children first")
                         }
-                    } else if (playlist.id == LOCAL_SEARCH_PLAYLIST || playlist.id == YOUTUBE_SEARCH_PLAYLIST) {
-                        val isLocal = playlist.id == LOCAL_SEARCH_PLAYLIST
+                    } else if (playlist.id == LocalSearch.id || playlist.id == YoutubeSearch.id) {
+                        val isLocal = playlist.id == LocalSearch.id
                         val type = searchMapper.searchTypeText(isLocal)
                         val key = if (isLocal) LAST_LOCAL_SEARCH else LAST_REMOTE_SEARCH
                         val lastSearch = prefsWrapper.getString(key, null)

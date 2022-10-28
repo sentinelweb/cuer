@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -24,6 +25,16 @@ class PlaylistMemoryRepository constructor(
     private val remoteSearchOrchestrator: YoutubeSearchPlayistInteractor
 ) : MemoryRepository<PlaylistDomain> {
 
+    enum class MemoryPlaylist(val id: Long) {
+        Shared(-100),
+        NewItems(-101),
+        Recent(-102),
+        LocalSearch(-103),
+        YoutubeSearch(-104),
+        Starred(-105),
+        Unfinished(-106)
+    }
+
     private val data: MutableMap<Long, PlaylistDomain> = mutableMapOf()
 
     val playlistItemMemoryRepository = PlayListItemMemoryRepository()
@@ -42,13 +53,13 @@ class PlaylistMemoryRepository constructor(
     }
 
     override suspend fun load(id: Long, options: Options): PlaylistDomain? = when (id) {
-        NEWITEMS_PLAYLIST -> newItemsInteractor.getPlaylist()
-        RECENT_PLAYLIST -> recentItemsInteractor.getPlaylist()
-        LOCAL_SEARCH_PLAYLIST -> localSearchInteractor.getPlaylist()
-        YOUTUBE_SEARCH_PLAYLIST -> remoteSearchOrchestrator.getPlaylist()
-        STAR_PLAYLIST -> starredItemsInteractor.getPlaylist()
-        UNFINISHED_PLAYLIST -> unfinishedItemsInteractor.getPlaylist()
-        SHARED_PLAYLIST -> data[id]
+        NewItems.id -> newItemsInteractor.getPlaylist()
+        Recent.id -> recentItemsInteractor.getPlaylist()
+        LocalSearch.id -> localSearchInteractor.getPlaylist()
+        YoutubeSearch.id -> remoteSearchOrchestrator.getPlaylist()
+        Starred.id -> starredItemsInteractor.getPlaylist()
+        Unfinished.id -> unfinishedItemsInteractor.getPlaylist()
+        Shared.id -> data[id]
         else -> throw NotImplementedException("$id is invalid memory playlist")
     }
 
@@ -104,13 +115,6 @@ class PlaylistMemoryRepository constructor(
         private val _playlistItemFlow = MutableSharedFlow<Pair<Operation, PlaylistItemDomain>>()
         override val updates: Flow<Pair<Operation, PlaylistItemDomain>>
             get() = _playlistItemFlow
-
-//        private var _idCounter = 0L
-//        val idCounter: Long
-//            get() {
-//                _idCounter--
-//                return _idCounter
-//            }
 
         override fun load(platformId: String, options: Options): PlaylistItemDomain? {
             throw NotImplementedException()
@@ -199,15 +203,15 @@ class PlaylistMemoryRepository constructor(
 
         override fun save(domain: MediaDomain, options: Options): MediaDomain {
             if (domain.id == null) {
-                data[SHARED_PLAYLIST]
+                data[Shared.id]
                     .takeIf { it != null }
-                    ?.also { data[SHARED_PLAYLIST] = it.replaceMediaByPlatformId(media = domain) }
+                    ?.also { data[Shared.id] = it.replaceMediaByPlatformId(media = domain) }
             }
             return domain
         }
 
         override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> {
-            data[SHARED_PLAYLIST]
+            data[Shared.id]
                 .takeIf { it != null }
                 ?.also { playlist ->
                     var playlistMutate = playlist
@@ -216,7 +220,7 @@ class PlaylistMemoryRepository constructor(
                             playlistMutate = playlistMutate.replaceMediaByPlatformId(media = domain)
                         }
                     }
-                    data[SHARED_PLAYLIST] = playlistMutate
+                    data[Shared.id] = playlistMutate
                 }
             return domains
         }
@@ -228,16 +232,5 @@ class PlaylistMemoryRepository constructor(
         override fun delete(domain: MediaDomain, options: Options): Boolean {
             throw NotImplementedException()
         }
-    }
-
-    companion object {
-        // todo make enum
-        const val SHARED_PLAYLIST: Long = -100
-        const val NEWITEMS_PLAYLIST: Long = -101
-        const val RECENT_PLAYLIST: Long = -102
-        const val LOCAL_SEARCH_PLAYLIST: Long = -103
-        const val YOUTUBE_SEARCH_PLAYLIST: Long = -104
-        const val STAR_PLAYLIST: Long = -105
-        const val UNFINISHED_PLAYLIST: Long = -106
     }
 }

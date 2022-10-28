@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.STAR_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.Starred
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -37,7 +37,7 @@ class StarredItemsPlayistInteractor constructor(
         }
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
-        id = STAR_PLAYLIST,
+        id = Starred.id,
         title = "Starred items",
         type = APP,
         currentIndex = -1,
@@ -52,7 +52,7 @@ class StarredItemsPlayistInteractor constructor(
 
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = STAR_PLAYLIST,
+        playlistId = Starred.id,
         itemCount = -1, // todo log in a background process and save to pref
         watchedItemCount = -1 // todo log in a background process and save to pref
     )
