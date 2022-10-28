@@ -7,7 +7,9 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -81,7 +83,7 @@ class SqldelightMediaDatabaseRepository(
 
     override suspend fun load(id: Long, flat: Boolean): RepoResult<MediaDomain> = loadMedia(id)
 
-    override suspend fun loadList(filter: Filter?, flat: Boolean): RepoResult<List<MediaDomain>> =
+    override suspend fun loadList(filter: Filter, flat: Boolean): RepoResult<List<MediaDomain>> =
         withContext(coProvider.IO) {
             database.mediaEntityQueries.transactionWithResult<RepoResult<List<MediaDomain>>> {
                 try {
@@ -116,14 +118,14 @@ class SqldelightMediaDatabaseRepository(
             }
         }
 
-    override suspend fun loadStatsList(filter: Filter?): RepoResult<List<Nothing>> {
+    override suspend fun loadStatsList(filter: Filter): RepoResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: Filter?): RepoResult<Int> = withContext(coProvider.IO) {
+    override suspend fun count(filter: Filter): RepoResult<Int> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is AllFilter, null -> RepoResult.Data(database.mediaEntityQueries.count().executeAsOne().toInt())
+                is AllFilter -> RepoResult.Data(database.mediaEntityQueries.count().executeAsOne().toInt())
                 else -> throw IllegalArgumentException("$filter not implemented")
             }
         } catch (e: Exception) {

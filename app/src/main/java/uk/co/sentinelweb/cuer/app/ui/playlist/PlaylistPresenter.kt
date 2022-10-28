@@ -12,9 +12,11 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
@@ -740,7 +742,7 @@ class PlaylistPresenter(
                 }
                 ?.also {
                     state.playlistsTree = playlistOrchestrator
-                        .loadList(AllFilter(), LOCAL.flatOptions())
+                        .loadList(AllFilter, LOCAL.flatOptions())
                         .buildTree()
                         .also {
                             state.playlistsTreeLookup = it.buildLookup()

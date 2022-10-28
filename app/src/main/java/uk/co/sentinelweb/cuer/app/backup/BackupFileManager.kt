@@ -10,7 +10,8 @@ import uk.co.sentinelweb.cuer.app.db.repository.*
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository.Companion.REPO_SCHEME
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
 import uk.co.sentinelweb.cuer.core.ext.getFileName
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
@@ -61,7 +62,7 @@ class BackupFileManager constructor(
             val out = ZipOutputStream(FileOutputStream(f))
             val e = ZipEntry(DB_FILE_JSON)
             out.putNextEntry(e)
-            val playlists = playlistRepository.loadList(OrchestratorContract.AllFilter(), flat = false).data!!
+            val playlists = playlistRepository.loadList(AllFilter, flat = false).data!!
             val jsonDataBytes = backupDataJson(playlists).toByteArray()
             out.write(jsonDataBytes, 0, jsonDataBytes.size)
             out.closeEntry()
@@ -145,11 +146,11 @@ class BackupFileManager constructor(
                     log.d("items: " + backupFileModel.playlists.fold(0) { acc, p -> acc + p.items.size })
                     log.d("playlists: " + backupFileModel.playlists.size)
                     log.d("--- db -----")
-                    log.d("images: " + imageDatabaseRepository.count(null).data)
-                    log.d("channels: " + channelRepository.count(null).data)
-                    log.d("medias: " + mediaRepository.count(null).data)
-                    log.d("items: " + playlistItemRepository.count(null).data)
-                    log.d("playlists: " + playlistRepository.count(null).data)
+                    log.d("images: " + imageDatabaseRepository.count(AllFilter).data)
+                    log.d("channels: " + channelRepository.count(AllFilter).data)
+                    log.d("medias: " + mediaRepository.count(AllFilter).data)
+                    log.d("items: " + playlistItemRepository.count(AllFilter).data)
+                    log.d("playlists: " + playlistRepository.count(AllFilter).data)
                 } ?: false
         } else {
             return@withContext mediaRepository.deleteAll()
@@ -170,7 +171,7 @@ class BackupFileManager constructor(
                 ?.takeIf { it.isSuccessful }
                 ?.let {
                     playlistRepository
-                        .loadList(OrchestratorContract.DefaultFilter(), flat = false)
+                        .loadList(DefaultFilter, flat = false)
                         .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
                         ?.let { defPlaylistResult ->
                             val orderBase = timeProvider.currentTimeMillis()

@@ -1,8 +1,8 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.util
 
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.MediaIdListFilter
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.MediaIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
@@ -39,7 +39,7 @@ class PlaylistMediaLookupOrchestrator constructor(
                     items = playlist.items.map { item ->
                         map[item.media.platformId] ?: item
                     })
-            } ?: playlist
+            }
 
     private suspend fun buildMediaLookup(
         playlist: PlaylistDomain

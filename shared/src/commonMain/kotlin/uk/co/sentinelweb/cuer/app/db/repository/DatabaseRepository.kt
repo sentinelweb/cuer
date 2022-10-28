@@ -17,11 +17,11 @@ interface DatabaseRepository<Domain, Stats> {
 
     suspend fun load(id: Long, flat: Boolean): RepoResult<Domain>
 
-    suspend fun loadList(filter: Filter?, flat: Boolean): RepoResult<List<Domain>>
+    suspend fun loadList(filter: Filter, flat: Boolean): RepoResult<List<Domain>>
 
-    suspend fun loadStatsList(filter: Filter?): RepoResult<List<Stats>>
+    suspend fun loadStatsList(filter: Filter): RepoResult<List<Stats>>
 
-    suspend fun count(filter: Filter?): RepoResult<Int>
+    suspend fun count(filter: Filter): RepoResult<Int>
 
     suspend fun delete(domain: Domain, emit: Boolean): RepoResult<Boolean>
 

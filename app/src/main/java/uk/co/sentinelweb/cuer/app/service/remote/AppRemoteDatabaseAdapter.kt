@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.service.remote
 
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
@@ -19,7 +19,7 @@ class AppRemoteDatabaseAdapter constructor(
 ) : RemoteDatabaseAdapter {
     override suspend fun getPlaylists(): List<PlaylistDomain> =
         playlistOrchestrator
-            .loadList(AllFilter(), LOCAL.flatOptions())
+            .loadList(AllFilter, LOCAL.flatOptions())
 
     override suspend fun getPlaylist(id: Long): PlaylistDomain? =
         playlistOrchestrator
@@ -29,7 +29,7 @@ class AppRemoteDatabaseAdapter constructor(
         playlistItemOrchestrator
             .load(id, LOCAL.flatOptions())
 
-    override suspend fun scanUrl(url: String): Domain? = addLinkOrchestrator.scanUrl(url)
+    override suspend fun scanUrl(url: String): Domain = addLinkOrchestrator.scanUrl(url)
 
     override suspend fun commitPlaylistItem(item: PlaylistItemDomain) = addLinkOrchestrator.commitPlaylistItem(item)
 }

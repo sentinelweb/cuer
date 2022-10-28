@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.NewMediaFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.NewMediaFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions

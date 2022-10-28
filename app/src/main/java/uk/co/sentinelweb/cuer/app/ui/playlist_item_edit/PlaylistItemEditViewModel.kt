@@ -9,7 +9,9 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
@@ -415,7 +417,7 @@ class PlaylistItemEditViewModel constructor(
             val selectedPlaylists = if (state.selectedPlaylists.size > 0) {
                 state.selectedPlaylists
             } else {
-                playlistOrchestrator.loadList(DefaultFilter(), LOCAL.flatOptions())
+                playlistOrchestrator.loadList(DefaultFilter, LOCAL.flatOptions())
                     .takeIf { it.size > 0 }
                     ?: throw NoDefaultPlaylistException()
             }

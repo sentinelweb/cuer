@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.share
 
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.MediaIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.MediaIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY

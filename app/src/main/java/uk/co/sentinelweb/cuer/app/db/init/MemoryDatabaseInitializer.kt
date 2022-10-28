@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer.Companion.DEFAULT_
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -29,7 +29,7 @@ class MemoryDatabaseInitializer constructor(
 
     override fun initDatabase() {
         contextProvider.ioScope.launch {
-            (mediaRepository.count(AllFilter())
+            (mediaRepository.count(AllFilter)
                 .takeIf { it.isSuccessful && it.data == 0 }
                 ?: let { return@launch })
                 .let { initPlaylists() }
@@ -69,7 +69,7 @@ class MemoryDatabaseInitializer constructor(
     }
 
     suspend fun initPlaylists(): List<PlaylistDomain> =
-        playlistRepository.count(null)
+        playlistRepository.count(AllFilter)
             .takeIf { it.isSuccessful && it.data == 0 }
             ?.let {
                 listOf(
@@ -98,7 +98,7 @@ class MemoryDatabaseInitializer constructor(
             }
             ?.let { playlistRepository.save(it, flat = false, emit = false) }
             ?.takeIf { it.isSuccessful }?.data
-            ?: playlistRepository.loadList(null, flat = false).data!!
+            ?: playlistRepository.loadList(AllFilter, flat = false).data!!
 
     private fun mapQueueToMedia(it: DefaultItem) = MediaDomain(
         url = it.url,

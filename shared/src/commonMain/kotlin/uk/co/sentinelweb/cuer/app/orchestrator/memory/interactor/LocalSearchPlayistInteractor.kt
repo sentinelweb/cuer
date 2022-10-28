@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.SearchFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
@@ -47,7 +47,7 @@ class LocalSearchPlayistInteractor constructor(
             null
         }
 
-    private fun mapToFilter(searchDomain: SearchLocalDomain) = OrchestratorContract.SearchFilter(
+    private fun mapToFilter(searchDomain: SearchLocalDomain) = SearchFilter(
         text = searchDomain.text,
         isWatched = searchDomain.isWatched,
         isNew = searchDomain.isNew,

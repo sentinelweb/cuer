@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -149,7 +151,7 @@ class PlaylistEditViewModel constructor(
             viewModelScope.launch {
                 if (state.playlistEdit.default && state.source == LOCAL) {
                     playlistOrchestrator.loadList(
-                        OrchestratorContract.DefaultFilter(),
+                        DefaultFilter,
                         state.source.flatOptions()
                     )
                         .takeIf { it.size > 0 }
@@ -250,13 +252,13 @@ class PlaylistEditViewModel constructor(
             )
     }
 
-    fun onParentSelected(parent: PlaylistDomain?, checked: Boolean) = viewModelScope.launch {
+    private fun onParentSelected(parent: PlaylistDomain?, checked: Boolean) = viewModelScope.launch {
         if (parent == ADD_PLAYLIST_DUMMY) {
             return@launch
         }
         if (state.treeLookup.isEmpty()) {
             state.treeLookup = playlistOrchestrator
-                .loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
+                .loadList(AllFilter, LOCAL.flatOptions())
                 .buildTree()
                 .buildLookup()
         }

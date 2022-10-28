@@ -1,8 +1,8 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.UnfinishedMediaFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.UnfinishedMediaFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions

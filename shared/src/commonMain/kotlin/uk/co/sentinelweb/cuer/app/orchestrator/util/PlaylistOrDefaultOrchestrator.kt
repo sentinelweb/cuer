@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator.util
 import kotlinx.coroutines.delay
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.forceDatabaseSuccessNotNull
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -36,7 +37,7 @@ class PlaylistOrDefaultOrchestrator constructor(
             ?.takeIf { it.isSuccessful }
             ?.data
             ?: run {
-                playlistDatabaseRepository.loadList(OrchestratorContract.DefaultFilter(), flat)
+                playlistDatabaseRepository.loadList(DefaultFilter, flat)
                     .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
                     ?.data?.get(0)
             })

@@ -6,6 +6,8 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ImageDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.database.entity.Image
@@ -78,18 +80,18 @@ class SqldelightImageDatabaseRepository(
             }
         }
 
-    override suspend fun loadList(filter: OrchestratorContract.Filter?, flat: Boolean): RepoResult<List<ImageDomain>> {
+    override suspend fun loadList(filter: Filter, flat: Boolean): RepoResult<List<ImageDomain>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun loadStatsList(filter: OrchestratorContract.Filter?): RepoResult<List<Nothing>> {
+    override suspend fun loadStatsList(filter: Filter): RepoResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> = withContext(coProvider.IO) {
+    override suspend fun count(filter: Filter): RepoResult<Int> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is OrchestratorContract.AllFilter, null -> RepoResult.Data(
+                is AllFilter -> RepoResult.Data(
                     database.imageEntityQueries.count().executeAsOne().toInt()
                 )
 

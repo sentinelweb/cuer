@@ -6,7 +6,8 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -103,20 +104,20 @@ class SqldelightChannelDatabaseRepository(
     override suspend fun load(id: Long, flat: Boolean): RepoResult<ChannelDomain> = loadChannel(id)
 
     override suspend fun loadList(
-        filter: OrchestratorContract.Filter?,
+        filter: Filter,
         flat: Boolean
     ): RepoResult<List<ChannelDomain>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun loadStatsList(filter: OrchestratorContract.Filter?): RepoResult<List<Nothing>> {
+    override suspend fun loadStatsList(filter: Filter): RepoResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: OrchestratorContract.Filter?): RepoResult<Int> = withContext(coProvider.IO) {
+    override suspend fun count(filter: Filter): RepoResult<Int> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is OrchestratorContract.AllFilter, null -> RepoResult.Data(
+                is AllFilter -> RepoResult.Data(
                     database.channelEntityQueries.count().executeAsOne().toInt()
                 )
 

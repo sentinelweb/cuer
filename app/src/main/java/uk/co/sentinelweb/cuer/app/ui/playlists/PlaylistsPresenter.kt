@@ -5,9 +5,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.IdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
@@ -320,7 +324,7 @@ class PlaylistsPresenter(
     private suspend fun executeRefresh() {
         try {
             state.playlists =
-                playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
+                playlistOrchestrator.loadList(AllFilter, LOCAL.flatOptions())
                     .also {
                         state.treeRoot = it.buildTree()
                             .sort(compareBy { it.node?.title?.lowercase() })

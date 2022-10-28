@@ -1,7 +1,11 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.StarredMediaFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.Starred
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -26,7 +30,7 @@ class StarredItemsPlayistInteractor constructor(
     override suspend fun getPlaylist(): PlaylistDomain? =
         try {
             playlistItemOrchestrator
-                .loadList(OrchestratorContract.StarredMediaFilter(300), LOCAL.deepOptions())
+                .loadList(StarredMediaFilter(300), LOCAL.deepOptions())
                 .let {
                     makeHeader()
                         .copy(items = it.mapIndexed { _, playlistItem -> playlistItem.copy() })

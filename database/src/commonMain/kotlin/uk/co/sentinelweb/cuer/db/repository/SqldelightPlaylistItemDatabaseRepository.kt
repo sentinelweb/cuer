@@ -6,7 +6,9 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -113,7 +115,7 @@ class SqldelightPlaylistItemDatabaseRepository(
         }
 
     override suspend fun loadList(
-        filter: Filter?,
+        filter: Filter,
         flat: Boolean
     ): RepoResult<List<PlaylistItemDomain>> = withContext(coProvider.IO) {
         try {
@@ -143,7 +145,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                         }
                     }
 
-                    else -> loadAll()
+                    else -> throw IllegalArgumentException("filter not supported $filter")
                 }.executeAsList()
                     .map {
                         playlistItemMapper.map(
@@ -160,14 +162,14 @@ class SqldelightPlaylistItemDatabaseRepository(
         }
     }
 
-    override suspend fun loadStatsList(filter: Filter?): RepoResult<List<Nothing>> {
+    override suspend fun loadStatsList(filter: Filter): RepoResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: Filter?): RepoResult<Int> = withContext(coProvider.IO) {
+    override suspend fun count(filter: Filter): RepoResult<Int> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is AllFilter, null -> RepoResult.Data(database.playlistItemEntityQueries.count().executeAsOne().toInt())
+                is AllFilter -> RepoResult.Data(database.playlistItemEntityQueries.count().executeAsOne().toInt())
                 else -> throw IllegalArgumentException("$filter not implemented")
             }
         } catch (e: Exception) {
