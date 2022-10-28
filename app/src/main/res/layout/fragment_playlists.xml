@@ -24,9 +24,9 @@
             app:expandedTitleMarginEnd="16dp"
             app:expandedTitleMarginStart="16dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.ActionBar.Expanded"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways"
             app:statusBarScrim="?attr/colorPrimaryDark"
-            ><!-- todo find a way to make header appear when scrolling down adding |enterAlways seems to break it!  -->
+        >
 
             <ImageView
                 android:id="@+id/playlists_header_image"

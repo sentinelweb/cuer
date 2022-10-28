@@ -9,10 +9,11 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 /**
  * Checks for any existing media items in the playlist.
+ * todo use orchestrator?
  */
 class PlaylistMediaLookupOrchestrator constructor(
     private val mediaDatabaseRepository: MediaDatabaseRepository,
-    private val roomPlaylistItemDatabaseRepository: PlaylistItemDatabaseRepository
+    private val playlistItemDatabaseRepository: PlaylistItemDatabaseRepository
 ) {
     suspend fun lookupMediaAndReplace(playlist: PlaylistDomain): PlaylistDomain {
         val mediaLookup = buildMediaLookup(playlist)
@@ -29,7 +30,7 @@ class PlaylistMediaLookupOrchestrator constructor(
     suspend fun lookupPlaylistItemsAndReplace(playlist: PlaylistDomain): PlaylistDomain =
         buildMediaLookup(playlist)
             .let { it.values.mapNotNull { it.id } }
-            .let { roomPlaylistItemDatabaseRepository.loadList(MediaIdListFilter(it)) }
+            .let { playlistItemDatabaseRepository.loadList(MediaIdListFilter(it)) }
             .data
             ?.distinctBy { it.media.platformId }
             ?.associateBy { it.media.platformId }
