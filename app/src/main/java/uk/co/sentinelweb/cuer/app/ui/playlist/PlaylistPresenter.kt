@@ -705,7 +705,7 @@ class PlaylistPresenter(
                         }
                         ?: playlist
                 }
-                ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
+                ?.let { playlistOrchestrator.save(it, LOCAL.deepOptions(emit = true)) }
                 ?.also {
                     state.playlistIdentifier =
                         it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")

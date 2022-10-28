@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer.Companion.DEFAULT_
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.AllFilter
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -28,7 +29,7 @@ class MemoryDatabaseInitializer constructor(
 
     override fun initDatabase() {
         contextProvider.ioScope.launch {
-            (mediaRepository.count(null)
+            (mediaRepository.count(AllFilter())
                 .takeIf { it.isSuccessful && it.data == 0 }
                 ?: let { return@launch })
                 .let { initPlaylists() }

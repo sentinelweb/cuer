@@ -40,6 +40,7 @@ interface OrchestratorContract<Domain> {
 
     enum class Operation { FLAT, FULL, DELETE }
 
+    // todo sealed class
     interface Filter
     data class IdListFilter(val ids: List<Long>) : Filter
     data class MediaIdListFilter(val ids: List<Long>) : Filter
@@ -89,7 +90,6 @@ interface OrchestratorContract<Domain> {
     open class Identifier<IdType>(
         open val id: IdType,
         val source: Source,
-        // todo val type:ObjectType
     ) {
 
         override fun equals(other: Any?): Boolean {
