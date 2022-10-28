@@ -65,13 +65,13 @@ class PlayerControlsNotificationMedia constructor(
         val disconnectPendingIntent: PendingIntent = pendingIntent(ACTION_DISCONNECT)
         val starPendingIntent: PendingIntent = pendingIntent(ACTION_STAR)
 
-        val contentIntent = Intent(service, launchClass) // todo inject to launch player class
+        val contentIntent = Intent(service, launchClass)
         val contentPendingIntent: PendingIntent =
             PendingIntent.getActivity(service, 0, contentIntent, FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(
             service,
-            appState.castNotificationChannelId!! // todo show error
+            appState.castNotificationChannelId ?: throw IllegalStateException("No media session")
         )
             .setDefaults(Notification.DEFAULT_ALL)
             .setSmallIcon(icon)

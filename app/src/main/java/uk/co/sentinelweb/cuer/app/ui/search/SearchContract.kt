@@ -61,7 +61,8 @@ interface SearchContract {
                         mapper = get(),
                         prefsWrapper = get(),
                         timeStampMapper = get(),
-                        timeProvider = get()
+                        timeProvider = get(),
+                        res = get()
                     )
                 }
                 scoped { State() }

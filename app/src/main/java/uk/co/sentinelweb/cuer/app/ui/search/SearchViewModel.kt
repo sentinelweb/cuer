@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -40,7 +41,8 @@ class SearchViewModel(
     private val log: LogWrapper,
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val timeStampMapper: TimeStampMapper,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val res: ResourceWrapper
 ) : ViewModel() {
 
     init {
@@ -115,7 +117,7 @@ class SearchViewModel(
     fun onSelectDates() {
         _dialogModelLiveData.value =
             DateRangePickerDialogModel(
-                R.string.search_select_dates,
+                res.getString(R.string.search_select_dates),
                 state.remote.fromDate?.toJavaLocalDateTime(),
                 (state.remote.toDate ?: timeProvider.localDateTime()).toJavaLocalDateTime(),
                 this::onDatesSelected,
@@ -135,7 +137,7 @@ class SearchViewModel(
         log.d("Select order")
         _dialogModelLiveData.value =
             EnumValuesDialogModel(
-                R.string.search_select_dates,
+                res.getString(R.string.search_select_dates),
                 SearchRemoteDomain.Order.values().toList(),
                 state.remote.order,
                 this::onOrderSelected,
@@ -174,6 +176,7 @@ class SearchViewModel(
         if (chipModel.type == PLAYLIST_SELECT) {
             _dialogModelLiveData.value =
                 PlaylistsDialogContract.Config(
+                    res.getString(R.string.playlist_dialog_title),
                     state.local.playlists,
                     true,
                     this@SearchViewModel::onPlaylistSelected,

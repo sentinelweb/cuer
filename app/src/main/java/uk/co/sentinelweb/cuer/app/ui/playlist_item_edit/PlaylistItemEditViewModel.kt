@@ -35,6 +35,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_AD
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
@@ -56,6 +57,7 @@ class PlaylistItemEditViewModel constructor(
     private val playUseCase: PlayUseCase,
     private val linkNavigator: LinkNavigator,
     private val recentLocalPlaylists: RecentLocalPlaylists,
+    private val res: ResourceWrapper,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -237,6 +239,7 @@ class PlaylistItemEditViewModel constructor(
     override fun onSelectPlaylistChipClick(model: ChipModel) {
         _dialogModelLiveData.value =
             PlaylistsDialogContract.Config(
+                res.getString(R.string.playlist_dialog_title),
                 state.selectedPlaylists,
                 true,
                 this@PlaylistItemEditViewModel::onPlaylistSelected,
@@ -264,7 +267,7 @@ class PlaylistItemEditViewModel constructor(
             ?.also { update() }
             ?: apply {
                 _dialogModelLiveData.value =
-                    DialogModel(PLAYLIST_ADD, R.string.create_playlist_dialog_title)
+                    DialogModel(PLAYLIST_ADD, res.getString(R.string.create_playlist_dialog_title))
             }
     }
 
@@ -499,7 +502,7 @@ class PlaylistItemEditViewModel constructor(
             ?.also { media ->
                 _dialogModelLiveData.value = ArgumentDialogModel(
                     DialogModel.Type.SUPPORT,
-                    R.string.menu_support,
+                    res.getString(R.string.menu_support),
                     mapOf(NavigationModel.Param.MEDIA.toString() to media)
                 )
             }

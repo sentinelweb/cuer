@@ -30,7 +30,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 class NavigationRouter constructor(
     private val activity: Activity,
     private val toastWrapper: ToastWrapper,
-    private val fragment: Fragment? = null,
+    private val fragment: Fragment? = null,// todo remove
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val navController: NavController?,
     private val log: LogWrapper,
@@ -203,5 +203,5 @@ fun Scope.navigationRouter(
     } else null,
     urlLauncher = UrlLauncherWrapper(sourceActivity),
     log = AndroidLogWrapper(),
-    cryptoLauncher = AndroidCryptoLauncher(sourceActivity, get(), AlertDialogCreator(sourceActivity), get())
+    cryptoLauncher = AndroidCryptoLauncher(sourceActivity, get(), AlertDialogCreator(sourceActivity), get(), get())
 )

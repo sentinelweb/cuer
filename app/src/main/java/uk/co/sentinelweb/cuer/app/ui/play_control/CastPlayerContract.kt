@@ -130,6 +130,7 @@ interface CastPlayerContract {
                         coroutines = get(),
                         floatingService = get(),
                         playDialog = get(),
+                        res = get()
                     )
                 }
                 scoped {

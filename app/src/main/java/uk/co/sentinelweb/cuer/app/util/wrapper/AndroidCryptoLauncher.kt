@@ -16,6 +16,7 @@ class AndroidCryptoLauncher(
     private val activity: Activity,
     private val toast: ToastWrapper,
     private val alertDialogCreator: AlertDialogCreator,
+    private val res: ResourceWrapper,
     log: LogWrapper,
 ) : CryptoLauncher {
 
@@ -35,8 +36,8 @@ class AndroidCryptoLauncher(
     private fun showWarningDialog() {
         alertDialogCreator.create(
             AlertDialogModel(
-                title = R.string.support_crypto_warning_title,
-                message = R.string.support_crypto_warning_message,
+                title = res.getString(R.string.support_crypto_warning_title),
+                message = res.getString(R.string.support_crypto_warning_message),
                 confirm = AlertDialogModel.Button(
                     R.string.support_crypto_warning_ok,
                     { showCryptoAppLauncher() }

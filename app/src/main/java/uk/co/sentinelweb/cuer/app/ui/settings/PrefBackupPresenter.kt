@@ -157,7 +157,7 @@ class PrefBackupPresenter constructor(
     } catch (e: java.io.FileNotFoundException) {
         // seems to happen after restart at least for dropbox
         log.e("Could not backup data", e)
-        view.showBackupError(e.message)
+        view.showBackupError(e.message ?: "File not found")
         false
     }
 

@@ -5,6 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.IdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
@@ -26,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -61,6 +63,7 @@ class PlaylistsPresenter(
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val starredItems: StarredItemsPlayistInteractor,
     private val unfinishedItems: UnfinishedItemsPlayistInteractor,
+    private val res: ResourceWrapper,
 ) : PlaylistsContract.Presenter {
 
     init {
@@ -100,6 +103,7 @@ class PlaylistsPresenter(
                     ?.also { movePlaylist ->
                         view.showPlaylistSelector(
                             PlaylistsDialogContract.Config(
+                                title = res.getString(R.string.playlist_dialog_title),
                                 selectedPlaylists = setOf(),
                                 multi = true,
                                 itemClick = { playlistSelected, _ ->
@@ -265,6 +269,7 @@ class PlaylistsPresenter(
                 findPlaylist(item)?.also { delPlaylist ->
                     view.showPlaylistSelector(
                         PlaylistsDialogContract.Config(
+                            title = res.getString(R.string.playlist_dialog_title),
                             selectedPlaylists = setOf(),
                             multi = true,
                             itemClick = { p, _ -> merge(p!!, delPlaylist) },

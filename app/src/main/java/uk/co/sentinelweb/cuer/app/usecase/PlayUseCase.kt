@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceMana
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -24,8 +25,10 @@ class PlayUseCase constructor(
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
     private val floatingService: FloatingPlayerServiceManager,
-    private val playDialog: PlayDialog
-) {
+    private val playDialog: PlayDialog,
+    private val res: ResourceWrapper,
+
+    ) {
 
     init {
         playDialog.playUseCase = this
@@ -69,8 +72,8 @@ class PlayUseCase constructor(
 
     private fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel =
         AlertDialogModel(
-            title = R.string.playlist_change_dialog_title,
-            message = R.string.playlist_change_dialog_message,
+            title = res.getString(R.string.playlist_change_dialog_title),
+            message = res.getString(R.string.playlist_change_dialog_message),
             confirm = AlertDialogModel.Button(R.string.ok, confirm),
             neutral = AlertDialogModel.Button(R.string.dialog_button_view_info, info)
         )

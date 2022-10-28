@@ -21,7 +21,10 @@ class SkipModelMapper constructor(
     ) = SelectDialogModel(
         type = DialogModel.Type.SKIP_TIME,
         multi = false,
-        title = if (forward) R.string.dialog_title_select_fwd_skip_time else R.string.dialog_title_select_back_skip_time,
+        title = res.getString(
+            if (forward) R.string.dialog_title_select_fwd_skip_time
+            else R.string.dialog_title_select_back_skip_time
+        ),
         items = res.getIntArray(R.array.skip_time_values).map { time ->
             SelectDialogModel.Item(
                 if (forward) mapForwardTime(time.toLong()) else mapBackTime(time.toLong()),

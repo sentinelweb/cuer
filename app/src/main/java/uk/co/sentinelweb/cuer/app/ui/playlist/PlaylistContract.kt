@@ -217,7 +217,7 @@ interface PlaylistContract {
                     )
                 }
                 scoped { get<Presenter>() as External }
-                scoped { PlaylistModelMapper(itemModelMapper = get(), iconMapper = get()) }
+                scoped { PlaylistModelMapper(itemModelMapper = get(), iconMapper = get(), res = get()) }
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }
@@ -232,6 +232,7 @@ interface PlaylistContract {
                         coroutines = get(),
                         floatingService = get(),
                         playDialog = get(),
+                        res = get()
                     )
                 }
                 scoped {

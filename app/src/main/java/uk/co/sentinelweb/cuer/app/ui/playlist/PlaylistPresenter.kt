@@ -279,6 +279,7 @@ class PlaylistPresenter(
     private fun showPlaylistSelector() {
         view.showPlaylistSelector(
             PlaylistsDialogContract.Config(
+                res.getString(R.string.playlist_dialog_title),
                 selectedPlaylists = setOf(state.playlist!!),
                 multi = true,
                 itemClick = { which: PlaylistDomain?, _ ->
