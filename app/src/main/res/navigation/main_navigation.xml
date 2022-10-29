@@ -5,28 +5,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_navigation"
     app:startDestination="@id/navigation_browse"
-    >
+>
     <!--    Theres is a bug with app:startDestination that caused the specified fragment to use two instances when navigating -->
 
     <fragment
         android:id="@+id/navigation_browse"
         android:name="uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment"
         android:label="@string/bottomnav_title_browse"
-        />
+    />
 
     <fragment
         android:id="@+id/navigation_playlists"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsFragment"
         android:label="@string/bottomnav_title_playlists"
         tools:layout="@layout/fragment_playlists"
-        >
+    >
         <action
             android:id="@+id/action_goto_playlist"
             app:destination="@id/navigation_playlist"
             app:launchSingleTop="true"
             app:popUpTo="@id/navigation_playlist"
             app:popUpToInclusive="true"
-            />
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+        />
 
         <action
             android:id="@+id/action_edit_playlist"
@@ -34,7 +38,11 @@
             app:launchSingleTop="true"
             app:popUpTo="@id/navigation_playlist_edit"
             app:popUpToInclusive="true"
-            />
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+        />
     </fragment>
 
     <fragment
@@ -42,34 +50,38 @@
         android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment"
         android:label="@string/bottomnav_title_playlist"
         tools:layout="@layout/fragment_playlist"
-        >
+    >
         <argument
             android:name="PLAYLIST_ID"
             android:defaultValue="-1L"
             app:argType="long"
-            app:nullable="false" />
+            app:nullable="false"/>
 
         <argument
             android:name="PLAY_NOW"
             android:defaultValue="false"
-            app:argType="boolean" />
+            app:argType="boolean"/>
 
         <argument
             android:name="SOURCE"
             app:argType="string"
-            app:nullable="false" />
+            app:nullable="false"/>
 
         <argument
             android:name="IMAGE_URL"
             app:argType="string"
-            app:nullable="true" />
+            app:nullable="true"/>
 
         <action
             android:id="@+id/action_goto_playlist_item"
             app:destination="@id/navigation_playlist_item_edit"
             app:launchSingleTop="true"
             app:popUpTo="@id/navigation_playlist_item_edit"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
 
         <action
             android:id="@+id/action_goto_edit_playlist"
@@ -77,7 +89,11 @@
             app:launchSingleTop="true"
             app:popUpTo="@id/navigation_playlist_edit"
             app:popUpToInclusive="true"
-            />
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+        />
 
     </fragment>
 
@@ -90,17 +106,17 @@
             android:name="PLAYLIST_ID"
             android:defaultValue="-1L"
             app:argType="long"
-            app:nullable="false" />
+            app:nullable="false"/>
 
         <argument
             android:name="SOURCE"
             app:argType="string"
-            app:nullable="false" />
+            app:nullable="false"/>
 
         <argument
             android:name="IMAGE_URL"
             app:argType="string"
-            app:nullable="true" />
+            app:nullable="true"/>
     </fragment>
 
     <fragment
@@ -108,7 +124,7 @@
         android:name="uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment"
         android:label="@string/nav_playlist_item_edit_title"
         tools:layout="@layout/fragment_playlist_item_edit"
-        >
+    >
         <argument
             android:name="PLAYLIST_ITEM"
             app:argType="string"
@@ -141,7 +157,24 @@
         android:id="@+id/navigation_settings_root"
         android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefRootFragment"
         android:label="@string/menu_settings"
-    />
+    >
+        <action
+            android:id="@+id/action_goto_settings_backup"
+            app:destination="@id/navigation_settings_backup"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+        />
+        <action
+            android:id="@+id/action_goto_settings_player"
+            app:destination="@id/navigation_settings_player"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+        />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_settings_backup"
@@ -154,7 +187,6 @@
             app:nullable="false"
         />
     </fragment>
-
 
     <fragment
         android:id="@+id/navigation_settings_player"

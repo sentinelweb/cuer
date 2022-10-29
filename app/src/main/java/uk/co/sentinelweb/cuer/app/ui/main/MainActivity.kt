@@ -241,8 +241,8 @@ class MainActivity :
         pref: Preference,
     ): Boolean {
         when (pref.key) {
-            getString(R.string.prefs_root_backup_key) -> navController.navigate(R.id.navigation_settings_backup)
-            getString(R.string.prefs_root_player_key) -> navController.navigate(R.id.navigation_settings_player)
+            getString(R.string.prefs_root_backup_key) -> navController.navigate(R.id.action_goto_settings_backup)
+            getString(R.string.prefs_root_player_key) -> navController.navigate(R.id.action_goto_settings_player)
         }
         return true
     }

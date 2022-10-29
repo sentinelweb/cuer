@@ -25,7 +25,8 @@ android {
 
         buildConfigField "String", "youtubeApiKey", "\"$CUER_YOUTUBE_API_KEY\""
         buildConfigField "String", "pixabayApiKey", "\"$CUER_PIXABAY_API_KEY\""
-        buildConfigField "boolean", "backgroundPlay", "$CUER_BG_PLAY"
+        buildConfigField "boolean", "cuerBackgroundPlay", "$CUER_BG_PLAY"
+        buildConfigField "boolean", "cuerRemoteEnabled", "$CUER_REMOTE_ENABLED"
 
         javaCompileOptions {
             annotationProcessorOptions {

@@ -12,6 +12,7 @@ import androidx.preference.PreferenceFragmentCompat
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
+import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -22,7 +23,15 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     private val presenter: PrefRootContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
 
-    private val version get() = findPreference(R.string.prefs_root_version_key)
+    private val version
+        get() = findPreference(R.string.prefs_root_version_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_version_key")
+    private val remoteServiceCategory
+        get() = findPreferenceCategory(R.string.prefs_root_remote_service_cat_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_remote_service_cat_key")
+    private val remoteServicePreference
+        get() = findCheckbox(R.string.prefs_root_remote_service_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_remote_service_key")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
@@ -39,11 +48,13 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     }
 
     override fun setVersion(versionString: String) {
-        version?.summary = versionString
+        version.summary = versionString
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_root, rootKey)
+        remoteServiceCategory.isVisible = BuildConfig.cuerRemoteEnabled
+        remoteServicePreference.isVisible = BuildConfig.cuerRemoteEnabled
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
@@ -55,8 +66,8 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     }
 
     override fun setRemoteServiceRunning(running: Boolean, address: String?) {
-        findCheckbox(R.string.prefs_root_remote_service_key)
-            ?.apply {
+        remoteServicePreference
+            .apply {
                 setChecked(running)
                 val summary =
                     if (running)

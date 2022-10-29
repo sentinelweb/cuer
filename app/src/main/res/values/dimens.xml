@@ -60,4 +60,5 @@
     <dimen name="max_cache_image_size">100dp</dimen>
     <dimen name="notif_image_size_sdk_31">96dp</dimen>
 
+    <integer name="anim_transition_time">300</integer>
 </resources>
