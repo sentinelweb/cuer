@@ -1,12 +1,9 @@
 import App.Companion.NO_IMAGE_SRC
-import kotlinx.css.paddingRight
-import kotlinx.css.px
-import kotlinx.css.width
-import react.Props
-import react.RBuilder
-import react.RComponent
-import react.State
-import react.dom.div
+import com.ccfraser.muirwik.components.list.mListItem
+import com.ccfraser.muirwik.components.list.mListItemText
+import com.ccfraser.muirwik.components.list.mListSubheader
+import kotlinx.css.*
+import react.*
 import styled.css
 import styled.styledDiv
 import styled.styledImg
@@ -16,9 +13,18 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 class PlaylistList : RComponent<PlaylistListProps, State>() {
     override fun RBuilder.render() {
         styledDiv {
-            div { "Playlists" }
+            css {
+                put("grid-area", "playlists")
+                overflowY = Overflow.scroll
+                overflowX = Overflow.scroll
+            }
+            mListSubheader("Playlists", disableSticky = true)
             for (playlist in props.playlists) {
-                div {
+                mListItem(
+                    button = true,
+                    onClick = { props.onSelectPlaylist(playlist) },
+                    selected = playlist.id == props.selectedPlaylist?.id
+                ) {
                     ((playlist.thumb?.url ?: playlist.image?.url)
                         // see issue https://github.com/sentinelweb/cuer/issues/186 - need to cache pixabay images somewhere
                         ?.takeIf { !it.startsWith("gs") && !it.startsWith("https://pixabay.com") }
@@ -32,7 +38,7 @@ class PlaylistList : RComponent<PlaylistListProps, State>() {
                             }
                         }
 
-                    div { playlist.title }
+                    mListItemText(playlist.title)
                 }
             }
         }

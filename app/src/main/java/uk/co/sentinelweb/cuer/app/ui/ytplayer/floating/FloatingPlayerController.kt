@@ -75,7 +75,7 @@ class FloatingPlayerController constructor(
                 service.stopSelf()
             }
         }
-        if (!BuildConfig.backgroundPlay) {
+        if (!BuildConfig.cuerBackgroundPlay) {
             screenStateReceiver.screenOffCallbacks.add(lockHandler)
             screenStateReceiver.unlockCallbacks.add(unlockHandler)
         }
@@ -85,7 +85,7 @@ class FloatingPlayerController constructor(
     }
 
     override fun destroy() {
-        if (!BuildConfig.backgroundPlay) {
+        if (!BuildConfig.cuerBackgroundPlay) {
             screenStateReceiver.screenOffCallbacks.remove(lockHandler)
             screenStateReceiver.unlockCallbacks.remove(unlockHandler)
         }
@@ -157,5 +157,5 @@ class FloatingPlayerController constructor(
         }
     }
 
-    private fun allowPlayInBackground() = !screenStateReceiver.isLocked || BuildConfig.backgroundPlay
+    private fun allowPlayInBackground() = !screenStateReceiver.isLocked || BuildConfig.cuerBackgroundPlay
 }

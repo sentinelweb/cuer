@@ -43,9 +43,16 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
         log.tag(this)
     }
 
-    private val autoSummary get() = findPreference(R.string.prefs_backup_summary_auto_key)
-    private val autoClearPreference get() = findPreference(R.string.prefs_backup_clear_auto_key)
-    private val autoSetPreference get() = findPreference(R.string.prefs_backup_set_auto_key)
+    private val autoSummary
+        get() = findPreference(R.string.prefs_backup_summary_auto_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_backup_summary_auto_key")
+    private val autoClearPreference
+        get() = findPreference(R.string.prefs_backup_clear_auto_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_backup_clear_auto_key")
+    private val autoSetPreference
+        get() = findPreference(R.string.prefs_backup_set_auto_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_backup_set_auto_key")
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
@@ -59,14 +66,15 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_backup, rootKey)
+        presenter.updateSummaryForAutoBackup()
     }
 
     override fun onStart() {
         super.onStart()
         checkToAddProgress()
-        if (arguments?.getBoolean(AUTO_BACKUP) ?: false) {
+        if (arguments?.getBoolean(DO_AUTO_BACKUP) ?: false) {
             presenter.autoBackupDatabaseToJson()
-            arguments?.remove(AUTO_BACKUP)
+            arguments?.remove(DO_AUTO_BACKUP)
         }
         presenter.updateSummaryForAutoBackup()
     }
@@ -84,7 +92,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
             getString(R.string.prefs_backup_backup_key) -> presenter.manualBackupDatabaseToJson()
             getString(R.string.prefs_backup_restore_key) -> presenter.openRestoreFile()
             getString(R.string.prefs_backup_set_auto_key) -> presenter.onChooseAutoBackupFile()
-            getString(R.string.prefs_backup_clear_auto_key) -> presenter.onClearAutoBackup()
+            getString(R.string.prefs_backup_clear_auto_key) -> presenter.onClearAutoBackup() // todo confirm dialog
         }
         return super.onPreferenceTreeClick(preference)
     }
@@ -180,11 +188,11 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
     }
 
     override fun setAutoBackupValid(valid: Boolean) {
-        autoSetPreference?.isVisible = !valid
+        autoSetPreference.isVisible = !valid
     }
 
     override fun setAutoSummary(summary: String) {
-        autoSummary?.summary = summary
+        autoSummary.summary = summary
     }
 
     override fun promptForCreateAutoBackupLocation(fileName: String) {
@@ -217,7 +225,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
         private const val OPEN_MANUAL_BACKUP_FILE = 3
         private const val CREATE_AUTO_BACKUP_FILE = 4
         private const val OPEN_AUTO_BACKUP_FILE = 5
-        private const val AUTO_BACKUP = "AUTO_BACKUP"
+        private const val DO_AUTO_BACKUP = "DO_AUTO_BACKUP"
         private const val BACKUP_MIME_TYPE = "application/zip"
 
     }
