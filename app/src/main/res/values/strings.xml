@@ -259,5 +259,8 @@
     <string name="prefs_root_info_cat_title">App Info</string>
     <string name="prefs_root_version_title">Version</string>
     <string name="prefs_root_version_summary">Version will appear here</string>
+    <string name="close">Close</string>
+    <string name="buffering">Buffering</string>
+    <string name="stop">Stop</string>
 
 </resources>

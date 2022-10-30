@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
+import java.util.*
 
 
 class PlaylistModelMapper constructor(
@@ -40,13 +41,20 @@ class PlaylistModelMapper constructor(
         modelIdGenerator = 0
         val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
         return PlaylistContract.Model(
-            title = domain.title,
-            imageUrl = (domain.image?:domain.thumb)?.url
+            title = domain.title.capitalize(Locale.getDefault()),
+            imageUrl = (domain.image ?: domain.thumb)?.url
                 ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
             loopModeIndex = domain.mode.ordinal,
             loopModeIcon = iconMapper.map(domain.mode),
+            loopModeText = when (domain.mode) {
+                PlaylistDomain.PlaylistModeDomain.SINGLE -> res.getString(R.string.menu_playlist_mode_single)
+                PlaylistDomain.PlaylistModeDomain.LOOP -> res.getString(R.string.menu_playlist_mode_loop)
+                PlaylistDomain.PlaylistModeDomain.SHUFFLE -> res.getString(R.string.menu_playlist_mode_shuffle)
+            },
             playIcon = if (isPlaying) R.drawable.ic_playlist_close else R.drawable.ic_playlist_play,
+            playText = res.getString(if (isPlaying) R.string.stop else R.string.menu_play),
             starredIcon = if (domain.starred) R.drawable.ic_starred else R.drawable.ic_starred_off,
+            starredText = res.getString(if (domain.starred) R.string.menu_star else R.string.menu_unstar),
             isDefault = domain.default,
             isSaved = id.source == LOCAL,
             isPlayFromStart = domain.playItemsFromStart,

@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.wrapper
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.text.Spannable
@@ -96,5 +97,6 @@ class ResourceWrapper constructor(
         }
 
     fun getShapeModel(id: Int) = ShapeAppearanceModel.builder(context, 0, id).build()
+    fun getColorStateList(id: Int): ColorStateList? = ContextCompat.getColorStateList(context, id)
 
 }

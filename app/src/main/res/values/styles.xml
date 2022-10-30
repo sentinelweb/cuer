@@ -115,7 +115,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
         <item name="android:textScaleX">?headlineFontXScaling</item>
-        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:textColor">?colorOnSurface</item>
     </style>
 
     <style name="TextAppearance.ActionBar.Expanded">
@@ -125,7 +125,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
         <item name="android:textScaleX">?headlineFontXScaling</item>
-        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:textColor">?colorOnSurface</item>
     </style>
     <!-- end TextAppearance ActionBar-->
 
@@ -142,7 +142,7 @@
     <style name="Cuer.AppBar.OverFlow">
         <item name="android:src">@drawable/ic_more_vert_black</item>
         <item name="android:minWidth">48dp</item>
-        <item name="android:tint">@color/white</item>
+        <item name="android:tint">?colorOnSurface</item>
         <item name="android:elevation">4dp</item>
     </style>
 
@@ -179,23 +179,43 @@
     </style>
 
     <!-- Headers =========================== -->
-    <style name="Header" />
+    <style name="Header"/>
 
     <style name="Header.InfoText">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?colorOnSurface</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">top|end</item>
-        <item name="android:layout_marginTop">48dp</item>
-        <item name="android:background">@color/info_text_overlay_background</item>
         <item name="android:padding">4dp</item>
-        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1
-        </item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        <item name="drawableTint">?colorOnSurface</item>
+        <item name="android:drawableTint">?colorOnSurface</item>
+        <item name="android:drawablePadding">4dp</item>
     </style>
+
+    <style name="Header.InfoIcon">
+        <item name="tint">?colorOnSurface</item>
+        <item name="android:tint">?colorOnSurface</item>
+        <item name="android:layout_width">@dimen/flag_size</item>
+        <item name="android:layout_height">@dimen/flag_size</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+
+    <style name="Header.Button" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:tint">?colorOnSurface</item>
+        <item name="iconTint">?colorOnSurface</item>
+        <item name="android:textColor">?colorOnSurface</item>
+        <item name="strokeColor">?colorOnSurface</item>
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="rippleColor">@color/grey_400</item>
+    </style>
+
+
     <!-- end Headers =========================== -->
 
     <!-- ItemView =========================== -->
-    <style name="ItemView" />
+    <style name="ItemView"/>
 
     <style name="ItemView.Container">
         <item name="android:layout_margin">@dimen/list_item_margin</item>
