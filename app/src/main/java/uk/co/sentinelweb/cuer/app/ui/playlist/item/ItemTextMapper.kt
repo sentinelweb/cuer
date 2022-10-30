@@ -6,6 +6,7 @@ import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
 class ItemTextMapper constructor(
     private val res: ResourceWrapper,
@@ -84,22 +85,46 @@ class ItemTextMapper constructor(
     }
 
     fun mapBottomText(model: ItemContract.Model): SpannableString {
-        return SpannableString(model.run { "  $positon   $WATCH $watchedSince   $PLAT $published  ${playlistName ?: ""}" }).apply {
+        val posText = model.positon
+        val watchedText = model.watchedSince
+        val publishedText = model.published
+        val playlistText = model.playlistName
+        return buildBottomText(
+            posText,
+            watchedText,
+            publishedText,
+            playlistText,
+            model.platform,
+            model.isStarred,
+            model.isWatched
+        )
+    }
+
+    fun buildBottomText(
+        posText: String,
+        watchedText: String,
+        publishedText: String,
+        playlistText: String? = null,
+        platformDomain: PlatformDomain,
+        isStarred: Boolean,
+        isWatched: Boolean,
+    ): SpannableString {
+        return SpannableString("  $posText   $WATCH $watchedText   $PLAT $publishedText  ${playlistText ?: ""}").apply {
             res.replaceSpannableIcon(
                 this,
-                if (model.starred) starDrawable else unstarDrawable,
+                if (isStarred) starDrawable else unstarDrawable,
                 0, 1
             )
             val platPos = indexOf(PLAT)
             res.replaceSpannableIcon(
                 this,
-                bottomDrawable(iconMapper.map(model.platform)),
+                bottomDrawable(iconMapper.map(platformDomain)),
                 platPos, platPos + PLAT.length
             )
             val watchPos = indexOf(WATCH)
             res.replaceSpannableIcon(
                 this,
-                if (model.isWatched) watchDrawable else unwatchDrawable,
+                if (isWatched) watchDrawable else unwatchDrawable,
                 watchPos, watchPos + WATCH.length
             )
         }

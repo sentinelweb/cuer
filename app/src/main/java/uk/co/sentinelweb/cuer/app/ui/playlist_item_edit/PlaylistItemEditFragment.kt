@@ -230,6 +230,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     override fun onResume() {
         super.onResume()
+        viewModel.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
     }
 
@@ -296,9 +297,9 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 //                (ratio * binding.plieImage.width).toInt()
             binding.plieTitlePos.progress = (ratio * binding.plieTitlePos.max).toInt()
         } ?: binding.plieTitlePos.apply { isVisible = false }
-        println("pos: ${model.position} width: ${binding.plieImage.width} result:${binding.plieTitlePos.layoutParams.width}")
         binding.plieDescription.ribbonItems.find { it.item.type == STAR }?.isVisible = !model.starred
         binding.plieDescription.ribbonItems.find { it.item.type == UNSTAR }?.isVisible = model.starred
+        binding.plieItemInfo.text = model.itemText
     }
 
 

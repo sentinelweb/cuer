@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTextMapper
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
@@ -36,6 +37,7 @@ interface PlaylistItemEditContract {
         val isUpcoming: Boolean,
         @ColorRes val infoTextBackgroundColor: Int,
         val showPlay: Boolean,
+        val itemText: CharSequence,
     )
 
     @Serializable
@@ -85,11 +87,12 @@ interface PlaylistItemEditContract {
                         playUseCase = get(),
                         linkNavigator = get(),
                         recentLocalPlaylists = get(),
-                        res = get()
+                        res = get(),
+                        coroutines = get()
                     )
                 }
                 scoped { State() }
-                scoped { PlaylistItemEditModelMapper(get(), get(), get(), get(), get()) }
+                scoped { PlaylistItemEditModelMapper(get(), get(), get(), get(), get(), get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { SelectDialogCreator(this.getFragmentActivity()) }
                 scoped { this.getFragmentActivity() }
@@ -122,6 +125,7 @@ interface PlaylistItemEditContract {
                 }
                 scoped { ItemFactory(get(), get(), get()) }
                 scoped { ItemModelMapper(get(), get(), get(), get()) }
+                scoped { ItemTextMapper(get(), get()) }
             }
         }
 

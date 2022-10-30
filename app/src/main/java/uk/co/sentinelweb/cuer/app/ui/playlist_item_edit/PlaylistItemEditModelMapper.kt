@@ -4,12 +4,15 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.convertToLocalMillis
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionMapper
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTextMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.Format.SECS
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
+import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 class PlaylistItemEditModelMapper(
@@ -18,6 +21,8 @@ class PlaylistItemEditModelMapper(
     private val res: ResourceWrapper,
     private val backgroundMapper: BackgroundMapper,
     private val ribbonCreator: RibbonCreator,
+    private val itemTextMapper: ItemTextMapper,
+    private val timeSinceFormatter: TimeSinceFormatter,
 ) {
 
     fun map(state: PlaylistItemEditContract.State) = with(state) {
@@ -40,16 +45,35 @@ class PlaylistItemEditModelMapper(
                         } else media.duration?.let { timeFormater.formatMillis(it, SECS) }
                         ),
                 positionText = media.positon?.let { timeFormater.formatMillis(it, SECS) },
-                position = media.positon
-                    ?.takeIf { media.duration != null && media.duration!! > 0L }
-                    ?.let { (it.toFloat() / media.duration!!) },
+                position = getPositionRatio(media),
                 empty = false,
                 isLive = media.isLiveBroadcast,
                 isUpcoming = media.isLiveBroadcastUpcoming,
                 infoTextBackgroundColor = backgroundMapper.mapInfoBackground(media),
+                itemText = itemTextMapper.buildBottomText(
+                    posText = getPositionText(media),
+                    watchedText = media.dateLastPlayed
+                        ?.let { timeSinceFormatter.formatTimeSince(it.epochSeconds) }
+                        ?: "-",
+                    publishedText = media.published
+                        ?.let { timeSinceFormatter.formatTimeSince(it.convertToLocalMillis()) }
+                        ?: "-",
+                    platformDomain = media.platform,
+                    isStarred = media.starred,
+                    isWatched = media.watched,
+                )
             )
         } ?: mapEmpty()
     }
+
+    private fun getPositionRatio(media: MediaDomain) =
+        media.positon
+            ?.takeIf { media.duration != null && media.duration!! > 0L }
+            ?.let { (it.toFloat() / media.duration!!) }
+
+    private fun getPositionText(media: MediaDomain) =
+        if (media.isLiveBroadcast) res.getString(R.string.live)
+        else ((getPositionRatio(media) ?: 0f) * 100).toInt().toString() + "%"
 
     fun mapEmpty(): PlaylistItemEditContract.Model = PlaylistItemEditContract.Model(
         description = descriptionMapper.mapEmpty(),
@@ -63,7 +87,8 @@ class PlaylistItemEditModelMapper(
         empty = true,
         isLive = false,
         isUpcoming = false,
-        infoTextBackgroundColor = R.color.info_text_overlay_background
+        infoTextBackgroundColor = R.color.info_text_overlay_background,
+        itemText = ""
     )
 
     fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel =

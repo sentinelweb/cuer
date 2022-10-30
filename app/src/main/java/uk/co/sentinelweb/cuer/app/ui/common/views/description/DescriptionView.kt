@@ -54,6 +54,8 @@ class DescriptionView @JvmOverloads constructor(
     lateinit var ribbonItems: List<RibbonItemView>
         private set
 
+    var playlistChipsUpdate: String? = null
+
     private val ytDrawable: Drawable by lazy {
         res.getDrawable(R.drawable.ic_platform_youtube, R.color.primary)
     }
@@ -93,21 +95,26 @@ class DescriptionView @JvmOverloads constructor(
             }
             ?: run { binding.pidAuthorImage.setImageDrawable(ytDrawable) }
 
-        binding.pidChips.removeAllViews()
-        model.playlistChips.forEach { chipModel ->
-            chipCreator.create(chipModel, binding.pidChips).apply {
-                binding.pidChips.addView(this)
-                when (chipModel.type) {
-                    ChipModel.Type.PLAYLIST_SELECT -> {
-                        setOnClickListener { interactions.onSelectPlaylistChipClick(chipModel) }
-                    }
 
-                    ChipModel.Type.PLAYLIST -> {
-                        setOnCloseIconClickListener { interactions.onRemovePlaylist(chipModel) }
-                        setOnClickListener { interactions.onPlaylistChipClick(chipModel) }
+        val playlistChipsState = model.playlistChips.joinToString { it.text }
+        if (playlistChipsUpdate != playlistChipsState) {
+            binding.pidChips.removeAllViews()
+            model.playlistChips.forEach { chipModel ->
+                chipCreator.create(chipModel, binding.pidChips).apply {
+                    binding.pidChips.addView(this)
+                    when (chipModel.type) {
+                        ChipModel.Type.PLAYLIST_SELECT -> {
+                            setOnClickListener { interactions.onSelectPlaylistChipClick(chipModel) }
+                        }
+
+                        ChipModel.Type.PLAYLIST -> {
+                            setOnCloseIconClickListener { interactions.onRemovePlaylist(chipModel) }
+                            setOnClickListener { interactions.onPlaylistChipClick(chipModel) }
+                        }
                     }
                 }
             }
+            playlistChipsUpdate = playlistChipsState
         }
         if (!this::ribbonItems.isInitialized ||
             ribbonItems.map { it.item.type } != model.ribbonActions.map { it.type }
