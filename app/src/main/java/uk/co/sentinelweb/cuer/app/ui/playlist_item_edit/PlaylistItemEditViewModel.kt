@@ -105,7 +105,7 @@ class PlaylistItemEditViewModel constructor(
                 //log.d("media changed: $op, $source, id=${newMedia.id} title=${newMedia.title}")
                 when (op) {
                     FLAT, FULL -> {
-                        if (newMedia != state.media) {
+                        if (newMedia.platformId == state.media?.platformId) {
                             state.media = newMedia.copy(
                                 starred = state.media?.starred ?: newMedia.starred,
                                 watched = state.media?.watched ?: newMedia.watched,

@@ -75,10 +75,11 @@ class ResourceWrapper constructor(
         d: Drawable,
         start: Int,
         end: Int,
+        align: Int = ImageSpan.ALIGN_BOTTOM,
     ) {
         string.apply {
             setSpan(
-                ImageSpan(d, ImageSpan.ALIGN_BOTTOM),
+                ImageSpan(d, align),
                 start, end,
                 Spannable.SPAN_INCLUSIVE_INCLUSIVE
             )

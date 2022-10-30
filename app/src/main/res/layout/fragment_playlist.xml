@@ -14,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_header_height_playlist"
     >
-
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/playlist_collapsing_toolbar"
             android:layout_width="match_parent"
@@ -69,6 +68,7 @@
                             style="@style/Header.Button"
                             android:contentDescription="@string/menu_play"
                             android:text="@string/menu_play"
+                            android:visibility="gone"
                             app:icon="@drawable/ic_playlist_play"
                         />
 
@@ -77,6 +77,7 @@
                             style="@style/Header.Button"
                             android:contentDescription="@string/menu_edit"
                             android:text="@string/menu_edit"
+                            android:visibility="gone"
                             app:icon="@drawable/ic_edit_24"
                         />
 
@@ -85,6 +86,7 @@
                             style="@style/Header.Button"
                             android:contentDescription="@string/menu_star"
                             android:text="@string/menu_star"
+                            android:visibility="gone"
                             app:icon="@drawable/ic_starred"
                         />
 
@@ -93,6 +95,7 @@
                             style="@style/Header.Button"
                             android:contentDescription="@string/menu_playlist_mode_single"
                             android:text="@string/menu_playlist_mode_single"
+                            android:visibility="gone"
                             app:icon="@drawable/ic_playmode_shuffle"
                         />
                     </LinearLayout>

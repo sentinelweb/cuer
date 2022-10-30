@@ -1,7 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.text.SpannableString
+import android.text.style.ImageSpan
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
@@ -108,24 +110,25 @@ class ItemTextMapper constructor(
         platformDomain: PlatformDomain,
         isStarred: Boolean,
         isWatched: Boolean,
+        align: Int = if (Build.VERSION.SDK_INT >= 29) ImageSpan.ALIGN_CENTER else ImageSpan.ALIGN_BOTTOM,
     ): SpannableString {
         return SpannableString("  $posText   $WATCH $watchedText   $PLAT $publishedText  ${playlistText ?: ""}").apply {
             res.replaceSpannableIcon(
                 this,
                 if (isStarred) starDrawable else unstarDrawable,
-                0, 1
+                0, 1, align
             )
             val platPos = indexOf(PLAT)
             res.replaceSpannableIcon(
                 this,
                 bottomDrawable(iconMapper.map(platformDomain)),
-                platPos, platPos + PLAT.length
+                platPos, platPos + PLAT.length, align
             )
             val watchPos = indexOf(WATCH)
             res.replaceSpannableIcon(
                 this,
                 if (isWatched) watchDrawable else unwatchDrawable,
-                watchPos, watchPos + WATCH.length
+                watchPos, watchPos + WATCH.length, align
             )
         }
     }

@@ -1,11 +1,13 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist_item_edit
 
+import android.os.Build
+import android.text.style.ImageSpan
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.convertToLocalMillis
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTextMapper
@@ -19,7 +21,7 @@ class PlaylistItemEditModelMapper(
     private val timeFormater: TimeFormatter,
     private val descriptionMapper: DescriptionMapper,
     private val res: ResourceWrapper,
-    private val backgroundMapper: BackgroundMapper,
+    private val durationTextColorMapper: DurationTextColorMapper,
     private val ribbonCreator: RibbonCreator,
     private val itemTextMapper: ItemTextMapper,
     private val timeSinceFormatter: TimeSinceFormatter,
@@ -49,11 +51,11 @@ class PlaylistItemEditModelMapper(
                 empty = false,
                 isLive = media.isLiveBroadcast,
                 isUpcoming = media.isLiveBroadcastUpcoming,
-                infoTextBackgroundColor = backgroundMapper.mapInfoBackground(media),
+                infoTextColor = durationTextColorMapper.mapInfoText(media),
                 itemText = itemTextMapper.buildBottomText(
                     posText = getPositionText(media),
                     watchedText = media.dateLastPlayed
-                        ?.let { timeSinceFormatter.formatTimeSince(it.epochSeconds) }
+                        ?.let { timeSinceFormatter.formatTimeSince(it.toEpochMilliseconds()) }
                         ?: "-",
                     publishedText = media.published
                         ?.let { timeSinceFormatter.formatTimeSince(it.convertToLocalMillis()) }
@@ -61,6 +63,7 @@ class PlaylistItemEditModelMapper(
                     platformDomain = media.platform,
                     isStarred = media.starred,
                     isWatched = media.watched,
+                    align = if (Build.VERSION.SDK_INT >= 29) ImageSpan.ALIGN_CENTER else ImageSpan.ALIGN_BASELINE,
                 )
             )
         } ?: mapEmpty()
@@ -72,7 +75,7 @@ class PlaylistItemEditModelMapper(
             ?.let { (it.toFloat() / media.duration!!) }
 
     private fun getPositionText(media: MediaDomain) =
-        if (media.isLiveBroadcast) res.getString(R.string.live)
+        if (media.isLiveBroadcast) ""
         else ((getPositionRatio(media) ?: 0f) * 100).toInt().toString() + "%"
 
     fun mapEmpty(): PlaylistItemEditContract.Model = PlaylistItemEditContract.Model(
@@ -87,8 +90,8 @@ class PlaylistItemEditModelMapper(
         empty = true,
         isLive = false,
         isUpcoming = false,
-        infoTextBackgroundColor = R.color.info_text_overlay_background,
-        itemText = ""
+        itemText = "",
+        infoTextColor = R.color.white
     )
 
     fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel =

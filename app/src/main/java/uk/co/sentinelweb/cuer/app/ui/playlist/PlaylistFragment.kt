@@ -409,6 +409,12 @@ class PlaylistFragment :
         binding.playlistFabPlaymode.setIconResource(model.loopModeIcon)
         binding.playlistFlagChildren.isVisible = model.hasChildren > 0
         binding.playlistFlagChildren.text = model.hasChildren.toString()
+        binding.playlistEditButton.isVisible = model.canEdit
+        binding.playlistStarButton.isVisible = model.canEdit
+        binding.playlistAppbar.layoutParams.height = res.getDimensionPixelSize(
+            if (model.canEdit || model.canPlay) R.dimen.app_bar_header_height_playlist
+            else R.dimen.app_bar_header_height_playlist_no_actions
+        )
         menuState.lastPlayModeIndex = model.loopModeIndex
         menuState.isPlayable = model.canPlay
     }

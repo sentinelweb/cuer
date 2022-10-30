@@ -290,11 +290,9 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         binding.pliePlayFab.isEnabled = model.canPlay
         binding.plieDescription.setModel(model.description)
         binding.plieDuration.text = model.durationText
-        //binding.plieDuration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
+        binding.plieDuration.setTextColor(res.getColor(model.infoTextColor))
 
         model.position?.let { ratio ->
-//            binding.plieTitlePos.layoutParams.width =
-//                (ratio * binding.plieImage.width).toInt()
             binding.plieTitlePos.progress = (ratio * binding.plieTitlePos.max).toInt()
         } ?: binding.plieTitlePos.apply { isVisible = false }
         binding.plieDescription.ribbonItems.find { it.item.type == STAR }?.isVisible = !model.starred

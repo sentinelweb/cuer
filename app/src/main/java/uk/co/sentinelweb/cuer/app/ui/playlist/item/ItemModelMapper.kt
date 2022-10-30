@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.convertToLocalMillis
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.Format
@@ -14,7 +14,7 @@ class ItemModelMapper constructor(
     private val res: ResourceWrapper,
     private val timeSinceFormatter: TimeSinceFormatter,
     private val timeFormatter: TimeFormatter,
-    private val backgroundMapper: BackgroundMapper
+    private val durationTextColorMapper: DurationTextColorMapper
 ) {
 
     fun mapItem(
@@ -66,7 +66,7 @@ class ItemModelMapper constructor(
             platform = item.media.platform,
             isLive = item.media.isLiveBroadcast,
             isUpcoming = item.media.isLiveBroadcastUpcoming,
-            infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media),
+            infoTextBackgroundColor = durationTextColorMapper.mapInfoBackgroundItem(item.media),
             canEdit = canEdit,
             canDelete = canDelete,
             playlistName = playlistText,

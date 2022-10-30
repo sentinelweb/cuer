@@ -39,6 +39,7 @@
     <dimen name="chip_thumb_icon_size">48dp</dimen>
     <dimen name="app_bar_header_height">200dp</dimen>
     <dimen name="app_bar_header_height_playlist">380dp</dimen>
+    <dimen name="app_bar_header_height_playlist_no_actions">300dp</dimen>
     <dimen name="app_bar_header_height_playlist_edit">338dp</dimen>
     <dimen name="app_bar_header_height_playlist_item">336dp</dimen>
     <dimen name="app_bar_header_height_playlists">244dp</dimen>

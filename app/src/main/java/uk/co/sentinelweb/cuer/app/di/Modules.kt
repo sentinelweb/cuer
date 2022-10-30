@@ -26,7 +26,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.AndroidRibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
@@ -125,7 +125,7 @@ object Modules {
         factory { PlaylistSelectDialogModelCreator(get(), get()) }
         factory { DatePickerCreator() }
         factory { IconMapper() }
-        factory { BackgroundMapper(get()) }
+        factory { DurationTextColorMapper(get()) }
         single { AytViewHolder(get(), get()) }
         factory { PlayYangProgress(get()) }
         factory<RibbonCreator> { AndroidRibbonCreator(get()) }
