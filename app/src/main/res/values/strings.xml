@@ -262,5 +262,6 @@
     <string name="close">Close</string>
     <string name="buffering">Buffering</string>
     <string name="stop">Stop</string>
+    <string name="menu_unpin">Unpin</string>
 
 </resources>

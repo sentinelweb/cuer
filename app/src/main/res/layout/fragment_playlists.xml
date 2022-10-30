@@ -68,6 +68,7 @@
                     />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
+
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/playlists_toolbar"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"

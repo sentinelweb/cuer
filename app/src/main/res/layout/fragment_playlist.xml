@@ -67,8 +67,6 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/playlist_fab_play"
                             style="@style/Header.Button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:contentDescription="@string/menu_play"
                             android:text="@string/menu_play"
                             app:icon="@drawable/ic_playlist_play"
@@ -77,8 +75,6 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/playlist_edit_button"
                             style="@style/Header.Button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:contentDescription="@string/menu_edit"
                             android:text="@string/menu_edit"
                             app:icon="@drawable/ic_edit_24"
@@ -87,8 +83,6 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/playlist_star_button"
                             style="@style/Header.Button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:contentDescription="@string/menu_star"
                             android:text="@string/menu_star"
                             app:icon="@drawable/ic_starred"
@@ -97,8 +91,6 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/playlist_fab_playmode"
                             style="@style/Header.Button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:contentDescription="@string/menu_playlist_mode_single"
                             android:text="@string/menu_playlist_mode_single"
                             app:icon="@drawable/ic_playmode_shuffle"

@@ -6,64 +6,90 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.playlist_item_edit.PlaylistItemEditFragment"
-    >
+>
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/pe_appbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_header_height_playlist"
-        >
+        android:layout_height="@dimen/app_bar_header_height_playlist_edit"
+    >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/pe_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:collapsedTitleTextAppearance="@style/TextAppearance.ActionBar.Collapsed"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginBottom="28dp"
+            app:contentScrim="?colorSurface"
             app:expandedTitleMarginEnd="16dp"
             app:expandedTitleMarginStart="16dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.ActionBar.Expanded"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:statusBarScrim="?attr/colorPrimaryDark"
-            >
-
-            <ImageView
-                android:id="@+id/pe_image"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways"
+            app:statusBarScrim="?colorSurface"
+            android:background="?colorSurface"
+        >
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="@null"
-                android:scaleType="centerCrop"
-                android:background="@color/background"
-                android:transitionName="@string/playlist_trans_image"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7"
-                tools:src="@drawable/im_test_nietzche" />
-
-            <TextView
-                android:id="@+id/pe_click_prompt"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/pe_click_image_to_change"
-                android:textColor="@color/white"
-                android:layout_gravity="top"
-                android:padding="8dp"
-                android:background="@color/black_text_secondary" />
-
-            <View
-                android:id="@+id/pe_action_bg"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_gravity="top"
-                android:background="@drawable/actionbar_gradient" />
-
-            <View
-                android:id="@+id/pe_title_bg"
-                android:layout_width="match_parent"
-                android:layout_height="64sp"
-                android:layout_gravity="bottom"
-                android:background="@color/black_text_secondary"
+                android:background="?colorSurface"
+            >
+                <ImageView
+                    android:id="@+id/pe_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"
+                    android:background="@color/background"
+                    android:transitionName="@string/playlist_trans_image"
+                    app:layout_collapseMode="parallax"
+                    app:layout_collapseParallaxMultiplier="0.7"
+                    tools:src="@drawable/im_test_nietzche"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
                 />
+
+                <TextView
+                    android:id="@+id/pe_click_prompt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pe_click_image_to_change"
+                    android:textColor="@color/white"
+                    android:layout_gravity="top"
+                    android:padding="8dp"
+                    android:background="@color/black_text_secondary"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"/>
+                <HorizontalScrollView
+                    android:id="@+id/playlist_buttons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/pe_image"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:layout_marginStart="8dp"
+                    android:scrollbars="none"
+                >
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                    >
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/pe_star_fab"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/menu_star"
+                            android:text="@string/menu_star"
+                            app:icon="@drawable/ic_starred"
+                        />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/pe_pin_fab"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/menu_pin"
+                            android:text="@string/menu_pin"
+                            app:icon="@drawable/ic_push_pin_on"
+                        />
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/pe_toolbar"
@@ -76,7 +102,7 @@
                 android:transitionName="@string/playlist_trans_title"
                 app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:menu="@menu/playlist_edit_actionbar"
-                />
+            />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -88,7 +114,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
-        >
+    >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -96,14 +122,14 @@
             android:layout_margin="16dp"
             android:paddingBottom="128dp"
             tools:context=".ui.playlist_item_edit.PlaylistEditFragment"
-            >
+        >
 
             <View
                 android:id="@+id/pe_spacer"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintTop_toTopOf="parent"
-                />
+            />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/pe_title"
@@ -114,7 +140,7 @@
                 app:layout_constraintEnd_toEndOf="@id/pe_spacer"
                 app:layout_constraintStart_toStartOf="@id/pe_spacer"
                 app:layout_constraintTop_toBottomOf="@id/pe_spacer"
-                >
+            >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/pe_title_edit"
@@ -125,7 +151,7 @@
                     tools:text="Edit input"
                     android:maxLines="1"
                     android:singleLine="true"
-                    />
+                />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -137,7 +163,7 @@
                 app:layout_constraintEnd_toStartOf="@id/pe_play_start"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_title"
-                />
+            />
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/pe_play_start"
@@ -147,7 +173,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/pe_default"
                 app:layout_constraintTop_toBottomOf="@id/pe_title"
-                />
+            />
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/pe_playable"
@@ -157,7 +183,7 @@
                 app:layout_constraintEnd_toStartOf="@id/pe_deletable"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_play_start"
-                />
+            />
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/pe_deletable"
@@ -167,7 +193,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/pe_playable"
                 app:layout_constraintTop_toBottomOf="@id/pe_play_start"
-                />
+            />
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/pe_editable_items"
@@ -177,7 +203,7 @@
                 app:layout_constraintEnd_toStartOf="@id/pe_deletable_items"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_playable"
-                />
+            />
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/pe_deletable_items"
@@ -187,7 +213,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/pe_editable_items"
                 app:layout_constraintTop_toBottomOf="@id/pe_playable"
-                />
+            />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/pe_parent_label"
@@ -197,7 +223,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/pe_parent_chip"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/pe_parent_chip"
-                />
+            />
 
             <FrameLayout
                 android:id="@+id/pe_parent_chip"
@@ -206,7 +232,7 @@
                 android:layout_marginStart="8dp"
                 app:layout_constraintStart_toEndOf="@id/pe_parent_label"
                 app:layout_constraintTop_toBottomOf="@id/pe_editable_items"
-                />
+            />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/pe_commit_button"
@@ -224,41 +250,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_parent_chip"
                 tools:text="Commit"
-                />
-
-            <View
-                android:id="@+id/pe_divider1"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/divider"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_commit_button"
-                />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/pe_info_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:text="@string/pe_info"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_divider1"
-                />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/pe_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:autoLink="web|email"
-                android:linksClickable="true"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_info_title"
-                tools:text="@string/pe_info"
-                />
+            />
 
             <View
                 android:id="@+id/pe_divider"
@@ -268,7 +260,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_info"
-                />
+            />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/pe_other_actions_title"
@@ -280,7 +272,41 @@
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_divider"
-                />
+            />
+
+            <View
+                android:id="@+id/pe_divider1"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_commit_button"
+            />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pe_info_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/pe_info"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_divider1"
+            />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pe_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:autoLink="web|email"
+                android:linksClickable="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pe_info_title"
+                tools:text="@string/pe_info"
+            />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/pe_watch_all"
@@ -296,37 +322,10 @@
                 app:icon="@drawable/ic_visibility_24"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_other_actions_title"
-                />
+            />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/pe_star_fab"
-        style="@style/FabButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:contentDescription="@null"
-        app:layout_anchor="@id/pe_appbar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_starred_off"
-        />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/pe_pin_fab"
-        style="@style/FabButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="80dp"
-        android:contentDescription="@null"
-        android:tint="@color/white"
-        android:visibility="visible"
-        app:fabSize="mini"
-        app:layout_anchor="@id/pe_appbar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_push_pin_off"
-        tools:ignore="RtlSymmetry"
-        />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

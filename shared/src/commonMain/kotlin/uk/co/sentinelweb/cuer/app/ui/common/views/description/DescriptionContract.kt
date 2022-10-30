@@ -24,7 +24,6 @@ interface DescriptionContract {
         fun onChannelClick()
         fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain)
         fun onTimecodeClick(timecode: TimecodeDomain)
-
         fun onSelectPlaylistChipClick(model: ChipModel)
         fun onRemovePlaylist(chipModel: ChipModel)
         fun onRibbonItemClick(ribbonItem: RibbonModel)

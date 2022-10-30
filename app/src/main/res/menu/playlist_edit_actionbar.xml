@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
-    <item
-        android:id="@+id/pe_star"
-        android:icon="@drawable/ic_starred_off"
-        android:title="@string/menu_star"
-        android:orderInCategory="200"
-        app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="ifRoom"
-        />
+>
+    <!--    <item-->
+    <!--        android:id="@+id/pe_star"-->
+    <!--        android:icon="@drawable/ic_starred_off"-->
+    <!--        android:title="@string/menu_star"-->
+    <!--        android:orderInCategory="200"-->
+    <!--        app:iconTint="@color/menu_button_icon_tint"-->
+    <!--        app:showAsAction="ifRoom"-->
+    <!--        />-->
 
-    <item
-        android:id="@+id/pe_pin"
-        android:icon="@drawable/ic_push_pin_off"
-        android:orderInCategory="100"
-        android:title="@string/menu_pin"
-        app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="ifRoom"
-        />
+    <!--    <item-->
+    <!--        android:id="@+id/pe_pin"-->
+    <!--        android:icon="@drawable/ic_push_pin_off"-->
+    <!--        android:orderInCategory="100"-->
+    <!--        android:title="@string/menu_pin"-->
+    <!--        app:iconTint="@color/menu_button_icon_tint"-->
+    <!--        app:showAsAction="ifRoom"-->
+    <!--        />-->
 
 </menu>

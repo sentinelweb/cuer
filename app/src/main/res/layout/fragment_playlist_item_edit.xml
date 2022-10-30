@@ -75,8 +75,6 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/plie_play_fab"
                         style="@style/Header.Button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:contentDescription="@string/menu_play"
                         android:text="@string/menu_play"
                         app:icon="@drawable/ic_play_black"
