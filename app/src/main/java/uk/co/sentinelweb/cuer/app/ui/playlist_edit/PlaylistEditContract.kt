@@ -93,9 +93,7 @@ interface PlaylistEditContract {
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }
-                scoped {
-                    navigationRouter(true, this.getFragmentActivity())
-                }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
             }
         }
     }

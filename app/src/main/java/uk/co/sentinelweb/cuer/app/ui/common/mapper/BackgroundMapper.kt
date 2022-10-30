@@ -13,6 +13,6 @@ class BackgroundMapper(
         } else if (media.isLiveBroadcast) {
             R.color.live_background
         } else {
-            R.color.info_text_overlay_background
+            R.color.color_on_surface
         }
 }

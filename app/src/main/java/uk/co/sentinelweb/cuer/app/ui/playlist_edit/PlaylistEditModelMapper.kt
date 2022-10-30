@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 
 class PlaylistEditModelMapper constructor(
     private val res: ResourceWrapper,
-    private val validator: PlaylistValidator
+    private val validator: PlaylistValidator,
 ) {
     fun mapModel(
         domain: PlaylistDomain,

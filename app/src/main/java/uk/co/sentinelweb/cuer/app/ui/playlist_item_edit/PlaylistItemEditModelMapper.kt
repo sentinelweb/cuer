@@ -42,11 +42,11 @@ class PlaylistItemEditModelMapper(
                 positionText = media.positon?.let { timeFormater.formatMillis(it, SECS) },
                 position = media.positon
                     ?.takeIf { media.duration != null && media.duration!! > 0L }
-                    ?.let { (it / media.duration!!).toFloat() },
+                    ?.let { (it.toFloat() / media.duration!!) },
                 empty = false,
                 isLive = media.isLiveBroadcast,
                 isUpcoming = media.isLiveBroadcastUpcoming,
-                infoTextBackgroundColor = backgroundMapper.mapInfoBackground(media)
+                infoTextBackgroundColor = backgroundMapper.mapInfoBackground(media),
             )
         } ?: mapEmpty()
     }
