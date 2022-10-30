@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -38,6 +39,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -59,6 +61,7 @@ class PlaylistsFragment :
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
+    private val res: ResourceWrapper by inject()
 
     private var _binding: FragmentPlaylistsBinding? = null
     private val binding get() = _binding!!
@@ -70,6 +73,7 @@ class PlaylistsFragment :
 
     private var snackbar: Snackbar? = null
     private var dialogFragment: DialogFragment? = null
+
     init {
         log.tag(this)
     }
@@ -114,10 +118,36 @@ class PlaylistsFragment :
         compactPlayerScroll.addScrollListener(binding.playlistsList, this)
         binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
         binding.playlistsSwipe.isRefreshing = true
+        binding.playlistsAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+
+            var isShow = false
+            var scrollRange = -1
+
+            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange()
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    isShow = true
+                    setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
+                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+                } else if (isShow) {
+                    isShow = false
+                    setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+                }
+            }
+        })
         postponeEnterTransition()
         binding.playlistsList.doOnPreDraw {
             startPostponedEnterTransition()
         }
+    }
+
+    private fun setMenuItemsColor(cslRes: Int) {
+        val colorStateList = res.getColorStateList(cslRes)
+        searchMenuItem.iconTintList = colorStateList
+        addMenuItem.iconTintList = colorStateList
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
