@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.util.share.scan
 import android.net.Uri
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
+import java.net.URLDecoder
 
 val urlMediaMappers = listOf(
     YoutubeShortUrlMapper(),
@@ -10,7 +11,8 @@ val urlMediaMappers = listOf(
     YoutubePlaylistUrlMapper(),
     YoutubeChannelUrlUserMapper(),
     YoutubeChannelUrlMapper(),
-    YoutubeShortsUrlMapper()
+    YoutubeShortsUrlMapper(),
+    GoogleYoutubeUrlMapper(YoutubeMediaUrlMapper())
 )
 
 interface UrlMediaMapper {
@@ -18,6 +20,7 @@ interface UrlMediaMapper {
     fun map(uri: Uri): Pair<ObjectTypeDomain, Domain>
 }
 
+// https://youtu.be/Wp_UfkH2bL8
 private class YoutubeShortUrlMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean = uri.host?.endsWith("youtu.be") ?: false
@@ -28,6 +31,8 @@ private class YoutubeShortUrlMapper : UrlMediaMapper {
             ?: throw IllegalArgumentException("Link format error: $uri")
 }
 
+// https://www.youtube.com/watch?v=Wp_UfkH2bL8
+// https://m.youtube.com/watch?v=88YCkY8U2NU
 private class YoutubeMediaUrlMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
@@ -96,3 +101,26 @@ private class YoutubeShortsUrlMapper : UrlMediaMapper {
             }
             ?: throw IllegalArgumentException("Link format error: $uri")
 }
+
+// https://www.google.com/url?sa=t&source=web&rct=j&url=https://m.youtube.com/watch%3Fv%3D88YCkY8U2NU&ved=2ahUKEwiuh5DxpYH7AhWJx4UKHVrKB1IQwqsBegQIdhAF&usg=AOvVaw0faoqETwWJ6C2Y_kMcucLW
+private class GoogleYoutubeUrlMapper(
+    private val youtubeMediaUrlMapper: YoutubeMediaUrlMapper
+) : UrlMediaMapper {
+
+    override fun check(uri: Uri): Boolean =
+        ((uri.host?.contains("google.") ?: false)
+                && (uri.path?.let { it.indexOf("url") == 1 } ?: false)
+                && (uri.getQueryParameters("url")?.takeIf { it.size == 1 }?.get(0)?.contains("youtube.com") ?: false))
+
+
+    override fun map(uri: Uri): Pair<ObjectTypeDomain, MediaDomain> =
+        uri.getQueryParameters("url")
+            ?.takeIf { it.size == 1 }
+            ?.get(0)
+            ?.let { URLDecoder.decode(it) }
+            ?.let { Uri.parse(it) }
+            ?.takeIf { youtubeMediaUrlMapper.check(it) }
+            ?.let { youtubeMediaUrlMapper.map(it) }
+            ?: throw IllegalArgumentException("Link format error: $uri")
+}
+
