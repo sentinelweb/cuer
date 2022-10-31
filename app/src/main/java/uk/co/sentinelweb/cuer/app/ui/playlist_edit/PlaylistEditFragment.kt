@@ -227,7 +227,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
             binding.peTitleEdit.setText(model.titleEdit)
             binding.peTitleEdit.setSelection(model.titleEdit.length)
         }
-        binding.peCollapsingToolbar.title = model.titleDisplay
+        binding.peCollapsingToolbar.title = getString(R.string.edit_prefix) + model.titleDisplay
         binding.peClickPrompt.isVisible = !model.isDialog
 
         binding.peStarFab.setIconResource(

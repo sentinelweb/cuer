@@ -263,5 +263,6 @@
     <string name="buffering">Buffering</string>
     <string name="stop">Stop</string>
     <string name="menu_unpin">Unpin</string>
+    <string name="edit_prefix">"Edit: "</string>
 
 </resources>
