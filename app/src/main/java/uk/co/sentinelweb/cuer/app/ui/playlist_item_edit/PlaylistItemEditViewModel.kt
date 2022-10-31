@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import summarise
@@ -11,6 +13,8 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
@@ -38,6 +42,7 @@ import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
@@ -60,6 +65,7 @@ class PlaylistItemEditViewModel constructor(
     private val linkNavigator: LinkNavigator,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val res: ResourceWrapper,
+    private val coroutines: CoroutineContextProvider,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -87,6 +93,32 @@ class PlaylistItemEditViewModel constructor(
 
     fun setInShare(isInShare: Boolean) {
         state.isInShare = isInShare
+    }
+
+    fun onResume() {
+        listen()
+    }
+
+    private fun listen() {
+        mediaOrchestrator.updates
+            .onEach { (op, source, newMedia) ->
+                //log.d("media changed: $op, $source, id=${newMedia.id} title=${newMedia.title}")
+                when (op) {
+                    FLAT, FULL -> {
+                        if (newMedia.platformId == state.media?.platformId) {
+                            state.media = newMedia.copy(
+                                starred = state.media?.starred ?: newMedia.starred,
+                                watched = state.media?.watched ?: newMedia.watched,
+                                playFromStart = state.media?.playFromStart ?: newMedia.playFromStart,
+                            )
+                            update()
+                        }
+                    }
+
+                    OrchestratorContract.Operation.DELETE -> Unit
+                }
+            }
+            .launchIn(coroutines.mainScope)
     }
 
     fun setData(

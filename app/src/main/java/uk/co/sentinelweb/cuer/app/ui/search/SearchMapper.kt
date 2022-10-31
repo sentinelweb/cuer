@@ -17,11 +17,13 @@ class SearchMapper constructor(
     fun map(state: SearchContract.State): SearchContract.Model {
         val playlistQuantity = if (state.local.playlists.size > 0) "(${state.local.playlists.size})" else ""
         return SearchContract.Model(
-            searchTypeText(state.searchType),
-            searchTypeText(if (state.searchType == LOCAL) REMOTE else LOCAL),
-            if (state.searchType == LOCAL) state.local.text else state.remote.text ?: "",
-            state.searchType == LOCAL,
-            state.local.let {
+            type = searchTypeText(state.searchType),
+            icon = if (state.searchType == LOCAL) R.drawable.ic_portrait else R.drawable.ic_youtube,
+            otherType = searchTypeText(if (state.searchType == LOCAL) REMOTE else LOCAL),
+            otherIcon = if (state.searchType == LOCAL) R.drawable.ic_youtube else R.drawable.ic_portrait,
+            text = if (state.searchType == LOCAL) state.local.text else state.remote.text ?: "",
+            isLocal = state.searchType == LOCAL,
+            localParams = state.local.let {
                 SearchContract.LocalModel(
                     isWatched = it.isWatched,
                     isNew = it.isNew,
@@ -33,7 +35,7 @@ class SearchMapper constructor(
                         )
                 )
             },
-            state.remote.let { remote ->
+            remoteParams = state.remote.let { remote ->
                 SearchContract.RemoteModel(
                     platform = remote.platform,
                     relatedTo = remote.relatedToMediaPlatformId?.let { "${remote.relatedToMediaTitle} [$it]" },

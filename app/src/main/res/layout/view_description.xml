@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
     tools:context=".ui.playlist_item_edit.PlaylistItemEditFragment"
 >
     <HorizontalScrollView
@@ -41,7 +42,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:ellipsize="end"
-        android:maxWidth="200dp"
         android:maxLines="1"
         android:textIsSelectable="true"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"

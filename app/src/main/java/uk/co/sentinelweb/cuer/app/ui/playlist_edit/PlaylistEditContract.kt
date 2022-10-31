@@ -39,6 +39,7 @@ interface PlaylistEditContract {
         val info: String,
         val config: PlaylistDomain.PlaylistConfigDomain,
         val showDefault: Boolean,
+        val isCreate: Boolean,
         var isDialog: Boolean
     )
 
@@ -93,9 +94,7 @@ interface PlaylistEditContract {
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }
-                scoped {
-                    navigationRouter(true, this.getFragmentActivity())
-                }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
             }
         }
     }

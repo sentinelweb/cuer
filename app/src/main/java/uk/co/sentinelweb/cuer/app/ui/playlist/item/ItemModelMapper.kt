@@ -1,22 +1,20 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.convertToLocalMillis
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.Format
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import java.time.OffsetDateTime
 
 class ItemModelMapper constructor(
     private val res: ResourceWrapper,
     private val timeSinceFormatter: TimeSinceFormatter,
     private val timeFormatter: TimeFormatter,
-    private val backgroundMapper: BackgroundMapper
+    private val durationTextColorMapper: DurationTextColorMapper
 ) {
 
     fun mapItem(
@@ -58,17 +56,17 @@ class ItemModelMapper constructor(
             imageUrl = (item.media.image ?: item.media.thumbNail)?.url,
             channelImageUrl = item.media.channelData.thumbNail?.url,
             progress = progress,
-            starred = item.media.starred,
+            isStarred = item.media.starred,
             watchedSince = item.media.dateLastPlayed?.let { timeSinceFormatter.formatTimeSince(it.toEpochMilliseconds()) }
                 ?: "-",
             isWatched = item.media.watched,
             published = item.media.published
-                ?.let { timeSinceFormatter.formatTimeSince(convertToLocalMillis(it)) }
+                ?.let { timeSinceFormatter.formatTimeSince(it.convertToLocalMillis()) }
                 ?: "-",
             platform = item.media.platform,
             isLive = item.media.isLiveBroadcast,
             isUpcoming = item.media.isLiveBroadcastUpcoming,
-            infoTextBackgroundColor = backgroundMapper.mapInfoBackground(item.media),
+            infoTextBackgroundColor = durationTextColorMapper.mapInfoBackgroundItem(item.media),
             canEdit = canEdit,
             canDelete = canDelete,
             playlistName = playlistText,
@@ -78,7 +76,5 @@ class ItemModelMapper constructor(
         )
     }
 
-    private fun convertToLocalMillis(it: LocalDateTime) =
-        it.toJavaLocalDateTime().toInstant(OffsetDateTime.now().getOffset())
-            .toEpochMilli()
+
 }

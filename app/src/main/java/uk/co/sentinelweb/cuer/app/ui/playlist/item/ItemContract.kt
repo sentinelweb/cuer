@@ -92,7 +92,7 @@ interface ItemContract {
         val published: String,
         val watchedSince: String,
         val isWatched: Boolean,
-        val starred: Boolean,
+        val isStarred: Boolean,
         val platform: PlatformDomain,
         val isLive: Boolean,
         val isUpcoming: Boolean,

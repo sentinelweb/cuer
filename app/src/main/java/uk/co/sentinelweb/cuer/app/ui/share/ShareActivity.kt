@@ -101,12 +101,12 @@ class ShareActivity : AppCompatActivity(),
         savedInstanceState
             ?.getString(STATE_KEY)
             ?.apply { presenter.restoreState(this) }
-        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         _binding = ActivityShareBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         edgeToEdgeWrapper.doOnApplyWindowInsets(binding.shareRoot) { view, insets, padding ->
             view.updatePadding(
                 bottom = padding.bottom + insets.systemWindowInsetBottom

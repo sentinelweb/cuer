@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.util.wrapper
 import android.app.Activity
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
+import android.text.style.ImageSpan
 import android.view.View
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
@@ -57,7 +58,7 @@ class AndroidSnackbarWrapper constructor(
         action: ((View) -> Unit)?
     ): Snackbar {
         val text = SpannableString("  $msg")
-            .apply { res.replaceSpannableIcon(this, errorDrawable, 0, 1) }
+            .apply { res.replaceSpannableIcon(this, errorDrawable, 0, 1, ImageSpan.ALIGN_BOTTOM) }
         return Snackbar.make(a.findViewById(android.R.id.content), text, LENGTH_SHORT)
             .setBackgroundTint(res.getColor(R.color.error_snackbar))
             .setTextColor(res.getColor(R.color.white))

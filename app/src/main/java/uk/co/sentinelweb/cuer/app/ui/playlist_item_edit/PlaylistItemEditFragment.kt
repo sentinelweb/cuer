@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -70,12 +71,14 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val playerControls: PlayerContract.PlayerControls by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
+    private val actionBarModifier: ActionBarModifier by inject()
 
     private val binding: FragmentPlaylistItemEditBinding
         get() = _binding ?: throw IllegalStateException("FragmentPlaylistItemEditBinding not bound")
     private var _binding: FragmentPlaylistItemEditBinding? = null
-    private val playMenuItem: MenuItem
-        get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
+
+//    private val playMenuItem: MenuItem
+//        get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
 
     private var dialog: AppCompatDialog? = null
     private var dialogFragment: DialogFragment? = null
@@ -146,19 +149,20 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         binding.plieToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
+        binding.plieToolbar.title = ""
         binding.pliePlayFab.setOnClickListener { viewModel.onPlayVideo() }
         binding.pliePlayFab.isVisible = allowPlayArg
-        playMenuItem.isVisible = false
+//        playMenuItem.isVisible = false
         binding.plieDescription.interactions = viewModel
-        binding.plieToolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.plie_play -> {
-                    viewModel.onPlayVideo(); true
-                }
-
-                else -> false
-            }
-        }
+//        binding.plieToolbar.setOnMenuItemClickListener { menuItem ->
+//            when (menuItem.itemId) {
+//                R.id.plie_play -> {
+//                    viewModel.onPlayVideo(); true
+//                }
+//
+//                else -> false
+//            }
+//        }
         binding.plieSwipe.setOnRefreshListener { viewModel.refreshMediaBackground() }
         binding.plieAppbar.addOnOffsetChangedListener(object :
             AppBarLayout.OnOffsetChangedListener {
@@ -173,26 +177,25 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    playMenuItem.isVisible = !menuState.modelEmpty
+                    actionBarModifier.setMenuItemColor(R.color.actionbar_icon_collapsed_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
-                    playMenuItem.isVisible = false
+                    actionBarModifier.setMenuItemColor(R.color.actionbar_icon_expanded_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
                 menuState.scrolledDown = isShow
             }
         })
         compactPlayerScroll.addScrollListener(binding.plieScroll, this)
-
         itemArg?.apply {
             saveCallback.isEnabled = true
             if (id != null) {
                 media.image?.apply { setImage(url) }
                 binding.plieDescription.channelImageVisible(false)
-                binding.plieTitlePos.isVisible = false
-                binding.plieTitleBg.isVisible = false
-                playMenuItem.isVisible = false
+//                binding.plieTitlePos.isVisible = false
+//                binding.plieTitleBg.isVisible = false
+//                playMenuItem.isVisible = false
             }
             viewModel.setData(this, sourceArg, parentArg, allowPlayArg, isOnSharePlaylist)
         }
@@ -213,6 +216,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
+        actionBarModifier.setMenuItemColor(R.color.actionbar_icon_expanded_csl)
     }
 
     override fun onAttach(context: Context) {
@@ -229,6 +233,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     override fun onResume() {
         super.onResume()
+        viewModel.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
     }
 
@@ -265,14 +270,14 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
 
     private fun observeModel(model: PlaylistItemEditContract.Model) {
-        binding.plieTitleBg.isVisible = true
+//        binding.plieTitleBg.isVisible = true
         binding.plieTitlePos.isVisible = !model.empty
         binding.plieDuration.isVisible = !model.empty
-        if (menuState.scrolledDown) {
-            playMenuItem.isVisible = !model.empty
-        } else {
-            playMenuItem.isVisible = false
-        }
+//        if (menuState.scrolledDown) {
+//            playMenuItem.isVisible = !model.empty
+//        } else {
+//            playMenuItem.isVisible = false
+//        }
         val imageUrl = model.imageUrl
         setImage(imageUrl)
 
@@ -288,14 +293,14 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         binding.pliePlayFab.isEnabled = model.canPlay
         binding.plieDescription.setModel(model.description)
         binding.plieDuration.text = model.durationText
-        binding.plieDuration.setBackgroundColor(res.getColor(model.infoTextBackgroundColor))
+        binding.plieDuration.setTextColor(res.getColor(model.infoTextColor))
 
         model.position?.let { ratio ->
-            binding.plieTitlePos.layoutParams.width =
-                (ratio * binding.plieTitleBg.width).toInt()
+            binding.plieTitlePos.progress = (ratio * binding.plieTitlePos.max).toInt()
         } ?: binding.plieTitlePos.apply { isVisible = false }
         binding.plieDescription.ribbonItems.find { it.item.type == STAR }?.isVisible = !model.starred
         binding.plieDescription.ribbonItems.find { it.item.type == UNSTAR }?.isVisible = model.starred
+        binding.plieItemInfo.text = model.itemText
     }
 
 

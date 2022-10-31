@@ -64,7 +64,7 @@ class ItemPresenter(
 
     override fun isCompositePlaylist(): Boolean = state.item!!.playlistName != null
 
-    override fun isStarred(): Boolean = state.item!!.starred
+    override fun isStarred(): Boolean = state.item!!.isStarred
 
     override fun canDragLeft(): Boolean = state.item?.canDelete ?: false
 

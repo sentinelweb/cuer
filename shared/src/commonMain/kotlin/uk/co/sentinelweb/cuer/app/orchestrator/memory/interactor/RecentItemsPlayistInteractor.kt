@@ -43,7 +43,7 @@ class RecentItemsPlayistInteractor constructor(
         title = "Recent",
         type = APP,
         currentIndex = -1,
-        starred = true,
+        starred = false,
         image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-ketut-subiyanto-4474038-600.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
             playable = false,

@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.wrapper
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.text.Spannable
@@ -74,10 +75,11 @@ class ResourceWrapper constructor(
         d: Drawable,
         start: Int,
         end: Int,
+        align: Int = ImageSpan.ALIGN_BOTTOM,
     ) {
         string.apply {
             setSpan(
-                ImageSpan(d, ImageSpan.ALIGN_BOTTOM),
+                ImageSpan(d, align),
                 start, end,
                 Spannable.SPAN_INCLUSIVE_INCLUSIVE
             )
@@ -96,5 +98,6 @@ class ResourceWrapper constructor(
         }
 
     fun getShapeModel(id: Int) = ShapeAppearanceModel.builder(context, 0, id).build()
+    fun getColorStateList(id: Int): ColorStateList? = ContextCompat.getColorStateList(context, id)
 
 }

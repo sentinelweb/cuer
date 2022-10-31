@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.playlist_item_edit.PlaylistItemEditFragment">
+                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                     xmlns:tools="http://schemas.android.com/tools"
+                                                     android:layout_width="match_parent"
+                                                     android:layout_height="match_parent"
+                                                     android:orientation="vertical"
+                                                     tools:context=".ui.playlist_item_edit.PlaylistItemEditFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/plie_appbar"
@@ -16,64 +16,93 @@
             android:id="@+id/plie_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/background"
             app:collapsedTitleTextAppearance="@style/TextAppearance.ActionBar.Collapsed"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginBottom="28dp"
+            app:contentScrim="?colorSurface"
             app:expandedTitleMarginEnd="16dp"
             app:expandedTitleMarginStart="16dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.ActionBar.Expanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap|enterAlways"
-            app:statusBarScrim="?attr/colorPrimaryDark">
+            app:statusBarScrim="?colorSurface"
+            android:background="?colorSurface">
 
-            <ImageView
-                android:id="@+id/plie_image"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/background"
-                android:contentDescription="@null"
-                android:scaleType="centerCrop"
-                android:transitionName="@string/playlist_item_trans_image"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7"
-                tools:src="@drawable/im_test_nietzche" />
+                android:layout_height="wrap_content"
+                android:background="?colorSurface"
+            >
 
-            <View
-                android:id="@+id/plie_action_bg"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_gravity="top"
-                android:background="@drawable/actionbar_gradient" />
+                <ImageView
+                    android:id="@+id/plie_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:background="@color/background"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"
+                    android:transitionName="@string/playlist_item_trans_image"
+                    app:layout_collapseMode="parallax"
+                    app:layout_collapseParallaxMultiplier="0.7"
+                    tools:src="@drawable/im_test_nietzche"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"/>
 
-            <View
-                android:id="@+id/plie_title_bg"
-                android:layout_width="match_parent"
-                android:layout_height="64sp"
-                android:layout_gravity="bottom"
-                android:background="@color/black_text_secondary" />
+                <ProgressBar
+                    android:id="@+id/plie_title_pos"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:padding="0dp"
+                    android:max="100"
+                    android:progressDrawable="@drawable/item_progress_bar"
+                    android:background="@color/transparent"
+                    android:progressBackgroundTint="@color/transparent"
+                    app:layout_constraintBottom_toBottomOf="@id/plie_image"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
 
-            <View
-                android:id="@+id/plie_title_pos"
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:layout_gravity="bottom"
-                android:background="@color/primary" />
+                <LinearLayout
+                    android:id="@+id/plie_flags"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginStart="8dp"
+                    android:orientation="horizontal"
+                    tools:text="800"
+                    app:layout_constraintTop_toBottomOf="@id/plie_image"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                >
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/plie_play_fab"
+                        style="@style/Header.Button"
+                        android:contentDescription="@string/menu_play"
+                        android:text="@string/menu_play"
+                        app:icon="@drawable/ic_play_black"
+                    />
 
-            <TextView
-                android:id="@+id/plie_duration"
-                style="@style/Header.InfoText"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="1:00:00" />
+                    <TextView
+                        android:id="@+id/plie_duration"
+                        style="@style/Header.InfoText"
+                        android:textStyle="bold"
+                        tools:text="1:00:00"/>
+
+                    <TextView
+                        android:id="@+id/plie_item_info"
+                        style="@style/Header.InfoText"
+                        tools:text="1:00:00"/>
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/plie_toolbar"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
                 android:elevation="0dp"
-                android:transitionName="@string/playlist_item_trans_title"
                 app:layout_collapseMode="pin"
-                app:menu="@menu/playlist_item_edit_actionbar" /><!-- app:layout_scrollFlags="scroll|enterAlways|snap"-->
+                android:transitionName="@string/playlist_item_trans_title"
+                app:menu="@menu/playlist_item_edit_actionbar"/><!-- app:layout_scrollFlags="scroll|enterAlways|snap"-->
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -96,20 +125,20 @@
                 android:id="@+id/plie_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="128dp" />
+                android:paddingBottom="128dp"/>
 
         </androidx.core.widget.NestedScrollView>
     </uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/plie_play_fab"
-        style="@style/FabButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/menu_play"
-        app:layout_anchor="@id/plie_appbar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_player_play_black" />
+    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+    <!--        android:id="@+id/plie_play_fab"-->
+    <!--        style="@style/FabButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="16dp"-->
+    <!--        android:contentDescription="@string/menu_play"-->
+    <!--        app:layout_anchor="@id/plie_appbar"-->
+    <!--        app:layout_anchorGravity="bottom|end"-->
+    <!--        app:srcCompat="@drawable/ic_player_play_black"/>-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

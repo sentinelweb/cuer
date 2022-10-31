@@ -90,6 +90,7 @@ class SearchImageViewModel(
         state.config?.let { it.itemClick(savedImage) }
         state.loading = false
         searchState = mapper.mapSearch(state)
+        _uiLiveData.value = UiEvent(CLOSE, null)
     }
 
     fun onLibraryClick() {

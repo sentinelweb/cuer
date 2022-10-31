@@ -1,15 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.search
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.ButtonDefaults.elevation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -28,6 +27,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
+import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonColors
+import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonStroke
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 
@@ -72,17 +73,39 @@ fun SearchParametersUi(
                     .padding(dimensionResource(R.dimen.page_margin))
             ) {
 
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = model.type + " " + stringResource(id = R.string.search_title),
-                        style = MaterialTheme.typography.h5
-                    )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row {
+                        Icon(
+                            painter = painterResource(model.icon),
+                            tint = MaterialTheme.colors.onSurface,
+                            contentDescription = stringResource(id = R.string.menu_search),
+                            modifier = Modifier.padding(12.dp).size(24.dp)
+                        )
+                        Text(
+                            text = model.type + " " + stringResource(id = R.string.search_title),
+                            style = MaterialTheme.typography.h5,
+                            modifier = Modifier
+                                .padding(8.dp)
+                        )
+                    }
                     Button(
                         onClick = localOrRemoteClick,
                         modifier = Modifier
                             .padding(2.dp)
-                            .align(Alignment.TopEnd)
+                            .align(Alignment.TopEnd),
+                        border = cuerOutlineButtonStroke(),
+                        colors = cuerOutlineButtonColors(),
+                        elevation = elevation(0.dp)
                     ) {
+                        Icon(
+                            painter = painterResource(model.otherIcon),
+                            tint = MaterialTheme.colors.onSurface,
+                            contentDescription = stringResource(id = R.string.menu_search),
+                            modifier = Modifier.padding(end = 4.dp).size(24.dp)
+                        )
                         Text(
                             text = model.otherType,
                             style = MaterialTheme.typography.button
@@ -113,8 +136,17 @@ fun SearchParametersUi(
                     onClick = submit,
                     modifier = Modifier
                         .padding(top = 16.dp)
-                        .align(Alignment.End)
+                        .align(Alignment.End),
+                    border = cuerOutlineButtonStroke(),
+                    colors = cuerOutlineButtonColors(),
+                    elevation = elevation(0.dp)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        tint = MaterialTheme.colors.onSurface,
+                        contentDescription = stringResource(id = R.string.menu_search),
+                        modifier = Modifier.padding(end = 4.dp).size(24.dp)
+                    )
                     Text(
                         text = stringResource(id = R.string.search_title),
                         style = MaterialTheme.typography.button
@@ -183,12 +215,31 @@ fun SearchRemote(
                     onClick = selectDatesClick,
                     modifier = Modifier
                         .padding(2.dp)
-                        .clip(shape = MaterialTheme.shapes.small)
+                        .clip(shape = MaterialTheme.shapes.small),
+                    border = cuerOutlineButtonStroke(),
+                    colors = cuerOutlineButtonColors()
                 ) {
                     Text(
                         text = dateSelectionText,
                         style = MaterialTheme.typography.body2,
                         modifier = text
+                    )
+                }
+                Button(
+                    onClick = selectOrderClick,
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clip(shape = MaterialTheme.shapes.small),
+                    border = cuerOutlineButtonStroke(),
+                    colors = cuerOutlineButtonColors(),
+                    elevation = elevation(0.dp)
+                ) {
+                    Text(
+                        text = "Order: ${model.order.name}",
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .align(Alignment.CenterVertically)
                     )
                 }
             }
@@ -205,22 +256,6 @@ fun SearchRemote(
                     text = "Live",
                     style = MaterialTheme.typography.body2,
                     modifier = text
-                )
-            }
-        }
-        Row(modifier = Modifier.padding(8.dp)) {
-            Button(
-                onClick = selectOrderClick,
-                modifier = Modifier
-                    .padding(2.dp)
-                    .clip(shape = MaterialTheme.shapes.small)
-            ) {
-                Text(
-                    text = "Order: ${model.order.name}",
-                    style = MaterialTheme.typography.body2,
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .align(Alignment.CenterVertically)
                 )
             }
         }
@@ -287,12 +322,15 @@ fun Chip(model: ChipModel, onClick: (ChipModel) -> Unit) {
         onClick = { onClick(model) },
         modifier = Modifier
             .padding(2.dp)
-            .clip(shape = MaterialTheme.shapes.small)
+            .clip(shape = MaterialTheme.shapes.small),
+        border = cuerOutlineButtonStroke(),
+        colors = cuerOutlineButtonColors(),
+        elevation = elevation(0.dp)
     ) {
         if (model.type != ChipModel.Type.PLAYLIST_SELECT) {
             Icon(
                 imageVector = Icons.Default.Clear,
-                tint = MaterialTheme.colors.onPrimary,
+                tint = MaterialTheme.colors.onSurface,
                 contentDescription = stringResource(id = R.string.clear),
                 modifier = Modifier.size(16.dp)
             )
@@ -367,7 +405,9 @@ fun SearchInputText(
 
 val searchParams = SearchContract.Model(
     type = "Local",
+    icon = R.drawable.ic_portrait,
     otherType = "YouTube",
+    otherIcon = R.drawable.ic_youtube,
     text = "philosophy",
     isLocal = true,
     localParams = SearchContract.LocalModel(
@@ -403,7 +443,9 @@ fun PreviewLocalUi() {
 fun PreviewRemoteUi() {
     SearchParametersUi(searchParams.copy(
         type = "YouTube",
+        icon = R.drawable.ic_youtube,
         otherType = "Local",
+        otherIcon = R.drawable.ic_portrait,
         isLocal = false
     ), {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
 }
@@ -414,7 +456,9 @@ fun PreviewRemoteRelatedlUi() {
     SearchParametersUi(
         searchParams.copy(
             type = "YouTube",
+            icon = R.drawable.ic_youtube,
             otherType = "Local",
+            otherIcon = R.drawable.ic_portrait,
             text = null,
             isLocal = false,
             remoteParams = searchParams.remoteParams.copy(
