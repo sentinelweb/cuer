@@ -119,7 +119,7 @@
     </style>
 
     <style name="TextAppearance.ActionBar.Expanded">
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">32sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
         <item name="android:textStyle">bold</item>

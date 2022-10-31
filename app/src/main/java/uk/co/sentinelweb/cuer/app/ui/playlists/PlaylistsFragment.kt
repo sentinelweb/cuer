@@ -105,7 +105,7 @@ class PlaylistsFragment :
         binding.playlistsToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
-
+        binding.playlistsToolbar.title = ""
         binding.playlistsList.layoutManager = LinearLayoutManager(context)
         binding.playlistsList.adapter = adapter
         binding.playlistsList.addItemDecoration(

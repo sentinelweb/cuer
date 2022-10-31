@@ -149,6 +149,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         binding.plieToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
+        binding.plieToolbar.title = ""
         binding.pliePlayFab.setOnClickListener { viewModel.onPlayVideo() }
         binding.pliePlayFab.isVisible = allowPlayArg
 //        playMenuItem.isVisible = false

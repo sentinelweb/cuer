@@ -174,6 +174,7 @@ class PlaylistFragment :
         ItemTouchHelper(ItemTouchHelperCallback(this)).apply {
             attachToRecyclerView(binding.playlistList)
         }
+        binding.playlistToolbar.title = ""
         binding.playlistFabUp.setOnClickListener { presenter.scroll(Up) }
         binding.playlistFabUp.setOnLongClickListener { presenter.scroll(Top);true }
         binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }

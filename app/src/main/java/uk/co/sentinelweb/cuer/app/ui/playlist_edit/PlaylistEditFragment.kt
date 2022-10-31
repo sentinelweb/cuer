@@ -114,7 +114,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         val isDialog = this.dialog != null
         viewModel.setIsDialog(isDialog)
         binding.peClickPrompt.isVisible = !isDialog
-
+        binding.peToolbar.title = ""
         binding.peImage.setOnTouchListener { iv, e ->
             when (e.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
