@@ -137,6 +137,25 @@ class PlaylistFragment :
         }
     }
 
+    var appBarOffsetScrollRange = -1
+    val appBarOffsetChangedistener = object : AppBarLayout.OnOffsetChangedListener {
+
+        override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
+            if (appBarOffsetScrollRange == -1) {
+                appBarOffsetScrollRange = appBarLayout.getTotalScrollRange()
+            }
+            if (appBarOffsetScrollRange + verticalOffset == 0) {
+                menuState.isCollapsed = true
+                setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
+                edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+            } else if (menuState.isCollapsed) {
+                menuState.isCollapsed = false
+                setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+                edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+            }
+        }
+    }
+
     init {
         log.tag(this)
     }
@@ -180,25 +199,8 @@ class PlaylistFragment :
         binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }
         binding.playlistFabDown.setOnLongClickListener { presenter.scroll(Bottom);true }
         binding.playlistFabRefresh.setOnClickListener { presenter.refreshPlaylist() }
-        binding.playlistAppbar.addOnOffsetChangedListener(object :
-            AppBarLayout.OnOffsetChangedListener {
 
-            var scrollRange = -1
-            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange()
-                }
-                if (scrollRange + verticalOffset == 0) {
-                    menuState.isCollapsed = true
-                    setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-                } else if (menuState.isCollapsed) {
-                    menuState.isCollapsed = false
-                    setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-                }
-            }
-        })
+        binding.playlistAppbar.addOnOffsetChangedListener(appBarOffsetChangedistener)
         compactPlayerScroll.addScrollListener(binding.playlistList, this)
         binding.playlistFabPlaymode.setOnClickListener { presenter.onPlayModeChange() }
         binding.playlistFabPlay.setOnClickListener { presenter.onPlayPlaylist() }
@@ -398,7 +400,6 @@ class PlaylistFragment :
     override fun setHeaderModel(model: PlaylistContract.Model) {
         setImage(model.imageUrl)
         binding.playlistCollapsingToolbar.title = model.title
-        //binding.playlistTitle.text=model.title
         binding.playlistFabPlay.setIconResource(model.playIcon)
         binding.playlistFabPlay.text = model.playText
         binding.playlistFabPlay.isVisible = model.canPlay
@@ -421,6 +422,7 @@ class PlaylistFragment :
             if (model.canEdit || model.canPlay) R.dimen.app_bar_header_height_playlist
             else R.dimen.app_bar_header_height_playlist_no_actions
         )
+        appBarOffsetScrollRange = -1
         menuState.lastPlayModeIndex = model.loopModeIndex
         menuState.isPlayable = model.canPlay
     }
