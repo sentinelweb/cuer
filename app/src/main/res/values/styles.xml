@@ -542,6 +542,18 @@
         <item name="android:layout_margin">8dp</item>
         <item name="rippleColor">@color/grey_400</item>
     </style>
+
+    <style name="Button.Solid" parent="@style/Widget.MaterialComponents.Button.Icon">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableTint">@color/button_fg_tint</item>
+        <item name="iconTint">@color/white</item>
+        <item name="tint">?colorPrimary</item>
+        <item name="android:elevation">@dimen/button_elevation</item>
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="rippleColor">?colorPrimaryVariant</item>
+    </style>
     <!-- end Buttons =========================== -->
     <!-- Full screen =========================== -->
     <style name="FullscreenTheme" parent="AppTheme">
