@@ -97,12 +97,8 @@ class PlaylistEditViewModel constructor(
     private fun update() {
         val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlistEdit.id
         _modelLiveData.value = mapper.mapModel(
-            domain = state.playlistEdit,
+            state = state,
             pinned = pinned,
-            parent = state.playlistParent,
-            showAllWatched = state.isAllWatched == true,
-            showDefault = !state.defaultInitial,
-            isDialog = state.isDialog
         ).apply { state.model = this }
     }
 

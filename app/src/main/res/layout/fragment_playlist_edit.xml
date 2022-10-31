@@ -74,6 +74,16 @@
                         android:orientation="horizontal"
                     >
                         <com.google.android.material.button.MaterialButton
+                            android:id="@+id/pe_commit_button"
+                            style="@style/Button.Solid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pe_create"
+                            app:icon="@drawable/ic_button_tick_24_white"
+                            tools:text="Commit"
+                        />
+
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/pe_star_fab"
                             style="@style/Header.Button"
                             android:contentDescription="@string/menu_star"
@@ -89,15 +99,6 @@
                             app:icon="@drawable/ic_push_pin_on"
                         />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/pe_commit_button"
-                            style="@style/Button.Solid"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/pe_create"
-                            app:icon="@drawable/ic_button_tick_24_white"
-                            tools:text="Commit"
-                        />
                     </LinearLayout>
                 </HorizontalScrollView>
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -246,7 +247,7 @@
             />
 
             <View
-                android:id="@+id/pe_divider"
+                android:id="@+id/pe_divider_other_actions"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:background="@color/divider"
@@ -264,7 +265,7 @@
                 android:textAllCaps="true"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_divider"
+                app:layout_constraintTop_toBottomOf="@id/pe_divider_other_actions"
             />
 
             <com.google.android.material.button.MaterialButton
@@ -279,7 +280,7 @@
             />
 
             <View
-                android:id="@+id/pe_divider1"
+                android:id="@+id/pe_divider_info"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:background="@color/divider"
@@ -297,7 +298,7 @@
                 android:textAllCaps="true"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pe_divider1"
+                app:layout_constraintTop_toBottomOf="@id/pe_divider_info"
             />
 
             <com.google.android.material.textview.MaterialTextView

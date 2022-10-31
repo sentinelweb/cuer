@@ -260,6 +260,11 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         binding.peDeletableItems.isChecked = model.config.deletableItems
         binding.peEditableItems.isChecked = model.config.editableItems
         binding.peParentChip.removeAllViews()
+
+        binding.peDividerOtherActions.isVisible = !model.isCreate
+        binding.peOtherActionsTitle.isVisible = !model.isCreate
+        binding.peWatchAll.isVisible = !model.isCreate
+
         chipCreator.create(model.chip, binding.peParentChip).apply {
             binding.peParentChip.addView(this)
             when (model.chip.type) {

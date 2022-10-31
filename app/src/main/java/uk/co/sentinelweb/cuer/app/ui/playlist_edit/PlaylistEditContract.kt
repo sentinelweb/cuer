@@ -39,6 +39,7 @@ interface PlaylistEditContract {
         val info: String,
         val config: PlaylistDomain.PlaylistConfigDomain,
         val showDefault: Boolean,
+        val isCreate: Boolean,
         var isDialog: Boolean
     )
 
