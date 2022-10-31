@@ -59,22 +59,22 @@ Using
 
 ### Browse
 
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/25-11-21/browse-sm-2021-11-25-170212.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/browse_20221031_200950.png" width="400">
 ### Playlist
 
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/25-11-21/playlist-sm-2021-11-25-170440.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlist_20221031_200719.png" width="400">
 
 ### Playlists
 
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/25-11-21/playlists-sm-2021-11-25-170316.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlists_20221031_200615.png" width="400">
 
 ### Video info
 
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/25-11-21/item-description-sm-2021-11-25-170511.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlist_item_20221031_200847.png" width="400">
 
 ### Portrait Player
 
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/player-port-2021-07-19-204543.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/player_playlist_20221031_201518.png" width="400">
 
 ### Landscape Player
 
@@ -82,4 +82,4 @@ Using
 
 ### Add via Share
 
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/share-2021-07-19-205316.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/share_20221031_201927.png" width="400">
