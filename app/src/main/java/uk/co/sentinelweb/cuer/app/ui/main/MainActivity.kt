@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
 import android.animation.ObjectAnimator
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -26,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter.BackupResult.*
 import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -44,13 +46,13 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-
 class MainActivity :
     AppCompatActivity(),
     MainContract.View,
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     CompactPlayerScroll.PlayerHost,
     AndroidScopeComponent,
+    ActionBarModifier,
     MainContract.PlayerViewControl {
 
     override val scope: Scope by activityScopeWithSource<MainActivity>()
@@ -75,6 +77,14 @@ class MainActivity :
     private val playerFragment: Fragment
         get() = supportFragmentManager.findFragmentById(R.id.cast_player_fragment)
             ?: throw Exception("No player fragment")
+
+    private var _menu: Menu? = null
+    private val pasteAddMenuItem: MenuItem?
+        get() = _menu?.findItem(R.id.menu_paste_add)
+    private val settingsMenuItem: MenuItem?
+        get() = _menu?.findItem(R.id.menu_settings)
+
+    private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
 
     init {
         log.tag(this)
@@ -168,6 +178,7 @@ class MainActivity :
         presenter.onDestroy()
         volumeControl.controlView = null
         _binding = null
+        _menu = null
         super.onDestroy()
     }
 
@@ -178,15 +189,26 @@ class MainActivity :
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_actionbar, menu)
+        _menu = menu
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_paste_add -> startActivity(ShareActivity.intent(this, true))
+            R.id.menu_paste_add -> checkIntentAndGotoShare()
             R.id.menu_settings -> navController.navigate(R.id.navigation_settings_root)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun checkIntentAndGotoShare() {
+        // check clipboard data
+        clipboard.getPrimaryClip()
+            ?.getItemAt(0)
+            ?.text
+            ?.takeIf { it.startsWith("http") }
+            ?.also { startActivity(ShareActivity.intent(this, true)) }
+            ?: also { snackBarWrapper.makeError("There's no url on the clipboard").show() }
     }
 
     override fun checkPlayServices() {
@@ -241,8 +263,8 @@ class MainActivity :
         pref: Preference,
     ): Boolean {
         when (pref.key) {
-            getString(R.string.prefs_root_backup_key) -> navController.navigate(R.id.navigation_settings_backup)
-            getString(R.string.prefs_root_player_key) -> navController.navigate(R.id.navigation_settings_player)
+            getString(R.string.prefs_root_backup_key) -> navController.navigate(R.id.action_goto_settings_backup)
+            getString(R.string.prefs_root_player_key) -> navController.navigate(R.id.action_goto_settings_player)
         }
         return true
     }
@@ -297,7 +319,7 @@ class MainActivity :
         private const val SERVICES_REQUEST_CODE = 1
 
         fun start(c: Context, plId: Long, plItemId: Long?, source: Source, play: Boolean) {
-            c.startActivity( // todo map in NavigationMapper
+            c.startActivity(
                 Intent(c, MainActivity::class.java).apply {
                     putExtra(Target.KEY, Target.PLAYLIST.name)
                     putExtra(PLAYLIST_ID.name, plId)
@@ -311,5 +333,12 @@ class MainActivity :
             c.startActivity(Intent(c, MainActivity::class.java)
                 .apply { setFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
         }
+    }
+
+    // from ActionBarModifier
+    override fun setMenuItemColor(colorStateListId: Int) {
+        val colorStateList = res.getColorStateList(colorStateListId)
+        pasteAddMenuItem?.setIconTintList(colorStateList)
+        settingsMenuItem?.setIconTintList(colorStateList)
     }
 }

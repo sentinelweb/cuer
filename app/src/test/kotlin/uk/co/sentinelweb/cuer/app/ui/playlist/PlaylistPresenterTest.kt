@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -122,8 +122,8 @@ class PlaylistPresenterTest {
     @MockK
     lateinit var mockMultiPrefs: MultiPlatformPreferencesWrapper
 
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
-    private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())
+    private val testCoroutineDispatcher = TestCoroutineDispatcher()// use standard test dispatcher
+    private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())// use createCoroutineScope
 
     private val coroutines: CoroutineContextProvider =
         CoroutineContextTestProvider(testCoroutineDispatcher)
@@ -176,7 +176,17 @@ class PlaylistPresenterTest {
             mockPlaylistOrDefaultOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id, fixtCurrentIdentifier.source.flatOptions())
         } returns (fixtCurrentPlaylist to fixtCurrentSource)
         log.d("cuurrent: id:${fixtCurrentIdentifier.id} opts:${fixtCurrentIdentifier.source.flatOptions()}")
-        every { mockModelMapper.map(any(), any(), true, fixtCurrentIdentifier, any(), any()) } returns fixtCurrentPlaylistMapped
+        every {
+            mockModelMapper.map(
+                any(),
+                any(),
+                true,
+                fixtCurrentIdentifier,
+                any(),
+                any(),
+                any()
+            )
+        } returns fixtCurrentPlaylistMapped
 
 
         // next
@@ -190,15 +200,28 @@ class PlaylistPresenterTest {
         fixtNextPlaylistMapped = fixture.build<PlaylistContract.Model>()
             .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(12))
         coEvery {
-            mockPlaylistOrDefaultOrchestrator.getPlaylistOrDefault(fixtNextIdentifier.id, fixtNextIdentifier.source.flatOptions())
+            mockPlaylistOrDefaultOrchestrator.getPlaylistOrDefault(
+                fixtNextIdentifier.id,
+                fixtNextIdentifier.source.flatOptions()
+            )
         } returns (fixtNextPlaylist to fixtNextSource)
-        every { mockModelMapper.map(any(), any(), true, fixtNextIdentifier, any(), any()) } returns fixtNextPlaylistMapped
+        every {
+            mockModelMapper.map(
+                any(),
+                any(),
+                true,
+                fixtNextIdentifier,
+                any(),
+                any(),
+                any()
+            )
+        } returns fixtNextPlaylistMapped
 
         // fixme this *should* work for app playlists (executeRefresh.if (it.first.type == APP) {)
         //coEvery{mockPlaylistOrchestrator.loadList(AllFilter(), Options(Source.LOCAL))} returns listOf(fixtCurrentPlaylist)
 
         coEvery {
-            mockPlaylistOrchestrator.loadList(any<AllFilter>(), LOCAL.flatOptions())
+            mockPlaylistOrchestrator.loadList(any<Filter.AllFilter>(), LOCAL.flatOptions())
         } returns listOf()// fixme: problems building the tree will need pt play with data
 
         // orchestrator
@@ -249,7 +272,8 @@ class PlaylistPresenterTest {
             recentLocalPlaylists = mockRecentLocalPlaylists,
             playUseCase = mockPlayUseCase,
             itemMapper = mockItemMapper,
-            multiPrefs = mockMultiPrefs
+            multiPrefs = mockMultiPrefs,
+            appPlaylistInteractors = mapOf()
         )
         sut.onResume()
     }
@@ -273,7 +297,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlist header changed`() {
-        testCoroutineScope.runBlockingTest {
+        testCoroutineScope.runTest {
             createSut()
             val fixChangedHeader = fixtCurrentPlaylist.copy(currentIndex = 3)
 
@@ -286,7 +310,10 @@ class PlaylistPresenterTest {
             assertThat(fixtState?.playlist!!.items).isEqualTo(fixtCurrentPlaylist.items)
             assertTrue(fixtState?.playlist?.matchesHeader(fixChangedHeader) ?: false)
 
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), false, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), false, fixtCurrentIdentifier, any(), null, any())
+            }
             verify { mockView.setHeaderModel(any()) }
             verify { mockView.highlightPlayingItem(fixtState!!.playlist!!.currentIndex) }
         }
@@ -294,7 +321,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlist changed`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val currentIndex = 3
             val fixChanged = fixture.build<PlaylistDomain>()
@@ -307,7 +334,10 @@ class PlaylistPresenterTest {
             //verify
             assertThat(fixtState?.playlist!!.items.size).isEqualTo(fixChanged.items.size)
             assertThat(fixtState?.playlist).isEqualTo(fixChanged)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null, any())
+            }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtState!!.playlist!!.currentIndex) }
@@ -316,7 +346,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlist deleted`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             val fixtErrString: String = fixture.build()
             every { mockResources.getString(R.string.playlist_msg_deleted) } returns fixtErrString
             createSut()
@@ -333,7 +363,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlistitem changed not current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val replaceItemIndex = 3
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -348,7 +378,10 @@ class PlaylistPresenterTest {
             //verify
             assertThat(fixtState!!.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
             assertThat(fixtState!!.playlist!!.items.get(replaceItemIndex)).isEqualTo(fixtChanged)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null, any())
+            }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtState!!.playlist!!.currentIndex) }
@@ -357,7 +390,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow current playlistitem changed`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -372,7 +405,10 @@ class PlaylistPresenterTest {
             //verify
             assertThat(fixtState!!.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
             assertThat(fixtState!!.playlist!!.items.get(replaceItemIndex)).isEqualTo(fixtChanged)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null, any())
+            }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtState!!.playlist!!.currentIndex) }
@@ -381,7 +417,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow current playlistitem moved`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex
             val targetItemIndex = 5
@@ -397,7 +433,10 @@ class PlaylistPresenterTest {
             //verify
             assertThat(fixtState!!.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
             assertThat(fixtState!!.playlist!!.items.get(targetItemIndex)).isEqualTo(fixtChanged)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null, any())
+            }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtState!!.playlist!!.currentIndex) }
@@ -406,7 +445,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow current playlistitem moved out of playlist`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -423,7 +462,10 @@ class PlaylistPresenterTest {
             //verify
             assertThat(fixtState!!.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
             assertThat(fixtState!!.playlist!!.items.find { it.id == fixtChanged.id }).isNull()
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null, any())
+            }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtState!!.playlist!!.currentIndex) }
@@ -432,7 +474,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlistitem moved out of playlist before current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex - 1
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -447,7 +489,10 @@ class PlaylistPresenterTest {
             //verify
             assertThat(fixtState!!.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
             assertThat(fixtState!!.playlist!!.items.find { it.id == fixtChanged.id }).isNull()
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null, any())
+            }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtState!!.playlist!!.currentIndex) }
@@ -456,7 +501,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlistitem added to playlist before current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val addItemIndex = fixtCurrentCurentIndex - 1
             val fixtAdded: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -473,7 +518,10 @@ class PlaylistPresenterTest {
             assertThat(fixtState!!.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size + 1)
             assertThat(fixtState!!.playlist!!.items.find { it.id == fixtAdded.id }).isEqualTo(fixtAdded)
             assertThat(fixtState!!.playlist!!.items.indexOfFirst { it.id == fixtAdded.id }).isEqualTo(addItemIndex)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null, any())
+            }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtState!!.playlist!!.currentIndex) }
@@ -482,7 +530,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlistitem deleted before current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val deleteItemIndex = fixtCurrentCurentIndex - 1
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -497,7 +545,10 @@ class PlaylistPresenterTest {
             //verify
             assertThat(fixtState!!.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
             assertThat(fixtState!!.playlist!!.items.find { it.id == fixtChanged.id }).isNull()
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null, any())
+            }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtState!!.playlist!!.currentIndex) }
@@ -506,7 +557,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `test flow playlistitem deleted is current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val deleteItemIndex = fixtCurrentCurentIndex
             val fixtChanged: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().copy(
@@ -521,7 +572,10 @@ class PlaylistPresenterTest {
             //verify
             assertThat(fixtState!!.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
             assertThat(fixtState!!.playlist!!.items.find { it.id == fixtChanged.id }).isNull()
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), null, any())
+            }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtState!!.playlist!!.currentIndex) }
@@ -530,7 +584,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun onResume() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
 
             createSut()
 
@@ -543,7 +597,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun onPause() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
 
             sut.onPause()
@@ -644,7 +698,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `onItemSwipeLeft - delete item before current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val deletedItemIndex = 0
             val deletedItem = fixtCurrentPlaylist.items.get(deletedItemIndex)
@@ -653,18 +707,13 @@ class PlaylistPresenterTest {
             val fixtSwipeItemModel = fixture.build<ItemContract.Model>().copy(id = deletedItem.id!!)
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtExpectedPlaylist)
             every {
-                mockModelMapper.map(
-                    fixtExpectedPlaylist,
-                    any(),
-                    true,
-                    fixtCurrentIdentifier,
-                    any(),
-                    null
-                )
+                mockModelMapper
+                    .map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), null, any())
             } returns fixtExpectedMapped //
             log.d("before:${fixtCurrentPlaylist.scanOrder()}")
             fixtState?.model = fixtCurrentPlaylistMapped.copy(
-                itemsIdMap = fixtCurrentPlaylistMapped.itemsIdMap.toMutableMap().apply { put(fixtSwipeItemModel.id, deletedItem) }
+                itemsIdMap = fixtCurrentPlaylistMapped.itemsIdMap.toMutableMap()
+                    .apply { put(fixtSwipeItemModel.id, deletedItem) }
             )
             // test
             sut.onItemSwipeLeft(fixtSwipeItemModel)
@@ -678,7 +727,10 @@ class PlaylistPresenterTest {
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtExpectedPlaylist)
             assertThat(fixtState!!.playlist!!.currentIndex).isEqualTo(fixtCurrentCurentIndex - 1)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtCurrentIdentifier)
-            verify { mockModelMapper.map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), null) }
+            verify {
+                mockModelMapper
+                    .map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), null, any())
+            }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
@@ -691,7 +743,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `commitMove ahead to behind - current playlist`() {// todo behind -> ahead
-        testCoroutineScope.runBlockingTest {
+        runTest {
             fixtState = createDefaultState().copy(
                 dragFrom = 2, dragTo = 0
             )
@@ -702,14 +754,8 @@ class PlaylistPresenterTest {
             val fixtExpectedMapped: PlaylistContract.Model = fixture.build()
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtExpectedPlaylist)
             every {
-                mockModelMapper.map(
-                    fixtExpectedPlaylist,
-                    any(),
-                    true,
-                    fixtCurrentIdentifier,
-                    any(),
-                    null
-                )
+                mockModelMapper
+                    .map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), null, any())
             } returns fixtExpectedMapped //
 
             // test
@@ -720,7 +766,10 @@ class PlaylistPresenterTest {
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtExpectedPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtCurrentIdentifier)
             assertThat(movedItem.id).isEqualTo(fixtExpectedChangedItem.id)
-            verify { mockModelMapper.map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), any()) }
+            verify {
+                mockModelMapper
+                    .map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), any(), any())
+            }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
@@ -734,7 +783,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `setPlaylistData no playlist id - no item - no playNow - is current queued `() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             fixtState = State()
             coEvery { mockDbInit.isInitialized() } returns true
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
@@ -746,7 +795,10 @@ class PlaylistPresenterTest {
             // verify
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtCurrentPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtCurrentIdentifier)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), any()) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtCurrentIdentifier, any(), any(), any())
+            }
             verify { mockView.setModel(fixtCurrentPlaylistMapped) }
             verify { mockView.scrollToItem(fixtCurrentPlaylist.currentIndex) }
             verify { mockView.highlightPlayingItem(fixtCurrentPlaylist.currentIndex) }
@@ -758,7 +810,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `setPlaylistData playlist id - no item - no playNow`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             fixtState = State()
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
@@ -769,7 +821,10 @@ class PlaylistPresenterTest {
             // verify
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtNextPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtNextIdentifier)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), any()) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), any(), any())
+            }
             verify { mockView.setModel(fixtNextPlaylistMapped) }
             verify { mockView.scrollToItem(fixtNextPlaylist.currentIndex) }
             verify { mockView.highlightPlayingItem(fixtNextPlaylist.currentIndex) }
@@ -780,19 +835,26 @@ class PlaylistPresenterTest {
 
     @Test
     fun `setPlaylistData playlist id - has item - no playNow`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             fixtState = State()
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
             val selectedItemIndex = 8
 
             // test
-            sut.setPlaylistData(fixtNextPlaylist.id, fixtNextPlaylist.items[selectedItemIndex].id, source = fixtNextSource)
+            sut.setPlaylistData(
+                fixtNextPlaylist.id,
+                fixtNextPlaylist.items[selectedItemIndex].id,
+                source = fixtNextSource
+            )
 
             // verify
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtNextPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtNextIdentifier)
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), any()) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), any(), any())
+            }
             verify { mockView.setModel(fixtNextPlaylistMapped) }
 //            verify { mockView.scrollToItem(selectedItemIndex) }
             verify { mockView.scrollToItem(fixtNextPlaylist.currentIndex) }
@@ -804,7 +866,7 @@ class PlaylistPresenterTest {
 
     @Test
     fun `setPlaylistData playlist id - has item - playNow`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             fixtState = State()
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtCurrentPlaylist, fixtCurrentPlaylist.currentIndex)
             createSut()
@@ -820,7 +882,10 @@ class PlaylistPresenterTest {
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtNextPlaylist)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtNextIdentifier)
             coVerify { mockQueue.playNow(fixtNextIdentifier, plItem.id) }
-            verify { mockModelMapper.map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), any()) }
+            verify {
+                mockModelMapper
+                    .map(fixtState?.playlist!!, any(), true, fixtNextIdentifier, any(), any(), any())
+            }
             verify { mockView.setModel(fixtNextPlaylistMapped) }
 //            verify { mockView.scrollToItem(selectedItemIndex) }
             verify { mockView.scrollToItem(fixtNextPlaylist.currentIndex) }
@@ -832,24 +897,20 @@ class PlaylistPresenterTest {
 
     @Test
     fun `undoDelete - item before current`() {
-        testCoroutineScope.runBlockingTest {
+        runTest {
             createSut()
             val deletedItem = fixture.build<PlaylistItemDomain>().copy(
-                id = idCounter, order = fixtCurrentPlaylist.items.get(0).order - 100, playlistId = fixtCurrentPlaylist.id
+                id = idCounter,
+                order = fixtCurrentPlaylist.items.get(0).order - 100,
+                playlistId = fixtCurrentPlaylist.id
             )
             fixtState!!.deletedPlaylistItem = deletedItem
             val fixtExpectedPlaylist = playlistMutator.addOrReplaceItem(fixtCurrentPlaylist, deletedItem)
             val fixtExpectedMapped: PlaylistContract.Model = fixture.build()
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtExpectedPlaylist)
             every {
-                mockModelMapper.map(
-                    fixtExpectedPlaylist,
-                    any(),
-                    true,
-                    fixtCurrentIdentifier,
-                    any(),
-                    any()
-                )
+                mockModelMapper
+                    .map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), any(), any())
             } returns fixtExpectedMapped //
             log.d("before:${fixtCurrentPlaylist.scanOrder()}")
             // test
@@ -862,11 +923,14 @@ class PlaylistPresenterTest {
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtExpectedPlaylist)
             assertThat(fixtState!!.playlist!!.currentIndex).isEqualTo(fixtCurrentCurentIndex + 1)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtCurrentIdentifier)
-            verify { mockModelMapper.map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), any()) }
+            verify {
+                mockModelMapper
+                    .map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), any(), any())
+            }
             verify(exactly = 0) { mockView.scrollToItem(any()) }
             verify { mockView.highlightPlayingItem(fixtExpectedPlaylist.currentIndex) }
             coVerify {
-                mockPlaylistItemOrchestrator.save(deletedItem, LOCAL.flatOptions())
+                mockPlaylistItemOrchestrator.save(deletedItem, LOCAL.deepOptions())
             }
             verify { mockView.setModel(fixtExpectedMapped) }
             assertThat(fixtState!!.deletedPlaylistItem).isNull()

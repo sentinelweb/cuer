@@ -1,9 +1,11 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.util
 
-import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.MediaIdListFilter
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.PlatformIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.MediaIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
@@ -11,8 +13,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
  * Checks for any existing media items in the playlist.
  */
 class PlaylistMediaLookupOrchestrator constructor(
-    private val mediaDatabaseRepository: MediaDatabaseRepository,
-    private val roomPlaylistItemDatabaseRepository: PlaylistItemDatabaseRepository
+    private val mediaOrchestrator: MediaOrchestrator,
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator
 ) {
     suspend fun lookupMediaAndReplace(playlist: PlaylistDomain): PlaylistDomain {
         val mediaLookup = buildMediaLookup(playlist)
@@ -29,35 +31,32 @@ class PlaylistMediaLookupOrchestrator constructor(
     suspend fun lookupPlaylistItemsAndReplace(playlist: PlaylistDomain): PlaylistDomain =
         buildMediaLookup(playlist)
             .let { it.values.mapNotNull { it.id } }
-            .let { roomPlaylistItemDatabaseRepository.loadList(MediaIdListFilter(it)) }
-            .data
-            ?.distinctBy { it.media.platformId }
-            ?.associateBy { it.media.platformId }
-            ?.let { map ->
+            .let { playlistItemOrchestrator.loadList(MediaIdListFilter(it), LOCAL.deepOptions(emit = false)) }
+            .distinctBy { it.media.platformId }
+            .associateBy { it.media.platformId }
+            .let { map ->
                 playlist.copy(
                     items = playlist.items.map { item ->
                         map[item.media.platformId] ?: item
                     })
-            } ?: playlist
+            }
 
-
-    // todo consider moving this to playlist save
     private suspend fun buildMediaLookup(
         playlist: PlaylistDomain
     ): Map<String, MediaDomain> =
-        mediaDatabaseRepository.loadList(
+        mediaOrchestrator.loadList(
             PlatformIdListFilter(playlist.items.map { it.media.platformId }),
-            false
-        ).data?.let { existingMedia ->
+            LOCAL.deepOptions(emit = false)
+        ).let { existingMedia ->
             val existingMediaPlatformIds = existingMedia.map { it.platformId }
             playlist.items
                 .map { it.media }
                 .toMutableList()
                 .apply { removeAll { existingMediaPlatformIds.contains(it.platformId) } }
                 .map { it.copy(id = null) }
-                .let { mediaDatabaseRepository.save(it, false).data!! }
+                .let { mediaOrchestrator.save(it, LOCAL.deepOptions(emit = false)) }
                 .toMutableList()
                 .apply { addAll(existingMedia) }
                 .associate { it.platformId to it }
-        } ?: mapOf()
+        }
 }

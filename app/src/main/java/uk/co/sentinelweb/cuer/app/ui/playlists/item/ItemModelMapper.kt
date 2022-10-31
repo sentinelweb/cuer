@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.style.ImageSpan
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.text.toSpannable
@@ -11,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.ItemType.ROW
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+
 // todo ditch this and just add the icons to the views
 class ItemModelMapper constructor(
     private val res: ResourceWrapper,
@@ -56,10 +58,6 @@ class ItemModelMapper constructor(
             SCALING
         )
 
-//    private val tree: Drawable by lazy {
-//        res.getDrawable(R.drawable.ic_tree_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
-//    }
-
     private fun textColor(type:ItemContract.ItemType) = if (type==ItemContract.ItemType.TILE) {
         R.color.white
     } else {
@@ -96,7 +94,7 @@ class ItemModelMapper constructor(
 
     private fun addIconToStart(builder: SpannableStringBuilder, drawable: Drawable) {
         val str = SpannableString("  ")
-        res.replaceSpannableIcon(str, drawable, 0, 1)
+        res.replaceSpannableIcon(str, drawable, 0, 1, ImageSpan.ALIGN_BOTTOM)
         builder.insert(0, str)
     }
 
@@ -106,25 +104,25 @@ class ItemModelMapper constructor(
             res.replaceSpannableIcon(
                 it,
                 bottomDrawable(iconMapper.map(model.type, model.platform)),
-                0, 1
+                0, 1, ImageSpan.ALIGN_BOTTOM
             )
 
             res.replaceSpannableIcon(
                 it,
                 if (model.starred) starDrawable(textColor(ROW)) else unstarDrawable(textColor(ROW)),
-                2, 3
+                2, 3, ImageSpan.ALIGN_BOTTOM
             )
 
             res.replaceSpannableIcon(
                 it,
                 bottomDrawable(iconMapper.map(model.loopMode)),
-                5, 6
+                5, 6, ImageSpan.ALIGN_BOTTOM
             )
 
             res.replaceSpannableIcon(
                 it,
                 if (model.watched) watchDrawable else unwatchDrawable,
-                8, 9
+                8, 9, ImageSpan.ALIGN_BOTTOM
             )
             it
         }
@@ -135,7 +133,7 @@ class ItemModelMapper constructor(
             res.replaceSpannableIcon(
                 str,
                 pinDrawable(textColor(ROW)),
-                0, 1
+                0, 1, ImageSpan.ALIGN_BOTTOM
             )
             builder.append(str)
         }
@@ -145,7 +143,7 @@ class ItemModelMapper constructor(
             res.replaceSpannableIcon(
                 str,
                 defaultDrawable(textColor(ROW)),
-                0, 1
+                0, 1, ImageSpan.ALIGN_BOTTOM
             )
             builder.append(str)
         }

@@ -25,7 +25,8 @@ android {
 
         buildConfigField "String", "youtubeApiKey", "\"$CUER_YOUTUBE_API_KEY\""
         buildConfigField "String", "pixabayApiKey", "\"$CUER_PIXABAY_API_KEY\""
-        buildConfigField "boolean", "backgroundPlay", "$CUER_BG_PLAY"
+        buildConfigField "boolean", "cuerBackgroundPlay", "$CUER_BG_PLAY"
+        buildConfigField "boolean", "cuerRemoteEnabled", "$CUER_REMOTE_ENABLED"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -153,9 +154,7 @@ dependencies {
     implementation "androidx.compose.foundation:foundation-layout:$ver_compose"
     implementation "androidx.compose.material:material:$ver_compose"
     implementation "androidx.compose.runtime:runtime-livedata:$ver_compose"
-    implementation ("androidx.compose.ui:ui-tooling:$ver_compose"){
-        version{strictly("1.0.0-beta09")} // todo remove when preview starts working
-    }
+    implementation("androidx.compose.ui:ui-tooling:$ver_compose")
     implementation "androidx.compose.compiler:compiler:$ver_compose_compiler"
     implementation "com.google.android.material:compose-theme-adapter:$ver_compose_theme_adapter"
 

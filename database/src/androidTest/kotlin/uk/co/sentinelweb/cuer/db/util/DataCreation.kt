@@ -2,13 +2,14 @@ package uk.co.sentinelweb.cuer.db.util
 
 import com.appmattus.kotlinfixture.Fixture
 import uk.co.sentinelweb.cuer.app.db.Database
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.database.entity.Media
 import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.database.entity.Playlist_item
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
-class DataCreation(private val database: Database, private val fixture: Fixture) {
+class DataCreation(private val database: Database, private val fixture: Fixture, val timeProvider: TimeProvider) {
     fun createPlaylistAndItem(): Pair<Playlist, Playlist_item> {
         val playlist = createPlaylist()
         val item = createPlaylistItem(playlist.id)
@@ -30,7 +31,12 @@ class DataCreation(private val database: Database, private val fixture: Fixture)
         val media = fixture<Media>().copy(id = 0, channel_id = channelId, image_id = null, thumb_id = null)
         database.mediaEntityQueries.create(media)
         val mediaId = database.mediaEntityQueries.getInsertId().executeAsOne()
-        val initial = fixture<Playlist_item>().copy(id = 0, media_id = mediaId, playlist_id = playlistId)
+        val initial = fixture<Playlist_item>().copy(
+            id = 0,
+            media_id = mediaId,
+            playlist_id = playlistId,
+            date_added = timeProvider.instant()
+        )
         database.playlistItemEntityQueries.create(initial)
         val insertId = database.playlistItemEntityQueries.getInsertId().executeAsOne()
         return initial.copy(id = insertId)

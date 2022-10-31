@@ -9,9 +9,9 @@ import androidx.lifecycle.ViewModel
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST_SELECT
@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.LOCAL
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -40,7 +41,8 @@ class SearchViewModel(
     private val log: LogWrapper,
     private val prefsWrapper: GeneralPreferencesWrapper,
     private val timeStampMapper: TimeStampMapper,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val res: ResourceWrapper
 ) : ViewModel() {
 
     init {
@@ -115,7 +117,7 @@ class SearchViewModel(
     fun onSelectDates() {
         _dialogModelLiveData.value =
             DateRangePickerDialogModel(
-                R.string.search_select_dates,
+                res.getString(R.string.search_select_dates),
                 state.remote.fromDate?.toJavaLocalDateTime(),
                 (state.remote.toDate ?: timeProvider.localDateTime()).toJavaLocalDateTime(),
                 this::onDatesSelected,
@@ -135,7 +137,7 @@ class SearchViewModel(
         log.d("Select order")
         _dialogModelLiveData.value =
             EnumValuesDialogModel(
-                R.string.search_select_dates,
+                res.getString(R.string.search_select_dates),
                 SearchRemoteDomain.Order.values().toList(),
                 state.remote.order,
                 this::onOrderSelected,
@@ -163,17 +165,18 @@ class SearchViewModel(
         _navigateLiveData.value = NavigationModel(
             NavigationModel.Target.PLAYLIST,
             mapOf(
-                NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LOCAL_SEARCH_PLAYLIST else REMOTE_SEARCH_PLAYLIST,
+                NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LocalSearch.id else YoutubeSearch.id,
                 NavigationModel.Param.PLAY_NOW to false,
-                NavigationModel.Param.SOURCE to OrchestratorContract.Source.MEMORY
+                NavigationModel.Param.SOURCE to MEMORY
             )
         )
     }
 
-    fun onPlaylistSelect(@Suppress("UNUSED_PARAMETER") chipModel: ChipModel) {
+    fun onPlaylistSelect(chipModel: ChipModel) {
         if (chipModel.type == PLAYLIST_SELECT) {
             _dialogModelLiveData.value =
                 PlaylistsDialogContract.Config(
+                    res.getString(R.string.playlist_dialog_title),
                     state.local.playlists,
                     true,
                     this@SearchViewModel::onPlaylistSelected,

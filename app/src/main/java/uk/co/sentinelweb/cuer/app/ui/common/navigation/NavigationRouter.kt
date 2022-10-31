@@ -30,7 +30,6 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 class NavigationRouter constructor(
     private val activity: Activity,
     private val toastWrapper: ToastWrapper,
-    private val fragment: Fragment? = null,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val navController: NavController?,
     private val log: LogWrapper,
@@ -93,10 +92,6 @@ class NavigationRouter constructor(
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
                 nav.navOpts,
-//                navOptions(optionsBuilder = {// todo remove
-//                    launchSingleTop = true
-//                    popUpTo(R.id.navigation_playlist, { inclusive = true })
-//                }),
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
 
@@ -108,19 +103,13 @@ class NavigationRouter constructor(
                 nav.navOpts,
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
-            // todo maybe remove these and use directions: if they are used from different places the back stack might be messed up
             NavigationModel.Target.PLAYLIST_ITEM -> navController?.navigate(
                 R.id.navigation_playlist_item_edit,
                 bundleOf(
                     PLAYLIST_ITEM.name to (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain).serialise(),
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                nav.navOpts
-//                    ?: navOptions(optionsBuilder = {
-//                    launchSingleTop = true
-//                    popUpTo(R.id.navigation_playlist_edit, { inclusive = true })
-//                })
-                ,
+                nav.navOpts,
                 nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
 
@@ -130,7 +119,6 @@ class NavigationRouter constructor(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                // todo check this
                 nav.navOpts ?: navOptions(optionsBuilder = {
                     launchSingleTop = true
                     popUpTo(R.id.navigation_playlists, { inclusive = false })
@@ -185,7 +173,6 @@ fun Scope.navigationRouter(
 ) = NavigationRouter(
     activity = sourceActivity,
     toastWrapper = ToastWrapper(sourceActivity),
-    fragment = if (isFragment) (get() as Fragment) else null,
     ytJavaApi = YoutubeJavaApiWrapper(sourceActivity, get()),
     navController = if (withNavHost && sourceActivity is AppCompatActivity) {
         if (isFragment) {
@@ -203,5 +190,5 @@ fun Scope.navigationRouter(
     } else null,
     urlLauncher = UrlLauncherWrapper(sourceActivity),
     log = AndroidLogWrapper(),
-    cryptoLauncher = AndroidCryptoLauncher(sourceActivity, get(), AlertDialogCreator(sourceActivity), get())
+    cryptoLauncher = AndroidCryptoLauncher(sourceActivity, get(), AlertDialogCreator(sourceActivity), get(), get())
 )

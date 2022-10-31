@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator.util
 import kotlinx.coroutines.delay
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.forceDatabaseSuccessNotNull
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -36,18 +37,22 @@ class PlaylistOrDefaultOrchestrator constructor(
             ?.takeIf { it.isSuccessful }
             ?.data
             ?: run {
-                playlistDatabaseRepository.loadList(OrchestratorContract.DefaultFilter(), flat)
-                    .takeIf { it.isSuccessful && it.data?.size ?: 0 > 0 }
+                playlistDatabaseRepository.loadList(DefaultFilter, flat)
+                    .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
                     ?.data?.get(0)
             })
 
     suspend fun updateCurrentIndex(input: PlaylistDomain, options: OrchestratorContract.Options): Boolean =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> true // todo : persist current item? for new
+            OrchestratorContract.Source.MEMORY -> true
             OrchestratorContract.Source.LOCAL ->
-                playlistDatabaseRepository.update(PlaylistIndexUpdateDomain(input.id!!, input.currentIndex), options.emit)
-                    .forceDatabaseSuccessNotNull("Update did not succeed")
+                playlistDatabaseRepository.update(
+                    PlaylistIndexUpdateDomain(input.id!!, input.currentIndex),
+                    emit = options.emit,
+                    flat = false
+                ).forceDatabaseSuccessNotNull("Update did not succeed")
                     .let { it.currentIndex == input.currentIndex }
+
             else -> throw UnsupportedOperationException("Not supported for ${options.source}")
         }
 }

@@ -77,6 +77,7 @@ sealed class CuerMenuItem constructor(
     object SortAlpha : CuerMenuItem(R.string.menu_sort_alpha, R.drawable.ic_sort_by_alpha)
     object SortCategory : CuerMenuItem(R.string.menu_sort_category, R.drawable.ic_category)
     object Search : CuerMenuItem(R.string.menu_search, R.drawable.ic_search)
+    object PasteAdd : CuerMenuItem(R.string.menu_paste, R.drawable.ic_menu_paste_add_black)
 }
 
 data class Action(

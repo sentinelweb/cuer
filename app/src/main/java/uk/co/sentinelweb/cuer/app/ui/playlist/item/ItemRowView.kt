@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistRowBinding
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_IMAGE
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_TITLE
+import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -192,6 +193,18 @@ class ItemRowView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fram
 
     override fun showProgress(live: Boolean) {
         binding.listitemProgress.isVisible = live
+    }
+
+    override fun setDeleteResources(deleteResources: ActionResources?) {
+        binding.swipeLabelLeft.setText(deleteResources?.label ?: context.getString(R.string.pl_item_delete))
+        binding.swipeLabelLeft.setCompoundDrawablesWithIntrinsicBounds(
+            null, null,
+            res.getDrawable(deleteResources?.icon ?: R.drawable.ic_delete_white),
+            null
+        )
+        binding.swipeLabelLeft.setBackgroundColor(
+            deleteResources?.color?.let { res.getColor(it) }
+                ?: res.getColor(res.getColorAttr(R.attr.colorDelete)))
     }
 
     override fun makeTransitionExtras() =

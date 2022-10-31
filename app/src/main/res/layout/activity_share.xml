@@ -44,14 +44,11 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/bottom_left_button"
-        style="@style/Widget.MaterialComponents.Button.Icon"
+        style="@style/Button.Action"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="4dp"
-        android:drawableTint="@color/button_fg_tint"
-        android:elevation="@dimen/button_elevation"
         android:text="@string/share_button_add_return"
-        android:textAppearance="?attr/textAppearanceButton"
         app:icon="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/bottom_right_button"
@@ -61,14 +58,11 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/top_left_button"
-        style="@style/Widget.MaterialComponents.Button.Icon"
+        style="@style/Button.Action"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="4dp"
-        android:drawableTint="@color/button_fg_tint"
-        android:elevation="@dimen/button_elevation"
         android:text="@string/share_button_reject"
-        android:textAppearance="?attr/textAppearanceButton"
         app:icon="@drawable/ic_button_reject_black"
         app:layout_constraintBottom_toTopOf="@id/bottom_right_button"
         app:layout_constraintEnd_toStartOf="@id/top_right_button"
@@ -78,14 +72,11 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/top_right_button"
-        style="@style/Widget.MaterialComponents.Button.Icon"
+        style="@style/Button.Action"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="4dp"
-        android:drawableTint="@color/button_fg_tint"
-        android:elevation="@dimen/button_elevation"
         android:text="@string/share_button_play_now"
-        android:textAppearance="?attr/textAppearanceButton"
         app:icon="@drawable/ic_button_play_black"
         app:layout_constraintBottom_toTopOf="@id/bottom_right_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,14 +86,11 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/bottom_right_button"
-        style="@style/Widget.MaterialComponents.Button.Icon"
+        style="@style/Button.Action"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="4dp"
-        android:drawableTint="@color/button_fg_tint"
-        android:elevation="@dimen/button_elevation"
         android:text="@string/share_button_add_to_queue"
-        android:textAppearance="?attr/textAppearanceButton"
         app:icon="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -36,9 +36,9 @@ interface PrefBackupContract {
         fun goBack()
         fun setAutoSummary(summary: String)
         fun promptForOpenAutoBackupLocation()
-        fun setAutoBackupValid(first: Boolean)
+        fun setAutoBackupValid(valid: Boolean)
         fun askToRestoreAutoBackup()
-        fun showBackupError(message: String?)
+        fun showBackupError(message: String)
     }
 
     data class State constructor(

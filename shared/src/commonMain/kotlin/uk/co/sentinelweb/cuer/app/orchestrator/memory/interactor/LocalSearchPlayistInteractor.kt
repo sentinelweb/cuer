@@ -1,41 +1,53 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.SearchFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
-import uk.co.sentinelweb.cuer.domain.ImageDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
-import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
-import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
 
 class LocalSearchPlayistInteractor constructor(
-    private val playlistItemDatabaseRepository: PlaylistItemDatabaseRepository,
-    private val prefsWrapper: GeneralPreferencesWrapper
-) {
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val log: LogWrapper
+) : AppPlaylistInteractor {
+
+    init {
+        log.tag(this)
+    }
+
+    override val hasCustomDeleteAction = false
+    override val customResources = null
+
     fun search(): SearchLocalDomain? =
         prefsWrapper
             .getString(GeneralPreferences.LAST_LOCAL_SEARCH, null)
             ?.let { deserialiseSearchLocal(it) }
 
-    suspend fun getPlaylist(): PlaylistDomain? =
-        search()
-            ?.let { mapToFilter(it) }
-            ?.let {
-                playlistItemDatabaseRepository
-                    .loadList(it)
-                    .takeIf { it.isSuccessful }
-                    ?.data
-                    ?.let {
-                        makeSearchHeader()
-                            .copy(items = it.mapIndexed { _, playlistItem -> playlistItem.copy() })
-                    }
-            }
+    override suspend fun getPlaylist(): PlaylistDomain? =
+        try {
+            search()
+                ?.let { mapToFilter(it) }
+                ?.let {
+                    playlistItemOrchestrator
+                        .loadList(it, LOCAL.deepOptions())
+                        .let {
+                            makeHeader()
+                                .copy(items = it.mapIndexed { _, playlistItem -> playlistItem.copy() })
+                        }
+                }
+        } catch (e: Exception) {
+            log.e("Couldn't load local search playlist", e)
+            null
+        }
 
-    private fun mapToFilter(searchDomain: SearchLocalDomain) = OrchestratorContract.SearchFilter(
+    private fun mapToFilter(searchDomain: SearchLocalDomain) = SearchFilter(
         text = searchDomain.text,
         isWatched = searchDomain.isWatched,
         isNew = searchDomain.isNew,
@@ -44,14 +56,17 @@ class LocalSearchPlayistInteractor constructor(
         else searchDomain.playlists.mapNotNull { it.id }
     )
 
-    fun makeSearchHeader(): PlaylistDomain = PlaylistDomain(
-        id = LOCAL_SEARCH_PLAYLIST,
+    override fun makeHeader(): PlaylistDomain = PlaylistDomain(
+        id = LocalSearch.id,
         title = mapTitle(),
         type = APP,
         currentIndex = -1,
         starred = true,
         image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-noelle-otto-906055.jpg"),
-        config = PlaylistDomain.PlaylistConfigDomain(playable = false, editable = false)
+        config = PlaylistDomain.PlaylistConfigDomain(
+            playable = false,
+            editable = false
+        )
     )
 
     private fun mapTitle() =
@@ -63,9 +78,11 @@ class LocalSearchPlayistInteractor constructor(
                 }
 
 
-    fun makeSearchItemsStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = LOCAL_SEARCH_PLAYLIST,
+    override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
+        playlistId = LocalSearch.id,
         itemCount = -1,
         watchedItemCount = -1
     )
+
+    override suspend fun performCustomDeleteAction(item: PlaylistItemDomain) = Unit
 }

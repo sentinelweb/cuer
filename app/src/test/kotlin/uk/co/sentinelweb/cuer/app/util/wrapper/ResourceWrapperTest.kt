@@ -149,7 +149,7 @@ class ResourceWrapperTest {
         val mockSpannableString: SpannableString = mock()
         val start: Int = fixture.build()
         val end: Int = fixture.build()
-        sut.replaceSpannableIcon(mockSpannableString, mockDrawable, start, end)
+        sut.replaceSpannableIcon(mockSpannableString, mockDrawable, start, end, ImageSpan.ALIGN_BOTTOM)
         val imgSpanCapture = argumentCaptor<ImageSpan>()
         verify(mockSpannableString).setSpan(imgSpanCapture.capture(), eq(start), eq(end), eq(Spannable.SPAN_INCLUSIVE_INCLUSIVE))
         assertThat(imgSpanCapture.firstValue.drawable).isEqualTo(mockDrawable)

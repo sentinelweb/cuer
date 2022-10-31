@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 import uk.co.sentinelweb.cuer.domain.ext.iterate
+import java.util.*
 
 class PlaylistsModelMapper constructor(
     private val res: ResourceWrapper
@@ -116,7 +117,7 @@ class PlaylistsModelMapper constructor(
         depth: Int
     ) = ItemContract.Model.ItemModel(
         pl.id ?: throw Exception("Playlist must have an id"),
-        pl.title,
+        pl.title.capitalize(Locale.getDefault()),
         false,
         (pl.thumb ?: pl.image)?.url,
         count = playlistStatDomain?.itemCount ?: -1,

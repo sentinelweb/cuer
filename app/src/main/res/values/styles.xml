@@ -115,17 +115,17 @@
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
         <item name="android:textScaleX">?headlineFontXScaling</item>
-        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:textColor">?colorOnSurface</item>
     </style>
 
     <style name="TextAppearance.ActionBar.Expanded">
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">32sp</item>
         <item name="fontFamily">?headlineFont</item>
         <item name="android:fontFamily">?headlineFont</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
         <item name="android:textScaleX">?headlineFontXScaling</item>
-        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:textColor">?colorOnSurface</item>
     </style>
     <!-- end TextAppearance ActionBar-->
 
@@ -142,7 +142,7 @@
     <style name="Cuer.AppBar.OverFlow">
         <item name="android:src">@drawable/ic_more_vert_black</item>
         <item name="android:minWidth">48dp</item>
-        <item name="android:tint">@color/white</item>
+        <item name="android:tint">@color/grey_500</item>
         <item name="android:elevation">4dp</item>
     </style>
 
@@ -151,8 +151,6 @@
         <item name="materialAlertDialogTitleTextStyle">
             @style/Cuer.MaterialAlertDialog.App.Title.Text
         </item>
-        <!--        <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button</item>-->
-        <!--        <item name="buttonBarNeutralButtonStyle">@style/Widget.App.Button</item>-->
     </style>
 
     <style name="Cuer.MaterialAlertDialog.Window" parent="MaterialAlertDialog.MaterialComponents">
@@ -179,23 +177,45 @@
     </style>
 
     <!-- Headers =========================== -->
-    <style name="Header" />
+    <style name="Header"/>
 
     <style name="Header.InfoText">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?colorOnSurface</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">top|end</item>
-        <item name="android:layout_marginTop">48dp</item>
-        <item name="android:background">@color/info_text_overlay_background</item>
         <item name="android:padding">4dp</item>
-        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1
-        </item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        <item name="drawableTint">?colorOnSurface</item>
+        <item name="android:drawableTint">?colorOnSurface</item>
+        <item name="android:drawablePadding">4dp</item>
     </style>
+
+    <style name="Header.InfoIcon">
+        <item name="tint">?colorOnSurface</item>
+        <item name="android:tint">?colorOnSurface</item>
+        <item name="android:layout_width">@dimen/flag_size</item>
+        <item name="android:layout_height">@dimen/flag_size</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+
+    <style name="Header.Button" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:tint">?colorOnSurface</item>
+        <item name="iconTint">?colorOnSurface</item>
+        <item name="android:textColor">?colorOnSurface</item>
+        <item name="strokeColor">?colorOnSurface</item>
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="rippleColor">@color/grey_400</item>
+    </style>
+
+
     <!-- end Headers =========================== -->
 
     <!-- ItemView =========================== -->
-    <style name="ItemView" />
+    <style name="ItemView"/>
 
     <style name="ItemView.Container">
         <item name="android:layout_margin">@dimen/list_item_margin</item>
@@ -255,7 +275,7 @@
 
     <style name="ItemView.Thumb.InfoText">
         <item name="android:background">@color/black_transparent_background</item>
-        <item name="android:padding">2dp</item>
+        <item name="android:padding">4dp</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">12sp</item>
     </style>
@@ -488,17 +508,7 @@
         <item name="android:checkable">false</item>
     </style>
     <!-- end Chips =========================== -->
-
-    <style name="FullscreenTheme" parent="AppTheme">
-        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
-        <item name="android:windowActionBarOverlay">true</item>
-        <item name="android:windowBackground">@null</item>
-    </style>
-
-    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
-        <item name="android:background">@color/grey_800</item>
-    </style>
-
+    <!-- Buttons =========================== -->
     <style name="FabButton" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="backgroundTint">@color/fab_primary_csl</item>
         <item name="tint">?colorOnPrimary</item>
@@ -509,15 +519,53 @@
         <item name="tint">?colorOnSecondary</item>
     </style>
 
-    <style name="Button.IconOnly" parent="Widget.MaterialComponents.Button">
+    <style name="Button.IconOnly" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="iconPadding">0dp</item>
-        <item name="android:insetTop">0dp</item>
-        <item name="android:insetBottom">0dp</item>
+        <!--        <item name="android:insetTop">0dp</item>-->
+        <!--        <item name="android:insetBottom">0dp</item>-->
         <item name="android:paddingLeft">12dp</item>
         <item name="android:paddingRight">12dp</item>
-        <item name="android:minWidth">48dp</item>
-        <item name="android:minHeight">48dp</item>
+        <item name="iconTint">?colorOnSurface</item>
+        <item name="strokeColor">?colorOnSurface</item>
+        <item name="rippleColor">@color/grey_400</item>
+        <item name="android:tint">?colorOnSurface</item>
     </style>
+
+    <style name="Button.Action" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:tint">?colorOnSurface</item>
+        <item name="iconTint">?colorOnSurface</item>
+        <item name="android:textColor">?colorOnSurface</item>
+        <item name="strokeColor">?colorOnSurface</item>
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="rippleColor">@color/grey_400</item>
+    </style>
+
+    <style name="Button.Solid" parent="@style/Widget.MaterialComponents.Button.Icon">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableTint">@color/button_fg_tint</item>
+        <item name="iconTint">@color/white</item>
+        <item name="tint">?colorPrimary</item>
+        <item name="android:elevation">@dimen/button_elevation</item>
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="rippleColor">?colorPrimaryVariant</item>
+    </style>
+    <!-- end Buttons =========================== -->
+    <!-- Full screen =========================== -->
+    <style name="FullscreenTheme" parent="AppTheme">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+    </style>
+
+    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/grey_800</item>
+    </style>
+    <!-- end Full screen =========================== -->
 
 
 </resources>

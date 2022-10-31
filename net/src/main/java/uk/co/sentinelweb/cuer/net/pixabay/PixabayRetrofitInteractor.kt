@@ -12,8 +12,7 @@ import uk.co.sentinelweb.cuer.net.pixabay.mapper.PixabayImageMapper
 import uk.co.sentinelweb.cuer.net.retrofit.ErrorMapper
 
 /**
- * Youtube interactor implementation
- * todo categories : https://www.googleapis.com/youtube/v3/videoCategories?regionCode=uk&key=
+ * Pixabay interactor implementation
  */
 internal class PixabayRetrofitInteractor constructor(
     private val keyProvider: ApiKeyProvider,

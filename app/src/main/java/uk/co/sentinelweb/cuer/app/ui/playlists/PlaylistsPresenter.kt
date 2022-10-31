@@ -5,15 +5,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.IdListFilter
+import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.IdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.LOCAL_SEARCH_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.LocalSearchPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.NewMediaPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RecentItemsPlayistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.RemoteSearchPlayistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
@@ -25,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -52,12 +55,15 @@ class PlaylistsPresenter(
     private val newMedia: NewMediaPlayistInteractor,
     private val recentItems: RecentItemsPlayistInteractor,
     private val localSearch: LocalSearchPlayistInteractor,
-    private val remoteSearch: RemoteSearchPlayistOrchestrator,
+    private val remoteSearch: YoutubeSearchPlayistInteractor,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val searchMapper: SearchMapper,
     private val merge: PlaylistMergeOrchestrator,
     private val shareWrapper: ShareWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists,
+    private val starredItems: StarredItemsPlayistInteractor,
+    private val unfinishedItems: UnfinishedItemsPlayistInteractor,
+    private val res: ResourceWrapper,
 ) : PlaylistsContract.Presenter {
 
     init {
@@ -79,7 +85,7 @@ class PlaylistsPresenter(
         // todo listen for stat changes
         playlistOrchestrator.updates
             .onEach { (op, source, plist) ->
-                log.d("playlist changed: $op, $source, id=${plist.id} items=${plist.items.size}")
+//                log.d("playlist changed: $op, $source, id=${plist.id} items=${plist.items.size}")
                 refreshPlaylists()
             }
             .launchIn(coroutines.mainScope)
@@ -97,6 +103,7 @@ class PlaylistsPresenter(
                     ?.also { movePlaylist ->
                         view.showPlaylistSelector(
                             PlaylistsDialogContract.Config(
+                                title = res.getString(R.string.playlist_dialog_title),
                                 selectedPlaylists = setOf(),
                                 multi = true,
                                 itemClick = { playlistSelected, _ ->
@@ -116,7 +123,6 @@ class PlaylistsPresenter(
             }
     }
 
-    // todo review this
     private fun setParent(parent: PlaylistDomain, child: PlaylistDomain) {
         val childNode = state.treeLookup[child.id]!!
         val parentNode = state.treeLookup[parent.id]
@@ -155,8 +161,8 @@ class PlaylistsPresenter(
                         } else {
                             view.showError("Please delete the children first")
                         }
-                    } else if (playlist.id == LOCAL_SEARCH_PLAYLIST || playlist.id == REMOTE_SEARCH_PLAYLIST) {
-                        val isLocal = playlist.id == LOCAL_SEARCH_PLAYLIST
+                    } else if (playlist.id == LocalSearch.id || playlist.id == YoutubeSearch.id) {
+                        val isLocal = playlist.id == LocalSearch.id
                         val type = searchMapper.searchTypeText(isLocal)
                         val key = if (isLocal) LAST_LOCAL_SEARCH else LAST_REMOTE_SEARCH
                         val lastSearch = prefsWrapper.getString(key, null)
@@ -171,7 +177,6 @@ class PlaylistsPresenter(
                         executeRefresh()
                     }
                 } ?: let { view.showError("Cannot delete playlist") }
-
         }
     }
 
@@ -263,6 +268,7 @@ class PlaylistsPresenter(
                 findPlaylist(item)?.also { delPlaylist ->
                     view.showPlaylistSelector(
                         PlaylistsDialogContract.Config(
+                            title = res.getString(R.string.playlist_dialog_title),
                             selectedPlaylists = setOf(),
                             multi = true,
                             itemClick = { p, _ -> merge(p!!, delPlaylist) },
@@ -296,9 +302,8 @@ class PlaylistsPresenter(
 
     override fun commitMove() {
         if (state.dragFrom != null && state.dragTo != null) {
-            //toastWrapper.show("todo save move ..")
+            //todo save move ..
         } else {
-            //toastWrapper.show("Move failed ..")
             refreshPlaylists()
         }
         state.dragFrom = null
@@ -322,7 +327,7 @@ class PlaylistsPresenter(
     private suspend fun executeRefresh() {
         try {
             state.playlists =
-                playlistOrchestrator.loadList(OrchestratorContract.AllFilter(), LOCAL.flatOptions())
+                playlistOrchestrator.loadList(AllFilter, LOCAL.flatOptions())
                     .also {
                         state.treeRoot = it.buildTree()
                             .sort(compareBy { it.node?.title?.lowercase() })
@@ -337,20 +342,11 @@ class PlaylistsPresenter(
                 )
                 .toMutableList()
 
-            val appLists = mutableMapOf(
-                newMedia.makeNewItemsHeader() to newMedia.makeNewItemsStats(),
-                recentItems.makeRecentItemsHeader() to recentItems.makeRecentItemsStats()
-            )
-                .apply {
-                    if (prefsWrapper.has(LAST_LOCAL_SEARCH)) {
-                        put(localSearch.makeSearchHeader(), localSearch.makeSearchItemsStats())
-                    }
-                }
-                .apply {
-                    if (prefsWrapper.has(LAST_REMOTE_SEARCH)) {
-                        put(remoteSearch.makeSearchHeader(), remoteSearch.makeSearchItemsStats())
-                    }
-                }
+            val appLists = mutableListOf(newMedia, recentItems, starredItems, unfinishedItems)
+                .apply { if (prefsWrapper.has(LAST_LOCAL_SEARCH)) add(localSearch) }
+                .apply { if (prefsWrapper.has(LAST_REMOTE_SEARCH)) add(remoteSearch) }
+                .map { it.makeHeader() to it.makeStats() }
+                .toMap()
 
             modelMapper.map(
                 state.playlists

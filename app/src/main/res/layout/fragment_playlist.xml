@@ -7,143 +7,174 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.main.MainActivity"
-    >
+>
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/playlist_appbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_header_height_playlist"
-        >
-
+    >
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/playlist_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:collapsedTitleTextAppearance="@style/TextAppearance.ActionBar.Collapsed"
-            app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginBottom="28dp"
             app:expandedTitleMarginEnd="16dp"
             app:expandedTitleMarginStart="16dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.ActionBar.Expanded"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:statusBarScrim="?attr/colorPrimaryDark"
-            ><!-- todo find a way to make header appear when scrolling down adding |enterAlways seems to break it!  -->
-
-            <ImageView
-                android:id="@+id/playlist_header_image"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways"
+            app:statusBarScrim="?colorSurface"
+            android:background="?colorSurface"
+        >
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="@null"
-                android:scaleType="centerCrop"
-                android:background="@color/background"
-                android:transitionName="@string/playlist_trans_image"
-                tools:src="@drawable/im_test_nietzche"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7"
-                />
-
-            <View
-                android:id="@+id/playlist_action_bg"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_gravity="top"
-                android:background="@drawable/actionbar_gradient"
-                />
-
-            <TextView
-                android:id="@+id/playlist_items"
-                style="@style/Header.InfoText"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/dash"
-                tools:text="800"
+                android:background="?colorSurface"
+            >
+
+                <ImageView
+                    android:id="@+id/playlist_header_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"
+                    android:background="@color/background"
+                    android:transitionName="@string/playlist_trans_image"
+                    tools:src="@drawable/im_test_nietzche"
+                    app:layout_collapseMode="parallax"
+                    app:layout_collapseParallaxMultiplier="0.7"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
                 />
 
-            <LinearLayout
-                android:id="@+id/playlist_flags"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="84dp"
-                android:background="@color/info_text_overlay_background"
-                android:orientation="horizontal"
-                android:padding="2dp"
-                android:visibility="gone"
-                tools:text="800"
+                <HorizontalScrollView
+                    android:id="@+id/playlist_buttons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/playlist_header_image"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:layout_marginStart="8dp"
+                    android:scrollbars="none"
                 >
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                    >
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/playlist_fab_play"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/menu_play"
+                            android:text="@string/menu_play"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_playlist_play"
+                        />
 
-                <ImageView
-                    android:id="@+id/playlist_flag_default"
-                    android:layout_width="@dimen/flag_size"
-                    android:layout_height="@dimen/flag_size"
-                    android:contentDescription="@string/default_playlist"
-                    android:padding="2dp"
-                    android:src="@drawable/ic_playlist_default"
-                    android:visibility="gone"
-                    app:tint="@color/white"
-                    />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/playlist_edit_button"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/menu_edit"
+                            android:text="@string/menu_edit"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_edit_24"
+                        />
 
-                <ImageView
-                    android:id="@+id/playlist_flag_play_start"
-                    android:layout_width="@dimen/flag_size"
-                    android:layout_height="@dimen/flag_size"
-                    android:contentDescription="@string/playlist_play_items_from_start"
-                    android:padding="2dp"
-                    android:src="@drawable/ic_play_start_black"
-                    android:visibility="gone"
-                    app:tint="@color/white"
-                    />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/playlist_star_button"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/menu_star"
+                            android:text="@string/menu_star"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_starred"
+                        />
 
-                <ImageView
-                    android:id="@+id/playlist_flag_pinned"
-                    android:layout_width="@dimen/flag_size"
-                    android:layout_height="@dimen/flag_size"
-                    android:contentDescription="@string/menu_pin"
-                    android:padding="2dp"
-                    android:src="@drawable/ic_push_pin_on"
-                    android:visibility="gone"
-                    app:tint="@color/white"
-                    />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/playlist_fab_playmode"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/menu_playlist_mode_single"
+                            android:text="@string/menu_playlist_mode_single"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_playmode_shuffle"
+                        />
+                    </LinearLayout>
+                </HorizontalScrollView>
 
-                <TextView
-                    android:id="@+id/playlist_flag_children"
+                <LinearLayout
+                    android:id="@+id/playlist_flags"
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/flag_size"
-                    android:drawablePadding="2dp"
-                    android:gravity="top"
-                    android:padding="2dp"
-                    android:textAppearance="@style/TextAppearance.App.Caption"
-                    android:textColor="@color/white"
-                    android:visibility="gone"
-                    app:drawableStartCompat="@drawable/ic_tree_flag_20"
-                    app:drawableTint="@color/white"
-                    tools:text="3"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginStart="16dp"
+                    android:orientation="horizontal"
+                    tools:text="800"
+                    app:layout_constraintTop_toBottomOf="@id/playlist_buttons"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                >
+                    <TextView
+                        android:id="@+id/playlist_items"
+                        style="@style/Header.InfoText"
+                        android:text="@string/dash"
+                        tools:text="800"
                     />
 
-            </LinearLayout>
+                    <ImageView
+                        android:id="@+id/playlist_flag_star"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/playlists_section_starred"
+                        android:src="@drawable/ic_starred"
+                        android:visibility="gone"
+                    />
 
-            <View
-                android:id="@+id/playlist_title_bg"
-                android:layout_width="match_parent"
-                android:layout_height="64sp"
-                android:layout_gravity="bottom"
-                android:background="@color/black_transparent_background"
-                />
+                    <ImageView
+                        android:id="@+id/playlist_flag_default"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/default_playlist"
+                        android:src="@drawable/ic_playlist_default"
+                        android:visibility="gone"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_play_start"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/playlist_play_items_from_start"
+                        android:src="@drawable/ic_play_start_black"
+                        android:visibility="gone"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_pinned"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/menu_pin"
+                        android:src="@drawable/ic_push_pin_on"
+                        android:visibility="gone"
+                    />
+
+                    <TextView
+                        android:id="@+id/playlist_flag_children"
+                        style="@style/Header.InfoText"
+                        android:visibility="gone"
+                        app:drawableStartCompat="@drawable/ic_tree_flag_20"
+                        tools:text="3"
+                    />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/playlist_toolbar"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@android:color/transparent"
+                android:background="@color/transparent"
                 android:elevation="0dp"
                 app:layout_collapseMode="pin"
                 android:transitionName="@string/playlist_trans_title"
                 app:menu="@menu/playlist_actionbar"
-                />
+            />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
-
     </com.google.android.material.appbar.AppBarLayout>
 
     <uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout
@@ -160,7 +191,7 @@
             tools:context=".ui.playlist.PlaylistFragment"
             tools:listitem="@layout/view_playlist_row"
             android:scrollbars="vertical"
-            android:scrollbarThumbVertical="@drawable/scrollbar_thumb" />
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"/>
 
     </uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout>
 
@@ -173,11 +204,7 @@
         android:textAppearance="@style/TextAppearance.App.Headline2"
         android:textColor="@color/grey_500"
         android:visibility="gone"
-        app:layoutManager="LinearLayoutManager"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context=".ui.playlist.PlaylistFragment"
-        tools:listitem="@layout/view_playlist_row"
-        />
+    />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/playlist_fab_up"
@@ -192,7 +219,8 @@
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:srcCompat="@drawable/ic_button_up_black"
         android:visibility="gone"
-        />
+        android:alpha="@dimen/fab_navigation_alpha"
+    />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/playlist_fab_down"
@@ -207,7 +235,8 @@
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:srcCompat="@drawable/ic_button_down_black"
         android:visibility="gone"
-        />
+        android:alpha="@dimen/fab_navigation_alpha"
+    />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/playlist_fab_refresh"
@@ -225,39 +254,6 @@
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:srcCompat="@drawable/ic_refresh"
         android:visibility="gone"
-        />
-
-    <uk.co.sentinelweb.cuer.app.ui.common.views.FABProgress
-        android:id="@+id/playlist_fab_play"
-        style="@style/FabButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/menu_play"
-        android:tint="@color/white"
-        app:layout_anchor="@id/playlist_appbar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_button_play_black"
-        app:progressColor="@color/white"
-        app:progressMargin="2dp"
-        android:visibility="gone"
-        />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/playlist_fab_playmode"
-        style="@style/FabButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="80dp"
-        android:contentDescription="@null"
-        android:tint="@color/white"
-        app:fabSize="mini"
-        app:layout_anchor="@id/playlist_appbar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_playmode_shuffle"
-        tools:ignore="RtlSymmetry"
-        android:visibility="gone"
-        />
-
-
+        android:alpha="@dimen/fab_navigation_alpha"
+    />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

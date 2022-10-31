@@ -105,7 +105,8 @@ class PlayDialog constructor(
                         canDelete = false,
                         canReorder = false,
                         playlistText = playlistTitle ?: "",
-                        showOverflow = false
+                        showOverflow = false,
+                        deleteResources = null
                     ),
                     false
                 )

@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.search
 
+import androidx.annotation.DrawableRes
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -22,7 +23,9 @@ interface SearchContract {
 
     data class Model(
         val type: String,
+        @DrawableRes val icon: Int,
         val otherType: String,
+        @DrawableRes val otherIcon: Int,
         val text: String?,
         val isLocal: Boolean,
         val localParams: LocalModel,
@@ -61,7 +64,8 @@ interface SearchContract {
                         mapper = get(),
                         prefsWrapper = get(),
                         timeStampMapper = get(),
-                        timeProvider = get()
+                        timeProvider = get(),
+                        res = get()
                     )
                 }
                 scoped { State() }

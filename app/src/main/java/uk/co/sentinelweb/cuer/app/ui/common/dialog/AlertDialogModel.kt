@@ -3,9 +3,8 @@ package uk.co.sentinelweb.cuer.app.ui.common.dialog
 import androidx.annotation.StringRes
 
 data class AlertDialogModel constructor(
-    @StringRes override val title: Int,
-    @StringRes val message: Int = 0,
-    var messageString: String? = null,
+    override val title: String,
+    var message: String,
     val confirm: Button,
     val neutral: Button? = null,
     val cancel: Button? = null,

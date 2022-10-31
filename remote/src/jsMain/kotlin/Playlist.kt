@@ -1,9 +1,12 @@
 import App.Companion.NO_IMAGE_SRC
-import com.ccfraser.muirwik.components.list.mListItem
-import com.ccfraser.muirwik.components.list.mListItemText
-import com.ccfraser.muirwik.components.list.mListSubheader
-import kotlinx.css.*
-import react.*
+import kotlinx.css.paddingRight
+import kotlinx.css.px
+import kotlinx.css.width
+import react.Props
+import react.RBuilder
+import react.RComponent
+import react.State
+import react.dom.html.ReactHTML.span
 import styled.css
 import styled.styledDiv
 import styled.styledImg
@@ -14,22 +17,17 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 class Playlist : RComponent<PlaylistProps, State>() {
     override fun RBuilder.render() {
         styledDiv {
-            css {
-                put("grid-area", "playlist")
-                overflowY = Overflow.scroll
-            }
-            mListSubheader(props.title, disableSticky = true)
             props.playlist?.items?.forEach { item ->
-                mListItem(button = true, onClick = { props.onSelectItem(item) }, selected = item == props.selectedItem) {
-                    styledImg(
-                        src = item.media.thumbNail?.url ?: NO_IMAGE_SRC, alt = item.media.title
-                    ) {
-                        css { width = 150.px;paddingRight = 10.px }
-                    }
-                    mListItemText(
-                        item.media.title ?: "No title",
-                        item.media.channelData.title ?: "No Channel"
-                    )
+                styledImg(
+                    src = item.media.thumbNail?.url ?: NO_IMAGE_SRC, alt = item.media.title
+                ) {
+                    css { width = 150.px;paddingRight = 10.px }
+                }
+                span {
+                    item.media.title ?: "No title"
+                }
+                span {
+                    item.media.channelData.title ?: "No Channel"
                 }
             }
         }

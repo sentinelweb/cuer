@@ -19,6 +19,7 @@ interface PrefRootContract {
     interface View {
         fun showMessage(msg: String)
         fun setRemoteServiceRunning(running: Boolean, address: String?)
+        fun setVersion(versionString: String)
     }
 
     data class State constructor(

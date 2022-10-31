@@ -31,8 +31,6 @@ class MediaSessionManager constructor(
         log.tag(this)
     }
 
-    // fixme: might ned two media sessions if local and rmote id needed? not really sure it is tbh
-    // the last playerlistener sent here is the one that gets the events - so if i do a preview function then i should not create a media session
     override fun checkCreateMediaSession(controls: PlayerContract.PlayerControls.Listener) {
         if (appState.mediaSession == null) {
             appState.mediaSession = MediaSessionCompat(context, "CuerCastService")
@@ -80,7 +78,6 @@ class MediaSessionManager constructor(
         appState.mediaSession?.setPlaybackState(playbackStateMapper.map(media, state, liveOffset, playlist))
     }
 
-    // todo this will go somewhere near the player controls
     inner class CuerMediaSessionCallback(private val controls: PlayerContract.PlayerControls.Listener) :
         MediaSessionCompat.Callback() {
 
@@ -116,13 +113,11 @@ class MediaSessionManager constructor(
 
         override fun onRewind() {
             controls.skipBack()
-            // todo add methods in interface (if needed)
             log.d("onRewind")
         }
 
         override fun onFastForward() {
             controls.skipFwd()
-            // todo add methods in interface (if needed)
             log.d("onFastForward")
         }
     }

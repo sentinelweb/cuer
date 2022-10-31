@@ -16,6 +16,8 @@ import uk.co.sentinelweb.cuer.app.db.AppDatabaseModule
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor.CustomisationResources
 import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
@@ -24,7 +26,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.BackgroundMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.AndroidRibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
@@ -38,6 +40,9 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.resources.NewPlaylistCustomisationResources
+import uk.co.sentinelweb.cuer.app.ui.resources.StarredPlaylistCustomisationResources
+import uk.co.sentinelweb.cuer.app.ui.resources.UnfinishedPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.search.SearchContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupContract
@@ -120,10 +125,17 @@ object Modules {
         factory { PlaylistSelectDialogModelCreator(get(), get()) }
         factory { DatePickerCreator() }
         factory { IconMapper() }
-        factory { BackgroundMapper(get()) }
+        factory { DurationTextColorMapper(get()) }
         single { AytViewHolder(get(), get()) }
         factory { PlayYangProgress(get()) }
         factory<RibbonCreator> { AndroidRibbonCreator(get()) }
+        factory<CustomisationResources>(named(NewItems)) { NewPlaylistCustomisationResources(get()) }
+        factory<CustomisationResources>(named(Starred)) { StarredPlaylistCustomisationResources(get()) }
+        factory<CustomisationResources>(named(Unfinished)) {
+            UnfinishedPlaylistCustomisationResources(
+                get()
+            )
+        }
     }
 
     private val receiverModule = module {

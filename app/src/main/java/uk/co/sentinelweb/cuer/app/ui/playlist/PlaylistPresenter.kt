@@ -12,12 +12,15 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.Companion.REMOTE_SEARCH_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
@@ -84,6 +87,7 @@ class PlaylistPresenter(
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val playUseCase: PlayUseCase,
     private val multiPrefs: MultiPlatformPreferencesWrapper,
+    private val appPlaylistInteractors: Map<Long, AppPlaylistInteractor>,
 ) : PlaylistContract.Presenter, PlaylistContract.External {
 
     override var interactions: PlaylistContract.Interactions? = null
@@ -156,14 +160,16 @@ class PlaylistPresenter(
                                 state.playlist
                                     ?.apply { updateHeader() }
                             }
+
                         FULL ->
                             if (plist != state.playlist) {
                                 state.playlist = plist
                                 updateView()
                             }
+
                         DELETE -> {
                             toastWrapper.show(res.getString(R.string.playlist_msg_deleted))
-                            view.exit() // todo exit or back
+                            view.exit()
                         }
                     }
                 }
@@ -196,6 +202,7 @@ class PlaylistPresenter(
                             ?.also { state.playlist = it }
                             ?.also { updateView() }
                     }
+
                     DELETE ->
                         state.playlist
                             ?.let { playlistMutator.remove(it, plistItem) }
@@ -227,6 +234,7 @@ class PlaylistPresenter(
                             updatePlaylistItemByMediaId(null, media)
                         }
                     }
+
                     DELETE -> Unit
                 }
             }
@@ -271,6 +279,7 @@ class PlaylistPresenter(
     private fun showPlaylistSelector() {
         view.showPlaylistSelector(
             PlaylistsDialogContract.Config(
+                res.getString(R.string.playlist_dialog_title),
                 selectedPlaylists = setOf(state.playlist!!),
                 multi = true,
                 itemClick = { which: PlaylistDomain?, _ ->
@@ -377,12 +386,31 @@ class PlaylistPresenter(
                 ?.also { log.d("found item ${it.id}") }
                 ?.let { deleteItem ->
                     state.deletedPlaylistItem = deleteItem
-                    playlistItemOrchestrator.delete(deleteItem, LOCAL.flatOptions())
+                    val appPlaylistInteractor = appPlaylistInteractors[state.playlist?.id]
+                    val action = appPlaylistInteractor?.customResources?.customDelete?.label ?: "Deleted"
+                    if (state.playlist?.type != APP
+                        || !(appPlaylistInteractor?.hasCustomDeleteAction ?: false)
+                    ) {
+                        playlistItemOrchestrator.delete(deleteItem, LOCAL.flatOptions())
+                    } else {
+                        appPlaylistInteractor?.performCustomDeleteAction(deleteItem)
+                        executeRefresh()
+                    }
                     view.showUndo(
-                        "Deleted: ${deleteItem.media.title}",
+                        "$action: ${deleteItem.media.title}",
                         ::undoDelete
-                    ) // todo extract
+                    )
                 }
+        }
+    }
+
+    override fun undoDelete() {
+        state.deletedPlaylistItem?.let { itemDomain ->
+            state.viewModelScope.launch {
+                playlistItemOrchestrator.save(itemDomain, LOCAL.deepOptions())
+                state.deletedPlaylistItem = null
+                executeRefresh()
+            }
         }
     }
 
@@ -396,7 +424,7 @@ class PlaylistPresenter(
                             if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
                         view.showItemDescription(itemModel.id, this, source)
                     }
-            } // todo pass identifier?
+            }
     }
 
     override fun onItemPlayClicked(itemModel: ItemContract.Model) {
@@ -409,7 +437,7 @@ class PlaylistPresenter(
                 } else {
                     playUseCase.playLogic(itemDomain, state.playlist, false)
                 }
-            } // todo error
+            }
     }
 
     override fun onPlayStartClick(itemModel: ItemContract.Model) {
@@ -423,7 +451,7 @@ class PlaylistPresenter(
                     playUseCase.playLogic(itemDomain, state.playlist, false)
                 }
             }
-    } // todo error
+    }
 
     override fun onStarPlaylist(): Boolean {
         state.playlist
@@ -475,7 +503,7 @@ class PlaylistPresenter(
                 prefsWrapper.putEnum(LAST_SEARCH_TYPE, REMOTE)
 
                 view.navigate(
-                    PlaylistContract.makeNav(REMOTE_SEARCH_PLAYLIST, null, false, MEMORY)
+                    PlaylistContract.makeNav(YoutubeSearch.id, null, false, MEMORY)
                 )
             }
     }
@@ -561,7 +589,8 @@ class PlaylistPresenter(
                         it, isPlaylistPlaying(),
                         id = state.playlistIdentifier,
                         playlists = state.playlistsTreeLookup,
-                        pinned = isPlaylistPinned()
+                        pinned = isPlaylistPinned(),
+                        appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] }
                     )
                         .also { view.setModel(it, false) }
                     view.highlightPlayingItem(it.currentIndex)
@@ -612,16 +641,6 @@ class PlaylistPresenter(
         }
     }
 
-    override fun undoDelete() {
-        state.deletedPlaylistItem?.let { itemDomain ->
-            state.viewModelScope.launch {
-                playlistItemOrchestrator.save(itemDomain, LOCAL.flatOptions())
-                state.deletedPlaylistItem = null
-                executeRefresh()
-            }
-        }
-    }
-
     override fun refreshPlaylist() {
         state.viewModelScope.launch {
             view.showRefresh()
@@ -643,7 +662,7 @@ class PlaylistPresenter(
             view.showAlertDialog(modelMapper.mapSaveConfirmAlert(
                 {
                     coroutines.mainScope.launch {
-                        commitPlaylist() // fixme: this doesn't go thru sharePresenter after commit after
+                        commitPlaylist()
                         view.navigate(NavigationModel(NAV_DONE))
                     }
                 },
@@ -689,7 +708,7 @@ class PlaylistPresenter(
                         }
                         ?: playlist
                 }
-                ?.let { playlistOrchestrator.save(it, Options(LOCAL, flat = false)) }
+                ?.let { playlistOrchestrator.save(it, LOCAL.deepOptions(emit = true)) }
                 ?.also {
                     state.playlistIdentifier =
                         it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")
@@ -724,7 +743,7 @@ class PlaylistPresenter(
                 }
                 ?.also {
                     state.playlistsTree = playlistOrchestrator
-                        .loadList(AllFilter(), LOCAL.flatOptions())
+                        .loadList(AllFilter, LOCAL.flatOptions())
                         .buildTree()
                         .also {
                             state.playlistsTreeLookup = it.buildLookup()
@@ -760,7 +779,8 @@ class PlaylistPresenter(
                     isPlaylistPlaying(),
                     id = state.playlistIdentifier,
                     playlists = state.playlistsTreeLookup,
-                    pinned = isPlaylistPinned()
+                    pinned = isPlaylistPinned(),
+                    appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] }
                 )
             }
             ?.also { state.model = it }
@@ -784,8 +804,13 @@ class PlaylistPresenter(
             ?.apply {
                 view.setHeaderModel(
                     modelMapper.map(
-                        this, isPlaylistPlaying(), false, id = state.playlistIdentifier,
-                        playlists = state.playlistsTreeLookup, pinned = isPlaylistPinned()
+                        this,
+                        isPlaylistPlaying(),
+                        false,
+                        id = state.playlistIdentifier,
+                        playlists = state.playlistsTreeLookup,
+                        pinned = isPlaylistPinned(),
+                        appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] }
                     )
                 )
                 state.playlist?.currentIndex?.also {
@@ -839,7 +864,8 @@ class PlaylistPresenter(
                 state.playlist,
                 state.playlistsTreeLookup
             ),
-            showOverflow = true
+            showOverflow = true,
+            deleteResources = state.playlist?.id?.let { appPlaylistInteractors[it] }?.customResources?.customDelete
         )
         state.model = state.model?.let {
             it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })

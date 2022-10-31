@@ -1,16 +1,19 @@
 package uk.co.sentinelweb.cuer.app.util.wrapper
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
+import android.util.TypedValue
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.shape.ShapeAppearanceModel
 import java.io.InputStream
+
 
 class ResourceWrapper constructor(
     private val context: Context,
@@ -35,6 +38,13 @@ class ResourceWrapper constructor(
 
     @ColorInt
     fun getColor(@ColorRes id: Int) = ContextCompat.getColor(context, id)
+
+    @ColorRes
+    fun getColorAttr(@AttrRes id: Int): Int {
+        val typedValue = TypedValue()
+        context.getTheme().resolveAttribute(id, typedValue, true)
+        return typedValue.resourceId
+    }
 
     fun getDimensionPixelSize(@DimenRes id: Int): Int = context.resources.getDimensionPixelSize(id)
 
@@ -65,10 +75,11 @@ class ResourceWrapper constructor(
         d: Drawable,
         start: Int,
         end: Int,
+        align: Int = ImageSpan.ALIGN_BOTTOM,
     ) {
         string.apply {
             setSpan(
-                ImageSpan(d, ImageSpan.ALIGN_BOTTOM),
+                ImageSpan(d, align),
                 start, end,
                 Spannable.SPAN_INCLUSIVE_INCLUSIVE
             )
@@ -87,5 +98,6 @@ class ResourceWrapper constructor(
         }
 
     fun getShapeModel(id: Int) = ShapeAppearanceModel.builder(context, 0, id).build()
+    fun getColorStateList(id: Int): ColorStateList? = ContextCompat.getColorStateList(context, id)
 
 }

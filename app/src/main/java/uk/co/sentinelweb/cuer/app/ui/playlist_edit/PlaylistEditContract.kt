@@ -39,6 +39,7 @@ interface PlaylistEditContract {
         val info: String,
         val config: PlaylistDomain.PlaylistConfigDomain,
         val showDefault: Boolean,
+        val isCreate: Boolean,
         var isDialog: Boolean
     )
 
@@ -82,7 +83,8 @@ interface PlaylistEditContract {
                         mediaOrchestrator = get(),
                         log = get(),
                         prefsWrapper = get(),
-                        recentLocalPlaylists = get()
+                        recentLocalPlaylists = get(),
+                        res = get()
                     )
                 }
                 scoped { State() }
@@ -92,9 +94,7 @@ interface PlaylistEditContract {
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }
-                scoped {
-                    navigationRouter(true, this.getFragmentActivity())
-                }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
             }
         }
     }

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -16,7 +17,7 @@ class PlaylistSelectDialogModelCreator constructor(
         block: (List<PlaylistDomain>) -> Unit
     ) {
         playlistRepo
-            .loadList(null)
+            .loadList(AllFilter, flat = false)
             .takeIf { it.isSuccessful }
             ?.data?.apply { block(this) }
     }
@@ -31,7 +32,7 @@ class PlaylistSelectDialogModelCreator constructor(
     ) = SelectDialogModel(
         type = DialogModel.Type.PLAYLIST,
         multi = multi,
-        title = R.string.playlist_dialog_title,
+        title = res.getString(R.string.playlist_dialog_title),
         items = all.map { playlist ->
             SelectDialogModel.Item(
                 playlist.title,

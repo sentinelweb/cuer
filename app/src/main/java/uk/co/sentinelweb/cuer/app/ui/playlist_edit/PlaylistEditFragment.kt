@@ -64,11 +64,6 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val commitHost: CommitHost by inject()
 
-    private val starMenuItem: MenuItem
-        get() = binding.peToolbar.menu.findItem(R.id.pe_star)
-    private val pinMenuItem: MenuItem
-        get() = binding.peToolbar.menu.findItem(R.id.pe_pin)
-
     internal var listener: Listener? = null
 
     private var _binding: FragmentPlaylistEditBinding? = null
@@ -114,36 +109,19 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        binding.peScroll.doOnPreDraw {
-//            startPostponedEnterTransition()
-//        }
         binding.peStarFab.setOnClickListener { viewModel.onStarClick() }
         binding.pePinFab.setOnClickListener { viewModel.onPinClick() }
-        starMenuItem.isVisible = false
-        pinMenuItem.isVisible = false
         val isDialog = this.dialog != null
         viewModel.setIsDialog(isDialog)
         binding.peClickPrompt.isVisible = !isDialog
-        binding.peToolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.pe_star -> {
-                    viewModel.onStarClick()
-                    true
-                }
-                R.id.pe_pin -> {
-                    viewModel.onPinClick()
-                    true
-                }
-                else -> false
-            }
-        }
-
+        binding.peToolbar.title = ""
         binding.peImage.setOnTouchListener { iv, e ->
             when (e.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     viewModel.onImageClick(e.x > iv.width / 2)
                     true
                 }
+
                 else -> true
             }
         }
@@ -178,13 +156,9 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    starMenuItem.isVisible = binding.peStarFab.isVisible
-                    pinMenuItem.isVisible = binding.pePinFab.isVisible
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
-                    starMenuItem.isVisible = false
-                    pinMenuItem.isVisible = false
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
             }
@@ -253,19 +227,25 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
             binding.peTitleEdit.setText(model.titleEdit)
             binding.peTitleEdit.setSelection(model.titleEdit.length)
         }
-        binding.peCollapsingToolbar.title = model.titleDisplay
+        binding.peCollapsingToolbar.title = getString(R.string.edit_prefix) + model.titleDisplay
         binding.peClickPrompt.isVisible = !model.isDialog
-        val starIconResource =
+
+        binding.peStarFab.setIconResource(
             if (model.starred) R.drawable.ic_starred
             else R.drawable.ic_starred_off
-        starMenuItem.setIcon(starIconResource)
-        binding.peStarFab.setImageResource(starIconResource)
-
-        val pinIconResource =
+        )
+        binding.peStarFab.setText(
+            if (model.starred) R.string.menu_unstar
+            else R.string.menu_star
+        )
+        binding.pePinFab.setIconResource(
             if (model.pinned) R.drawable.ic_push_pin_on
             else R.drawable.ic_push_pin_off
-        pinMenuItem.setIcon(pinIconResource)
-        binding.pePinFab.setImageResource(pinIconResource)
+        )
+        binding.pePinFab.setText(
+            if (model.pinned) R.string.menu_unpin
+            else R.string.menu_pin
+        )
 
         model.buttonText?.apply { binding.peCommitButton.text = this }
         model.imageUrl?.also { setImage(it) }
@@ -280,12 +260,18 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         binding.peDeletableItems.isChecked = model.config.deletableItems
         binding.peEditableItems.isChecked = model.config.editableItems
         binding.peParentChip.removeAllViews()
+
+        binding.peDividerOtherActions.isVisible = !model.isCreate
+        binding.peOtherActionsTitle.isVisible = !model.isCreate
+        binding.peWatchAll.isVisible = !model.isCreate
+
         chipCreator.create(model.chip, binding.peParentChip).apply {
             binding.peParentChip.addView(this)
             when (model.chip.type) {
                 ChipModel.Type.PLAYLIST_SELECT -> {
                     setOnClickListener { viewModel.onSelectParent() }
                 }
+
                 ChipModel.Type.PLAYLIST -> {
                     setOnCloseIconClickListener { viewModel.onRemoveParent() }
                 }
@@ -325,11 +311,13 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                     PlaylistsDialogFragment.newInstance(model)
                 dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())
             }
+
             is SearchImageContract.Config -> {
                 dialogFragment =
                     SearchImageDialogFragment.newInstance(model)
                 dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())
             }
+
             is DialogModel.DismissDialogModel -> dialogFragment?.dismiss()
             else -> Unit
         }

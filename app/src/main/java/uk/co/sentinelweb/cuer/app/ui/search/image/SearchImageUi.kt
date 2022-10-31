@@ -51,14 +51,15 @@ fun SearchImageParametersUi(
             Column {
                 Box(
                     modifier = Modifier
-                        .height(48.dp)
+                        .height(56.dp)
                         .fillMaxWidth()
                 ) {
                     Text(
                         text = "Search Images",
                         modifier = Modifier
-                            .padding(12.dp)
-                            .align(Alignment.TopStart)
+                            .padding(16.dp)
+                            .align(Alignment.TopStart),
+                        style = MaterialTheme.typography.h5
                     )
                     Row(modifier = Modifier.align(Alignment.TopEnd)) {
                         Icon(
@@ -67,7 +68,7 @@ fun SearchImageParametersUi(
                             modifier = Modifier
                                 .width(48.dp)
                                 .clickable { onLibraryClick() }
-                                .padding(12.dp)
+                                .padding(16.dp)
                         )
                         Icon(
                             imageVector = Icons.Default.Clear,
@@ -79,23 +80,41 @@ fun SearchImageParametersUi(
                         )
                     }
                 }
-                LazyColumn(
-                    modifier = Modifier.fillMaxHeight(0.6f),
-                    contentPadding = PaddingValues(top = 4.dp)
-                ) {
-                    items(results.images) { imageData ->
-                        Image(
-                            painter = rememberGlidePainter(
-                                request = imageData.url,
-                                fadeIn = true
-                            ),
-                            contentDescription = "",
+                if (results.images.size > 0) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxHeight(0.6f),
+                        contentPadding = PaddingValues(top = 4.dp)
+                    ) {
+                        items(results.images) { imageData ->
+                            Image(
+                                painter = rememberGlidePainter(
+                                    request = imageData.url,
+                                    fadeIn = true
+                                ),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .padding(2.dp)
+                                    .clickable { onSelectImage(imageData) }
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(),
+                                contentScale = ContentScale.FillWidth
+                            )
+                        }
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 80.dp)
+                    ) {
+                        Text(
+                            text = "No results",
+                            style = MaterialTheme.typography.h3
+                        )
+                        Text(
+                            text = "Edit your search below and search again by pressing done on the keyboard",
                             modifier = Modifier
-                                .padding(2.dp)
-                                .clickable { onSelectImage(imageData) }
-                                .fillMaxWidth()
-                                .wrapContentHeight(),
-                            contentScale = ContentScale.FillWidth
+                                .padding(horizontal = 8.dp, vertical = 48.dp),
+                            style = MaterialTheme.typography.body1
                         )
                     }
                 }

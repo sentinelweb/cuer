@@ -161,7 +161,7 @@ class YouTubePlayerListener(
 
     override fun onError(youTubePlayer: YouTubePlayer, error: PlayerError) {
         this.youTubePlayer = youTubePlayer
-        playerUi?.error(error.toString()) // todo map errors
+        playerUi?.error(error.toString())
 
     }
 
@@ -296,7 +296,6 @@ class YouTubePlayerListener(
         }
     }
 
-    // todo fix this - not clean
     private fun setupPlayer(controls: PlayerContract.PlayerControls) {
         controls.apply {
             addListener(this@YouTubePlayerListener)

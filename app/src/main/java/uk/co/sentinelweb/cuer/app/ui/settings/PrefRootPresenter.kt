@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.settings
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.toJavaInstant
+import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServiceManager
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -47,5 +48,6 @@ class PrefRootPresenter constructor(
 
     override fun initialisePrefs() {
         view.setRemoteServiceRunning(remoteServiceManger.isRunning(), remoteServiceManger.get()?.address)
+        view.setVersion("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
     }
 }

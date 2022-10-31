@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.common.dialog
 
 open class DialogModel constructor(
     open val type: Type,
-    open val title: Int// todo change to string
+    open val title: String
 ) {
     enum class Type {
         PLAYLIST, PLAYLIST_ADD, PLAYLIST_FULL, CONFIRM,
@@ -11,5 +11,5 @@ open class DialogModel constructor(
         IMAGE_SEARCH, SUPPORT
     }
 
-    class DismissDialogModel() : DialogModel(Type.DISMISS, 0)
+    class DismissDialogModel() : DialogModel(Type.DISMISS, "Dialog")
 }

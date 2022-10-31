@@ -52,10 +52,7 @@ object BrowseComposables {
                     CuerTopAppBarComposables.CuerAppBar(
                         text = model.title,
                         onUp = { view.dispatch(Event.OnUpClicked) },
-                        //backgroundColor = Color.White// todo dark theme make color?
                         actions = listOf(
-                            Action(CuerMenuItem.Search,
-                                { view.dispatch(Event.OnActionSearchClicked) }),
                             when (model.order) {
                                 CATEGORIES -> Action(CuerMenuItem.SortAlpha,
                                     { view.dispatch(Event.OnSetOrder(A_TO_Z)) }
@@ -65,6 +62,8 @@ object BrowseComposables {
                                     { view.dispatch(Event.OnSetOrder(CATEGORIES)) }
                                 )
                             },
+                            Action(CuerMenuItem.Search,
+                                { view.dispatch(Event.OnActionSearchClicked) }),
                             Action(CuerMenuItem.Settings,
                                 { view.dispatch(Event.OnActionSettingsClicked) }),
                         )

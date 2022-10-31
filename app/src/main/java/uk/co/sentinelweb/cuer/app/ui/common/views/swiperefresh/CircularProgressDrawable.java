@@ -16,37 +16,28 @@
 
 package uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh;
 
-import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX;
-
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
+import android.graphics.*;
 import android.graphics.Paint.Style;
-import android.graphics.Path;
-import android.graphics.PixelFormat;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.core.content.ContextCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+import uk.co.sentinelweb.cuer.app.R;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import uk.co.sentinelweb.cuer.app.R;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX;
 
 /**
  * Drawable that renders the animated indeterminate progress indicator in the Material design style
@@ -445,11 +436,6 @@ public class CircularProgressDrawable extends Drawable implements Animatable {
 
     private void setRotation(float rotation) {
         mRotation = rotation;
-    }
-
-    @SuppressWarnings("UnusedMethod") // TODO(b/141954576): Suppressed during upgrade to AGP 3.6.
-    private float getRotation() {
-        return mRotation;
     }
 
     @Override
