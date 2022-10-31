@@ -121,12 +121,19 @@
                     />
 
                     <ImageView
+                        android:id="@+id/playlist_flag_star"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/playlists_section_starred"
+                        android:src="@drawable/ic_starred"
+                        android:visibility="gone"
+                    />
+
+                    <ImageView
                         android:id="@+id/playlist_flag_default"
                         style="@style/Header.InfoIcon"
                         android:contentDescription="@string/default_playlist"
                         android:src="@drawable/ic_playlist_default"
                         android:visibility="gone"
-                        app:tint="?colorOnSurface"
                     />
 
                     <ImageView

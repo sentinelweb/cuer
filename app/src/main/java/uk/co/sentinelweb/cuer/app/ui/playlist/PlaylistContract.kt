@@ -146,6 +146,7 @@ interface PlaylistContract {
         val playText: String,
         @DrawableRes val starredIcon: Int,
         val starredText: String,
+        val isStarred: Boolean,
         val isDefault: Boolean,
         val isPlayFromStart: Boolean,
         val isPinned: Boolean,

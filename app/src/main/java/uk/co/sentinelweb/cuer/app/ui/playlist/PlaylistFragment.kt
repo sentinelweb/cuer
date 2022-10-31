@@ -401,6 +401,7 @@ class PlaylistFragment :
         binding.playlistFabPlaymode.text = model.loopModeText
         binding.playlistStarButton.setIconResource(model.starredIcon)
         binding.playlistStarButton.setText(model.starredText)
+        binding.playlistFlagStar.isVisible = model.isStarred
         cardsMenuItem.isVisible = !presenter.isCards
         rowsMenuItem.isVisible = presenter.isCards
         binding.playlistFlagDefault.isVisible = model.isDefault
