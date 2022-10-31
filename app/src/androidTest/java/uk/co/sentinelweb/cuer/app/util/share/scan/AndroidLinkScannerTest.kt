@@ -101,4 +101,18 @@ class AndroidLinkScannerTest {
         val actualPlaylist = actual!!.second as PlaylistDomain
         assertThat(actualPlaylist.platformId).isEqualTo("PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe")
     }
+
+    @Test
+    fun google_yt_url() {
+        val testLink =
+            "https://www.google.com/url?sa=t&source=web&rct=j&url=https://m.youtube.com/watch%3Fv%3D88YCkY8U2NU&ved=2ahUKEwiuh5DxpYH7AhWJx4UKHVrKB1IQwqsBegQIdhAF&usg=AOvVaw0faoqETwWJ6C2Y_kMcucLW"
+
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube("https://m.youtube.com/watch?v=88YCkY8U2NU", "88YCkY8U2NU")
+        assertThat(actual).isNotNull()
+        assertThat(actual?.first).isEqualTo(ObjectTypeDomain.MEDIA)
+        assertThat(actual?.second).isEqualTo(expectedMedia)
+        val actualMedia = actual!!.second as MediaDomain
+        assertThat(actualMedia.platformId).isEqualTo("88YCkY8U2NU")
+    }
 }
