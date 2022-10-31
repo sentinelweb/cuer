@@ -247,7 +247,6 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
             else R.string.menu_pin
         )
 
-
         model.buttonText?.apply { binding.peCommitButton.text = this }
         model.imageUrl?.also { setImage(it) }
         binding.peWatchAll.setText(model.watchAllText)
