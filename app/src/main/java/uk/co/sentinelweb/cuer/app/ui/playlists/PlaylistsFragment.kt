@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.transition.TransitionInflater
 import android.view.*
@@ -23,6 +24,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -36,6 +38,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -62,6 +65,7 @@ class PlaylistsFragment :
     private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val res: ResourceWrapper by inject()
+    private val actionBarModifier: ActionBarModifier by inject()
 
     private var _binding: FragmentPlaylistsBinding? = null
     private val binding get() = _binding!!
@@ -138,16 +142,23 @@ class PlaylistsFragment :
                 }
             }
         })
+
         postponeEnterTransition()
         binding.playlistsList.doOnPreDraw {
             startPostponedEnterTransition()
         }
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        linkScopeToActivity()
+    }
+
     private fun setMenuItemsColor(cslRes: Int) {
         val colorStateList = res.getColorStateList(cslRes)
         searchMenuItem.iconTintList = colorStateList
         addMenuItem.iconTintList = colorStateList
+        actionBarModifier.setMenuItemColor(cslRes)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -162,6 +173,7 @@ class PlaylistsFragment :
             presenter.onCreatePlaylist()
             true
         }
+        setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
     }
 
     override fun onStart() {

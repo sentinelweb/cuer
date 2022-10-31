@@ -26,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter.BackupResult.*
 import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -44,13 +45,13 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-
 class MainActivity :
     AppCompatActivity(),
     MainContract.View,
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     CompactPlayerScroll.PlayerHost,
     AndroidScopeComponent,
+    ActionBarModifier,
     MainContract.PlayerViewControl {
 
     override val scope: Scope by activityScopeWithSource<MainActivity>()
@@ -75,6 +76,13 @@ class MainActivity :
     private val playerFragment: Fragment
         get() = supportFragmentManager.findFragmentById(R.id.cast_player_fragment)
             ?: throw Exception("No player fragment")
+
+    private var _menu: Menu? = null
+    private val pasteAddMenuItem: MenuItem?
+        get() = _menu?.findItem(R.id.menu_paste_add)
+    private val settingsMenuItem: MenuItem?
+        get() = _menu?.findItem(R.id.menu_settings)
+
 
     init {
         log.tag(this)
@@ -168,6 +176,7 @@ class MainActivity :
         presenter.onDestroy()
         volumeControl.controlView = null
         _binding = null
+        _menu = null
         super.onDestroy()
     }
 
@@ -178,6 +187,7 @@ class MainActivity :
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_actionbar, menu)
+        _menu = menu
         return true
     }
 
@@ -311,5 +321,12 @@ class MainActivity :
             c.startActivity(Intent(c, MainActivity::class.java)
                 .apply { setFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
         }
+    }
+
+    // from ActionBarModifier
+    override fun setMenuItemColor(colorStateListId: Int) {
+        val colorStateList = res.getColorStateList(colorStateListId)
+        pasteAddMenuItem?.setIconTintList(colorStateList)
+        settingsMenuItem?.setIconTintList(colorStateList)
     }
 }

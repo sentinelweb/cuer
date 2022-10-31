@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -70,6 +71,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val playerControls: PlayerContract.PlayerControls by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
+    private val actionBarModifier: ActionBarModifier by inject()
 
     private val binding: FragmentPlaylistItemEditBinding
         get() = _binding ?: throw IllegalStateException("FragmentPlaylistItemEditBinding not bound")
@@ -174,18 +176,17 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-//                    playMenuItem.isVisible = !menuState.modelEmpty
+                    actionBarModifier.setMenuItemColor(R.color.actionbar_icon_collapsed_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
-//                    playMenuItem.isVisible = false
+                    actionBarModifier.setMenuItemColor(R.color.actionbar_icon_expanded_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
                 menuState.scrolledDown = isShow
             }
         })
         compactPlayerScroll.addScrollListener(binding.plieScroll, this)
-
         itemArg?.apply {
             saveCallback.isEnabled = true
             if (id != null) {
@@ -214,6 +215,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
+        actionBarModifier.setMenuItemColor(R.color.actionbar_icon_expanded_csl)
     }
 
     override fun onAttach(context: Context) {

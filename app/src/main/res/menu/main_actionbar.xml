@@ -8,19 +8,19 @@
         android:id="@+id/menu_settings"
         android:icon="@drawable/ic_menu_settings_black"
         android:title="@string/menu_settings"
-        app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="never"
+        app:iconTint="?colorOnSurface"
+        app:showAsAction="always"
         android:orderInCategory="1000"
 
-        />
+    />
 
     <item
         android:id="@+id/menu_paste_add"
         android:icon="@drawable/ic_menu_paste_add_black"
         android:title="@string/menu_paste"
-        app:iconTint="@color/menu_button_icon_tint"
-        app:showAsAction="never"
+        app:iconTint="?colorOnSurface"
+        app:showAsAction="always"
         android:orderInCategory="1100"
-        />
+    />
 
 </menu>

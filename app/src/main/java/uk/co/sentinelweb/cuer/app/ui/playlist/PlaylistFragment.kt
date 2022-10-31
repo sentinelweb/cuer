@@ -31,6 +31,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
@@ -93,6 +94,7 @@ class PlaylistFragment :
     private val commitHost: CommitHost by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val res: ResourceWrapper by inject()
+    private val actionBarModifier: ActionBarModifier by inject()
 
     private var _adapter: PlaylistAdapter? = null
     private val adapter: PlaylistAdapter
@@ -217,6 +219,8 @@ class PlaylistFragment :
         searchMenuItem.iconTintList = colorStateList
         cardsMenuItem.iconTintList = colorStateList
         rowsMenuItem.iconTintList = colorStateList
+        actionBarModifier.setMenuItemColor(cslRes)
+
     }
 
     private fun setupRecyclerView() {
