@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
 import android.animation.ObjectAnimator
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -83,6 +84,7 @@ class MainActivity :
     private val settingsMenuItem: MenuItem?
         get() = _menu?.findItem(R.id.menu_settings)
 
+    private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
 
     init {
         log.tag(this)
@@ -193,10 +195,20 @@ class MainActivity :
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_paste_add -> startActivity(ShareActivity.intent(this, true))
+            R.id.menu_paste_add -> checkIntentAndGotoShare()
             R.id.menu_settings -> navController.navigate(R.id.navigation_settings_root)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun checkIntentAndGotoShare() {
+        // check clipboard data
+        clipboard.getPrimaryClip()
+            ?.getItemAt(0)
+            ?.text
+            ?.takeIf { it.startsWith("http") }
+            ?.also { startActivity(ShareActivity.intent(this, true)) }
+            ?: also { snackBarWrapper.makeError("There's no url on the clipboard").show() }
     }
 
     override fun checkPlayServices() {

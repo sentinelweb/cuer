@@ -20,7 +20,7 @@
         android:title="@string/menu_paste"
         app:iconTint="?colorOnSurface"
         app:showAsAction="always"
-        android:orderInCategory="1100"
+        android:orderInCategory="900"
     />
 
 </menu>
