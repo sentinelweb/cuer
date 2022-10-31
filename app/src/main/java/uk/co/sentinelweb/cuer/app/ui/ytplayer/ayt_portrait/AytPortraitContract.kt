@@ -10,6 +10,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
+import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
+import uk.co.sentinelweb.cuer.app.ui.common.interfaces.EmptyActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.EmptyNavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -99,6 +101,7 @@ interface AytPortraitContract {
                 scoped { ShareWrapper(get<AytPortraitActivity>()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 scoped { ShareNavigationHack() }
+                scoped<ActionBarModifier> { EmptyActionBarModifier() }
             }
         }
     }

@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
@@ -102,6 +103,12 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onStart() {
         super.onStart()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
+        edgeToEdgeWrapper.doOnApplyWindowInsets(binding.root) { view, insets, padding ->
+            view.updatePadding(
+                bottom = padding.bottom + insets.systemWindowInsetBottom
+            )
+        }
         // this POS restores the AYT player to the mvi kotlin state after returning from a home press
         if (this::mviView.isInitialized) {
             coroutines.mainScope.launch {
@@ -118,6 +125,7 @@ class AytPortraitActivity : AppCompatActivity(),
             && floatingService.hasPermission(this@AytPortraitActivity)
             && currentItem != null
             && !castListener.castStarting
+            && !isChangingConfigurations
         ) {
             log.d("launch pip")
             aytViewHolder.switchView()
@@ -247,7 +255,14 @@ class AytPortraitActivity : AppCompatActivity(),
 
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
             when (label) {
-                is Command -> label.command.let { aytViewHolder.processCommand(it) }
+                is Command -> label.command
+                    .let { aytViewHolder.processCommand(it) }
+                    .also {
+                        if (label.command == Play) {
+                            edgeToEdgeWrapper.setDecorFitsSystemWindows(this@AytPortraitActivity)
+                        }
+                    }
+
                 is LinkOpen -> linkNavigator.navigateLink(label.link)
 
                 is ChannelOpen ->
