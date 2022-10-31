@@ -77,11 +77,20 @@ fun SearchParametersUi(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-                    Text(
-                        text = model.type + " " + stringResource(id = R.string.search_title),
-                        style = MaterialTheme.typography.h5,
-                        modifier = Modifier.padding(8.dp)
-                    )
+                    Row {
+                        Icon(
+                            painter = painterResource(model.icon),
+                            tint = MaterialTheme.colors.onSurface,
+                            contentDescription = stringResource(id = R.string.menu_search),
+                            modifier = Modifier.padding(12.dp).size(24.dp)
+                        )
+                        Text(
+                            text = model.type + " " + stringResource(id = R.string.search_title),
+                            style = MaterialTheme.typography.h5,
+                            modifier = Modifier
+                                .padding(8.dp)
+                        )
+                    }
                     Button(
                         onClick = localOrRemoteClick,
                         modifier = Modifier
@@ -91,6 +100,12 @@ fun SearchParametersUi(
                         colors = cuerOutlineButtonColors(),
                         elevation = elevation(0.dp)
                     ) {
+                        Icon(
+                            painter = painterResource(model.otherIcon),
+                            tint = MaterialTheme.colors.onSurface,
+                            contentDescription = stringResource(id = R.string.menu_search),
+                            modifier = Modifier.padding(end = 4.dp).size(24.dp)
+                        )
                         Text(
                             text = model.otherType,
                             style = MaterialTheme.typography.button
@@ -130,7 +145,7 @@ fun SearchParametersUi(
                         imageVector = Icons.Default.Search,
                         tint = MaterialTheme.colors.onSurface,
                         contentDescription = stringResource(id = R.string.menu_search),
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.padding(end = 4.dp).size(24.dp)
                     )
                     Text(
                         text = stringResource(id = R.string.search_title),
@@ -390,7 +405,9 @@ fun SearchInputText(
 
 val searchParams = SearchContract.Model(
     type = "Local",
+    icon = R.drawable.ic_portrait,
     otherType = "YouTube",
+    otherIcon = R.drawable.ic_youtube,
     text = "philosophy",
     isLocal = true,
     localParams = SearchContract.LocalModel(
@@ -426,7 +443,9 @@ fun PreviewLocalUi() {
 fun PreviewRemoteUi() {
     SearchParametersUi(searchParams.copy(
         type = "YouTube",
+        icon = R.drawable.ic_youtube,
         otherType = "Local",
+        otherIcon = R.drawable.ic_portrait,
         isLocal = false
     ), {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
 }
@@ -437,7 +456,9 @@ fun PreviewRemoteRelatedlUi() {
     SearchParametersUi(
         searchParams.copy(
             type = "YouTube",
+            icon = R.drawable.ic_youtube,
             otherType = "Local",
+            otherIcon = R.drawable.ic_portrait,
             text = null,
             isLocal = false,
             remoteParams = searchParams.remoteParams.copy(
