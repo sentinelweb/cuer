@@ -209,6 +209,7 @@
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="android:layout_margin">8dp</item>
         <item name="rippleColor">@color/grey_400</item>
+        <item name="iconSize">18dp</item>
     </style>
 
 
@@ -520,7 +521,6 @@
     </style>
 
     <style name="Button.IconOnly" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="iconPadding">0dp</item>
         <!--        <item name="android:insetTop">0dp</item>-->
         <!--        <item name="android:insetBottom">0dp</item>-->
         <item name="android:paddingLeft">12dp</item>
@@ -529,6 +529,7 @@
         <item name="strokeColor">?colorOnSurface</item>
         <item name="rippleColor">@color/grey_400</item>
         <item name="android:tint">?colorOnSurface</item>
+        <item name="iconSize">18dp</item>
     </style>
 
     <style name="Button.Action" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
@@ -541,6 +542,7 @@
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="android:layout_margin">8dp</item>
         <item name="rippleColor">@color/grey_400</item>
+        <item name="iconSize">18dp</item>
     </style>
 
     <style name="Button.Solid" parent="@style/Widget.MaterialComponents.Button.Icon">
@@ -553,6 +555,7 @@
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="android:layout_margin">8dp</item>
         <item name="rippleColor">?colorPrimaryVariant</item>
+        <item name="iconSize">18dp</item>
     </style>
     <!-- end Buttons =========================== -->
     <!-- Full screen =========================== -->
