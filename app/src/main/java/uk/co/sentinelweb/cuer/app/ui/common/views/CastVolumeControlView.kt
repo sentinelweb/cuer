@@ -38,6 +38,7 @@ class CastVolumeControlView @JvmOverloads constructor(
     private var hideJob: Job? = null
 
     private var lastUpdateLong = 0L
+
     @DrawableRes
     private var lastVolumeDrawable = R.drawable.ic_volume_up_24
 
@@ -49,6 +50,13 @@ class CastVolumeControlView @JvmOverloads constructor(
 
     override fun onFinishInflate() {
         super.onFinishInflate()
+        binding.root.setOnClickListener { }
+        binding.cvVolumeMuteIcon.setOnClickListener {
+            cuerCastSessionListener.currentCastSession
+                ?.apply { volume = 0.0 }
+                ?.apply { binding.cvVolume.progress = 0 }
+                ?.apply { updateIcon() }
+        }
         binding.cvVolume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {

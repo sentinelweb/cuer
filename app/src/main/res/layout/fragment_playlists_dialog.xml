@@ -38,7 +38,7 @@
         app:iconGravity="textStart"
         android:text="@string/playlist_dialog_add_playlist"
         android:textAppearance="?attr/textAppearanceButton"
-        app:icon="@drawable/ic_add"
+        app:icon="@drawable/ic_playlist_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:visibility="gone"
