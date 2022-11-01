@@ -91,7 +91,7 @@ class PlaylistsDialogPresenter(
 
         val recentLocalPlaylists = recentLocalPlaylists
             .buildRecentSelectionList()
-            .let { it.reversed().subList(0, min(10, it.size)) }
+            .let { it.subList(0, min(10, it.size)) }
             .mapNotNull { recentId -> state.playlists.find { it.id == recentId.id } }
 
         state.playlists.map { it.id }
