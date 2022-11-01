@@ -7,4 +7,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     tools:text="Playlist 1"
-    />
+    app:chipStrokeColor="?colorOnSurface"
+    app:chipStrokeWidth="1dp"
+/>
