@@ -27,7 +27,7 @@ class RibbonItemView(
     init {
         _binding = ViewRibbonItemBinding.inflate(LayoutInflater.from(parent.context), parent, true)
         binding.ribbonItemText.setText(item.text)
-        binding.ribbonItemIcon.setImageDrawable(res.getDrawable(item.icon))
+        binding.ribbonItemText.icon = res.getDrawable(item.icon)
     }
 
     fun setOnClickListener(listener: (RibbonModel) -> Unit) = binding.root.setOnClickListener {

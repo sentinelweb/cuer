@@ -1,37 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<com.google.android.material.button.MaterialButton
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:id="@+id/ribbon_item_text"
+    style="@style/Header.Button"
+    android:contentDescription="@string/menu_star"
     android:layout_height="64dp"
-    android:minWidth="64dp"
-    android:background="@drawable/ic_ripple_item_background"
-    android:layout_margin="2dp"
-    android:padding="4dp"
->
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ribbon_item_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_volume_up_24"
-        app:tint="?colorOnSurface"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/ribbon_item_text"
-    />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/ribbon_item_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:tint="?colorOnSurface"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ribbon_item_icon"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:maxLines="1"
-    />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    android:layout_width="wrap_content"
+    android:text="@string/menu_star"
+    app:tint="?colorOnSurface"
+    app:iconGravity="textTop"
+    app:iconPadding="4dp"
+    app:icon="@drawable/ic_starred"
+    android:paddingHorizontal="8dp"
+    android:minWidth="48dp"
+/>
