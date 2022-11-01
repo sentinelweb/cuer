@@ -203,7 +203,6 @@ interface PlaylistContract {
                         chromeCastWrapper = get(),
                         ytJavaApi = get(),
                         shareWrapper = get(),
-                        prefsWrapper = get(),
                         playlistMutator = get(),
                         log = get(),
                         timeProvider = get(),
