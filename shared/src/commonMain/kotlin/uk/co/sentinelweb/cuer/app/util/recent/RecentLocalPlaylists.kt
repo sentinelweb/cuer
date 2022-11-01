@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.app.util.recent
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.RECENT_PLAYLISTS
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -17,11 +16,11 @@ class RecentLocalPlaylists constructor(
         log.tag(this)
     }
 
-    fun getRecent(): List<Long> = (prefs.getString(RECENT_PLAYLISTS, null)
+    fun getRecent(): List<Long> = prefs.recentIds
         ?.split(",")
         ?.map { it.toLong() }
         ?.toMutableList()
-        ?: mutableListOf())
+        ?: mutableListOf()
 
     fun addRecent(pl: PlaylistDomain) {
         val id = pl.id
@@ -38,8 +37,7 @@ class RecentLocalPlaylists constructor(
             current.remove(id)
             current.add(id)
             while (current.size > MAX_RECENT) current.removeAt(0)
-            val value = current.toTypedArray().joinToString(",")
-            prefs.putString(RECENT_PLAYLISTS, value)
+            prefs.recentIds = current.toTypedArray().joinToString(",")
         }
     }
 

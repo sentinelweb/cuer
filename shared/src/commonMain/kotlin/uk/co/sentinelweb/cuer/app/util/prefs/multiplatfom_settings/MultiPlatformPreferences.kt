@@ -143,4 +143,11 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
             ?: let { remove(LAST_SEARCH_TYPE) }
 
 
+    var recentIds: String?
+        get() = getString(RECENT_PLAYLISTS, null)
+        set(value) = value
+            ?.let { putString(RECENT_PLAYLISTS, it) }
+            ?: let { remove(RECENT_PLAYLISTS) }
+
+
 }
