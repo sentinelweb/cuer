@@ -12,7 +12,7 @@
         android:id="@+id/pdf_swipe"
         android:layout_width="match_parent"
         android:layout_height="500dp"
-        app:layout_constraintBottom_toTopOf="@id/pdf_add_button"
+        app:layout_constraintBottom_toTopOf="@id/pdf_button_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -24,10 +24,17 @@
             app:layoutManager="LinearLayoutManager"
             tools:context=".ui.playlists.PlaylistsFragment"
             tools:listitem="@layout/view_playlists_item_row"
-            android:scrollbarThumbVertical="@drawable/scrollbar_thumb" />
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"/>
 
     </uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout>
 
+    <View android:id="@+id/pdf_button_bg"
+          android:layout_width="match_parent"
+          android:layout_height="72dp"
+          android:background="?colorSurface"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+    />
     <com.google.android.material.button.MaterialButton
         android:id="@+id/pdf_add_button"
         style="@style/Button.Action"
