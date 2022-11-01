@@ -144,7 +144,7 @@ class SharedPrefsWrapperRoboTest {
     }
 
     companion object {
-        private val X1_FIRST = "currentPlaylist.first"
-        private val X1_SECOND = "currentPlaylist.second"
+        private val X1_FIRST = "testId.first"
+        private val X1_SECOND = "testId.second"
     }
 }
