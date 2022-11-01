@@ -10,8 +10,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ROOT_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -29,7 +28,7 @@ class PlaylistsDialogPresenter(
     private val dialogModelMapper: PlaylistsDialogModelMapper,
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
     private val recentLocalPlaylists: RecentLocalPlaylists,
 ) : PlaylistsDialogContract.Presenter {
@@ -51,7 +50,7 @@ class PlaylistsDialogPresenter(
             ?.let { state.playlists.find { it.id == findId } }
             ?.apply {
                 if (state.pinWhenSelected) {
-                    prefsWrapper.putLong(GeneralPreferences.PINNED_PLAYLIST, id!!)
+                    prefsWrapper.pinnedPlaylistId = id
                 }
             }
             ?.apply { state.config.itemClick(this, true) }
@@ -74,7 +73,7 @@ class PlaylistsDialogPresenter(
                 .apply { state.channelPlaylistIds.addAll(this.map { it.id!! }) }
         }
 
-        val pinnedId = prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
+        val pinnedId = prefsWrapper.pinnedPlaylistId
         state.playlists = playlistOrchestrator.loadList(AllFilter, LOCAL.flatOptions())
             .filter { it.config.editableItems }
             .apply { state.treeRoot = buildTree().sort(compareBy { it.node?.title?.lowercase() }) }
@@ -92,7 +91,7 @@ class PlaylistsDialogPresenter(
 
         val recentLocalPlaylists = recentLocalPlaylists
             .buildRecentSelectionList()
-            .let { it.subList(0, min(10, it.size)) }
+            .let { it.reversed().subList(0, min(10, it.size)) }
             .mapNotNull { recentId -> state.playlists.find { it.id == recentId.id } }
 
         state.playlists.map { it.id }

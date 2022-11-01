@@ -5,15 +5,13 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
-import uk.co.sentinelweb.cuer.app.orchestrator.toPairType
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -22,7 +20,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 class PlayUseCase constructor(
     private val queue: QueueMediatorContract.Producer,
     private val ytCastContextHolder: ChromecastYouTubePlayerContextHolder,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
     private val floatingService: FloatingPlayerServiceManager,
     private val playDialog: PlayDialog,
@@ -57,10 +55,7 @@ class PlayUseCase constructor(
             playDialog.showDialog(mapChangePlaylistAlert({
                 val toIdentifier = itemDomain.playlistId!!.toIdentifier(LOCAL)
 
-                prefsWrapper.putPair(
-                    GeneralPreferences.CURRENT_PLAYING_PLAYLIST,
-                    toIdentifier.toPairType<Long>()
-                )
+                prefsWrapper.currentPlayingPlaylistId = toIdentifier
                 coroutines.computationScope.launch {
                     queue.switchToPlaylist(toIdentifier)
                     queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)

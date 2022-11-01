@@ -2,15 +2,13 @@ package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_REMOTE_SEARCH
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
-import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
 class YoutubeSearchPlayistInteractor constructor(
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val ytInteractor: YoutubeInteractor,
     private val playlistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator,
     private val state: State
@@ -24,10 +22,7 @@ class YoutubeSearchPlayistInteractor constructor(
         var searchTerm: SearchRemoteDomain? = null
     )
 
-    fun searchPref(): SearchRemoteDomain? =
-        prefsWrapper
-            .getString(LAST_REMOTE_SEARCH, null)
-            ?.let { deserialiseSearchRemote(it) }
+    fun searchPref(): SearchRemoteDomain? = prefsWrapper.lastRemoteSearch
 
     override suspend fun getPlaylist(): PlaylistDomain? =
         cachedOrSearch()
