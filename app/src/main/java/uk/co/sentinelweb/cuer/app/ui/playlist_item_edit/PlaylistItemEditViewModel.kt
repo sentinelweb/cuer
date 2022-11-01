@@ -35,9 +35,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -59,7 +57,7 @@ class PlaylistItemEditViewModel constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val shareWrapper: ShareWrapper,
     private val playUseCase: PlayUseCase,
     private val linkNavigator: LinkNavigator,
@@ -169,7 +167,7 @@ class PlaylistItemEditViewModel constructor(
                         ?.also { state.selectedPlaylists.add(it) }
                 }
 
-                prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
+                prefsWrapper.pinnedPlaylistId
                     ?.takeIf { state.selectedPlaylists.size == 0 }
                     ?.let { playlistOrchestrator.load(it, LOCAL.flatOptions()) }
                     ?.also { state.selectedPlaylists.add(it) }
@@ -306,7 +304,7 @@ class PlaylistItemEditViewModel constructor(
     }
 
     fun onUnPin() {
-        prefsWrapper.remove(GeneralPreferences.PINNED_PLAYLIST)
+        prefsWrapper.pinnedPlaylistId = null
     }
 
     fun onPlaylistCreated(domain: PlaylistDomain) {
@@ -356,7 +354,7 @@ class PlaylistItemEditViewModel constructor(
                 state.selectedPlaylists.remove(it)
                 state.deletedPlayLists.add(it)
             }
-        prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
+        prefsWrapper.pinnedPlaylistId
             ?.takeIf { it == plId }
             ?.apply {
                 _uiLiveData.value = UiEvent(UNPIN, null)
@@ -507,7 +505,7 @@ class PlaylistItemEditViewModel constructor(
                                     ).also { log.d("after playlistItemOrchestrator.save") }
                                         .takeIf { saveSource == LOCAL && isNew }
                                         ?.also {
-                                            prefsWrapper.putLong(LAST_PLAYLIST_ADDED_TO, it.playlistId!!)
+                                            prefsWrapper.lastAddedPlaylistId = it.playlistId!!
                                             recentLocalPlaylists.addRecentId(it.playlistId!!)
                                         }
                                 }

@@ -23,8 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchMapper
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -50,7 +49,7 @@ class PlaylistsPresenter(
     private val modelMapper: PlaylistsModelMapper,
     private val log: LogWrapper,
     private val toastWrapper: ToastWrapper,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
     private val newMedia: NewMediaPlayistInteractor,
     private val recentItems: RecentItemsPlayistInteractor,
@@ -164,12 +163,14 @@ class PlaylistsPresenter(
                     } else if (playlist.id == LocalSearch.id || playlist.id == YoutubeSearch.id) {
                         val isLocal = playlist.id == LocalSearch.id
                         val type = searchMapper.searchTypeText(isLocal)
-                        val key = if (isLocal) LAST_LOCAL_SEARCH else LAST_REMOTE_SEARCH
-                        val lastSearch = prefsWrapper.getString(key, null)
-                        prefsWrapper.remove(key)
+                        val lastLocalSearch = prefsWrapper.lastLocalSearch
+                        val lastRemoteSearch = prefsWrapper.lastRemoteSearch
+                        if (isLocal) prefsWrapper.lastLocalSearch = null
+                        else prefsWrapper.lastRemoteSearch = null
                         if (!isLocal) remoteSearch.clearCached()
                         view.showUndo("Deleted $type search") {
-                            prefsWrapper.putString(key, lastSearch!!)
+                            if (isLocal) prefsWrapper.lastLocalSearch = lastLocalSearch
+                            else prefsWrapper.lastRemoteSearch = lastRemoteSearch
                             state.viewModelScope.launch {
                                 executeRefresh()
                             }
@@ -343,8 +344,8 @@ class PlaylistsPresenter(
                 .toMutableList()
 
             val appLists = mutableListOf(newMedia, recentItems, starredItems, unfinishedItems)
-                .apply { if (prefsWrapper.has(LAST_LOCAL_SEARCH)) add(localSearch) }
-                .apply { if (prefsWrapper.has(LAST_REMOTE_SEARCH)) add(remoteSearch) }
+                .apply { if (prefsWrapper.hasLocalSearch) add(localSearch) }
+                .apply { if (prefsWrapper.hasRemoteSearch) add(remoteSearch) }
                 .map { it.makeHeader() to it.makeStats() }
                 .toMap()
 
@@ -354,7 +355,7 @@ class PlaylistsPresenter(
                 queue.playlistId,
                 appLists,
                 recentLocalPlaylists.buildRecentSelectionList(),
-                prefsWrapper.getLong(PINNED_PLAYLIST),
+                prefsWrapper.pinnedPlaylistId,
                 state.treeRoot
             ).takeIf { coroutines.mainScopeActive }
                 ?.also { view.setList(it, false) }

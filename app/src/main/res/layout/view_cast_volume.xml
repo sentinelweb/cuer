@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="48dp"
+    android:layout_width="64dp"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/black_transparent_background"
-    android:padding="8dp">
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cv_volume_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_gravity="center_horizontal"
         app:srcCompat="@drawable/ic_volume_up_24"
-        app:tint="?colorOnSurface"
+        android:padding="8dp"
+        app:tint="@color/white"
     />
 
     <uk.co.sentinelweb.cuer.app.ui.common.views.VerticalSeekBar
@@ -28,11 +31,23 @@
     />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/cv_volume_mute_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
+        app:srcCompat="@drawable/ic_volume_off"
+        android:padding="8dp"
+        app:tint="@color/white"
+    />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cv_cast_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_gravity="center_horizontal"
         app:srcCompat="@drawable/ic_cast_connected_24"
-        app:tint="?colorOnSurface"
+        android:padding="8dp"
+        app:tint="@color/white"
     />
 
 </LinearLayout>

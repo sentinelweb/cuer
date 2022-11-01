@@ -19,8 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.PINNED_PLAYLIST
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -38,7 +37,7 @@ class PlaylistEditViewModel constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
     private val log: LogWrapper,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val res: ResourceWrapper,
 ) : ViewModel() {
@@ -95,7 +94,7 @@ class PlaylistEditViewModel constructor(
     }
 
     private fun update() {
-        val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlistEdit.id
+        val pinned = prefsWrapper.pinnedPlaylistId == state.playlistEdit.id
         _modelLiveData.value = mapper.mapModel(
             state = state,
             pinned = pinned,
@@ -174,11 +173,11 @@ class PlaylistEditViewModel constructor(
 
     fun onPinClick() {
         state.playlistEdit.id?.apply {
-            val pinnedId = prefsWrapper.getLong(PINNED_PLAYLIST, 0)
+            val pinnedId = prefsWrapper.pinnedPlaylistId
             if (pinnedId != state.playlistEdit.id) {
-                prefsWrapper.putLong(PINNED_PLAYLIST, this)
+                prefsWrapper.pinnedPlaylistId = this
             } else {
-                prefsWrapper.remove(PINNED_PLAYLIST)
+                prefsWrapper.pinnedPlaylistId = null
             }
             update()
         } ?: run {

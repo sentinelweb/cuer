@@ -12,7 +12,6 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
@@ -33,13 +32,10 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
-import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.SHOW_VIDEO_CARDS
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
@@ -50,13 +46,10 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.PLAYLIST
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.ext.*
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
@@ -78,7 +71,6 @@ class PlaylistPresenter(
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val shareWrapper: ShareWrapper,
     private val playlistMutator: PlaylistMutator,
-    private val prefsWrapper: GeneralPreferencesWrapper,
     private val log: LogWrapper,
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider,
@@ -98,7 +90,7 @@ class PlaylistPresenter(
 
     private fun isPlaylistPlaying() = isQueuedPlaylist && ytCastContextHolder.isConnected()
     private fun isPlaylistPinned() =
-        state.playlist?.let { prefsWrapper.getLong(PINNED_PLAYLIST, 0) == it.id } ?: false
+        state.playlist?.let { multiPrefs.pinnedPlaylistId == it.id } ?: false
 
     private val isQueuedPlaylist: Boolean
         get() = state.playlistIdentifier == queue.playlistId
@@ -250,8 +242,7 @@ class PlaylistPresenter(
     }
 
     override fun initialise() {
-        state.playlistIdentifier =
-            prefsWrapper.getPair(CURRENT_PLAYING_PLAYLIST, NO_PLAYLIST.toPair()).toIdentifier()
+        state.playlistIdentifier = multiPrefs.currentPlayingPlaylistId
 
     }
 
@@ -494,13 +485,11 @@ class PlaylistPresenter(
     override fun onItemRelated(itemModel: ItemContract.Model) {
         playlistItemDomain(itemModel)
             ?.also { item ->
-                prefsWrapper.putString(
-                    LAST_REMOTE_SEARCH, SearchRemoteDomain(
-                        relatedToMediaPlatformId = item.media.platformId,
-                        relatedToMediaTitle = item.media.title
-                    ).serialise()
+                multiPrefs.lastRemoteSearch = SearchRemoteDomain(
+                    relatedToMediaPlatformId = item.media.platformId,
+                    relatedToMediaTitle = item.media.title
                 )
-                prefsWrapper.putEnum(LAST_SEARCH_TYPE, REMOTE)
+                multiPrefs.lastSearchType = SearchTypeDomain.REMOTE
 
                 view.navigate(
                     PlaylistContract.makeNav(YoutubeSearch.id, null, false, MEMORY)
@@ -625,9 +614,7 @@ class PlaylistPresenter(
                 }
                 ?: run {
                     if (dbInit.isInitialized()) {
-                        state.playlistIdentifier =
-                            prefsWrapper.getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair())
-                                .toIdentifier()
+                        state.playlistIdentifier = multiPrefs.lastViewedPlaylistId
                         executeRefresh(scrollToCurrent = notLoaded)
                     } else {
                         dbInit.addListener { b: Boolean ->
@@ -751,10 +738,8 @@ class PlaylistPresenter(
                 }
                 ?.also {
                     if (it.second == LOCAL || it.first.type == APP) {
-                        prefsWrapper.putPair(
-                            LAST_PLAYLIST_VIEWED,
-                            state.playlistIdentifier.toPairType<Long>()
-                        )
+                        multiPrefs.lastViewedPlaylistId =
+                            state.playlistIdentifier as OrchestratorContract.Identifier<Long>
                     }
                 }
                 .also {
