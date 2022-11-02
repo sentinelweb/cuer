@@ -39,8 +39,10 @@ class PlaylistUpdateOrchestrator constructor(
                         playlistOrchestrator
                             .load(this, Source.PLATFORM.deepOptions())
                             ?.let { removeExistingItems(it, p) }
+                            //?.also { log.w("removeExistingItems: $it") }
                             ?.takeIf { it.items.size > 0 }
                             ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }
+                            //?.also { log.w("lookupMediaAndReplace: $it") }
                             ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
                     }
                     else -> Unit
@@ -52,9 +54,10 @@ class PlaylistUpdateOrchestrator constructor(
         val platformPlaylistExistingMediaPlatformIds =
             mediaOrchestrator.loadList(PlatformIdListFilter(platform.items.map { it.media.platformId }), LOCAL.flatOptions())
                 .map { it.platformId }
-        val maxOrder = if (existing.items.size>0) existing.items.maxOf { it.order } else 0
+        val maxOrder = if (existing.items.size > 0) existing.items.maxOf { it.order } else 0
         val newItems =
-            platform.items.toMutableList().apply { removeAll { platformPlaylistExistingMediaPlatformIds.contains(it.media.platformId) } }
+            platform.items.toMutableList()
+                .apply { removeAll { platformPlaylistExistingMediaPlatformIds.contains(it.media.platformId) } }
         return existing.copy(items = newItems.mapIndexed { i, item ->
             item.copy(
                 id = null,

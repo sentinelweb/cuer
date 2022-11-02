@@ -23,19 +23,21 @@ class CompositeLogWrapper constructor(
 
     override fun i(msg: String) {
         android.i(msg)
+        firebase.setCrashlyticTag(tag)
+        firebase.logMessage("INFO: $tag: $msg")
     }
 
     override fun w(msg: String) {
         android.w(msg)
+        firebase.setCrashlyticTag(tag)
+        firebase.logMessage("WARN: $tag: $msg")
     }
 
     override fun e(msg: String, t: Throwable?) {
         android.e(msg, t)
-        t?.apply {
-            firebase.setCrashlyticTag(tag)
-            firebase.logMessage(msg)
-            firebase.logException(t)
-        }
+        firebase.setCrashlyticTag(tag)
+        firebase.logMessage("ERROR: $tag: $msg")
+        t?.apply { firebase.logException(t) }
     }
 
 }

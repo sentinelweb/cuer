@@ -52,7 +52,7 @@
         />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/prefs_root_debug_cat_title" app:isPreferenceVisible="false">
+    <PreferenceCategory app:title="@string/prefs_root_debug_cat_title">
         <Preference
             app:icon="@drawable/ic_bug_report"
             app:key="@string/prefs_root_debug_send_reports_key"

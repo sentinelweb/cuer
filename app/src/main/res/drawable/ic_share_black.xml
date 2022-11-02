@@ -2,6 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="@dimen/menu_icon_size"
     android:height="@dimen/menu_icon_size"
+    android:tint="?attr/colorOnSurface"
     android:viewportWidth="24.0"
     android:viewportHeight="24.0"
     >
