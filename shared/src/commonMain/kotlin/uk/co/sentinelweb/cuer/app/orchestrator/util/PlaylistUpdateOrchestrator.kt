@@ -39,10 +39,8 @@ class PlaylistUpdateOrchestrator constructor(
                         playlistOrchestrator
                             .load(this, Source.PLATFORM.deepOptions())
                             ?.let { removeExistingItems(it, p) }
-                            //?.also { log.w("removeExistingItems: $it") }
                             ?.takeIf { it.items.size > 0 }
                             ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }
-                            //?.also { log.w("lookupMediaAndReplace: $it") }
                             ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
                     }
                     else -> Unit
