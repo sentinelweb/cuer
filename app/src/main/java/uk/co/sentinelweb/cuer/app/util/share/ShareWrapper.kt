@@ -1,8 +1,10 @@
 package uk.co.sentinelweb.cuer.app.util.share
 
 import android.content.Intent
+import android.content.Intent.*
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
+import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
@@ -15,13 +17,13 @@ class ShareWrapper(
 ) {
     fun share(media: MediaDomain) {
         Intent().apply {
-            action = Intent.ACTION_SEND
+            action = ACTION_SEND
             data = Uri.parse(media.url)
             putExtra(
-                Intent.EXTRA_TEXT,
+                EXTRA_TEXT,
                 fullMessage(media).trimMargin()
             )
-            putExtra(Intent.EXTRA_SUBJECT, "Watch '${media.title}' by '${media.channelData.title}'")
+            putExtra(EXTRA_SUBJECT, "Watch '${media.title}' by '${media.channelData.title}'")
             type = "text/plain"
         }.let {
             Intent.createChooser(it, "Share Video: ${media.title}")
@@ -33,17 +35,32 @@ class ShareWrapper(
 
     fun share(playlist: PlaylistDomain) {
         Intent().apply {
-            action = Intent.ACTION_SEND
+            action = ACTION_SEND
             data = Uri.parse(playlistUrl(playlist))
             putExtra(
-                Intent.EXTRA_TEXT,
+                EXTRA_TEXT,
                 playlistMessage(playlist).trimMargin()
             )
-            val subject = "Shared playlist: '${playlist.title}'" + (playlist.channelData?.let { " by '${it.title}'" } ?: "")
-            putExtra(Intent.EXTRA_SUBJECT, subject)
+            val subject =
+                "Shared playlist: '${playlist.title}'" + (playlist.channelData?.let { " by '${it.title}'" } ?: "")
+            putExtra(EXTRA_SUBJECT, subject)
             type = "text/plain"
         }.let {
             Intent.createChooser(it, "Share Playlist: ${playlist.title}")
+        }.run {
+            activity.startActivity(this)
+        }
+    }
+
+    fun share(shareData: ShareUseCase.Data) {
+        Intent().apply {
+            action = ACTION_SEND
+            data = Uri.parse(shareData.uri)
+            putExtra(EXTRA_TEXT, shareData.text)
+            putExtra(EXTRA_SUBJECT, shareData.subject)
+            type = "text/plain"
+        }.let {
+            Intent.createChooser(it, shareData.title)
         }.run {
             activity.startActivity(this)
         }
@@ -107,7 +124,7 @@ class ShareWrapper(
                 ?.takeIf { it.itemCount > 0 }
                 ?.let { it.getItemAt(0)?.let { it.uri ?: it.text }.toString() }
                 ?.takeIf { it.startsWith("http") }
-            ?: intent.getStringExtra(Intent.EXTRA_TEXT)
+            ?: intent.getStringExtra(EXTRA_TEXT)
                 ?.takeIf { it.startsWith("http") }
 
     fun getTextFromIntent(intent: Intent): String? =
@@ -115,6 +132,6 @@ class ShareWrapper(
             ?: intent.clipData
                 ?.takeIf { it.itemCount > 0 }
                 ?.let { it.getItemAt(0)?.let { it.uri ?: it.text }.toString() }
-            ?: intent.getStringExtra(Intent.EXTRA_TEXT)
+            ?: intent.getStringExtra(EXTRA_TEXT)
 
 }

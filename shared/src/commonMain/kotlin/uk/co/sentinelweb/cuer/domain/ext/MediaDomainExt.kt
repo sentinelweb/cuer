@@ -18,5 +18,5 @@ fun MediaDomain.startPosition(): Long {
 }
 
 fun MediaDomain.summarise(): String = """
-    id: $id, title: $title, platform: $platform - $platformId, [channel: ${channelData.summarise()}]
+    id: $id,platform: $platform - $platformId,  title: $title, [channel: ${channelData.summarise()}]
 """.trimIndent()

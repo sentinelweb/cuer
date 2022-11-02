@@ -56,6 +56,8 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
+import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
+import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.image.BitmapSizer
@@ -142,6 +144,11 @@ object Modules {
         single { ScreenStateReceiver() }
     }
 
+    private val usecaseModule = module {
+        single { EmailUseCase(get()) }
+        single { ShareUseCase(get()) }
+    }
+
     private val utilModule = module {
         factory<LinkScanner> { AndroidLinkScanner(log = get(), mappers = urlMediaMappers) }
         single { CuerAppState() }
@@ -223,6 +230,7 @@ object Modules {
         .plus(scopedModules)
         .plus(appNetModule)
         .plus(receiverModule)
+        .plus(usecaseModule)
         .plus(DatabaseModule.modules)
         .plus(AppDatabaseModule.module)
         .plus(AndroidDatabaseModule.modules)

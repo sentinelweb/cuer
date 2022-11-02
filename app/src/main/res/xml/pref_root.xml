@@ -35,6 +35,16 @@
 
     <PreferenceCategory app:title="@string/prefs_root_info_cat_title">
         <Preference
+            app:icon="@drawable/ic_comment_24"
+            app:key="@string/prefs_root_feedback_key"
+            app:title="@string/prefs_root_feedback_title"
+        />
+        <Preference
+            app:icon="@drawable/ic_share_black"
+            app:key="@string/prefs_root_share_key"
+            app:title="@string/prefs_root_share_title"
+        />
+        <Preference
             app:icon="@drawable/ic_info"
             app:key="@string/prefs_root_version_key"
             app:title="@string/prefs_root_version_title"
@@ -42,7 +52,7 @@
         />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/prefs_root_debug_cat_title" app:isPreferenceVisible="false">
+    <PreferenceCategory app:title="@string/prefs_root_debug_cat_title">
         <Preference
             app:icon="@drawable/ic_bug_report"
             app:key="@string/prefs_root_debug_send_reports_key"

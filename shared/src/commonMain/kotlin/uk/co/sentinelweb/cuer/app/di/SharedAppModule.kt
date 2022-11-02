@@ -49,7 +49,7 @@ object SharedAppModule {
         factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get(), get(), get()) }
         factory<PlaylistUpdateOrchestrator.UpdateCheck> { PlaylistUpdateOrchestrator.PlatformUpdateCheck() }
         factory { PlaylistMergeOrchestrator(get(), get()) }
-        factory { PlaylistMediaLookupOrchestrator(get(), get()) }
+        factory { PlaylistMediaLookupOrchestrator(get(), get(), get()) }
         single { NewMediaPlayistInteractor(get(), get(), get(), get(named(NewItems))) }
         single { RecentItemsPlayistInteractor(get(), get()) }
         single { StarredItemsPlayistInteractor(get(), get(), get(), get(named(Starred))) }

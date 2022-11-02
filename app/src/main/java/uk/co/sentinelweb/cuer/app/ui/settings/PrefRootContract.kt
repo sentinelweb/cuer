@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
+import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -14,12 +16,16 @@ interface PrefRootContract {
         fun sendDebugReports()
         fun toggleRemoteService()
         fun initialisePrefs()
+        fun onFeedback()
+        fun onShare()
     }
 
     interface View {
         fun showMessage(msg: String)
         fun setRemoteServiceRunning(running: Boolean, address: String?)
         fun setVersion(versionString: String)
+        fun sendEmail(data: EmailUseCase.Data)
+        fun launchShare(data: ShareUseCase.Data)
     }
 
     data class State constructor(
@@ -39,7 +45,9 @@ interface PrefRootContract {
                         firebaseWrapper = get(),
                         timeProvider = get(),
                         remoteServiceManger = get(),
-                        coroutines = get()
+                        coroutines = get(),
+                        emailUseCase = get(),
+                        shareUseCase = get(),
                     )
                 }
                 scoped<SnackbarWrapper> {
