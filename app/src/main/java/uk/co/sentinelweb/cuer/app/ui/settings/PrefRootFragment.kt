@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,16 +15,24 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
+import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.share.EmailWrapper
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import kotlin.random.Random
 
 class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<PrefRootFragment>()
     private val presenter: PrefRootContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
+    private val emailWrapper: EmailWrapper by inject()
+    private val shareWrapper: ShareWrapper by inject()
 
-    private val version
+    private val versionCategory
         get() = findPreference(R.string.prefs_root_version_key)
             ?: throw IllegalArgumentException("Couldn't get: prefs_root_version_key")
     private val remoteServiceCategory
@@ -32,6 +41,13 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     private val remoteServicePreference
         get() = findCheckbox(R.string.prefs_root_remote_service_key)
             ?: throw IllegalArgumentException("Couldn't get: prefs_root_remote_service_key")
+
+    private val feedbackPreference
+        get() = findPreference(R.string.prefs_root_feedback_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_version_key")
+    private val sharePreference
+        get() = findPreference(R.string.prefs_root_share_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_version_key")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
@@ -42,13 +58,20 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
         return onCreateView
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        linkScopeToActivity()
+    }
+
     override fun onStart() {
         super.onStart()
         presenter.initialisePrefs()
+
+        setPreferencesSummaries()
     }
 
     override fun setVersion(versionString: String) {
-        version.summary = versionString
+        versionCategory.summary = versionString
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -61,8 +84,27 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
         when (preference.key) {
             getString(R.string.prefs_root_debug_send_reports_key) -> presenter.sendDebugReports()
             getString(R.string.prefs_root_remote_service_key) -> presenter.toggleRemoteService()
+            getString(R.string.prefs_root_feedback_key) -> presenter.onFeedback()
+            getString(R.string.prefs_root_share_key) -> presenter.onShare()
         }
         return super.onPreferenceTreeClick(preference)
+    }
+
+    override fun sendEmail(data: EmailUseCase.Data) {
+        emailWrapper.launchEmail(data)
+    }
+
+    override fun launchShare(data: ShareUseCase.Data) {
+        shareWrapper.share(data)
+    }
+
+    private fun setPreferencesSummaries() {
+        feedbackPreference.summary = resources.getString(R.string.prefs_root_feedback_summary_how) + "\n\n" +
+                resources.getStringArray(R.array.prefs_root_feedback_summary)
+                    .let { it.get(Random.nextInt(it.size)) }
+        sharePreference.summary =
+            resources.getStringArray(R.array.prefs_root_share_summary)
+                .let { it.get(Random.nextInt(it.size)) }
     }
 
     override fun setRemoteServiceRunning(running: Boolean, address: String?) {

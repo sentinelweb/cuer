@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Cuer Dbg</string>
 
     <!-- nav -->
@@ -162,7 +162,33 @@
         lock - autoplay after unlock
     </string>
     <string name="prefs_player_restart_after_unlock_title">Restart after unlock</string>
+    <string name="prefs_root_feedback_title">Feedback</string>
+    <!--    https://www.cognology.com.au/49-best-quotes-on-feedback/-->
+    <string name="prefs_root_feedback_summary_how">How are we doing?</string>
+    <string-array name="prefs_root_feedback_summary">
+        <item>“Criticism, like rain, should be gentle enough to nourish a man’s growth without destroying his roots.” –
+            Frank A. Clark
+        </item>
+        <item>“Feedback is the breakfast of champions.” – Ken Blanchard</item>
+        <item>“True intuitive expertise is learned from prolonged experience with good feedback on mistakes.” – Daniel
+            Kahneman
+        </item>
+        <item>“Examine what is said and not who speaks.” – African proverb</item>
+        <item>“Whatever words we utter should be chosen with care for people will hear them and be influenced by them
+            for good or ill.” – Buddha
+        </item>
+    </string-array>
+    <string name="prefs_root_share_title">Share us</string>
 
+    <!--    https://www.shareable.net/coworking-is-awesome-lets-keep-it-that-way/-->
+    <string-array name="prefs_root_share_summary">
+        <item>“There is no joy in possession without sharing.” — Erasmus</item>
+        <item>“Share your knowledge. It is a way to achieve immortality.” — His Holiness the Dalai Lama</item>
+        <item>“There is no delight in owning anything unshared.” — Seneca</item>
+        <item>“The miracle is this: The more we share the more we have.” — Leonard Nimoy</item>
+        <item>“The only thing that will redeem mankind is cooperation.” — Bertrand Russell</item>
+        <item>“It is in the shelter of each other that the people live.” — Irish Proverb</item>
+    </string-array>
     <!-- playlist edit -->
     <string name="pe_default_display_title">Enter a title …</string>
     <string name="pe_error_title_blank">Add a title</string>
@@ -264,5 +290,27 @@
     <string name="stop">Stop</string>
     <string name="menu_unpin">Unpin</string>
     <string name="edit_prefix">"Edit: "</string>
+    <string name="email_title_choose">Choose email app …</string>
+    <string name="email_feedback_subject">Feedback on Cuer</string>
+    <string name="email_feedback_body">😎 What do you think needs improving?
+        \n
+        \n
+        \n ❤️ What do you like?
+        \n
+        \n
+        \n 👀 Is there content we are missing?
+        \n
+        \n
+        \n 🙏 Thankyou for your feedback
+    </string>
+    <string name="share_title_choose">Choose sharing app …</string>
+    <string name="share_subject">Share Cuer</string>
+    <string name="share_body" tools:ignore="Typos">
+        \n ︎☯️ Cuer is a philosophy playlist app for your favourite videos.
+        \n
+        \n🌎 https://cuer.app
+        \n🐤 https://twitter.com/cuerapp - @cuerapp
+        \n✉️ cuerapp@gmail.com
+    </string>
 
 </resources>
