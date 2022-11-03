@@ -183,6 +183,7 @@ class PlaylistsPresenter(
 
     override fun performOpen(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
         if (item is ItemContract.Model.ItemModel) {
+            recentLocalPlaylists.addRecentId(item.id)
             view.navigate(
                 PlaylistContract.makeNav(
                     item.id, null, false, item.source,

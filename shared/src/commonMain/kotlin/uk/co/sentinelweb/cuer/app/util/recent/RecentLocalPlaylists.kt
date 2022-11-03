@@ -44,9 +44,9 @@ class RecentLocalPlaylists constructor(
     fun buildRecentSelectionList(): List<Identifier<Long>> {
         val recent = mutableListOf<Identifier<Long>>()
 
-        prefs.lastAddedPlaylistId
-            ?.toIdentifier(LOCAL)
-            ?.also { recent.add(it) }
+//        prefs.lastAddedPlaylistId
+//            ?.toIdentifier(LOCAL)
+//            ?.also { recent.add(it) }
 
         prefs.pinnedPlaylistId
             ?.toIdentifier(LOCAL)

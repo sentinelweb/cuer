@@ -202,10 +202,10 @@
     <style name="Header.Button" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:tint">?colorOnSurface</item>
-        <item name="iconTint">?colorOnSurface</item>
-        <item name="android:textColor">?colorOnSurface</item>
-        <item name="strokeColor">?colorOnSurface</item>
+        <item name="android:tint">@color/button_csl</item>
+        <item name="iconTint">@color/button_csl</item>
+        <item name="android:textColor">@color/button_csl</item>
+        <item name="strokeColor">@color/button_csl</item>
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="android:layout_margin">8dp</item>
         <item name="rippleColor">@color/grey_400</item>
@@ -525,20 +525,21 @@
         <!--        <item name="android:insetBottom">0dp</item>-->
         <item name="android:paddingLeft">12dp</item>
         <item name="android:paddingRight">12dp</item>
-        <item name="iconTint">?colorOnSurface</item>
-        <item name="strokeColor">?colorOnSurface</item>
+        <item name="iconTint">@color/button_csl</item>
+        <item name="strokeColor">@color/button_csl</item>
         <item name="rippleColor">@color/grey_400</item>
-        <item name="android:tint">?colorOnSurface</item>
+        <item name="android:tint">@color/button_csl</item>
         <item name="iconSize">18dp</item>
     </style>
 
     <style name="Button.Action" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:tint">?colorOnSurface</item>
-        <item name="iconTint">?colorOnSurface</item>
-        <item name="android:textColor">?colorOnSurface</item>
-        <item name="strokeColor">?colorOnSurface</item>
+        <item name="android:tint">@color/button_csl</item>
+        <item name="tint">@color/button_csl</item>
+        <item name="iconTint">@color/button_csl</item>
+        <item name="android:textColor">@color/button_csl</item>
+        <item name="strokeColor">@color/button_csl</item>
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="android:layout_margin">8dp</item>
         <item name="rippleColor">@color/grey_400</item>

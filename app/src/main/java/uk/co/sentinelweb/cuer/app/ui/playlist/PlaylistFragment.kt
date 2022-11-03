@@ -120,8 +120,6 @@ class PlaylistFragment :
 
     private data class MenuState constructor(
         var isCollapsed: Boolean = false,
-        var isPlayable: Boolean = false,
-        var lastPlayModeIndex: Int = 0,
         var reloadHeaderAfterMenuInit: Boolean = false,
     )
 
@@ -261,6 +259,8 @@ class PlaylistFragment :
             bottomSheetFragment.show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
             true
         }
+        cardsMenuItem.isVisible = !presenter.isCards
+        rowsMenuItem.isVisible = presenter.isCards
         setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
     }
 
@@ -408,8 +408,6 @@ class PlaylistFragment :
         binding.playlistStarButton.setIconResource(model.starredIcon)
         binding.playlistStarButton.setText(model.starredText)
         binding.playlistFlagStar.isVisible = model.isStarred
-        cardsMenuItem.isVisible = !presenter.isCards
-        rowsMenuItem.isVisible = presenter.isCards
         binding.playlistFlagDefault.isVisible = model.isDefault
         binding.playlistFlagPlayStart.isVisible = model.isPlayFromStart
         binding.playlistFlagPinned.isVisible = model.isPinned
@@ -423,8 +421,6 @@ class PlaylistFragment :
             else R.dimen.app_bar_header_height_playlist_no_actions
         )
         appBarOffsetScrollRange = -1
-        menuState.lastPlayModeIndex = model.loopModeIndex
-        menuState.isPlayable = model.canPlay
     }
 
     private fun setImage(url: String) {
