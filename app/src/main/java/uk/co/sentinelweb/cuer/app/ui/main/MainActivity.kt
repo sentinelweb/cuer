@@ -173,7 +173,6 @@ class MainActivity :
                 navController.navigate(R.id.navigation_settings_backup)
             }.show()
         }
-
     }
 
     override fun onDestroy() {
