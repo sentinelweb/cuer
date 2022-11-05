@@ -306,7 +306,7 @@ class PlaylistFragment :
                 log.d("onResume: apply nav args model = $this")
                 setPlaylistData()
                 navigationProvider.clearPendingNavigation(PLAYLIST)
-            } ?: run {
+            } ?: run {// fixme i don't think we can get here
             log.d("onResume: got no nav args")
             presenter.setPlaylistData()
         }
