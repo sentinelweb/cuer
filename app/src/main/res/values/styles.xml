@@ -148,6 +148,9 @@
 
     <style name="Cuer.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/Cuer.MaterialAlertDialog.Window</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Cuer.MaterialAlertDialog.Button.Positive</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Cuer.MaterialAlertDialog.Button</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Cuer.MaterialAlertDialog.Button</item>
         <item name="materialAlertDialogTitleTextStyle">
             @style/Cuer.MaterialAlertDialog.App.Title.Text
         </item>
@@ -163,6 +166,23 @@
         <item name="android:fontFamily">?headlineFont</item>
     </style>
 
+    <style name="Cuer.MaterialAlertDialog.Button" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:tint">@color/button_csl</item>
+        <item name="iconTint">@color/button_csl</item>
+        <item name="android:textColor">@color/button_csl</item>
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="rippleColor">@color/grey_500</item>
+        <item name="iconSize">18dp</item>
+    </style>
+
+    <!-- doesn't show border -->
+    <style name="Cuer.MaterialAlertDialog.Button.Positive">
+        <item name="strokeColor">@color/button_primary_csl</item>
+        <item name="android:tint">@color/button_primary_csl</item>
+        <item name="iconTint">@color/button_primary_csl</item>
+        <item name="android:textColor">@color/button_primary_csl</item>
+        <item name="rippleColor">@color/primary_variant</item>
+    </style>
 
     <style name="Cuer.MaterialAlertDialog.Item">
         <item name="android:layout_width">match_parent</item>
