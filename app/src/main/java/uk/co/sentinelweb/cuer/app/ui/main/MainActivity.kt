@@ -39,8 +39,7 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_BOTTOM_TAB
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -67,7 +66,7 @@ class MainActivity :
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val res: ResourceWrapper by inject()
-    private val prefs: GeneralPreferencesWrapper by inject()
+    private val prefs: MultiPlatformPreferencesWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
 
     private lateinit var navController: NavController
@@ -109,14 +108,14 @@ class MainActivity :
         navController = navHostFragment.navController
         binding.bottomNavView.setupWithNavController(navController)
         binding.bottomNavView.setOnNavigationItemSelectedListener {
-            prefs.putInt(
-                LAST_BOTTOM_TAB, when (it.itemId) {
-                    R.id.navigation_browse -> BROWSE
-                    R.id.navigation_playlists -> PLAYLISTS
-                    R.id.navigation_playlist -> PLAYLIST
-                    else -> BROWSE
-                }.ordinal
-            )
+            when (it.itemId) {
+                R.id.navigation_browse -> BROWSE
+                R.id.navigation_playlists -> PLAYLISTS
+                R.id.navigation_playlist -> PLAYLIST
+                else -> BROWSE
+            }.ordinal
+                .also { prefs.lastBottomTab = it }
+                .also { log.d("set LAST_BOTTOM_TAB: $it") }
             if (navController.currentDestination?.id != it.itemId)
                 navController.navigate(it.itemId)
             true
@@ -134,23 +133,26 @@ class MainActivity :
 
         volumeControl.controlView = binding.castPlayerVolume
 
-        prefs.getInt(LAST_BOTTOM_TAB, 0)
-            .takeIf { it > 0 }
-            ?.also {
-                when (MainContract.LastTab.values()[it]) {
-                    PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
-                        navController.navigate(R.id.navigation_playlists)
-                    }
+        if (savedInstanceState == null) {
+            prefs.lastBottomTab
+                .also { log.d("get LAST_BOTTOM_TAB: $it") }
+                .takeIf { it > 0 }
+                ?.also {
+                    when (MainContract.LastTab.values()[it]) {
+                        PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
+                            navController.navigate(R.id.navigation_playlists)
+                        }
 
-                    PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
-                        navController.navigate(R.id.navigation_playlist)
-                    }
+                        PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
+                            navController.navigate(R.id.navigation_playlist)
+                        }
 
-                    else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
-                        navController.navigate(R.id.navigation_browse)
+                        else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
+                            navController.navigate(R.id.navigation_browse)
+                        }
                     }
                 }
-            }
+        }
         presenter.initialise()
     }
 

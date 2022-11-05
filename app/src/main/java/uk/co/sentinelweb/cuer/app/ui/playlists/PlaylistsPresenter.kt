@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
@@ -184,6 +185,7 @@ class PlaylistsPresenter(
     override fun performOpen(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
         if (item is ItemContract.Model.ItemModel) {
             recentLocalPlaylists.addRecentId(item.id)
+            prefsWrapper.lastBottomTab = MainContract.LastTab.PLAYLIST.ordinal
             view.navigate(
                 PlaylistContract.makeNav(
                     item.id, null, false, item.source,

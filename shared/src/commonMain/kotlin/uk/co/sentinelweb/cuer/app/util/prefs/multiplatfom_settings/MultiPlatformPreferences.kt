@@ -40,6 +40,7 @@ enum class MultiPlatformPreferences constructor(
     LAST_REMOTE_SEARCH("lastRemoteSearch"),
     LAST_SEARCH_TYPE("lastSearchType"),
     DB_INITIALISED("dbInitialised"),
+    LAST_BOTTOM_TAB("lastBottomNavTab"),
     ;
 
     companion object {
@@ -149,5 +150,9 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
             ?.let { putString(RECENT_PLAYLISTS, it) }
             ?: let { remove(RECENT_PLAYLISTS) }
 
+    var lastBottomTab: Int
+        get() = getInt(LAST_BOTTOM_TAB) ?: 0
+        set(value) = value
+            .let { putInt(LAST_BOTTOM_TAB, it) }
 
 }
