@@ -103,23 +103,11 @@ class MainActivity :
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-        binding.bottomNavView.setupWithNavController(navController)
-        binding.bottomNavView.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.navigation_browse -> BROWSE
-                R.id.navigation_playlists -> PLAYLISTS
-                R.id.navigation_playlist -> PLAYLIST
-                else -> BROWSE
-            }.ordinal
-                .also { prefs.lastBottomTab = it }
-                .also { log.d("set LAST_BOTTOM_TAB: $it") }
-            if (navController.currentDestination?.id != it.itemId)
-                navController.navigate(it.itemId)
-            true
-        }
+
+        (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+            .also { navController = it.navController }
+
+        setupBottomNav()
 
         edgeToEdgeWrapper.doOnApplyWindowInsets(binding.bottomNavView) { view, insets, padding ->
             view.updatePadding(
@@ -128,31 +116,11 @@ class MainActivity :
         }
         navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, bundle: Bundle? ->
             log.d("navigation change: dest: $navDestination bundle:$bundle")
-            //Exception().printStackTrace()
         }
 
         volumeControl.controlView = binding.castPlayerVolume
 
-        if (savedInstanceState == null) {
-            prefs.lastBottomTab
-                .also { log.d("get LAST_BOTTOM_TAB: $it") }
-                .takeIf { it > 0 }
-                ?.also {
-                    when (MainContract.LastTab.values()[it]) {
-                        PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
-                            navController.navigate(R.id.navigation_playlists)
-                        }
-
-                        PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
-                            navController.navigate(R.id.navigation_playlist)
-                        }
-
-                        else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
-                            navController.navigate(R.id.navigation_browse)
-                        }
-                    }
-                }
-        }
+        restoreBottomNav(savedInstanceState)
         presenter.initialise()
     }
 
@@ -313,6 +281,46 @@ class MainActivity :
             transAnimation.setDuration(200)
             transAnimation.start()
             isRaised = true
+        }
+    }
+
+    private fun setupBottomNav() {
+        binding.bottomNavView.setupWithNavController(navController)
+        binding.bottomNavView.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.navigation_browse -> BROWSE
+                R.id.navigation_playlists -> PLAYLISTS
+                R.id.navigation_playlist -> PLAYLIST
+                else -> BROWSE
+            }.ordinal
+                .also { prefs.lastBottomTab = it }
+                .also { log.d("set LAST_BOTTOM_TAB: $it") }
+            if (navController.currentDestination?.id != it.itemId)
+                navController.navigate(it.itemId)
+            true
+        }
+    }
+
+    private fun restoreBottomNav(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            prefs.lastBottomTab
+                .also { log.d("get LAST_BOTTOM_TAB: $it") }
+                .takeIf { it > 0 }
+                ?.also {
+                    when (MainContract.LastTab.values()[it]) {
+                        PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
+                            navController.navigate(R.id.navigation_playlists)
+                        }
+
+                        PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
+                            navController.navigate(R.id.navigation_playlist)
+                        }
+
+                        else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
+                            navController.navigate(R.id.navigation_browse)
+                        }
+                    }
+                }
         }
     }
 

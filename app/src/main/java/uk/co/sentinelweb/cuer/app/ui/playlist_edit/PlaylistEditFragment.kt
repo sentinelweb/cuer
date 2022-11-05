@@ -350,7 +350,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     }
 
     companion object {
-        private val STATE_KEY = "playlist_edit_state"
+        private const val STATE_KEY = "playlist_edit_state"
         fun newInstance(): PlaylistEditFragment {
             return PlaylistEditFragment()
         }
