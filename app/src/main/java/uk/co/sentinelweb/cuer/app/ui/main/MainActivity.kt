@@ -160,7 +160,7 @@ class MainActivity :
                 actionText = getString(R.string.backup_setup_action)
             ) {
                 navController.navigate(
-                    R.id.navigation_settings_backup, bundleOf(AUTO_BACKUP.name to true)
+                    R.id.navigation_settings_backup, bundleOf(DO_AUTO_BACKUP.name to true)
                 )
             }.show()
 
