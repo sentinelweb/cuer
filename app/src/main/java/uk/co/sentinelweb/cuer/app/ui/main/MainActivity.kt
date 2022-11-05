@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.navOptions
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -120,7 +121,7 @@ class MainActivity :
 
         volumeControl.controlView = binding.castPlayerVolume
 
-        restoreBottomNav(savedInstanceState)
+        restoreBottomNavTab(savedInstanceState != null)
         presenter.initialise()
     }
 
@@ -295,33 +296,50 @@ class MainActivity :
             }.ordinal
                 .also { prefs.lastBottomTab = it }
                 .also { log.d("set LAST_BOTTOM_TAB: $it") }
-            if (navController.currentDestination?.id != it.itemId)
-                navController.navigate(it.itemId)
+            if (navController.currentDestination?.id != it.itemId) {
+                navigateToBottomTab(it.itemId)
+            }
             true
         }
     }
 
-    private fun restoreBottomNav(savedInstanceState: Bundle?) {
-        if (savedInstanceState == null) {
+    private fun restoreBottomNavTab(isConfigChange: Boolean) {
+        if (!isConfigChange) {
             prefs.lastBottomTab
                 .also { log.d("get LAST_BOTTOM_TAB: $it") }
                 .takeIf { it > 0 }
                 ?.also {
                     when (MainContract.LastTab.values()[it]) {
                         PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
-                            navController.navigate(R.id.navigation_playlists)
-                        }
+                            R.id.navigation_playlists
+                        } else null
 
                         PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
-                            navController.navigate(R.id.navigation_playlist)
-                        }
+                            R.id.navigation_playlist
+                        } else null
 
                         else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
-                            navController.navigate(R.id.navigation_browse)
-                        }
+                            R.id.navigation_browse
+                        } else null
+                    }?.also { navId ->
+                        navigateToBottomTab(navId)
                     }
                 }
         }
+    }
+
+    private fun navigateToBottomTab(navId: Int) {
+        navController.navigate(
+            navId,
+            args = null,
+            navOptions = navOptions {
+                launchSingleTop = true
+                popUpTo(navId) {
+                    inclusive = true
+                }
+            },
+            navigatorExtras = null
+        )
     }
 
     companion object {
