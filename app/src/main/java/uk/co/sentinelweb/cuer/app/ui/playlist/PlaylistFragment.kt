@@ -225,11 +225,13 @@ class PlaylistFragment :
     }
 
     private fun setupRecyclerView() {
-        if (_adapter == null) {
-            _adapter = createAdapter()
+        if (binding.playlistList.adapter != null) {
+            _adapter = binding.playlistList.adapter as? PlaylistAdapter
         }
-        binding.playlistList.layoutManager = LinearLayoutManager(context)
-        binding.playlistList.adapter = adapter
+        if (_adapter == null) {
+            newAdapter()
+            binding.playlistList.layoutManager = LinearLayoutManager(context)
+        }
         binding.playlistList.doOnPreDraw {
             startPostponedEnterTransition()
         }
@@ -304,7 +306,7 @@ class PlaylistFragment :
                 log.d("onResume: apply nav args model = $this")
                 setPlaylistData()
                 navigationProvider.clearPendingNavigation(PLAYLIST)
-            } ?: run {
+            } ?: run {// fixme i don't think we can get here
             log.d("onResume: got no nav args")
             presenter.setPlaylistData()
         }

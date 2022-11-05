@@ -46,6 +46,7 @@
     <string name="menu_list">List</string>
     <string name="menu_card">Cards</string>
     <string name="menu_exit">Exit</string>
+    <string name="menu_unpin">Unpin</string>
 
     <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>
@@ -179,6 +180,9 @@
         </item>
     </string-array>
     <string name="prefs_root_share_title">Share us</string>
+    <string name="prefs_root_info_cat_title">App Info</string>
+    <string name="prefs_root_version_title">Version</string>
+    <string name="prefs_root_version_summary">Version will appear here</string>
 
     <!--    https://www.shareable.net/coworking-is-awesome-lets-keep-it-that-way/-->
     <string-array name="prefs_root_share_summary">
@@ -267,29 +271,8 @@
     <string name="backup_fix_message">There was a problem backing up</string>
     <string name="backup_fix_action">FIX</string>
 
-    <!-- misc -->
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
-    <string name="up">Up</string>
-    <string name="media_route_menu_title">Cast on</string>
-    <string name="default_playlist">Default</string>
-    <string name="dash">-</string>
-    <string name="chip_select">Select &#8230;</string>
-    <string name="live">LIVE</string>
-    <string name="upcoming">Upcoming</string>
-    <string name="clear">Clear</string>
-    <string name="playlist_empty">No Items</string>
-    <string name="action_unpin">UNPIN</string>
-    <string name="action_mark_watched">Mark watched</string>
-    <string name="action_mark_complete">Mark complete</string>
-    <string name="prefs_root_info_cat_title">App Info</string>
-    <string name="prefs_root_version_title">Version</string>
-    <string name="prefs_root_version_summary">Version will appear here</string>
-    <string name="close">Close</string>
-    <string name="buffering">Buffering</string>
-    <string name="stop">Stop</string>
-    <string name="menu_unpin">Unpin</string>
-    <string name="edit_prefix">"Edit: "</string>
+
+    <!-- feedback -->
     <string name="email_title_choose">Choose email app …</string>
     <string name="email_feedback_subject">Feedback on Cuer</string>
     <string name="email_feedback_body">😎 What do you think needs improving?
@@ -303,6 +286,8 @@
         \n
         \n 🙏 Thankyou for your feedback
     </string>
+
+    <!-- share -->
     <string name="share_title_choose">Choose sharing app …</string>
     <string name="share_subject">Share Cuer</string>
     <string name="share_body" tools:ignore="Typos">
@@ -312,5 +297,25 @@
         \n🐤 https://twitter.com/cuerapp - @cuerapp
         \n✉️ cuerapp@gmail.com
     </string>
+
+    <!-- misc -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="up">Up</string>
+    <string name="media_route_menu_title">Cast on</string>
+    <string name="default_playlist">Default</string>
+    <string name="dash">-</string>
+    <string name="chip_select">Select playlist&#8230;</string>
+    <string name="live">LIVE</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="clear">Clear</string>
+    <string name="playlist_empty">No items in playlist</string>
+    <string name="action_unpin">UNPIN</string>
+    <string name="action_mark_watched">Mark watched</string>
+    <string name="action_mark_complete">Mark complete</string>
+    <string name="close">Close</string>
+    <string name="buffering">Buffering</string>
+    <string name="stop">Stop</string>
+    <string name="edit_prefix">"Edit: "</string>
 
 </resources>
