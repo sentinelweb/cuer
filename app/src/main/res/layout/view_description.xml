@@ -15,7 +15,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:paddingBottom="8dp"
+        android:paddingBottom="16dp"
+        android:scrollbars="none"
     >
         <LinearLayout
             android:id="@+id/pid_ribbon_ctnr"
@@ -26,13 +27,34 @@
         />
     </HorizontalScrollView>
 
+    <HorizontalScrollView
+        android:id="@+id/pid_chips_scroll"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pid_ribbon_scroll"
+        android:scrollbars="none"
+    >
+
+        <LinearLayout
+            android:id="@+id/pid_chips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+        >
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
     <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
         android:id="@+id/pid_author_image"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:contentDescription="@null"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pid_ribbon_scroll"
+        app:layout_constraintTop_toBottomOf="@id/pid_chips_scroll"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.Item.Icon"
     />
 
@@ -46,7 +68,7 @@
         android:textIsSelectable="true"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
         app:layout_constraintStart_toEndOf="@id/pid_author_image"
-        app:layout_constraintTop_toBottomOf="@id/pid_ribbon_scroll"
+        app:layout_constraintTop_toBottomOf="@id/pid_chips_scroll"
         tools:text="Channel title"
     />
 
@@ -81,50 +103,28 @@
         tools:text="Channel description http://www.yahoo.com descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel descriptionChannel description"
     />
 
-    <HorizontalScrollView
-        android:id="@+id/pid_chips_scroll"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pid_author_desc"
-    >
-
-        <LinearLayout
-            android:id="@+id/pid_chips"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-        >
-
-        </LinearLayout>
-
-    </HorizontalScrollView>
-
     <TextView
         android:id="@+id/pid_title"
-        style="?textAppearanceHeadline5"
+        style="?textAppearanceHeadline4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:textStyle="bold"
         android:textIsSelectable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pid_chips_scroll"
+        app:layout_constraintTop_toBottomOf="@id/pid_author_desc"
         tools:text="Playlist Item Edit Title"
     />
 
     <TextView
         android:id="@+id/pid_desc"
+        style="?textAppearanceBody1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:linksClickable="true"
         android:textIsSelectable="true"
         android:lineSpacingMultiplier="1.2"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pid_title"

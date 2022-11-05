@@ -411,6 +411,7 @@ class PlaylistPresenter(
                 interactions
                     ?.onView(this)
                     ?: run {
+                        state.focusIndex = itemModel.index
                         val source =
                             if (state.playlist?.type != APP) state.playlistIdentifier.source else LOCAL
                         view.showItemDescription(itemModel.id, this, source)
@@ -718,7 +719,10 @@ class PlaylistPresenter(
     private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false) {
         view.showRefresh()
         try {
-            log.d("executeRefresh: ${state.playlistIdentifier.id}")
+            log.e(
+                "executeRefresh: ${state.playlistIdentifier.id}, animate:$animate, scrollToCurrent:$scrollToCurrent",
+                Exception()
+            )
             playlistOrDefaultOrchestrator
                 .getPlaylistOrDefault(
                     state.playlistIdentifier.id as Long,

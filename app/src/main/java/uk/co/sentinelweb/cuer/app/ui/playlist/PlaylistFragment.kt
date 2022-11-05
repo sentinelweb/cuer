@@ -225,11 +225,13 @@ class PlaylistFragment :
     }
 
     private fun setupRecyclerView() {
-        if (_adapter == null) {
-            _adapter = createAdapter()
+        if (binding.playlistList.adapter != null) {
+            _adapter = binding.playlistList.adapter as? PlaylistAdapter
         }
-        binding.playlistList.layoutManager = LinearLayoutManager(context)
-        binding.playlistList.adapter = adapter
+        if (_adapter == null) {
+            newAdapter()
+            binding.playlistList.layoutManager = LinearLayoutManager(context)
+        }
         binding.playlistList.doOnPreDraw {
             startPostponedEnterTransition()
         }

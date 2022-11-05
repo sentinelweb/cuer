@@ -67,15 +67,14 @@ class ShareWrapper(
     }
 
     private fun fullMessage(media: MediaDomain): String {
-        return """Check out this vid:
+        return """Hey! Check out this video:
                     |
                     |${media.title}
                     |${media.url}
                     |
                     |by "${media.channelData.title}" (${channelUrl(media)})
                     | 
-                    |Sent via Cuer (https://cuer.app)
-                    |Twitter: @cuerapp (https://twitter.com/cuerapp) 
+                    |🌎 https://cuer.app
                     """
     }
 
@@ -112,8 +111,7 @@ class ShareWrapper(
             }
         }
 
-        sb.append("Sent via Cuer (https://cuer.app)").append("\n\n")
-        sb.append("Twitter: @cuerapp (https://twitter.com/cuerapp) ").append("\n\n")
+        sb.append("\uD83C\uDF0E https://cuer.app")
         return sb.toString()
     }
 
