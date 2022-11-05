@@ -329,6 +329,7 @@ class MainActivity :
     }
 
     private fun navigateToBottomTab(navId: Int) {
+        navController.clearBackStack(navId)
         navController.navigate(
             navId,
             args = null,
