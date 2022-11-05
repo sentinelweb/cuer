@@ -44,6 +44,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class MainActivity :
@@ -60,6 +61,7 @@ class MainActivity :
     private val presenter: MainContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val snackBarWrapper: SnackbarWrapper by inject()
+    private val toastWrapper: ToastWrapper by inject()
     private val log: LogWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
@@ -154,7 +156,7 @@ class MainActivity :
 
     override fun promptToBackup(result: AutoBackupFileExporter.BackupResult) {
         when (result) {
-            SUCCESS -> snackBarWrapper.make(getString(R.string.backup_success_message)).show()
+            SUCCESS -> toastWrapper.show(getString(R.string.backup_success_message))
             SETUP -> snackBarWrapper.make(
                 msg = getString(R.string.backup_setup_message),
                 actionText = getString(R.string.backup_setup_action)
