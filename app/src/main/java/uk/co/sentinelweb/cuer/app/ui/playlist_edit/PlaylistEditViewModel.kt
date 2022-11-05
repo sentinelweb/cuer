@@ -25,10 +25,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.ext.buildLookup
-import uk.co.sentinelweb.cuer.domain.ext.buildTree
-import uk.co.sentinelweb.cuer.domain.ext.isAllWatched
-import uk.co.sentinelweb.cuer.domain.ext.isAncestor
+import uk.co.sentinelweb.cuer.domain.ext.*
 
 
 class PlaylistEditViewModel constructor(
@@ -212,21 +209,25 @@ class PlaylistEditViewModel constructor(
                     deletable = b
                 )
             )
+
             Flag.EDITABLE -> state.playlistEdit.copy(
                 config = state.playlistEdit.config.copy(
                     editable = b
                 )
             )
+
             Flag.PLAYABLE -> state.playlistEdit.copy(
                 config = state.playlistEdit.config.copy(
                     playable = b
                 )
             )
+
             Flag.DELETE_ITEMS -> state.playlistEdit.copy(
                 config = state.playlistEdit.config.copy(
                     deletableItems = b
                 )
             )
+
             Flag.EDIT_ITEMS -> state.playlistEdit.copy(
                 config = state.playlistEdit.config.copy(
                     editableItems = b
@@ -304,5 +305,25 @@ class PlaylistEditViewModel constructor(
 
     fun setIsDialog(b: Boolean) {
         state.isDialog = b
+    }
+
+    fun serializeState(): String =
+        domainJsonSerializer.encodeToString(PlaylistEditContract.State.serializer(), state)
+
+    fun restoreState(s: String) {
+        domainJsonSerializer.decodeFromString(PlaylistEditContract.State.serializer(), s)
+            .also { restored ->
+                state.apply {
+                    isCreate = restored.isCreate
+                    isAllWatched = restored.isAllWatched
+                    playlistParent = restored.playlistParent
+                    defaultInitial = restored.defaultInitial
+                    isLoaded = restored.isLoaded
+                    isDialog = restored.isDialog
+                    source = restored.source
+                    playlistEdit = restored.playlistEdit
+                }
+                update()
+            }
     }
 }

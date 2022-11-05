@@ -719,10 +719,10 @@ class PlaylistPresenter(
     private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false) {
         view.showRefresh()
         try {
-            log.e(
-                "executeRefresh: ${state.playlistIdentifier.id}, animate:$animate, scrollToCurrent:$scrollToCurrent",
-                Exception()
-            )
+//            log.e(
+//                "executeRefresh: ${state.playlistIdentifier.id}, animate:$animate, scrollToCurrent:$scrollToCurrent",
+//                Exception()
+//            )
             playlistOrDefaultOrchestrator
                 .getPlaylistOrDefault(
                     state.playlistIdentifier.id as Long,

@@ -392,9 +392,9 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     companion object {
 
-        private val STATE_KEY = "playlist_item_edit_state"
-        private val CREATE_PLAYLIST_TAG = "pe_dialog"
-        private val SELECT_PLAYLIST_TAG = "pdf_dialog"
+        private const val STATE_KEY = "playlist_item_edit_state"
+        private const val CREATE_PLAYLIST_TAG = "pe_dialog"
+        private const val SELECT_PLAYLIST_TAG = "pdf_dialog"
 
         val TRANS_IMAGE by lazy {
             get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image)

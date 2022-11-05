@@ -11,6 +11,5 @@ enum class GeneralPreferences constructor(
     LOCAL_DURATION("localDuration"),
     LOCAL_DURATION_TIME("localDurationTime"),
     LOCAL_DURATION_ID("localDurationId"),
-    LAST_BOTTOM_TAB("lastBottomNavTab"),
     TEST_ID("testId"),
 }

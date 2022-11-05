@@ -72,6 +72,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
     override fun onStart() {
         super.onStart()
         checkToAddProgress()
+        log.d("auto_backup_arg:" + arguments?.getBoolean(DO_AUTO_BACKUP))
         if (arguments?.getBoolean(DO_AUTO_BACKUP) ?: false) {
             presenter.autoBackupDatabaseToJson()
             arguments?.remove(DO_AUTO_BACKUP)
