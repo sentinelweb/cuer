@@ -2,7 +2,7 @@
 <com.google.android.material.button.MaterialButton
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/ribbon_item_text"
+    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/ribbon_item_text"
     style="@style/Header.Button"
     android:contentDescription="@string/menu_star"
     android:layout_height="64dp"
@@ -12,6 +12,6 @@
     app:iconGravity="textTop"
     app:iconPadding="4dp"
     app:icon="@drawable/ic_starred"
-    android:paddingHorizontal="8dp"
+    android:paddingEnd="16dp"
     android:minWidth="48dp"
-/>
+    tools:ignore="RtlSymmetry"/>

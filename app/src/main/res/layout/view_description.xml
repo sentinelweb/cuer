@@ -110,6 +110,7 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textIsSelectable="true"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pid_author_desc"

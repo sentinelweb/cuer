@@ -69,18 +69,12 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="16dp"
                     android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
                     android:orientation="horizontal"
                     tools:text="800"
                     app:layout_constraintTop_toBottomOf="@id/plie_image"
                     app:layout_constraintLeft_toLeftOf="parent"
                 >
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/plie_play_fab"
-                        style="@style/Header.Button"
-                        android:contentDescription="@string/menu_play"
-                        android:text="@string/menu_play"
-                        app:icon="@drawable/ic_play_black"
-                    />
 
                     <TextView
                         android:id="@+id/plie_duration"
@@ -94,6 +88,17 @@
                         tools:text="1:00:00"/>
 
                 </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/plie_play_fab"
+                    style="@style/Header.Button"
+                    android:contentDescription="@string/menu_play"
+                    android:text="@string/menu_play"
+                    app:icon="@drawable/ic_play_black"
+                    app:layout_constraintTop_toBottomOf="@id/plie_image"
+                    app:layout_constraintRight_toRightOf="parent"
+                />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.appbar.MaterialToolbar
