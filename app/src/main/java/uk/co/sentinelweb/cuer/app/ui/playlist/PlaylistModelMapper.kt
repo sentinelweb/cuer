@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
@@ -82,7 +83,8 @@ class PlaylistModelMapper constructor(
                 null
             },
             hasChildren = playlists?.get(domain.id)?.chidren?.size ?: 0,
-            itemsIdMap = itemsIdMap
+            itemsIdMap = itemsIdMap,
+            canUpdate = domain.platformId != null && domain.platform == YOUTUBE
         )
     }
 

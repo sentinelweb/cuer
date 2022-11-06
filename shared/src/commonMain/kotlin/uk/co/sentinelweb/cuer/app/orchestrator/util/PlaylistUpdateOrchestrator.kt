@@ -25,29 +25,38 @@ class PlaylistUpdateOrchestrator constructor(
         log.tag(this)
     }
 
+    data class UpdateResult(
+        val success: Boolean,
+        val numberItems: Int
+    )
+
+    private val updateFail = UpdateResult(false, -1)
+
     fun checkToUpdate(p: PlaylistDomain): Boolean = updateChecker.shouldUpdate(p)
 
-    suspend fun update(playlistDomain: PlaylistDomain) {
-        playlistDomain.takeIf { playlistDomain.type == PLATFORM }
+    suspend fun update(playlistDomain: PlaylistDomain): UpdateResult {
+        return playlistDomain.takeIf { playlistDomain.type == PLATFORM }
             ?.let {
-                if (it.platform == null)
+                if (it.platform == null) {
                     playlistOrchestrator.save(it.copy(platform = YOUTUBE), LOCAL.flatOptions())
-                else it
+                } else it
             }
             ?.let { p ->
                 when (p.platform) {
-                    YOUTUBE -> p.platformId?.apply {
+                    YOUTUBE -> p.platformId?.run {
                         playlistOrchestrator
                             .load(this, Source.PLATFORM.deepOptions())
                             ?.let { removeExistingItems(it, p) }
                             ?.takeIf { it.items.size > 0 }
                             ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }
                             ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
-                    }
+                            ?.let { UpdateResult(true, it.size) }
+                    } ?: updateFail
 
-                    else -> Unit
+                    else -> updateFail
                 }
             }
+            ?: updateFail
     }
 
     private suspend fun removeExistingItems(platform: PlaylistDomain, existing: PlaylistDomain): PlaylistDomain {

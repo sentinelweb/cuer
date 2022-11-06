@@ -48,7 +48,7 @@ class YoutubeVideosRetrofitInteractorApiTest {
 
     @Before
     fun setUp() {
-        service = RetrofitBuilder(config).let { it.buildYoutubeService(it.buildYoutubeClient()) }
+        service = RetrofitBuilder(config, SystemLogWrapper()).let { it.buildYoutubeService(it.buildYoutubeClient()) }
 
         val channelMapper = YoutubeChannelDomainMapper(TimeStampMapper(log), imageMapper)
         sut = YoutubeRetrofitInteractor(

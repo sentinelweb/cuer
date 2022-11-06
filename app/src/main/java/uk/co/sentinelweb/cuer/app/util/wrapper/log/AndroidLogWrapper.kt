@@ -2,8 +2,10 @@ package uk.co.sentinelweb.cuer.app.util.wrapper.log
 
 import android.util.Log
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 
-class AndroidLogWrapper constructor(
+class AndroidLogWrapper(
+    private val buildConfig: BuildConfigDomain
 ) : LogWrapper {
 
     override var tag = APP_TAG
@@ -13,7 +15,7 @@ class AndroidLogWrapper constructor(
     }
 
     override fun d(msg: String) {
-        Log.d(tag, msg)
+        if (buildConfig.isDebug) Log.d(tag, msg)
     }
 
     override fun i(msg: String) {

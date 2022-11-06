@@ -25,7 +25,7 @@ class JsonDatabaseInitializer constructor(
 
     override fun initDatabase() {
         coroutines.ioScope.launch {
-            res.getAssetString("default-080721.json")
+            res.getAssetString("default-dbinit.json")
                 ?.apply { backup.restoreData(this) }
                 ?.apply { preferences.dbInitialised = true }
                 ?.apply { preferences.currentPlayingPlaylistId = 3L.toLocalIdentifier() /* philosophy */ }

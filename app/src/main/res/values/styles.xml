@@ -203,7 +203,8 @@
         <item name="android:textColor">?colorOnSurface</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">4dp</item>
+        <item name="android:paddingVertical">4dp</item>
+        <item name="android:paddingRight">8dp</item>
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1</item>
         <item name="drawableTint">?colorOnSurface</item>
         <item name="android:drawableTint">?colorOnSurface</item>
@@ -215,7 +216,8 @@
         <item name="android:tint">?colorOnSurface</item>
         <item name="android:layout_width">@dimen/flag_size</item>
         <item name="android:layout_height">@dimen/flag_size</item>
-        <item name="android:padding">4dp</item>
+        <item name="android:paddingVertical">4dp</item>
+        <item name="android:paddingRight">8dp</item>
         <item name="android:layout_marginTop">4dp</item>
     </style>
 
@@ -227,12 +229,26 @@
         <item name="android:textColor">@color/button_csl</item>
         <item name="strokeColor">@color/button_csl</item>
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
-        <item name="android:layout_margin">8dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:layout_marginVertical">8dp</item>
         <item name="rippleColor">@color/grey_400</item>
         <item name="iconSize">18dp</item>
     </style>
 
-
+    <style name="Header.Button.Solid" parent="@style/Widget.MaterialComponents.Button.Icon">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawableTint">@color/button_fg_tint</item>
+        <item name="iconTint">@color/white</item>
+        <item name="tint">?colorPrimary</item>
+        <item name="android:elevation">@dimen/button_elevation</item>
+        <item name="android:layout_marginLeft">0dp</item>
+        <item name="android:layout_marginRight">16dp</item>
+        <item name="android:layout_marginVertical">8dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="rippleColor">?colorPrimaryVariant</item>
+        <item name="iconSize">18dp</item>
+    </style>
     <!-- end Headers =========================== -->
 
     <!-- ItemView =========================== -->
@@ -516,19 +532,20 @@
     <style name="Chip"/>
 
     <style name="Chip.SelectPlaylist" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
         <item name="chipIcon">@drawable/ic_playlist_black</item>
         <item name="chipIconSize">20dp</item>
         <item name="chipIconTint">@color/chip_icon_tint</item>
     </style>
 
     <style name="Chip.Playlist" parent="Widget.MaterialComponents.Chip.Entry">
-        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
         <item name="chipIconSize">@dimen/chip_thumb_icon_size</item>
         <item name="chipIconVisible">true</item>
         <item name="android:checkable">false</item>
     </style>
     <!-- end Chips =========================== -->
+
     <!-- Buttons =========================== -->
     <style name="FabButton" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="backgroundTint">@color/fab_primary_csl</item>
@@ -541,8 +558,6 @@
     </style>
 
     <style name="Button.IconOnly" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <!--        <item name="android:insetTop">0dp</item>-->
-        <!--        <item name="android:insetBottom">0dp</item>-->
         <item name="android:paddingLeft">12dp</item>
         <item name="android:paddingRight">12dp</item>
         <item name="iconTint">@color/button_csl</item>
@@ -579,6 +594,7 @@
         <item name="iconSize">18dp</item>
     </style>
     <!-- end Buttons =========================== -->
+
     <!-- Full screen =========================== -->
     <style name="FullscreenTheme" parent="AppTheme">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
