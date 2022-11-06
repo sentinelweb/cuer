@@ -35,7 +35,7 @@ object NetModule {
         }
         factory { YoutubeVideoMediaDomainMapper(get(), get()) }
         factory { YoutubeChannelDomainMapper(get(), get()) }
-        factory { YoutubePlaylistDomainMapper(get(), get(), get(), get()) }
+        factory { YoutubePlaylistDomainMapper(get(), get(), get(), get(), get()) }
         factory { YoutubeSearchMapper(get(), get(), get(), get(), get()) }
         factory { YoutubeImageMapper() }
 

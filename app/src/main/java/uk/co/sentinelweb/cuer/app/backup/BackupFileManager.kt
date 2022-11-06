@@ -180,7 +180,8 @@ class BackupFileManager constructor(
                                     playlistItemCreator.buildPlayListItem(
                                         item,
                                         defPlist,
-                                        orderBase + (idx * 1000)
+                                        orderBase + (idx * 1000),
+                                        timeProvider.instant()
                                     )
                                 }
                             }.let {

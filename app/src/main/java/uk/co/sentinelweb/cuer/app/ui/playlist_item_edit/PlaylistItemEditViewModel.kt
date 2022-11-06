@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import summarise
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
@@ -41,11 +40,11 @@ import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
-import uk.co.sentinelweb.cuer.domain.ext.summarise
 
 
 class PlaylistItemEditViewModel constructor(
@@ -64,6 +63,7 @@ class PlaylistItemEditViewModel constructor(
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val res: ResourceWrapper,
     private val coroutines: CoroutineContextProvider,
+    private val timeProvider: TimeProvider,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -478,8 +478,6 @@ class PlaylistItemEditViewModel constructor(
                                 if (state.isOnSharePlaylist) {
                                     mediaOrchestrator.save(it, state.source.flatOptions())
                                 } else {
-                                    log.d("b4 mediaOrchestrator.save")
-
                                     mediaOrchestrator.save(it, saveSource.deepOptions())
                                         .also { log.d("after mediaOrchestrator.save") }
 
@@ -488,21 +486,20 @@ class PlaylistItemEditViewModel constructor(
                         }
                         ?.let { savedMedia ->
                             state.media = savedMedia
-                            log.d("editing item: ${state.editingPlaylistItem?.summarise()}")
                             val existingPlaylistItems = playlistItemOrchestrator
                                 .loadList(PlatformIdListFilter(listOf(savedMedia.platformId)), LOCAL.flatOptions())
                             selectedPlaylists
                                 .filter { playlist -> existingPlaylistItems.find { it.playlistId == playlist.id } == null }
                                 .mapNotNull { playlist ->
-                                    log.d("b4 playlistItemOrchestrator.save")
-                                    log.d("playlist: ${playlist.summarise()}")
-
-                                    val domain = itemCreator.buildPlayListItem(savedMedia, playlist)
-                                    log.d("playlist item: ${domain.summarise()}")
+                                    val domain = itemCreator.buildPlayListItem(
+                                        savedMedia,
+                                        playlist,
+                                        dateAdded = timeProvider.instant()
+                                    )
                                     playlistItemOrchestrator.save(
                                         domain,
                                         saveSource.flatOptions()
-                                    ).also { log.d("after playlistItemOrchestrator.save") }
+                                    )
                                         .takeIf { saveSource == LOCAL && isNew }
                                         ?.also {
                                             prefsWrapper.lastAddedPlaylistId = it.playlistId!!
