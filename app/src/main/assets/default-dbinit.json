@@ -1,0 +1,897 @@
+{
+  "version": 3,
+  "playlists": [
+    {
+      "id": 1,
+      "title": "Default",
+      "default": true,
+      "image": {
+        "url": "gs://cuer-275020.appspot.com/playlist_header/pexels-freestocksorg-34407-600.jpg"
+      },
+      "config": {
+        "deletable": false
+      }
+    },
+    {
+      "id": 3,
+      "title": "Philosophy",
+      "items": [
+        {
+          "id": 6808,
+          "media": {
+            "id": 7304,
+            "url": "https://youtu.be/FAp7GIA2rFM",
+            "platformId": "FAp7GIA2rFM",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "Western Philosophy - Part 1 - Full Documentary",
+            "duration": 2981181,
+            "positon": 2947094,
+            "dateLastPlayed": "2022-09-24T14:51:33.301027Z",
+            "description": "Western Philosophy traces the evolution of philosophy from classical Greece, it's development in Europe through the medieval period and the enlightenment into modern existentialists thought.\n\nPlease subscribe to the Documentary Base YouTube Channel: https://www.youtube.com/channel/UCX1v-zaMxcg4OAaLs7GAT8g?sub_confirmation=1\n\n#Philosophy #History #Documentary",
+            "published": "2019-09-12T13:05:32",
+            "channelData": {
+              "id": 821,
+              "platformId": "UCX1v-zaMxcg4OAaLs7GAT8g",
+              "platform": "YOUTUBE",
+              "title": "Documentary Base",
+              "customUrl": "https://youtube.com/channel/documentarybase",
+              "description": "Documentary Base is your new home for documentaries on YouTube. Subscribe now to be notified when we upload one of our many upcoming films.",
+              "published": "2019-06-05T15:00:50",
+              "thumbNail": {
+                "id": 849,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 850,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 851,
+              "url": "https://i.ytimg.com/vi/FAp7GIA2rFM/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 852,
+              "url": "https://i.ytimg.com/vi/FAp7GIA2rFM/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            },
+            "watched": true
+          },
+          "dateAdded": "2022-11-03T13:07:46.879146Z",
+          "order": 1667480866879,
+          "playlistId": 78
+        },
+        {
+          "id": 6809,
+          "media": {
+            "id": 7307,
+            "url": "https://youtu.be/fBq0Q7snVQ0",
+            "platformId": "fBq0Q7snVQ0",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "Western Philosophy - Part 2 - Full Documentary",
+            "duration": 2980441,
+            "positon": 2979093,
+            "dateLastPlayed": "2022-09-24T15:56:20.400937Z",
+            "description": "Western Philosophy traces the evolution of philosophy from classical Greece, it's development in Europe through the medieval period and the enlightenment into modern existentialists thought.\n\nPlease subscribe to the Documentary Base YouTube Channel: https://www.youtube.com/channel/UCX1v-zaMxcg4OAaLs7GAT8g?sub_confirmation=1\n\n#Philosophy #History #Documentary",
+            "published": "2019-09-12T17:18:37",
+            "channelData": {
+              "id": 821,
+              "platformId": "UCX1v-zaMxcg4OAaLs7GAT8g",
+              "platform": "YOUTUBE",
+              "title": "Documentary Base",
+              "customUrl": "https://youtube.com/channel/documentarybase",
+              "description": "Documentary Base is your new home for documentaries on YouTube. Subscribe now to be notified when we upload one of our many upcoming films.",
+              "published": "2019-06-05T15:00:50",
+              "thumbNail": {
+                "id": 849,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 850,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 857,
+              "url": "https://i.ytimg.com/vi/fBq0Q7snVQ0/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 858,
+              "url": "https://i.ytimg.com/vi/fBq0Q7snVQ0/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            },
+            "watched": true
+          },
+          "dateAdded": "2022-11-03T13:09:34.287889Z",
+          "order": 1667480974287,
+          "playlistId": 78
+        },
+        {
+          "id": 6810,
+          "media": {
+            "id": 7308,
+            "url": "https://youtu.be/N4JV8TdCVmM",
+            "platformId": "N4JV8TdCVmM",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "Western Philosophy - Part 3 - Full Documentary",
+            "duration": 2869501,
+            "positon": 2868606,
+            "dateLastPlayed": "2022-09-24T16:44:13.092433Z",
+            "description": "Western Philosophy traces the evolution of philosophy from classical Greece, it's development in Europe through the medieval period and the enlightenment into modern existentialists thought.\n\nPlease subscribe to the Documentary Base YouTube Channel: https://www.youtube.com/channel/UCX1v-zaMxcg4OAaLs7GAT8g?sub_confirmation=1\n\n#Philosophy #History  #Documentary",
+            "published": "2019-09-16T10:46:58",
+            "channelData": {
+              "id": 821,
+              "platformId": "UCX1v-zaMxcg4OAaLs7GAT8g",
+              "platform": "YOUTUBE",
+              "title": "Documentary Base",
+              "customUrl": "https://youtube.com/channel/documentarybase",
+              "description": "Documentary Base is your new home for documentaries on YouTube. Subscribe now to be notified when we upload one of our many upcoming films.",
+              "published": "2019-06-05T15:00:50",
+              "thumbNail": {
+                "id": 849,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 850,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 859,
+              "url": "https://i.ytimg.com/vi/N4JV8TdCVmM/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 860,
+              "url": "https://i.ytimg.com/vi/N4JV8TdCVmM/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            },
+            "watched": true
+          },
+          "dateAdded": "2022-11-03T13:09:46.994313Z",
+          "order": 1667480986994,
+          "playlistId": 78
+        },
+        {
+          "id": 6811,
+          "media": {
+            "id": 7306,
+            "url": "https://youtu.be/RppWBVxUtc8",
+            "platformId": "RppWBVxUtc8",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "Eastern Philosophy - Part 1 - Full Documentary",
+            "duration": 2854461,
+            "positon": 2853461,
+            "dateLastPlayed": "2022-09-24T17:31:31.221372Z",
+            "description": "What motivations underline human behaviour. This series examines the genesis of spiritual thought of nations including China, Japan & India. This philosophical journey looks at the doctrines of Confucianism, Shinto, Hinduism, Buddhism, Judaism and Islam.\n\nPlease subscribe to the Documentary Base YouTube Channel: https://www.youtube.com/channel/UCX1v-zaMxcg4OAaLs7GAT8g?sub_confirmation=1\n\n#Religion #History #Documentary",
+            "published": "2019-09-09T15:15:15",
+            "channelData": {
+              "id": 821,
+              "platformId": "UCX1v-zaMxcg4OAaLs7GAT8g",
+              "platform": "YOUTUBE",
+              "title": "Documentary Base",
+              "customUrl": "https://youtube.com/channel/documentarybase",
+              "description": "Documentary Base is your new home for documentaries on YouTube. Subscribe now to be notified when we upload one of our many upcoming films.",
+              "published": "2019-06-05T15:00:50",
+              "thumbNail": {
+                "id": 849,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 850,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 861,
+              "url": "https://i.ytimg.com/vi/RppWBVxUtc8/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 862,
+              "url": "https://i.ytimg.com/vi/RppWBVxUtc8/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            },
+            "watched": true
+          },
+          "dateAdded": "2022-11-03T13:09:58.647726Z",
+          "order": 1667480998647,
+          "playlistId": 78
+        },
+        {
+          "id": 6812,
+          "media": {
+            "id": 7309,
+            "url": "https://youtu.be/TED5Pt6JKqQ",
+            "platformId": "TED5Pt6JKqQ",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "Eastern Philosophy - Part 2 - Full Documentary",
+            "duration": 2914581,
+            "positon": 2475804,
+            "dateLastPlayed": "2022-09-24T18:12:50.260788Z",
+            "description": "What motivations underline human behaviour. This series examines the genesis of spiritual thought of nations including China, Japan & India. This philosophical journey looks at the doctrines of Confucianism, Shinto, Hinduism, Buddhism, Judaism and Islam.\n\nPlease subscribe to the Documentary Base YouTube Channel: https://www.youtube.com/channel/UCX1v-zaMxcg4OAaLs7GAT8g?sub_confirmation=1\n\n#Religion #History #Documentary",
+            "published": "2019-09-10T09:13:50",
+            "channelData": {
+              "id": 821,
+              "platformId": "UCX1v-zaMxcg4OAaLs7GAT8g",
+              "platform": "YOUTUBE",
+              "title": "Documentary Base",
+              "customUrl": "https://youtube.com/channel/documentarybase",
+              "description": "Documentary Base is your new home for documentaries on YouTube. Subscribe now to be notified when we upload one of our many upcoming films.",
+              "published": "2019-06-05T15:00:50",
+              "thumbNail": {
+                "id": 849,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 850,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 863,
+              "url": "https://i.ytimg.com/vi/TED5Pt6JKqQ/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 864,
+              "url": "https://i.ytimg.com/vi/TED5Pt6JKqQ/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            },
+            "watched": true
+          },
+          "dateAdded": "2022-11-03T13:10:06.682219Z",
+          "order": 1667481006682,
+          "playlistId": 78
+        },
+        {
+          "id": 6813,
+          "media": {
+            "id": 7310,
+            "url": "https://youtu.be/tbCfjhHeJ1g",
+            "platformId": "tbCfjhHeJ1g",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "Eastern Philosophy - Part 3 - Full Documentary",
+            "duration": 2948421,
+            "positon": 2946183,
+            "dateLastPlayed": "2022-09-24T19:09:31.810865Z",
+            "description": "What motivations underline human behaviour. This series examines the genesis of spiritual thought of nations including China, Japan & India. This philosophical journey looks at the doctrines of Confucianism, Shinto, Hinduism, Buddhism, Judaism and Islam.\n\nPlease subscribe to the Documentary Base YouTube Channel: https://www.youtube.com/channel/UCX1v-zaMxcg4OAaLs7GAT8g?sub_confirmation=1\n\n#Religion #History #Documentary",
+            "published": "2019-09-12T11:05:48",
+            "channelData": {
+              "id": 821,
+              "platformId": "UCX1v-zaMxcg4OAaLs7GAT8g",
+              "platform": "YOUTUBE",
+              "title": "Documentary Base",
+              "customUrl": "https://youtube.com/channel/documentarybase",
+              "description": "Documentary Base is your new home for documentaries on YouTube. Subscribe now to be notified when we upload one of our many upcoming films.",
+              "published": "2019-06-05T15:00:50",
+              "thumbNail": {
+                "id": 849,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 850,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_yPtyorNfPTVjg8GTVtrbSdXFWkPpJ6gN_QIrh=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 865,
+              "url": "https://i.ytimg.com/vi/tbCfjhHeJ1g/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 866,
+              "url": "https://i.ytimg.com/vi/tbCfjhHeJ1g/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            },
+            "watched": true
+          },
+          "dateAdded": "2022-11-03T13:10:25.232141Z",
+          "order": 1667481025232,
+          "playlistId": 78
+        },
+        {
+          "id": 6846,
+          "media": {
+            "id": 6009,
+            "url": "https://youtu.be/QkP4g9e86qA",
+            "platformId": "QkP4g9e86qA",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "The Story of Western Philosophy",
+            "duration": 554381,
+            "positon": 547571,
+            "dateLastPlayed": "2022-11-06T10:53:16.576260Z",
+            "description": "Relevant mystery link: https://youtu.be/myc7eHGg5y4\nIf you notice any factual errors in this week’s video, please just bear in mind that life is ultimately meaningless in the first place.\nBooks what I wrote, yo ► https://tinyurl.com/ycnl5bo3\n\nDiscord server ► https://discord.gg/76ybBSR  (just in case that doesn’t work: discord.gg/exurb1a)\nDiscuss passive-aggressively ► https://www.reddit.com/r/Exurb1a/\n\nI also make horrendous music ►  https://soundcloud.com/exurbia-1\nFacebook ► https://www.facebook.com/exurb1a/\nHelp me to do this full-time, if you're so inclined ► https://www.patreon.com/exurb1r?ty=h\n\n\nMusic: Waltz from Swan Lake by Mega Dong Tchaikovsky - https://youtu.be/CShopT9QUzw",
+            "published": "2017-05-26T15:20:42",
+            "channelData": {
+              "id": 810,
+              "platformId": "UCimiUgDLbi6P17BdaCZpVbg",
+              "platform": "YOUTUBE",
+              "title": "exurb1a",
+              "customUrl": "https://youtube.com/channel/@exurb1a",
+              "description": "Universe is weird, yo.\n\nSecond channel for silliness ► https://www.youtube.com/channel/UCcoO-8J0EYQHGPFQqwmAzVQ\n\nBooks what I wrote ► https://tinyurl.com/ycnl5bo3 \nT-shirts, mugs, and sadness ► https://teespring.com/stores/exurb1a\nDiscord server ► https://discord.gg/76ybBSR\nLike shit music? I attempt to make that ► https://soundcloud.com/exurbia-1\nFacebook ► https://www.facebook.com/exurb1a/\nPatreon ► https://www.patreon.com/exurb1r?ty=h\n\nFor sending me personalised insults, please direct them at: exurb1achannel@gmail.com",
+              "published": "2012-02-14T10:02:33",
+              "thumbNail": {
+                "id": 3945,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu-JtOwqfES3-Yk7AgBQgVlRcirFMW5Po7PaSOwOww=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 3946,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu-JtOwqfES3-Yk7AgBQgVlRcirFMW5Po7PaSOwOww=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 722,
+              "url": "https://i.ytimg.com/vi/QkP4g9e86qA/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 723,
+              "url": "https://i.ytimg.com/vi/QkP4g9e86qA/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            },
+            "watched": true
+          },
+          "dateAdded": "2022-11-06T09:58:48.158612Z",
+          "order": 1667728728158,
+          "playlistId": 78
+        },
+        {
+          "id": 6847,
+          "media": {
+            "id": 6016,
+            "url": "https://youtu.be/i2wLyhgeYsw",
+            "platformId": "i2wLyhgeYsw",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "Buddhism is Kinda Out There, Man",
+            "duration": 1191090,
+            "positon": 0,
+            "dateLastPlayed": "2021-06-13T14:34:38.942Z",
+            "description": "Super duper new book, Geometry for Ocelots (you might need to change your region) ► https://tinyurl.com/2e44sbdb\n\nThe rest of my books ► https://tinyurl.com/ycnl5bo3 \nT-shirts, mugs, and sadness ► https://teespring.com/stores/exurb1a \nI also make horrendous music ► https://soundcloud.com/exurbia-1 \nFor sending personalised insults ► https://www.facebook.com/exurb1a/ \nHelp me to do this full-time if you're deranged enough ► https://www.patreon.com/exurb1r?ty=h\n\nIf you’re interested in Buddhism, this is some stuff I certainly got a kick out of over the years: \n\nSo, a massive amount of this video came from a lecture series by Malcolm David Eckel. You can listen to it here, and no - no one's sponsoring me for this, it's just ace - https://www.audible.com/pd/Buddhism-Audiobook/B00DDUVALC\n\nAlso:\n\nMy favourite version of the Dhammapada, the sayings of the Buddha - https://youtu.be/4afDXAvbl0A\n\nA great written intro to Zen -  Zen Mind Beginner's Mind by Shunryu Suzuki - https://www.goodreads.com/book/show/402843.Zen_Mind_Beginner_s_Mind\n\nAnother brilliant intro to Zen by Alan Watts - https://youtu.be/f7F_SGCnVdI\n\nAct Normal (a great documentary about a Western Buddhist monk) - https://vimeo.com/27590176",
+            "published": "2021-06-03T17:49:26",
+            "channelData": {
+              "id": 810,
+              "platformId": "UCimiUgDLbi6P17BdaCZpVbg",
+              "platform": "YOUTUBE",
+              "title": "exurb1a",
+              "customUrl": "https://youtube.com/channel/@exurb1a",
+              "description": "Universe is weird, yo.\n\nSecond channel for silliness ► https://www.youtube.com/channel/UCcoO-8J0EYQHGPFQqwmAzVQ\n\nBooks what I wrote ► https://tinyurl.com/ycnl5bo3 \nT-shirts, mugs, and sadness ► https://teespring.com/stores/exurb1a\nDiscord server ► https://discord.gg/76ybBSR\nLike shit music? I attempt to make that ► https://soundcloud.com/exurbia-1\nFacebook ► https://www.facebook.com/exurb1a/\nPatreon ► https://www.patreon.com/exurb1r?ty=h\n\nFor sending me personalised insults, please direct them at: exurb1achannel@gmail.com",
+              "published": "2012-02-14T10:02:33",
+              "thumbNail": {
+                "id": 3945,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu-JtOwqfES3-Yk7AgBQgVlRcirFMW5Po7PaSOwOww=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 3946,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu-JtOwqfES3-Yk7AgBQgVlRcirFMW5Po7PaSOwOww=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 724,
+              "url": "https://i.ytimg.com/vi/i2wLyhgeYsw/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 725,
+              "url": "https://i.ytimg.com/vi/i2wLyhgeYsw/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            }
+          },
+          "dateAdded": "2022-11-06T09:58:53.336418Z",
+          "order": 1667728733336,
+          "playlistId": 78
+        },
+        {
+          "id": 6849,
+          "media": {
+            "id": 9501,
+            "url": "https://youtu.be/YxBShJU_CKs",
+            "platformId": "YxBShJU_CKs",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "The Map Of Philosophy",
+            "duration": 2752000,
+            "description": "A comprehensive map of all of the disciplines, areas and subdivisions of philosophy.  Including logic, History of philosophy, philosophical traditions, value theory, epistemology, metaphysics, philosophy of religion, philosophy of science, philosophy of mind, philosophy of language, philosophy of action, ethics, aesthetics, social philosophy, political philosophy, philosophical methods and more!  This video breaks down and offers a brief explanation of each area of study, and should serve as a good introduction for beginners, a solid refresher for journeymen and a cool illustration for experts.  Enjoy!\n\nTable of Contents:\n00:00 Introduction\n01:44 Logic and Philosophical Methods\n02:14 Formal Classical Logic\n04:55 Non-Classical Logic\n06:35 Informal Logic\n08:00 Philosophical Methods\n10:20 The History of Philosophy\n13:30 Philosophical Traditions Around the World\n20:55 Aesthetics\n22:35 Political Philosophy\n23:34 Social Philosophy\n25:00 Moral Theory & Ethics\n28:08 Epistemology\n30:34 Metaphysics\n34:13 Philosophy of Science\n37:35 Philosophy of Religion\n40:17 Philosophy of Language\n41:58 Philosophy of Mind\n43:49 Philosophy of Action\n44:57 Full Map \n\n\n\nAs we no longer have annotations, here are playlists of our videos on each of the main topics if you want to learn more!\nPhilosophical Methods: \n\nhttps://www.youtube.com/playlist?list=PLz0n_SjOttTcoYoZrMK1EWuZGipHitTjI\nEthics: \n\nhttps://www.youtube.com/playlist?list=PLz0n_SjOttTfg6LW9Lgul9xxphc2ZRLKC\nPhilosophy of Language:\nhttps://www.youtube.com/playlist?list=PLz0n_SjOttTeQkp6SFbnWjluJXUUvZK7n\nEpistemology:\n\nhttps://www.youtube.com/playlist?list=PLz0n_SjOttTc2k5SeO8VJYS_Yl9THy6cM\n\nMetaphysics:\nhttps://www.youtube.com/playlist?list=PLz0n_SjOttTeXRZhIv0tr-dWiG2NQJ9jT\n100 Days of Logic:\nhttps://www.youtube.com/playlist?list=PLz0n_SjOttTcjHsuebLrl0fjab5fdToui\n\nAdvanced Logic:\nhttps://www.youtube.com/playlist?list=PLz0n_SjOttTfubgY0h2AJhNyRSsog1X9P\nPhilosophy of Religion:\nhttps://www.youtube.com/playlist?list=PLz0n_SjOttTcrnflyetSnrzk_hWOPtzCe\nPhilosophy of Science:\nhttps://www.youtube.com/playlist?list=PLz0n_SjOttTf9XmTQncrxtuWPEvXN9vUC\n\n\n\n Sponsors: João Costa Neto, Dakota Jones, Joe Felix, Prince Otchere, Mike Samuel, Daniel Helland, Dennis Sexton, Will Roberts and √2.  Thanks for your support!\n\nDonate on Patreon: https://www.patreon.com/Carneades\n\nBuy stuff with Zazzle: https://www.zazzle.com/store/carneades?rf=238568769552007656\n\nFollow us on Twitter: @CarneadesCyrene  https://twitter.com/CarneadesCyrene\n\nInformation for this video gathered from The Stanford Encyclopedia of Philosophy, The Internet Encyclopedia of Philosophy, The Cambridge Dictionary of Philosophy, The Oxford Dictionary of Philosophy and more!\n\nInformation for this video gathered from The Stanford Encyclopedia of Philosophy, The Internet Encyclopedia of Philosophy, The Cambridge Dictionary of Philosophy, The Oxford Dictionary of Philosophy and more!\n(#Metaphysics #Epistemology)",
+            "published": "2017-04-30T12:00:05",
+            "channelData": {
+              "id": 813,
+              "platformId": "UC1VzCyqpmCaRh8_BnijbOvg",
+              "platform": "YOUTUBE",
+              "title": "Carneades.org",
+              "customUrl": "https://youtube.com/channel/carneadesofcyrene",
+              "description": "\"ΕΝ ΟΙΔΑ ΟΤΙ ΟΥΔΕΝ ΟΙΔΑ\"\n\"All I know is that I know nothing\"\n\nIn the modern world we are assailed each and every day by opinions disguised as fact.  The talking heads from the realms of religion, science, politics, and the media all claim to possess knowledge.  In this gladiatorial arena of argumentation too often the victor is the loudest voice, not the strongest argument.  The mob chooses the views that live and die on the basis of their heart, their fears, or their pain.  Rarely do they include their head.  Having grown weary of this lifestyle of panem et circenses, I long to journey back across the Mediterranean to a land of logos and arete.  If you share this sentiment, I implore you, continue reading and aide me in this quest.   Watch, learn, and visit: Carneades.org.",
+              "published": "2013-07-26T13:03:39",
+              "thumbNail": {
+                "id": 769,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu9TSHgPrQ9XkbmPeoRj5a5v64ZGHU9swJlqObOv=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 770,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu9TSHgPrQ9XkbmPeoRj5a5v64ZGHU9swJlqObOv=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 7450,
+              "url": "https://i.ytimg.com/vi/YxBShJU_CKs/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 7451,
+              "url": "https://i.ytimg.com/vi/YxBShJU_CKs/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            }
+          },
+          "dateAdded": "2022-11-06T10:22:36.613580Z",
+          "order": 1667730156613,
+          "playlistId": 78
+        },
+        {
+          "id": 6850,
+          "media": {
+            "id": 9502,
+            "url": "https://youtu.be/1A_CAkYt3GY",
+            "platformId": "1A_CAkYt3GY",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "What is Philosophy?: Crash Course Philosophy #1",
+            "duration": 635000,
+            "description": "Today Hank begins to teach you about Philosophy by discussing the historical origins of philosophy in ancient Greece, and its three main divisions: metaphysics, epistemology, and value theory. He will also introduce logic, and how you’re going to use it to understand and critically evaluate a whole host of different worldviews throughout this course. And also, hopefully, the rest of your life.\n\n--\n\nImages and video via VideoBlocks or Wikimedia Commons, licensed under Creative Commons by 4.0:\nhttps://creativecommons.org/licenses/by/4.0/\n\n--\n\nProduced in collaboration with PBS Digital Studios: http://youtube.com/pbsdigitalstudios\n\nCrash Course Philosophy is sponsored by Squarespace.\nhttp://www.squarespace.com/crashcourse\n\n--\n\nWant to find Crash Course elsewhere on the internet?\nFacebook - http://www.facebook.com/YouTubeCrashCourse\nTwitter - http://www.twitter.com/TheCrashCourse\nTumblr - http://thecrashcourse.tumblr.com \nSupport CrashCourse on Patreon: http://www.patreon.com/crashcourse\n\nCC Kids: http://www.youtube.com/crashcoursekids",
+            "published": "2016-02-08T23:00",
+            "channelData": {
+              "id": 1101,
+              "platformId": "UCX6b17PVsYBQ0ip5gyeme-Q",
+              "platform": "YOUTUBE",
+              "title": "CrashCourse",
+              "customUrl": "https://youtube.com/channel/@crashcourse",
+              "description": "At Crash Course, we believe that high-quality educational videos should be available to everyone for free! \n\nSubscribe for weekly videos from our current courses! Right now, we're producing Black American History and Public Health. The Crash Course team has produced more than 42 courses on a wide variety of subjects, including organic chemistry, literature, world history, biology, philosophy, theater, ecology, and many more!  We also recently teamed up with Arizona State University to bring you more courses on the Study Hall channel.\n\nHelp support Crash Course at Patreon.com/CrashCourse.",
+              "published": "2006-05-20T02:43:42",
+              "thumbNail": {
+                "id": 3541,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu-9vZVC7Lne2Q94NC5pqbLWtFxdCBrS105l7NXEkg=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 3542,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu-9vZVC7Lne2Q94NC5pqbLWtFxdCBrS105l7NXEkg=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 7452,
+              "url": "https://i.ytimg.com/vi/1A_CAkYt3GY/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 7453,
+              "url": "https://i.ytimg.com/vi/1A_CAkYt3GY/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            }
+          },
+          "dateAdded": "2022-11-06T10:23:08.086383Z",
+          "order": 1667730188086,
+          "playlistId": 78
+        },
+        {
+          "id": 6851,
+          "media": {
+            "id": 9503,
+            "url": "https://youtu.be/OCewkYZ1n50",
+            "platformId": "OCewkYZ1n50",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "1. Introduction to Philosophy",
+            "duration": 343000,
+            "description": "Straightforward and comprehensive explanation to the three aspects of Philosophy (Epistemology, Ontology and Metaphysics) running through the A level OCR Religious Studies course.",
+            "published": "2020-03-24T22:18:54",
+            "channelData": {
+              "id": 1157,
+              "platformId": "UC5sbXTpOotmWOhg0SZrnaRA",
+              "platform": "YOUTUBE",
+              "title": "Jest Education",
+              "customUrl": "https://youtube.com/channel/@jesteducation",
+              "description": "Religious Studies A Level for OCR. Everything you need to know!\n\nhttps://www.patreon.com/jesteducation\nhttps://gofund.me/652655d2\n\nRS revision\nPhilosophy explained\nTheology explained\nEthics explained",
+              "published": "2017-02-08T19:12:49",
+              "thumbNail": {
+                "id": 7454,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu-QXWSTTcsPoioe8zI1VU5-czT_TyNnI9_k6EaK8Q=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 7455,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu-QXWSTTcsPoioe8zI1VU5-czT_TyNnI9_k6EaK8Q=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 7456,
+              "url": "https://i.ytimg.com/vi/OCewkYZ1n50/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 7457,
+              "url": "https://i.ytimg.com/vi/OCewkYZ1n50/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            }
+          },
+          "dateAdded": "2022-11-06T10:23:29.883277Z",
+          "order": 1667730209883,
+          "playlistId": 78
+        },
+        {
+          "id": 6852,
+          "media": {
+            "id": 9504,
+            "url": "https://youtu.be/_tCl66AbkqI",
+            "platformId": "_tCl66AbkqI",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "Philosophy for beginners",
+            "duration": 3600000,
+            "description": "An introduction that takes you through metaphysics, epistemology, ethics, and logic, explaining what they are and the approach that characterises philosophy. Marianne Talbot is Director of Studies in Philosophy.",
+            "published": "2015-11-16T12:43:11",
+            "channelData": {
+              "id": 1158,
+              "platformId": "UC7XchzYa7gz0peYqpotb8Jg",
+              "platform": "YOUTUBE",
+              "title": "Oxford University Department for Continuing Education",
+              "customUrl": "https://youtube.com/channel/@oudce",
+              "description": "Extending Oxford learning for over 140 years, the University of Oxford's Department for Continuing Education offers over 1000 part-time classes and award programmes annually. We have nearly 20,000 enrolments a year, with students coming from across the globe, of all ages, nationalities and backgrounds.",
+              "published": "2012-02-16T12:22:06",
+              "thumbNail": {
+                "id": 7458,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_UCiRZrVvtEKeBIejFpJ7ABlwts6ZnqmZWYa-Z=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 7459,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_UCiRZrVvtEKeBIejFpJ7ABlwts6ZnqmZWYa-Z=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 7460,
+              "url": "https://i.ytimg.com/vi/_tCl66AbkqI/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 7461,
+              "url": "https://i.ytimg.com/vi/_tCl66AbkqI/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            }
+          },
+          "dateAdded": "2022-11-06T10:23:51.909873Z",
+          "order": 1667730231909,
+          "playlistId": 78
+        },
+        {
+          "id": 6853,
+          "media": {
+            "id": 9505,
+            "url": "https://youtu.be/M14ReHfPFUw",
+            "platformId": "M14ReHfPFUw",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "The philosophical method - logic and argument",
+            "duration": 5683000,
+            "description": "Logic and Argument: the joys of symbolic and philosophical logic",
+            "published": "2013-06-26T08:00:34",
+            "channelData": {
+              "id": 1158,
+              "platformId": "UC7XchzYa7gz0peYqpotb8Jg",
+              "platform": "YOUTUBE",
+              "title": "Oxford University Department for Continuing Education",
+              "customUrl": "https://youtube.com/channel/@oudce",
+              "description": "Extending Oxford learning for over 140 years, the University of Oxford's Department for Continuing Education offers over 1000 part-time classes and award programmes annually. We have nearly 20,000 enrolments a year, with students coming from across the globe, of all ages, nationalities and backgrounds.",
+              "published": "2012-02-16T12:22:06",
+              "thumbNail": {
+                "id": 7458,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_UCiRZrVvtEKeBIejFpJ7ABlwts6ZnqmZWYa-Z=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 7459,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_UCiRZrVvtEKeBIejFpJ7ABlwts6ZnqmZWYa-Z=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 7462,
+              "url": "https://i.ytimg.com/vi/M14ReHfPFUw/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 7463,
+              "url": "https://i.ytimg.com/vi/M14ReHfPFUw/hqdefault.jpg",
+              "width": 480,
+              "height": 360
+            }
+          },
+          "dateAdded": "2022-11-06T10:24:39.875948Z",
+          "order": 1667730279875,
+          "playlistId": 78
+        },
+        {
+          "id": 6854,
+          "media": {
+            "id": 9506,
+            "url": "https://youtu.be/16TegBGFTn8",
+            "platformId": "16TegBGFTn8",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "A romp through the history of philosophy from the Pre-Socratics to the present day",
+            "duration": 5539000,
+            "description": "A romp through the history of philosophy from the Pre-Socratics to the present day.",
+            "published": "2013-06-26T08:00:17",
+            "channelData": {
+              "id": 1158,
+              "platformId": "UC7XchzYa7gz0peYqpotb8Jg",
+              "platform": "YOUTUBE",
+              "title": "Oxford University Department for Continuing Education",
+              "customUrl": "https://youtube.com/channel/@oudce",
+              "description": "Extending Oxford learning for over 140 years, the University of Oxford's Department for Continuing Education offers over 1000 part-time classes and award programmes annually. We have nearly 20,000 enrolments a year, with students coming from across the globe, of all ages, nationalities and backgrounds.",
+              "published": "2012-02-16T12:22:06",
+              "thumbNail": {
+                "id": 7458,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_UCiRZrVvtEKeBIejFpJ7ABlwts6ZnqmZWYa-Z=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 7459,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu_UCiRZrVvtEKeBIejFpJ7ABlwts6ZnqmZWYa-Z=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 7464,
+              "url": "https://i.ytimg.com/vi/16TegBGFTn8/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 7465,
+              "url": "https://i.ytimg.com/vi/16TegBGFTn8/hqdefault.jpg",
+              "width": 480,
+              "height": 360
+            }
+          },
+          "dateAdded": "2022-11-06T10:24:50.758931Z",
+          "order": 1667730290758,
+          "playlistId": 78
+        },
+        {
+          "id": 6845,
+          "media": {
+            "id": 5053,
+            "url": "https://youtu.be/0NjvD2RQlaw",
+            "platformId": "0NjvD2RQlaw",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "Everyday Philosophy by Alain de Botton: How much more do you need to be happy? Is Meritocracy good?",
+            "duration": 481121,
+            "positon": 478321,
+            "dateLastPlayed": "2022-11-06T10:32:17.532257Z",
+            "description": "How much material possession do we really need to be happy, content and accepted? Is being extraordinary, famous, in the top 1%  of the rich really something that 'anyone can achieve if they put their mind to it'? Does your social/financial status and your job really define who you are? \nAlain de Botton speaks about these and other questions.",
+            "published": "2021-02-13T14:44:11",
+            "channelData": {
+              "id": 807,
+              "platformId": "UCExoUKDU3pr93KOdboyDZ-w",
+              "platform": "YOUTUBE",
+              "title": "Book-o-Holic",
+              "description": "Listen to the best free Audiobooks! On this channel, you’ll find audiobooks of great works of Fantasy Fiction, Children's Fiction,  Science Fiction and Short Stories, by such authors as E. Nesbit, Saki, Mark Twain, P.G. Wodehouse,  Edgar Allan Poe, Aldous Huxley, George Orwell, Bronte, Austen, Shakespeare for Children,  H.G. Wells & more. If you're looking for an audiobook that's not one here leave a comment. \nFor your listening pleasure, we're always adding new audiobooks so stay subscribed!\n",
+              "published": "2020-04-15T15:54:42.000931189",
+              "thumbNail": {
+                "id": 688,
+                "url": "https://yt3.ggpht.com/ytc/AAUvwniPuBXb258dxD45IFqMR17Bdu7uH1TrFiwUki_U=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              }
+            },
+            "thumbNail": {
+              "id": 689,
+              "url": "https://i.ytimg.com/vi/0NjvD2RQlaw/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 690,
+              "url": "https://i.ytimg.com/vi/0NjvD2RQlaw/maxresdefault.jpg",
+              "width": 1280,
+              "height": 720
+            },
+            "watched": true
+          },
+          "dateAdded": "2022-11-06T09:58:21.293158Z",
+          "order": 1667730291758,
+          "playlistId": 78
+        },
+        {
+          "id": 6855,
+          "media": {
+            "id": 9507,
+            "url": "https://youtu.be/Yat0ZKduW18",
+            "platformId": "Yat0ZKduW18",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "A History of Philosophy | 01 The Beginning of Greek Philosophy",
+            "duration": 2958000,
+            "description": "A History of Philosophy | 01 The Beginning of Greek Philosophy \n\nThis is the first in a series of philosophy classes taught by the brilliant and beloved Wheaton College Professor of Philosophy, Dr. Arthur Holmes. \n\nWheaton College in Illinois has one of the highest percentages of philosophy bachelor's degrees awarded in the country (#9 out of the top 20) excluding seminaries. (https://schwitzsplinters.blogspot.com/2021/07/schools-with-most-philosophy-majors.html?fbclid=IwAR2p8jbww-ws2Iz-MTtmxak9Np2ktfzN-x5NP3gcY2XTj8e_OJb4C78Cmxw)\n\nLearn more about Wheaton College at https://www.wheaton.edu. \nLearn more about the Wheaton College Philosophy program at https://www.wheaton.edu/academics/programs/philosophy.",
+            "published": "2015-04-02T20:38:23",
+            "channelData": {
+              "id": 817,
+              "platformId": "UCXy57QmloBl4eqUnJXhQwwA",
+              "platform": "YOUTUBE",
+              "title": "wheatoncollege",
+              "customUrl": "https://youtube.com/channel/@wheatoncollege",
+              "description": "Located 25 miles west of Chicago, Illinois, Wheaton College is a four-year Christian liberal arts college known for high academic standards and dedicated faculty.\r\n\r\nWheaton College was founded in 1860 by abolitionist Jonathan Blanchard, and since that time Wheaton has remained true to one mission, for Christ and His Kingdom.",
+              "published": "2006-11-18T02:32:23",
+              "thumbNail": {
+                "id": 7466,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu8U1MUHhQLIORa2q6WrtFZtzOfuuVN5Fz-dl_nHFQ=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 7467,
+                "url": "https://yt3.ggpht.com/ytc/AMLnZu8U1MUHhQLIORa2q6WrtFZtzOfuuVN5Fz-dl_nHFQ=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 7468,
+              "url": "https://i.ytimg.com/vi/Yat0ZKduW18/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 7469,
+              "url": "https://i.ytimg.com/vi/Yat0ZKduW18/hqdefault.jpg",
+              "width": 480,
+              "height": 360
+            }
+          },
+          "dateAdded": "2022-11-06T10:27:09.906436Z",
+          "order": 1667730429906,
+          "playlistId": 78
+        },
+        {
+          "id": 6856,
+          "media": {
+            "id": 9508,
+            "url": "https://youtu.be/PU8M128s4vU",
+            "platformId": "PU8M128s4vU",
+            "mediaType": "VIDEO",
+            "platform": "YOUTUBE",
+            "title": "Will Durant---The Greatest Minds And Ideas of All Time",
+            "duration": 11493000,
+            "description": "Will Durant---The Greatest Minds And Ideas of All Time\n\nfor those of you who want to download this as audio for your iPod or whatever you can use this site http://www.convertfiles.com/",
+            "published": "2015-01-09T10:35:27",
+            "channelData": {
+              "id": 1132,
+              "platformId": "UCWytMxSLLwejjLlgZYeJ1-w",
+              "platform": "YOUTUBE",
+              "title": "Durant and Friends",
+              "customUrl": "https://youtube.com/channel/@durantandfriends",
+              "description": "What started as a fun project has morphed into something valuable and worth building on. The Will Durant material that is contained on this channel is managed by planksip publishing (planksip.org) and was taken over in November of 2022 from the channel creator. We are very appreciative of the work he did to create and cultivate such a following. We hope fans of Will Durant will appreciate the broadening of the channel to include \"and friends\". \n\nIf you have suggestions for content or would like to co-create content with our network of creators, please visit planksip.org/co-create, sign up for a free membership and let us know that you want a contributor account. \n\nLooking forward to hearing from you. \n\n\n",
+              "published": "2014-06-21T00:16:25",
+              "thumbNail": {
+                "id": 7470,
+                "url": "https://yt3.ggpht.com/lI2roUmtJB0tJxwU9MMWa-BXFzPfB0_MS10rk_Dl3Dx-D4QC8dvvaKECl8Tgru229yZRZM1f=s240-c-k-c0x00ffffff-no-rj",
+                "width": 240,
+                "height": 240
+              },
+              "image": {
+                "id": 7471,
+                "url": "https://yt3.ggpht.com/lI2roUmtJB0tJxwU9MMWa-BXFzPfB0_MS10rk_Dl3Dx-D4QC8dvvaKECl8Tgru229yZRZM1f=s800-c-k-c0x00ffffff-no-rj",
+                "width": 800,
+                "height": 800
+              }
+            },
+            "thumbNail": {
+              "id": 7472,
+              "url": "https://i.ytimg.com/vi/PU8M128s4vU/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            "image": {
+              "id": 7473,
+              "url": "https://i.ytimg.com/vi/PU8M128s4vU/hqdefault.jpg",
+              "width": 480,
+              "height": 360
+            }
+          },
+          "dateAdded": "2022-11-06T10:36:40.708534Z",
+          "order": 1667731000708,
+          "playlistId": 78
+        }
+      ],
+      "currentIndex": 1,
+      "image": {
+        "url": "gs://cuer-275020.appspot.com/playlist_header/art-school-of-athens-1143741_640.jpg"
+      }
+    }
+  ],
+  "medias": [
+  ]
+}
