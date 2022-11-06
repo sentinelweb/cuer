@@ -41,7 +41,7 @@ class PixabayRetrofitInteractorApiTest {
 
     @Before
     fun setUp() {
-        service = RetrofitBuilder(config).let { it.buildPixabayService(it.buildPixabayClient()) }
+        service = RetrofitBuilder(config, SystemLogWrapper()).let { it.buildPixabayService(it.buildPixabayClient()) }
 
         sut = PixabayRetrofitInteractor(
             keyProvider = keyProvider,
