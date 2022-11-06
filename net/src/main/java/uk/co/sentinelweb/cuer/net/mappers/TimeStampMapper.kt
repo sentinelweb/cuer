@@ -25,6 +25,13 @@ class TimeStampMapper constructor(
         null
     }
 
+    fun mapTimestampInstant(dateString: String): Instant? = try {
+        Instant.parse(dateString)
+    } catch (e: Exception) {
+        log.e("mapTimestamp could not parse : $dateString", e)
+        null
+    }
+
     fun mapTimestamp(date: LocalDateTime) = timeStampFormatter.format(date)
 
     fun mapTimestamp(date: Instant) = timeStampFormatter.format(date)

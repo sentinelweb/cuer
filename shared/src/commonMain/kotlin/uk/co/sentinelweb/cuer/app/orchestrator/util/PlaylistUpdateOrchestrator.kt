@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
+import uk.co.sentinelweb.cuer.domain.ext.orderIsAscending
 
 class PlaylistUpdateOrchestrator constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
@@ -43,6 +44,7 @@ class PlaylistUpdateOrchestrator constructor(
                             ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }
                             ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
                     }
+
                     else -> Unit
                 }
             }
@@ -50,9 +52,14 @@ class PlaylistUpdateOrchestrator constructor(
 
     private suspend fun removeExistingItems(platform: PlaylistDomain, existing: PlaylistDomain): PlaylistDomain {
         val platformPlaylistExistingMediaPlatformIds =
-            mediaOrchestrator.loadList(PlatformIdListFilter(platform.items.map { it.media.platformId }), LOCAL.flatOptions())
+            mediaOrchestrator.loadList(
+                PlatformIdListFilter(platform.items.map { it.media.platformId }),
+                LOCAL.flatOptions()
+            )
                 .map { it.platformId }
+        val minOrder = if (existing.items.size > 0) existing.items.minOf { it.order } else 0
         val maxOrder = if (existing.items.size > 0) existing.items.maxOf { it.order } else 0
+        val orderIsAscending = existing.orderIsAscending()
         val newItems =
             platform.items.toMutableList()
                 .apply { removeAll { platformPlaylistExistingMediaPlatformIds.contains(it.media.platformId) } }
@@ -61,7 +68,7 @@ class PlaylistUpdateOrchestrator constructor(
                 id = null,
                 playlistId = existing.id,
                 dateAdded = timeProvider.instant(),
-                order = maxOrder + i * 1000
+                order = if (orderIsAscending) (maxOrder + (i + 1) * 1000) else (minOrder - (i + 1) * 1000)
             )
         })
     }

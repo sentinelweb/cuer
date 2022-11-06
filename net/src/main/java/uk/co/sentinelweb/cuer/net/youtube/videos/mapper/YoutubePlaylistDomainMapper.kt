@@ -1,10 +1,12 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 
+import kotlinx.datetime.toKotlinInstant
 import kotlinx.datetime.toKotlinLocalDateTime
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.exception.BadDataException
+import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubePlaylistDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubePlaylistItemDto
@@ -14,8 +16,13 @@ internal class YoutubePlaylistDomainMapper(
     private val timeStampMapper: TimeStampMapper,
     private val itemCreator: PlaylistItemCreator,
     private val imageMapper: YoutubeImageMapper,
-    private val channelMapper: YoutubeChannelDomainMapper
+    private val channelMapper: YoutubeChannelDomainMapper,
+    private val log: LogWrapper,
 ) {
+    init {
+        log.tag(this)
+    }
+
     fun map(
         dto: YoutubePlaylistDto,
         items: List<YoutubePlaylistItemDto.PlaylistItemDto>,
@@ -51,7 +58,13 @@ internal class YoutubePlaylistDomainMapper(
     ): List<PlaylistItemDomain> = items
         .filter { videoLookup.keys.contains<String>(it.snippet.resourceId.videoId) } // some videos are deleted
         .map {
-            itemCreator.buildPlayListItem(mapMedia(it, videoLookup, channelLookup), null, order = it.snippet.position * 1000L)
+            itemCreator.buildPlayListItem(
+                media = mapMedia(it, videoLookup, channelLookup),
+                playlist = null,
+                order = it.snippet.position * 1000L,
+                dateAdded = it.snippet.publishedAt
+                    .let { ts -> timeStampMapper.mapTimestampInstant(ts)?.toKotlinInstant()!! }
+            )
         }
 
     private fun mapMedia(
@@ -59,6 +72,10 @@ internal class YoutubePlaylistDomainMapper(
         videoLookup: Map<String, YoutubeVideosDto.VideoDto>,
         channelLookup: Map<String, ChannelDomain>
     ) = item.snippet.let {
+        val videoDto = videoLookup[it.resourceId.videoId] ?: throw BadDataException("No video for playlist item")
+
+        val channelDomain = (it.videoOwnerChannelId.let { channelLookup[it] }
+            ?: throw BadDataException("Channel not found: ownerId:${it.videoOwnerChannelId} videoId:${it.resourceId.videoId}"))
         MediaDomain(
             id = null,
             url = "https://youtu.be/${it.resourceId.videoId}",
@@ -67,21 +84,22 @@ internal class YoutubePlaylistDomainMapper(
             mediaType = MediaDomain.MediaTypeDomain.VIDEO,
             platform = PlatformDomain.YOUTUBE,
             platformId = it.resourceId.videoId,
-            duration = videoLookup[it.resourceId.videoId]?.contentDetails?.duration
+            duration = videoDto.contentDetails?.duration
                 ?.let { dur -> timeStampMapper.mapDuration(dur) }
                 ?: -1,
             thumbNail = imageMapper.mapThumb(it.thumbnails),
             image = imageMapper.mapImage(it.thumbnails),
-            channelData = it.videoOwnerChannelId?.let { channelLookup[it] }
-                ?: throw BadDataException("Channel not found: ownerId:${it.videoOwnerChannelId} videoId:${it.resourceId.videoId}"),
-            published = it.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts)?.toKotlinLocalDateTime() },
-            isLiveBroadcast = videoLookup[it.resourceId.videoId]
-                ?.snippet?.liveBroadcastContent
-                ?.let { it == YoutubeVideosDto.LIVE || it == YoutubeVideosDto.UPCOMING }
+            channelData = channelDomain,
+            published = videoDto.snippet.publishedAt.let { ts ->
+                timeStampMapper.mapTimestamp(ts)?.toKotlinLocalDateTime()
+            },
+            isLiveBroadcast = videoDto
+                .snippet.liveBroadcastContent
+                .let { it == YoutubeVideosDto.LIVE || it == YoutubeVideosDto.UPCOMING }
                 ?: false,
-            isLiveBroadcastUpcoming = videoLookup[it.resourceId.videoId]
-                ?.snippet?.liveBroadcastContent
-                ?.let { it == YoutubeVideosDto.UPCOMING }
+            isLiveBroadcastUpcoming = videoDto
+                .snippet.liveBroadcastContent
+                .let { it == YoutubeVideosDto.UPCOMING }
                 ?: false
         )
     }

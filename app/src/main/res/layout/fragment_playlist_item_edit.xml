@@ -92,6 +92,7 @@
                         android:id="@+id/plie_item_info"
                         style="@style/Header.InfoText"
                         tools:text="1:00:00"/>
+
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -2,12 +2,12 @@ package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinLocalDateTime
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.exception.BadDataException
+import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeSearchDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeSearchDto.Companion.EVENT_TYPE_MAP
@@ -74,17 +74,23 @@ internal class YoutubeSearchMapper(
     ): List<PlaylistItemDomain> = items
         .filter { it.id.kind == VIDEO.kind }
         .mapIndexed { i, item ->
-            itemCreator.buildPlayListItem(mapMedia(item, channelLookup), null, order = i * 1000L)
+            itemCreator.buildPlayListItem(
+                media = mapMedia(item, channelLookup),
+                playlist = null,
+                order = i * 1000L,
+                dateAdded = timeProvider.instant()
+            )
         }
 
     private fun mapMedia(
         item: YoutubeSearchDto.SearchResultDto,
         channelLookup: Map<String, ChannelDomain>
     ) = item.let {
+        val channelData = it.snippet?.let { channelLookup[it.channelId] } ?: throw BadDataException("Channel not found")
         MediaDomain(
             id = null,
             url = it.id.videoId?.let { "https://youtu.be/$it" } ?: throw BadDataException("No video ID"),
-            title = it.snippet?.title ?: throw Exception("Snippet is null - should be fitlered out"),
+            title = it.snippet.title ?: throw Exception("Snippet is null - should be fitlered out"),
             description = it.snippet.description,
             mediaType = MediaDomain.MediaTypeDomain.VIDEO,
             platform = PlatformDomain.YOUTUBE,
@@ -92,7 +98,7 @@ internal class YoutubeSearchMapper(
             duration = null,
             thumbNail = imageMapper.mapThumb(it.snippet.thumbnails),
             image = imageMapper.mapImage(it.snippet.thumbnails),
-            channelData = channelLookup[it.snippet.channelId] ?: throw BadDataException("Channel not found"),
+            channelData = channelData,
             published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts)?.toKotlinLocalDateTime() },
             isLiveBroadcast = !(listOf(COMPLETED, NONE).contains(EVENT_TYPE_MAP[it.snippet.liveBroadcastContent])),
             isLiveBroadcastUpcoming = (EVENT_TYPE_MAP[it.snippet.liveBroadcastContent] == UPCOMING)
