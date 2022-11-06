@@ -194,6 +194,9 @@ fun PlaylistDomain.orderIsAscending() =
     items.foldIndexed(true) { index, acc, thisItem ->
         if (index > 0) {
             val lastItem = items.get(index - 1)
-            acc && thisItem.media.published?.let { t -> lastItem.media.published?.let { l -> t.compareTo(l) } == 1 } ?: false
+            val lastIsBefore = thisItem.media.published
+                ?.let { t -> lastItem.media.published?.let { l -> t.compareTo(l) } == 1 }
+                ?: false
+            acc && lastIsBefore
         } else acc
     }

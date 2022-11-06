@@ -90,7 +90,7 @@ internal class YoutubeSearchMapper(
         MediaDomain(
             id = null,
             url = it.id.videoId?.let { "https://youtu.be/$it" } ?: throw BadDataException("No video ID"),
-            title = it.snippet.title ?: throw Exception("Snippet is null - should be fitlered out"),
+            title = it.snippet.title,
             description = it.snippet.description,
             mediaType = MediaDomain.MediaTypeDomain.VIDEO,
             platform = PlatformDomain.YOUTUBE,

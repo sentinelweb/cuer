@@ -40,11 +40,14 @@ internal class YoutubePlaylistDomainMapper(
                 platformId = it.id,
                 thumb = imageMapper.mapThumb(it.snippet.thumbnails),
                 image = imageMapper.mapImage(it.snippet.thumbnails),
-                channelData = channelLookup[it.snippet.channelId] ?: throw IllegalStateException("Channel data not found"),
+                channelData = channelLookup[it.snippet.channelId]
+                    ?: throw IllegalStateException("Channel data not found"),
                 config = PlaylistDomain.PlaylistConfigDomain(
                     platformUrl = "https://youtube.com/playlist?list=${it.id}",
                     description = it.snippet.description,
-                    published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts)?.toKotlinLocalDateTime() }
+                    published = it.snippet.publishedAt.let { ts ->
+                        timeStampMapper.mapTimestamp(ts)?.toKotlinLocalDateTime()
+                    }
                 ),
                 items = mapItems(items, videoLookup, channelLookup)
             )
@@ -72,10 +75,14 @@ internal class YoutubePlaylistDomainMapper(
         videoLookup: Map<String, YoutubeVideosDto.VideoDto>,
         channelLookup: Map<String, ChannelDomain>
     ) = item.snippet.let {
-        val videoDto = videoLookup[it.resourceId.videoId] ?: throw BadDataException("No video for playlist item")
+        val videoDto = videoLookup[it.resourceId.videoId]
+            ?: throw BadDataException("No video for playlist item: ${it.resourceId.videoId}")
 
-        val channelDomain = (it.videoOwnerChannelId.let { channelLookup[it] }
-            ?: throw BadDataException("Channel not found: ownerId:${it.videoOwnerChannelId} videoId:${it.resourceId.videoId}"))
+        val channelDomain = it.videoOwnerChannelId
+            .let { channelLookup[it] }
+            ?: throw BadDataException(
+                "Channel not found: ownerId:${it.videoOwnerChannelId} videoId:${it.resourceId.videoId}"
+            )
         MediaDomain(
             id = null,
             url = "https://youtu.be/${it.resourceId.videoId}",
@@ -95,12 +102,10 @@ internal class YoutubePlaylistDomainMapper(
             },
             isLiveBroadcast = videoDto
                 .snippet.liveBroadcastContent
-                .let { it == YoutubeVideosDto.LIVE || it == YoutubeVideosDto.UPCOMING }
-                ?: false,
+                .let { it == YoutubeVideosDto.LIVE || it == YoutubeVideosDto.UPCOMING },
             isLiveBroadcastUpcoming = videoDto
                 .snippet.liveBroadcastContent
                 .let { it == YoutubeVideosDto.UPCOMING }
-                ?: false
         )
     }
 
