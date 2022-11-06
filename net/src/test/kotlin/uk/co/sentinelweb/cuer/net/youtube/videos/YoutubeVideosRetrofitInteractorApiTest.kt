@@ -63,7 +63,8 @@ class YoutubeVideosRetrofitInteractorApiTest {
                 TimeStampMapper(log),
                 PlaylistItemCreator(TimeProvider()),
                 imageMapper,
-                channelMapper
+                channelMapper,
+                SystemLogWrapper()
             ),
             searchMapper = YoutubeSearchMapper(
                 timeStampMapper = TimeStampMapper(log),
