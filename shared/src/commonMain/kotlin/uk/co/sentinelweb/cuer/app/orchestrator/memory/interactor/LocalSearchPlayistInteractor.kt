@@ -5,16 +5,14 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
-import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
 
 class LocalSearchPlayistInteractor constructor(
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val log: LogWrapper
 ) : AppPlaylistInteractor {
 
@@ -25,10 +23,7 @@ class LocalSearchPlayistInteractor constructor(
     override val hasCustomDeleteAction = false
     override val customResources = null
 
-    fun search(): SearchLocalDomain? =
-        prefsWrapper
-            .getString(GeneralPreferences.LAST_LOCAL_SEARCH, null)
-            ?.let { deserialiseSearchLocal(it) }
+    fun search(): SearchLocalDomain? = prefsWrapper.lastLocalSearch
 
     override suspend fun getPlaylist(): PlaylistDomain? =
         try {

@@ -9,14 +9,19 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayService
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import java.util.concurrent.TimeUnit
 
 internal class RetrofitBuilder constructor(
-    private val config: NetModuleConfig
+    private val config: NetModuleConfig,
+    private val log: LogWrapper,
 ) {
+    init {
+        log.tag(this)
+    }
 
     internal fun buildYoutubeClient() = Retrofit.Builder()
         .baseUrl(YOUTUBE_BASE)
@@ -34,10 +39,10 @@ internal class RetrofitBuilder constructor(
         if (config.debug) {
             builder.addInterceptor(HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
                 override fun log(message: String) {
-                    println(message)
+                    log.d(message)
                 }
             }))
-                .addInterceptor(PRINT_URL_INTERCEPTOR)
+                .addInterceptor(printUrlInterceptor)
         }
         builder.readTimeout(config.timeoutMs, TimeUnit.MILLISECONDS)
         builder.connectTimeout(config.timeoutMs, TimeUnit.MILLISECONDS)
@@ -58,18 +63,17 @@ internal class RetrofitBuilder constructor(
     internal fun buildPixabayService(retrofit: Retrofit): PixabayService =
         retrofit.create(PixabayService::class.java)
 
+    val printUrlInterceptor = object : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            log.d(chain.request().url.toString())
+            return chain.proceed(chain.request())
+        }
+    }
+
     internal companion object {
         private const val YOUTUBE_BASE = "https://www.googleapis.com/youtube/v3/"
         private const val PIXABAY_BASE = "https://pixabay.com/api/"
         private val CONTENT_TYPE = "application/json".toMediaType()
-
-        val PRINT_URL_INTERCEPTOR = object : Interceptor {
-            override fun intercept(chain: Interceptor.Chain): Response {
-                println(chain.request().url)
-                return chain.proceed(chain.request())
-            }
-        }
-
     }
 
 }

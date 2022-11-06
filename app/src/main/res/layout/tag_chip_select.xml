@@ -8,5 +8,7 @@
     android:layout_marginHorizontal="4dp"
     android:text="@string/chip_select"
     app:chipIcon="@drawable/ic_chip_tag_black"
-    app:chipIconSize="18dp"
-    />
+    app:chipIconSize="24dp"
+    app:chipStrokeColor="?colorOnSurface"
+    app:chipStrokeWidth="1dp"
+/>

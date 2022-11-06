@@ -49,7 +49,7 @@ object SharedAppModule {
         factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get(), get(), get()) }
         factory<PlaylistUpdateOrchestrator.UpdateCheck> { PlaylistUpdateOrchestrator.PlatformUpdateCheck() }
         factory { PlaylistMergeOrchestrator(get(), get()) }
-        factory { PlaylistMediaLookupOrchestrator(get(), get()) }
+        factory { PlaylistMediaLookupOrchestrator(get(), get(), get()) }
         single { NewMediaPlayistInteractor(get(), get(), get(), get(named(NewItems))) }
         single { RecentItemsPlayistInteractor(get(), get()) }
         single { StarredItemsPlayistInteractor(get(), get(), get(), get(named(Starred))) }
@@ -85,7 +85,7 @@ object SharedAppModule {
         single { get<PlaylistMemoryRepository>().mediaMemoryRepository }
         single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperImpl() }
         factory { BrowseRecentCategories(get(), get()) }
-        factory { RecentLocalPlaylists(get(), get(), get(), get()) }
+        factory { RecentLocalPlaylists(get(), get()) }
         factory { PlatformFileOperation() }
         factory { LinkExtractor() }
         factory { TimecodeExtractor() }

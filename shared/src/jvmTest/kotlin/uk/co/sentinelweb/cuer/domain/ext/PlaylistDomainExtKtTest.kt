@@ -1,8 +1,11 @@
 package uk.co.sentinelweb.cuer.domain.ext
 
+import kotlinx.datetime.*
 import org.junit.Assert.*
 import org.junit.Test
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlaylistDomainExtKtTest {
     private val nodes = listOf(
@@ -38,13 +41,57 @@ class PlaylistDomainExtKtTest {
 
     @Test
     fun isAncestor() {
-        assertTrue( treeLookup[2]!!.isAncestor(treeLookup[4]!!))
-        assertTrue( tree.isAncestor(treeLookup[2]!!))
+        assertTrue(treeLookup[2]!!.isAncestor(treeLookup[4]!!))
+        assertTrue(tree.isAncestor(treeLookup[2]!!))
     }
 
     @Test
     fun isDescendent() {
-        assertTrue( treeLookup[4]!!.isDescendent(treeLookup[2]!!))
-        assertFalse( tree.isDescendent(treeLookup[2]!!))
+        assertTrue(treeLookup[4]!!.isDescendent(treeLookup[2]!!))
+        assertFalse(tree.isDescendent(treeLookup[2]!!))
+    }
+
+    @Test
+    fun orderIsAscending() {
+        val now = Clock.System.now()
+        val test = PlaylistDomain
+            .createYoutube("plUrl1", "plPlat1")
+            .copy(
+                items = (0..5).map {
+                    PlaylistItemDomain(
+                        media = MediaDomain.createYoutube("url$it", "plat$it")
+                            .copy(
+                                published = now.plus(it, DateTimeUnit.SECOND)
+                                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                            ),
+                        dateAdded = now,
+                        order = it.toLong()
+                    )
+                }
+            )
+
+        assertTrue(test.orderIsAscending())
+    }
+
+    @Test
+    fun orderIsAscending_false() {
+        val now = Clock.System.now()
+        val test = PlaylistDomain
+            .createYoutube("plUrl1", "plPlat1")
+            .copy(
+                items = (0..5).map {
+                    PlaylistItemDomain(
+                        media = MediaDomain.createYoutube("url$it", "plat$it")
+                            .copy(
+                                published = now.minus(it, DateTimeUnit.SECOND)
+                                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                            ),
+                        dateAdded = now,
+                        order = it.toLong()
+                    )
+                }
+            )
+
+        assertFalse(test.orderIsAscending())
     }
 }

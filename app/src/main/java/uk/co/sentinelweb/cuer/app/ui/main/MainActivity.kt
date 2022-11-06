@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.navOptions
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -39,11 +40,11 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_BOTTOM_TAB
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class MainActivity :
@@ -60,12 +61,13 @@ class MainActivity :
     private val presenter: MainContract.Presenter by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val snackBarWrapper: SnackbarWrapper by inject()
+    private val toastWrapper: ToastWrapper by inject()
     private val log: LogWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val res: ResourceWrapper by inject()
-    private val prefs: GeneralPreferencesWrapper by inject()
+    private val prefs: MultiPlatformPreferencesWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
 
     private lateinit var navController: NavController
@@ -102,23 +104,11 @@ class MainActivity :
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-        binding.bottomNavView.setupWithNavController(navController)
-        binding.bottomNavView.setOnNavigationItemSelectedListener {
-            prefs.putInt(
-                LAST_BOTTOM_TAB, when (it.itemId) {
-                    R.id.navigation_browse -> BROWSE
-                    R.id.navigation_playlists -> PLAYLISTS
-                    R.id.navigation_playlist -> PLAYLIST
-                    else -> BROWSE
-                }.ordinal
-            )
-            if (navController.currentDestination?.id != it.itemId)
-                navController.navigate(it.itemId)
-            true
-        }
+
+        (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+            .also { navController = it.navController }
+
+        setupBottomNav()
 
         edgeToEdgeWrapper.doOnApplyWindowInsets(binding.bottomNavView) { view, insets, padding ->
             view.updatePadding(
@@ -127,40 +117,23 @@ class MainActivity :
         }
         navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, bundle: Bundle? ->
             log.d("navigation change: dest: $navDestination bundle:$bundle")
-            //Exception().printStackTrace()
         }
 
         volumeControl.controlView = binding.castPlayerVolume
 
-        prefs.getInt(LAST_BOTTOM_TAB, 0)
-            .takeIf { it > 0 }
-            ?.also {
-                when (MainContract.LastTab.values()[it]) {
-                    PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
-                        navController.navigate(R.id.navigation_playlists)
-                    }
-
-                    PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
-                        navController.navigate(R.id.navigation_playlist)
-                    }
-
-                    else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
-                        navController.navigate(R.id.navigation_browse)
-                    }
-                }
-            }
+        restoreBottomNavTab(savedInstanceState != null)
         presenter.initialise()
     }
 
     override fun promptToBackup(result: AutoBackupFileExporter.BackupResult) {
         when (result) {
-            SUCCESS -> snackBarWrapper.make(getString(R.string.backup_success_message)).show()
+            SUCCESS -> toastWrapper.show(getString(R.string.backup_success_message))
             SETUP -> snackBarWrapper.make(
                 msg = getString(R.string.backup_setup_message),
                 actionText = getString(R.string.backup_setup_action)
             ) {
                 navController.navigate(
-                    R.id.navigation_settings_backup, bundleOf(AUTO_BACKUP.name to true)
+                    R.id.navigation_settings_backup, bundleOf(DO_AUTO_BACKUP.name to true)
                 )
             }.show()
 
@@ -171,7 +144,6 @@ class MainActivity :
                 navController.navigate(R.id.navigation_settings_backup)
             }.show()
         }
-
     }
 
     override fun onDestroy() {
@@ -311,6 +283,64 @@ class MainActivity :
             transAnimation.start()
             isRaised = true
         }
+    }
+
+    private fun setupBottomNav() {
+        binding.bottomNavView.setupWithNavController(navController)
+        binding.bottomNavView.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.navigation_browse -> BROWSE
+                R.id.navigation_playlists -> PLAYLISTS
+                R.id.navigation_playlist -> PLAYLIST
+                else -> BROWSE
+            }.ordinal
+                .also { prefs.lastBottomTab = it }
+                .also { log.d("set LAST_BOTTOM_TAB: $it") }
+            if (navController.currentDestination?.id != it.itemId) {
+                navigateToBottomTab(it.itemId)
+            }
+            true
+        }
+    }
+
+    private fun restoreBottomNavTab(isConfigChange: Boolean) {
+        if (!isConfigChange) {
+            prefs.lastBottomTab
+                .also { log.d("get LAST_BOTTOM_TAB: $it") }
+                .takeIf { it > 0 }
+                ?.also {
+                    when (MainContract.LastTab.values()[it]) {
+                        PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
+                            R.id.navigation_playlists
+                        } else null
+
+                        PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
+                            R.id.navigation_playlist
+                        } else null
+
+                        else -> if (navController.currentDestination?.id != R.id.navigation_browse) {
+                            R.id.navigation_browse
+                        } else null
+                    }?.also { navId ->
+                        navigateToBottomTab(navId)
+                    }
+                }
+        }
+    }
+
+    private fun navigateToBottomTab(navId: Int) {
+        navController.clearBackStack(navId)
+        navController.navigate(
+            navId,
+            args = null,
+            navOptions = navOptions {
+                launchSingleTop = true
+                popUpTo(navId) {
+                    inclusive = true
+                }
+            },
+            navigatorExtras = null
+        )
     }
 
     companion object {

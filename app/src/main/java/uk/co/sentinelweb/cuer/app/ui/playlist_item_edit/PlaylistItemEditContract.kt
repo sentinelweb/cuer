@@ -88,7 +88,8 @@ interface PlaylistItemEditContract {
                         linkNavigator = get(),
                         recentLocalPlaylists = get(),
                         res = get(),
-                        coroutines = get()
+                        coroutines = get(),
+                        timeProvider = get()
                     )
                 }
                 scoped { State() }

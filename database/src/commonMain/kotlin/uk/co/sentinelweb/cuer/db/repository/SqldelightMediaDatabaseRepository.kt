@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.db.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
+import uk.co.sentinelweb.cuer.domain.ext.summarise
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.MediaUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
@@ -225,7 +226,8 @@ class SqldelightMediaDatabaseRepository(
         domains: List<MediaDomain>,
         flat: Boolean
     ) = domains
-        .map { saveInternal(it, flat) }
+        .map { log.i("save id: ${it.summarise()}"); saveInternal(it, flat) }
+        .map { log.i("saved id: $it"); it }
         .map { loadMediaInternal(it).data!! }
 
     private fun saveInternal(mediaDomain: MediaDomain, flat: Boolean): Long =

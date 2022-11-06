@@ -11,4 +11,6 @@
     app:chipIcon="@drawable/ic_chip_tag_black"
     app:chipIconSize="18dp"
     app:closeIconVisible="true"
-    />
+    app:chipStrokeColor="?colorOnSurface"
+    app:chipStrokeWidth="1dp"
+/>

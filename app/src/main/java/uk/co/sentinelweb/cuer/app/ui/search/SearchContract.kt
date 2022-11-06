@@ -12,11 +12,12 @@ import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
+import uk.co.sentinelweb.cuer.domain.SearchTypeDomain
 
 interface SearchContract {
 
     data class State(
-        var searchType: SearchType = SearchType.LOCAL,
+        var searchType: SearchTypeDomain = SearchTypeDomain.LOCAL,
         var local: SearchLocalDomain = SearchLocalDomain(),
         var remote: SearchRemoteDomain = SearchRemoteDomain()
     )
@@ -48,10 +49,6 @@ interface SearchContract {
         val toDate: String?,
         val order: SearchRemoteDomain.Order
     )
-
-    enum class SearchType {
-        LOCAL, REMOTE
-    }
 
     companion object {
         @JvmStatic

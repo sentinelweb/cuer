@@ -5,6 +5,8 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.toJavaInstant
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServiceManager
+import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
+import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
@@ -17,7 +19,9 @@ class PrefRootPresenter constructor(
     private val firebaseWrapper: FirebaseWrapper,
     private val log: LogWrapper,
     private val remoteServiceManger: RemoteServiceManager,
-    private val coroutines: CoroutineContextProvider
+    private val coroutines: CoroutineContextProvider,
+    private val emailUseCase: EmailUseCase,
+    private val shareUseCase: ShareUseCase,
 ) : PrefRootContract.Presenter {
 
     override fun sendDebugReports() {
@@ -49,5 +53,14 @@ class PrefRootPresenter constructor(
     override fun initialisePrefs() {
         view.setRemoteServiceRunning(remoteServiceManger.isRunning(), remoteServiceManger.get()?.address)
         view.setVersion("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+    }
+
+    override fun onFeedback() {
+
+        view.sendEmail(emailUseCase.makeFeedbackEmail())
+    }
+
+    override fun onShare() {
+        view.launchShare(shareUseCase.shareApp())
     }
 }

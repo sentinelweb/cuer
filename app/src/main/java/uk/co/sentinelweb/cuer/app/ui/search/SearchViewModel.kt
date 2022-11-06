@@ -20,40 +20,33 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
-import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.LOCAL
-import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
-import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
-import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
-import uk.co.sentinelweb.cuer.domain.ext.serialise
+import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.LOCAL
+import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.REMOTE
 import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 
 class SearchViewModel(
     private val state: SearchContract.State,
     private val mapper: SearchMapper,
     private val log: LogWrapper,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val timeStampMapper: TimeStampMapper,
     private val timeProvider: TimeProvider,
     private val res: ResourceWrapper
 ) : ViewModel() {
 
     init {
-        state.searchType = prefsWrapper.getEnum(LAST_SEARCH_TYPE, LOCAL)
-        state.local = prefsWrapper
-            .getString(LAST_LOCAL_SEARCH, null)
-            ?.let { deserialiseSearchLocal(it) }
+        state.searchType = prefsWrapper.lastSearchType ?: LOCAL
+        state.local = prefsWrapper.lastLocalSearch
             ?: SearchLocalDomain()
-        state.remote = prefsWrapper
-            .getString(LAST_REMOTE_SEARCH, null)
-            ?.let { deserialiseSearchRemote(it) }
+        state.remote = prefsWrapper.lastRemoteSearch
             ?: SearchRemoteDomain()
     }
 
@@ -153,12 +146,12 @@ class SearchViewModel(
     fun onSubmit() {
         when (state.searchType) {
             LOCAL -> {
-                prefsWrapper.putString(LAST_LOCAL_SEARCH, state.local.serialise())
-                prefsWrapper.putEnum(LAST_SEARCH_TYPE, LOCAL)
+                prefsWrapper.lastLocalSearch = state.local
+                prefsWrapper.lastSearchType = LOCAL
             }
             REMOTE -> {
-                prefsWrapper.putString(LAST_REMOTE_SEARCH, state.remote.serialise())
-                prefsWrapper.putEnum(LAST_SEARCH_TYPE, REMOTE)
+                prefsWrapper.lastRemoteSearch = state.remote
+                prefsWrapper.lastSearchType = REMOTE
             }
         }
 

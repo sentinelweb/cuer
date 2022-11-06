@@ -1,11 +1,22 @@
 package uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings
 
 import kotlinx.datetime.Instant
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
+import uk.co.sentinelweb.cuer.app.orchestrator.toPair
 import uk.co.sentinelweb.cuer.app.util.prefs.Field
 import uk.co.sentinelweb.cuer.app.util.prefs.PrefWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.Companion.PLAYER_AUTO_FLOAT_DEFAULT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.Companion.RESTART_AFTER_UNLOCK_DEFAULT
+import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
+import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
+import uk.co.sentinelweb.cuer.domain.SearchTypeDomain
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 enum class MultiPlatformPreferences constructor(
     override val fname: String,
@@ -19,6 +30,17 @@ enum class MultiPlatformPreferences constructor(
     RESTART_AFTER_UNLOCK("restartAfterUnlock"),
     BACKUP_LAST("lastBackup"),
     BACKUP_LAST_LOCATION("lastBackupLocation"),
+    CURRENT_PLAYING_PLAYLIST_ID("currentPlaylistId"),
+    CURRENT_PLAYING_PLAYLIST_SOURCE("currentPlaylistSource"),
+    LAST_PLAYLIST_VIEWED_ID("lastViewedPlaylistId"),
+    LAST_PLAYLIST_VIEWED_SOURCE("lastViewedPlaylistSource"),
+    LAST_PLAYLIST_ADDED_TO("lastPlaylistAddedTo"),
+    PINNED_PLAYLIST("pinnedPlaylist"),
+    LAST_LOCAL_SEARCH("lastLocalSearch"),
+    LAST_REMOTE_SEARCH("lastRemoteSearch"),
+    LAST_SEARCH_TYPE("lastSearchType"),
+    DB_INITIALISED("dbInitialised"),
+    LAST_BOTTOM_TAB("lastBottomNavTab"),
     ;
 
     companion object {
@@ -44,6 +66,10 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
             return true
         }
 
+    var dbInitialised: Boolean
+        get() = getBoolean(DB_INITIALISED, false)
+        set(value) = putBoolean(DB_INITIALISED, value)
+
     var lastBackupInstant: Instant?
         get() = getString(BACKUP_LAST, null)
             ?.let { Instant.parse(it) }
@@ -55,5 +81,78 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
             ?.let { putString(BACKUP_LAST_LOCATION, it) }
             ?: let { remove(BACKUP_LAST_LOCATION) }
 
+    var currentPlayingPlaylistId: OrchestratorContract.Identifier<Long>
+        get() = if (has(CURRENT_PLAYING_PLAYLIST_ID) && has(CURRENT_PLAYING_PLAYLIST_ID)) {
+            (getLong(CURRENT_PLAYING_PLAYLIST_ID)!!
+                    to Source.valueOf(getString(CURRENT_PLAYING_PLAYLIST_SOURCE, null)!!)
+                    ).toIdentifier()
+        } else NO_PLAYLIST.toPair().toIdentifier()
+        set(value) = value
+            .let {
+                putLong(CURRENT_PLAYING_PLAYLIST_ID, it.id)
+                putString(CURRENT_PLAYING_PLAYLIST_SOURCE, it.source.toString())
+            }
+
+    var lastViewedPlaylistId: OrchestratorContract.Identifier<Long>
+        get() = if (has(LAST_PLAYLIST_VIEWED_ID) && has(LAST_PLAYLIST_VIEWED_ID)) {
+            (getLong(LAST_PLAYLIST_VIEWED_ID)!!
+                    to Source.valueOf(getString(LAST_PLAYLIST_VIEWED_SOURCE, null)!!)
+                    ).toIdentifier()
+        } else NO_PLAYLIST.toPair().toIdentifier()
+        set(value) = value
+            .let {
+                putLong(LAST_PLAYLIST_VIEWED_ID, it.id)
+                putString(LAST_PLAYLIST_VIEWED_SOURCE, it.source.toString())
+            }
+//        get() = getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair()).toIdentifier()
+//        set(value) = value
+//            .let { putPair(LAST_PLAYLIST_VIEWED, it.toPair()) }
+
+    var lastAddedPlaylistId: Long?
+        get() = getLong(LAST_PLAYLIST_ADDED_TO)
+        set(value) = value
+            ?.let { putLong(LAST_PLAYLIST_ADDED_TO, it) }
+            ?: let { remove(LAST_PLAYLIST_ADDED_TO) }
+
+    var pinnedPlaylistId: Long?
+        get() = getLong(PINNED_PLAYLIST)
+        set(value) = value
+            ?.let { putLong(PINNED_PLAYLIST, it) }
+            ?: let { remove(PINNED_PLAYLIST) }
+
+    var lastLocalSearch: SearchLocalDomain?
+        get() = getString(LAST_LOCAL_SEARCH, null)
+            ?.let { deserialiseSearchLocal(it) }
+        set(value) = value
+            ?.let { putString(LAST_LOCAL_SEARCH, it.serialise()) }
+            ?: let { remove(LAST_LOCAL_SEARCH) }
+
+    val hasLocalSearch: Boolean get() = getString(LAST_LOCAL_SEARCH, null) != null
+    var lastRemoteSearch: SearchRemoteDomain?
+        get() = getString(LAST_REMOTE_SEARCH, null)
+            ?.let { deserialiseSearchRemote(it) }
+        set(value) = value
+            ?.let { putString(LAST_REMOTE_SEARCH, it.serialise()) }
+            ?: let { remove(LAST_REMOTE_SEARCH) }
+    val hasRemoteSearch: Boolean get() = getString(LAST_REMOTE_SEARCH, null) != null
+
+    var lastSearchType: SearchTypeDomain?
+        get() = getString(LAST_SEARCH_TYPE, null)
+            ?.let { SearchTypeDomain.valueOf(it) }
+        set(value) = value
+            ?.let { putString(LAST_SEARCH_TYPE, it.toString()) }
+            ?: let { remove(LAST_SEARCH_TYPE) }
+
+
+    var recentIds: String?
+        get() = getString(RECENT_PLAYLISTS, null)
+        set(value) = value
+            ?.let { putString(RECENT_PLAYLISTS, it) }
+            ?: let { remove(RECENT_PLAYLISTS) }
+
+    var lastBottomTab: Int
+        get() = getInt(LAST_BOTTOM_TAB) ?: 0
+        set(value) = value
+            .let { putInt(LAST_BOTTOM_TAB, it) }
 
 }

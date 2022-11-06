@@ -21,7 +21,6 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandActivity
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
-import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LinkDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -48,10 +47,8 @@ class NavigationRouter constructor(
                     ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
 
             LOCAL_PLAYER -> {
-                log.d("YoutubePortraitActivity.NavigationMapper")
                 (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
                     AytPortraitActivity.start(activity, it)
-                    log.d("YoutubePortraitActivity.start called")
                 } ?: throw IllegalArgumentException("$LOCAL_PLAYER: $PLAYLIST_ITEM param required")
             }
 
@@ -142,7 +139,10 @@ class NavigationRouter constructor(
                 ?.let { activity.startActivity(ShareActivity.urlIntent(activity, it)) }
                 ?: throw IllegalArgumentException("$SHARE: $LINK param required")
 
-            else -> toastWrapper.show("Cannot launch ${nav.target}")
+            else -> {
+                log.e("Cannot launch ${nav}")
+                toastWrapper.show("Cannot launch ${nav.target}")
+            }
         }
     }
 
@@ -189,6 +189,6 @@ fun Scope.navigationRouter(
         }
     } else null,
     urlLauncher = UrlLauncherWrapper(sourceActivity),
-    log = AndroidLogWrapper(),
+    log = get(),
     cryptoLauncher = AndroidCryptoLauncher(sourceActivity, get(), AlertDialogCreator(sourceActivity), get(), get())
 )

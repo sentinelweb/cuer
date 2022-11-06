@@ -9,8 +9,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYING_PLAYLIST
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -29,7 +28,7 @@ class QueueMediator constructor(
     private val playlistMutator: PlaylistMutator,
     private val mediaUpdate: PlaylistMediaUpdateOrchestrator,
     private val playlistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val log: LogWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists
 ) : QueueMediatorContract.Producer, QueueMediatorContract.Consumer {
@@ -54,9 +53,7 @@ class QueueMediator constructor(
 
     init {
         log.tag(this)
-        state.playlistIdentifier =
-            prefsWrapper.getPair(CURRENT_PLAYING_PLAYLIST, NO_PLAYLIST.toPair())
-                .toIdentifier()
+        state.playlistIdentifier = prefsWrapper.currentPlayingPlaylistId
         _currentItemFlow = MutableStateFlow(state.currentItem)
         coroutines.computationScope.launch {
             refreshQueue(state.playlistIdentifier)
@@ -280,7 +277,7 @@ class QueueMediator constructor(
             state.playlistIdentifier = playlistIdentifier
                 ?: throw IllegalStateException("No playlist ID")
             state.currentItem = playlistDomain.currentItemOrStart()
-            playlistIdentifier.apply { prefsWrapper.putPair(CURRENT_PLAYING_PLAYLIST, this.toPair()) }
+            playlistIdentifier.also { prefsWrapper.currentPlayingPlaylistId = it }
         } else {
             state.currentItem = playlistDomain.currentItem()
         }

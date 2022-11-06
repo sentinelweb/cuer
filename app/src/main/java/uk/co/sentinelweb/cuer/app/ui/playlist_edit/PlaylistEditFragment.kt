@@ -89,6 +89,9 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        savedInstanceState
+            ?.getString(STATE_KEY)
+            ?.apply { viewModel.restoreState(this) }
         setHasOptionsMenu(true)
         playlistIdArg?.apply {
             sharedElementEnterTransition =
@@ -341,7 +344,13 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         dialogFragment = null
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE_KEY, viewModel.serializeState())
+    }
+
     companion object {
+        private const val STATE_KEY = "playlist_edit_state"
         fun newInstance(): PlaylistEditFragment {
             return PlaylistEditFragment()
         }

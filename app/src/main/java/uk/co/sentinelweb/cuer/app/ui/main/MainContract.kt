@@ -18,6 +18,8 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
+import uk.co.sentinelweb.cuer.app.util.share.EmailWrapper
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
@@ -88,6 +90,9 @@ interface MainContract {
                 scoped { AlertDialogCreator(get<MainActivity>()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), true) }
                 scoped<ActionBarModifier> { get<MainActivity>() }
+                scoped { EmailWrapper(get<MainActivity>()) }
+                scoped { ShareWrapper(get<MainActivity>()) }
+
                 // ALL SHARE HACKS
                 scoped<DoneNavigation> { MainDoneNavigation(get<MainActivity>()) }
                 scoped<CommitHost> { EmptyCommitHost() }

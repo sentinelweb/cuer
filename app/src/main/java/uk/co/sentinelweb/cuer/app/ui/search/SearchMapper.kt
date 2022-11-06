@@ -4,10 +4,11 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Companion.PLAYLIST_SELECT_MODEL
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel.Type.PLAYLIST
-import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.LOCAL
-import uk.co.sentinelweb.cuer.app.ui.search.SearchContract.SearchType.REMOTE
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
+import uk.co.sentinelweb.cuer.domain.SearchTypeDomain
+import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.LOCAL
+import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.REMOTE
 
 class SearchMapper constructor(
     private val res: ResourceWrapper,
@@ -31,7 +32,7 @@ class SearchMapper constructor(
                     playlists = listOf(PLAYLIST_SELECT_MODEL.copy(text = "Playlists $playlistQuantity ..."))
                         .plus(state.local.playlists
                             .map { pl -> ChipModel(type = PLAYLIST, text = pl.title, value = pl.id?.toString()) }
-                            .sortedBy { it.text.toLowerCase() }
+                            .sortedBy { it.text.lowercase() }
                         )
                 )
             },
@@ -51,7 +52,7 @@ class SearchMapper constructor(
 
     fun searchTypeText(isLocal: Boolean) = searchTypeText(if (isLocal) LOCAL else REMOTE)
 
-    private fun searchTypeText(type: SearchContract.SearchType) = when (type) {
+    private fun searchTypeText(type: SearchTypeDomain) = when (type) {
         LOCAL -> res.getString(R.string.search_local)
         REMOTE -> res.getString(R.string.search_youtube)
     }

@@ -6,20 +6,29 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.Platf
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.ext.summarise
 
 /**
  * Checks for any existing media items in the playlist.
  */
 class PlaylistMediaLookupOrchestrator constructor(
     private val mediaOrchestrator: MediaOrchestrator,
-    private val playlistItemOrchestrator: PlaylistItemOrchestrator
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val log: LogWrapper
 ) {
-    suspend fun lookupMediaAndReplace(playlist: PlaylistDomain): PlaylistDomain {
-        val mediaLookup = buildMediaLookup(playlist)
+    init {
+        log.tag(this)
+    }
 
-        return playlist.copy(id = null,
+    suspend fun lookupMediaAndReplace(playlist: PlaylistDomain): PlaylistDomain {
+        log.i("lookupMediaAndReplace: playlist: ${playlist.summarise()}")
+        val mediaLookup = buildMediaLookup(playlist)
+        log.i("lookupMediaAndReplace: mediaLookup: $mediaLookup")
+        return playlist.copy(
+            id = null,
             items = playlist.items.map {
                 it.copy(
                     media = mediaLookup.get(it.media.platformId)
@@ -48,12 +57,16 @@ class PlaylistMediaLookupOrchestrator constructor(
             PlatformIdListFilter(playlist.items.map { it.media.platformId }),
             LOCAL.deepOptions(emit = false)
         ).let { existingMedia ->
+            // fixme this crashes where the playlist has duplicate media in the source
             val existingMediaPlatformIds = existingMedia.map { it.platformId }
+            log.d("buildMediaLookup: existingMediaPlatformIds: ${existingMedia.map { "${it.id} ${it.platformId}" }}")
             playlist.items
                 .map { it.media }
                 .toMutableList()
                 .apply { removeAll { existingMediaPlatformIds.contains(it.platformId) } }
                 .map { it.copy(id = null) }
+                .associateBy { it.platformId to it }
+                .values.toList()
                 .let { mediaOrchestrator.save(it, LOCAL.deepOptions(emit = false)) }
                 .toMutableList()
                 .apply { addAll(existingMedia) }

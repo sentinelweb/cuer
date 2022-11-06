@@ -15,9 +15,9 @@ See the app website here: https://cuer.app
 Using
 
 - Kotlin Multiplatform
-  - shared module: domain model and common app components
-  - remote module: web / react interface
-  - website module: kotlin JS module
+  - Shared module: domain model and common app components
+  - Remote module: web / react interface
+  - Website module: kotlin JS module
 - Material Design Libraries & Themes (Day/Night)
 - Jetpack Libraries
   - Room
@@ -55,11 +55,12 @@ Using
   - Coroutines test
 - Github Actions (Build / Test)
 
-## screenshots
+## Screenshots
 
 ### Browse
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/browse_20221031_200950.png" width="400">
+
 ### Playlist
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlist_20221031_200719.png" width="400">

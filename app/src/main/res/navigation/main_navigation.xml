@@ -181,7 +181,7 @@
         android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefBackupFragment"
         android:label="@string/prefs_root_backup_item_title">
         <argument
-            android:name="AUTO_BACKUP"
+            android:name="DO_AUTO_BACKUP"
             android:defaultValue="false"
             app:argType="boolean"
             app:nullable="false"

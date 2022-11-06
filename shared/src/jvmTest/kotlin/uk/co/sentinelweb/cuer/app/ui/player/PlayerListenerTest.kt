@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.core.providers.TestCoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.tools.rule.CoroutineTestRule
 
+//todo something wrong with test setup
 @ExperimentalCoroutinesApi
 class PlayerListenerTest {
     @get:Rule

@@ -3,10 +3,6 @@ package uk.co.sentinelweb.cuer.app.util.prefs
 enum class GeneralPreferences constructor(
     override val fname: String
 ) : Field {
-    DB_INITIALISED("dbInitialised"),
-    CURRENT_PLAYING_PLAYLIST("currentPlaylist"),
-    LAST_PLAYLIST_VIEWED("lastViewedPlaylist"),
-    LAST_PLAYLIST_ADDED_TO("lastPlaylistAddedTo"),
     SKIP_FWD_TIME("skipFwdTime"),
     SKIP_BACK_TIME("skipBackTime"),
     LIVE_DURATION("liveDuration"),
@@ -15,9 +11,5 @@ enum class GeneralPreferences constructor(
     LOCAL_DURATION("localDuration"),
     LOCAL_DURATION_TIME("localDurationTime"),
     LOCAL_DURATION_ID("localDurationId"),
-    LAST_LOCAL_SEARCH("lastLocalSearch"),
-    LAST_REMOTE_SEARCH("lastRemoteSearch"),
-    LAST_SEARCH_TYPE("lastSearchType"),
-    PINNED_PLAYLIST("pinnedPlaylist"),
-    LAST_BOTTOM_TAB("lastBottomNavTab"),
+    TEST_ID("testId"),
 }

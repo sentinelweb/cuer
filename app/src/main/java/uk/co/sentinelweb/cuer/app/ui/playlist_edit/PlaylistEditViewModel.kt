@@ -19,17 +19,13 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.PINNED_PLAYLIST
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.ext.buildLookup
-import uk.co.sentinelweb.cuer.domain.ext.buildTree
-import uk.co.sentinelweb.cuer.domain.ext.isAllWatched
-import uk.co.sentinelweb.cuer.domain.ext.isAncestor
+import uk.co.sentinelweb.cuer.domain.ext.*
 
 
 class PlaylistEditViewModel constructor(
@@ -38,7 +34,7 @@ class PlaylistEditViewModel constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
     private val log: LogWrapper,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val res: ResourceWrapper,
 ) : ViewModel() {
@@ -95,7 +91,7 @@ class PlaylistEditViewModel constructor(
     }
 
     private fun update() {
-        val pinned = prefsWrapper.getLong(PINNED_PLAYLIST, 0) == state.playlistEdit.id
+        val pinned = prefsWrapper.pinnedPlaylistId == state.playlistEdit.id
         _modelLiveData.value = mapper.mapModel(
             state = state,
             pinned = pinned,
@@ -174,11 +170,11 @@ class PlaylistEditViewModel constructor(
 
     fun onPinClick() {
         state.playlistEdit.id?.apply {
-            val pinnedId = prefsWrapper.getLong(PINNED_PLAYLIST, 0)
+            val pinnedId = prefsWrapper.pinnedPlaylistId
             if (pinnedId != state.playlistEdit.id) {
-                prefsWrapper.putLong(PINNED_PLAYLIST, this)
+                prefsWrapper.pinnedPlaylistId = this
             } else {
-                prefsWrapper.remove(PINNED_PLAYLIST)
+                prefsWrapper.pinnedPlaylistId = null
             }
             update()
         } ?: run {
@@ -213,21 +209,25 @@ class PlaylistEditViewModel constructor(
                     deletable = b
                 )
             )
+
             Flag.EDITABLE -> state.playlistEdit.copy(
                 config = state.playlistEdit.config.copy(
                     editable = b
                 )
             )
+
             Flag.PLAYABLE -> state.playlistEdit.copy(
                 config = state.playlistEdit.config.copy(
                     playable = b
                 )
             )
+
             Flag.DELETE_ITEMS -> state.playlistEdit.copy(
                 config = state.playlistEdit.config.copy(
                     deletableItems = b
                 )
             )
+
             Flag.EDIT_ITEMS -> state.playlistEdit.copy(
                 config = state.playlistEdit.config.copy(
                     editableItems = b
@@ -305,5 +305,25 @@ class PlaylistEditViewModel constructor(
 
     fun setIsDialog(b: Boolean) {
         state.isDialog = b
+    }
+
+    fun serializeState(): String =
+        domainJsonSerializer.encodeToString(PlaylistEditContract.State.serializer(), state)
+
+    fun restoreState(s: String) {
+        domainJsonSerializer.decodeFromString(PlaylistEditContract.State.serializer(), s)
+            .also { restored ->
+                state.apply {
+                    isCreate = restored.isCreate
+                    isAllWatched = restored.isAllWatched
+                    playlistParent = restored.playlistParent
+                    defaultInitial = restored.defaultInitial
+                    isLoaded = restored.isLoaded
+                    isDialog = restored.isDialog
+                    source = restored.source
+                    playlistEdit = restored.playlistEdit
+                }
+                update()
+            }
     }
 }

@@ -23,12 +23,12 @@ import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.Order.A_TO_Z
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.Order.CATEGORIES
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.*
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Event.OnCategoryClicked
+import uk.co.sentinelweb.cuer.app.ui.common.compose.Const.PREVIEW_LOG_WRAPPER
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerBrowseTheme
 import uk.co.sentinelweb.cuer.app.ui.common.compose.image.NetworkImage
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.Action
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerTopAppBarComposables
-import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import kotlin.math.max
 
 object BrowseComposables {
@@ -347,7 +347,7 @@ class TestStrings : BrowseContract.Strings {
 @Composable
 @ExperimentalAnimationApi
 private fun BrowsePreview() {
-    val browseModelMapper = BrowseModelMapper(TestStrings(), AndroidLogWrapper())
+    val browseModelMapper = BrowseModelMapper(TestStrings(), PREVIEW_LOG_WRAPPER)
     val view = object : BaseMviView<Model, Event>() {}
     BrowseComposables.BrowseView(
         browseModelMapper.map(BrowseTestData.previewState),

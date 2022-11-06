@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import summarise
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.*
@@ -35,19 +34,17 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.LAST_PLAYLIST_ADDED_TO
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
-import uk.co.sentinelweb.cuer.domain.ext.summarise
 
 
 class PlaylistItemEditViewModel constructor(
@@ -59,13 +56,14 @@ class PlaylistItemEditViewModel constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val shareWrapper: ShareWrapper,
     private val playUseCase: PlayUseCase,
     private val linkNavigator: LinkNavigator,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val res: ResourceWrapper,
     private val coroutines: CoroutineContextProvider,
+    private val timeProvider: TimeProvider,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -169,7 +167,7 @@ class PlaylistItemEditViewModel constructor(
                         ?.also { state.selectedPlaylists.add(it) }
                 }
 
-                prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
+                prefsWrapper.pinnedPlaylistId
                     ?.takeIf { state.selectedPlaylists.size == 0 }
                     ?.let { playlistOrchestrator.load(it, LOCAL.flatOptions()) }
                     ?.also { state.selectedPlaylists.add(it) }
@@ -306,7 +304,7 @@ class PlaylistItemEditViewModel constructor(
     }
 
     fun onUnPin() {
-        prefsWrapper.remove(GeneralPreferences.PINNED_PLAYLIST)
+        prefsWrapper.pinnedPlaylistId = null
     }
 
     fun onPlaylistCreated(domain: PlaylistDomain) {
@@ -356,7 +354,7 @@ class PlaylistItemEditViewModel constructor(
                 state.selectedPlaylists.remove(it)
                 state.deletedPlayLists.add(it)
             }
-        prefsWrapper.getLong(GeneralPreferences.PINNED_PLAYLIST)
+        prefsWrapper.pinnedPlaylistId
             ?.takeIf { it == plId }
             ?.apply {
                 _uiLiveData.value = UiEvent(UNPIN, null)
@@ -480,8 +478,6 @@ class PlaylistItemEditViewModel constructor(
                                 if (state.isOnSharePlaylist) {
                                     mediaOrchestrator.save(it, state.source.flatOptions())
                                 } else {
-                                    log.d("b4 mediaOrchestrator.save")
-
                                     mediaOrchestrator.save(it, saveSource.deepOptions())
                                         .also { log.d("after mediaOrchestrator.save") }
 
@@ -490,24 +486,23 @@ class PlaylistItemEditViewModel constructor(
                         }
                         ?.let { savedMedia ->
                             state.media = savedMedia
-                            log.d("editing item: ${state.editingPlaylistItem?.summarise()}")
                             val existingPlaylistItems = playlistItemOrchestrator
                                 .loadList(PlatformIdListFilter(listOf(savedMedia.platformId)), LOCAL.flatOptions())
                             selectedPlaylists
                                 .filter { playlist -> existingPlaylistItems.find { it.playlistId == playlist.id } == null }
                                 .mapNotNull { playlist ->
-                                    log.d("b4 playlistItemOrchestrator.save")
-                                    log.d("playlist: ${playlist.summarise()}")
-
-                                    val domain = itemCreator.buildPlayListItem(savedMedia, playlist)
-                                    log.d("playlist item: ${domain.summarise()}")
+                                    val domain = itemCreator.buildPlayListItem(
+                                        savedMedia,
+                                        playlist,
+                                        dateAdded = timeProvider.instant()
+                                    )
                                     playlistItemOrchestrator.save(
                                         domain,
                                         saveSource.flatOptions()
-                                    ).also { log.d("after playlistItemOrchestrator.save") }
+                                    )
                                         .takeIf { saveSource == LOCAL && isNew }
                                         ?.also {
-                                            prefsWrapper.putLong(LAST_PLAYLIST_ADDED_TO, it.playlistId!!)
+                                            prefsWrapper.lastAddedPlaylistId = it.playlistId!!
                                             recentLocalPlaylists.addRecentId(it.playlistId!!)
                                         }
                                 }

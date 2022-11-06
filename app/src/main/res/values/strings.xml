@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Cuer Dbg</string>
 
     <!-- nav -->
@@ -46,6 +46,7 @@
     <string name="menu_list">List</string>
     <string name="menu_card">Cards</string>
     <string name="menu_exit">Exit</string>
+    <string name="menu_unpin">Unpin</string>
 
     <!-- share activity -->
     <string name="share_button_add_return">Add Return</string>
@@ -162,7 +163,36 @@
         lock - autoplay after unlock
     </string>
     <string name="prefs_player_restart_after_unlock_title">Restart after unlock</string>
+    <string name="prefs_root_feedback_title">Feedback</string>
+    <!--    https://www.cognology.com.au/49-best-quotes-on-feedback/-->
+    <string name="prefs_root_feedback_summary_how">How are we doing?</string>
+    <string-array name="prefs_root_feedback_summary">
+        <item>“Criticism, like rain, should be gentle enough to nourish a man’s growth without destroying his roots.” –
+            Frank A. Clark
+        </item>
+        <item>“Feedback is the breakfast of champions.” – Ken Blanchard</item>
+        <item>“True intuitive expertise is learned from prolonged experience with good feedback on mistakes.” – Daniel
+            Kahneman
+        </item>
+        <item>“Examine what is said and not who speaks.” – African proverb</item>
+        <item>“Whatever words we utter should be chosen with care for people will hear them and be influenced by them
+            for good or ill.” – Buddha
+        </item>
+    </string-array>
+    <string name="prefs_root_share_title">Share us</string>
+    <string name="prefs_root_info_cat_title">App Info</string>
+    <string name="prefs_root_version_title">Version</string>
+    <string name="prefs_root_version_summary">Version will appear here</string>
 
+    <!--    https://www.shareable.net/coworking-is-awesome-lets-keep-it-that-way/-->
+    <string-array name="prefs_root_share_summary">
+        <item>“There is no joy in possession without sharing.” — Erasmus</item>
+        <item>“Share your knowledge. It is a way to achieve immortality.” — His Holiness the Dalai Lama</item>
+        <item>“There is no delight in owning anything unshared.” — Seneca</item>
+        <item>“The miracle is this: The more we share the more we have.” — Leonard Nimoy</item>
+        <item>“The only thing that will redeem mankind is cooperation.” — Bertrand Russell</item>
+        <item>“It is in the shelter of each other that the people live.” — Irish Proverb</item>
+    </string-array>
     <!-- playlist edit -->
     <string name="pe_default_display_title">Enter a title …</string>
     <string name="pe_error_title_blank">Add a title</string>
@@ -241,6 +271,33 @@
     <string name="backup_fix_message">There was a problem backing up</string>
     <string name="backup_fix_action">FIX</string>
 
+
+    <!-- feedback -->
+    <string name="email_title_choose">Choose email app …</string>
+    <string name="email_feedback_subject">Feedback on Cuer</string>
+    <string name="email_feedback_body">😎 What do you think needs improving?
+        \n
+        \n
+        \n ❤️ What do you like?
+        \n
+        \n
+        \n 👀 Is there content we are missing?
+        \n
+        \n
+        \n 🙏 Thankyou for your feedback
+    </string>
+
+    <!-- share -->
+    <string name="share_title_choose">Choose sharing app …</string>
+    <string name="share_subject">Share Cuer</string>
+    <string name="share_body" tools:ignore="Typos">
+        \n ︎☯️ Cuer is a philosophy playlist app for your favourite videos.
+        \n
+        \n🌎 https://cuer.app
+        \n🐤 https://twitter.com/cuerapp - @cuerapp
+        \n✉️ cuerapp@gmail.com
+    </string>
+
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -248,21 +305,18 @@
     <string name="media_route_menu_title">Cast on</string>
     <string name="default_playlist">Default</string>
     <string name="dash">-</string>
-    <string name="chip_select">Select &#8230;</string>
+    <string name="chip_select">Select playlist&#8230;</string>
     <string name="live">LIVE</string>
     <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
-    <string name="playlist_empty">No Items</string>
+    <string name="playlist_empty">No items in playlist</string>
     <string name="action_unpin">UNPIN</string>
     <string name="action_mark_watched">Mark watched</string>
     <string name="action_mark_complete">Mark complete</string>
-    <string name="prefs_root_info_cat_title">App Info</string>
-    <string name="prefs_root_version_title">Version</string>
-    <string name="prefs_root_version_summary">Version will appear here</string>
     <string name="close">Close</string>
     <string name="buffering">Buffering</string>
     <string name="stop">Stop</string>
-    <string name="menu_unpin">Unpin</string>
     <string name="edit_prefix">"Edit: "</string>
+    <string name="menu_update">Update</string>
 
 </resources>

@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
+import uk.co.sentinelweb.cuer.domain.ext.orderIsAscending
 
 class PlaylistUpdateOrchestrator constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
@@ -24,43 +25,59 @@ class PlaylistUpdateOrchestrator constructor(
         log.tag(this)
     }
 
+    data class UpdateResult(
+        val success: Boolean,
+        val numberItems: Int
+    )
+
+    private val updateFail = UpdateResult(false, -1)
+
     fun checkToUpdate(p: PlaylistDomain): Boolean = updateChecker.shouldUpdate(p)
 
-    suspend fun update(playlistDomain: PlaylistDomain) {
-        playlistDomain.takeIf { playlistDomain.type == PLATFORM }
+    suspend fun update(playlistDomain: PlaylistDomain): UpdateResult {
+        return playlistDomain.takeIf { playlistDomain.type == PLATFORM }
             ?.let {
-                if (it.platform == null)
+                if (it.platform == null) {
                     playlistOrchestrator.save(it.copy(platform = YOUTUBE), LOCAL.flatOptions())
-                else it
+                } else it
             }
             ?.let { p ->
                 when (p.platform) {
-                    YOUTUBE -> p.platformId?.apply {
+                    YOUTUBE -> p.platformId?.run {
                         playlistOrchestrator
                             .load(this, Source.PLATFORM.deepOptions())
                             ?.let { removeExistingItems(it, p) }
                             ?.takeIf { it.items.size > 0 }
                             ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }
                             ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
-                    }
-                    else -> Unit
+                            ?.let { UpdateResult(true, it.size) }
+                    } ?: updateFail
+
+                    else -> updateFail
                 }
             }
+            ?: updateFail
     }
 
     private suspend fun removeExistingItems(platform: PlaylistDomain, existing: PlaylistDomain): PlaylistDomain {
         val platformPlaylistExistingMediaPlatformIds =
-            mediaOrchestrator.loadList(PlatformIdListFilter(platform.items.map { it.media.platformId }), LOCAL.flatOptions())
+            mediaOrchestrator.loadList(
+                PlatformIdListFilter(platform.items.map { it.media.platformId }),
+                LOCAL.flatOptions()
+            )
                 .map { it.platformId }
-        val maxOrder = if (existing.items.size>0) existing.items.maxOf { it.order } else 0
+        val minOrder = if (existing.items.size > 0) existing.items.minOf { it.order } else 0
+        val maxOrder = if (existing.items.size > 0) existing.items.maxOf { it.order } else 0
+        val orderIsAscending = existing.orderIsAscending()
         val newItems =
-            platform.items.toMutableList().apply { removeAll { platformPlaylistExistingMediaPlatformIds.contains(it.media.platformId) } }
+            platform.items.toMutableList()
+                .apply { removeAll { platformPlaylistExistingMediaPlatformIds.contains(it.media.platformId) } }
         return existing.copy(items = newItems.mapIndexed { i, item ->
             item.copy(
                 id = null,
                 playlistId = existing.id,
                 dateAdded = timeProvider.instant(),
-                order = maxOrder + i * 1000
+                order = if (orderIsAscending) (maxOrder + (i + 1) * 1000) else (minOrder - (i + 1) * 1000)
             )
         })
     }

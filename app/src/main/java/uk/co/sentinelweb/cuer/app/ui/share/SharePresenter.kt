@@ -15,8 +15,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_FINISH
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -35,7 +34,7 @@ class SharePresenter constructor(
     private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
     private val log: LogWrapper,
     private val mapper: ShareModelMapper,
-    private val prefsWrapper: GeneralPreferencesWrapper,
+    private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val timeProvider: TimeProvider,
@@ -217,21 +216,21 @@ class SharePresenter constructor(
     ) {
         try {
             val isConnected = ytContextHolder.isConnected()
-            val currentPlaylistId = prefsWrapper.getLong(GeneralPreferences.CURRENT_PLAYING_PLAYLIST)
+            val currentPlaylistId = prefsWrapper.currentPlayingPlaylistId
             val playId: Pair<Long, Long?> = when (type) {
                 PLAYLIST -> (data as List<PlaylistDomain>).let {
                     (if (it.size > 0) {
                         it[0].id!!
-                    } else currentPlaylistId!!) to (null as Long?)
+                    } else currentPlaylistId.id) to (null as Long?)
                 }
 
                 PLAYLIST_ITEM -> (data as List<PlaylistItemDomain>)
                     .let { playlistItemList ->
                         val playlistItem: PlaylistItemDomain? =
-                            chooseItem(playlistItemList, currentPlaylistId)
+                            chooseItem(playlistItemList, currentPlaylistId.id)
                         playlistItem
                             ?.let { it.playlistId!! to it.id }
-                            ?: let { currentPlaylistId!! to (null as Long?) }
+                            ?: let { currentPlaylistId.id to (null as Long?) }
                     }
                 else -> throw java.lang.IllegalStateException("Unsupported type")
             }

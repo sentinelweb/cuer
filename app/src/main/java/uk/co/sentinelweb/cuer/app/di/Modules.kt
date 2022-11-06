@@ -7,7 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.BuildConfig
+import uk.co.sentinelweb.cuer.app.BuildConfig.*
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
@@ -56,6 +56,8 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
+import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
+import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.image.BitmapSizer
@@ -78,6 +80,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.db.di.AndroidDatabaseModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseModule
+import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
@@ -142,7 +145,13 @@ object Modules {
         single { ScreenStateReceiver() }
     }
 
+    private val usecaseModule = module {
+        single { EmailUseCase(get()) }
+        single { ShareUseCase(get()) }
+    }
+
     private val utilModule = module {
+        single { BuildConfigDomain(DEBUG, VERSION_CODE, VERSION_NAME) }
         factory<LinkScanner> { AndroidLinkScanner(log = get(), mappers = urlMediaMappers) }
         single { CuerAppState() }
 
@@ -200,7 +209,7 @@ object Modules {
         factory { ResourceWrapper(androidApplication()) }
         factory<LogWrapper> { CompositeLogWrapper(get(), get()) }
         factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication()) }
-        factory { AndroidLogWrapper() }
+        factory { AndroidLogWrapper(get()) }
         factory { ContentProviderFileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
         single<GeneralPreferencesWrapper> {
@@ -214,7 +223,7 @@ object Modules {
     private val appNetModule = module {
         factory<ApiKeyProvider>(named(YOUTUBE)) { CuerYoutubeApiKeyProvider() }
         factory<ApiKeyProvider>(named(PIXABAY)) { CuerPixabayApiKeyProvider() }
-        single { NetModuleConfig(debug = BuildConfig.DEBUG) }
+        single { NetModuleConfig(debug = DEBUG) }
     }
 
     val allModules = listOf(utilModule)
@@ -223,6 +232,7 @@ object Modules {
         .plus(scopedModules)
         .plus(appNetModule)
         .plus(receiverModule)
+        .plus(usecaseModule)
         .plus(DatabaseModule.modules)
         .plus(AppDatabaseModule.module)
         .plus(AndroidDatabaseModule.modules)

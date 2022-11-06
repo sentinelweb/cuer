@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_edit
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -43,16 +45,18 @@ interface PlaylistEditContract {
         var isDialog: Boolean
     )
 
+    @Serializable
     data class State constructor(
         var isCreate: Boolean = false,
+        @Transient
         var model: Model? = null,
         var isAllWatched: Boolean? = null,
         var playlistParent: PlaylistDomain? = null,
         var defaultInitial: Boolean = false,
+        @Transient
         var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf(),
         var isLoaded: Boolean = false,
-        var isDialog: Boolean = false,
-        var transitionFinished: Boolean = false
+        var isDialog: Boolean = false
     ) {
         fun isInitialized(): Boolean = this::playlistEdit.isInitialized
 

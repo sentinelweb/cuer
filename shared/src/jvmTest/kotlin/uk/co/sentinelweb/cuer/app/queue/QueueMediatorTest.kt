@@ -15,15 +15,16 @@ import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.CURRENT_PLAYING_PLAYLIST
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -50,7 +51,7 @@ class QueueMediatorTest {
     lateinit var mockPlaylistItemOrchestrator: PlaylistItemOrchestrator
 
     @MockK
-    lateinit var mockPrefsWrapper: GeneralPreferencesWrapper
+    lateinit var mockPrefsWrapper: MultiPlatformPreferencesWrapper
 
     @MockK
     lateinit var mediaUpdate: PlaylistMediaUpdateOrchestrator
@@ -116,8 +117,8 @@ class QueueMediatorTest {
         } returns (fixtCurrentPlaylist to fixtSource)
         every { mockPlaylistItemOrchestrator.updates } returns fixtPlaylistItemOrchestratorFlow
         every {
-            mockPrefsWrapper.getPair(CURRENT_PLAYING_PLAYLIST, NO_PLAYLIST.toPair())
-        } returns (fixtCurrentIdentifier.id to fixtCurrentIdentifier.source)
+            mockPrefsWrapper.currentPlayingPlaylistId
+        } returns (Identifier(fixtCurrentIdentifier.id, fixtCurrentIdentifier.source))
     }
 
     private fun createSut(state: QueueMediatorState = QueueMediatorState()) {
@@ -530,7 +531,7 @@ class QueueMediatorTest {
             assertThat(sut.currentItem).isEqualTo(expectedCurrentItem)
             assertThat(captureItemFlow.last()).isEqualTo(expectedCurrentItem)
             assertThat(capturePlaylistFlow.last()).isEqualTo(fixtSwitchPlaylist)
-            verify { mockPrefsWrapper.putPair(CURRENT_PLAYING_PLAYLIST, switchIdentifier.toPair()) }
+            verify { mockPrefsWrapper.currentPlayingPlaylistId = switchIdentifier }
             verify { mockRecentLocalPlaylists.addRecent(sut.playlist!!) }
         }
     }
