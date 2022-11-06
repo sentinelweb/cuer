@@ -635,7 +635,11 @@ class PlaylistPresenter(
             try {
                 state.playlist
                     ?.takeIf { playlistUpdateOrchestrator.checkToUpdate(it) }
-                    ?.also { playlistUpdateOrchestrator.update(it) }
+                    ?.let { playlistUpdateOrchestrator.update(it) }
+                    ?.also {
+                        if (it.success) view.showMessage("${it.numberItems} new items")
+                        else view.showError("Error updating ...")
+                    }
                     ?.also { view.hideRefresh() }
                     ?: executeRefresh()
             } catch (e: Exception) {

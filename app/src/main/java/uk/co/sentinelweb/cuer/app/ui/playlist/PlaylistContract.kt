@@ -106,6 +106,7 @@ interface PlaylistContract {
         fun hideRefresh()
         fun showRefresh()
         fun showError(message: String)
+        fun showMessage(message: String)
         fun updateItemModel(model: ItemContract.Model)
         fun navigate(nav: NavigationModel)
         fun newAdapter()
@@ -153,6 +154,7 @@ interface PlaylistContract {
         val isSaved: Boolean,
         val canPlay: Boolean,
         val canEdit: Boolean,
+        val canUpdate: Boolean,
         val items: List<ItemContract.Model>?,
         val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
         val hasChildren: Int,

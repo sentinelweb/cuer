@@ -60,6 +60,7 @@ import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -83,6 +84,7 @@ class PlaylistFragment :
 
     private val presenter: PlaylistContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
+    private val toastWrapper: ToastWrapper by inject()
     private val log: LogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
     private val imageProvider: ImageProvider by inject()
@@ -192,11 +194,12 @@ class PlaylistFragment :
             attachToRecyclerView(binding.playlistList)
         }
         binding.playlistToolbar.title = ""
-        binding.playlistFabUp.setOnClickListener { presenter.scroll(Up) }
-        binding.playlistFabUp.setOnLongClickListener { presenter.scroll(Top);true }
-        binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }
-        binding.playlistFabDown.setOnLongClickListener { presenter.scroll(Bottom);true }
-        binding.playlistFabRefresh.setOnClickListener { presenter.refreshPlaylist() }
+//        binding.playlistFabUp.setOnClickListener { presenter.scroll(Up) }
+//        binding.playlistFabUp.setOnLongClickListener { presenter.scroll(Top);true }
+//        binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }
+//        binding.playlistFabDown.setOnLongClickListener { presenter.scroll(Bottom);true }
+//        binding.playlistFabRefresh.setOnClickListener { presenter.refreshPlaylist() }
+        binding.playlistUpdateButton.setOnClickListener { presenter.refreshPlaylist() }
 
         binding.playlistAppbar.addOnOffsetChangedListener(appBarOffsetChangedistener)
         compactPlayerScroll.addScrollListener(binding.playlistList, this)
@@ -361,10 +364,10 @@ class PlaylistFragment :
     override fun setList(items: List<ItemContract.Model>, animate: Boolean) {
         binding.playlistSwipe.isRefreshing = false
         adapter.setData(items, animate)
-        val isListLarge = items.size > 30
-        binding.playlistFabUp.isVisible = isListLarge
-        binding.playlistFabDown.isVisible = isListLarge
-        binding.playlistFabRefresh.isVisible = isListLarge || items.size == 0
+//        val isListLarge = items.size > 30
+//        binding.playlistFabUp.isVisible = isListLarge
+//        binding.playlistFabDown.isVisible = isListLarge
+//        binding.playlistFabRefresh.isVisible = isListLarge || items.size == 0
         binding.playlistEmpty.isVisible = items.size == 0
         binding.playlistSwipe.isVisible = items.size > 0
     }
@@ -418,6 +421,7 @@ class PlaylistFragment :
         binding.playlistFlagChildren.text = model.hasChildren.toString()
         binding.playlistEditButton.isVisible = model.canEdit
         binding.playlistStarButton.isVisible = model.canEdit
+        binding.playlistUpdateButton.isVisible = model.canUpdate
         binding.playlistAppbar.layoutParams.height = res.getDimensionPixelSize(
             if (model.canEdit || model.canPlay) R.dimen.app_bar_header_height_playlist
             else R.dimen.app_bar_header_height_playlist_no_actions
@@ -568,6 +572,10 @@ class PlaylistFragment :
         if (isAdded) {
             snackbarWrapper.makeError(message).show()
         }
+    }
+
+    override fun showMessage(message: String) {
+        toastWrapper.show(message)
     }
 
     override fun exit() {
