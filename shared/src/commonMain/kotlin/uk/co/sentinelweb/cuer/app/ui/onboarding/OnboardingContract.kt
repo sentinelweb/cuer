@@ -8,7 +8,7 @@ class OnboardingContract {
         val screens: List<Screen>
     ) {
         data class Screen(
-            val title: String,
+            val title: ActionResources,
             val lines: List<ActionResources>,
         )
     }
