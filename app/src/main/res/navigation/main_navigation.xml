@@ -4,14 +4,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_navigation"
-    app:startDestination="@id/navigation_browse"
+    app:startDestination="@id/navigation_onboard"
 >
-    <!--    Theres is a bug with app:startDestination that caused the specified fragment to use two instances when navigating -->
+    <!-- There's is a bug with app:startDestination that caused the specified fragment to use two instances when navigating -->
 
     <fragment
         android:id="@+id/navigation_browse"
         android:name="uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment"
         android:label="@string/bottomnav_title_browse"
+    />
+
+    <fragment
+        android:id="@+id/navigation_onboard"
+        android:name="uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment"
+        android:label="@string/nav_title_onboard"
     />
 
     <fragment

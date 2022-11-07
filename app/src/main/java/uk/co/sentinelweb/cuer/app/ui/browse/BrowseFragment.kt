@@ -42,7 +42,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 
-class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
+class BrowseFragment : Fragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<BrowseFragment>()
     private val controller: BrowseController by inject()
@@ -56,7 +56,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     private var _binding: FragmentComposeBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
 
     init {
         log.tag(this)
