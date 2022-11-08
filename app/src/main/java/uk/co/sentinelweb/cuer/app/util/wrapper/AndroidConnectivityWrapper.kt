@@ -9,14 +9,11 @@ class AndroidConnectivityWrapper constructor(
     private val context: Context
 ) : ConnectivityWrapper {
 
+    private val cm: ConnectivityManager by lazy { context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
     override fun isConnected(): Boolean {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
         return activeNetwork?.isConnectedOrConnecting == true
     }
 
-    override fun isMetered(): Boolean {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return cm.isActiveNetworkMetered()
-    }
+    override fun isMetered(): Boolean = cm.isActiveNetworkMetered()
 }

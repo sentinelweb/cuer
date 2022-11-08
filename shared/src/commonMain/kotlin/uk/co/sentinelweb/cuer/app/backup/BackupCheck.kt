@@ -16,7 +16,7 @@ class BackupCheck(
 
     fun checkToBackup(): Boolean = prefs.lastBackupInstant
         ?.let { timeProvider.instant().minus(it).inWholeSeconds > BACKUP_INTERVAL_SECS }
-        ?.let { it && connectivityCheck.isConnected() }
+        ?.let { it && connectivityCheck.isConnected() && !connectivityCheck.isMetered() }
         ?: true
 
     fun setLastBackupNow() {
