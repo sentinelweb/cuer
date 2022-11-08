@@ -208,7 +208,6 @@ object Modules {
         factory { NotificationWrapper(androidApplication()) }
         factory { ResourceWrapper(androidApplication()) }
         factory<LogWrapper> { CompositeLogWrapper(get(), get()) }
-        factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication()) }
         factory { AndroidLogWrapper(get()) }
         factory { ContentProviderFileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
@@ -224,6 +223,7 @@ object Modules {
         factory<ApiKeyProvider>(named(YOUTUBE)) { CuerYoutubeApiKeyProvider() }
         factory<ApiKeyProvider>(named(PIXABAY)) { CuerPixabayApiKeyProvider() }
         single { NetModuleConfig(debug = DEBUG) }
+        factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication()) }
     }
 
     val allModules = listOf(utilModule)
