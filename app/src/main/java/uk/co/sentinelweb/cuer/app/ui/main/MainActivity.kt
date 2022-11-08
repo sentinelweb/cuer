@@ -296,9 +296,9 @@ class MainActivity :
             }.ordinal
                 .also { prefs.lastBottomTab = it }
                 .also { log.d("set LAST_BOTTOM_TAB: $it") }
-            if (navController.currentDestination?.id != it.itemId) {
-                navigateToBottomTab(it.itemId)
-            }
+//            if (navController.currentDestination?.id != it.itemId) {
+//                navigateToBottomTab(it.itemId)
+//            }
             true
         }
     }
@@ -322,7 +322,7 @@ class MainActivity :
                             R.id.navigation_browse
                         } else null
                     }?.also { navId ->
-                        navigateToBottomTab(navId)
+                        // navigateToBottomTab(navId)
                     }
                 }
         }
