@@ -1,9 +1,15 @@
 package uk.co.sentinelweb.cuer.app.ui.onboarding
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -58,26 +64,38 @@ object OnboardingComposables {
 
     @Composable
     private fun Line(line: ActionResources, modifier: Modifier) {
-        Row(
-            modifier = modifier
-                .padding(16.dp)
-        ) {
-            val color = line.color?.let { colorResource(it) } ?: MaterialTheme.colors.onSurface
-            line.icon?.also {
-                Icon(
-                    painter = painterResource(it),
-                    tint = color,
-                    contentDescription = stringResource(id = R.string.menu_search),
-                    modifier = Modifier.padding(end = 8.dp).size(24.dp)
-                )
+        val state = remember {
+            MutableTransitionState(false).apply {
+                // Start the animation immediately.
+                targetState = true
             }
-            line.label?.also {
-                Text(
-                    modifier = Modifier,
-                    style = MaterialTheme.typography.body1,
-                    color = color,
-                    text = it
-                )
+        }
+        AnimatedVisibility(
+            state,
+            enter = fadeIn(animationSpec = tween(durationMillis = 1000)),
+            exit = fadeOut(animationSpec = tween(durationMillis = 1000))
+        ) {
+            Row(
+                modifier = modifier
+                    .padding(16.dp)
+            ) {
+                val color = line.color?.let { colorResource(it) } ?: MaterialTheme.colors.onSurface
+                line.icon?.also {
+                    Icon(
+                        painter = painterResource(it),
+                        tint = color,
+                        contentDescription = stringResource(id = R.string.menu_search),
+                        modifier = Modifier.padding(end = 8.dp).size(24.dp)
+                    )
+                }
+                line.label?.also {
+                    Text(
+                        modifier = Modifier,
+                        style = MaterialTheme.typography.body1,
+                        color = color,
+                        text = it
+                    )
+                }
             }
         }
     }
