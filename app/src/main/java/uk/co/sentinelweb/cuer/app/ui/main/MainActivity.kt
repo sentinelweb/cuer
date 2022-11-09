@@ -34,6 +34,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract.LastTab.*
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
+import uk.co.sentinelweb.cuer.app.ui.onboarding.onboardingConfig
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
@@ -217,6 +219,12 @@ class MainActivity :
         //checkIntent(intent)
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        OnboardingFragment.show(this, onboardingConfig)
     }
 
     override fun onStop() {
@@ -296,9 +304,9 @@ class MainActivity :
             }.ordinal
                 .also { prefs.lastBottomTab = it }
                 .also { log.d("set LAST_BOTTOM_TAB: $it") }
-//            if (navController.currentDestination?.id != it.itemId) {
-//                navigateToBottomTab(it.itemId)
-//            }
+            if (navController.currentDestination?.id != it.itemId) {
+                navigateToBottomTab(it.itemId)
+            }
             true
         }
     }
@@ -322,7 +330,7 @@ class MainActivity :
                             R.id.navigation_browse
                         } else null
                     }?.also { navId ->
-                        // navigateToBottomTab(navId)
+                        navigateToBottomTab(navId)
                     }
                 }
         }

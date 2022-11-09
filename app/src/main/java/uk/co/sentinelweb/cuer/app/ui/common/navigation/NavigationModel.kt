@@ -6,6 +6,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.LinkDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -85,6 +86,7 @@ data class NavigationModel constructor(
         APP_LIST(List::class),
         ALLOW_PLAY(Boolean::class),
         DO_AUTO_BACKUP(Boolean::class),
+        ONBOARD_CONFIG(OnboardingContract.Config::class),
         ;
 
         fun getLong(b: Bundle?) = b?.getLong(name)

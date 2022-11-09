@@ -34,7 +34,7 @@ object OnboardingComposables {
     @Composable
     fun OnboardingView(
         model: OnboardingContract.Model,
-        view: OnboardingViewModel
+        interactions: OnboardingContract.Interactions
     ) {
         isTransitioning = false
         CuerTheme {
@@ -42,13 +42,13 @@ object OnboardingComposables {
                 val scope = rememberCoroutineScope()
                 Box(
                     modifier = Modifier
-                        .padding(top = 128.dp)
+                        .height(500.dp)
                 ) {
                     val states = mutableListOf<MutableTransitionState<Boolean>>()
                     Column(
                         modifier = Modifier
 //                            .align(Alignment.TopCenter)
-                            .padding(32.dp)
+                            .padding(horizontal = 32.dp, vertical = 16.dp)
                             .fillMaxWidth()
                     ) {
                         val layoutModifiers = Modifier.align(Alignment.CenterHorizontally)
@@ -62,57 +62,16 @@ object OnboardingComposables {
                         }
                     }
                     states.add(animatedText(Any(), states.size) {
-                        ButtonsRow(model) { transitionToNext(states, view, scope) }
+                        ButtonsRow(model, interactions) { transitionToNext(states, interactions, scope) }
                     })
                 }
             }
         }
     }
 
-    @Composable
-    private fun ButtonsRow(
-        model: OnboardingContract.Model,
-        modifier: Modifier = Modifier, // , Modifier.align(Alignment.BottomCenter) // doesnt work
-        onClick: () -> Unit
-    ) {
-        Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(16.dp)
-        ) {
-            Button(
-                modifier = Modifier
-                    .padding(bottom = 168.dp, end = 32.dp) // todo position when finished
-                    .align(Alignment.BottomEnd),
-                border = cuerOutlineButtonStroke(),
-                colors = cuerOutlineButtonColors(),
-                onClick = onClick
-            ) {
-                Text(stringResource(R.string.next))
-            }
-
-            Text(
-                model.screenPosition, modifier = Modifier
-                    .padding(bottom = 180.dp)
-                    .align(Alignment.BottomCenter)
-            )
-
-            Button(
-                modifier = Modifier
-                    .padding(bottom = 168.dp, start = 32.dp) // todo position when finished
-                    .align(Alignment.BottomStart),
-                colors = cuerOutlineButtonColors(),
-                onClick = {}
-            ) {
-                Text(stringResource(R.string.skip))
-            }
-        }
-    }
-
     private fun transitionToNext(
         states: List<MutableTransitionState<Boolean>>,
-        view: OnboardingViewModel,
+        view: OnboardingContract.Interactions,
         scope: CoroutineScope
     ) {
         if (!isTransitioning) {
@@ -152,15 +111,57 @@ object OnboardingComposables {
     }
 
     @Composable
+    private fun ButtonsRow(
+        model: OnboardingContract.Model,
+        interactions: OnboardingContract.Interactions,
+        onClick: () -> Unit
+    ) {
+        val padding = 16
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ) {
+            Button(
+                modifier = Modifier
+                    .padding(bottom = padding.dp, end = padding.dp) // todo position when finished
+                    .align(Alignment.BottomEnd),
+                border = cuerOutlineButtonStroke(),
+                colors = cuerOutlineButtonColors(),
+                onClick = onClick
+            ) {
+                Text(stringResource(R.string.next))
+            }
+
+            Text(
+                model.screenPosition, modifier = Modifier
+                    .padding(bottom = (padding + 12).dp)
+                    .align(Alignment.BottomCenter)
+            )
+
+            Button(
+                modifier = Modifier
+                    .padding(bottom = padding.dp, start = padding.dp) // todo position when finished
+                    .align(Alignment.BottomStart),
+                colors = cuerOutlineButtonColors(),
+                onClick = { interactions.onSkip() }
+            ) {
+                Text(stringResource(R.string.skip))
+            }
+        }
+    }
+
+    @Composable
     private fun Line(
         line: ActionResources,
         isTitle: Boolean,
         modifier: Modifier = Modifier
     ) {
+        val vPad = if (isTitle) 16.dp else 8.dp
         Row(
             modifier = modifier
-                //                    .background(Color.Red)
-                .padding(16.dp)
+                // .background(Color.Red)
+                .padding(vertical = vPad)
         ) {
             val color = line.color?.let { colorResource(it) } ?: MaterialTheme.colors.onSurface
             line.icon?.also {
@@ -169,7 +170,7 @@ object OnboardingComposables {
                     tint = color,
                     contentDescription = stringResource(id = R.string.menu_search),
                     modifier = Modifier
-                        //                            .background(Color.Green)
+                        // .background(Color.Green)
                         .padding(end = 8.dp)
                         .size(24.dp)
                         .align(Alignment.CenterVertically)

@@ -117,7 +117,8 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
         const val TAG = "SupportDialogFragment"
 
         fun show(a: FragmentActivity, m: MediaDomain) {
-            SupportDialogFragment().apply { arguments = bundleOf(MEDIA.toString() to m.serialise()) }
+            SupportDialogFragment()
+                .apply { arguments = bundleOf(MEDIA.toString() to m.serialise()) }
                 .show(a.supportFragmentManager, TAG)
         }
 

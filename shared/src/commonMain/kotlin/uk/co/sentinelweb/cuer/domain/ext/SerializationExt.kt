@@ -6,6 +6,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.serialization.InstantSerializer
@@ -117,6 +118,7 @@ fun deserialiseResponse(input: String) = domainJsonSerializer.decodeFromString(
 fun deserialiseCategory(input: String) = domainJsonSerializer.decodeFromString(
     CategoryDomain.serializer(), input
 )
+
 // AppDetailsDomain
 fun List<AppDetailsDomain>.serialiseAppList() = domainJsonSerializer.encodeToString(
     ListSerializer(AppDetailsDomain.serializer()), this
@@ -124,6 +126,14 @@ fun List<AppDetailsDomain>.serialiseAppList() = domainJsonSerializer.encodeToStr
 
 fun deserialiseAppList(input: String) = domainJsonSerializer.decodeFromString(
     AppDetailsDomain.serializer(), input
+)
+
+fun OnboardingContract.Config.serialise() = domainJsonSerializer.encodeToString(
+    OnboardingContract.Config.serializer(), this
+)
+
+fun deserialiseOnboarding(input: String) = domainJsonSerializer.decodeFromString(
+    OnboardingContract.Config.serializer(), input
 )
 
 val domainJsonSerializer = Json {
@@ -144,6 +154,7 @@ val domainJsonSerializer = Json {
             ErrorDomain::class to ErrorDomain.serializer(),
             ResponseDomain::class to ResponseDomain.serializer(),
             AppDetailsDomain::class to AppDetailsDomain.serializer(),
+            OnboardingContract.Config::class to OnboardingContract.Config.serializer(),
         )
         polymorphic(Domain::class, PlaylistDomain::class, PlaylistDomain.serializer())
         polymorphic(Domain::class, MediaDomain::class, MediaDomain.serializer())

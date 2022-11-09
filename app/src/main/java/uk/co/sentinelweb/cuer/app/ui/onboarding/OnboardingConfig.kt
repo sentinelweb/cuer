@@ -27,7 +27,7 @@ val onboardingConfig = OnboardingContract.Config(
         ),
         Screen(
             title = ActionResources(
-                label = "Playlist",
+                label = "Playlists",
                 icon = R.drawable.ic_playlists,
                 color = R.color.color_on_surface
             ),
