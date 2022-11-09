@@ -120,7 +120,7 @@
     <string name="cd_check">Select item</string>
 
     <!-- prefs -->
-    <string name="prefs_root_backup_item_title">Backup</string>
+    <string name="prefs_root_backup_item_title">Backup/Restore</string>
     <string name="prefs_root_backup_cat_title">Backup/Restore</string>
     <string name="prefs_root_backup_summary">Data backup options</string>
     <string name="prefs_root_debug_cat_title">Debug</string>
@@ -298,6 +298,25 @@
         \n✉️ cuerapp@gmail.com
     </string>
 
+    <!-- help -->
+    <string name="help">Help</string>
+    <string name="help_playlist_delete">Swipe LEFT to delete</string>
+    <string name="help_playlist_move">Swipe RIGHT to move to another playlist</string>
+    <string name="help_playlist_reorder">Drag up/down to reorder</string>
+    <string name="help_playlist_play">Play playlist from current position</string>
+    <string name="help_playlist_stop">Stop playlist</string>
+    <string name="help_playlist_actions">Playlists - actions</string>
+    <string name="help_playlist_edit">Edit playlist settings</string>
+    <string name="help_playlist_star">Star playlist</string>
+    <string name="help_playlist_playmode">Toggle playmode: straight / loop / shuffle</string>
+    <string name="help_playlist_actions_top">Playlists - actionbar</string>
+    <string name="help_playlist_viewmode">Toggle cards / rows view</string>
+    <string name="help_playlist_search">Search</string>
+    <string name="help_playlist_status_icons">Playlist status icons</string>
+    <string name="help_playlist_pos">100 / 200 : Playlist position / size</string>
+    <string name="help_playlist_starred">Playlist starred</string>
+    <string name="help_playlist_children">Number of child playlists</string>
+
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -321,5 +340,8 @@
     <string name="nav_title_onboard">Onboarding</string>
     <string name="skip">Skip</string>
     <string name="next">Next</string>
+    <string name="done">Done</string>
+    <string name="finish">Finish</string>
+
 
 </resources>

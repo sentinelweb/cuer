@@ -73,9 +73,9 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
     companion object {
         const val TAG = "OnboardingFragment"
 
-        fun show(a: FragmentActivity, config: OnboardingContract.Config) {
+        fun show(a: FragmentActivity, config: OnboardingContract.ConfigBuilder) {
             OnboardingFragment()
-                .apply { arguments = bundleOf(ONBOARD_CONFIG.toString() to config.serialise()) }
+                .apply { arguments = bundleOf(ONBOARD_CONFIG.toString() to config.build().serialise()) }
                 .show(a.supportFragmentManager, TAG)
         }
 

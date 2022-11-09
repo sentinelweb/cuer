@@ -23,13 +23,18 @@ class OnboardingContract {
 
     data class Model(
         val screen: Config.Screen,
-        val screenPosition: String
+        val screenPosition: String,
+        val isLastScreen: Boolean
     )
 
     interface Interactions {
         fun onNext()
 
         fun onSkip()
+    }
+
+    interface ConfigBuilder {
+        fun build(): Config
     }
 
     enum class Event { Finished }

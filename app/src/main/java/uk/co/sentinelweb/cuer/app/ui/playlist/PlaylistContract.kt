@@ -75,6 +75,7 @@ interface PlaylistContract {
         fun setAddPlaylistParent(id: Long)
         fun checkToSave()
         fun onShowCards(cards: Boolean): Boolean
+        fun onHelp()
     }
 
     interface Interactions {
@@ -111,6 +112,8 @@ interface PlaylistContract {
         fun navigate(nav: NavigationModel)
         fun newAdapter()
         fun getScrollIndex(): Int
+        fun showHelp()
+
         val isHeadless: Boolean
     }
 
@@ -254,6 +257,7 @@ interface PlaylistContract {
                     )
                 }
                 viewModel { State() }
+                scoped { PlaylistHelpConfig(get()) }
             }
         }
     }

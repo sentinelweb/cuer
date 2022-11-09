@@ -42,6 +42,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.CastState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
@@ -97,6 +98,7 @@ class PlaylistFragment :
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val res: ResourceWrapper by inject()
     private val actionBarModifier: ActionBarModifier by inject()
+    private val playlistHelpConfig: PlaylistHelpConfig by inject()
 
     private var _adapter: PlaylistAdapter? = null
     private val adapter: PlaylistAdapter
@@ -207,6 +209,7 @@ class PlaylistFragment :
         binding.playlistFabPlay.setOnClickListener { presenter.onPlayPlaylist() }
         binding.playlistEditButton.setOnClickListener { presenter.onEdit() }
         binding.playlistStarButton.setOnClickListener { presenter.onStarPlaylist() }
+        binding.playlistHelp.setOnClickListener { presenter.onHelp() }
         binding.playlistSwipe.setOnRefreshListener { presenter.refreshPlaylist() }
         if (isHeadless) {
             binding.playlistAppbar.isVisible = false
@@ -214,8 +217,11 @@ class PlaylistFragment :
             binding.playlistFabPlaymode.isVisible = false
         }
         setupRecyclerView()
-
         imageUrlArg?.also { setImage(it) }
+    }
+
+    override fun showHelp() {
+        OnboardingFragment.show(requireActivity(), playlistHelpConfig)
     }
 
     private fun setMenuItemsColor(cslRes: Int) {

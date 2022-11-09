@@ -675,6 +675,10 @@ class PlaylistPresenter(
         return true
     }
 
+    override fun onHelp() {
+        view.showHelp()
+    }
+
     override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit?) {
         if (state.playlistIdentifier.source == MEMORY) {
             log.i("commitPlaylist: id:${state.playlistIdentifier}")

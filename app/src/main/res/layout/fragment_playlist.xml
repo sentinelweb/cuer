@@ -107,6 +107,15 @@
                             android:visibility="gone"
                             app:icon="@drawable/ic_playmode_shuffle"
                         />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/playlist_help"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/help"
+                            android:text="@string/help"
+                            app:icon="@drawable/ic_help"
+                        />
+
                     </LinearLayout>
                 </HorizontalScrollView>
 

@@ -78,7 +78,7 @@ object OnboardingComposables {
             scope.launch {
                 states.reversed().forEach {
                     it.targetState = false
-                    delay(300)
+                    delay(100)
                 }
                 view.onNext()
             }
@@ -97,13 +97,13 @@ object OnboardingComposables {
             MutableTransitionState(false)
         }
         LaunchedEffect(line) {
-            delay(seq * 300L)
+            delay(seq * 200L)
             state.targetState = true
         }
         AnimatedVisibility(
             state,
-            enter = fadeIn(animationSpec = tween(durationMillis = 1000)),
-            exit = fadeOut(animationSpec = tween(durationMillis = 1000))
+            enter = fadeIn(animationSpec = tween(durationMillis = 500)),
+            exit = fadeOut(animationSpec = tween(durationMillis = 500))
         ) {
             block()
         }
@@ -130,7 +130,7 @@ object OnboardingComposables {
                 colors = cuerOutlineButtonColors(),
                 onClick = onClick
             ) {
-                Text(stringResource(R.string.next))
+                Text(stringResource(if (model.isLastScreen) R.string.finish else R.string.next))
             }
 
             Text(
@@ -164,6 +164,7 @@ object OnboardingComposables {
                 .padding(vertical = vPad)
         ) {
             val color = line.color?.let { colorResource(it) } ?: MaterialTheme.colors.onSurface
+            println("line label:" + line.label)
             line.icon?.also {
                 Icon(
                     painter = painterResource(it),
@@ -200,7 +201,7 @@ object OnboardingComposables {
     private fun TitleText(color: Color, it: String, modifier: Modifier = Modifier) {
         Text(
             modifier = modifier,
-            style = MaterialTheme.typography.h3,
+            style = MaterialTheme.typography.h5,
             color = color,
             text = it
         )

@@ -34,8 +34,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract.LastTab.*
-import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
-import uk.co.sentinelweb.cuer.app.ui.onboarding.onboardingConfig
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
@@ -220,11 +218,6 @@ class MainActivity :
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
 
-    }
-
-    override fun onResume() {
-        super.onResume()
-        OnboardingFragment.show(this, onboardingConfig)
     }
 
     override fun onStop() {
