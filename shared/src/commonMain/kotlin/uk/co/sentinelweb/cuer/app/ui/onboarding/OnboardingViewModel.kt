@@ -25,7 +25,7 @@ class OnboardingViewModel(
     }
 
     fun onNext() {
-        state.positionScreen++
+        state.positionScreen = (state.positionScreen + 1) % config.screens.size
         if (state.positionScreen < config.screens.size) {
             _model.value = mapper.map(state)
         } else {

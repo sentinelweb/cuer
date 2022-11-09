@@ -16,7 +16,7 @@ val onboardingConfig = OnboardingContract.Config(
                 ActionResources(
                     label = "From your tube app",
                     icon = R.drawable.ic_platform_youtube,
-                    color = R.color.primary_on
+                    color = R.color.color_on_surface
                 ),
                 ActionResources(
                     label = "Share a video or playlist with Cuer",

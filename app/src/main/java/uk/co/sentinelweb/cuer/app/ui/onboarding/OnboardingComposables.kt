@@ -7,15 +7,17 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
 import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonColors
@@ -23,6 +25,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonStroke
 import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
 
 object OnboardingComposables {
+    var isTransitioning = false
     @Composable
     fun OnboardingUi(view: OnboardingViewModel) {
         OnboardingView(view.model.collectAsState().value, view)
@@ -33,77 +36,130 @@ object OnboardingComposables {
         model: OnboardingContract.Model,
         view: OnboardingViewModel
     ) {
+        isTransitioning = false
         CuerTheme {
             Surface {
+                val scope = rememberCoroutineScope()
                 Box(
                     modifier = Modifier
                         .padding(top = 128.dp)
                 ) {
+                    val states = mutableListOf<MutableTransitionState<Boolean>>()
                     Column(
                         modifier = Modifier
-                            .align(Alignment.TopCenter)
+//                            .align(Alignment.TopCenter)
+                            .padding(32.dp)
+                            .fillMaxWidth()
                     ) {
-                        Title(model.screen.title, modifier = Modifier.align(Alignment.CenterHorizontally))
-                        model.screen.lines.forEach { line ->
-                            Line(line, modifier = Modifier.align(Alignment.CenterHorizontally))
+                        val layoutModifiers = Modifier.align(Alignment.CenterHorizontally)
+                        states.add(animatedText(model.screen.title, 0) {
+                            Line(model.screen.title, true, layoutModifiers)
+                        })
+                        model.screen.lines.forEachIndexed { i, line ->
+                            states.add(animatedText(line, i + 1) {
+                                Line(line, false, layoutModifiers)
+                            })
                         }
                     }
-                    Button(
-                        modifier = Modifier
-                            .padding(bottom = 168.dp, end = 16.dp) // todo position when finished
-                            .align(Alignment.BottomEnd),
-                        border = cuerOutlineButtonStroke(),
-                        colors = cuerOutlineButtonColors(),
-                        onClick = { view.onNext() }) {
-                        Text("Next")
-                    }
+                    states.add(animatedText(Any(), states.size) {
+                        ButtonsRow(model) { transitionToNext(states, view, scope) }
+                    })
                 }
             }
         }
     }
 
     @Composable
-    private fun Line(line: ActionResources, modifier: Modifier) {
-        val state = remember {
-            MutableTransitionState(false).apply {
-                // Start the animation immediately.
-                targetState = true
+    private fun ButtonsRow(
+        model: OnboardingContract.Model,
+        modifier: Modifier = Modifier, // , Modifier.align(Alignment.BottomCenter) // doesnt work
+        onClick: () -> Unit
+    ) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(16.dp)
+        ) {
+            Button(
+                modifier = Modifier
+                    .padding(bottom = 168.dp, end = 32.dp) // todo position when finished
+                    .align(Alignment.BottomEnd),
+                border = cuerOutlineButtonStroke(),
+                colors = cuerOutlineButtonColors(),
+                onClick = onClick
+            ) {
+                Text(stringResource(R.string.next))
             }
+
+            Text(
+                model.screenPosition, modifier = Modifier
+                    .padding(bottom = 180.dp)
+                    .align(Alignment.BottomCenter)
+            )
+
+            Button(
+                modifier = Modifier
+                    .padding(bottom = 168.dp, start = 32.dp) // todo position when finished
+                    .align(Alignment.BottomStart),
+                colors = cuerOutlineButtonColors(),
+                onClick = {}
+            ) {
+                Text(stringResource(R.string.skip))
+            }
+        }
+    }
+
+    private fun transitionToNext(
+        states: List<MutableTransitionState<Boolean>>,
+        view: OnboardingViewModel,
+        scope: CoroutineScope
+    ) {
+        if (!isTransitioning) {
+            scope.launch {
+                states.reversed().forEach {
+                    it.targetState = false
+                    delay(300)
+                }
+                view.onNext()
+            }
+            isTransitioning = true
+        }
+
+    }
+
+    @Composable
+    private fun animatedText(
+        line: Any,
+        seq: Int,
+        block: @Composable () -> Unit
+    ): MutableTransitionState<Boolean> {
+        val state = remember(line) {
+            MutableTransitionState(false)
+        }
+        LaunchedEffect(line) {
+            delay(seq * 300L)
+            state.targetState = true
         }
         AnimatedVisibility(
             state,
             enter = fadeIn(animationSpec = tween(durationMillis = 1000)),
             exit = fadeOut(animationSpec = tween(durationMillis = 1000))
         ) {
-            Row(
-                modifier = modifier
-                    .padding(16.dp)
-            ) {
-                val color = line.color?.let { colorResource(it) } ?: MaterialTheme.colors.onSurface
-                line.icon?.also {
-                    Icon(
-                        painter = painterResource(it),
-                        tint = color,
-                        contentDescription = stringResource(id = R.string.menu_search),
-                        modifier = Modifier.padding(end = 8.dp).size(24.dp)
-                    )
-                }
-                line.label?.also {
-                    Text(
-                        modifier = Modifier,
-                        style = MaterialTheme.typography.body1,
-                        color = color,
-                        text = it
-                    )
-                }
-            }
+            block()
         }
+        return state
     }
 
     @Composable
-    private fun Title(line: ActionResources, modifier: Modifier) {
+    private fun Line(
+        line: ActionResources,
+        isTitle: Boolean,
+        modifier: Modifier = Modifier
+    ) {
         Row(
             modifier = modifier
+                //                    .background(Color.Red)
                 .padding(16.dp)
         ) {
             val color = line.color?.let { colorResource(it) } ?: MaterialTheme.colors.onSurface
@@ -112,17 +168,40 @@ object OnboardingComposables {
                     painter = painterResource(it),
                     tint = color,
                     contentDescription = stringResource(id = R.string.menu_search),
-                    modifier = Modifier.padding(end = 8.dp).size(24.dp).align(Alignment.CenterVertically)
+                    modifier = Modifier
+                        //                            .background(Color.Green)
+                        .padding(end = 8.dp)
+                        .size(24.dp)
+                        .align(Alignment.CenterVertically)
                 )
             }
             line.label?.also {
-                Text(
-                    modifier = Modifier,
-                    style = MaterialTheme.typography.h3,
-                    color = color,
-                    text = it
-                )
+                if (isTitle) {
+                    TitleText(color, it)
+                } else {
+                    LineText(color, it)
+                }
             }
         }
+    }
+
+    @Composable
+    private fun LineText(color: Color, it: String, modifier: Modifier = Modifier) {
+        Text(
+            modifier = modifier,
+            style = MaterialTheme.typography.body1,
+            color = color,
+            text = it
+        )
+    }
+
+    @Composable
+    private fun TitleText(color: Color, it: String, modifier: Modifier = Modifier) {
+        Text(
+            modifier = modifier,
+            style = MaterialTheme.typography.h3,
+            color = color,
+            text = it
+        )
     }
 }

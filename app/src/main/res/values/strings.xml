@@ -319,5 +319,7 @@
     <string name="edit_prefix">"Edit: "</string>
     <string name="menu_update">Update</string>
     <string name="nav_title_onboard">Onboarding</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
 
 </resources>

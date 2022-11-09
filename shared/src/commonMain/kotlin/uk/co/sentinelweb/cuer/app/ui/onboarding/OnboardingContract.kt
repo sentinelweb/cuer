@@ -19,7 +19,8 @@ class OnboardingContract {
     )
 
     data class Model(
-        val screen: Config.Screen
+        val screen: Config.Screen,
+        val screenPosition: String
     )
 
     enum class Event { Finished }
