@@ -5,15 +5,18 @@ import kotlinx.datetime.toLocalDateTime
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 
 class BackupCheck(
     val prefs: MultiPlatformPreferencesWrapper,
     val timeProvider: TimeProvider,
-    val dateTimeFormatter: DateTimeFormatter
+    val dateTimeFormatter: DateTimeFormatter,
+    val connectivityCheck: ConnectivityWrapper
 ) {
 
     fun checkToBackup(): Boolean = prefs.lastBackupInstant
         ?.let { timeProvider.instant().minus(it).inWholeSeconds > BACKUP_INTERVAL_SECS }
+        ?.let { it && connectivityCheck.isConnected() && !connectivityCheck.isMetered() }
         ?: true
 
     fun setLastBackupNow() {

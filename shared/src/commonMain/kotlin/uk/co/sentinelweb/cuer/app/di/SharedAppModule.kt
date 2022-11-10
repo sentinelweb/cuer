@@ -89,7 +89,7 @@ object SharedAppModule {
         factory { PlatformFileOperation() }
         factory { LinkExtractor() }
         factory { TimecodeExtractor() }
-        factory { BackupCheck(get(), get(), get()) }
+        factory { BackupCheck(get(), get(), get(), get()) }
     }
 
     val modules = listOf(objectModule)
