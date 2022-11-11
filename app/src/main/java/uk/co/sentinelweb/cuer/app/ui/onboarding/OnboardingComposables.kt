@@ -42,7 +42,7 @@ object OnboardingComposables {
                 val scope = rememberCoroutineScope()
                 Box(
                     modifier = Modifier
-                        .height(500.dp)
+                        .height(512.dp)
                 ) {
                     val states = mutableListOf<MutableTransitionState<Boolean>>()
                     Column(
