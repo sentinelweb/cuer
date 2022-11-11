@@ -318,6 +318,43 @@
     <string name="help_playlist_starred">Playlist starred</string>
     <string name="help_playlist_children">Number of child playlists</string>
 
+    <string name="help_playlist_paste_add">Add video from clipboard</string>
+    <string name="help_playlists_title_app">Playlists - App</string>
+    <string name="help_playlists_app_new">New : Unwatched videos</string>
+    <string name="help_playlists_app_recent">Recent: Recently watched videos</string>
+    <string name="help_playlists_app_starred">Starred: Starred videos</string>
+    <string name="help_playlists_app_unfinished">Unfinished: Videos incomplete</string>
+    <string name="help_playlists_app_local">Local search: last search on device</string>
+    <string name="help_playlists_app_yt">Youtube search: last search on youtube</string>
+    <string name="help_playlists_title_actionbar">Playlists - Actionbar</string>
+    <string name="help_playlists_ab_create">Create playlist</string>
+    <string name="help_playlists_ab_pasteadd">Add video from clipboard</string>
+
+    <string name="help_plie_title_1">PlaylistItem - Actions</string>
+    <string name="help_plie_play">Play</string>
+    <string name="help_plie_select_playlist">Select playlist</string>
+    <string name="help_plie_star">Star</string>
+    <string name="help_plie_support">Support</string>
+    <string name="help_plie_edit">Edit</string>
+    <string name="help_plie_title_2">PlaylistItem - Actions 2</string>
+    <string name="help_plie_share">Share</string>
+    <string name="help_plie_like">Like: on platform</string>
+    <string name="help_plie_comment">Comment: on platform</string>
+    <string name="help_plie_launch">Launch: on platform</string>
+
+    <string name="help_pe_title">Playlist edit</string>
+    <string name="help_pe_save">Save / Create</string>
+    <string name="help_pe_star">Star</string>
+    <string name="help_pe_pin">Pin</string>
+    <string name="help_pe_title_text">Change the title text</string>
+    <string name="help_pe_title_options">Playlist options</string>
+    <string name="help_pe_default">Default: Used when nothing selcted</string>
+    <string name="help_pe_play_start">Play from start (all items)</string>
+    <string name="help_pe_playable">Playable</string>
+    <string name="help_pe_deletable">Deleteable</string>
+    <string name="help_pe_deletable_items">Deleteable Items</string>
+    <string name="help_pe_editabe_items">Editable items</string>
+
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -343,17 +380,6 @@
     <string name="next">Next</string>
     <string name="done">Done</string>
     <string name="finish">Finish</string>
-    <string name="help_playlist_paste_add">Add video from clipboard</string>
-    <string name="help_playlists_title_app">Playlists - App</string>
-    <string name="help_playlists_app_new">New : Unwatched videos</string>
-    <string name="help_playlists_app_recent">Recent: Recently watched videos</string>
-    <string name="help_playlists_app_starred">Starred: Starred videos</string>
-    <string name="help_playlists_app_unfinished">Unfinished: Videos incomplete</string>
-    <string name="help_playlists_app_local">Local search: last search on device</string>
-    <string name="help_playlists_app_yt">Youtube search: last search on youtube</string>
-    <string name="help_playlists_title_actionbar">Playlists - Actionbar</string>
-    <string name="help_playlists_ab_create">Create playlist</string>
-    <string name="help_playlists_ab_pasteadd">Add video from clipboard</string>
 
 
 </resources>

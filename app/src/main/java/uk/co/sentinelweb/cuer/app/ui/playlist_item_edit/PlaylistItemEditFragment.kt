@@ -34,7 +34,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel.Type.STAR
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel.Type.UNSTAR
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
-import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingTestConfigBuilder
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
@@ -73,6 +72,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val playerControls: PlayerContract.PlayerControls by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
+    private val playlistItemEditHelpConfig: PlaylistItemEditHelpConfig by inject()
 
     private val binding: FragmentPlaylistItemEditBinding
         get() = _binding ?: throw IllegalStateException("FragmentPlaylistItemEditBinding not bound")
@@ -221,7 +221,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
         helpMenuItem.setOnMenuItemClickListener {
-            OnboardingFragment.show(requireActivity(), OnboardingTestConfigBuilder(res))
+            OnboardingFragment.show(requireActivity(), playlistItemEditHelpConfig)
             true
         }
         binding.plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)

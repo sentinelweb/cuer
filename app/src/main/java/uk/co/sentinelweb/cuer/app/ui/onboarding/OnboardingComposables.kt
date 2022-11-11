@@ -157,11 +157,11 @@ object OnboardingComposables {
         isTitle: Boolean,
         modifier: Modifier = Modifier
     ) {
-        val vPad = if (isTitle) 16.dp else 8.dp
+        val vPad = if (isTitle) 32.dp else 8.dp
         Row(
             modifier = modifier
                 // .background(Color.Red)
-                .padding(vertical = vPad)
+                .padding(bottom = vPad, top = 16.dp)
         ) {
             val color = line.color?.let { colorResource(it) } ?: MaterialTheme.colors.onSurface
             println("line label:" + line.label)

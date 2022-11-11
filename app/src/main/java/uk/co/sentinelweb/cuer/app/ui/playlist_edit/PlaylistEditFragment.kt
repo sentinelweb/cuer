@@ -34,7 +34,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
-import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingTestConfigBuilder
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.*
@@ -68,6 +67,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val commitHost: CommitHost by inject()
     private val res: ResourceWrapper by inject()
+    private val playlistEditHelpConfig: PlaylistEditHelpConfig by inject()
 
     internal var listener: Listener? = null
 
@@ -208,7 +208,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         helpMenuItem.setOnMenuItemClickListener {
-            OnboardingFragment.show(requireActivity(), OnboardingTestConfigBuilder(res))
+            OnboardingFragment.show(requireActivity(), playlistEditHelpConfig)
             true
         }
         binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
