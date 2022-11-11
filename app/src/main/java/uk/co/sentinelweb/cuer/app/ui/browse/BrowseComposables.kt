@@ -53,6 +53,8 @@ object BrowseComposables {
                         text = model.title,
                         onUp = { view.dispatch(Event.OnUpClicked) },
                         actions = listOf(
+                            Action(CuerMenuItem.Help,
+                                { view.dispatch(Event.OnActionHelpClicked) }),
                             when (model.order) {
                                 CATEGORIES -> Action(CuerMenuItem.SortAlpha,
                                     { view.dispatch(Event.OnSetOrder(A_TO_Z)) }
@@ -62,7 +64,8 @@ object BrowseComposables {
                                     { view.dispatch(Event.OnSetOrder(CATEGORIES)) }
                                 )
                             },
-                            Action(CuerMenuItem.Search,
+                            Action(
+                                CuerMenuItem.Search,
                                 { view.dispatch(Event.OnActionSearchClicked) }),
                             Action(CuerMenuItem.Settings,
                                 { view.dispatch(Event.OnActionSettingsClicked) }),

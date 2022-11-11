@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
 >
+    <item
+        android:id="@+id/pe_help"
+        android:icon="@drawable/ic_help"
+        android:orderInCategory="15"
+        android:title="@string/help"
+        android:visible="true"
+        app:iconTint="@color/menu_button_icon_tint"
+        app:showAsAction="always"/>
+
     <!--    <item-->
     <!--        android:id="@+id/pe_star"-->
     <!--        android:icon="@drawable/ic_starred_off"-->

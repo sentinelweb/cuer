@@ -18,6 +18,7 @@ class BrowseContract {
             object Up : Intent()
             object ActionSettings : Intent()
             object ActionSearch : Intent()
+            object ActionHelp : Intent()
             data class SetOrder(val order: Order) : Intent()
         }
 
@@ -27,6 +28,7 @@ class BrowseContract {
             object TopReached : Label()
             object ActionSettings : Label()
             object ActionSearch : Label()
+            object ActionHelp : Label()
 
             data class AddPlaylist(
                 val cat: CategoryDomain,
@@ -76,6 +78,7 @@ class BrowseContract {
             object OnUpClicked : Event()
             object OnActionSettingsClicked : Event()
             object OnActionSearchClicked : Event()
+            object OnActionHelpClicked : Event()
             data class OnCategoryClicked(val model: CategoryModel) : Event()
             data class OnSetOrder(val order: Order) : Event()
         }

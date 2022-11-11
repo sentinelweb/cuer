@@ -12,7 +12,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
         screens = listOf(
             Screen(
                 title = ActionResources(
-                    label = res.getString(R.string.bottomnav_title_playlist),
+                    label = res.getString(R.string.help_playlist_title_gestures),
                     icon = R.drawable.ic_playlist_black,
                     color = R.color.color_on_surface
                 ),
@@ -36,7 +36,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
             ),
             Screen(
                 title = ActionResources(
-                    label = res.getString(R.string.help_playlist_actions),
+                    label = res.getString(R.string.help_playlist_title_actions),
                     icon = R.drawable.ic_playlists,
                     color = R.color.color_on_surface
                 ),
@@ -70,7 +70,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
             ),
             Screen(
                 title = ActionResources(
-                    label = res.getString(R.string.help_playlist_actions_top),
+                    label = res.getString(R.string.help_playlist_title_actions_top),
                     icon = R.drawable.ic_playlists,
                     color = R.color.color_on_surface
                 ),
@@ -84,12 +84,17 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                         label = res.getString(R.string.help_playlist_search),
                         icon = R.drawable.ic_search,
                         color = R.color.color_on_surface
-                    )
+                    ),
+                    ActionResources(
+                        label = res.getString(R.string.help_playlist_paste_add),
+                        icon = R.drawable.ic_menu_paste_add_black,
+                        color = R.color.color_on_surface
+                    ),
                 )
             ),
             Screen(
                 title = ActionResources(
-                    label = res.getString(R.string.help_playlist_status_icons),
+                    label = res.getString(R.string.help_playlist_title_status_icons),
                     icon = R.drawable.ic_playlists,
                     color = R.color.color_on_surface
                 ),
