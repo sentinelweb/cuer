@@ -13,7 +13,7 @@ class CastPlayerHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
             Screen(
                 title = ActionResources(
                     label = "Player",
-                    icon = R.drawable.ic_playlist_edit,
+                    icon = R.drawable.ic_editable_items,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(
@@ -47,7 +47,7 @@ class CastPlayerHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
             Screen(
                 title = ActionResources(
                     label = "Playler 2",
-                    icon = R.drawable.ic_playlist_edit,
+                    icon = R.drawable.ic_editable_items,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(

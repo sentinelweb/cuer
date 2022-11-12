@@ -19,7 +19,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                 lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_playlist_delete),
-                        icon = R.drawable.ic_delete_white,
+                        icon = R.drawable.ic_delete_item,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
@@ -76,8 +76,13 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                 ),
                 lines = listOf(
                     ActionResources(
-                        label = res.getString(R.string.help_playlist_viewmode),
+                        label = res.getString(R.string.help_playlist_viewmode_cards),
                         icon = R.drawable.ic_view_card,
+                        color = R.color.color_on_surface
+                    ),
+                    ActionResources(
+                        label = res.getString(R.string.help_playlist_viewmode_rows),
+                        icon = R.drawable.ic_view_list,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
@@ -88,6 +93,11 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     ActionResources(
                         label = res.getString(R.string.help_playlist_paste_add),
                         icon = R.drawable.ic_menu_paste_add_black,
+                        color = R.color.color_on_surface
+                    ),
+                    ActionResources(
+                        label = res.getString(R.string.help_playlist_settings),
+                        icon = R.drawable.ic_menu_settings_black,
                         color = R.color.color_on_surface
                     ),
                 )
@@ -112,6 +122,21 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     ActionResources(
                         label = res.getString(R.string.help_playlist_children),
                         icon = R.drawable.ic_tree_24,
+                        color = R.color.color_on_surface
+                    ),
+                    ActionResources(
+                        label = res.getString(R.string.help_playlist_default),
+                        icon = R.drawable.ic_playlist_default,
+                        color = R.color.color_on_surface
+                    ),
+                    ActionResources(
+                        label = res.getString(R.string.help_playlist_playstart),
+                        icon = R.drawable.ic_play_start_black,
+                        color = R.color.color_on_surface
+                    ),
+                    ActionResources(
+                        label = res.getString(R.string.help_playlist_pinned),
+                        icon = R.drawable.ic_push_pin_on,
                         color = R.color.color_on_surface
                     )
                 )

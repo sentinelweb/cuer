@@ -13,7 +13,7 @@ class BackupHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
             Screen(
                 title = ActionResources(
                     label = "Playlist edit",
-                    icon = R.drawable.ic_playlist_edit,
+                    icon = R.drawable.ic_editable_items,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(
@@ -42,7 +42,7 @@ class BackupHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
             Screen(
                 title = ActionResources(
                     label = "Playlist options",
-                    icon = R.drawable.ic_playlist_edit,
+                    icon = R.drawable.ic_editable_items,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(
@@ -63,7 +63,7 @@ class BackupHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
                     ),
                     ActionResources(
                         label = "Deleteable",
-                        icon = R.drawable.ic_delete_white,
+                        icon = R.drawable.ic_delete_item,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(

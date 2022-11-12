@@ -422,6 +422,11 @@ class PlaylistFragment :
         binding.playlistFabPlaymode.setIconResource(model.loopModeIcon)
         binding.playlistFlagChildren.isVisible = model.hasChildren > 0
         binding.playlistFlagChildren.text = model.hasChildren.toString()
+        binding.playlistFlagPlayable.isVisible = model.canPlay
+        binding.playlistFlagDeletable.isVisible = model.canDelete
+        binding.playlistFlagEditable.isVisible = model.canEdit
+        binding.playlistFlagDeletableItems.isVisible = model.canDeleteItems
+        binding.playlistFlagEditableItems.isVisible = model.canEditItems
         binding.playlistEditButton.isVisible = model.canEdit
         binding.playlistStarButton.isVisible = model.canEdit
         binding.playlistUpdateButton.isVisible = model.canUpdate

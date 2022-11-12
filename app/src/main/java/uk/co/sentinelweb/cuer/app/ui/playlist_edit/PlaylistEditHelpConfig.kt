@@ -13,7 +13,7 @@ class PlaylistEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.Conf
             Screen(
                 title = ActionResources(
                     label = res.getString(R.string.help_pe_title),
-                    icon = R.drawable.ic_playlist_edit,
+                    icon = R.drawable.ic_editable_items,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(
@@ -36,13 +36,18 @@ class PlaylistEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.Conf
                         label = res.getString(R.string.help_pe_title_text),
                         icon = R.drawable.ic_edit_24,
                         color = R.color.color_on_surface
+                    ),
+                    ActionResources(
+                        label = res.getString(R.string.help_pe_parent),
+                        icon = R.drawable.ic_tree_24,
+                        color = R.color.color_on_surface
                     )
                 )
             ),
             Screen(
                 title = ActionResources(
                     label = res.getString(R.string.help_pe_title_options),
-                    icon = R.drawable.ic_playlist_edit,
+                    icon = R.drawable.ic_edit_24,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(
@@ -63,17 +68,17 @@ class PlaylistEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.Conf
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_pe_deletable),
-                        icon = R.drawable.ic_delete_white,
+                        icon = R.drawable.ic_delete,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_pe_deletable_items),
-                        icon = R.drawable.ic_delete_white,
+                        icon = R.drawable.ic_delete_item,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_pe_editabe_items),
-                        icon = R.drawable.ic_launch_black,
+                        icon = R.drawable.ic_editable_items,
                         color = R.color.color_on_surface
                     ),
                 )

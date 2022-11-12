@@ -29,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.scaleDrawableLeftSize
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -126,6 +127,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         viewModel.setIsDialog(isDialog)
         binding.peClickPrompt.isVisible = !isDialog
         binding.peToolbar.title = ""
+        binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
         binding.peImage.setOnTouchListener { iv, e ->
             when (e.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
@@ -154,7 +156,16 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         binding.peDeletableItems.setOnCheckedChangeListener { v, b ->
             viewModel.onFlagChanged(b, DELETE_ITEMS)
         }
-        binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
+
+        binding.pePlayable.scaleDrawableLeftSize(1f)
+        binding.peDeletable.scaleDrawableLeftSize(0.8f)
+        binding.pePlayable.scaleDrawableLeftSize(0.8f)
+        binding.peEditableItems.scaleDrawableLeftSize(0.7f)
+        binding.peDeletableItems.scaleDrawableLeftSize(0.7f)
+        binding.peDefault.scaleDrawableLeftSize(0.8f)
+        binding.pePlayStart.scaleDrawableLeftSize(0.8f)
+        binding.peParentLabel.scaleDrawableLeftSize(0.7f)
+
         binding.peAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false

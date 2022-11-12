@@ -311,12 +311,18 @@
     <string name="help_playlist_star">Star playlist</string>
     <string name="help_playlist_playmode">Toggle playmode: straight / loop / shuffle</string>
     <string name="help_playlist_title_actions_top">Playlist - Actionbar</string>
-    <string name="help_playlist_viewmode">Toggle cards / rows view</string>
+    <string name="help_playlist_viewmode_rows">Toggle rows view</string>
+    <string name="help_playlist_viewmode_cards">Toggle cards view</string>
     <string name="help_playlist_search">Search</string>
+    <string name="help_playlist_settings">Settings</string>
     <string name="help_playlist_title_status_icons">Playlist - Status icons</string>
     <string name="help_playlist_pos">100 / 200 : Playlist position / size</string>
     <string name="help_playlist_starred">Playlist starred</string>
     <string name="help_playlist_children">Number of child playlists</string>
+    <string name="help_playlist_default">Default playlist</string>
+    <string name="help_playlist_playstart">Plays items from start</string>
+    <string name="help_playlist_pinned">Pinned</string>
+    <string name="help_playlist_title_props_icons">Playlist Options</string>
 
     <string name="help_playlist_paste_add">Add video from clipboard</string>
     <string name="help_playlists_title_app">Playlists - App</string>
@@ -330,31 +336,32 @@
     <string name="help_playlists_ab_create">Create playlist</string>
     <string name="help_playlists_ab_pasteadd">Add video from clipboard</string>
 
-    <string name="help_plie_title_1">PlaylistItem - Actions</string>
+    <string name="help_plie_title_1">Playlist Item - Actions</string>
     <string name="help_plie_play">Play</string>
     <string name="help_plie_select_playlist">Select playlist</string>
     <string name="help_plie_star">Star</string>
     <string name="help_plie_support">Support</string>
     <string name="help_plie_edit">Edit</string>
-    <string name="help_plie_title_2">PlaylistItem - Actions 2</string>
+    <string name="help_plie_title_2">Playlist Item - Actions 2</string>
     <string name="help_plie_share">Share</string>
     <string name="help_plie_like">Like: on platform</string>
     <string name="help_plie_comment">Comment: on platform</string>
     <string name="help_plie_launch">Launch: on platform</string>
 
-    <string name="help_pe_title">Playlist edit</string>
+    <string name="help_pe_title">Playlist Edit</string>
     <string name="help_pe_save">Save / Create</string>
     <string name="help_pe_star">Star</string>
     <string name="help_pe_pin">Pin</string>
     <string name="help_pe_title_text">Change the title text</string>
+    <string name="help_pe_parent">Select the parent playlist</string>
     <string name="help_pe_title_options">Playlist options</string>
     <string name="help_pe_default">Default: Used when nothing selcted</string>
     <string name="help_pe_play_start">Play from start (all items)</string>
     <string name="help_pe_playable">Playable</string>
     <string name="help_pe_deletable">Deleteable</string>
     <string name="help_pe_deletable_items">Deleteable Items</string>
-    <string name="help_pe_editabe_items">Editable items</string>
-
+    <string name="help_pe_editabe_items">Editable (Moveable) items</string>
+    <string name="help_pe_editable">Editable playlist</string>
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>

@@ -199,7 +199,7 @@ class ItemRowView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fram
         binding.swipeLabelLeft.setText(deleteResources?.label ?: context.getString(R.string.pl_item_delete))
         binding.swipeLabelLeft.setCompoundDrawablesWithIntrinsicBounds(
             null, null,
-            res.getDrawable(deleteResources?.icon ?: R.drawable.ic_delete_white),
+            res.getDrawable(deleteResources?.icon ?: R.drawable.ic_delete_item),
             null
         )
         binding.swipeLabelLeft.setBackgroundColor(

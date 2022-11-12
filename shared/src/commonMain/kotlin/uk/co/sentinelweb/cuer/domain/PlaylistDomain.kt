@@ -52,7 +52,7 @@ data class PlaylistDomain constructor(
         val editable: Boolean = true,
         val deletable: Boolean = true,
         val editableItems: Boolean = true,
-        val deletableItems: Boolean = true
+        val deletableItems: Boolean = true,
     )
 
     companion object {
