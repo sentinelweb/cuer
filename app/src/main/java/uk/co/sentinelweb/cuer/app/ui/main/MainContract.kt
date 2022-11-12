@@ -9,7 +9,6 @@ import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
-import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -89,7 +88,6 @@ interface MainContract {
                 scoped { FloatingPlayerCastListener(get(), get(), get()) }
                 scoped { AlertDialogCreator(get<MainActivity>()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), true) }
-                scoped<ActionBarModifier> { get<MainActivity>() }
                 scoped { EmailWrapper(get<MainActivity>()) }
                 scoped { ShareWrapper(get<MainActivity>()) }
 

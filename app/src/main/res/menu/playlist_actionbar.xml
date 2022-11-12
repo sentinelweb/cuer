@@ -4,6 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
 >
 
+    <item
+        android:id="@+id/playlist_help"
+        android:icon="@drawable/ic_help"
+        android:orderInCategory="15"
+        android:title="@string/help"
+        android:visible="true"
+        app:iconTint="@color/menu_button_icon_tint"
+        app:showAsAction="always"/>
     <!--    <item-->
     <!--        android:id="@+id/playlist_edit"-->
     <!--        android:icon="@drawable/ic_edit_24"-->

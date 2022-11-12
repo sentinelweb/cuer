@@ -12,8 +12,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
-import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
-import uk.co.sentinelweb.cuer.app.ui.common.interfaces.EmptyActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.EmptyPlayerControls
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -138,7 +136,6 @@ interface ShareContract {
                 scoped<PlayerContract.PlayerControls> { EmptyPlayerControls() }
                 scoped { AlertDialogCreator(get<ShareActivity>()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
-                scoped<ActionBarModifier> { EmptyActionBarModifier() }
                 // SHARE HACKS
                 scoped<CommitHost> { get<ShareActivity>() }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }

@@ -24,13 +24,14 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
@@ -65,7 +66,7 @@ class PlaylistsFragment :
     private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val res: ResourceWrapper by inject()
-    private val actionBarModifier: ActionBarModifier by inject()
+    private val playlistsHelpConfig: PlaylistsHelpConfig by inject()
 
     private var _binding: FragmentPlaylistsBinding? = null
     private val binding get() = _binding!!
@@ -74,6 +75,9 @@ class PlaylistsFragment :
         get() = binding.playlistsToolbar.menu.findItem(R.id.playlists_search)
     private val addMenuItem: MenuItem
         get() = binding.playlistsToolbar.menu.findItem(R.id.playlists_add)
+
+    private val helpMenuItem: MenuItem
+        get() = binding.playlistsToolbar.menu.findItem(R.id.playlists_help)
 
     private var snackbar: Snackbar? = null
     private var dialogFragment: DialogFragment? = null
@@ -133,11 +137,11 @@ class PlaylistsFragment :
                 }
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
-                    setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
+                    binding.playlistsToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
-                    setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+                    binding.playlistsToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
             }
@@ -154,13 +158,6 @@ class PlaylistsFragment :
         linkScopeToActivity()
     }
 
-    private fun setMenuItemsColor(cslRes: Int) {
-        val colorStateList = res.getColorStateList(cslRes)
-        searchMenuItem.iconTintList = colorStateList
-        addMenuItem.iconTintList = colorStateList
-        actionBarModifier.setMenuItemColor(cslRes)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlists_actionbar, menu)
@@ -173,7 +170,11 @@ class PlaylistsFragment :
             presenter.onCreatePlaylist()
             true
         }
-        setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+        helpMenuItem.setOnMenuItemClickListener {
+            OnboardingFragment.show(requireActivity(), playlistsHelpConfig)
+            true
+        }
+        binding.playlistsToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
     }
 
     override fun onStart() {

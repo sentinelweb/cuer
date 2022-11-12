@@ -29,9 +29,12 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.scaleDrawableLeftSize
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.*
@@ -44,6 +47,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -63,6 +67,8 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val commitHost: CommitHost by inject()
+    private val res: ResourceWrapper by inject()
+    private val playlistEditHelpConfig: PlaylistEditHelpConfig by inject()
 
     internal var listener: Listener? = null
 
@@ -70,6 +76,9 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val binding get() = _binding ?: throw IllegalStateException("FragmentPlaylistEditBinding not bound")
 
     private var dialogFragment: DialogFragment? = null
+
+    private val helpMenuItem: MenuItem
+        get() = binding.peToolbar.menu.findItem(R.id.pe_help)
 
     private val playlistIdArg: Long? by lazy {
         PLAYLIST_ID.getLong(arguments)?.takeIf { it > 0 || it < -1 }
@@ -118,6 +127,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         viewModel.setIsDialog(isDialog)
         binding.peClickPrompt.isVisible = !isDialog
         binding.peToolbar.title = ""
+        binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
         binding.peImage.setOnTouchListener { iv, e ->
             when (e.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
@@ -146,7 +156,16 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         binding.peDeletableItems.setOnCheckedChangeListener { v, b ->
             viewModel.onFlagChanged(b, DELETE_ITEMS)
         }
-        binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
+
+        binding.pePlayable.scaleDrawableLeftSize(1f)
+        binding.peDeletable.scaleDrawableLeftSize(0.8f)
+        binding.pePlayable.scaleDrawableLeftSize(0.8f)
+        binding.peEditableItems.scaleDrawableLeftSize(0.7f)
+        binding.peDeletableItems.scaleDrawableLeftSize(0.7f)
+        binding.peDefault.scaleDrawableLeftSize(0.8f)
+        binding.pePlayStart.scaleDrawableLeftSize(0.8f)
+        binding.peParentLabel.scaleDrawableLeftSize(0.7f)
+
         binding.peAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
             var isShow = false
@@ -159,9 +178,11 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
+                    binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
+                    binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
             }
@@ -193,6 +214,15 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         linkScopeToActivity()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        helpMenuItem.setOnMenuItemClickListener {
+            OnboardingFragment.show(requireActivity(), playlistEditHelpConfig)
+            true
+        }
+        binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
     }
 
     override fun onStart() {

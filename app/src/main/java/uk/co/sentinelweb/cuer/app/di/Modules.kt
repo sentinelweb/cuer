@@ -33,6 +33,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
@@ -122,6 +123,7 @@ object Modules {
         FloatingPlayerContract.serviceModule,
         SupportDialogFragment.fragmentModule,
         AppSelectorBottomSheet.fragmentModule,
+        OnboardingFragment.fragmentModule
     )
 
     private val uiModule = module {

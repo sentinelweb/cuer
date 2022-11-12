@@ -63,6 +63,9 @@ class PlaylistModelMapper constructor(
             isPinned = pinned,
             canPlay = domain.config.playable,
             canEdit = domain.config.editable,
+            canDelete = domain.config.deletable,
+            canEditItems = domain.config.editableItems,
+            canDeleteItems = domain.config.deletableItems,
             items = if (mapItems) {
                 domain.items.mapIndexed { index, item ->
                     val modelId = item.id ?: modelIdGenerator

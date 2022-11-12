@@ -61,7 +61,7 @@ class IconMapper {
             INSTAGRAM -> R.drawable.ic_instagram
             TWITTER -> R.drawable.ic_platform_twitter_24_black
             DISCORD -> R.drawable.ic_discord
-            YOUTUBE -> R.drawable.ic_youtube
+            YOUTUBE -> R.drawable.ic_platform_youtube
             VIMEO -> R.drawable.ic_vimeo
             SOUNDCLOUD -> R.drawable.ic_soundcloud
             TEESPRING -> R.drawable.ic_teespring

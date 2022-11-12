@@ -28,7 +28,6 @@ import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter.BackupResult.*
 import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
-import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -53,7 +52,6 @@ class MainActivity :
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     CompactPlayerScroll.PlayerHost,
     AndroidScopeComponent,
-    ActionBarModifier,
     MainContract.PlayerViewControl {
 
     override val scope: Scope by activityScopeWithSource<MainActivity>()
@@ -217,6 +215,7 @@ class MainActivity :
         //checkIntent(intent)
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
+
     }
 
     override fun onStop() {
@@ -363,12 +362,5 @@ class MainActivity :
             c.startActivity(Intent(c, MainActivity::class.java)
                 .apply { setFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
         }
-    }
-
-    // from ActionBarModifier
-    override fun setMenuItemColor(colorStateListId: Int) {
-        val colorStateList = res.getColorStateList(colorStateListId)
-        pasteAddMenuItem?.setIconTintList(colorStateList)
-        settingsMenuItem?.setIconTintList(colorStateList)
     }
 }

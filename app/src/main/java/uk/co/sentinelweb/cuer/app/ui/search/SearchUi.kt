@@ -1,9 +1,12 @@
 package uk.co.sentinelweb.cuer.app.ui.search
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.ButtonDefaults.elevation
 import androidx.compose.material.icons.Icons
@@ -407,7 +410,7 @@ val searchParams = SearchContract.Model(
     type = "Local",
     icon = R.drawable.ic_portrait,
     otherType = "YouTube",
-    otherIcon = R.drawable.ic_youtube,
+    otherIcon = R.drawable.ic_platform_youtube,
     text = "philosophy",
     isLocal = true,
     localParams = SearchContract.LocalModel(
@@ -443,7 +446,7 @@ fun PreviewLocalUi() {
 fun PreviewRemoteUi() {
     SearchParametersUi(searchParams.copy(
         type = "YouTube",
-        icon = R.drawable.ic_youtube,
+        icon = R.drawable.ic_platform_youtube,
         otherType = "Local",
         otherIcon = R.drawable.ic_portrait,
         isLocal = false
@@ -456,7 +459,7 @@ fun PreviewRemoteRelatedlUi() {
     SearchParametersUi(
         searchParams.copy(
             type = "YouTube",
-            icon = R.drawable.ic_youtube,
+            icon = R.drawable.ic_platform_youtube,
             otherType = "Local",
             otherIcon = R.drawable.ic_portrait,
             text = null,

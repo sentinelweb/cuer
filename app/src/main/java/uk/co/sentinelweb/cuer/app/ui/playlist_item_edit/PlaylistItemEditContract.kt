@@ -127,6 +127,7 @@ interface PlaylistItemEditContract {
                 scoped { ItemFactory(get(), get(), get()) }
                 scoped { ItemModelMapper(get(), get(), get(), get()) }
                 scoped { ItemTextMapper(get(), get()) }
+                scoped { PlaylistItemEditHelpConfig(get()) }
             }
         }
 

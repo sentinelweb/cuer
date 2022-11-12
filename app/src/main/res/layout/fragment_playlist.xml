@@ -107,6 +107,7 @@
                             android:visibility="gone"
                             app:icon="@drawable/ic_playmode_shuffle"
                         />
+
                     </LinearLayout>
                 </HorizontalScrollView>
 
@@ -167,6 +168,51 @@
                         android:visibility="gone"
                         app:drawableStartCompat="@drawable/ic_tree_flag_20"
                         tools:text="3"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_playable"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/help_pe_playable"
+                        android:src="@drawable/ic_play_black"
+                        android:visibility="visible"
+                        app:tint="@color/light_color_on_surface"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_deletable"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/help_pe_deletable"
+                        android:src="@drawable/ic_delete"
+                        android:visibility="visible"
+                        app:tint="@color/light_color_on_surface"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_editable"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/help_pe_editable"
+                        android:src="@drawable/ic_edit_24"
+                        android:visibility="visible"
+                        app:tint="@color/light_color_on_surface"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_deletable_items"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/help_pe_deletable_items"
+                        android:src="@drawable/ic_delete_item"
+                        android:visibility="visible"
+                        app:tint="@color/light_color_on_surface"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_editable_items"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/help_pe_editabe_items"
+                        android:src="@drawable/ic_editable_items"
+                        android:visibility="visible"
+                        app:tint="@color/light_color_on_surface"
                     />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
@@ -42,7 +43,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 
-class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
+class BrowseFragment : Fragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<BrowseFragment>()
     private val controller: BrowseController by inject()
@@ -54,9 +55,11 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
+    private val res: ResourceWrapper by inject()
+    private val browseHelpConfig: BrowseHelpConfig by inject()
 
     private var _binding: FragmentComposeBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
 
     init {
         log.tag(this)
@@ -135,6 +138,11 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                             SearchBottomSheetFragment()
                                 .show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
                         }
+
+                        ActionHelp -> {
+                            OnboardingFragment.show(requireActivity(), browseHelpConfig)
+                        }
+
                         is AddPlaylist -> {
                             startActivity(
                                 ShareActivity.urlIntent(
@@ -200,6 +208,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                 scoped { BrowseModelMapper(get(), get()) }
                 scoped { BrowseMviView(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
+                scoped { BrowseHelpConfig(get()) }
             }
         }
     }

@@ -144,6 +144,7 @@ class BrowseStoreFactory constructor(
 
                 Intent.ActionSettings -> publish(Label.ActionSettings)
                 Intent.ActionSearch -> publish(Label.ActionSearch)
+                Intent.ActionHelp -> publish(Label.ActionHelp)
             }
 
         private suspend fun checkPlatformId(

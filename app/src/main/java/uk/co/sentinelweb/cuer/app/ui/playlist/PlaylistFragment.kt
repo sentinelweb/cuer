@@ -31,9 +31,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
-import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -42,6 +42,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.CastState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
@@ -69,7 +70,6 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-
 class PlaylistFragment :
     Fragment(),
     PlaylistContract.View,
@@ -96,7 +96,7 @@ class PlaylistFragment :
     private val commitHost: CommitHost by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val res: ResourceWrapper by inject()
-    private val actionBarModifier: ActionBarModifier by inject()
+    private val playlistHelpConfig: PlaylistHelpConfig by inject()
 
     private var _adapter: PlaylistAdapter? = null
     private val adapter: PlaylistAdapter
@@ -111,8 +111,12 @@ class PlaylistFragment :
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_search)
     private val cardsMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_view_cards)
+
     private val rowsMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_view_rows)
+
+    private val helpMenuItem: MenuItem
+        get() = binding.playlistToolbar.menu.findItem(R.id.playlist_help)
 
     override val isHeadless: Boolean
         get() = HEADLESS.getBoolean(arguments)
@@ -146,11 +150,11 @@ class PlaylistFragment :
             }
             if (appBarOffsetScrollRange + verticalOffset == 0) {
                 menuState.isCollapsed = true
-                setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
+                binding.playlistToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
                 edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
             } else if (menuState.isCollapsed) {
                 menuState.isCollapsed = false
-                setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+                binding.playlistToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
                 edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
             }
         }
@@ -214,18 +218,13 @@ class PlaylistFragment :
             binding.playlistFabPlaymode.isVisible = false
         }
         setupRecyclerView()
-
         imageUrlArg?.also { setImage(it) }
     }
 
-    private fun setMenuItemsColor(cslRes: Int) {
-        val colorStateList = res.getColorStateList(cslRes)
-        searchMenuItem.iconTintList = colorStateList
-        cardsMenuItem.iconTintList = colorStateList
-        rowsMenuItem.iconTintList = colorStateList
-        actionBarModifier.setMenuItemColor(cslRes)
-
+    override fun showHelp() {
+        OnboardingFragment.show(requireActivity(), playlistHelpConfig)
     }
+
 
     private fun setupRecyclerView() {
         if (binding.playlistList.adapter != null) {
@@ -264,9 +263,13 @@ class PlaylistFragment :
             bottomSheetFragment.show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
             true
         }
+        helpMenuItem.setOnMenuItemClickListener {
+            presenter.onHelp()
+            true
+        }
         cardsMenuItem.isVisible = !presenter.isCards
         rowsMenuItem.isVisible = presenter.isCards
-        setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+        binding.playlistToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
     }
 
     override fun onAttach(context: Context) {
@@ -419,6 +422,11 @@ class PlaylistFragment :
         binding.playlistFabPlaymode.setIconResource(model.loopModeIcon)
         binding.playlistFlagChildren.isVisible = model.hasChildren > 0
         binding.playlistFlagChildren.text = model.hasChildren.toString()
+        binding.playlistFlagPlayable.isVisible = model.canPlay
+        binding.playlistFlagDeletable.isVisible = model.canDelete
+        binding.playlistFlagEditable.isVisible = model.canEdit
+        binding.playlistFlagDeletableItems.isVisible = model.canDeleteItems
+        binding.playlistFlagEditableItems.isVisible = model.canEditItems
         binding.playlistEditButton.isVisible = model.canEdit
         binding.playlistStarButton.isVisible = model.canEdit
         binding.playlistUpdateButton.isVisible = model.canUpdate

@@ -38,6 +38,7 @@ class BrowseController constructor(
             is OnActionSettingsClicked -> ActionSettings
             is OnSetOrder -> SetOrder(order)
             is OnActionSearchClicked -> ActionSearch
+            is OnActionHelpClicked -> ActionHelp
         }
     }
 

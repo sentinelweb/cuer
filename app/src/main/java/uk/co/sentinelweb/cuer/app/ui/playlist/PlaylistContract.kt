@@ -75,6 +75,7 @@ interface PlaylistContract {
         fun setAddPlaylistParent(id: Long)
         fun checkToSave()
         fun onShowCards(cards: Boolean): Boolean
+        fun onHelp()
     }
 
     interface Interactions {
@@ -111,6 +112,8 @@ interface PlaylistContract {
         fun navigate(nav: NavigationModel)
         fun newAdapter()
         fun getScrollIndex(): Int
+        fun showHelp()
+
         val isHeadless: Boolean
     }
 
@@ -155,6 +158,9 @@ interface PlaylistContract {
         val canPlay: Boolean,
         val canEdit: Boolean,
         val canUpdate: Boolean,
+        val canDelete: Boolean,
+        val canEditItems: Boolean,
+        val canDeleteItems: Boolean,
         val items: List<ItemContract.Model>?,
         val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
         val hasChildren: Int,
@@ -254,6 +260,7 @@ interface PlaylistContract {
                     )
                 }
                 viewModel { State() }
+                scoped { PlaylistHelpConfig(get()) }
             }
         }
     }

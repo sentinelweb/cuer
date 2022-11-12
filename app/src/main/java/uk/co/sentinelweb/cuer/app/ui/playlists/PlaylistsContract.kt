@@ -132,6 +132,8 @@ interface PlaylistsContract {
                 scoped { ItemModelMapper(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 viewModel { State() }
+                scoped { PlaylistsHelpConfig(get()) }
+
             }
         }
 
