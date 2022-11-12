@@ -387,6 +387,10 @@
     <string name="next">Next</string>
     <string name="done">Done</string>
     <string name="finish">Finish</string>
+    <string name="help_browse">Browse</string>
+    <string name="help_browse_desc">Lists all the content in categories</string>
+    <string name="help_browse_az">See all A-Z</string>
+    <string name="help_browse_categories">See categories</string>
 
 
 </resources>

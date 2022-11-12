@@ -78,7 +78,7 @@ object OnboardingComposables {
             scope.launch {
                 states.reversed().forEach {
                     it.targetState = false
-                    delay(100)
+                    delay(50)
                 }
                 view.onNext()
             }
@@ -97,7 +97,7 @@ object OnboardingComposables {
             MutableTransitionState(false)
         }
         LaunchedEffect(line) {
-            delay(seq * 200L)
+            delay(seq * 300L)
             state.targetState = true
         }
         AnimatedVisibility(
