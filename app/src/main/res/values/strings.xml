@@ -362,6 +362,11 @@
     <string name="help_pe_deletable_items">Deleteable Items</string>
     <string name="help_pe_editabe_items">Editable (Moveable) items</string>
     <string name="help_pe_editable">Editable playlist</string>
+
+    <string name="help_browse">Browse</string>
+    <string name="help_browse_desc">Lists all the content in categories</string>
+    <string name="help_browse_az">See all A-Z</string>
+    <string name="help_browse_categories">See categories</string>
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -387,10 +392,6 @@
     <string name="next">Next</string>
     <string name="done">Done</string>
     <string name="finish">Finish</string>
-    <string name="help_browse">Browse</string>
-    <string name="help_browse_desc">Lists all the content in categories</string>
-    <string name="help_browse_az">See all A-Z</string>
-    <string name="help_browse_categories">See categories</string>
 
 
 </resources>
