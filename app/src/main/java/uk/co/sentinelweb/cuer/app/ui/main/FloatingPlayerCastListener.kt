@@ -11,8 +11,7 @@ class FloatingPlayerCastListener constructor(
     private var activity: MainActivity?,
     private val wrapper: ChromeCastWrapper,
     private val floatingPlayerServiceManager: FloatingPlayerServiceManager,
-
-    ) : SessionManagerListener<CastSession> {
+) : SessionManagerListener<CastSession> {
 
     fun observeConnection() {
         activity?.lifecycle?.addObserver(object : DefaultLifecycleObserver {
@@ -24,7 +23,7 @@ class FloatingPlayerCastListener constructor(
                 release()
                 activity = null
             }
-        })
+        }) ?: throw IllegalStateException("FloatingPlayerCastListener: Activity already cleaned up")
     }
 
     fun listen() {
