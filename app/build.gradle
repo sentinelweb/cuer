@@ -39,15 +39,15 @@ android {
     signingConfigs {
         release {
             // for bundleRelease
-            keyAlias "$CUER_UPLOAD_KEY_ALIAS"
-            keyPassword "$CUER_UPLOAD_PASSWORD"
-            storeFile file("$CUER_UPLOAD_KEY_FILE")
-            storePassword "$CUER_UPLOAD_PASSWORD"
+//            keyAlias "$CUER_UPLOAD_KEY_ALIAS"
+//            keyPassword "$CUER_UPLOAD_PASSWORD"
+//            storeFile file("$CUER_UPLOAD_KEY_FILE")
+//            storePassword "$CUER_UPLOAD_PASSWORD"
             // for assembleRelease
-//            keyAlias "$CUER_SIGNING_KEY_ALIAS"
-//            keyPassword "$CUER_SIGNING_PASSWORD"
-//            storeFile file("$CUER_SIGNING_KEY_FILE")
-//            storePassword "$CUER_SIGNING_PASSWORD"
+            keyAlias "$CUER_SIGNING_KEY_ALIAS"
+            keyPassword "$CUER_SIGNING_PASSWORD"
+            storeFile file("$CUER_SIGNING_KEY_FILE")
+            storePassword "$CUER_SIGNING_PASSWORD"
         }
     }
 
