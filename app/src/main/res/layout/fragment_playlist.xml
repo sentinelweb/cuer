@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.main.MainActivity"
+    android:background="?colorSurface"
 >
 
     <com.google.android.material.appbar.AppBarLayout
@@ -246,14 +247,16 @@
             tools:context=".ui.playlist.PlaylistFragment"
             tools:listitem="@layout/view_playlist_row"
             android:scrollbars="vertical"
-            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"/>
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+            android:visibility="visible"/>
 
     </uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/playlist_empty"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="match_parent"
+        android:paddingTop="84dp"
         android:gravity="center"
         android:text="@string/playlist_empty"
         android:textAppearance="@style/TextAppearance.App.Headline2"

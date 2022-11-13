@@ -574,9 +574,11 @@ class PlaylistPresenter(
                             // updates order
                             ?.let { playlistItemOrchestrator.save(it.first, it.second) }
                     }
-                }?.also {
+                }
+                ?.also {
                     modelMapper.map(
-                        it, isPlaylistPlaying(),
+                        domain = it,
+                        isPlaying = isPlaylistPlaying(),
                         id = state.playlistIdentifier,
                         playlists = state.playlistsTreeLookup,
                         pinned = isPlaylistPinned(),
@@ -774,8 +776,8 @@ class PlaylistPresenter(
             .takeIf { coroutines.mainScopeActive }
             ?.let {
                 modelMapper.map(
-                    it,
-                    isPlaylistPlaying(),
+                    domain = it,
+                    isPlaying = isPlaylistPlaying(),
                     id = state.playlistIdentifier,
                     playlists = state.playlistsTreeLookup,
                     pinned = isPlaylistPinned(),
