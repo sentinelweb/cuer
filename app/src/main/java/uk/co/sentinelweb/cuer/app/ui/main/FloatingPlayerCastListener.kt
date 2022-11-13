@@ -1,32 +1,29 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.cast.framework.CastSession
 import com.google.android.gms.cast.framework.SessionManagerListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 
 class FloatingPlayerCastListener constructor(
-    private val activity: MainActivity,
+    private var activity: MainActivity?,
     private val wrapper: ChromeCastWrapper,
     private val floatingPlayerServiceManager: FloatingPlayerServiceManager,
 
     ) : SessionManagerListener<CastSession> {
 
     fun observeConnection() {
-        activity.lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-            fun connectListener() {
+        activity?.lifecycle?.addObserver(object : DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
                 listen()
             }
 
-            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            fun disconnectListener() {
+            override fun onDestroy(owner: LifecycleOwner) {
                 release()
+                activity = null
             }
-
         })
     }
 
