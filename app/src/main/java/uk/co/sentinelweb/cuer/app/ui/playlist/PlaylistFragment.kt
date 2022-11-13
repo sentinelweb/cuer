@@ -243,7 +243,7 @@ class PlaylistFragment :
     }
 
     private fun createAdapter() =
-        PlaylistAdapter(get(), this, presenter.isCards)
+        PlaylistAdapter(get(), this, presenter.isCards, get())
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
