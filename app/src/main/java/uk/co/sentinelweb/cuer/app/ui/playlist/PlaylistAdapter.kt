@@ -8,13 +8,19 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemViewHolder
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 
 class PlaylistAdapter constructor(
     private val itemFactory: ItemFactory,
     private val interactions: ItemContract.Interactions,
-    private val showCards: Boolean
+    private val showCards: Boolean,
+    private val log: LogWrapper,
 ) : RecyclerView.Adapter<ItemViewHolder>() {
+
+    init {
+        log.tag(this)
+    }
 
     private var _recyclerView: RecyclerView? = null
     private val recyclerView: RecyclerView
@@ -48,7 +54,12 @@ class PlaylistAdapter constructor(
             }
         } else {
             this@PlaylistAdapter._data = data.toMutableList()
-            notifyDataSetChanged()
+            // https://github.com/sentinelweb/cuer/issues/369
+            if (!recyclerView.isComputingLayout) {
+                notifyDataSetChanged()
+            } else {
+                log.e("Could not update playlist adapter: isComputingLayout", IllegalStateException())
+            }
         }
     }
 
