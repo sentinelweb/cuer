@@ -12,7 +12,7 @@ struct MainView: View {
     @StateObject private var coordinator: MainCoordinator
     // updated from onReceive at bottom of view
     //      @State private var screen: Screen = Screen.launch
-    
+    @State private var playlistViewModel: PlaylistViewModel?
     
     init(mainCoordinator: MainCoordinator) {
         self._coordinator = StateObject(wrappedValue: mainCoordinator)
@@ -32,11 +32,11 @@ struct MainView: View {
                 PlaylistsView(viewModel: coordinator.createPlaylistsViewModel())
                     .tabItem { Label("Playlists", systemImage: "list.bullet.indent") }
                     .tag(MainTab.playlists)
-                
-                PlaylistView(viewModel: coordinator.createPlaylistViewModel())
-                    .tabItem { Label("Playlist", systemImage: "music.note.list") }
-                    .tag(MainTab.playlist)
-                
+                if (playlistViewModel != nil) {
+                    PlaylistView(viewModel: playlistViewModel!)
+                        .tabItem { Label("Playlist", systemImage: "music.note.list") }
+                        .tag(MainTab.playlist)
+                    }
                 NavigationView {
                     SettingsView(coordinator: coordinator)
                 }
@@ -48,7 +48,7 @@ struct MainView: View {
             .sheet(item: $coordinator.openedURL) {
                 SafariView(url: $0)
                     .edgesIgnoringSafeArea(.all)
-            }
+            }.onReceive(coordinator.$currentPlaylistViewModel, perform: {vm in playlistViewModel=vm})
         default:
             Text("Unsupported")
         }

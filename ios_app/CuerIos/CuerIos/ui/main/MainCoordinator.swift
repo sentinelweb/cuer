@@ -51,6 +51,7 @@ class MainCoordinator: ObservableObject {
     @Published var currentRoute: Route = Route.none
     @Published var currentTab: MainTab = MainTab.browse
     @Published var currentPlaylistId: Int = -1
+    @Published var currentPlaylistViewModel: PlaylistViewModel?=nil
     @Published var openedURL: URL?
     
     func navigate(route: Route) {
@@ -58,6 +59,7 @@ class MainCoordinator: ObservableObject {
         debugPrint("navigate: \(route)")
         switch(route){
         case .main:
+            self.currentPlaylistViewModel = createPlaylistViewModel()
             self.screen = Parent.main
         case .browse:
             self.currentTab = MainTab.browse
@@ -80,7 +82,11 @@ class MainCoordinator: ObservableObject {
     }
     
     func createPlaylistViewModel() -> PlaylistViewModel{
-        return dependencies.createPlaylistViewModel(plId: -1)
+        if (self.currentPlaylistViewModel == nil) {
+            let extractedExpr: PlaylistViewModel = dependencies.createPlaylistViewModel(plId: -1)
+            self.currentPlaylistViewModel =  extractedExpr
+        }
+        return self.currentPlaylistViewModel!
     }
     
     func open(_ url: URL) {

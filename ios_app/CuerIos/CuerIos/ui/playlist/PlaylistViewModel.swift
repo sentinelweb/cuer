@@ -28,15 +28,21 @@ final class PlaylistViewModel: ObservableObject {
     let dependencies: Dependencies
     let playlist: PlaylistDomain? = nil
     
+    private let log = SystemLogWrapper()
+    
     private var playlistIdSubscription: AnyCancellable? = nil
     
     @Published var plId:Int = -1
     
     init(dependencies: Dependencies) {
+        log.tag="PlaylistViewModel"
+        log.d(msg: "init start")
         self.dependencies = dependencies
         playlistIdSubscription = dependencies.mainCoordinator.$currentPlaylistId.sink(receiveValue:{plId in
             self.plId = plId
+            self.log.d(msg: "got playlistid: \(plId)")
         })
+        log.d(msg: "init complete")
     }
     
     deinit{
