@@ -51,7 +51,7 @@ class MainCoordinator: ObservableObject {
     @Published var currentRoute: Route = Route.none
     @Published var currentTab: MainTab = MainTab.browse
     @Published var currentPlaylistId: Int = -1
-    @Published var currentPlaylistViewModel: PlaylistViewModel?=nil
+    @Published var currentPlaylistViewModel: PlaylistViewModel? = nil
     @Published var openedURL: URL?
     
     func navigate(route: Route) {
