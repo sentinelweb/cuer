@@ -4,6 +4,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization")
+    id("com.chromaticnoise.multiplatform-swiftpackage") version "2.0.3"
 }
 
 val ver_coroutines: String by project
@@ -25,26 +26,10 @@ val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
 val ver_kotlin_fixture: String by project
+val ver_swift_tools: String by project
+val ver_ios_deploy_target: String by project
 
 version = "1.0"
-
-android {
-    compileSdk = app_compileSdkVersion.toInt()
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdk = app_minSdkVersion.toInt()
-        targetSdk = app_targetSdkVersion.toInt()
-    }
-    // remove when upgrading to kotlin 1.5
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
-    }
-}
 
 kotlin {
     jvm()
@@ -55,6 +40,21 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+
+    multiplatformSwiftPackage {
+        packageName("shared")
+        swiftToolsVersion(ver_swift_tools)
+        targetPlatforms {
+            iOS { v(ver_ios_deploy_target) }
+        }
+    }
+
+//    targets.withType(org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget::class.java) {
+//        binaries.all {
+//            binaryOptions["memoryModel"] = "experimental"
+//            //freeCompilerArgs += "-Xruntime-logs=gc=info -Xobjc-generics"
+//        }
+//    }
 
     sourceSets {
         all {
@@ -140,6 +140,24 @@ kotlin {
             iosSimulatorArm64Test.dependsOn(this)
         }
     }
+}
+
+android {
+    compileSdk = app_compileSdkVersion.toInt()
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    defaultConfig {
+        minSdk = app_minSdkVersion.toInt()
+        targetSdk = app_targetSdkVersion.toInt()
+    }
+    // remove when upgrading to kotlin 1.5
+//    configurations {
+//        create("androidTestApi")
+//        create("androidTestDebugApi")
+//        create("androidTestReleaseApi")
+//        create("testApi")
+//        create("testDebugApi")
+//        create("testReleaseApi")
+//    }
 }
 
 //https://stackoverflow.com/questions/55456176/unresolved-reference-compilekotlin-in-build-gradle-kts
