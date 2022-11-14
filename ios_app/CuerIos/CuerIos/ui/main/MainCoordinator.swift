@@ -26,7 +26,7 @@ enum Route {
     case main
     case browse
     case playlists
-    case playlist
+    case playlist(plId: Int)
     case itemEdit
     case playlistEdit
     case none
@@ -63,7 +63,7 @@ class MainCoordinator: ObservableObject {
             self.currentTab = MainTab.browse
         case .playlists:
             self.currentTab = MainTab.playlists
-        case .playlist:
+        case let .playlist(plId):
             self.currentTab = MainTab.playlist
         
         default: debugPrint("navigate default: \(route)")
@@ -79,7 +79,7 @@ class MainCoordinator: ObservableObject {
     }
     
     func createPlaylistViewModel() -> PlaylistViewModel{
-        return dependencies.createPlaylistViewModel()
+        return dependencies.createPlaylistViewModel(plId: -1)
     }
     
     func open(_ url: URL) {

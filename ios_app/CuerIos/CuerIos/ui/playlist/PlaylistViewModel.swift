@@ -8,19 +8,24 @@
 import Foundation
 
 protocol PlaylistViewModelDependency {
-    func createPlaylistViewModel() -> PlaylistViewModel
+    func createPlaylistViewModel(plId: Int) -> PlaylistViewModel
 }
 
 class PlaylistViewModelProvider: PlaylistViewModel.Dependencies {
     let mainCoordinator: MainCoordinator
-    init(mainCoordinator: MainCoordinator) {
+    let plId: Int
+    init(mainCoordinator: MainCoordinator, plId: Int) {
         self.mainCoordinator = mainCoordinator
+        self.plId = plId
+    
     }
 }
 
 final class PlaylistViewModel: ObservableObject {
-    typealias Dependencies = MainCoordinatorDependency
+    typealias Dependencies = MainCoordinatorDependency & PlaylistIdDependency
     let dependencies: Dependencies
+    
+    @Published var plId:Int = -1
     
     init(dependencies: Dependencies) {
         self.dependencies = dependencies

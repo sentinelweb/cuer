@@ -13,6 +13,7 @@ protocol PlaylistsViewModelDependency {
 
 class PlaylistsViewModelProvider: PlaylistsViewModel.Dependencies {
     let mainCoordinator: MainCoordinator
+    
     init(mainCoordinator: MainCoordinator) {
         self.mainCoordinator = mainCoordinator
     }
@@ -24,5 +25,9 @@ final class PlaylistsViewModel: ObservableObject {
     
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
+    }
+    
+    func navigateToPlaylist(id: Int) {
+        self.dependencies.mainCoordinator.navigate(route: Route.playlist(plId: id))
     }
 }

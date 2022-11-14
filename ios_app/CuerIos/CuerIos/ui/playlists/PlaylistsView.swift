@@ -15,7 +15,18 @@ struct PlaylistsView: View {
     }
     
     var body: some View {
-        Text("Playlists")
+        VStack {
+            Text("Playlists")
+            Spacer()
+            Text("Playlist 1").onTapGesture {
+                viewModel.navigateToPlaylist(id: 1)
+            }
+            Text("Playlist 2").onTapGesture {
+                viewModel.navigateToPlaylist(id: 2)
+            }
+            Spacer()
+        }
+        
     }
 }
 

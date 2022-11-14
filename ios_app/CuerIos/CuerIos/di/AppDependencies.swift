@@ -13,8 +13,8 @@ import Foundation
 //  var xxxExecutor: UseCaseExecutor { get }
 //}
 
-protocol PlaylistIdDependency {var batchId: String { get }}
-protocol PlaylistIdOptionalDependency {var batchId: String? { get }}
+protocol PlaylistIdDependency {var plId: Int { get }}
+protocol PlaylistIdOptionalDependency {var plId: Int? { get }}
 
 class AppDependencies: IosBuildConfigDependency
 & MainCoordinatorDependency
@@ -34,10 +34,11 @@ class AppDependencies: IosBuildConfigDependency
         )
     }
     
-    func createPlaylistViewModel() -> PlaylistViewModel {
+    func createPlaylistViewModel(plId: Int) -> PlaylistViewModel {
         PlaylistViewModel(
             dependencies: PlaylistViewModelProvider(
-                mainCoordinator: mainCoordinator
+                mainCoordinator: mainCoordinator,
+                plId: plId
             )
         )
     }
