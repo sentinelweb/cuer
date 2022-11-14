@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct BrowseView: View {
+    @StateObject private var viewModel: BrowseViewModel
+    
+    init(viewModel: BrowseViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
+    
     var body: some View {
         Text("Browse, World!")
     }

@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct PlaylistView: View {
+    @StateObject private var viewModel: PlaylistViewModel
+    
+    init(viewModel: PlaylistViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
+    
     var body: some View {
         Text("Playlist")
     }

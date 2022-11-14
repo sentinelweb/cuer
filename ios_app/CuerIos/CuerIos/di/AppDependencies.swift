@@ -19,6 +19,8 @@ protocol PlaylistIdOptionalDependency {var batchId: String? { get }}
 class AppDependencies: IosBuildConfigDependency
 & MainCoordinatorDependency
 & BrowseViewModelDependency
+& PlaylistViewModelDependency
+& PlaylistsViewModelDependency
 {
     lazy var buildConfig: IosBuildConfig = {IosBuildConfig()}()
     
@@ -27,6 +29,22 @@ class AppDependencies: IosBuildConfigDependency
     func createBrowseViewModel() -> BrowseViewModel {
         BrowseViewModel(
             dependencies: BrowseViewModelProvider(
+                mainCoordinator: mainCoordinator
+            )
+        )
+    }
+    
+    func createPlaylistViewModel() -> PlaylistViewModel {
+        PlaylistViewModel(
+            dependencies: PlaylistViewModelProvider(
+                mainCoordinator: mainCoordinator
+            )
+        )
+    }
+    
+    func createPlaylistsViewModel() -> PlaylistsViewModel {
+        PlaylistsViewModel(
+            dependencies: PlaylistsViewModelProvider(
                 mainCoordinator: mainCoordinator
             )
         )

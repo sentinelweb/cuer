@@ -8,7 +8,7 @@
 import Foundation
 
 // outgoing route request (pass view dependencies)
-enum Screen {
+enum Parent {
     case launch
     case main
     case none // no screen
@@ -21,19 +21,15 @@ enum MainTab {
     case settings
 }
 
-enum MainTabScreen {
-    case browse(viewModel: BrowseViewModel)
-    case playlists(viewModel: PlaylistsViewModel)
-    case playlist(viewModel: PlaylistViewModel)
-}
-
 // incoming route request (pass data in enum)
 enum Route {
+    case main
     case browse
     case playlists
     case playlist
     case itemEdit
     case playlistEdit
+    case none
 }
 
 protocol MainCoordinatorDependency {
@@ -51,9 +47,9 @@ class MainCoordinator: ObservableObject {
 //        self.tabScreen = MainTabScreen.browse(viewModel: dependencies.createBrowseViewModel())
     }
     
-    @Published var screen: Screen = Screen.launch // navigate called in view onAppear
-    @Published var tabScreen: MainTabScreen? = nil
-    @Published var currentRoute: Route = Route.browse
+    @Published var screen: Parent = Parent.launch // navigate called in view onAppear
+
+    @Published var currentRoute: Route = Route.none
     @Published var currentTab: MainTab = MainTab.browse
     @Published var openedURL: URL?
     
@@ -61,21 +57,30 @@ class MainCoordinator: ObservableObject {
         self.currentRoute = route
         debugPrint("navigate: \(route)")
         switch(route){
+        case .main:
+            self.screen = Parent.main
         case .browse:
-            tabScreen = MainTabScreen.browse(viewModel: dependencies.createBrowseViewModel())
+            self.currentTab = MainTab.browse
+        case .playlists:
+            self.currentTab = MainTab.playlists
+        case .playlist:
+            self.currentTab = MainTab.playlist
         
         default: debugPrint("navigate default: \(route)")
         }
     }
     
-//    func createViewModel(route: Route)-> any ObservableObject {
-//        switch(route){
-//        case .browse:
-//            return dependencies.createBrowseViewModel()
-//        default:EmptyObservable()
-//        }
-//
-//    }
+    func createBrowseViewModel() -> BrowseViewModel {
+        return dependencies.createBrowseViewModel()
+    }
+    
+    func createPlaylistsViewModel() -> PlaylistsViewModel {
+        return dependencies.createPlaylistsViewModel()
+    }
+    
+    func createPlaylistViewModel() -> PlaylistViewModel{
+        return dependencies.createPlaylistViewModel()
+    }
     
     func open(_ url: URL) {
         self.openedURL = url
