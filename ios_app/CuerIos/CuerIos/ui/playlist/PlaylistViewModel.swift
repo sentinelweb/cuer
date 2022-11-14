@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 protocol PlaylistViewModelDependency {
     func createPlaylistViewModel(plId: Int) -> PlaylistViewModel
@@ -14,10 +15,10 @@ protocol PlaylistViewModelDependency {
 class PlaylistViewModelProvider: PlaylistViewModel.Dependencies {
     let mainCoordinator: MainCoordinator
     let plId: Int
+    
     init(mainCoordinator: MainCoordinator, plId: Int) {
         self.mainCoordinator = mainCoordinator
         self.plId = plId
-    
     }
 }
 
@@ -25,9 +26,18 @@ final class PlaylistViewModel: ObservableObject {
     typealias Dependencies = MainCoordinatorDependency & PlaylistIdDependency
     let dependencies: Dependencies
     
+    private var playlistIdSubscription: AnyCancellable? = nil
+    
     @Published var plId:Int = -1
     
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
+        playlistIdSubscription = dependencies.mainCoordinator.$currentPlaylistId.sink(receiveValue:{plId in
+            self.plId = plId
+        })
+    }
+    
+    deinit{
+        playlistIdSubscription?.cancel()
     }
 }

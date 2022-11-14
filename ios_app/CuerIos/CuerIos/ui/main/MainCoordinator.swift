@@ -44,13 +44,13 @@ class MainCoordinator: ObservableObject {
     
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
-//        self.tabScreen = MainTabScreen.browse(viewModel: dependencies.createBrowseViewModel())
     }
     
     @Published var screen: Parent = Parent.launch // navigate called in view onAppear
 
     @Published var currentRoute: Route = Route.none
     @Published var currentTab: MainTab = MainTab.browse
+    @Published var currentPlaylistId: Int = -1
     @Published var openedURL: URL?
     
     func navigate(route: Route) {
@@ -65,6 +65,7 @@ class MainCoordinator: ObservableObject {
             self.currentTab = MainTab.playlists
         case let .playlist(plId):
             self.currentTab = MainTab.playlist
+            self.currentPlaylistId = plId
         
         default: debugPrint("navigate default: \(route)")
         }
