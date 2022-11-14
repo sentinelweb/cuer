@@ -8,12 +8,36 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.remote.server.RemoteServer
+//import uk.co.sentinelweb.cuer.remote.server.RemoteServer
 import java.math.BigInteger
 import java.net.InetAddress
 import java.net.UnknownHostException
 import java.nio.ByteOrder
 
+// todo remove for remote
+interface RemoteServer {
+    val port: Int
+    fun fullAddress(ip: String): String
+    val isRunning: Boolean
+    fun start()
+    fun stop()
+}
+
+class EmptyRemoteServer : RemoteServer {
+    override val port: Int
+        get() = 2345
+
+    override fun fullAddress(ip: String): String {
+        return "fulladdress"
+    }
+
+    override val isRunning: Boolean
+        get() = false
+
+    override fun start() {}
+
+    override fun stop() {}
+}
 
 class RemoteServiceController constructor(
     private val service: RemoteService,

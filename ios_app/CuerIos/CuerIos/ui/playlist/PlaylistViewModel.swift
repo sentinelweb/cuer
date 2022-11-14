@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import shared
 
 protocol PlaylistViewModelDependency {
     func createPlaylistViewModel(plId: Int) -> PlaylistViewModel
@@ -25,6 +26,7 @@ class PlaylistViewModelProvider: PlaylistViewModel.Dependencies {
 final class PlaylistViewModel: ObservableObject {
     typealias Dependencies = MainCoordinatorDependency & PlaylistIdDependency
     let dependencies: Dependencies
+    let playlist: PlaylistDomain? = nil
     
     private var playlistIdSubscription: AnyCancellable? = nil
     

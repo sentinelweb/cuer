@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import shared
 
 protocol PlaylistsViewModelDependency {
     func createPlaylistsViewModel() -> PlaylistsViewModel
@@ -22,6 +23,7 @@ class PlaylistsViewModelProvider: PlaylistsViewModel.Dependencies {
 final class PlaylistsViewModel: ObservableObject {
     typealias Dependencies = MainCoordinatorDependency
     let dependencies: Dependencies
+
     
     init(dependencies: Dependencies) {
         self.dependencies = dependencies

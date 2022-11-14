@@ -1,10 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
+// build swift: ./gradlew shared:updatePackageSwift
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization")
-    id("com.chromaticnoise.multiplatform-swiftpackage") version "2.0.3"
+    id("co.touchlab.faktory.kmmbridge") version "0.2.2"
+    kotlin("native.cocoapods")
 }
 
 val ver_coroutines: String by project
@@ -41,12 +42,14 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    multiplatformSwiftPackage {
-        packageName("shared")
-        swiftToolsVersion(ver_swift_tools)
-        targetPlatforms {
-            iOS { v(ver_ios_deploy_target) }
+    cocoapods {
+        framework {
+            isStatic = true //or false
         }
+//        name = "shared"
+        summary = "shared"
+        homepage = "https://sentinelweb.co.uk"
+        ios.deploymentTarget = ver_ios_deploy_target
     }
 
 //    targets.withType(org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget::class.java) {
@@ -149,24 +152,16 @@ android {
         minSdk = app_minSdkVersion.toInt()
         targetSdk = app_targetSdkVersion.toInt()
     }
-    // remove when upgrading to kotlin 1.5
-//    configurations {
-//        create("androidTestApi")
-//        create("androidTestDebugApi")
-//        create("androidTestReleaseApi")
-//        create("testApi")
-//        create("testDebugApi")
-//        create("testReleaseApi")
-//    }
 }
 
-//https://stackoverflow.com/questions/55456176/unresolved-reference-compilekotlin-in-build-gradle-kts
-//tasks.withType<KotlinCompile> {
-//    kotlinOptions {
-//        jvmTarget = ver_jvm
-//        freeCompilerArgs = listOf("-Xopt-in=kotlin.time.ExperimentalTime")
-//    }
-//}
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.time.ExperimentalTime"
+}
+
+kmmbridge {
+    githubReleaseArtifacts()
+    githubReleaseVersions()
+    spm()
+    //cocoapods("git@github.com:touchlab/PublicPodspecs.git")
+    versionPrefix.set("0.6")
 }

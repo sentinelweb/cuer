@@ -90,7 +90,7 @@ import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.di.SharedNetModule
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
-import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
+//import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
 @ExperimentalCoroutinesApi
 object Modules {
@@ -245,6 +245,6 @@ object Modules {
         .plus(SharedAppModule.modules)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
-        .plus(RemoteModule.objectModule)
+//        .plus(RemoteModule.objectModule)
         .plus(PlayerModule.localPlayerModule)
 }

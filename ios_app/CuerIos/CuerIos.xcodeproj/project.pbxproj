@@ -27,6 +27,8 @@
 		BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD4292295F70004AEF4 /* SafariView.swift */; };
 		BDBEDFD8292297B70004AEF4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD7292297B70004AEF4 /* SettingsView.swift */; };
 		BDBEDFDB2922A1B10004AEF4 /* URL+Identifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFDA2922A1B10004AEF4 /* URL+Identifiable.swift */; };
+		BDBEDFE42922DC9A0004AEF4 /* shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFE32922DC9A0004AEF4 /* shared.framework */; };
+		BDBEDFE52922DC9A0004AEF4 /* shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFE32922DC9A0004AEF4 /* shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +47,20 @@
 			remoteInfo = CuerIos;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BDBEDFE62922DC9A0004AEF4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BDBEDFE52922DC9A0004AEF4 /* shared.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		BDBEDF8B29221FD20004AEF4 /* CuerIos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CuerIos.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -70,6 +86,10 @@
 		BDBEDFD4292295F70004AEF4 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 		BDBEDFD7292297B70004AEF4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		BDBEDFDA2922A1B10004AEF4 /* URL+Identifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Identifiable.swift"; sourceTree = "<group>"; };
+		BDBEDFDD2922DA2F0004AEF4 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
+		BDBEDFDE2922DA2F0004AEF4 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = shared.xcframework; path = ../../shared/build/XCFrameworks/release/shared.xcframework; sourceTree = "<group>"; };
+		BDBEDFE32922DC9A0004AEF4 /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = shared.framework; path = ../../shared/build/cocoapods/framework/shared.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDBEDFE42922DC9A0004AEF4 /* shared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +125,7 @@
 				BDBEDF9E29221FD20004AEF4 /* CuerIosTests */,
 				BDBEDFA829221FD20004AEF4 /* CuerIosUITests */,
 				BDBEDF8C29221FD20004AEF4 /* Products */,
+				BDBEDFDC2922DA2E0004AEF4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -238,6 +260,17 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		BDBEDFDC2922DA2E0004AEF4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BDBEDFE32922DC9A0004AEF4 /* shared.framework */,
+				BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */,
+				BDBEDFDD2922DA2F0004AEF4 /* libsqlite3.0.tbd */,
+				BDBEDFDE2922DA2F0004AEF4 /* libsqlite3.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -248,6 +281,7 @@
 				BDBEDF8729221FD20004AEF4 /* Sources */,
 				BDBEDF8829221FD20004AEF4 /* Frameworks */,
 				BDBEDF8929221FD20004AEF4 /* Resources */,
+				BDBEDFE62922DC9A0004AEF4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
