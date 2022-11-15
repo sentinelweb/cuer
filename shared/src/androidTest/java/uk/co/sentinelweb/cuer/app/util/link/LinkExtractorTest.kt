@@ -4,7 +4,6 @@ import org.junit.Test
 import uk.co.sentinelweb.cuer.domain.LinkDomain
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
 class LinkExtractorTest {
 

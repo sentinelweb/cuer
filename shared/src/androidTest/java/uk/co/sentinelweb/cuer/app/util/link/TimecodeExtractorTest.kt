@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.link
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import uk.co.sentinelweb.cuer.domain.TimecodeDomain
 

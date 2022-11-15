@@ -92,25 +92,6 @@ kotlin {
                 implementation("io.mockk:mockk:$ver_mockk")
             }
         }
-//        val jvmMain by getting {
-//            kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
-//            dependencies {
-//                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
-//            }
-//        }
-//        val jvmTest by getting {
-//            dependencies {
-//                // Koin for JUnit 4
-//                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
-//                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-//                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-//                implementation("com.google.truth:truth:$ver_truth")
-//                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
-//                implementation("app.cash.turbine:turbine:$ver_turbine")
-//                implementation("org.mock-server:mockserver-netty:$ver_mockserver")
-//                implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
-//            }
-//        }
         val androidMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-cio:$ver_ktor")
@@ -120,6 +101,14 @@ kotlin {
         }
         val androidTest by getting {
             dependencies {
+                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
+                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
+                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
+                implementation("com.google.truth:truth:$ver_truth")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
+                implementation("app.cash.turbine:turbine:$ver_turbine")
+                implementation("org.mock-server:mockserver-netty:$ver_mockserver")
+                implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
             }
         }
         val jsMain by getting {
