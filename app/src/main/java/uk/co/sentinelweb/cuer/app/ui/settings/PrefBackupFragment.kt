@@ -140,7 +140,9 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
     }
 
     override fun showMessage(msg: String) {
-        snackbarWrapper.make(msg).show()
+        if (!isRemoving) {
+            snackbarWrapper.make(msg).show()
+        }
     }
 
     override fun showBackupError(message: String) {

@@ -36,7 +36,7 @@ struct MainView: View {
                     PlaylistView(viewModel: playlistViewModel!)
                         .tabItem { Label("Playlist", systemImage: "music.note.list") }
                         .tag(MainTab.playlist)
-                    }
+                }
                 NavigationView {
                     SettingsView(coordinator: coordinator)
                 }

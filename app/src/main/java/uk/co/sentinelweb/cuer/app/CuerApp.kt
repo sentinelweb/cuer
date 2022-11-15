@@ -55,7 +55,7 @@ class CuerApp : Application() {
         }
 
         if (!databaseInit.isInitialized()) {
-            databaseInit.initDatabase()
+            databaseInit.initDatabase("default-dbinit.json")
         }
 
         firebaseWrapper.init()

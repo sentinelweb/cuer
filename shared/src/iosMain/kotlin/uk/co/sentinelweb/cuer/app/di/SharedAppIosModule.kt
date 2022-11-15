@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.di
 
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperation
+import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperations
 import uk.co.sentinelweb.cuer.app.factory.OrchestratorFactory
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -15,16 +15,16 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart
 
 object SharedAppIosModule {
 
-    val factoryModule = module {
+    private val factoryModule = module {
         single { OrchestratorFactory() }
     }
 
-    val utilModule = module {
-        factory { AssetOperation() }
+    private val utilModule = module {
+        factory { AssetOperations() }
         factory<LogWrapper> { SystemLogWrapper() }// todo move to domain module?
     }
 
-    val netModule = module {
+    private val netModule = module {
         factory<YoutubeInteractor> { DummyYoutubeInteractor() }
     }
 
@@ -32,6 +32,7 @@ object SharedAppIosModule {
         .plus(utilModule)
         .plus(netModule)
 
+    // todo remove when net moved to kmm
     class DummyYoutubeInteractor : YoutubeInteractor {
         override suspend fun videos(ids: List<String>, parts: List<YoutubePart>): NetResult<List<MediaDomain>> =
             NetResult.Error(msg = "Not implemented", t = null)

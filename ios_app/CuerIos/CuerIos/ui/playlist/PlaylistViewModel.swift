@@ -52,19 +52,22 @@ final class PlaylistViewModel: ObservableObject {
     }
     
     func loadPlaylist(plId: Int) {
+    // debugPrint(DomainAssetOperation().getAsString(path: "default-dbinit") ?? "No Asset")
+
 //        let task = Task{
-//            do {
+            do {
                 let allFilter=ProxyFilter().allFilter()
-            orch.playlistOrchestrator.count(
-                filter: allFilter,// wont match anything
-                options:DomainOrchestratorContractOptions(source: DomainOrchestratorContractSource.local, flat: true, emit: false)
-            ) { count, e in
-                print("loadPlaylist count: \(count)")
+                orch.playlistOrchestrator.count(
+                    filter: allFilter,// wont match anything
+                    options:DomainOrchestratorContractOptions(source: DomainOrchestratorContractSource.local, flat: true, emit: false)
+                ) { count, e in
+                    print("loadPlaylist count: \(count)")
+                }
+                let fullNoEmitOptions = DomainOrchestratorContractOptions(source: DomainOrchestratorContractSource.local, flat: false, emit: false)
+                //orch.playlistOrchestrator.load(id: Int64(plId), options: fullNoEmitOptions)
+            } catch {
+                print("loadPlaylist error: \(error)")
             }
-        
-//    } catch {
-//                print("loadPlaylist error: \(error)")
-//            }
 //        }
     }
     

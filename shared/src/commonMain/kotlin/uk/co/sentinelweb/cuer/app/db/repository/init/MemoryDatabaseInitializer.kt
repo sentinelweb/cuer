@@ -27,7 +27,7 @@ class MemoryDatabaseInitializer constructor(
 
     override fun isInitialized(): Boolean = true
 
-    override fun initDatabase() {
+    override fun initDatabase(path: String) {
         contextProvider.ioScope.launch {
             (mediaRepository.count(AllFilter)
                 .takeIf { it.isSuccessful && it.data == 0 }

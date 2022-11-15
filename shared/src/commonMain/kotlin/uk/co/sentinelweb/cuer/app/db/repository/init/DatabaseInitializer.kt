@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 interface DatabaseInitializer {
     fun isInitialized(): Boolean
-    fun initDatabase()
+    fun initDatabase(path: String)
     fun addListener(
         listener: (Boolean) -> Unit,
     )

@@ -1,5 +1,5 @@
 package uk.co.sentinelweb.cuer.app.db.repository.file
 
-expect class AssetOperation {
+expect class AssetOperations {
     fun getAsString(path: String): String?
 }

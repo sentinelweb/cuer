@@ -18,7 +18,7 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            Text("Sentinel Web Technology Ltd").bold()
+            Text("Sentinel Web Technologies Ltd").bold()
             Text("Chamonix, France")
         }
         .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)

@@ -12,7 +12,6 @@ import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.backup.IBackupManager
-import uk.co.sentinelweb.cuer.app.db.AppDatabaseModule
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
@@ -90,6 +89,7 @@ import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.di.DomainNetModule
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
+
 //import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
 @ExperimentalCoroutinesApi
@@ -173,14 +173,9 @@ object Modules {
         factory { SharingShortcutsManager() }
         factory<IBackupManager> {
             BackupFileManager(
-                channelRepository = get(),
-                mediaRepository = get(),
+                backupJsonManager = get(),
                 playlistRepository = get(),
-                playlistItemRepository = get(),
-                imageDatabaseRepository = get(),
                 contextProvider = get(),
-                parserFactory = get(),
-                playlistItemCreator = get(),
                 timeProvider = get(),
                 timeStampMapper = get(),
                 imageFileRepository = get(),
@@ -202,7 +197,6 @@ object Modules {
         }
         factory { ContentUriUtil(androidApplication()) }
         factory { BitmapSizer() }
-
     }
 
     private val wrapperModule = module {
@@ -237,7 +231,6 @@ object Modules {
         .plus(receiverModule)
         .plus(usecaseModule)
         .plus(DatabaseCommonModule.modules)
-        .plus(AppDatabaseModule.module)
         .plus(AndroidDatabaseModule.modules)
         .plus(NetModule.netModule)
         .plus(SharedCoreModule.objectModule)

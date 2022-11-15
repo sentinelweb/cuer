@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.db.repository.file
 import android.content.Context
 import java.io.InputStream
 
-actual class AssetOperation(
+actual class AssetOperations(
     private val context: Context
 ) {
     actual fun getAsString(path: String): String? =

@@ -37,6 +37,7 @@
 		BDBEE0062923D3F40004AEF4 /* KMPNativeCoroutinesCore in Frameworks */ = {isa = PBXBuildFile; productRef = BDBEE0052923D3F40004AEF4 /* KMPNativeCoroutinesCore */; };
 		BDBEE00D2923EE4D0004AEF4 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; };
 		BDBEE00E2923EE4D0004AEF4 /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BDBEE0152924312C0004AEF4 /* PlaylistContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEE0142924312C0004AEF4 /* PlaylistContract.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,7 @@
 		BDBEDFF12923C8E10004AEF4 /* default-dbinit.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "default-dbinit.json"; sourceTree = "<group>"; };
 		BDBEDFF42923C97A0004AEF4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BDBEDFF72923CCBF0004AEF4 /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = shared.framework; path = ../../shared/build/bin/iosSimulatorArm64/podDebugFramework/shared.framework; sourceTree = "<group>"; };
+		BDBEE0142924312C0004AEF4 /* PlaylistContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistContract.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +162,7 @@
 		BDBEDF8D29221FD20004AEF4 /* CuerIos */ = {
 			isa = PBXGroup;
 			children = (
+				BDBEE01029241FE10004AEF4 /* shared */,
 				BDBEDFF62923CBB50004AEF4 /* app */,
 				BDBEDFCE29228F700004AEF4 /* di */,
 				BDBEDFB8292220CD0004AEF4 /* ui */,
@@ -222,6 +225,7 @@
 			children = (
 				BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */,
 				BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */,
+				BDBEE0142924312C0004AEF4 /* PlaylistContract.swift */,
 			);
 			path = playlist;
 			sourceTree = "<group>";
@@ -297,6 +301,21 @@
 				BDBEDF8E29221FD20004AEF4 /* CuerIosApp.swift */,
 			);
 			path = app;
+			sourceTree = "<group>";
+		};
+		BDBEE01029241FE10004AEF4 /* shared */ = {
+			isa = PBXGroup;
+			children = (
+				BDBEE01129241FF50004AEF4 /* platform */,
+			);
+			path = shared;
+			sourceTree = "<group>";
+		};
+		BDBEE01129241FF50004AEF4 /* platform */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = platform;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -441,6 +460,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BDBEDFCD29228DAD0004AEF4 /* BrowseViewModel.swift in Sources */,
+				BDBEE0152924312C0004AEF4 /* PlaylistContract.swift in Sources */,
 				BDBEDFDB2922A1B10004AEF4 /* URL+Identifiable.swift in Sources */,
 				BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */,
 				BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */,
