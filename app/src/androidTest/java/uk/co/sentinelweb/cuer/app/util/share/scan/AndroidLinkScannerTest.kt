@@ -9,7 +9,10 @@ import uk.co.sentinelweb.cuer.domain.*
 
 @RunWith(AndroidJUnit4::class)
 class AndroidLinkScannerTest {
-    val sut = AndroidLinkScanner(log = AndroidLogWrapper(), mappers = urlMediaMappers)
+    val sut = AndroidLinkScanner(
+        log = AndroidLogWrapper(BuildConfigDomain(true, 50, "version")),
+        mappers = urlMediaMappers
+    )
 
     @Test
     fun shorts_url() {
