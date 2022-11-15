@@ -141,7 +141,6 @@ val domainSerializersModule = SerializersModule {
         ErrorDomain::class to ErrorDomain.serializer(),
         ResponseDomain::class to ResponseDomain.serializer(),
         AppDetailsDomain::class to AppDetailsDomain.serializer(),
-//            OnboardingContract.Config::class to OnboardingContract.Config.serializer(),// fixme
     )
     polymorphic(Domain::class, PlaylistDomain::class, PlaylistDomain.serializer())
     polymorphic(Domain::class, MediaDomain::class, MediaDomain.serializer())

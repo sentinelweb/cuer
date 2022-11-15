@@ -4,6 +4,7 @@ import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
+import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.net.di.DomainNetModule
@@ -21,7 +22,8 @@ private fun initKoinInternal(
             listOf(SharedCoreModule.objectModule, SharedDomainModule.objectModule, DomainNetModule.objectModule)
                 .plus(configModule)
                 .plus(SharedAppModule.modules)
-                .plus(IosAppModule.modules)
+                .plus(SharedAppIosModule.modules)
+                .plus(DatabaseCommonModule.modules)
         )
     }
 

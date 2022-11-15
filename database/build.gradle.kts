@@ -6,6 +6,7 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+group = "uk.co.sentinelweb.cuer"
 version = "1.0"
 
 val ver_coroutines: String by project
@@ -23,6 +24,7 @@ val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
 
 kotlin {
+    jvm()
     android()
     iosX64()
     iosArm64()
@@ -79,7 +81,7 @@ kotlin {
         }
         val androidTest by getting {
             dependencies {
-                implementation(project(":shared"))
+                implementation(project(":domain"))
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
                 implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")

@@ -47,7 +47,7 @@ class MemoryDatabaseInitializer constructor(
                     playlistItemRepository.save(it, emit = true, flat = false)
                 }
                 ?.takeIf { result -> result.isSuccessful }
-                ?: throw ExceptionInInitializerError("failed to init database")
+                ?: throw IllegalStateException("failed to init database")
         }
     }
 

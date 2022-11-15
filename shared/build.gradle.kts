@@ -70,6 +70,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":domain"))
+                implementation(project(":database"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
@@ -109,9 +110,10 @@ kotlin {
 //            }
 //        }
         val androidMain by getting {
-            kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
                 implementation("io.ktor:ktor-client-cio:$ver_ktor")
+                implementation("io.insert-koin:koin-android:$ver_koin")
+
             }
         }
         val androidTest by getting {
@@ -132,6 +134,7 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
+
             }
 
         }

@@ -2,14 +2,14 @@ package uk.co.sentinelweb.cuer.app.db.init
 
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.backup.IBackupManager
+import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperation
 import uk.co.sentinelweb.cuer.app.orchestrator.toLocalIdentifier
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class JsonDatabaseInitializer constructor(
-    private val res: ResourceWrapper,
+    private val assetOperator: AssetOperation,
     private val backup: IBackupManager,
     private val preferences: MultiPlatformPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
@@ -25,7 +25,8 @@ class JsonDatabaseInitializer constructor(
 
     override fun initDatabase() {
         coroutines.ioScope.launch {
-            res.getAssetString("default-dbinit.json")
+            assetOperator.getAsString("default-dbinit.json")
+                //res.getAssetString("default-dbinit.json")
                 ?.apply { backup.restoreData(this) }
                 ?.apply { preferences.dbInitialised = true }
                 ?.apply { preferences.currentPlayingPlaylistId = 3L.toLocalIdentifier() /* philosophy */ }

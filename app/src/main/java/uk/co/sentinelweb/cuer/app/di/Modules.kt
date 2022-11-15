@@ -80,7 +80,7 @@ import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.db.di.AndroidDatabaseModule
-import uk.co.sentinelweb.cuer.db.di.DatabaseModule
+import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
@@ -123,7 +123,7 @@ object Modules {
         FloatingPlayerContract.serviceModule,
         SupportDialogFragment.fragmentModule,
         AppSelectorBottomSheet.fragmentModule,
-        OnboardingFragment.fragmentModule
+        OnboardingFragment.fragmentModule,
     )
 
     private val uiModule = module {
@@ -202,6 +202,7 @@ object Modules {
         }
         factory { ContentUriUtil(androidApplication()) }
         factory { BitmapSizer() }
+
     }
 
     private val wrapperModule = module {
@@ -235,7 +236,7 @@ object Modules {
         .plus(appNetModule)
         .plus(receiverModule)
         .plus(usecaseModule)
-        .plus(DatabaseModule.modules)
+        .plus(DatabaseCommonModule.modules)
         .plus(AppDatabaseModule.module)
         .plus(AndroidDatabaseModule.modules)
         .plus(NetModule.netModule)
@@ -247,4 +248,5 @@ object Modules {
         .plus(FirebaseModule.fbModule)
 //        .plus(RemoteModule.objectModule)
         .plus(PlayerModule.localPlayerModule)
+        .plus(SharedAppAndroidModule.modules)
 }
