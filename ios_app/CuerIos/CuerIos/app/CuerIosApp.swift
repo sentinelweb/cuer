@@ -9,11 +9,12 @@ import SwiftUI
 
 @main
 struct CuerIosApp: App {
-    let dependencies = AppDependencies()
+    
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     var body: some Scene {
         WindowGroup {
-            MainView(mainCoordinator: self.dependencies.mainCoordinator)
+            MainView(mainCoordinator: self.appDelegate.dependencies.mainCoordinator)
         }
     }
 }

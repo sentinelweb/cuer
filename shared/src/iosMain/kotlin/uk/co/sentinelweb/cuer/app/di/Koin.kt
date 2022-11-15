@@ -5,6 +5,7 @@ import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
+import uk.co.sentinelweb.cuer.db.di.DatabaseIosModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.net.di.DomainNetModule
@@ -24,6 +25,7 @@ private fun initKoinInternal(
                 .plus(SharedAppModule.modules)
                 .plus(SharedAppIosModule.modules)
                 .plus(DatabaseCommonModule.modules)
+                .plus(DatabaseIosModule.modules)
         )
     }
 

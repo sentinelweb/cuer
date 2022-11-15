@@ -7,7 +7,7 @@
 
 import Foundation
 
-//import shared
+import shared
 //
 //protocol xxxExecutorDependency {
 //  var xxxExecutor: UseCaseExecutor { get }
@@ -22,7 +22,15 @@ class AppDependencies: IosBuildConfigDependency
 & PlaylistViewModelDependency
 & PlaylistsViewModelDependency
 {
-    lazy var buildConfig: IosBuildConfig = {IosBuildConfig()}()
+#if DEBUG
+    private let isDebug = true
+#else
+    private let isDebug = false
+#endif
+    lazy var buildConfig: DomainBuildConfigDomain = DomainBuildConfigDomain(
+        isDebug: isDebug,
+        versionCode: 1,
+        version: "0.77")
     
     lazy var mainCoordinator: MainCoordinator = {MainCoordinator(dependencies: self)}()
     

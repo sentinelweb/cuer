@@ -10,13 +10,14 @@ interface DispatcherProvider {
     val IO: CoroutineDispatcher
     val Computation: CoroutineDispatcher
 }
-
+// should be single
+// todo review this - maybe just inject CoroutineDispatcher with enums?
 expect object PlatformDispatcherProvider : DispatcherProvider
 
 open class CoroutineContextProvider constructor(
     val Main: CoroutineDispatcher = Dispatchers.Main,
     val IO: CoroutineDispatcher = PlatformDispatcherProvider.IO,
-    val Default: CoroutineDispatcher = Dispatchers.Default,
+    val Default: CoroutineDispatcher = Dispatchers.Default,// todo remove
     val Computation: CoroutineDispatcher = PlatformDispatcherProvider.Computation
 ) {
     inner class ScopeHolder(private val dispatcher: CoroutineDispatcher) {

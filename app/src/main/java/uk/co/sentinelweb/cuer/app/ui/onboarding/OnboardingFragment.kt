@@ -91,7 +91,7 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
                         ?: throw IllegalArgumentException("Could not load onboarding config")
                 }
                 scoped { OnboardingMapper() }
-                scoped { CoroutineContextProvider() }
+                scoped { CoroutineContextProvider() }//todo wtf why
             }
         }
     }

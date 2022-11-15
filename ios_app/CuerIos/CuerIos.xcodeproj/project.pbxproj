@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		BDBEDF8F29221FD20004AEF4 /* CuerIosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDF8E29221FD20004AEF4 /* CuerIosApp.swift */; };
-		BDBEDF9129221FD20004AEF4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDF9029221FD20004AEF4 /* ContentView.swift */; };
 		BDBEDF9329221FD20004AEF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDBEDF9229221FD20004AEF4 /* Assets.xcassets */; };
 		BDBEDF9629221FD20004AEF4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDBEDF9529221FD20004AEF4 /* Preview Assets.xcassets */; };
 		BDBEDFA029221FD20004AEF4 /* CuerIosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDF9F29221FD20004AEF4 /* CuerIosTests.swift */; };
@@ -27,11 +26,17 @@
 		BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD4292295F70004AEF4 /* SafariView.swift */; };
 		BDBEDFD8292297B70004AEF4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD7292297B70004AEF4 /* SettingsView.swift */; };
 		BDBEDFDB2922A1B10004AEF4 /* URL+Identifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFDA2922A1B10004AEF4 /* URL+Identifiable.swift */; };
-		BDBEDFEA2923B33D0004AEF4 /* shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFE32922DC9A0004AEF4 /* shared.framework */; };
-		BDBEDFEB2923B33D0004AEF4 /* shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFE32922DC9A0004AEF4 /* shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BDBEDFED2923B3890004AEF4 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDD2922DA2F0004AEF4 /* libsqlite3.0.tbd */; };
 		BDBEDFEE2923B3890004AEF4 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDE2922DA2F0004AEF4 /* libsqlite3.tbd */; };
 		BDBEDFF02923B4290004AEF4 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFEF2923B4290004AEF4 /* CoreData.framework */; };
+		BDBEDFF22923C8E10004AEF4 /* default-dbinit.json in Resources */ = {isa = PBXBuildFile; fileRef = BDBEDFF12923C8E10004AEF4 /* default-dbinit.json */; };
+		BDBEDFF32923C8E10004AEF4 /* default-dbinit.json in Resources */ = {isa = PBXBuildFile; fileRef = BDBEDFF12923C8E10004AEF4 /* default-dbinit.json */; };
+		BDBEDFF52923C97A0004AEF4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFF42923C97A0004AEF4 /* AppDelegate.swift */; };
+		BDBEE0022923D3F40004AEF4 /* KMPNativeCoroutinesAsync in Frameworks */ = {isa = PBXBuildFile; productRef = BDBEE0012923D3F40004AEF4 /* KMPNativeCoroutinesAsync */; };
+		BDBEE0042923D3F40004AEF4 /* KMPNativeCoroutinesCombine in Frameworks */ = {isa = PBXBuildFile; productRef = BDBEE0032923D3F40004AEF4 /* KMPNativeCoroutinesCombine */; };
+		BDBEE0062923D3F40004AEF4 /* KMPNativeCoroutinesCore in Frameworks */ = {isa = PBXBuildFile; productRef = BDBEE0052923D3F40004AEF4 /* KMPNativeCoroutinesCore */; };
+		BDBEE00D2923EE4D0004AEF4 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; };
+		BDBEE00E2923EE4D0004AEF4 /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,13 +57,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BDBEDFEC2923B33D0004AEF4 /* Embed Frameworks */ = {
+		BDBEE00F2923EE4D0004AEF4 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BDBEDFEB2923B33D0004AEF4 /* shared.framework in Embed Frameworks */,
+				BDBEE00E2923EE4D0004AEF4 /* shared.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -68,7 +73,6 @@
 /* Begin PBXFileReference section */
 		BDBEDF8B29221FD20004AEF4 /* CuerIos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CuerIos.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDBEDF8E29221FD20004AEF4 /* CuerIosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuerIosApp.swift; sourceTree = "<group>"; };
-		BDBEDF9029221FD20004AEF4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BDBEDF9229221FD20004AEF4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BDBEDF9529221FD20004AEF4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BDBEDF9B29221FD20004AEF4 /* CuerIosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CuerIosTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +98,9 @@
 		BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = shared.xcframework; path = ../../shared/build/XCFrameworks/release/shared.xcframework; sourceTree = "<group>"; };
 		BDBEDFE32922DC9A0004AEF4 /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = shared.framework; path = ../../shared/build/cocoapods/framework/shared.framework; sourceTree = "<group>"; };
 		BDBEDFEF2923B4290004AEF4 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		BDBEDFF12923C8E10004AEF4 /* default-dbinit.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "default-dbinit.json"; sourceTree = "<group>"; };
+		BDBEDFF42923C97A0004AEF4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		BDBEDFF72923CCBF0004AEF4 /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = shared.framework; path = ../../shared/build/bin/iosSimulatorArm64/podDebugFramework/shared.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,10 +108,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDBEE00D2923EE4D0004AEF4 /* shared.xcframework in Frameworks */,
 				BDBEDFEE2923B3890004AEF4 /* libsqlite3.tbd in Frameworks */,
+				BDBEE0062923D3F40004AEF4 /* KMPNativeCoroutinesCore in Frameworks */,
 				BDBEDFF02923B4290004AEF4 /* CoreData.framework in Frameworks */,
+				BDBEE0042923D3F40004AEF4 /* KMPNativeCoroutinesCombine in Frameworks */,
+				BDBEE0022923D3F40004AEF4 /* KMPNativeCoroutinesAsync in Frameworks */,
 				BDBEDFED2923B3890004AEF4 /* libsqlite3.0.tbd in Frameworks */,
-				BDBEDFEA2923B33D0004AEF4 /* shared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,6 +138,7 @@
 		BDBEDF8229221FD20004AEF4 = {
 			isa = PBXGroup;
 			children = (
+				BDBEDFF12923C8E10004AEF4 /* default-dbinit.json */,
 				BDBEDF8D29221FD20004AEF4 /* CuerIos */,
 				BDBEDF9E29221FD20004AEF4 /* CuerIosTests */,
 				BDBEDFA829221FD20004AEF4 /* CuerIosUITests */,
@@ -149,11 +160,10 @@
 		BDBEDF8D29221FD20004AEF4 /* CuerIos */ = {
 			isa = PBXGroup;
 			children = (
-				BDBEDFD92922A19B0004AEF4 /* Extensions */,
+				BDBEDFF62923CBB50004AEF4 /* app */,
 				BDBEDFCE29228F700004AEF4 /* di */,
 				BDBEDFB8292220CD0004AEF4 /* ui */,
-				BDBEDF8E29221FD20004AEF4 /* CuerIosApp.swift */,
-				BDBEDF9029221FD20004AEF4 /* ContentView.swift */,
+				BDBEDFD92922A19B0004AEF4 /* Extensions */,
 				BDBEDF9229221FD20004AEF4 /* Assets.xcassets */,
 				BDBEDF9429221FD20004AEF4 /* Preview Content */,
 			);
@@ -270,6 +280,7 @@
 		BDBEDFDC2922DA2E0004AEF4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BDBEDFF72923CCBF0004AEF4 /* shared.framework */,
 				BDBEDFEF2923B4290004AEF4 /* CoreData.framework */,
 				BDBEDFE32922DC9A0004AEF4 /* shared.framework */,
 				BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */,
@@ -277,6 +288,15 @@
 				BDBEDFDE2922DA2F0004AEF4 /* libsqlite3.tbd */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BDBEDFF62923CBB50004AEF4 /* app */ = {
+			isa = PBXGroup;
+			children = (
+				BDBEDFF42923C97A0004AEF4 /* AppDelegate.swift */,
+				BDBEDF8E29221FD20004AEF4 /* CuerIosApp.swift */,
+			);
+			path = app;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -289,13 +309,18 @@
 				BDBEDF8729221FD20004AEF4 /* Sources */,
 				BDBEDF8829221FD20004AEF4 /* Frameworks */,
 				BDBEDF8929221FD20004AEF4 /* Resources */,
-				BDBEDFEC2923B33D0004AEF4 /* Embed Frameworks */,
+				BDBEE00F2923EE4D0004AEF4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = CuerIos;
+			packageProductDependencies = (
+				BDBEE0012923D3F40004AEF4 /* KMPNativeCoroutinesAsync */,
+				BDBEE0032923D3F40004AEF4 /* KMPNativeCoroutinesCombine */,
+				BDBEE0052923D3F40004AEF4 /* KMPNativeCoroutinesCore */,
+			);
 			productName = CuerIos;
 			productReference = BDBEDF8B29221FD20004AEF4 /* CuerIos.app */;
 			productType = "com.apple.product-type.application";
@@ -368,6 +393,9 @@
 				Base,
 			);
 			mainGroup = BDBEDF8229221FD20004AEF4;
+			packageReferences = (
+				BDBEE0002923D3F40004AEF4 /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */,
+			);
 			productRefGroup = BDBEDF8C29221FD20004AEF4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -385,6 +413,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BDBEDF9629221FD20004AEF4 /* Preview Assets.xcassets in Resources */,
+				BDBEDFF22923C8E10004AEF4 /* default-dbinit.json in Resources */,
 				BDBEDF9329221FD20004AEF4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -393,6 +422,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDBEDFF32923C8E10004AEF4 /* default-dbinit.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,9 +448,9 @@
 				BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */,
 				BDBEDFD2292294800004AEF4 /* IosBuildConfig.swift in Sources */,
 				BDBEDFC329228D260004AEF4 /* PlaylistsView.swift in Sources */,
+				BDBEDFF52923C97A0004AEF4 /* AppDelegate.swift in Sources */,
 				BDBEDFD8292297B70004AEF4 /* SettingsView.swift in Sources */,
 				BDBEDFC729228D5F0004AEF4 /* PlaylistView.swift in Sources */,
-				BDBEDF9129221FD20004AEF4 /* ContentView.swift in Sources */,
 				BDBEDFC529228D4B0004AEF4 /* PlaylistsViewModel.swift in Sources */,
 				BDBEDFC02922213B0004AEF4 /* MainView.swift in Sources */,
 				BDBEDFBE2922212B0004AEF4 /* MainCoordinator.swift in Sources */,
@@ -749,6 +779,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BDBEE0002923D3F40004AEF4 /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rickclephas/KMP-NativeCoroutines";
+			requirement = {
+				kind = exactVersion;
+				version = 0.13.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BDBEE0012923D3F40004AEF4 /* KMPNativeCoroutinesAsync */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BDBEE0002923D3F40004AEF4 /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */;
+			productName = KMPNativeCoroutinesAsync;
+		};
+		BDBEE0032923D3F40004AEF4 /* KMPNativeCoroutinesCombine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BDBEE0002923D3F40004AEF4 /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */;
+			productName = KMPNativeCoroutinesCombine;
+		};
+		BDBEE0052923D3F40004AEF4 /* KMPNativeCoroutinesCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BDBEE0002923D3F40004AEF4 /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */;
+			productName = KMPNativeCoroutinesCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BDBEDF8329221FD20004AEF4 /* Project object */;
 }

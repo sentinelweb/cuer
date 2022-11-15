@@ -26,23 +26,46 @@ class PlaylistViewModelProvider: PlaylistViewModel.Dependencies {
 final class PlaylistViewModel: ObservableObject {
     typealias Dependencies = MainCoordinatorDependency & PlaylistIdDependency
     let dependencies: Dependencies
-    let playlist: PlaylistDomain? = nil
+    let playlist: DomainPlaylistDomain? = nil
     
-    private let log = SystemLogWrapper()
+//    private let log = SystemLogWrapper() // fixme: not available?
+    private let orch = OrchestratorFactory()
     
     private var playlistIdSubscription: AnyCancellable? = nil
     
     @Published var plId:Int = -1
     
     init(dependencies: Dependencies) {
-        log.tag="PlaylistViewModel"
-        log.d(msg: "init start")
+//        log.tag="PlaylistViewModel"
+//        log.d(msg: "init start")
         self.dependencies = dependencies
         playlistIdSubscription = dependencies.mainCoordinator.$currentPlaylistId.sink(receiveValue:{plId in
-            self.plId = plId
-            self.log.d(msg: "got playlistid: \(plId)")
+            if (self.plId != plId) {
+                self.plId = plId
+                if (plId > 0) {
+                    self.loadPlaylist(plId: plId)
+                }
+            }
+//            self.log.d(msg: "got playlistid: \(plId)")
         })
-        log.d(msg: "init complete")
+//        log.d(msg: "init complete")
+    }
+    
+    func loadPlaylist(plId: Int) {
+//        let task = Task{
+//            do {
+                let allFilter=ProxyFilter().allFilter()
+            orch.playlistOrchestrator.count(
+                filter: allFilter,// wont match anything
+                options:DomainOrchestratorContractOptions(source: DomainOrchestratorContractSource.local, flat: true, emit: false)
+            ) { count, e in
+                print("loadPlaylist count: \(count)")
+            }
+        
+//    } catch {
+//                print("loadPlaylist error: \(error)")
+//            }
+//        }
     }
     
     deinit{

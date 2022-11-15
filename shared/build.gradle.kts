@@ -1,11 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 // build swift: ./gradlew shared:updatePackageSwift
+val ver_native_coroutines: String by project
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization")
     id("co.touchlab.faktory.kmmbridge") version "0.2.2"
     kotlin("native.cocoapods")
+    id("com.rickclephas.kmp.nativecoroutines") version "0.13.1" //todo use ver_native_coroutines
 }
 
 val ver_coroutines: String by project
