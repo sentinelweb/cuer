@@ -101,7 +101,7 @@ object BrowseComposables {
         rows: Int
     ) {
         val visible = remember { mutableStateOf(false) }
-        LaunchedEffect(Unit) {
+        LaunchedEffect(model) {
             delay(100)
             visible.value = true
         }
@@ -169,7 +169,7 @@ object BrowseComposables {
     ) {
         // cos compose is old cant use by
         val visible = remember { mutableStateOf(false) }
-        LaunchedEffect(Unit) {
+        LaunchedEffect(category) {
             delay(seq * 25L)
             visible.value = true
         }
@@ -356,4 +356,23 @@ private fun BrowsePreview() {
         browseModelMapper.map(BrowseTestData.previewState),
         view
     )
+}
+
+@Preview(name = "chip")
+@Composable
+@ExperimentalAnimationApi
+private fun ChipPreview() {
+    val model = CategoryModel(
+        id = 1,
+        title = "title",
+        description = "null",
+        thumbNailUrl = "https://cuer-275020.firebaseapp.com/images/categories/Socrates.jpg",
+        existingPlaylist = null,
+        forceItem = false,
+        isPlaylist = false,
+        subCategories = emptyList(),
+        subCount = 4
+    )
+    val view = object : BaseMviView<Model, Event>() {}
+    BrowseComposables.CatChip(model, 1, view)
 }
