@@ -6,7 +6,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
-import uk.co.sentinelweb.cuer.net.di.SharedNetModule
+import uk.co.sentinelweb.cuer.net.di.DomainNetModule
 
 private fun initKoinInternal(
     config: BuildConfigDomain,
@@ -18,7 +18,7 @@ private fun initKoinInternal(
             factory { config }
         }
         modules(
-            listOf(SharedCoreModule.objectModule, SharedDomainModule.objectModule, SharedNetModule.objectModule)
+            listOf(SharedCoreModule.objectModule, SharedDomainModule.objectModule, DomainNetModule.objectModule)
                 .plus(configModule)
                 .plus(SharedAppModule.modules)
                 .plus(IosAppModule.modules)

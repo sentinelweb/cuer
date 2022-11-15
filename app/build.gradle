@@ -125,7 +125,9 @@ dependencies {
     implementation project(":shared")
     implementation project(":net")
 //    implementation project(":remote")
-    implementation project(":database")
+    implementation project(":database")// todo: remove get through shared
+    implementation project(":domain")
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // deps

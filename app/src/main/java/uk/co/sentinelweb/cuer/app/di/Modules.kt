@@ -87,7 +87,7 @@ import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
-import uk.co.sentinelweb.cuer.net.di.SharedNetModule
+import uk.co.sentinelweb.cuer.net.di.DomainNetModule
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
 //import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
@@ -241,7 +241,7 @@ object Modules {
         .plus(NetModule.netModule)
         .plus(SharedCoreModule.objectModule)
         .plus(SharedDomainModule.objectModule)
-        .plus(SharedNetModule.objectModule)
+        .plus(DomainNetModule.objectModule)
         .plus(SharedAppModule.modules)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)

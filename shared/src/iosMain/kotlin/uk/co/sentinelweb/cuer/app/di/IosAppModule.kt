@@ -1,11 +1,12 @@
 package uk.co.sentinelweb.cuer.app.di
 
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.factory.OrchestratorFactory
 
 object IosAppModule {
 
-    val usecaseModule = module {
-
+    val factoryModule = module {
+        single { OrchestratorFactory() }
     }
 
     val utilModule = module {
@@ -16,7 +17,7 @@ object IosAppModule {
 
     }
 
-    val modules = listOf(usecaseModule)
+    val modules = listOf(factoryModule)
         .plus(utilModule)
         .plus(dbModule)
 }

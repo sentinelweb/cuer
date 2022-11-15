@@ -6,7 +6,6 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
-import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.serialization.InstantSerializer
@@ -128,47 +127,42 @@ fun deserialiseAppList(input: String) = domainJsonSerializer.decodeFromString(
     AppDetailsDomain.serializer(), input
 )
 
-fun OnboardingContract.Config.serialise() = domainJsonSerializer.encodeToString(
-    OnboardingContract.Config.serializer(), this
-)
-
-fun deserialiseOnboarding(input: String) = domainJsonSerializer.decodeFromString(
-    OnboardingContract.Config.serializer(), input
-)
+val domainClassDiscriminator = "domainType"
+val domainSerializersModule = SerializersModule {
+    mapOf(
+        PlaylistItemDomain::class to PlaylistItemDomain.serializer(),
+        PlaylistDomain.PlaylistConfigDomain::class to PlaylistDomain.PlaylistConfigDomain.serializer(),
+        PlaylistDomain::class to PlaylistDomain.serializer(),
+        ChannelDomain::class to ChannelDomain.serializer(),
+        MediaDomain::class to MediaDomain.serializer(),
+        SearchRemoteDomain::class to SearchRemoteDomain.serializer(),
+        SearchLocalDomain::class to SearchLocalDomain.serializer(),
+        BackupFileModel::class to BackupFileModel.serializer(),
+        ErrorDomain::class to ErrorDomain.serializer(),
+        ResponseDomain::class to ResponseDomain.serializer(),
+        AppDetailsDomain::class to AppDetailsDomain.serializer(),
+//            OnboardingContract.Config::class to OnboardingContract.Config.serializer(),// fixme
+    )
+    polymorphic(Domain::class, PlaylistDomain::class, PlaylistDomain.serializer())
+    polymorphic(Domain::class, MediaDomain::class, MediaDomain.serializer())
+    polymorphic(Domain::class, ImageDomain::class, ImageDomain.serializer())
+    polymorphic(Domain::class, ChannelDomain::class, ChannelDomain.serializer())
+    polymorphic(Domain::class, PlaylistItemDomain::class, PlaylistItemDomain.serializer())
+    polymorphic(Domain::class, PlaylistTreeDomain::class, PlaylistTreeDomain.serializer())
+    polymorphic(Domain::class, SearchLocalDomain::class, SearchLocalDomain.serializer())
+    polymorphic(Domain::class, SearchRemoteDomain::class, SearchRemoteDomain.serializer())
+}.plus(SerializersModule {
+    contextual(Instant::class, InstantSerializer)
+}).plus(SerializersModule {
+    contextual(LocalDateTime::class, LocalDateTimeSerializer)
+})
 
 val domainJsonSerializer = Json {
     prettyPrint = true
     isLenient = true
     ignoreUnknownKeys = true
-    classDiscriminator = "domainType"// property added when base domain type is use (see ResponseDomain)
-    serializersModule = SerializersModule {
-        mapOf(
-            PlaylistItemDomain::class to PlaylistItemDomain.serializer(),
-            PlaylistDomain.PlaylistConfigDomain::class to PlaylistDomain.PlaylistConfigDomain.serializer(),
-            PlaylistDomain::class to PlaylistDomain.serializer(),
-            ChannelDomain::class to ChannelDomain.serializer(),
-            MediaDomain::class to MediaDomain.serializer(),
-            SearchRemoteDomain::class to SearchRemoteDomain.serializer(),
-            SearchLocalDomain::class to SearchLocalDomain.serializer(),
-            BackupFileModel::class to BackupFileModel.serializer(),
-            ErrorDomain::class to ErrorDomain.serializer(),
-            ResponseDomain::class to ResponseDomain.serializer(),
-            AppDetailsDomain::class to AppDetailsDomain.serializer(),
-            OnboardingContract.Config::class to OnboardingContract.Config.serializer(),
-        )
-        polymorphic(Domain::class, PlaylistDomain::class, PlaylistDomain.serializer())
-        polymorphic(Domain::class, MediaDomain::class, MediaDomain.serializer())
-        polymorphic(Domain::class, ImageDomain::class, ImageDomain.serializer())
-        polymorphic(Domain::class, ChannelDomain::class, ChannelDomain.serializer())
-        polymorphic(Domain::class, PlaylistItemDomain::class, PlaylistItemDomain.serializer())
-        polymorphic(Domain::class, PlaylistTreeDomain::class, PlaylistTreeDomain.serializer())
-        polymorphic(Domain::class, SearchLocalDomain::class, SearchLocalDomain.serializer())
-        polymorphic(Domain::class, SearchRemoteDomain::class, SearchRemoteDomain.serializer())
-    }.plus(SerializersModule {
-        contextual(Instant::class, InstantSerializer)
-    }
-    ).plus(SerializersModule {
-        contextual(LocalDateTime::class, LocalDateTimeSerializer)
-    }
-    )
+    classDiscriminator = domainClassDiscriminator// property added when base domain type is use (see ResponseDomain)
+    serializersModule = domainSerializersModule
 }
+
+

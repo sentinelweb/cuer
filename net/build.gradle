@@ -8,7 +8,7 @@ compileKotlin {
 }
 
 dependencies {
-    implementation project(":shared")
+    implementation(project(":domain"))
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk$ver_jdk:$ver_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines"

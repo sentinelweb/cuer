@@ -15,14 +15,14 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ext.deserialiseOnboarding
+import uk.co.sentinelweb.cuer.app.ext.serialise
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindFlow
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.ONBOARD_CONFIG
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.ext.deserialiseOnboarding
-import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
 

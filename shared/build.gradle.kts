@@ -30,6 +30,7 @@ val ver_kotlin_fixture: String by project
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
 
+group = "uk.co.sentinelweb.cuer"
 version = "1.0"
 
 kotlin {
@@ -68,6 +69,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
+                implementation(project(":domain"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
@@ -87,29 +89,29 @@ kotlin {
                 implementation("io.mockk:mockk:$ver_mockk")
             }
         }
-        val jvmMain by getting {
-            kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
-            dependencies {
-                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
-            }
-        }
-        val jvmTest by getting {
-            dependencies {
-                // Koin for JUnit 4
-                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
-                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-                implementation("com.google.truth:truth:$ver_truth")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
-                implementation("app.cash.turbine:turbine:$ver_turbine")
-                implementation("org.mock-server:mockserver-netty:$ver_mockserver")
-                implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
-            }
-        }
+//        val jvmMain by getting {
+//            kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
+//            dependencies {
+//                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
+//            }
+//        }
+//        val jvmTest by getting {
+//            dependencies {
+//                // Koin for JUnit 4
+//                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
+//                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
+//                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
+//                implementation("com.google.truth:truth:$ver_truth")
+//                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
+//                implementation("app.cash.turbine:turbine:$ver_turbine")
+//                implementation("org.mock-server:mockserver-netty:$ver_mockserver")
+//                implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
+//            }
+//        }
         val androidMain by getting {
             kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
             dependencies {
-                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
+                implementation("io.ktor:ktor-client-cio:$ver_ktor")
             }
         }
         val androidTest by getting {

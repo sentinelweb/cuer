@@ -1,20 +1,19 @@
+// build swift: ./gradlew shared:updatePackageSwift
 plugins {
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
     id("com.android.library")
-    id("com.squareup.sqldelight")
     kotlin("plugin.serialization")
+//    id("co.touchlab.faktory.kmmbridge") version "0.2.2"
+    kotlin("native.cocoapods")
 }
-
-version = "1.0"
 
 val ver_coroutines: String by project
 val ver_kotlinx_serialization_core: String by project
-val ver_sqldelight: String by project
 val ver_kotlinx_datetime: String by project
 val ver_koin: String by project
-val ver_turbine: String by project
-val ver_kotlin_fixture: String by project
+val ver_mockk: String by project
+val ver_jvm: String by project
+
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
@@ -22,70 +21,75 @@ val app_minSdkVersion: String by project
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
 
+group = "uk.co.sentinelweb.cuer"
+version = "1.0"
+
 kotlin {
+    jvm()
+    js {
+        browser()
+    }
     android()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    js {
-        browser()
-    }
+
     cocoapods {
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
-        ios.deploymentTarget = ver_ios_deploy_target
-        version = "1"
         framework {
-            baseName = "database"
             isStatic = true //or false
         }
+        summary = "domain"
+        homepage = "https://sentinelweb.co.uk"
+        ios.deploymentTarget = ver_ios_deploy_target
     }
 
     sourceSets {
         all {
             languageSettings.optIn("kotlin.time.ExperimentalTime")
             languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            languageSettings.optIn("com.russhwolf.settings.ExperimentalSettingsImplementation")
+            languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
-
         val commonMain by getting {
             dependencies {
-                implementation(project(":domain"))
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("io.insert-koin:koin-core:$ver_koin")
-
+//                implementation("io.ktor:ktor-client-core:$ver_ktor")
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(project(":domain"))
-                implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:$ver_koin")
-//                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-//                implementation("com.google.truth:truth:$ver_truth")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
-                implementation("app.cash.turbine:turbine:$ver_turbine")
-
+                implementation("io.mockk:mockk:$ver_mockk")
             }
         }
+
         val androidMain by getting {
             dependencies {
-//                implementation(project(":shared"))
-                implementation("com.squareup.sqldelight:android-driver:$ver_sqldelight")
-                implementation("io.insert-koin:koin-android:$ver_koin")
+//                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
             }
         }
         val androidTest by getting {
             dependencies {
-                implementation(project(":shared"))
-                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
-                implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
-                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-
             }
         }
+        val jvmMain by getting {
+            dependencies {
+//                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+            }
+        }
+        val jsTest by getting
         val iosX64Main by getting
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
@@ -95,8 +99,6 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
-//                implementation(project(":shared"))
-                implementation("com.squareup.sqldelight:native-driver:$ver_sqldelight")
             }
 
         }
@@ -109,12 +111,6 @@ kotlin {
             iosArm64Test.dependsOn(this)
             iosSimulatorArm64Test.dependsOn(this)
         }
-        val jsMain by getting {
-            dependencies {
-                implementation("com.squareup.sqldelight:sqljs-driver:$ver_sqldelight")
-            }
-        }
-        val jsTest by getting
     }
 }
 
@@ -124,15 +120,5 @@ android {
     defaultConfig {
         minSdk = app_minSdkVersion.toInt()
         targetSdk = app_targetSdkVersion.toInt()
-    }
-}
-
-sqldelight {
-    database("Database") { // This will be the name of the generated database class.
-        packageName = "uk.co.sentinelweb.cuer.app.db"
-        sourceFolders = listOf("sqldelight")
-        schemaOutputDirectory = file("src/commonMain/sqldelight/uk/co/sentinelweb/cuer/app/database")
-        verifyMigrations = true
-        dialect = "sqlite:3.24"
     }
 }
