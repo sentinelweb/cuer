@@ -60,7 +60,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("io.insert-koin:koin-core:$ver_koin")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
-                implementation("io.ktor:ktor-client-cio:$ver_ktor")
+//                implementation("io.ktor:ktor-client-cio:$ver_ktor")
 //                implementation("io.ktor:ktor-serialization:$ver_ktor")
                 implementation("io.ktor:ktor-client-content-negotiation:$ver_ktor")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ver_ktor")

@@ -38,11 +38,8 @@ actual class TimeStampMapper constructor(
             ?: "BAD DATE: $date"
     }
 
-    actual fun toTimestamp(date: Instant): String {
-        val date = date.toNSDate()
-        return date
-            .let { timestampDateFormatter.stringFromDate(date = it) }
-    }
+    actual fun toTimestamp(date: Instant): String =
+        timestampDateFormatter.stringFromDate(date = date.toNSDate())
 
     actual fun parseDuration(duration: String): Long? = parseDurationPrivate(duration)
 
