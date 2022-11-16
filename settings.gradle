@@ -5,11 +5,13 @@ pluginManagement {
         maven { url "https://plugins.gradle.org/m2/" }
     }
 }
-rootProject.name='Cuer'
+rootProject.name = 'Cuer'
 
 include ':app'
 include ':net'
 include ':shared'
-include ':remote'
+//include ':remote'
 include ':website'
 include ':database'
+include 'domain'
+

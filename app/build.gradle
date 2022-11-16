@@ -72,7 +72,6 @@ android {
 
     kotlinOptions {
         jvmTarget = ver_jvm
-        useIR = true
         freeCompilerArgs += [
                 // bypass compose kotlin version compatability check
                 // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
@@ -96,7 +95,7 @@ android {
     sourceSets {
         // Adds exported schema location as test app assets.
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
-        test {
+        testDebug {
             java.srcDir 'src/sharedTest/java'
         }
         androidTest {
@@ -125,8 +124,10 @@ android {
 dependencies {
     implementation project(":shared")
     implementation project(":net")
-    implementation project(":remote")
-    implementation project(":database")
+//    implementation project(":remote")
+    implementation project(":database")// todo: remove get through shared
+    implementation project(":domain")
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // deps

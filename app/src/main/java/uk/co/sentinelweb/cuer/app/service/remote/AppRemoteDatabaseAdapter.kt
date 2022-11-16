@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.util.AddLinkOrchestrator
 import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
+// import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 
 class AppRemoteDatabaseAdapter constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
@@ -32,4 +32,14 @@ class AppRemoteDatabaseAdapter constructor(
     override suspend fun scanUrl(url: String): Domain = addLinkOrchestrator.scanUrl(url)
 
     override suspend fun commitPlaylistItem(item: PlaylistItemDomain) = addLinkOrchestrator.commitPlaylistItem(item)
+}
+
+// fixme remove when :remote module supports 1.7.20
+interface RemoteDatabaseAdapter {
+
+    suspend fun getPlaylists(): List<PlaylistDomain>
+    suspend fun getPlaylist(id: Long): PlaylistDomain?
+    suspend fun getPlaylistItem(id: Long): PlaylistItemDomain?
+    suspend fun scanUrl(url: String): Domain?
+    suspend fun commitPlaylistItem(item: PlaylistItemDomain): PlaylistItemDomain
 }

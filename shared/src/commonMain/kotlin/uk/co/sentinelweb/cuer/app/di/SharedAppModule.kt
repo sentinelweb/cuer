@@ -3,7 +3,11 @@ package uk.co.sentinelweb.cuer.app.di
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.backup.BackupCheck
+import uk.co.sentinelweb.cuer.app.backup.BackupUseCase
+import uk.co.sentinelweb.cuer.app.backup.IBackupJsonManager
 import uk.co.sentinelweb.cuer.app.backup.version.ParserFactory
+import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
+import uk.co.sentinelweb.cuer.app.db.init.JsonDatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.repository.file.PlatformFileOperation
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
@@ -38,6 +42,10 @@ object SharedAppModule {
             )
         }
         single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }
+    }
+
+    private val dbModule = module {
+        single<DatabaseInitializer> { JsonDatabaseInitializer(get(), get(), get(), get(), get()) }
     }
 
     private val orchestratorModule = module {
@@ -90,10 +98,25 @@ object SharedAppModule {
         factory { LinkExtractor() }
         factory { TimecodeExtractor() }
         factory { BackupCheck(get(), get(), get(), get()) }
+        factory<IBackupJsonManager> {
+            BackupUseCase(
+                channelRepository = get(),
+                mediaRepository = get(),
+                playlistRepository = get(),
+                playlistItemRepository = get(),
+                imageDatabaseRepository = get(),
+                contextProvider = get(),
+                parserFactory = get(),
+                playlistItemCreator = get(),
+                timeProvider = get(),
+                log = get()
+            )
+        }
     }
 
     val modules = listOf(objectModule)
         .plus(orchestratorModule)
         .plus(queueModule)
+        .plus(dbModule)
         .plus(DescriptionContract.viewModule)
 }

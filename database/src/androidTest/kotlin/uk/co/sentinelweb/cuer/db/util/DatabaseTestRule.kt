@@ -6,10 +6,10 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.koin.core.component.KoinComponent
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.db.di.DatabaseModule
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
+import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 
 class DatabaseTestRule : TestWatcher(), KoinComponent {
 
@@ -26,7 +26,7 @@ class DatabaseTestRule : TestWatcher(), KoinComponent {
     }
 
     val modules = listOf(driverModule, dbTestModule, utilTestModule)
-        .plus(DatabaseModule.modules)
+        .plus(DatabaseCommonModule.modules)
 
     override fun starting(description: Description) {
         super.starting(description)

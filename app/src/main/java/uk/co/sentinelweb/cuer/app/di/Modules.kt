@@ -12,7 +12,6 @@ import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.backup.IBackupManager
-import uk.co.sentinelweb.cuer.app.db.AppDatabaseModule
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
@@ -80,17 +79,18 @@ import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.db.di.AndroidDatabaseModule
-import uk.co.sentinelweb.cuer.db.di.DatabaseModule
+import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
-import uk.co.sentinelweb.cuer.net.di.SharedNetModule
+import uk.co.sentinelweb.cuer.net.di.DomainNetModule
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
 import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
-import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
+
+//import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
 @ExperimentalCoroutinesApi
 object Modules {
@@ -123,7 +123,7 @@ object Modules {
         FloatingPlayerContract.serviceModule,
         SupportDialogFragment.fragmentModule,
         AppSelectorBottomSheet.fragmentModule,
-        OnboardingFragment.fragmentModule
+        OnboardingFragment.fragmentModule,
     )
 
     private val uiModule = module {
@@ -173,14 +173,9 @@ object Modules {
         factory { SharingShortcutsManager() }
         factory<IBackupManager> {
             BackupFileManager(
-                channelRepository = get(),
-                mediaRepository = get(),
+                backupJsonManager = get(),
                 playlistRepository = get(),
-                playlistItemRepository = get(),
-                imageDatabaseRepository = get(),
                 contextProvider = get(),
-                parserFactory = get(),
-                playlistItemCreator = get(),
                 timeProvider = get(),
                 timeStampMapper = get(),
                 imageFileRepository = get(),
@@ -235,16 +230,16 @@ object Modules {
         .plus(appNetModule)
         .plus(receiverModule)
         .plus(usecaseModule)
-        .plus(DatabaseModule.modules)
-        .plus(AppDatabaseModule.module)
+        .plus(DatabaseCommonModule.modules)
         .plus(AndroidDatabaseModule.modules)
         .plus(NetModule.netModule)
         .plus(SharedCoreModule.objectModule)
         .plus(SharedDomainModule.objectModule)
-        .plus(SharedNetModule.objectModule)
+        .plus(DomainNetModule.objectModule)
         .plus(SharedAppModule.modules)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
-        .plus(RemoteModule.objectModule)
+//        .plus(RemoteModule.objectModule)
         .plus(PlayerModule.localPlayerModule)
+        .plus(SharedAppAndroidModule.modules)
 }

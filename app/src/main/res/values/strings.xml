@@ -237,7 +237,8 @@
     <string name="browse_error_no_playlist">No playlist configured</string>
     <string name="browse_error_no_category">No category with that id = %1$s</string>
     <string name="browse_recent">Recently viewed</string>
-
+    <string name="browse_all_cats_title">All categories</string>
+    
     <!-- player -->
     <string name="player_fab_fullscreen">Fullscreen</string>
     <string name="player_fab_pip">Picture in Picture</string>

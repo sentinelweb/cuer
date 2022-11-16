@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
@@ -31,6 +32,7 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeSearchMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainMapper
 
 // todo test update and channels
+@Ignore("enable with ktor") // fixme
 class YoutubeVideosRetrofitInteractorTest {
 
     @MockK
