@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.datetime.toJavaLocalDateTime
-import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
@@ -120,8 +119,8 @@ class SearchViewModel(
 
     fun onDatesSelected(start: Long, end: Long) {
         state.remote = state.remote.copy(
-            fromDate = timeStampMapper.toLocalDateTimeNano(start).toKotlinLocalDateTime(),
-            toDate = timeStampMapper.toLocalDateTimeNano(end).toKotlinLocalDateTime()
+            fromDate = timeStampMapper.toLocalDateTimeNano(start),
+            toDate = timeStampMapper.toLocalDateTimeNano(end)
         )
         model = mapper.map(state)
     }

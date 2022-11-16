@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.app.backup
 import android.content.Context
 import android.os.Build
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.toJavaLocalDateTime
 import uk.co.sentinelweb.cuer.app.db.repository.*
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
@@ -107,7 +106,7 @@ class BackupFileManager constructor(
     private fun makeFileName(): String {
         val device = Build.MODEL.replace(" ", "_")
         val timeStamp = timeStampMapper.mapDateTimeSimple(
-            timeProvider.localDateTime().toJavaLocalDateTime()
+            timeProvider.localDateTime()
         )
         return "v$BACKUP_VERSION-$timeStamp-cuer_backup-$device.zip"
     }

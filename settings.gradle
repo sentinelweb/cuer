@@ -8,10 +8,11 @@ pluginManagement {
 rootProject.name = 'Cuer'
 
 include ':app'
-include ':net'
+//include ':net'
 include ':shared'
 //include ':remote'
 include ':website'
 include ':database'
 include 'domain'
+include 'netKmm'
 
