@@ -105,7 +105,7 @@ class BackupFileManager constructor(
 
     private fun makeFileName(): String {
         val device = Build.MODEL.replace(" ", "_")
-        val timeStamp = timeStampMapper.mapDateTimeSimple(
+        val timeStamp = timeStampMapper.toTimestampSimple(
             timeProvider.localDateTime()
         )
         return "v$BACKUP_VERSION-$timeStamp-cuer_backup-$device.zip"

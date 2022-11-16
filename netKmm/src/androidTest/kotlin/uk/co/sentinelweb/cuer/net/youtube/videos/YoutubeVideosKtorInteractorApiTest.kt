@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.net.client.ErrorMapper
 import uk.co.sentinelweb.cuer.net.client.KtorClientBuilder
 import uk.co.sentinelweb.cuer.net.client.ServiceExecutor
 import uk.co.sentinelweb.cuer.net.client.ServiceType
+import uk.co.sentinelweb.cuer.net.mappers.EscapeEntityMapper
 import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
@@ -76,7 +77,8 @@ class YoutubeVideosKtorInteractorApiTest {
                 timeProvider = TimeProvider(),
                 itemCreator = PlaylistItemCreator(TimeProvider()),
                 imageMapper = imageMapper,
-                channelMapper = channelMapper
+                channelMapper = channelMapper,
+                escapeEntityMapper = EscapeEntityMapper()
             )
         )
     }

@@ -119,8 +119,8 @@ class SearchViewModel(
 
     fun onDatesSelected(start: Long, end: Long) {
         state.remote = state.remote.copy(
-            fromDate = timeStampMapper.toLocalDateTimeNano(start),
-            toDate = timeStampMapper.toLocalDateTimeNano(end)
+            fromDate = timeStampMapper.nanosToLocalDateTime(start),
+            toDate = timeStampMapper.nanosToLocalDateTime(end)
         )
         model = mapper.map(state)
     }

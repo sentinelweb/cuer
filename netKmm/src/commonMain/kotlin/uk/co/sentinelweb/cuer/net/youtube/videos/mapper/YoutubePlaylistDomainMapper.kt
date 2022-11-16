@@ -44,7 +44,7 @@ internal class YoutubePlaylistDomainMapper(
                     platformUrl = "https://youtube.com/playlist?list=${it.id}",
                     description = it.snippet.description,
                     published = it.snippet.publishedAt.let { ts ->
-                        timeStampMapper.mapTimestamp(ts)
+                        timeStampMapper.parseTimestamp(ts)
                     }
                 ),
                 items = mapItems(items, videoLookup, channelLookup)
@@ -64,7 +64,7 @@ internal class YoutubePlaylistDomainMapper(
                 playlist = null,
                 order = it.snippet.position * 1000L,
                 dateAdded = it.snippet.publishedAt
-                    .let { ts -> timeStampMapper.mapTimestampInstant(ts)!! }
+                    .let { ts -> timeStampMapper.parseTimestampInstant(ts)!! }
             )
         }
 
@@ -90,13 +90,13 @@ internal class YoutubePlaylistDomainMapper(
             platform = PlatformDomain.YOUTUBE,
             platformId = it.resourceId.videoId,
             duration = videoDto.contentDetails?.duration
-                ?.let { dur -> timeStampMapper.mapDuration(dur) }
+                ?.let { dur -> timeStampMapper.parseDuration(dur) }
                 ?: -1,
             thumbNail = imageMapper.mapThumb(it.thumbnails),
             image = imageMapper.mapImage(it.thumbnails),
             channelData = channelDomain,
             published = videoDto.snippet.publishedAt.let { ts ->
-                timeStampMapper.mapTimestamp(ts)
+                timeStampMapper.parseTimestamp(ts)
             },
             isLiveBroadcast = videoDto
                 .snippet.liveBroadcastContent

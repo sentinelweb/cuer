@@ -23,7 +23,7 @@ internal class YoutubeVideoMediaDomainMapper(
                 platform = PlatformDomain.YOUTUBE,
                 platformId = it.id,
                 duration = it.contentDetails?.duration
-                    ?.let { dur -> timeStampMapper.mapDuration(dur) }
+                    ?.let { dur -> timeStampMapper.parseDuration(dur) }
                     ?: -1,
                 thumbNail = imageMapper.mapThumb(it.snippet.thumbnails),
                 image = imageMapper.mapImage(it.snippet.thumbnails),
@@ -32,7 +32,7 @@ internal class YoutubeVideoMediaDomainMapper(
                     title = it.snippet.channelTitle,
                     platform = PlatformDomain.YOUTUBE
                 ),
-                published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) },
+                published = it.snippet.publishedAt.let { ts -> timeStampMapper.parseTimestamp(ts) },
                 isLiveBroadcast = it.snippet.liveBroadcastContent.let { it == LIVE || it == UPCOMING },
                 isLiveBroadcastUpcoming = it.snippet.liveBroadcastContent.let { it == UPCOMING }
             )

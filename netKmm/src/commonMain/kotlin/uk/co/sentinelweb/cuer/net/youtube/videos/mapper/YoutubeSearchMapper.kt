@@ -41,8 +41,8 @@ internal class YoutubeSearchMapper(
             relatedToVideoId = null,
             type = VIDEO.param,
             channelId = domain.channelPlatformId,
-            publishedBefore = domain.toDate?.let { timeStampMapper.mapTimestamp(it) },
-            publishedAfter = domain.fromDate?.let { timeStampMapper.mapTimestamp(it) },
+            publishedBefore = domain.toDate?.let { timeStampMapper.toTimestamp(it) },
+            publishedAfter = domain.fromDate?.let { timeStampMapper.toTimestamp(it) },
             order = mapOrder(domain.order).param,
             eventType = domain.isLive.let {
                 if (it) LIVE.param else null
@@ -100,7 +100,7 @@ internal class YoutubeSearchMapper(
             thumbNail = imageMapper.mapThumb(it.snippet.thumbnails),
             image = imageMapper.mapImage(it.snippet.thumbnails),
             channelData = channelData,
-            published = it.snippet.publishedAt.let { ts -> timeStampMapper.mapTimestamp(ts) },
+            published = it.snippet.publishedAt.let { ts -> timeStampMapper.parseTimestamp(ts) },
             isLiveBroadcast = !(listOf(COMPLETED, NONE).contains(EVENT_TYPE_MAP[it.snippet.liveBroadcastContent])),
             isLiveBroadcastUpcoming = (EVENT_TYPE_MAP[it.snippet.liveBroadcastContent] == UPCOMING)
         )

@@ -21,7 +21,6 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeImageMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainMapper
 
-// @Ignore("enable with ktor") // fixme
 class YoutubeVideoMediaDomainMapperTest {
     @MockK
     private lateinit var mockStampMapper: TimeStampMapper
@@ -67,8 +66,8 @@ class YoutubeVideoMediaDomainMapperTest {
                 )
             )
         })
-        every { mockStampMapper.mapTimestamp(any<String>()) } returns fixtDate
-        every { mockStampMapper.mapDuration(any()) } returns fixtDuration
+        every { mockStampMapper.parseTimestamp(any<String>()) } returns fixtDate
+        every { mockStampMapper.parseDuration(any()) } returns fixtDuration
         dto.items.forEach {
             every { mockImageMapper.mapThumb(it.snippet.thumbnails) } returns fixtMediumDomain
             every { mockImageMapper.mapImage(it.snippet.thumbnails) } returns fixMaxResDomain
