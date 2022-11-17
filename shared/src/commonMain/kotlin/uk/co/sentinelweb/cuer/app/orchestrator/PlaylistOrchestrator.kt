@@ -30,7 +30,7 @@ class PlaylistOrchestrator constructor(
                 .map { it.first to MEMORY then it.second })
         )
 
-    suspend override fun load(id: Long, options: Options): PlaylistDomain? = when (options.source) {
+    suspend override fun loadById(id: Long, options: Options): PlaylistDomain? = when (options.source) {
         MEMORY -> playlistMemoryRepository.load(id, options)
         LOCAL -> playlistDatabaseRepository.load(id, options.flat)
             .forceDatabaseSuccess()
@@ -50,7 +50,7 @@ class PlaylistOrchestrator constructor(
             PLATFORM -> throw InvalidOperationException(this::class, filter, options)
         }
 
-    suspend override fun load(platformId: String, options: Options): PlaylistDomain? =
+    suspend override fun loadByPlatformId(platformId: String, options: Options): PlaylistDomain? =
         when (options.source) {
             MEMORY -> playlistMemoryRepository.loadList(PlatformIdListFilter(listOf(platformId)), options)
                 .firstOrNull()
@@ -66,7 +66,7 @@ class PlaylistOrchestrator constructor(
                 .forceNetSuccessNotNull("Youtube ${platformId} does not exist")
         }
 
-    suspend override fun load(domain: PlaylistDomain, options: Options): PlaylistDomain? {
+    suspend override fun loadByDomain(domain: PlaylistDomain, options: Options): PlaylistDomain? {
         throw NotImplementedException()
     }
 

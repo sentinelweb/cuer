@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
-import uk.co.sentinelweb.cuer.net.exception.BadDataException
 import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubePlaylistDto
@@ -44,7 +43,8 @@ internal class YoutubePlaylistDomainMapper(
                     platformUrl = "https://youtube.com/playlist?list=${it.id}",
                     description = it.snippet.description,
                     published = it.snippet.publishedAt.let { ts ->
-                        timeStampMapper.parseTimestamp(ts)
+                        log.d("pl.pub: before parse: $ts")
+                        timeStampMapper.parseTimestamp(ts).also { log.d("pl.pub: after parse: $it") }
                     }
                 ),
                 items = mapItems(items, videoLookup, channelLookup)
@@ -58,14 +58,20 @@ internal class YoutubePlaylistDomainMapper(
         channelLookup: Map<String, ChannelDomain>
     ): List<PlaylistItemDomain> = items
         .filter { videoLookup.keys.contains<String>(it.snippet.resourceId.videoId) } // some videos are deleted
-        .map {
-            itemCreator.buildPlayListItem(
-                media = mapMedia(it, videoLookup, channelLookup),
-                playlist = null,
-                order = it.snippet.position * 1000L,
-                dateAdded = it.snippet.publishedAt
-                    .let { ts -> timeStampMapper.parseTimestampInstant(ts)!! }
-            )
+        .mapNotNull {
+            mapMedia(it, videoLookup, channelLookup)
+                ?.let { mediaDomain ->
+                    itemCreator.buildPlayListItem(
+                        media = mediaDomain,
+                        playlist = null,
+                        order = it.snippet.position * 1000L,
+                        dateAdded = it.snippet.publishedAt
+                            .let { ts ->
+                                log.d("pli.add: before parse: $ts")
+                                timeStampMapper.parseTimestampInstant(ts).also { log.d("pli.add: after parse: $it") }
+                            }
+                    )
+                }
         }
 
     private fun mapMedia(
@@ -74,13 +80,13 @@ internal class YoutubePlaylistDomainMapper(
         channelLookup: Map<String, ChannelDomain>
     ) = item.snippet.let {
         val videoDto = videoLookup[it.resourceId.videoId]
-            ?: throw BadDataException("No video for playlist item: ${it.resourceId.videoId}")
+            ?: return@let null // throw BadDataException("No video for playlist item: ${it.resourceId.videoId}")
 
         val channelDomain = it.videoOwnerChannelId
             .let { channelLookup[it] }
-            ?: throw BadDataException(
-                "Channel not found: ownerId:${it.videoOwnerChannelId} videoId:${it.resourceId.videoId}"
-            )
+            ?: return@let null //throw BadDataException(
+//                "Channel not found: ownerId:${it.videoOwnerChannelId} videoId:${it.resourceId.videoId}"
+//            )
         MediaDomain(
             id = null,
             url = "https://youtu.be/${it.resourceId.videoId}",

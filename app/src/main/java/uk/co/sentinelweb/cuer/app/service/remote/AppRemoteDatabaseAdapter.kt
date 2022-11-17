@@ -23,11 +23,11 @@ class AppRemoteDatabaseAdapter constructor(
 
     override suspend fun getPlaylist(id: Long): PlaylistDomain? =
         playlistOrchestrator
-            .load(id, LOCAL.deepOptions())
+            .loadById(id, LOCAL.deepOptions())
 
     override suspend fun getPlaylistItem(id: Long): PlaylistItemDomain? =
         playlistItemOrchestrator
-            .load(id, LOCAL.flatOptions())
+            .loadById(id, LOCAL.flatOptions())
 
     override suspend fun scanUrl(url: String): Domain = addLinkOrchestrator.scanUrl(url)
 

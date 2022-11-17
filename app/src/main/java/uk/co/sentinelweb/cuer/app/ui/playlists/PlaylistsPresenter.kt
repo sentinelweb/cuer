@@ -145,7 +145,7 @@ class PlaylistsPresenter(
                         val node = state.treeLookup[playlist.id]!!
                         if (node.chidren.size == 0) {
                             state.deletedPlaylist = playlist.id
-                                ?.let { playlistOrchestrator.load(it, LOCAL.deepOptions()) }
+                                ?.let { playlistOrchestrator.loadById(it, LOCAL.deepOptions()) }
                                 ?.apply {
                                     playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
                                     view.notifyItemRemoved(item)
@@ -244,7 +244,7 @@ class PlaylistsPresenter(
             ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 && it.type != APP }
             ?.let { itemDomain ->
                 coroutines.mainScope.launch {
-                    playlistOrchestrator.load(itemDomain.id!!, LOCAL.deepOptions())
+                    playlistOrchestrator.loadById(itemDomain.id!!, LOCAL.deepOptions())
                         ?.also { shareWrapper.share(it) }
                         ?: view.showError("Couldn't load playlist ...")
                 }

@@ -33,7 +33,7 @@ import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeVideoMediaDomainM
 
 // todo test update and channels
 @Ignore("enable with ktor") // fixme
-class YoutubeVideosRetrofitInteractorTest {
+class YoutubeVideosKtornteractorTest {
 
     @MockK
     private lateinit var mockService: YoutubeService

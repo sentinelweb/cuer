@@ -14,7 +14,7 @@ class ChannelOrchestrator constructor(
     override val updates: Flow<Triple<Operation, Source, ChannelDomain>>
         get() = throw NotImplementedException()
 
-    suspend override fun load(id: Long, options: Options): ChannelDomain? {
+    suspend override fun loadById(id: Long, options: Options): ChannelDomain? {
         throw NotImplementedException()
     }
 
@@ -22,11 +22,11 @@ class ChannelOrchestrator constructor(
         throw NotImplementedException()
     }
 
-    suspend override fun load(platformId: String, options: Options): ChannelDomain? {
+    suspend override fun loadByPlatformId(platformId: String, options: Options): ChannelDomain? {
         throw NotImplementedException()
     }
 
-    suspend override fun load(domain: ChannelDomain, options: Options): ChannelDomain? {
+    suspend override fun loadByDomain(domain: ChannelDomain, options: Options): ChannelDomain? {
         throw NotImplementedException()
     }
 

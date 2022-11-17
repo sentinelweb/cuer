@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.net.client
 
 import io.ktor.client.*
+import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -9,9 +10,11 @@ import kotlinx.serialization.json.Json
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 
+expect val defaultPlatformEngine: HttpClientEngine
+
 class KtorClientBuilder {
 
-    fun build(config: NetModuleConfig, log: LogWrapper) = HttpClient {
+    fun build(config: NetModuleConfig, log: LogWrapper) = HttpClient(defaultPlatformEngine) {
         expectSuccess = false
         install(ContentNegotiation) {
             json(Json {

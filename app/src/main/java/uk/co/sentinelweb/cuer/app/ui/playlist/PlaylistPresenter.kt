@@ -703,7 +703,7 @@ class PlaylistPresenter(
                     state.addPlaylistParent
                         ?.takeIf { it > 0 }
                         ?.let { parentId ->
-                            playlistOrchestrator.load(parentId, LOCAL.flatOptions())
+                            playlistOrchestrator.loadById(parentId, LOCAL.flatOptions())
                                 ?.let { playlist.copy(parentId = parentId) }
                         }
                         ?: playlist

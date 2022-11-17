@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ext
+package uk.co.sentinelweb.cuer.core.ext
 
 import platform.Foundation.*
 

@@ -8,7 +8,9 @@ import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseIosModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
+import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.di.DomainNetModule
+import uk.co.sentinelweb.cuer.net.di.NetModule
 
 private fun initKoinInternal(
     config: BuildConfigDomain,
@@ -18,6 +20,9 @@ private fun initKoinInternal(
         appDeclaration()
         val configModule = module {
             factory { config }
+            factory {
+                NetModuleConfig(debug = config.isDebug)
+            }
         }
         modules(
             listOf(SharedCoreModule.objectModule, SharedDomainModule.objectModule, DomainNetModule.objectModule)
@@ -26,6 +31,7 @@ private fun initKoinInternal(
                 .plus(SharedAppIosModule.modules)
                 .plus(DatabaseCommonModule.modules)
                 .plus(DatabaseIosModule.modules)
+                .plus(NetModule.modules)
         )
     }
 

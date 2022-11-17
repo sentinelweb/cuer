@@ -16,11 +16,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             config: dependencies.buildConfig
         )
         let dbInit = OrchestratorFactory().databaseInitializer
-        debugPrint("init: \(dbInit.isInitialized())")
         if !dbInit.isInitialized() {
-            debugPrint("init db:start")
             dbInit.doInitDatabase(path: "default-dbinit")
-            debugPrint("init db:done")
         }
         return true
     }

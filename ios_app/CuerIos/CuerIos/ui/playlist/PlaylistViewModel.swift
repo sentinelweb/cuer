@@ -29,7 +29,7 @@ final class PlaylistViewModel: ObservableObject {
     let playlist: DomainPlaylistDomain? = nil
     
 //    private let log = SystemLogWrapper() // fixme: not available?
-    private let orch = OrchestratorFactory()
+    private let orch = OrchestratorFactory()  // todo inject
     
     private var playlistIdSubscription: AnyCancellable? = nil
     

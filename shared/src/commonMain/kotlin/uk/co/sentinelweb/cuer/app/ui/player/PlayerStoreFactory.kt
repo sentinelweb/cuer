@@ -178,7 +178,7 @@ class PlayerStoreFactory(
                         it.media.copy(starred = it.media.starred.not()),
                         LOCAL.deepOptions(true)
                     )
-                    playlistItemOrchestrator.load(it.id!!, LOCAL.deepOptions(false))
+                    playlistItemOrchestrator.loadById(it.id!!, LOCAL.deepOptions(false))
                         ?.apply { dispatch(Result.SetVideo(this)) }
                 }
         }

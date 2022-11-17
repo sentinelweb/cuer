@@ -56,33 +56,44 @@ actual class TimeStampMapper constructor(
 
     // from: https://stackoverflow.com/questions/48030681/how-to-parse-a-iso-8601-duration-format-in-swift
     private fun parseDurationPrivate(duration: String): Long {
-        var durationMod = duration
-        if (durationMod.startsWith("PT")) {
-            durationMod = durationMod.substring(2)
-        } else throw IllegalArgumentException("duration doesn't start with PT: $duration")
-        val (hour, remainder) = chompNumber(durationMod, "H")
-        val (minute, remainder1) = chompNumber(remainder, "M")
-        val (second, remainder2) = chompNumber(remainder1, "S")
-        return hour * 3600 + minute * 60 + second
+        val durationMod = duration.substring(1)//"P"
+        var (days, remainderDays) = chompNumber(durationMod, "D")
+        return if (remainderDays.startsWith("T")) {
+            remainderDays = remainderDays.substring(1)
+            val (hours, remainderHours) = chompNumber(remainderDays, "H")
+            val (minutes, remainderMins) = chompNumber(remainderHours, "M")
+            val (seconds, _) = chompNumber(remainderMins, "S")
+            (days * DAYS + hours * HOURS + minutes * MINS + seconds) * MS
+        } else {
+            days * DAYS * MS
+        }
     }
 
-    private fun chompNumber(durationMod: String, unit: String): Pair<Long, String> {
-        var durationMod1 = durationMod
-        val hourIndex = durationMod1.indexOf(unit)
-        val hour = if (hourIndex > -1) {
-            val digit = durationMod1.substring(0, hourIndex).toLong()
-            durationMod1 = durationMod1.substring(hourIndex)
+    private fun chompNumber(buffer: String, token: String): Pair<Long, String> {
+        var bufferMod = buffer
+        val tokenIndex = bufferMod.indexOf(token)
+        val parsedNumber = if (tokenIndex > -1) {
+            val number = bufferMod.substring(0, tokenIndex)
+                .let {
+                    val dotIndex = it.indexOf(".")
+                    if (dotIndex > -1) it.substring(0, dotIndex) else it
+                }
+            val digit = number.toLong()
+            bufferMod = bufferMod.substring(tokenIndex + 1)
             digit
         } else {
             0
         }
-        return Pair(hour, durationMod1)
+        return Pair(parsedNumber, bufferMod)
     }
-
 
     companion object {
         private const val TIMESTAMP_PATTERN = "uuuu-MM-dd'T'HH:mm:ss[.n]'Z'"
         private const val SIMPLE_DATETIME_PATTERN = "uuuu-MM-dd_HH:mm:ss"
+        private const val DAYS = 24 * 60 * 60
+        private const val HOURS = 60 * 60
+        private const val MINS = 60
+        private const val MS = 1000
     }
 
 }

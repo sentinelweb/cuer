@@ -15,7 +15,9 @@ struct BrowseView: View {
     }
     
     var body: some View {
-        Text("Browse, World!")
+        Text("Browse, World!").onTapGesture {
+            viewModel.execPlatformRequest()
+        }
     }
 }
 

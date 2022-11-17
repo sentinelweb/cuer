@@ -60,8 +60,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("io.insert-koin:koin-core:$ver_koin")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
-//                implementation("io.ktor:ktor-client-cio:$ver_ktor")
-//                implementation("io.ktor:ktor-serialization:$ver_ktor")
+                implementation("io.ktor:ktor-serialization:$ver_ktor")
                 implementation("io.ktor:ktor-client-content-negotiation:$ver_ktor")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ver_ktor")
                 implementation("io.ktor:ktor-client-logging:$ver_ktor")
@@ -75,6 +74,8 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
+                implementation("io.ktor:ktor-client-cio:$ver_ktor")
+
             }
         }
         val androidTest by getting {
@@ -86,6 +87,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
+                implementation("io.ktor:ktor-client-cio:$ver_ktor")
             }
         }
         val jvmTest by getting {
@@ -94,6 +96,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
+                implementation("io.ktor:ktor-client-js:$ver_ktor")
             }
         }
         val jsTest by getting
@@ -106,6 +109,7 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
+                implementation("io.ktor:ktor-client-darwin:$ver_ktor")
             }
 
         }

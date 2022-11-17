@@ -45,7 +45,7 @@ class PlaylistUpdateOrchestrator constructor(
                 when (p.platform) {
                     YOUTUBE -> p.platformId?.run {
                         playlistOrchestrator
-                            .load(this, Source.PLATFORM.deepOptions())
+                            .loadByPlatformId(this, Source.PLATFORM.deepOptions())
                             ?.let { removeExistingItems(it, p) }
                             ?.takeIf { it.items.size > 0 }
                             ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }

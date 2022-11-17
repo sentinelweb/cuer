@@ -124,9 +124,9 @@ class YoutubeVideosKtorInteractorApiTest {
     //@Ignore("Real api test .. run manually only")
     @Test
     fun playlist() = runBlocking {
-        //https://www.youtube.com/playlist?list=PLf-zrdqNE8p9qjU-kzB8ROMpgbXYahCQR
+        //https://www.youtube.com/playlist?list=PLf-zrdqNE8p-7tt7JHtlpLH3w9QA1EU0L
         val actualLive = sut.playlist(// live - news
-            "PLf-zrdqNE8p9qjU-kzB8ROMpgbXYahCQR"
+            "PLf-zrdqNE8p-7tt7JHtlpLH3w9QA1EU0L"
         )
 
         assertTrue(actualLive.isSuccessful)

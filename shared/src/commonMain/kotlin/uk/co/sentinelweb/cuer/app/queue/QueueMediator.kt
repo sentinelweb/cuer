@@ -141,7 +141,7 @@ class QueueMediator constructor(
 
     // todo refactor / consolidate the playNow's
     override suspend fun playNow(identifier: Identifier<*>, playlistItemId: Long?) {
-        playlistOrchestrator.load(identifier.id as Long, Options(identifier.source, false))
+        playlistOrchestrator.loadById(identifier.id as Long, Options(identifier.source, false))
             ?.let {
                 playNow(it, playlistItemId, identifier.source)
             }
