@@ -5,6 +5,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
@@ -18,7 +19,6 @@ import uk.co.sentinelweb.cuer.net.client.KtorClientBuilder
 import uk.co.sentinelweb.cuer.net.client.ServiceExecutor
 import uk.co.sentinelweb.cuer.net.client.ServiceType
 import uk.co.sentinelweb.cuer.net.mappers.EscapeEntityMapper
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubePart.*

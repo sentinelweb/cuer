@@ -11,11 +11,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.ThumbnailDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.mapper.YoutubeImageMapper
