@@ -6,7 +6,6 @@ import org.junit.Before
 import org.junit.Test
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 
 class TimeStampMapperTest {
     private val spyLog = spyk<LogWrapper>(SystemLogWrapper())
