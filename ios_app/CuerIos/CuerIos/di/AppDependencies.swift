@@ -6,21 +6,36 @@
 //
 
 import Foundation
-
 import shared
 //
 //protocol xxxExecutorDependency {
 //  var xxxExecutor: UseCaseExecutor { get }
 //}
 
+// todo make build info plist: https://stackoverflow.com/questions/6851660/version-vs-build-in-xcode
+protocol IosBuildConfigDependency {
+    var buildConfig:DomainBuildConfigDomain {get}
+}
+
+protocol SharedDependency {
+    var shared:SharedAppDependencies {get}
+}
+
+protocol SharedObjectsDependency {
+    var orchestratorFactory: OrchestratorFactory {get}
+}
+
 protocol PlaylistIdDependency {var plId: Int { get }}
 protocol PlaylistIdOptionalDependency {var plId: Int? { get }}
 
-class AppDependencies: IosBuildConfigDependency
+class AppDependencies:
+    IosBuildConfigDependency
 & MainCoordinatorDependency
 & BrowseViewModelDependency
 & PlaylistViewModelDependency
 & PlaylistsViewModelDependency
+& SharedDependency
+& SharedObjectsDependency
 {
 #if DEBUG
     private let isDebug = true
@@ -32,12 +47,21 @@ class AppDependencies: IosBuildConfigDependency
         versionCode: 1,
         version: "0.77")
     
+    lazy var shared: SharedAppDependencies = SharedAppDependencies(
+        config: self.buildConfig,
+        ytApiKey: CuerYoutubeApiKeyProvider(),
+        pixabayApiKey: CuerPixabayApiKeyProvider()
+    )
+    
+    var orchestratorFactory = OrchestratorFactory()
+    
     lazy var mainCoordinator: MainCoordinator = {MainCoordinator(dependencies: self)}()
     
     func createBrowseViewModel() -> BrowseViewModel {
         BrowseViewModel(
             dependencies: BrowseViewModelProvider(
-                mainCoordinator: mainCoordinator
+                mainCoordinator: mainCoordinator,
+                orchestratorFactory: orchestratorFactory
             )
         )
     }
@@ -46,7 +70,8 @@ class AppDependencies: IosBuildConfigDependency
         PlaylistViewModel(
             dependencies: PlaylistViewModelProvider(
                 mainCoordinator: mainCoordinator,
-                plId: plId
+                plId: plId,
+                orchestratorFactory: orchestratorFactory
             )
         )
     }

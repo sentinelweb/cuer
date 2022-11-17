@@ -14,11 +14,11 @@ interface OrchestratorContract<Domain> {
 
     val updates: Flow<Triple<Operation, Source, Domain>>
 
-    suspend fun load(platformId: String, options: Options): Domain?
+    suspend fun loadByPlatformId(platformId: String, options: Options): Domain?
 
-    suspend fun load(domain: Domain, options: Options): Domain?
+    suspend fun loadByDomain(domain: Domain, options: Options): Domain?
 
-    suspend fun load(id: Long, options: Options): Domain?
+    suspend fun loadById(id: Long, options: Options): Domain?
 
     suspend fun loadList(filter: Filter, options: Options): List<Domain>
 

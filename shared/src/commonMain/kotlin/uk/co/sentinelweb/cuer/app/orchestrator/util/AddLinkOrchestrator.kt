@@ -28,7 +28,7 @@ class AddLinkOrchestrator constructor(
                     MEDIA -> (scannedMedia.second as MediaDomain)
                         .let {
                             mediaOrchestrator
-                                .load(it.platformId, LOCAL.flatOptions())
+                                .loadByPlatformId(it.platformId, LOCAL.flatOptions())
                                 ?.takeIf { it.id != null }
                                 ?.let {
                                     playlistItemOrchestrator
@@ -37,7 +37,7 @@ class AddLinkOrchestrator constructor(
                                         ?.get(0)
                                 }
                                 ?: mediaOrchestrator
-                                    .load(it.platformId, PLATFORM.flatOptions())
+                                    .loadByPlatformId(it.platformId, PLATFORM.flatOptions())
                         }
 //                  ObjectTypeDomain.PLAYLIST -> (scannedMedia.second as PlaylistDomain).apply {
 //

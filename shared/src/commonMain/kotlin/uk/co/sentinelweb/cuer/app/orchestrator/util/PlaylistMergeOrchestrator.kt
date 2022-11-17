@@ -26,8 +26,8 @@ class PlaylistMergeOrchestrator constructor(
 
     suspend fun merge(toDelete: PlaylistDomain, toReceive: PlaylistDomain): PlaylistDomain {
         if (!checkMerge(toDelete, toReceive)) throw IllegalArgumentException("Cannot merge these playlists")
-        val toDeleteFull = playlistOrchestrator.load(toDelete.id!!, LOCAL.deepOptions())!!
-        val toReceiveFull = playlistOrchestrator.load(toReceive.id!!, LOCAL.deepOptions())!!
+        val toDeleteFull = playlistOrchestrator.loadById(toDelete.id!!, LOCAL.deepOptions())!!
+        val toReceiveFull = playlistOrchestrator.loadById(toReceive.id!!, LOCAL.deepOptions())!!
         val merged = toReceiveFull.copy(
             type = if (toDeleteFull.type == PLATFORM) PLATFORM else toReceiveFull.type,
             channelData = if (toDeleteFull.type == PLATFORM && toReceiveFull.type == USER) toDeleteFull.channelData else toReceiveFull.channelData,

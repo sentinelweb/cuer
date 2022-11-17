@@ -9,10 +9,10 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 class PlaylistItemCreator constructor(
     private val timeProvider: TimeProvider
 ) {
-    fun buildPlayListItem(media: MediaDomain, playlist: PlaylistDomain?, order: Long? = null, dateAdded: Instant) =
+    fun buildPlayListItem(media: MediaDomain, playlist: PlaylistDomain?, order: Long? = null, dateAdded: Instant?) =
         PlaylistItemDomain(
             media = media,
-            dateAdded = dateAdded,
+            dateAdded = dateAdded ?: timeProvider.instant(),
             playlistId = playlist?.id,
             order = order ?: timeProvider.currentTimeMillis(), // fixme this could give duplicate ordering numbers
             archived = false

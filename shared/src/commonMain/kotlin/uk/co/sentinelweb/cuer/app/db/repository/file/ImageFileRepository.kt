@@ -38,7 +38,7 @@ class ImageFileRepository(
             if (input.url.startsWith("http")) {
                 val url = Url(input.url)
                 val httpResponse: HttpResponse = client.get(url)
-                val byteArrayBody: ByteArray = httpResponse.receive()
+                val byteArrayBody: ByteArray = httpResponse.body()
                 val fullPath = url.fullPath
                 val fileName = buildFileName(fullPath, nameBase)
                 val targetFile = makeUniqueFileName(fileName, byteArrayBody)

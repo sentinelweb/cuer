@@ -84,11 +84,10 @@ import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
-import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
+import uk.co.sentinelweb.cuer.net.client.ServiceType
 import uk.co.sentinelweb.cuer.net.di.DomainNetModule
-import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
-import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
+import uk.co.sentinelweb.cuer.net.di.NetModule
 
 //import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
@@ -217,8 +216,8 @@ object Modules {
     }
 
     private val appNetModule = module {
-        factory<ApiKeyProvider>(named(YOUTUBE)) { CuerYoutubeApiKeyProvider() }
-        factory<ApiKeyProvider>(named(PIXABAY)) { CuerPixabayApiKeyProvider() }
+        factory<ApiKeyProvider>(named(ServiceType.YOUTUBE)) { CuerYoutubeApiKeyProvider() }
+        factory<ApiKeyProvider>(named(ServiceType.PIXABAY)) { CuerPixabayApiKeyProvider() }
         single { NetModuleConfig(debug = DEBUG) }
         factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication()) }
     }
@@ -232,7 +231,7 @@ object Modules {
         .plus(usecaseModule)
         .plus(DatabaseCommonModule.modules)
         .plus(AndroidDatabaseModule.modules)
-        .plus(NetModule.netModule)
+        .plus(NetModule.modules)
         .plus(SharedCoreModule.objectModule)
         .plus(SharedDomainModule.objectModule)
         .plus(DomainNetModule.objectModule)

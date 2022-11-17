@@ -82,10 +82,10 @@ class ScanPresenter(
         try {
             return (scannedPlaylist.platformId
                 ?.let {
-                    playlistOrchestrator.load(it, Options(LOCAL))
+                    playlistOrchestrator.loadByPlatformId(it, Options(LOCAL))
                         ?.also { log.d("found playlist = $it") }
                         ?.let { it to false }
-                        ?: playlistOrchestrator.load(it, PLATFORM.deepOptions(emit = false))
+                        ?: playlistOrchestrator.loadByPlatformId(it, PLATFORM.deepOptions(emit = false))
                             ?.copy(
                                 id = Shared.id,
                                 config = scannedPlaylist.config.copy(

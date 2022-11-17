@@ -125,7 +125,7 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
-
+                implementation(project(":netKmm"))
             }
 
         }
@@ -159,5 +159,5 @@ kmmbridge {
     githubReleaseVersions()
     spm()
     //cocoapods("git@github.com:touchlab/PublicPodspecs.git")
-    versionPrefix.set("0.6")
+    versionPrefix.set("0.6")//fixme do i need this?
 }

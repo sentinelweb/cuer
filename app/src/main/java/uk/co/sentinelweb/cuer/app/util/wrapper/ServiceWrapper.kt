@@ -4,7 +4,7 @@ import android.app.ActivityManager
 import android.app.Application
 import android.app.Service.*
 import android.content.Context.ACTIVITY_SERVICE
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 
 
 class ServiceWrapper(
@@ -37,7 +37,7 @@ class ServiceWrapper(
                     isRunning = true,
                     isForeground = runningServiceInfo.foreground,
                     isStarted = runningServiceInfo.started,
-                    activeSince = timeStampMapper.mapDateTimeSimple(runningServiceInfo.activeSince),
+                    activeSince = timeStampMapper.toTimeStampSimple(runningServiceInfo.activeSince),
                     flagContinuation = runningServiceInfo.flags and START_CONTINUATION_MASK == START_CONTINUATION_MASK,
                     flagNotSticky = runningServiceInfo.flags and START_NOT_STICKY == START_NOT_STICKY,
                     flagRedelivery = runningServiceInfo.flags and START_FLAG_REDELIVERY == START_FLAG_REDELIVERY,

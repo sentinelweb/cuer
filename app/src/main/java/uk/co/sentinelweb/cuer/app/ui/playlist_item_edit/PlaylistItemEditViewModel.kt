@@ -163,13 +163,13 @@ class PlaylistItemEditViewModel constructor(
                 }
 
                 if (state.parentPlaylistId > 0L) {
-                    playlistOrchestrator.load(state.parentPlaylistId, LOCAL.flatOptions())
+                    playlistOrchestrator.loadById(state.parentPlaylistId, LOCAL.flatOptions())
                         ?.also { state.selectedPlaylists.add(it) }
                 }
 
                 prefsWrapper.pinnedPlaylistId
                     ?.takeIf { state.selectedPlaylists.size == 0 }
-                    ?.let { playlistOrchestrator.load(it, LOCAL.flatOptions()) }
+                    ?.let { playlistOrchestrator.loadById(it, LOCAL.flatOptions()) }
                     ?.also { state.selectedPlaylists.add(it) }
 
                 if (originalMedia.channelData.thumbNail == null
@@ -206,7 +206,7 @@ class PlaylistItemEditViewModel constructor(
                             .maxByOrNull { it.size } // should get the largest list of items
                             ?.get(0)
                             ?.playlistId
-                            ?.let { playlistOrchestrator.load(it, LOCAL.flatOptions()) }
+                            ?.let { playlistOrchestrator.loadById(it, LOCAL.flatOptions()) }
                             ?.also { state.selectedPlaylists.add(it) }
                     }
                 }
@@ -231,7 +231,7 @@ class PlaylistItemEditViewModel constructor(
             state.media?.let { originalMedia ->
                 _uiLiveData.value = UiEvent(REFRESHING, true)
                 try {
-                    mediaOrchestrator.load(originalMedia.platformId, Options(PLATFORM))
+                    mediaOrchestrator.loadByPlatformId(originalMedia.platformId, Options(PLATFORM))
                         ?.let {
                             it.copy(
                                 id = originalMedia.id,

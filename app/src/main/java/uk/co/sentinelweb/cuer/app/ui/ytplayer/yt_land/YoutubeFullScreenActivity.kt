@@ -46,7 +46,7 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
-import uk.co.sentinelweb.cuer.net.retrofit.ServiceType
+import uk.co.sentinelweb.cuer.net.client.ServiceType
 import android.R as RA
 
 /**

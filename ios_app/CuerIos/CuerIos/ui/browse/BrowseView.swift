@@ -9,13 +9,19 @@ import SwiftUI
 
 struct BrowseView: View {
     @StateObject private var viewModel: BrowseViewModel
-    
+    private let apiKey:CuerYoutubeApiKeyProvider = CuerYoutubeApiKeyProvider()
     init(viewModel: BrowseViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
     }
     
     var body: some View {
-        Text("Browse, World!")
+        VStack {
+            Text("Browse, World!").onTapGesture {
+                viewModel.execPlatformRequest()
+            }
+            Text("apiKey.key")
+            Text(apiKey.key)
+        }
     }
 }
 
