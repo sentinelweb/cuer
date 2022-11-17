@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.net.mappers
+package uk.co.sentinelweb.cuer.core.mappers
 
 import kotlinx.datetime.*
 import platform.Foundation.NSDateFormatter

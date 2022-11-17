@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -29,7 +30,6 @@ import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.LOCAL
 import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.REMOTE
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 
 class SearchViewModel(
     private val state: SearchContract.State,

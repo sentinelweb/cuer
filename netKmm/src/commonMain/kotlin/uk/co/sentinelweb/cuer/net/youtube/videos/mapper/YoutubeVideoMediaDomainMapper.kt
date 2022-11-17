@@ -1,9 +1,9 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto.Companion.LIVE
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeVideosDto.Companion.UPCOMING

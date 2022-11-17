@@ -1,9 +1,9 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubePlaylistDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubePlaylistItemDto

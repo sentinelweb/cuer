@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.net.mappers
+package uk.co.sentinelweb.cuer.core.mappers
 
 //import java.time.*
 import kotlinx.datetime.*
@@ -49,10 +49,10 @@ actual class TimeStampMapper constructor(
     actual fun toTimestampSimple(date: LocalDateTime): String =
         simpleTimeStampFormatter.format(date.toJavaLocalDateTime())
 
-    actual fun toTimeStampSimple(ms: Long): String = simpleTimeStampFormatter.format(toLocalDateTime(ms))
+    actual fun toTimeStampSimple(ms: Long): String = simpleTimeStampFormatter.format(millisLocalDateTime(ms))
 
     // fixme: looks like ofEpochSecond takes microseconds?
-    private fun toLocalDateTime(ms: Long): java.time.LocalDateTime =
+    private fun millisLocalDateTime(ms: Long): java.time.LocalDateTime =
         java.time.LocalDateTime.ofEpochSecond(ms * 1000, 0, OffsetDateTime.now().getOffset())
 
     actual fun nanosToLocalDateTime(ns: Long): LocalDateTime? =

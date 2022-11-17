@@ -2,13 +2,13 @@ package uk.co.sentinelweb.cuer.net.di
 
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.client.ErrorMapper
 import uk.co.sentinelweb.cuer.net.client.KtorClientBuilder
 import uk.co.sentinelweb.cuer.net.client.ServiceExecutor
 import uk.co.sentinelweb.cuer.net.client.ServiceType.PIXABAY
 import uk.co.sentinelweb.cuer.net.client.ServiceType.YOUTUBE
 import uk.co.sentinelweb.cuer.net.mappers.EscapeEntityMapper
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayInteractor
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayKtorInteractor
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayService

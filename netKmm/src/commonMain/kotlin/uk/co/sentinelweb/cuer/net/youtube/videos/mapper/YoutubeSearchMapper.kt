@@ -1,12 +1,12 @@
 package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.exception.BadDataException
 import uk.co.sentinelweb.cuer.net.mappers.EscapeEntityMapper
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeSearchDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeSearchDto.Companion.EVENT_TYPE_MAP
