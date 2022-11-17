@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BDA559B829264018008C07E1 /* ApiKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = BDA559B729264017008C07E1 /* ApiKeys.plist */; };
+		BDA559BB29264124008C07E1 /* ApiKeyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA559BA29264124008C07E1 /* ApiKeyProvider.swift */; };
 		BDBEDF8F29221FD20004AEF4 /* CuerIosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDF8E29221FD20004AEF4 /* CuerIosApp.swift */; };
 		BDBEDF9329221FD20004AEF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDBEDF9229221FD20004AEF4 /* Assets.xcassets */; };
 		BDBEDF9629221FD20004AEF4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDBEDF9529221FD20004AEF4 /* Preview Assets.xcassets */; };
@@ -22,7 +24,6 @@
 		BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCA29228D940004AEF4 /* BrowseView.swift */; };
 		BDBEDFCD29228DAD0004AEF4 /* BrowseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCC29228DAD0004AEF4 /* BrowseViewModel.swift */; };
 		BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */; };
-		BDBEDFD2292294800004AEF4 /* IosBuildConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD1292294800004AEF4 /* IosBuildConfig.swift */; };
 		BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD4292295F70004AEF4 /* SafariView.swift */; };
 		BDBEDFD8292297B70004AEF4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD7292297B70004AEF4 /* SettingsView.swift */; };
 		BDBEDFDB2922A1B10004AEF4 /* URL+Identifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFDA2922A1B10004AEF4 /* URL+Identifiable.swift */; };
@@ -72,6 +73,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BDA559B729264017008C07E1 /* ApiKeys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ApiKeys.plist; sourceTree = "<group>"; };
+		BDA559BA29264124008C07E1 /* ApiKeyProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyProvider.swift; sourceTree = "<group>"; };
 		BDBEDF8B29221FD20004AEF4 /* CuerIos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CuerIos.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDBEDF8E29221FD20004AEF4 /* CuerIosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuerIosApp.swift; sourceTree = "<group>"; };
 		BDBEDF9229221FD20004AEF4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -90,7 +93,6 @@
 		BDBEDFCA29228D940004AEF4 /* BrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseView.swift; sourceTree = "<group>"; };
 		BDBEDFCC29228DAD0004AEF4 /* BrowseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseViewModel.swift; sourceTree = "<group>"; };
 		BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
-		BDBEDFD1292294800004AEF4 /* IosBuildConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosBuildConfig.swift; sourceTree = "<group>"; };
 		BDBEDFD4292295F70004AEF4 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 		BDBEDFD7292297B70004AEF4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		BDBEDFDA2922A1B10004AEF4 /* URL+Identifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Identifiable.swift"; sourceTree = "<group>"; };
@@ -137,6 +139,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BDA559B929264106008C07E1 /* net */ = {
+			isa = PBXGroup;
+			children = (
+				BDA559BA29264124008C07E1 /* ApiKeyProvider.swift */,
+			);
+			path = net;
+			sourceTree = "<group>";
+		};
 		BDBEDF8229221FD20004AEF4 = {
 			isa = PBXGroup;
 			children = (
@@ -252,7 +262,6 @@
 			isa = PBXGroup;
 			children = (
 				BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */,
-				BDBEDFD1292294800004AEF4 /* IosBuildConfig.swift */,
 			);
 			path = di;
 			sourceTree = "<group>";
@@ -299,6 +308,7 @@
 			children = (
 				BDBEDFF42923C97A0004AEF4 /* AppDelegate.swift */,
 				BDBEDF8E29221FD20004AEF4 /* CuerIosApp.swift */,
+				BDA559B729264017008C07E1 /* ApiKeys.plist */,
 			);
 			path = app;
 			sourceTree = "<group>";
@@ -306,6 +316,7 @@
 		BDBEE01029241FE10004AEF4 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				BDA559B929264106008C07E1 /* net */,
 				BDBEE01129241FF50004AEF4 /* platform */,
 			);
 			path = shared;
@@ -329,6 +340,7 @@
 				BDBEDF8829221FD20004AEF4 /* Frameworks */,
 				BDBEDF8929221FD20004AEF4 /* Resources */,
 				BDBEE00F2923EE4D0004AEF4 /* Embed Frameworks */,
+				BDA559BC2926430F008C07E1 /* Copy private plist */,
 			);
 			buildRules = (
 			);
@@ -433,6 +445,7 @@
 			files = (
 				BDBEDF9629221FD20004AEF4 /* Preview Assets.xcassets in Resources */,
 				BDBEDFF22923C8E10004AEF4 /* default-dbinit.json in Resources */,
+				BDA559B829264018008C07E1 /* ApiKeys.plist in Resources */,
 				BDBEDF9329221FD20004AEF4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -454,6 +467,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		BDA559BC2926430F008C07E1 /* Copy private plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy private plist";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "CONFIG_FILE_BASE_NAME=\"ApiKeys\"\n\nCONFIG_FILE_NAME=${CONFIG_FILE_BASE_NAME}.plist\nSAMPLE_CONFIG_FILE_NAME=$CONFIG_FILE_NAME\n\nCONFIG_FILE_PATH=$SRCROOT/$PRODUCT_NAME/app/$CONFIG_FILE_NAME\nSAMPLE_CONFIG_FILE_PATH=$HOME/build/$SAMPLE_CONFIG_FILE_NAME\n\nif [ -f \"$CONFIG_FILE_PATH\" ]; then\n  echo \"$CONFIG_FILE_PATH exists.\"\nelse\n  echo \"$CONFIG_FILE_PATH does not exist, copying sample\"\n  cp -v \"${SAMPLE_CONFIG_FILE_PATH}\" \"${CONFIG_FILE_PATH}\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		BDBEDF8729221FD20004AEF4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -466,7 +500,6 @@
 				BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */,
 				BDBEDFC929228D700004AEF4 /* PlaylistViewModel.swift in Sources */,
 				BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */,
-				BDBEDFD2292294800004AEF4 /* IosBuildConfig.swift in Sources */,
 				BDBEDFC329228D260004AEF4 /* PlaylistsView.swift in Sources */,
 				BDBEDFF52923C97A0004AEF4 /* AppDelegate.swift in Sources */,
 				BDBEDFD8292297B70004AEF4 /* SettingsView.swift in Sources */,
@@ -475,6 +508,7 @@
 				BDBEDFC02922213B0004AEF4 /* MainView.swift in Sources */,
 				BDBEDFBE2922212B0004AEF4 /* MainCoordinator.swift in Sources */,
 				BDBEDF8F29221FD20004AEF4 /* CuerIosApp.swift in Sources */,
+				BDA559BB29264124008C07E1 /* ApiKeyProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

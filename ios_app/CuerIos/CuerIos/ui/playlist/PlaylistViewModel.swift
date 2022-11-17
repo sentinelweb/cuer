@@ -15,30 +15,37 @@ protocol PlaylistViewModelDependency {
 
 class PlaylistViewModelProvider: PlaylistViewModel.Dependencies {
     let mainCoordinator: MainCoordinator
+    let orchestratorFactory: OrchestratorFactory
     let plId: Int
     
-    init(mainCoordinator: MainCoordinator, plId: Int) {
+    init(
+        mainCoordinator: MainCoordinator,
+        plId: Int,
+        orchestratorFactory: OrchestratorFactory
+    ) {
         self.mainCoordinator = mainCoordinator
         self.plId = plId
+        self.orchestratorFactory = orchestratorFactory
     }
 }
 
 final class PlaylistViewModel: ObservableObject {
-    typealias Dependencies = MainCoordinatorDependency & PlaylistIdDependency
+    typealias Dependencies = MainCoordinatorDependency & PlaylistIdDependency & SharedObjectsDependency
     let dependencies: Dependencies
+    
     let playlist: DomainPlaylistDomain? = nil
     
-//    private let log = SystemLogWrapper() // fixme: not available?
-    private let orch = OrchestratorFactory()  // todo inject
+    private let orchestrator: OrchestratorFactory
+    private let filter: ProxyFilter
     
     private var playlistIdSubscription: AnyCancellable? = nil
     
     @Published var plId:Int = -1
     
     init(dependencies: Dependencies) {
-//        log.tag="PlaylistViewModel"
-//        log.d(msg: "init start")
         self.dependencies = dependencies
+        self.orchestrator = dependencies.orchestratorFactory
+        self.filter = dependencies.orchestratorFactory.proxyFilter
         playlistIdSubscription = dependencies.mainCoordinator.$currentPlaylistId.sink(receiveValue:{plId in
             if (self.plId != plId) {
                 self.plId = plId
@@ -46,24 +53,19 @@ final class PlaylistViewModel: ObservableObject {
                     self.loadPlaylist(plId: plId)
                 }
             }
-//            self.log.d(msg: "got playlistid: \(plId)")
         })
-//        log.d(msg: "init complete")
     }
     
     func loadPlaylist(plId: Int) {
-    // debugPrint(DomainAssetOperation().getAsString(path: "default-dbinit") ?? "No Asset")
-
 //        let task = Task{
             do {
-                let allFilter=ProxyFilter().allFilter()
-                orch.playlistOrchestrator.count(
-                    filter: allFilter,// wont match anything
-                    options:DomainOrchestratorContractOptions(source: DomainOrchestratorContractSource.local, flat: true, emit: false)
+                orchestrator.playlistOrchestrator.count(
+                    filter: filter.allFilter(),
+                    options: DomainOrchestratorContractOptions(source: DomainOrchestratorContractSource.local, flat: true, emit: false)
                 ) { count, e in
                     print("loadPlaylist count: \(count)")
                 }
-                let fullNoEmitOptions = DomainOrchestratorContractOptions(source: DomainOrchestratorContractSource.local, flat: false, emit: false)
+                // let fullNoEmitOptions = DomainOrchestratorContractOptions(source: DomainOrchestratorContractSource.local, flat: false, emit: false)
                 //orch.playlistOrchestrator.load(id: Int64(plId), options: fullNoEmitOptions)
             } catch {
                 print("loadPlaylist error: \(error)")

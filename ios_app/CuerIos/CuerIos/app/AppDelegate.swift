@@ -13,7 +13,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     let dependencies = AppDependencies()
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         KoinKt.doInitKoin(
-            config: dependencies.buildConfig
+            dependencies: dependencies.shared
         )
         let dbInit = OrchestratorFactory().databaseInitializer
         if !dbInit.isInitialized() {
