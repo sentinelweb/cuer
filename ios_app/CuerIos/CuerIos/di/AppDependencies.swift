@@ -12,6 +12,7 @@ import shared
 //  var xxxExecutor: UseCaseExecutor { get }
 //}
 
+// todo make build info plist: https://stackoverflow.com/questions/6851660/version-vs-build-in-xcode
 protocol IosBuildConfigDependency {
     var buildConfig:DomainBuildConfigDomain {get}
 }
