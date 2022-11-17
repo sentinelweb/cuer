@@ -65,8 +65,6 @@ final class PlaylistViewModel: ObservableObject {
                 ) { count, e in
                     print("loadPlaylist count: \(count)")
                 }
-                // let fullNoEmitOptions = DomainOrchestratorContractOptions(source: DomainOrchestratorContractSource.local, flat: false, emit: false)
-                //orch.playlistOrchestrator.load(id: Int64(plId), options: fullNoEmitOptions)
             } catch {
                 print("loadPlaylist error: \(error)")
             }
