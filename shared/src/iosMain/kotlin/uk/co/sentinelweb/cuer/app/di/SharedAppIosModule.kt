@@ -3,7 +3,9 @@ package uk.co.sentinelweb.cuer.app.di
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperations
 import uk.co.sentinelweb.cuer.app.factory.OrchestratorFactory
+import uk.co.sentinelweb.cuer.app.factory.PresentationModule
 import uk.co.sentinelweb.cuer.app.impl.ProxyFilter
+import uk.co.sentinelweb.cuer.app.impl.Utils
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -14,6 +16,7 @@ object SharedAppIosModule {
     private val factoryModule = module {
         single { OrchestratorFactory() }
         single { ProxyFilter() }
+        single { Utils() }
     }
 
     private val utilModule = module {
@@ -28,5 +31,6 @@ object SharedAppIosModule {
     val modules = listOf(factoryModule)
         .plus(utilModule)
         .plus(netModule)
+        .plus(PresentationModule.modules)
 
 }

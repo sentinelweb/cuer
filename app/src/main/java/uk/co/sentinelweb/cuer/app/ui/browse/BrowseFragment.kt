@@ -49,7 +49,7 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
     private val controller: BrowseController by inject()
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
-    private val browseMviView: BrowseMviView by inject()
+    private val browseMviView: BrowseMviViewProxy by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
@@ -204,9 +204,9 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
                     )
                 }
                 scoped<BrowseContract.Strings> { BrowseStrings(get()) }
-                scoped { BrowseRepository(BrowseJsonLoader(get())) }
+                scoped { BrowseRepository(BrowseRepositoryJsonLoader(get()), "browse_categories.json") }
                 scoped { BrowseModelMapper(get(), get()) }
-                scoped { BrowseMviView(get(), get()) }
+                scoped { BrowseMviViewProxy(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { BrowseHelpConfig(get()) }
             }

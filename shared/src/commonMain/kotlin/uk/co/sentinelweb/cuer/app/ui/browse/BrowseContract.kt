@@ -51,7 +51,7 @@ class BrowseContract {
 
     interface View : MviView<View.Model, View.Event> {
 
-        suspend fun processLabel(label: MviStore.Label)
+        fun processLabel(label: MviStore.Label)
 
         data class Model(
             val title: String,

@@ -40,7 +40,7 @@ object BrowseComposables {
 //    }
 
     @Composable
-    fun BrowseUi(view: BrowseMviView) {
+    fun BrowseUi(view: BrowseMviViewProxy) {
         BrowseView(view.observableModel, view)
     }
 

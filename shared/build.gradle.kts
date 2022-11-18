@@ -34,6 +34,8 @@ val ver_ios_deploy_target: String by project
 
 group = "uk.co.sentinelweb.cuer"
 version = "1.0"
+//essenty-lifecycle = { group = "com.arkivanov.essenty", name = "lifecycle", version.ref = "essenty" }
+//essenty-instanceKeeper = { group = "com.arkivanov.essenty", name = "instance-keeper", version.ref = "essenty" }
 
 kotlin {
     jvm()
@@ -44,10 +46,24 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+//
+//    targets
+//        .filterIsInstance<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
+//        .filter { it.konanTarget.family == org.jetbrains.kotlin.konan.target.Family.IOS }
+//        .forEach { target ->
+//            target.binaries.framework {
+//                export("com.arkivanov.essenty:lifecycle:0.6.0")
+//                export("com.arkivanov.essenty:instance-keeper:0.6.0")
+//                export("com.arkivanov.mvikotlin:mvikotlin:$ver_mvikotlin")
+//                export("com.arkivanov.mvikotlin:mvikotlin-logging:$ver_mvikotlin")
+////                export(project(":mvikotlin-timetravel"))
+//            }
+//        }
 
     cocoapods {
         framework {
             isStatic = true //or false
+            baseName = "shared"
         }
 //        name = "shared"
         summary = "shared"
@@ -73,14 +89,22 @@ kotlin {
             dependencies {
                 implementation(project(":domain"))
                 implementation(project(":database"))
+
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
+
                 implementation("io.insert-koin:koin-core:$ver_koin")
-                implementation("com.arkivanov.mvikotlin:mvikotlin:$ver_mvikotlin")
-                implementation("com.arkivanov.mvikotlin:mvikotlin-main:$ver_mvikotlin")
-                implementation("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$ver_mvikotlin")
+
+                api("com.arkivanov.mvikotlin:mvikotlin:$ver_mvikotlin")
+                api("com.arkivanov.mvikotlin:mvikotlin-main:$ver_mvikotlin")
+                api("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$ver_mvikotlin")
+                api("com.arkivanov.essenty:lifecycle:0.6.0")
+                api("com.arkivanov.essenty:instance-keeper:0.6.0")
+                // for debugging only remove
+                implementation("com.arkivanov.mvikotlin:mvikotlin-logging:$ver_mvikotlin")
+
                 implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:$ver_multiplatform_settings")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
@@ -126,6 +150,7 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
                 implementation(project(":netKmm"))
+//                implementation("com.arkivanov.essenty:lifecycle:0.6.0")
             }
 
         }

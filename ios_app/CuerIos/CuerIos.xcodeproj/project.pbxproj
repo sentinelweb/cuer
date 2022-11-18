@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BD3F9E98292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
+		BD3F9E99292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
+		BD3F9EA22927952600380350 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; };
+		BD3F9EA32927952600380350 /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BD3F9EA62927C2EE00380350 /* FirstAppearModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */; };
+		BD3F9EA72927C2EE00380350 /* FirstAppearModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */; };
 		BDA559B829264018008C07E1 /* ApiKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = BDA559B729264017008C07E1 /* ApiKeys.plist */; };
 		BDA559BB29264124008C07E1 /* ApiKeyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA559BA29264124008C07E1 /* ApiKeyProvider.swift */; };
 		BDA559BF292675A8008C07E1 /* Snippets.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA559BE292675A8008C07E1 /* Snippets.swift */; };
@@ -37,8 +43,6 @@
 		BDBEE0022923D3F40004AEF4 /* KMPNativeCoroutinesAsync in Frameworks */ = {isa = PBXBuildFile; productRef = BDBEE0012923D3F40004AEF4 /* KMPNativeCoroutinesAsync */; };
 		BDBEE0042923D3F40004AEF4 /* KMPNativeCoroutinesCombine in Frameworks */ = {isa = PBXBuildFile; productRef = BDBEE0032923D3F40004AEF4 /* KMPNativeCoroutinesCombine */; };
 		BDBEE0062923D3F40004AEF4 /* KMPNativeCoroutinesCore in Frameworks */ = {isa = PBXBuildFile; productRef = BDBEE0052923D3F40004AEF4 /* KMPNativeCoroutinesCore */; };
-		BDBEE00D2923EE4D0004AEF4 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; };
-		BDBEE00E2923EE4D0004AEF4 /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BDBEE0152924312C0004AEF4 /* PlaylistContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEE0142924312C0004AEF4 /* PlaylistContract.swift */; };
 /* End PBXBuildFile section */
 
@@ -60,13 +64,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BDBEE00F2923EE4D0004AEF4 /* Embed Frameworks */ = {
+		BD3F9EA42927952600380350 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BDBEE00E2923EE4D0004AEF4 /* shared.xcframework in Embed Frameworks */,
+				BD3F9EA32927952600380350 /* shared.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -74,6 +78,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BD3F9E97292695BF00380350 /* browse_categories.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = browse_categories.json; path = ../../app/src/main/assets/browse_categories.json; sourceTree = "<group>"; };
+		BD3F9E9E2926BB9700380350 /* TEST.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = TEST.xcframework; path = ../../shared/build/XCFrameworks/release/TEST.xcframework; sourceTree = "<group>"; };
+		BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstAppearModifier.swift; sourceTree = "<group>"; };
 		BDA559B729264017008C07E1 /* ApiKeys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ApiKeys.plist; sourceTree = "<group>"; };
 		BDA559BA29264124008C07E1 /* ApiKeyProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyProvider.swift; sourceTree = "<group>"; };
 		BDA559BE292675A8008C07E1 /* Snippets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snippets.swift; sourceTree = "<group>"; };
@@ -114,7 +121,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BDBEE00D2923EE4D0004AEF4 /* shared.xcframework in Frameworks */,
+				BD3F9EA22927952600380350 /* shared.xcframework in Frameworks */,
 				BDBEDFEE2923B3890004AEF4 /* libsqlite3.tbd in Frameworks */,
 				BDBEE0062923D3F40004AEF4 /* KMPNativeCoroutinesCore in Frameworks */,
 				BDBEDFF02923B4290004AEF4 /* CoreData.framework in Frameworks */,
@@ -152,6 +159,7 @@
 		BDBEDF8229221FD20004AEF4 = {
 			isa = PBXGroup;
 			children = (
+				BD3F9E97292695BF00380350 /* browse_categories.json */,
 				BDBEDFF12923C8E10004AEF4 /* default-dbinit.json */,
 				BDBEDF8D29221FD20004AEF4 /* CuerIos */,
 				BDBEDF9E29221FD20004AEF4 /* CuerIosTests */,
@@ -247,6 +255,7 @@
 			children = (
 				BDBEDFCA29228D940004AEF4 /* BrowseView.swift */,
 				BDBEDFCC29228DAD0004AEF4 /* BrowseViewModel.swift */,
+				BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */,
 			);
 			path = browse;
 			sourceTree = "<group>";
@@ -295,6 +304,7 @@
 		BDBEDFDC2922DA2E0004AEF4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BD3F9E9E2926BB9700380350 /* TEST.xcframework */,
 				BDBEDFF72923CCBF0004AEF4 /* shared.framework */,
 				BDBEDFEF2923B4290004AEF4 /* CoreData.framework */,
 				BDBEDFE32922DC9A0004AEF4 /* shared.framework */,
@@ -342,8 +352,8 @@
 				BDBEDF8729221FD20004AEF4 /* Sources */,
 				BDBEDF8829221FD20004AEF4 /* Frameworks */,
 				BDBEDF8929221FD20004AEF4 /* Resources */,
-				BDBEE00F2923EE4D0004AEF4 /* Embed Frameworks */,
 				BDA559BC2926430F008C07E1 /* Copy private plist */,
+				BD3F9EA42927952600380350 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -447,6 +457,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BDBEDF9629221FD20004AEF4 /* Preview Assets.xcassets in Resources */,
+				BD3F9E98292695BF00380350 /* browse_categories.json in Resources */,
 				BDBEDFF22923C8E10004AEF4 /* default-dbinit.json in Resources */,
 				BDA559B829264018008C07E1 /* ApiKeys.plist in Resources */,
 				BDBEDF9329221FD20004AEF4 /* Assets.xcassets in Resources */,
@@ -458,6 +469,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BDBEDFF32923C8E10004AEF4 /* default-dbinit.json in Resources */,
+				BD3F9E99292695BF00380350 /* browse_categories.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -502,6 +514,7 @@
 				BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */,
 				BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */,
 				BDA559BF292675A8008C07E1 /* Snippets.swift in Sources */,
+				BD3F9EA62927C2EE00380350 /* FirstAppearModifier.swift in Sources */,
 				BDBEDFC929228D700004AEF4 /* PlaylistViewModel.swift in Sources */,
 				BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */,
 				BDBEDFC329228D260004AEF4 /* PlaylistsView.swift in Sources */,
@@ -520,6 +533,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BD3F9EA72927C2EE00380350 /* FirstAppearModifier.swift in Sources */,
 				BDBEDFA029221FD20004AEF4 /* CuerIosTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

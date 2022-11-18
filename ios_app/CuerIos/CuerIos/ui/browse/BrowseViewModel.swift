@@ -7,6 +7,7 @@
 
 import Foundation
 import shared
+import Combine
 
 protocol BrowseViewModelDependency {
     func createBrowseViewModel() -> BrowseViewModel
@@ -31,11 +32,14 @@ final class BrowseViewModel: ObservableObject {
     
     private let orchestrator: OrchestratorFactory
     private let filter: ProxyFilter
+//    private let browseController: BrowseController
     
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
         self.orchestrator = dependencies.orchestratorFactory
         self.filter = dependencies.orchestratorFactory.proxyFilter
+//        self.browseController = PresentationFactory().browseController
+        //self.browseController.onViewCreated(views: [BrowseContractView], viewLifecycle: <#T##LifecycleLifecycle#>)
     }
     
     func execPlatformRequest() {
