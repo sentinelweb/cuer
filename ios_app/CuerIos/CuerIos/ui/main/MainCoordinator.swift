@@ -74,8 +74,8 @@ class MainCoordinator: ObservableObject {
         }
     }
     
-    func createBrowseViewModel() -> BrowseViewModel {
-        return dependencies.createBrowseViewModel()
+    func createBrowseController() -> BrowseControllerHolder {
+        return dependencies.createBrowseHolder()
     }
     
     func createPlaylistsViewModel() -> PlaylistsViewModel {

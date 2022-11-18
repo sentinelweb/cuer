@@ -25,7 +25,7 @@ struct MainView: View {
                 .onAppear{coordinator.navigate(route: Route.main)}
         case .main:
             TabView(selection: $coordinator.currentTab) {
-                BrowseView(viewModel: coordinator.createBrowseViewModel())
+                BrowseView(holder: coordinator.createBrowseController())
                     .tabItem { Label("Browse", systemImage: "folder.fill.badge.person.crop") }
                     .tag(MainTab.browse)
                 

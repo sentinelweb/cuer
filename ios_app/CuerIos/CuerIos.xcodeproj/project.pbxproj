@@ -13,6 +13,8 @@
 		BD3F9EA32927952600380350 /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BD3F9EA62927C2EE00380350 /* FirstAppearModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */; };
 		BD3F9EA72927C2EE00380350 /* FirstAppearModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */; };
+		BD3F9EA92927D0DA00380350 /* BrowseMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */; };
+		BD3F9EAA2927D0DA00380350 /* BrowseMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */; };
 		BDA559B829264018008C07E1 /* ApiKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = BDA559B729264017008C07E1 /* ApiKeys.plist */; };
 		BDA559BB29264124008C07E1 /* ApiKeyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA559BA29264124008C07E1 /* ApiKeyProvider.swift */; };
 		BDA559BF292675A8008C07E1 /* Snippets.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA559BE292675A8008C07E1 /* Snippets.swift */; };
@@ -29,7 +31,6 @@
 		BDBEDFC729228D5F0004AEF4 /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */; };
 		BDBEDFC929228D700004AEF4 /* PlaylistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */; };
 		BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCA29228D940004AEF4 /* BrowseView.swift */; };
-		BDBEDFCD29228DAD0004AEF4 /* BrowseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCC29228DAD0004AEF4 /* BrowseViewModel.swift */; };
 		BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */; };
 		BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD4292295F70004AEF4 /* SafariView.swift */; };
 		BDBEDFD8292297B70004AEF4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD7292297B70004AEF4 /* SettingsView.swift */; };
@@ -81,6 +82,7 @@
 		BD3F9E97292695BF00380350 /* browse_categories.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = browse_categories.json; path = ../../app/src/main/assets/browse_categories.json; sourceTree = "<group>"; };
 		BD3F9E9E2926BB9700380350 /* TEST.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = TEST.xcframework; path = ../../shared/build/XCFrameworks/release/TEST.xcframework; sourceTree = "<group>"; };
 		BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstAppearModifier.swift; sourceTree = "<group>"; };
+		BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseMviController.swift; sourceTree = "<group>"; };
 		BDA559B729264017008C07E1 /* ApiKeys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ApiKeys.plist; sourceTree = "<group>"; };
 		BDA559BA29264124008C07E1 /* ApiKeyProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyProvider.swift; sourceTree = "<group>"; };
 		BDA559BE292675A8008C07E1 /* Snippets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snippets.swift; sourceTree = "<group>"; };
@@ -100,7 +102,6 @@
 		BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistView.swift; sourceTree = "<group>"; };
 		BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistViewModel.swift; sourceTree = "<group>"; };
 		BDBEDFCA29228D940004AEF4 /* BrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseView.swift; sourceTree = "<group>"; };
-		BDBEDFCC29228DAD0004AEF4 /* BrowseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseViewModel.swift; sourceTree = "<group>"; };
 		BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
 		BDBEDFD4292295F70004AEF4 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 		BDBEDFD7292297B70004AEF4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -254,8 +255,8 @@
 			isa = PBXGroup;
 			children = (
 				BDBEDFCA29228D940004AEF4 /* BrowseView.swift */,
-				BDBEDFCC29228DAD0004AEF4 /* BrowseViewModel.swift */,
 				BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */,
+				BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */,
 			);
 			path = browse;
 			sourceTree = "<group>";
@@ -508,7 +509,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BDBEDFCD29228DAD0004AEF4 /* BrowseViewModel.swift in Sources */,
 				BDBEE0152924312C0004AEF4 /* PlaylistContract.swift in Sources */,
 				BDBEDFDB2922A1B10004AEF4 /* URL+Identifiable.swift in Sources */,
 				BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */,
@@ -525,6 +525,7 @@
 				BDBEDFC02922213B0004AEF4 /* MainView.swift in Sources */,
 				BDBEDFBE2922212B0004AEF4 /* MainCoordinator.swift in Sources */,
 				BDBEDF8F29221FD20004AEF4 /* CuerIosApp.swift in Sources */,
+				BD3F9EA92927D0DA00380350 /* BrowseMviController.swift in Sources */,
 				BDA559BB29264124008C07E1 /* ApiKeyProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -533,6 +534,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BD3F9EAA2927D0DA00380350 /* BrowseMviController.swift in Sources */,
 				BD3F9EA72927C2EE00380350 /* FirstAppearModifier.swift in Sources */,
 				BDBEDFA029221FD20004AEF4 /* CuerIosTests.swift in Sources */,
 			);
