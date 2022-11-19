@@ -42,6 +42,8 @@ class BrowseControllerHolder : ObservableObject {
     deinit {
         lifecycle.onDestroy()
     }
+    
+    func createMviView() -> BrowseViewProxy { BrowseViewProxy(dependencies:self.dependencies)}
 }
 
 class BCStrings:BrowseContractStrings {
@@ -60,13 +62,19 @@ class BrowseViewProxy : UtilsUBaseView<BrowseContractViewModel, BrowseContractVi
     @Published
     var model: BrowseContractViewModel
     
-    override init() {
+    private let dependencies: BrowseControllerHolder.Dependencies
+//    init(dependencies: BrowseControllerHolder.Dependencies) {
+//        self.dependencies = dependencies
+//    }
+    
+    init(dependencies: BrowseControllerHolder.Dependencies)  {
         model = BrowseContractViewModel(
             title: "browsetitle",
             categories: [],
             recent: nil,
             isRoot: true,
             order: BrowseContract.Order.categories)
+        self.dependencies = dependencies
         super.init()
     }
 
@@ -75,6 +83,13 @@ class BrowseViewProxy : UtilsUBaseView<BrowseContractViewModel, BrowseContractVi
     }
     
     func processLabel(label: BrowseContractMviStoreLabel) {
-        
+        switch(label) {
+        case is BrowseContractMviStoreLabel.AddPlaylist:
+            let addLabel = label as! BrowseContractMviStoreLabel.AddPlaylist
+//            let str:String = playlistUrl(platformId: addLabel.cat.platformId)
+            let str = "https://www.youtube.com/playlist?list=" + addLabel.cat.platformId!
+            self.dependencies.mainCoordinator.open(URL.init(string: str)!)
+        default: debugPrint(label)
+        }
     }
 }

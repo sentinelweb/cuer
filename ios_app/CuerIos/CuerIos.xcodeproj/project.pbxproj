@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5513228F2928F0E000212FF5 /* CompatKotlin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5513228E2928F0E000212FF5 /* CompatKotlin.swift */; };
+		55540C082928010800086F37 /* Identifiables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55540C072928010800086F37 /* Identifiables.swift */; };
 		BD3F9E98292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
 		BD3F9E99292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
 		BD3F9EA22927952600380350 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; };
@@ -79,6 +81,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5513228E2928F0E000212FF5 /* CompatKotlin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatKotlin.swift; sourceTree = "<group>"; };
+		55540C072928010800086F37 /* Identifiables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiables.swift; sourceTree = "<group>"; };
 		BD3F9E97292695BF00380350 /* browse_categories.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = browse_categories.json; path = ../../app/src/main/assets/browse_categories.json; sourceTree = "<group>"; };
 		BD3F9E9E2926BB9700380350 /* TEST.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = TEST.xcframework; path = ../../shared/build/XCFrameworks/release/TEST.xcframework; sourceTree = "<group>"; };
 		BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstAppearModifier.swift; sourceTree = "<group>"; };
@@ -149,6 +153,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		55540C06292800EB00086F37 /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				55540C072928010800086F37 /* Identifiables.swift */,
+			);
+			path = ui;
+			sourceTree = "<group>";
+		};
 		BDA559B929264106008C07E1 /* net */ = {
 			isa = PBXGroup;
 			children = (
@@ -298,6 +310,7 @@
 			isa = PBXGroup;
 			children = (
 				BDBEDFDA2922A1B10004AEF4 /* URL+Identifiable.swift */,
+				5513228E2928F0E000212FF5 /* CompatKotlin.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -329,6 +342,7 @@
 		BDBEE01029241FE10004AEF4 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				55540C06292800EB00086F37 /* ui */,
 				BDA559B929264106008C07E1 /* net */,
 				BDBEE01129241FF50004AEF4 /* platform */,
 				BDA559BE292675A8008C07E1 /* Snippets.swift */,
@@ -350,10 +364,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BDBEDFAF29221FD20004AEF4 /* Build configuration list for PBXNativeTarget "CuerIos" */;
 			buildPhases = (
+				BDA559BC2926430F008C07E1 /* Copy private plist */,
 				BDBEDF8729221FD20004AEF4 /* Sources */,
 				BDBEDF8829221FD20004AEF4 /* Frameworks */,
 				BDBEDF8929221FD20004AEF4 /* Resources */,
-				BDA559BC2926430F008C07E1 /* Copy private plist */,
 				BD3F9EA42927952600380350 /* Embed Frameworks */,
 			);
 			buildRules = (
@@ -510,6 +524,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BDBEE0152924312C0004AEF4 /* PlaylistContract.swift in Sources */,
+				55540C082928010800086F37 /* Identifiables.swift in Sources */,
 				BDBEDFDB2922A1B10004AEF4 /* URL+Identifiable.swift in Sources */,
 				BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */,
 				BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */,
@@ -518,6 +533,7 @@
 				BDBEDFC929228D700004AEF4 /* PlaylistViewModel.swift in Sources */,
 				BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */,
 				BDBEDFC329228D260004AEF4 /* PlaylistsView.swift in Sources */,
+				5513228F2928F0E000212FF5 /* CompatKotlin.swift in Sources */,
 				BDBEDFF52923C97A0004AEF4 /* AppDelegate.swift in Sources */,
 				BDBEDFD8292297B70004AEF4 /* SettingsView.swift in Sources */,
 				BDBEDFC729228D5F0004AEF4 /* PlaylistView.swift in Sources */,

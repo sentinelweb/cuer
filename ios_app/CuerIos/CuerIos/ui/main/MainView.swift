@@ -45,6 +45,7 @@ struct MainView: View {
                 .tag(MainTab.settings)
                 
             }
+            .background(Color(.white))
             .sheet(item: $coordinator.openedURL) {
                 SafariView(url: $0)
                     .edgesIgnoringSafeArea(.all)
@@ -53,6 +54,7 @@ struct MainView: View {
             Text("Unsupported")
         }
     }
+
 }
 
 
