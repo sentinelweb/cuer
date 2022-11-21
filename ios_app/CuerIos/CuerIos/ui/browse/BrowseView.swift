@@ -33,7 +33,6 @@ struct BrowseView: View {
 //                Text("go up")
                 Image(systemName: "arrow.backward")
                     .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnUpClicked())}
-                    .foregroundColor(Color(.link))
                     .padding(8)
                 Text(view.model.title)
                     .onTapGesture {
