@@ -20,8 +20,7 @@ struct BrowseItem: View {
     }
     var body: some View {
         VStack {
-            let url = (item.thumbNailUrl ??? {$0?.starts(with: "https") ?? false})
-                        ?? "https://cuer-275020.firebaseapp.com/images/categories/greek.jpg"
+            let url = (item.thumbNailUrl ??? {$0?.starts(with: "https") ?? false}) ?? "https://cuer-275020.firebaseapp.com/images/categories/greek.jpg"
             KFImage(URL(string: url))
                 .fade(duration: 0.3 + 0.1 * Double(seq))
                 .forceTransition()
@@ -43,15 +42,15 @@ struct BrowseItem: View {
     
     @ViewBuilder
     private func titleOverlay(item: BrowseContractViewCategoryModel)-> some View {
-        return HStack {
+        HStack {
             Text(item.title)
-                Spacer()
-            }
-            .foregroundColor(Color(.label))
-            .padding(.horizontal, 20)
-            .padding(.vertical, 8)
-            .background(Color(.systemBackground).opacity(0.75))
-            .font(itemTileTypeface)
+            Spacer()
+        }
+        .foregroundColor(Color(.label))
+        .padding(.horizontal, 20)
+        .padding(.vertical, 8)
+        .background(Color(.systemBackground).opacity(0.75))
+        .font(itemTileTypeface)
     }
 }
 
@@ -62,7 +61,7 @@ struct Images_Previews: PreviewProvider {
                 id: 1,
                 title: "title",
                 description: "description",
-                thumbNailUrl: "https://cuer-275020.firebaseapp.com/images/categories/greek.jpg",
+                thumbNailUrl: "greek.jpg",
                 subCategories: [],
                 subCount: 0,
                 isPlaylist: true,

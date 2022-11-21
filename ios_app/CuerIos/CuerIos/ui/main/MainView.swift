@@ -26,25 +26,27 @@ struct MainView: View {
         case .main:
             TabView(selection: $coordinator.currentTab) {
                 BrowseView(holder: coordinator.createBrowseController())
-                    .tabItem { Label("Browse", systemImage: "folder.fill.badge.person.crop").padding(8) }
+                    .tabItem { TabLabelView(text:"Browse", systemImage: "folder.fill.badge.person.crop") }
                     .tag(MainTab.browse)
                 
                 PlaylistsView(viewModel: coordinator.createPlaylistsViewModel())
-                    .tabItem { Label("Playlists", systemImage: "list.bullet.indent").padding(4) }
+                    .tabItem { TabLabelView(text:"Playlists", systemImage: "list.bullet.indent") }
                     .tag(MainTab.playlists)
                 if (playlistViewModel != nil) {
                     PlaylistView(viewModel: playlistViewModel!)
-                        .tabItem { Label("Playlist", systemImage: "music.note.list").padding(4) }
+                        .tabItem { TabLabelView(text:"Playlist", systemImage: "music.note.list") }
                         .tag(MainTab.playlist)
                 }
                 NavigationView {
                     SettingsView(coordinator: coordinator)
                 }
                 .navigationViewStyle(StackNavigationViewStyle())
-                .tabItem { Label("Settings", systemImage: "gear") }
+                .tabItem { TabLabelView(text:"Settings", systemImage: "gear") }
                 .tag(MainTab.settings)
             }.onAppear() {
                 UITabBar.appearance().backgroundColor = .systemBackground.withAlphaComponent(0.8)
+                 UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: tabItemTypeface], for: .normal)
+                 UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: tabItemSelectedTypeface], for: .selected)
             }
             .sheet(item: $coordinator.openedURL) {
                 SafariView(url: $0)

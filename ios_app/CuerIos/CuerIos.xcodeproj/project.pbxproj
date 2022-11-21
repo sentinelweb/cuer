@@ -9,10 +9,12 @@
 /* Begin PBXBuildFile section */
 		5513228F2928F0E000212FF5 /* CompatKotlin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5513228E2928F0E000212FF5 /* CompatKotlin.swift */; };
 		55132293292B966A00212FF5 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 55132292292B966A00212FF5 /* Kingfisher */; };
-		55132296292B9EAC00212FF5 /* BrowseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55132295292B9EAC00212FF5 /* BrowseItem.swift */; };
-		5513229D292BB12000212FF5 /* montserrat_light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5513229C292BB12000212FF5 /* montserrat_light.ttf */; };
+		55132296292B9EAC00212FF5 /* BrowseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55132295292B9EAC00212FF5 /* BrowseViews.swift */; };
 		551322A0292BB44500212FF5 /* Typeface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5513229F292BB44500212FF5 /* Typeface.swift */; };
-		551322A2292BB5D200212FF5 /* didactgothic_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A1292BB5D200212FF5 /* didactgothic_regular.ttf */; };
+		551322A9292BD71000212FF5 /* montserrat_light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A7292BD71000212FF5 /* montserrat_light.ttf */; };
+		551322AA292BD71000212FF5 /* didactgothic_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A8292BD71000212FF5 /* didactgothic_regular.ttf */; };
+		551322AC292BD9A000212FF5 /* TabViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551322AB292BD9A000212FF5 /* TabViews.swift */; };
+		551322AE292BDA0B00212FF5 /* greek.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 551322AD292BDA0B00212FF5 /* greek.jpg */; };
 		55540C082928010800086F37 /* Identifiables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55540C072928010800086F37 /* Identifiables.swift */; };
 		BD3F9E98292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
 		BD3F9E99292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
@@ -85,11 +87,13 @@
 
 /* Begin PBXFileReference section */
 		5513228E2928F0E000212FF5 /* CompatKotlin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatKotlin.swift; sourceTree = "<group>"; };
-		55132295292B9EAC00212FF5 /* BrowseItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseItem.swift; sourceTree = "<group>"; };
-		5513229C292BB12000212FF5 /* montserrat_light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = montserrat_light.ttf; path = ../../../../../app/src/main/res/font/montserrat_light.ttf; sourceTree = "<group>"; };
+		55132295292B9EAC00212FF5 /* BrowseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseViews.swift; sourceTree = "<group>"; };
 		5513229E292BB22800212FF5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5513229F292BB44500212FF5 /* Typeface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typeface.swift; sourceTree = "<group>"; };
-		551322A1292BB5D200212FF5 /* didactgothic_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = didactgothic_regular.ttf; path = ../../../../../app/src/main/res/font/didactgothic_regular.ttf; sourceTree = "<group>"; };
+		551322A7292BD71000212FF5 /* montserrat_light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = montserrat_light.ttf; path = ../../../../../app/src/main/res/font/montserrat_light.ttf; sourceTree = "<group>"; };
+		551322A8292BD71000212FF5 /* didactgothic_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = didactgothic_regular.ttf; path = ../../../../../app/src/main/res/font/didactgothic_regular.ttf; sourceTree = "<group>"; };
+		551322AB292BD9A000212FF5 /* TabViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViews.swift; sourceTree = "<group>"; };
+		551322AD292BDA0B00212FF5 /* greek.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = greek.jpg; sourceTree = "<group>"; };
 		55540C072928010800086F37 /* Identifiables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiables.swift; sourceTree = "<group>"; };
 		BD3F9E97292695BF00380350 /* browse_categories.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = browse_categories.json; path = ../../app/src/main/assets/browse_categories.json; sourceTree = "<group>"; };
 		BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstAppearModifier.swift; sourceTree = "<group>"; };
@@ -170,6 +174,7 @@
 		55132294292B9E8700212FF5 /* views */ = {
 			isa = PBXGroup;
 			children = (
+				551322AD292BDA0B00212FF5 /* greek.jpg */,
 				5513229F292BB44500212FF5 /* Typeface.swift */,
 			);
 			path = views;
@@ -178,8 +183,8 @@
 		55132297292BADAB00212FF5 /* fonts */ = {
 			isa = PBXGroup;
 			children = (
-				551322A1292BB5D200212FF5 /* didactgothic_regular.ttf */,
-				5513229C292BB12000212FF5 /* montserrat_light.ttf */,
+				551322A8292BD71000212FF5 /* didactgothic_regular.ttf */,
+				551322A7292BD71000212FF5 /* montserrat_light.ttf */,
 			);
 			path = fonts;
 			sourceTree = "<group>";
@@ -283,6 +288,7 @@
 			children = (
 				BDBEDFBD2922212B0004AEF4 /* MainCoordinator.swift */,
 				BDBEDFBF2922213B0004AEF4 /* MainView.swift */,
+				551322AB292BD9A000212FF5 /* TabViews.swift */,
 			);
 			path = main;
 			sourceTree = "<group>";
@@ -300,7 +306,7 @@
 		BDBEDFBC292220FD0004AEF4 /* browse */ = {
 			isa = PBXGroup;
 			children = (
-				55132295292B9EAC00212FF5 /* BrowseItem.swift */,
+				55132295292B9EAC00212FF5 /* BrowseViews.swift */,
 				BDBEDFCA29228D940004AEF4 /* BrowseView.swift */,
 				BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */,
 			);
@@ -489,13 +495,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				551322A2292BB5D200212FF5 /* didactgothic_regular.ttf in Resources */,
+				551322AA292BD71000212FF5 /* didactgothic_regular.ttf in Resources */,
 				BDBEDF9629221FD20004AEF4 /* Preview Assets.xcassets in Resources */,
 				BD3F9E98292695BF00380350 /* browse_categories.json in Resources */,
 				BDBEDFF22923C8E10004AEF4 /* default-dbinit.json in Resources */,
 				BDA559B829264018008C07E1 /* ApiKeys.plist in Resources */,
+				551322A9292BD71000212FF5 /* montserrat_light.ttf in Resources */,
+				551322AE292BDA0B00212FF5 /* greek.jpg in Resources */,
 				BDBEDF9329221FD20004AEF4 /* Assets.xcassets in Resources */,
-				5513229D292BB12000212FF5 /* montserrat_light.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -555,13 +562,14 @@
 				5513228F2928F0E000212FF5 /* CompatKotlin.swift in Sources */,
 				BDBEDFF52923C97A0004AEF4 /* AppDelegate.swift in Sources */,
 				BDBEDFD8292297B70004AEF4 /* SettingsView.swift in Sources */,
+				551322AC292BD9A000212FF5 /* TabViews.swift in Sources */,
 				BDBEDFC729228D5F0004AEF4 /* PlaylistView.swift in Sources */,
 				BDBEDFC529228D4B0004AEF4 /* PlaylistsViewModel.swift in Sources */,
 				BDBEDFC02922213B0004AEF4 /* MainView.swift in Sources */,
 				BDBEDFBE2922212B0004AEF4 /* MainCoordinator.swift in Sources */,
 				551322A0292BB44500212FF5 /* Typeface.swift in Sources */,
 				BDBEDF8F29221FD20004AEF4 /* CuerIosApp.swift in Sources */,
-				55132296292B9EAC00212FF5 /* BrowseItem.swift in Sources */,
+				55132296292B9EAC00212FF5 /* BrowseViews.swift in Sources */,
 				BD3F9EA92927D0DA00380350 /* BrowseMviController.swift in Sources */,
 				BDA559BB29264124008C07E1 /* ApiKeyProvider.swift in Sources */,
 			);
