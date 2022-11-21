@@ -30,7 +30,6 @@ struct BrowseView: View {
         
         VStack (alignment: .leading, spacing:8) {
             HStack(alignment: .center, spacing: 8) {
-//                Text("go up")
                 Image(systemName: "arrow.backward")
                     .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnUpClicked())}
                     .padding(8)
@@ -38,6 +37,17 @@ struct BrowseView: View {
                     .onTapGesture {
                     view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: view.model.categories.first!))
                 }.font(headerTypeface)
+                Spacer()
+                if (view.model.order == BrowseContract.Order.categories) {
+                    Image(systemName: "abc")
+                        .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnSetOrder(order: BrowseContract.Order.aToZ))}
+                        .padding(8)
+                } else {
+                    Image(systemName: "folder")
+                        .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnSetOrder(order: BrowseContract.Order.categories))}
+                        .padding(8)
+                }
+                
             }
             ScrollView {
                 LazyVGrid(columns: layout, spacing: 0) {

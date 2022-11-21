@@ -41,7 +41,7 @@ struct MainView: View {
                 
                 NavigationView { SettingsView(coordinator: coordinator) }
                     .navigationViewStyle(StackNavigationViewStyle())
-                    .tabItem { TabLabelView(text: "Settings", systemImage: "gear") }
+                    .tabItem { TabLabelView(text: "Settings", systemImage: "gearshape") }
                     .tag(MainTab.settings)
                 
             }.onAppear() {

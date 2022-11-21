@@ -18,26 +18,20 @@ struct BrowseItem: View {
         self.item = item
         self.seq = seq
     }
+    
     var body: some View {
         VStack {
             let url = (item.thumbNailUrl ??? {$0?.starts(with: "https") ?? false}) ?? "https://cuer-275020.firebaseapp.com/images/categories/greek.jpg"
             KFImage(URL(string: url))
-                .fade(duration: 0.3 + 0.1 * Double(seq))
+                .fade(duration: 0.3 + 0.1 * Double(seq % 10))
                 .forceTransition()
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: UIScreen.main.bounds.width / 2, height: 150)
                 .clipped()
                 .overlay(titleOverlay(item: item), alignment: .bottom)
-            // todo vary show time not fade time
-//                .onAppear {
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-//                        self.isButtonHidden = false
-//                    }
-//                }
         }
         .clipShape(RoundedRectangle(cornerRadius: 25.0))
-        
     }
     
     @ViewBuilder
