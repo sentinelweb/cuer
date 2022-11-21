@@ -29,11 +29,14 @@ struct BrowseView: View {
     var body: some View {
         
         VStack (alignment: .leading, spacing:8) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("go up").onTapGesture {
-                    view.dispatch(event: BrowseContractViewEvent.OnUpClicked())
-                }
-                Text(view.model.title).onTapGesture {
+            HStack(alignment: .center, spacing: 8) {
+//                Text("go up")
+                Image(systemName: "arrow.backward")
+                    .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnUpClicked())}
+                    .foregroundColor(Color(.link))
+                    .padding(8)
+                Text(view.model.title)
+                    .onTapGesture {
                     view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: view.model.categories.first!))
                 }.font(.title)
             }
@@ -49,12 +52,15 @@ struct BrowseView: View {
                             } placeholder: {
                                 ProgressView()
                             }.frame(width: UIScreen.main.bounds.width / 2, height: 150)
-                                .clipped()
+                            .clipped()
+                            .transition(.opacity.animation(.default))
 //                                .shadow(color: .gray, radius: 2, x: 4, y: 4)
                                 
                             .overlay(titleOverlay(item: item), alignment: .bottom)
                             .frame(maxWidth: UIScreen.main.bounds.width / 2, maxHeight:150)
-                        }.onTapGesture{ view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: item))}
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 25.0)) // todo cut corner
+                        .onTapGesture{ view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: item))}
                     }
                 }
             }
@@ -72,6 +78,7 @@ struct BrowseView: View {
                 Spacer()
             }
             .font(.headline)
+            .foregroundColor(Color(.label))
             .padding(.horizontal, 20)
             .padding(.vertical, 8)
             .background(Color(.systemBackground).opacity(0.75))

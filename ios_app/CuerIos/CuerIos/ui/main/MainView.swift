@@ -26,15 +26,15 @@ struct MainView: View {
         case .main:
             TabView(selection: $coordinator.currentTab) {
                 BrowseView(holder: coordinator.createBrowseController())
-                    .tabItem { Label("Browse", systemImage: "folder.fill.badge.person.crop") }
+                    .tabItem { Label("Browse", systemImage: "folder.fill.badge.person.crop").padding(8) }
                     .tag(MainTab.browse)
                 
                 PlaylistsView(viewModel: coordinator.createPlaylistsViewModel())
-                    .tabItem { Label("Playlists", systemImage: "list.bullet.indent") }
+                    .tabItem { Label("Playlists", systemImage: "list.bullet.indent").padding(4) }
                     .tag(MainTab.playlists)
                 if (playlistViewModel != nil) {
                     PlaylistView(viewModel: playlistViewModel!)
-                        .tabItem { Label("Playlist", systemImage: "music.note.list") }
+                        .tabItem { Label("Playlist", systemImage: "music.note.list").padding(4) }
                         .tag(MainTab.playlist)
                 }
                 NavigationView {
@@ -43,9 +43,9 @@ struct MainView: View {
                 .navigationViewStyle(StackNavigationViewStyle())
                 .tabItem { Label("Settings", systemImage: "gear") }
                 .tag(MainTab.settings)
-                
+            }.onAppear() {
+                UITabBar.appearance().backgroundColor = .systemBackground.withAlphaComponent(0.8)
             }
-            .background(Color(.white))
             .sheet(item: $coordinator.openedURL) {
                 SafariView(url: $0)
                     .edgesIgnoringSafeArea(.all)

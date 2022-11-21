@@ -9,3 +9,11 @@ import Foundation
 import shared
 
 extension BrowseContractViewCategoryModel: Identifiable{}
+
+extension URL: Identifiable {
+
+    public var id: String {
+        absoluteString
+    }
+
+}

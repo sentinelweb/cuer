@@ -14,7 +14,6 @@
 		BD3F9EA22927952600380350 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; };
 		BD3F9EA32927952600380350 /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BD3F9EA62927C2EE00380350 /* FirstAppearModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */; };
-		BD3F9EA72927C2EE00380350 /* FirstAppearModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */; };
 		BD3F9EA92927D0DA00380350 /* BrowseMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */; };
 		BD3F9EAA2927D0DA00380350 /* BrowseMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */; };
 		BDA559B829264018008C07E1 /* ApiKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = BDA559B729264017008C07E1 /* ApiKeys.plist */; };
@@ -36,7 +35,6 @@
 		BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */; };
 		BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD4292295F70004AEF4 /* SafariView.swift */; };
 		BDBEDFD8292297B70004AEF4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD7292297B70004AEF4 /* SettingsView.swift */; };
-		BDBEDFDB2922A1B10004AEF4 /* URL+Identifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFDA2922A1B10004AEF4 /* URL+Identifiable.swift */; };
 		BDBEDFED2923B3890004AEF4 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDD2922DA2F0004AEF4 /* libsqlite3.0.tbd */; };
 		BDBEDFEE2923B3890004AEF4 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDE2922DA2F0004AEF4 /* libsqlite3.tbd */; };
 		BDBEDFF02923B4290004AEF4 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFEF2923B4290004AEF4 /* CoreData.framework */; };
@@ -109,7 +107,6 @@
 		BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
 		BDBEDFD4292295F70004AEF4 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 		BDBEDFD7292297B70004AEF4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		BDBEDFDA2922A1B10004AEF4 /* URL+Identifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Identifiable.swift"; sourceTree = "<group>"; };
 		BDBEDFDD2922DA2F0004AEF4 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 		BDBEDFDE2922DA2F0004AEF4 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = shared.xcframework; path = ../../shared/build/XCFrameworks/release/shared.xcframework; sourceTree = "<group>"; };
@@ -153,9 +150,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		55132290292B85E100212FF5 /* kotlin */ = {
+			isa = PBXGroup;
+			children = (
+				5513228E2928F0E000212FF5 /* CompatKotlin.swift */,
+			);
+			path = kotlin;
+			sourceTree = "<group>";
+		};
 		55540C06292800EB00086F37 /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */,
 				55540C072928010800086F37 /* Identifiables.swift */,
 			);
 			path = ui;
@@ -199,7 +205,6 @@
 				BDBEDFF62923CBB50004AEF4 /* app */,
 				BDBEDFCE29228F700004AEF4 /* di */,
 				BDBEDFB8292220CD0004AEF4 /* ui */,
-				BDBEDFD92922A19B0004AEF4 /* Extensions */,
 				BDBEDF9229221FD20004AEF4 /* Assets.xcassets */,
 				BDBEDF9429221FD20004AEF4 /* Preview Content */,
 			);
@@ -267,7 +272,6 @@
 			isa = PBXGroup;
 			children = (
 				BDBEDFCA29228D940004AEF4 /* BrowseView.swift */,
-				BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */,
 				BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */,
 			);
 			path = browse;
@@ -306,15 +310,6 @@
 			path = settings;
 			sourceTree = "<group>";
 		};
-		BDBEDFD92922A19B0004AEF4 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				BDBEDFDA2922A1B10004AEF4 /* URL+Identifiable.swift */,
-				5513228E2928F0E000212FF5 /* CompatKotlin.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
 		BDBEDFDC2922DA2E0004AEF4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -342,19 +337,12 @@
 		BDBEE01029241FE10004AEF4 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				55132290292B85E100212FF5 /* kotlin */,
 				55540C06292800EB00086F37 /* ui */,
 				BDA559B929264106008C07E1 /* net */,
-				BDBEE01129241FF50004AEF4 /* platform */,
 				BDA559BE292675A8008C07E1 /* Snippets.swift */,
 			);
 			path = shared;
-			sourceTree = "<group>";
-		};
-		BDBEE01129241FF50004AEF4 /* platform */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = platform;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -525,7 +513,6 @@
 			files = (
 				BDBEE0152924312C0004AEF4 /* PlaylistContract.swift in Sources */,
 				55540C082928010800086F37 /* Identifiables.swift in Sources */,
-				BDBEDFDB2922A1B10004AEF4 /* URL+Identifiable.swift in Sources */,
 				BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */,
 				BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */,
 				BDA559BF292675A8008C07E1 /* Snippets.swift in Sources */,
@@ -551,7 +538,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				BD3F9EAA2927D0DA00380350 /* BrowseMviController.swift in Sources */,
-				BD3F9EA72927C2EE00380350 /* FirstAppearModifier.swift in Sources */,
 				BDBEDFA029221FD20004AEF4 /* CuerIosTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
