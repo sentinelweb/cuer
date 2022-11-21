@@ -43,24 +43,10 @@ struct BrowseView: View {
             ScrollView {
                 LazyVGrid(columns: layout, spacing: 0) {
                     ForEach(view.model.categories) { item in
-                        VStack {
-                            let url = (item.thumbNailUrl ??? {$0?.starts(with: "https") ?? false})
-                            ?? "https://cuer-275020.firebaseapp.com/images/categories/greek.jpg"
-                            AsyncImage(url: URL(string: url)) { image in
-                                image.resizable()
-                                    .aspectRatio(contentMode: .fill)
-                            } placeholder: {
-                                ProgressView()
-                            }.frame(width: UIScreen.main.bounds.width / 2, height: 150)
-                            .clipped()
-                            .transition(.opacity.animation(.default))
-//                                .shadow(color: .gray, radius: 2, x: 4, y: 4)
-                                
-                            .overlay(titleOverlay(item: item), alignment: .bottom)
-                            .frame(maxWidth: UIScreen.main.bounds.width / 2, maxHeight:150)
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 25.0)) // todo cut corner
-                        .onTapGesture{ view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: item))}
+                        let seq = view.model.categories.firstIndex(of: item) ?? 0
+                        
+                        BrowseImage(item: item, seq: seq)
+                            .onTapGesture{ view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: item))}
                     }
                 }
             }
@@ -68,22 +54,6 @@ struct BrowseView: View {
         .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
         .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }
         .onDisappear { holder.lifecycle.onPause();holder.lifecycle.onStop(); }
-    }
-    
-    
-    @ViewBuilder
-    private func titleOverlay(item: BrowseContractViewCategoryModel)-> some View {
-        return HStack {
-            Text(item.title)
-                Spacer()
-            }
-            .font(.headline)
-            .foregroundColor(Color(.label))
-            .padding(.horizontal, 20)
-            .padding(.vertical, 8)
-            .background(Color(.systemBackground).opacity(0.75))
-//            .onTapGesture { viewModel.open(source) }
-        
     }
 }
 

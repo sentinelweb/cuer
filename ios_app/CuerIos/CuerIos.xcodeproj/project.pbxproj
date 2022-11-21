@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		5513228F2928F0E000212FF5 /* CompatKotlin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5513228E2928F0E000212FF5 /* CompatKotlin.swift */; };
+		55132293292B966A00212FF5 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 55132292292B966A00212FF5 /* Kingfisher */; };
+		55132296292B9EAC00212FF5 /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55132295292B9EAC00212FF5 /* Images.swift */; };
 		55540C082928010800086F37 /* Identifiables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55540C072928010800086F37 /* Identifiables.swift */; };
 		BD3F9E98292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
 		BD3F9E99292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
@@ -80,6 +82,7 @@
 
 /* Begin PBXFileReference section */
 		5513228E2928F0E000212FF5 /* CompatKotlin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatKotlin.swift; sourceTree = "<group>"; };
+		55132295292B9EAC00212FF5 /* Images.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Images.swift; sourceTree = "<group>"; };
 		55540C072928010800086F37 /* Identifiables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiables.swift; sourceTree = "<group>"; };
 		BD3F9E97292695BF00380350 /* browse_categories.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = browse_categories.json; path = ../../app/src/main/assets/browse_categories.json; sourceTree = "<group>"; };
 		BD3F9E9E2926BB9700380350 /* TEST.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = TEST.xcframework; path = ../../shared/build/XCFrameworks/release/TEST.xcframework; sourceTree = "<group>"; };
@@ -127,6 +130,7 @@
 				BDBEDFEE2923B3890004AEF4 /* libsqlite3.tbd in Frameworks */,
 				BDBEE0062923D3F40004AEF4 /* KMPNativeCoroutinesCore in Frameworks */,
 				BDBEDFF02923B4290004AEF4 /* CoreData.framework in Frameworks */,
+				55132293292B966A00212FF5 /* Kingfisher in Frameworks */,
 				BDBEE0042923D3F40004AEF4 /* KMPNativeCoroutinesCombine in Frameworks */,
 				BDBEE0022923D3F40004AEF4 /* KMPNativeCoroutinesAsync in Frameworks */,
 				BDBEDFED2923B3890004AEF4 /* libsqlite3.0.tbd in Frameworks */,
@@ -156,6 +160,14 @@
 				5513228E2928F0E000212FF5 /* CompatKotlin.swift */,
 			);
 			path = kotlin;
+			sourceTree = "<group>";
+		};
+		55132294292B9E8700212FF5 /* views */ = {
+			isa = PBXGroup;
+			children = (
+				55132295292B9EAC00212FF5 /* Images.swift */,
+			);
+			path = views;
 			sourceTree = "<group>";
 		};
 		55540C06292800EB00086F37 /* ui */ = {
@@ -239,6 +251,7 @@
 		BDBEDFB8292220CD0004AEF4 /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				55132294292B9E8700212FF5 /* views */,
 				BDBEDFD6292297A60004AEF4 /* settings */,
 				BDBEDFD3292295E20004AEF4 /* safari */,
 				BDBEDFBC292220FD0004AEF4 /* browse */,
@@ -367,6 +380,7 @@
 				BDBEE0012923D3F40004AEF4 /* KMPNativeCoroutinesAsync */,
 				BDBEE0032923D3F40004AEF4 /* KMPNativeCoroutinesCombine */,
 				BDBEE0052923D3F40004AEF4 /* KMPNativeCoroutinesCore */,
+				55132292292B966A00212FF5 /* Kingfisher */,
 			);
 			productName = CuerIos;
 			productReference = BDBEDF8B29221FD20004AEF4 /* CuerIos.app */;
@@ -442,6 +456,7 @@
 			mainGroup = BDBEDF8229221FD20004AEF4;
 			packageReferences = (
 				BDBEE0002923D3F40004AEF4 /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */,
+				55132291292B966A00212FF5 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			productRefGroup = BDBEDF8C29221FD20004AEF4 /* Products */;
 			projectDirPath = "";
@@ -528,6 +543,7 @@
 				BDBEDFC02922213B0004AEF4 /* MainView.swift in Sources */,
 				BDBEDFBE2922212B0004AEF4 /* MainCoordinator.swift in Sources */,
 				BDBEDF8F29221FD20004AEF4 /* CuerIosApp.swift in Sources */,
+				55132296292B9EAC00212FF5 /* Images.swift in Sources */,
 				BD3F9EA92927D0DA00380350 /* BrowseMviController.swift in Sources */,
 				BDA559BB29264124008C07E1 /* ApiKeyProvider.swift in Sources */,
 			);
@@ -857,6 +873,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		55132291292B966A00212FF5 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 		BDBEE0002923D3F40004AEF4 /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rickclephas/KMP-NativeCoroutines";
@@ -868,6 +892,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		55132292292B966A00212FF5 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55132291292B966A00212FF5 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
 		BDBEE0012923D3F40004AEF4 /* KMPNativeCoroutinesAsync */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = BDBEE0002923D3F40004AEF4 /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */;
