@@ -33,11 +33,12 @@ struct BrowseView: View {
                 Image(systemName: "arrow.backward")
                     .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnUpClicked())}
                     .padding(8)
+                
                 Text(view.model.title)
-                    .onTapGesture {
-                    view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: view.model.categories.first!))
-                }.font(headerTypeface)
+                    .font(headerTypeface)
+                
                 Spacer()
+                
                 if (view.model.order == BrowseContract.Order.categories) {
                     Image(systemName: "abc")
                         .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnSetOrder(order: BrowseContract.Order.aToZ))}
