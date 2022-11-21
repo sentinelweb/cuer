@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 @ExperimentalCoroutinesApi
 class PlaylistsMviController constructor(
-    private val modelMapper: PlayerModelMapper,
+    private val modelMapper: PlaylistsMviModelMapper,
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,
     private val store: PlaylistsMviContract.MviStore,
