@@ -9,7 +9,7 @@ import SwiftUI
 import shared
 import Kingfisher
 
-struct BrowseImage: View {
+struct BrowseItem: View {
     
     let item:BrowseContractViewCategoryModel
     let seq: Int
@@ -47,17 +47,17 @@ struct BrowseImage: View {
             Text(item.title)
                 Spacer()
             }
-            .font(.headline)
             .foregroundColor(Color(.label))
             .padding(.horizontal, 20)
             .padding(.vertical, 8)
             .background(Color(.systemBackground).opacity(0.75))
+            .font(itemTileTypeface)
     }
 }
 
 struct Images_Previews: PreviewProvider {
     static var previews: some View {
-        BrowseImage(
+        BrowseItem(
             item: BrowseContractViewCategoryModel(
                 id: 1,
                 title: "title",

@@ -38,14 +38,14 @@ struct BrowseView: View {
                 Text(view.model.title)
                     .onTapGesture {
                     view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: view.model.categories.first!))
-                }.font(.title)
+                }.font(headerTypeface)
             }
             ScrollView {
                 LazyVGrid(columns: layout, spacing: 0) {
                     ForEach(view.model.categories) { item in
                         let seq = view.model.categories.firstIndex(of: item) ?? 0
                         
-                        BrowseImage(item: item, seq: seq)
+                        BrowseItem(item: item, seq: seq)
                             .onTapGesture{ view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: item))}
                     }
                 }
