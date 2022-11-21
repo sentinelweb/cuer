@@ -11,6 +11,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsDialogBinding
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -109,27 +110,27 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onClick(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.onItemClicked(item)
     }
 
-    override fun onRightSwipe(item: ItemContract.Model) {
+    override fun onRightSwipe(item: ItemMviContract.Model) {
 
     }
 
-    override fun onLeftSwipe(item: ItemContract.Model) {
+    override fun onLeftSwipe(item: ItemMviContract.Model) {
 
     }
 
     override fun onPlay(
-        item: ItemContract.Model,
+        item: ItemMviContract.Model,
         external: Boolean,
         sourceView: ItemContract.ItemView
     ) {
 
     }
 
-    override fun onStar(item: ItemContract.Model) {
+    override fun onStar(item: ItemMviContract.Model) {
 
     }
 
@@ -137,23 +138,23 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
         dismissAllowingStateLoss()
     }
 
-    override fun onShare(item: ItemContract.Model) {
+    override fun onShare(item: ItemMviContract.Model) {
         //presenter.onItemShare(item)
     }
 
-    override fun onMerge(item: ItemContract.Model) {
+    override fun onMerge(item: ItemMviContract.Model) {
 
     }
 
-    override fun onImageClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onImageClick(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.onItemClicked(item)
     }
 
-    override fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onEdit(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
 
     }
 
-    override fun onDelete(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onDelete(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
 
     }
 

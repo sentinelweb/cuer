@@ -45,41 +45,41 @@ class PlaylistsModelMapper constructor(
         recentPlaylists: List<OrchestratorContract.Identifier<Long>>,
         pinnedId: Long?,
         root: PlaylistTreeDomain
-    ): List<ItemContract.Model> {
+    ): List<ItemMviContract.Model> {
         val starred = buildStarredList(domains)
         val recent = buildRecentList(domains, recentPlaylists)
         val list = mutableListOf(
 
-            ItemContract.Model.HeaderModel(
+            ItemMviContract.Model.HeaderModel(
                 ID_APP_HEADER,
                 res.getString(R.string.playlists_section_app)
             ),
-            ItemContract.Model.ListModel(
+            ItemMviContract.Model.ListModel(
                 ID_APP_LIST,
                 appPlaylists.keys.map {
                     itemModel(it, it.id == pinnedId, appPlaylists[it], 0)
                 }),
 
-            ItemContract.Model.HeaderModel(
+            ItemMviContract.Model.HeaderModel(
                 ID_RECENT_LIST,
                 res.getString(R.string.playlists_section_recent)
             ),
-            ItemContract.Model.ListModel(ID_RECENT_LIST,
+            ItemMviContract.Model.ListModel(ID_RECENT_LIST,
                 recent.map {
                     itemModel(it, it.id == pinnedId, domains[it], 0)
                 }),
 
-            ItemContract.Model.HeaderModel(
+            ItemMviContract.Model.HeaderModel(
                 ID_STARRED_LIST,
                 res.getString(R.string.playlists_section_starred)
             ),
-            ItemContract.Model.ListModel(
+            ItemMviContract.Model.ListModel(
                 ID_STARRED_LIST,
                 starred.map {
                     itemModel(it, it.id == pinnedId, domains[it], 0)
                 }),
 
-            ItemContract.Model.HeaderModel(
+            ItemMviContract.Model.HeaderModel(
                 ID_ALL_HEADER,
                 res.getString(R.string.playlists_section_all)
             ),
@@ -115,7 +115,7 @@ class PlaylistsModelMapper constructor(
         pinned: Boolean,
         playlistStatDomain: PlaylistStatDomain?,
         depth: Int
-    ) = ItemContract.Model.ItemModel(
+    ) = ItemMviContract.Model.ItemModel(
         pl.id ?: throw Exception("Playlist must have an id"),
         pl.title.capitalize(Locale.getDefault()),
         false,

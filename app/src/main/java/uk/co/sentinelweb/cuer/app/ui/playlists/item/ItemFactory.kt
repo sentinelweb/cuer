@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import android.view.ViewGroup
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.header.HeaderView
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.header.HeaderViewHolder
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.list.ListPresenter
@@ -28,7 +29,7 @@ class ItemFactory constructor(
     fun createPresenter(
         view: ItemContract.View,
         interactions: ItemContract.Interactions
-    ): ItemContract.External<ItemContract.Model.ItemModel> {
+    ): ItemContract.External<ItemMviContract.Model.ItemModel> {
         val itemPresenter = ItemPresenter(view, interactions, ItemContract.State(), modelMapper)
         view.setPresenter(itemPresenter)
         return itemPresenter

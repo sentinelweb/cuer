@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Model.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Model.ItemModel
 
 class ItemPresenter(
     val view: ItemContract.View,

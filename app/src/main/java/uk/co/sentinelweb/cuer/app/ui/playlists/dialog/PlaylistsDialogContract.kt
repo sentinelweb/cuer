@@ -5,6 +5,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
@@ -22,7 +23,7 @@ interface PlaylistsDialogContract {
     interface Presenter {
         fun destroy()
         fun refreshList()
-        fun onItemClicked(item: ItemContract.Model)
+        fun onItemClicked(item: ItemMviContract.Model)
         fun onResume()
         fun onPause()
         fun setConfig(config: Config)

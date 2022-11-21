@@ -323,52 +323,52 @@ class PlaylistsFragment :
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onClick(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.performOpen(item, sourceView)
     }
 
-    override fun onRightSwipe(item: ItemContract.Model) {
+    override fun onRightSwipe(item: ItemMviContract.Model) {
         presenter.performMove(item)
     }
 
-    override fun onLeftSwipe(item: ItemContract.Model) {
+    override fun onLeftSwipe(item: ItemMviContract.Model) {
         adapter.notifyItemRemoved(adapter.data.indexOf(item))
         presenter.performDelete(item) // delays for animation
     }
 
     override fun onPlay(
-        item: ItemContract.Model,
+        item: ItemMviContract.Model,
         external: Boolean,
         sourceView: ItemContract.ItemView
     ) {
         presenter.performPlay(item, external, sourceView)
     }
 
-    override fun onStar(item: ItemContract.Model) {
+    override fun onStar(item: ItemMviContract.Model) {
         presenter.performStar(item)
     }
 
-    override fun onShare(item: ItemContract.Model) {
+    override fun onShare(item: ItemMviContract.Model) {
         presenter.performShare(item)
     }
 
-    override fun onMerge(item: ItemContract.Model) {
+    override fun onMerge(item: ItemMviContract.Model) {
         presenter.performMerge(item)
     }
 
-    override fun onImageClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onImageClick(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.onItemImageClicked(item, sourceView)
     }
 
-    override fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onEdit(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.performEdit(item, sourceView)
     }
 
-    override fun onDelete(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onDelete(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.performDelete(item) // delays for animation
     }
 
-    override fun notifyItemRemoved(model: ItemContract.Model) {
+    override fun notifyItemRemoved(model: ItemMviContract.Model) {
         adapter.notifyItemRemoved(adapter.data.indexOf(model))
     }
     //endregion

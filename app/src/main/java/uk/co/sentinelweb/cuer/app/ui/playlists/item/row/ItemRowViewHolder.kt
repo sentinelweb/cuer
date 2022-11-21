@@ -3,10 +3,11 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item.row
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 
 class ItemRowViewHolder(
-    val itemPresenter: ItemContract.External<ItemContract.Model.ItemModel>,
+    val itemPresenter: ItemContract.External<ItemMviContract.Model.ItemModel>,
     private val rowView: ItemRowView
 ) : RecyclerView.ViewHolder(rowView.root),
     ItemBaseContract.ItemTouchHelperViewHolder {

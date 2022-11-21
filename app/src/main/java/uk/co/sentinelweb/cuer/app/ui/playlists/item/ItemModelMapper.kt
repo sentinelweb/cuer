@@ -10,6 +10,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.text.toSpannable
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.ItemType.ROW
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
@@ -76,7 +77,7 @@ class ItemModelMapper constructor(
         }
     }
 
-    fun mapTopText(model: ItemContract.Model.ItemModel, playing: Boolean, type:ItemContract.ItemType): Spannable {
+    fun mapTopText(model: ItemMviContract.Model.ItemModel, playing: Boolean, type:ItemContract.ItemType): Spannable {
         val builder = SpannableStringBuilder(model.title)
         if (type == ItemContract.ItemType.TILE) {
             if (model.pinned) {
@@ -98,7 +99,7 @@ class ItemModelMapper constructor(
         builder.insert(0, str)
     }
 
-    fun mapBottomText(model: ItemContract.Model.ItemModel): Spannable {
+    fun mapBottomText(model: ItemMviContract.Model.ItemModel): Spannable {
         val countText = if (model.count > 0) model.run { "$newItems / $count " } else ""
         val base = SpannableString("          $countText").let {
             res.replaceSpannableIcon(
