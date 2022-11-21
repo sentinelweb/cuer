@@ -7,6 +7,7 @@
 
 import Foundation
 import shared
+import UIKit
 
 // outgoing route request (pass view dependencies)
 enum Parent {
@@ -52,7 +53,9 @@ class MainCoordinator: ObservableObject {
     @Published var currentRoute: Route = Route.none
     @Published var currentTab: MainTab = MainTab.browse
     @Published var currentPlaylistId: Int = -1
-    @Published var currentPlaylistViewModel: PlaylistViewModel! = nil
+    @Published var playlistViewModel: PlaylistViewModel! = nil
+    @Published var playlistsViewModel: PlaylistsViewModel! = nil
+    @Published var browseController: BrowseControllerHolder! = nil
     @Published var openedURL: URL?
     
     func navigate(route: Route) {
@@ -60,7 +63,9 @@ class MainCoordinator: ObservableObject {
         debugPrint("navigate: \(route)")
         switch(route){
         case .main:
-            self.currentPlaylistViewModel = createPlaylistViewModel()
+            self.playlistViewModel = createPlaylistViewModel()
+            self.playlistsViewModel = createPlaylistsViewModel()
+            self.browseController = dependencies.createBrowseHolder()
             self.screen = Parent.main
         case .browse:
             self.currentTab = MainTab.browse
@@ -74,20 +79,25 @@ class MainCoordinator: ObservableObject {
         }
     }
     
-    func createBrowseViewModel() -> BrowseViewModel {
-        return dependencies.createBrowseViewModel()
-    }
-    
-    func createPlaylistsViewModel() -> PlaylistsViewModel {
-        return dependencies.createPlaylistsViewModel()
-    }
-    
-    func createPlaylistViewModel() -> PlaylistViewModel{
-        if (self.currentPlaylistViewModel == nil) {
-            let extractedExpr: PlaylistViewModel = dependencies.createPlaylistViewModel(plId: -1)
-            self.currentPlaylistViewModel =  extractedExpr
+    private func createBrowseController() -> BrowseControllerHolder {
+        if (self.browseController == nil) {
+            self.browseController = dependencies.createBrowseHolder()
         }
-        return self.currentPlaylistViewModel!
+        return self.browseController!
+    }
+    
+    private func createPlaylistsViewModel() -> PlaylistsViewModel {
+        if (self.playlistsViewModel == nil) {
+            self.playlistsViewModel = dependencies.createPlaylistsViewModel()
+        }
+        return self.playlistsViewModel!
+    }
+    
+    private func createPlaylistViewModel() -> PlaylistViewModel{
+        if (self.playlistViewModel == nil) {
+            self.playlistViewModel = dependencies.createPlaylistViewModel(plId: -1)
+        }
+        return self.playlistViewModel!
     }
     
     func open(_ url: URL) {

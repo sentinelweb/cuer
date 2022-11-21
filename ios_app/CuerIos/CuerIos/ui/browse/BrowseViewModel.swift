@@ -7,6 +7,7 @@
 
 import Foundation
 import shared
+import Combine
 
 protocol BrowseViewModelDependency {
     func createBrowseViewModel() -> BrowseViewModel
@@ -14,28 +15,29 @@ protocol BrowseViewModelDependency {
 
 class BrowseViewModelProvider: BrowseViewModel.Dependencies {
     let mainCoordinator: MainCoordinator
-    let orchestratorFactory: OrchestratorFactory
+    let sharedFactories: SharedFactories
     
     init(
         mainCoordinator: MainCoordinator,
-        orchestratorFactory: OrchestratorFactory
+        sharedFactories: SharedFactories
     ) {
         self.mainCoordinator = mainCoordinator
-        self.orchestratorFactory = orchestratorFactory
+        self.sharedFactories = sharedFactories
     }
 }
 
 final class BrowseViewModel: ObservableObject {
-    typealias Dependencies = MainCoordinatorDependency & SharedObjectsDependency
+    typealias Dependencies = MainCoordinatorDependency & SharedFactoriesDependency
     private let dependencies: Dependencies
     
     private let orchestrator: OrchestratorFactory
     private let filter: ProxyFilter
+//    private let browseController: BrowseController
     
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
-        self.orchestrator = dependencies.orchestratorFactory
-        self.filter = dependencies.orchestratorFactory.proxyFilter
+        self.orchestrator = dependencies.sharedFactories.orchestratorFactory
+        self.filter = dependencies.sharedFactories.orchestratorFactory.proxyFilter
     }
     
     func execPlatformRequest() {

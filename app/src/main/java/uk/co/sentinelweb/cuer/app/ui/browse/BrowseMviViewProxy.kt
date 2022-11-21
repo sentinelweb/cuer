@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.browse.BrowseContract.View.Model
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class BrowseMviView constructor(
+class BrowseMviViewProxy constructor(
     private val log: LogWrapper,
     private val res: ResourceWrapper,
 ) : BaseMviView<Model, Event>(), BrowseContract.View {
@@ -31,7 +31,7 @@ class BrowseMviView constructor(
     private val _labelData: MutableLiveData<Label> = MutableLiveData()
     fun labelObservable(): LiveData<Label> = _labelData
 
-    override suspend fun processLabel(label: Label) {
+    override fun processLabel(label: Label) {
         _labelData.value = label
         _labelData.value = Label.None
     }

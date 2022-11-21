@@ -6,7 +6,7 @@
       "id": -1,
       "title": "Philosophy",
       "image": {
-        "url": "gs://cuer-275020.appspot.com/playlist_header/pexels-matheus-bertelli-2674271-600.jpg"
+        "url": "https://cuer-275020.firebaseapp.com/images/categories/pexels-matheus-bertelli-2674271-600.jpg"
       },
       "subCategories": [
         {
@@ -737,7 +737,7 @@
       "id": -1,
       "title": "Psychology",
       "image": {
-        "url": "gs://cuer-275020.appspot.com/playlist_header/psychology-4440675_640.jpg"
+        "url": "https://cuer-275020.firebaseapp.com/images/categories/psychology-4440675_640.jpg"
       },
       "subCategories": [
         {

@@ -21,8 +21,13 @@ protocol SharedDependency {
     var shared:SharedAppDependencies {get}
 }
 
-protocol SharedObjectsDependency {
-    var orchestratorFactory: OrchestratorFactory {get}
+protocol SharedFactoriesDependency {
+    var sharedFactories: SharedFactories {get}
+}
+
+class SharedFactories {
+    let orchestratorFactory = OrchestratorFactory()
+    let presentationFactory = PresentationFactory()
 }
 
 protocol PlaylistIdDependency {var plId: Int { get }}
@@ -31,12 +36,14 @@ protocol PlaylistIdOptionalDependency {var plId: Int? { get }}
 class AppDependencies:
     IosBuildConfigDependency
 & MainCoordinatorDependency
-& BrowseViewModelDependency
+& BrowseControllerDependency
 & PlaylistViewModelDependency
 & PlaylistsViewModelDependency
 & SharedDependency
-& SharedObjectsDependency
+& SharedFactoriesDependency
 {
+    
+    
 #if DEBUG
     private let isDebug = true
 #else
@@ -53,17 +60,15 @@ class AppDependencies:
         pixabayApiKey: CuerPixabayApiKeyProvider()
     )
     
-    var orchestratorFactory = OrchestratorFactory()
+    var sharedFactories = SharedFactories()
     
     lazy var mainCoordinator: MainCoordinator = {MainCoordinator(dependencies: self)}()
-    
-    func createBrowseViewModel() -> BrowseViewModel {
-        BrowseViewModel(
-            dependencies: BrowseViewModelProvider(
-                mainCoordinator: mainCoordinator,
-                orchestratorFactory: orchestratorFactory
-            )
-        )
+
+    func createBrowseHolder() -> BrowseControllerHolder {
+        BrowseControllerHolder(dependencies: BrowseControllerProvider(
+            mainCoordinator: mainCoordinator,
+            sharedFactories: sharedFactories
+        ))
     }
     
     func createPlaylistViewModel(plId: Int) -> PlaylistViewModel {
@@ -71,7 +76,7 @@ class AppDependencies:
             dependencies: PlaylistViewModelProvider(
                 mainCoordinator: mainCoordinator,
                 plId: plId,
-                orchestratorFactory: orchestratorFactory
+                sharedFactories: sharedFactories
             )
         )
     }

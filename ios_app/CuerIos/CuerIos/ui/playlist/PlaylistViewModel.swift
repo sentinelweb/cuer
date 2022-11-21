@@ -15,22 +15,22 @@ protocol PlaylistViewModelDependency {
 
 class PlaylistViewModelProvider: PlaylistViewModel.Dependencies {
     let mainCoordinator: MainCoordinator
-    let orchestratorFactory: OrchestratorFactory
+    let sharedFactories: SharedFactories
     let plId: Int
     
     init(
         mainCoordinator: MainCoordinator,
         plId: Int,
-        orchestratorFactory: OrchestratorFactory
+        sharedFactories: SharedFactories
     ) {
         self.mainCoordinator = mainCoordinator
         self.plId = plId
-        self.orchestratorFactory = orchestratorFactory
+        self.sharedFactories = sharedFactories
     }
 }
 
 final class PlaylistViewModel: ObservableObject {
-    typealias Dependencies = MainCoordinatorDependency & PlaylistIdDependency & SharedObjectsDependency
+    typealias Dependencies = MainCoordinatorDependency & PlaylistIdDependency & SharedFactoriesDependency
     let dependencies: Dependencies
     
     let playlist: DomainPlaylistDomain? = nil
@@ -44,8 +44,8 @@ final class PlaylistViewModel: ObservableObject {
     
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
-        self.orchestrator = dependencies.orchestratorFactory
-        self.filter = dependencies.orchestratorFactory.proxyFilter
+        self.orchestrator = dependencies.sharedFactories.orchestratorFactory
+        self.filter = dependencies.sharedFactories.orchestratorFactory.proxyFilter
         playlistIdSubscription = dependencies.mainCoordinator.$currentPlaylistId.sink(receiveValue:{plId in
             if (self.plId != plId) {
                 self.plId = plId
