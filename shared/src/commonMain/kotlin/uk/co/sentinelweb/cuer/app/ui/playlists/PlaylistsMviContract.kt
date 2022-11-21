@@ -9,10 +9,9 @@ import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
 class PlaylistsMviContract {
 
-
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
         sealed class Intent {
-//            object Display : Intent()
+            object Load : Intent()
 //            data class ClickCategory(val id: Long, val forceItem: Boolean) : Intent()
 //            object Up : Intent()
 //            object ActionSettings : Intent()
