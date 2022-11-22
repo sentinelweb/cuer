@@ -18,12 +18,14 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_CREATE
+import uk.co.sentinelweb.cuer.app.ui.main.MainCommonContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Label.Navigate
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Label.ShowUndo
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.UndoType.PlaylistDelete
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.UndoType.SearchDelete
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviStoreFactory.Action.Init
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -31,6 +33,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.buildLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildTree
+import uk.co.sentinelweb.cuer.domain.ext.isAncestor
 import uk.co.sentinelweb.cuer.domain.ext.sort
 
 class PlaylistsMviStoreFactory(
@@ -62,6 +65,7 @@ class PlaylistsMviStoreFactory(
         ) : Result()
 
         data class SetDeletedItem(val item: Domain?) : Result()
+        data class SetMoveState(val from: Int?, val to: Int?) : Result()
     }
 
     private sealed class Action {
@@ -71,7 +75,6 @@ class PlaylistsMviStoreFactory(
     private object ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(msg: Result): State =
             when (msg) {
-//                is State -> copy(playerState = result.state)
                 is Result.Load -> copy(
                     playlists = msg.playlists,
                     playlistStats = msg.playlistStats,
@@ -106,40 +109,56 @@ class PlaylistsMviStoreFactory(
         override fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
                 Intent.Refresh -> refresh()
-                Intent.CreatePlaylist ->
-                    publish(Navigate(NavigationModel(PLAYLIST_CREATE, mapOf(SOURCE to LOCAL)), null))
-
-                is Intent.OpenPlaylist -> openPlaylist(intent.item, intent.view)
-                is Intent.Edit -> openEdit(intent.item, intent.view)
-                is Intent.Delete -> performDelete(intent.item, getState())
+                Intent.CreatePlaylist -> openCreatePlaylist()
+                is Intent.OpenPlaylist -> openPlaylist(intent)
+                is Intent.Edit -> openEdit(intent)
+                is Intent.Delete -> performDelete(intent, getState())
                 is Intent.Undo -> performUndo(intent, getState())
+                is Intent.MoveSwipe -> performMove(intent, getState())
+                is Intent.Move -> moveItem(intent, getState())
+                is Intent.ClearMove -> clearMoveState(getState())
                 else -> Unit
             }
 
-        private fun openPlaylist(item: PlaylistsItemMviContract.Model, view: PlaylistsItemMviContract.ItemPassView?) {
-            if (item is PlaylistsItemMviContract.Model.ItemModel) {
-                recentLocalPlaylists.addRecentId(item.id)
-                // fixme move lasttab to shared
-                // prefsWrapper.lastBottomTab = MainContract.LastTab.PLAYLIST.ordinal
+        // region open
+        private fun openCreatePlaylist() { // Intent.CreatePlaylist
+            publish(Navigate(NavigationModel(PLAYLIST_CREATE, mapOf(SOURCE to LOCAL)), null))
+        }
+
+        private fun openPlaylist(intent: Intent.OpenPlaylist) {
+            if (intent.item is PlaylistsItemMviContract.Model.ItemModel) {
+                recentLocalPlaylists.addRecentId(intent.item.id)
+                prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
                 publish(
-                    Navigate(NavigationModel(PLAYLIST, mapOf(SOURCE to item.source, PLAYLIST_ID to item.id)), view)
+                    Navigate(
+                        NavigationModel(PLAYLIST, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id)),
+                        intent.view
+                    )
                 )
             } else Unit
         }
 
-        private fun openEdit(item: PlaylistsItemMviContract.Model, view: PlaylistsItemMviContract.ItemPassView?) {
-            if (item is PlaylistsItemMviContract.Model.ItemModel) {
-                recentLocalPlaylists.addRecentId(item.id)
+        private fun openEdit(intent: Intent.Edit) {
+            if (intent.item is PlaylistsItemMviContract.Model.ItemModel) {
+                recentLocalPlaylists.addRecentId(intent.item.id)
                 publish(
-                    Navigate(NavigationModel(PLAYLIST, mapOf(SOURCE to item.source, PLAYLIST_ID to item.id)), view)
+                    Navigate(
+                        NavigationModel(
+                            PLAYLIST_CREATE,
+                            mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id)
+                        ),
+                        intent.view
+                    )
                 )
             } else Unit
         }
+        // endregion
 
-        fun performDelete(item: PlaylistsItemMviContract.Model, state: State) {
+        // region delete/undo
+        fun performDelete(intent: Intent.Delete, state: State) {
             scope.launch {
                 delay(400)
-                state.findPlaylist(item)
+                state.findPlaylist(intent.item)
                     ?.also { playlist ->
                         if (playlist.type != PlaylistDomain.PlaylistTypeDomain.APP) {
                             val node = state.treeLookup[playlist.id]!!
@@ -148,7 +167,7 @@ class PlaylistsMviStoreFactory(
                                     ?.let { playlistOrchestrator.loadById(it, LOCAL.deepOptions()) }
                                     ?.apply {
                                         playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
-                                        publish(Label.ItemRemoved(item))
+                                        publish(Label.ItemRemoved(intent.item))
                                         publish(
                                             ShowUndo(PlaylistDelete, strings.playlists_message_deleted(playlist.title))
                                         )
@@ -199,7 +218,58 @@ class PlaylistsMviStoreFactory(
                 refresh()
             } ?: Unit
         }
+        // endregion
 
+        // region move
+        fun moveItem(intent: Intent.Move, state: State) {
+            dispatch(Result.SetMoveState(state.dragFrom ?: intent.fromPosition, intent.toPosition))
+        }
+
+        fun clearMoveState(state: State) {
+            if (state.dragFrom == null || state.dragTo == null) {
+                refresh()
+            }
+            dispatch(Result.SetMoveState(null, null))
+        }
+
+        fun performMove(intent: Intent.MoveSwipe, state: State) {
+            state.findPlaylist(intent.item)
+                ?.takeIf { it.type != PlaylistDomain.PlaylistTypeDomain.APP }
+                ?.also { movePlaylist ->
+                    PlaylistsMviDialogContract.Config(
+                        title = strings.playlist_dialog_title,
+                        selectedPlaylists = setOf(),
+                        multi = true,
+                        itemClick = { playlistSelected, _ ->
+                            playlistSelected
+                                ?.apply { setParent(this, movePlaylist, state) }
+                                ?: openCreatePlaylist()
+                        },
+                        confirm = { },
+                        dismiss = { publish(Label.Repaint) },
+                        suggestionsMedia = null,
+                        showPin = false,
+                        showRoot = true,
+                        showAdd = false
+                    ).also { publish(Label.ShowPlaylistsSelector(it)) }
+                }
+        }
+
+        private fun setParent(parent: PlaylistDomain, child: PlaylistDomain, state: State) {
+            val childNode = state.treeLookup[child.id]!!
+            val parentNode = state.treeLookup[parent.id]
+            if (parent.id == null || !childNode.isAncestor(parentNode!!)) {
+                scope.launch {
+                    playlistOrchestrator.save(child.copy(parentId = parent.id), LOCAL.flatOptions())
+                }
+            } else {
+                publish(Label.Repaint)
+                publish(Label.Message(strings.playlists_error_circular))
+            }
+        }
+        // endregion
+
+        // region refresh
         private fun refresh() {
             scope.launch {
                 executeRefresh()
@@ -244,6 +314,9 @@ class PlaylistsMviStoreFactory(
                 publish(Label.Error(strings.playlists_error_load_failed, e))
             }
         }
+
+        // endregion refresh
+
 
         private fun State.findPlaylist(item: PlaylistsItemMviContract.Model) = playlists.find { it.id == item.id }
     }

@@ -20,12 +20,12 @@ class PlaylistsMviContract {
         sealed class Intent {
             object Refresh : Intent()
             object CreatePlaylist : Intent()
-            data class Undo(val undoType: UndoType) : Intent()
             data class Move(val fromPosition: Int, val toPosition: Int) : Intent()
-            object CommitMove : Intent()
-            data class OpenPlaylist(val item: Model, val view: ItemPassView? = null) : Intent()
+            object ClearMove : Intent()
             data class MoveSwipe(val item: Model) : Intent()
+            data class OpenPlaylist(val item: Model, val view: ItemPassView? = null) : Intent()
             data class Delete(val item: Model) : Intent()
+            data class Undo(val undoType: UndoType) : Intent()
             data class Play(val item: Model, val external: Boolean) : Intent()
             data class Star(val item: Model) : Intent()
             data class Share(val item: Model) : Intent()
@@ -73,14 +73,15 @@ class PlaylistsMviContract {
         sealed class Event {
             object OnRefresh : Event()
             object OnCreatePlaylist : Event()
-            data class OnUndo(val undoType: UndoType) : Event()
             data class OnMove(val fromPosition: Int, val toPosition: Int) : Event()
-            object OnCommitMove : Event()
+            object OnClearMove : Event()
+            data class OnMoveSwipe(val item: PlaylistsItemMviContract.Model) : Event()
+            data class OnDelete(val item: PlaylistsItemMviContract.Model) : Event()
+
+            data class OnUndo(val undoType: UndoType) : Event()
             data class OnOpenPlaylist(val item: PlaylistsItemMviContract.Model, val view: ItemPassView? = null) :
                 Event()
 
-            data class OnMoveSwipe(val item: PlaylistsItemMviContract.Model) : Event()
-            data class OnDelete(val item: PlaylistsItemMviContract.Model) : Event()
             data class OnPlay(val item: PlaylistsItemMviContract.Model, val external: Boolean) : Event()
             data class OnStar(val item: PlaylistsItemMviContract.Model) : Event()
             data class OnShare(val item: PlaylistsItemMviContract.Model) : Event()
@@ -102,5 +103,7 @@ class PlaylistsMviContract {
         open val playlists_error_load_failed = "Load failed"
         open val playlists_error_cant_delete = "Cannot delete playlist"
         open val playlists_error_delete_children = "Please delete the children first"
+        open val playlist_dialog_title = "Select playlist"
+        open val playlists_error_circular = "That's a circular reference ..."
     }
 }

@@ -18,7 +18,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.main.MainContract
+import uk.co.sentinelweb.cuer.app.ui.main.MainCommonContract.LastTab.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
@@ -95,6 +95,7 @@ class PlaylistsPresenter(
         coroutines.cancel()
     }
 
+    //done
     override fun performMove(item: PlaylistsItemMviContract.Model) {
         findPlaylist(item)
             ?.takeIf { it.type != APP }
@@ -123,6 +124,7 @@ class PlaylistsPresenter(
             }
     }
 
+    //done
     private fun setParent(parent: PlaylistDomain, child: PlaylistDomain) {
         val childNode = state.treeLookup[child.id]!!
         val parentNode = state.treeLookup[parent.id]
@@ -136,6 +138,7 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     override fun performDelete(item: PlaylistsItemMviContract.Model) {
         state.viewModelScope.launch {
             delay(400)
@@ -182,10 +185,11 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     override fun performOpen(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         if (item is PlaylistsItemMviContract.Model.ItemModel) {
             recentLocalPlaylists.addRecentId(item.id)
-            prefsWrapper.lastBottomTab = MainContract.LastTab.PLAYLIST.ordinal
+            prefsWrapper.lastBottomTab = PLAYLIST.ordinal
             view.navigate(
                 PlaylistContract.makeNav(
                     item.id, null, false, item.source,
@@ -195,6 +199,7 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     override fun onItemImageClicked(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         findPlaylist(item)?.id?.apply {
             if (item is PlaylistsItemMviContract.Model.ItemModel) {
@@ -251,6 +256,7 @@ class PlaylistsPresenter(
             }
     }
 
+    // done
     override fun performEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         view.navigate(
             PlaylistEditContract.makeNav(
@@ -261,6 +267,7 @@ class PlaylistsPresenter(
         )
     }
 
+    // done
     override fun onCreatePlaylist() {
         view.navigate(PlaylistEditContract.makeCreateNav(LOCAL), null)
     }
@@ -297,6 +304,7 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     override fun moveItem(fromPosition: Int, toPosition: Int) {
         if (state.dragFrom == null) {
             state.dragFrom = fromPosition
@@ -304,6 +312,7 @@ class PlaylistsPresenter(
         state.dragTo = toPosition
     }
 
+    // done
     override fun commitMove() {
         if (state.dragFrom != null && state.dragTo != null) {
             //todo save move ..
@@ -314,6 +323,7 @@ class PlaylistsPresenter(
         state.dragTo = null
     }
 
+    // done
     override fun undoDelete() {
         state.deletedPlaylist?.let { itemDomain ->
             state.viewModelScope.launch {

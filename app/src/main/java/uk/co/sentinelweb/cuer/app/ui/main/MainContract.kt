@@ -24,10 +24,6 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
 interface MainContract {
 
-    enum class LastTab {
-        BROWSE, PLAYLISTS, PLAYLIST
-    }
-
     interface Presenter {
         fun initialise()
 
