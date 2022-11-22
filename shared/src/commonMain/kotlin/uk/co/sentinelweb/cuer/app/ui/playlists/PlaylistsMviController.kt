@@ -10,23 +10,21 @@ import kotlinx.coroutines.flow.mapNotNull
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Event
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 @ExperimentalCoroutinesApi
 class PlaylistsMviController constructor(
     private val modelMapper: PlaylistsMviModelMapper,
-    private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,
     private val store: PlaylistsMviContract.MviStore,
     private val playlistOrchestrator: PlaylistOrchestrator,
     lifecycle: Lifecycle?,
 ) {
+    private var binder: Binder? = null
+
     init {
         log.tag(this)
-        log.d("init")
         lifecycle?.doOnDestroy {
-            log.d("dispose onDestroy")
             store.dispose()
         }
     }
@@ -41,23 +39,13 @@ class PlaylistsMviController constructor(
             is Event.OnMove -> Intent.Move(fromPosition, toPosition)
             is Event.OnMoveSwipe -> Intent.MoveSwipe(item)
             is Event.OnOpenPlaylist -> Intent.OpenPlaylist(item, view)
-            is Event.OnPlay -> Intent.Play(item, external)
+            is Event.OnPlay -> Intent.Play(item, external, view)
             Event.OnRefresh -> Intent.Refresh
             is Event.OnShare -> Intent.Share(item)
             is Event.OnStar -> Intent.Star(item)
             is Event.OnUndo -> Intent.Undo(undoType)
         }
     }
-//
-//    private val trackChangeToIntent: suspend PlaylistItemDomain.() -> Intent = {
-//        TrackChange(this)
-//    }
-//
-//    private val playlistChangeToIntent: suspend PlaylistDomain.() -> Intent = {
-//        PlaylistChange(this)
-//    }
-
-    private var binder: Binder? = null
 
     @ExperimentalCoroutinesApi
     fun onViewCreated(views: List<PlaylistsMviContract.View>, viewLifecycle: Lifecycle) {
@@ -68,7 +56,6 @@ class PlaylistsMviController constructor(
     }
 
     private fun BindingsBuilder.bindTheThings(views: List<PlaylistsMviContract.View>) {
-        log.d("bind onViewCreated")
         views.forEach { view ->
             // store -> view
             store.states.mapNotNull { modelMapper.map(it) } bindTo view
@@ -81,7 +68,6 @@ class PlaylistsMviController constructor(
     }
 
     fun onViewDestroyed() {
-        log.d("onViewDestroyed")
         binder = null
     }
 }

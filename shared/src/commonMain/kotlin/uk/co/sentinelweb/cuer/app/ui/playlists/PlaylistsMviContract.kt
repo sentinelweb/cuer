@@ -26,7 +26,7 @@ class PlaylistsMviContract {
             data class OpenPlaylist(val item: Model, val view: ItemPassView? = null) : Intent()
             data class Delete(val item: Model) : Intent()
             data class Undo(val undoType: UndoType) : Intent()
-            data class Play(val item: Model, val external: Boolean) : Intent()
+            data class Play(val item: Model, val external: Boolean, val view: ItemPassView? = null) : Intent()
             data class Star(val item: Model) : Intent()
             data class Share(val item: Model) : Intent()
             data class Merge(val item: Model) : Intent()
@@ -79,10 +79,15 @@ class PlaylistsMviContract {
             data class OnDelete(val item: PlaylistsItemMviContract.Model) : Event()
 
             data class OnUndo(val undoType: UndoType) : Event()
-            data class OnOpenPlaylist(val item: PlaylistsItemMviContract.Model, val view: ItemPassView? = null) :
+            data class OnOpenPlaylist(
+                val item: PlaylistsItemMviContract.Model, val view: ItemPassView? = null
+            ) :
                 Event()
 
-            data class OnPlay(val item: PlaylistsItemMviContract.Model, val external: Boolean) : Event()
+            data class OnPlay(
+                val item: PlaylistsItemMviContract.Model, val external: Boolean, val view: ItemPassView? = null
+            ) : Event()
+
             data class OnStar(val item: PlaylistsItemMviContract.Model) : Event()
             data class OnShare(val item: PlaylistsItemMviContract.Model) : Event()
             data class OnMerge(val item: PlaylistsItemMviContract.Model) : Event()
@@ -105,5 +110,6 @@ class PlaylistsMviContract {
         open val playlists_error_delete_children = "Please delete the children first"
         open val playlist_dialog_title = "Select playlist"
         open val playlists_error_circular = "That's a circular reference ..."
+        open val playlists_error_cant_play = "Cannot launch playlist"
     }
 }

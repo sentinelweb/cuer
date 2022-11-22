@@ -199,7 +199,6 @@ class PlaylistsMviFragment :
             true
         }
         addMenuItem.setOnMenuItemClickListener {
-            //presenter.onCreatePlaylist()
             viewProxy.dispatch(Event.OnCreatePlaylist)
             true
         }
@@ -285,10 +284,6 @@ class PlaylistsMviFragment :
         snackbar?.show()
     }
 
-//    override fun hideRefresh() {
-//        binding.playlistsSwipe.isRefreshing = false
-//    }
-
     private fun showPlaylistSelector(config: PlaylistsMviDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()
         dialogFragment = PlaylistsDialogFragment.newInstance(config)
@@ -329,7 +324,6 @@ class PlaylistsMviFragment :
 
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-//        presenter.moveItem(fromPosition, toPosition)
         viewProxy.dispatch(Event.OnMove(fromPosition, toPosition))
         // shows the move while dragging
         adapter.notifyItemMoved(fromPosition, toPosition)
@@ -347,13 +341,11 @@ class PlaylistsMviFragment :
     }
 
     override fun onRightSwipe(item: PlaylistsItemMviContract.Model) {
-        // presenter.performMove(item)
         viewProxy.dispatch(Event.OnMoveSwipe(item))
     }
 
     override fun onLeftSwipe(item: PlaylistsItemMviContract.Model) {
         adapter.notifyItemRemoved(adapter.data.indexOf(item))
-        // presenter.performDelete(item) // delays for animation
         viewProxy.dispatch(Event.OnDelete(item))
     }
 
@@ -362,22 +354,18 @@ class PlaylistsMviFragment :
         external: Boolean,
         sourceView: ItemContract.ItemView
     ) {
-        //presenter.performPlay(item, external, sourceView)
-        viewProxy.dispatch(Event.OnPlay(item, external))
+        viewProxy.dispatch(Event.OnPlay(item, external, sourceView))
     }
 
     override fun onStar(item: PlaylistsItemMviContract.Model) {
-        //presenter.performStar(item)
         viewProxy.dispatch(Event.OnStar(item))
     }
 
     override fun onShare(item: PlaylistsItemMviContract.Model) {
-        //presenter.performShare(item)
         viewProxy.dispatch(Event.OnShare(item))
     }
 
     override fun onMerge(item: PlaylistsItemMviContract.Model) {
-        //presenter.performMerge(item)
         viewProxy.dispatch(Event.OnMerge(item))
     }
 
@@ -390,7 +378,6 @@ class PlaylistsMviFragment :
     }
 
     override fun onDelete(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        // presenter.performDelete(item) // delays for animation
         viewProxy.dispatch(Event.OnDelete(item))
     }
     //endregion
@@ -417,7 +404,6 @@ class PlaylistsMviFragment :
                         lifecycle = get<PlaylistsMviFragment>().lifecycle.asEssentyLifecycle(),
                         log = get(),
                         playlistOrchestrator = get(),
-                        coroutines = get()
                     )
                 }
                 scoped {
@@ -437,15 +423,14 @@ class PlaylistsMviFragment :
                         recentLocalPlaylists = get(),
                         starredItems = get(),
                         unfinishedItems = get(),
-                        strings = get()
+                        strings = get(),
+                        platformLauncher = get()
                     ).create()
                 }
                 scoped<PlaylistsMviContract.Strings> { PlaylistsMviStrings(get()) }
                 scoped { PlaylistsMviModelMapper(get()) }
-                scoped<SnackbarWrapper> {
-                    AndroidSnackbarWrapper(this.getFragmentActivity(), get())
-                }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
+                scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }

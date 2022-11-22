@@ -14,8 +14,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_CREATE
 import uk.co.sentinelweb.cuer.app.ui.main.MainCommonContract
@@ -28,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviStoreFactory.Action.I
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
@@ -51,6 +51,7 @@ class PlaylistsMviStoreFactory(
     private val starredItems: StarredItemsPlayistInteractor,
     private val unfinishedItems: UnfinishedItemsPlayistInteractor,
     private val strings: PlaylistsMviContract.Strings,
+    private val platformLauncher: PlatformLaunchWrapper,
 ) {
     private sealed class Result {
         data class Load(
@@ -117,6 +118,7 @@ class PlaylistsMviStoreFactory(
                 is Intent.MoveSwipe -> performMove(intent, getState())
                 is Intent.Move -> moveItem(intent, getState())
                 is Intent.ClearMove -> clearMoveState(getState())
+                is Intent.Play -> play(intent, getState())
                 else -> Unit
             }
 
@@ -154,8 +156,36 @@ class PlaylistsMviStoreFactory(
         }
         // endregion
 
+        // region play
+        private fun play(intent: Intent.Play, state: State) {
+            if (!intent.external) {
+                if (intent.item is PlaylistsItemMviContract.Model.ItemModel) {
+                    recentLocalPlaylists.addRecentId(intent.item.id)
+                    prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
+                    publish(
+                        Navigate(
+                            NavigationModel(
+                                PLAYLIST, mapOf(
+                                    SOURCE to intent.item.source,
+                                    PLAYLIST_ID to intent.item.id,
+                                    PLAY_NOW to true
+                                )
+                            ),
+                            intent.view
+                        )
+                    )
+                } else Unit
+            } else {
+                state.findPlaylist(intent.item)
+                    ?.takeIf { it.type == PlaylistDomain.PlaylistTypeDomain.PLATFORM }
+                    ?.apply { platformLauncher.launchPlaylist(platformId!!) }
+                    ?: let { publish(Label.Error(strings.playlists_error_cant_play)) }
+            }
+        }
+        // endregion
+
         // region delete/undo
-        fun performDelete(intent: Intent.Delete, state: State) {
+        private fun performDelete(intent: Intent.Delete, state: State) {
             scope.launch {
                 delay(400)
                 state.findPlaylist(intent.item)
@@ -221,18 +251,18 @@ class PlaylistsMviStoreFactory(
         // endregion
 
         // region move
-        fun moveItem(intent: Intent.Move, state: State) {
+        private fun moveItem(intent: Intent.Move, state: State) {
             dispatch(Result.SetMoveState(state.dragFrom ?: intent.fromPosition, intent.toPosition))
         }
 
-        fun clearMoveState(state: State) {
+        private fun clearMoveState(state: State) {
             if (state.dragFrom == null || state.dragTo == null) {
                 refresh()
             }
             dispatch(Result.SetMoveState(null, null))
         }
 
-        fun performMove(intent: Intent.MoveSwipe, state: State) {
+        private fun performMove(intent: Intent.MoveSwipe, state: State) {
             state.findPlaylist(intent.item)
                 ?.takeIf { it.type != PlaylistDomain.PlaylistTypeDomain.APP }
                 ?.also { movePlaylist ->
