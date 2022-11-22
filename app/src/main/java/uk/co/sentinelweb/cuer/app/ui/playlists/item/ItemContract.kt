@@ -91,15 +91,4 @@ interface ItemContract {
     data class ListState constructor(
         var presenters: MutableList<External<ItemMviContract.Model.ItemModel>> = mutableListOf()
     )
-
-    companion object {
-        const val ID_APP_HEADER = -1001L
-        const val ID_APP_LIST = -1002L
-        const val ID_RECENT_HEADER = -1003L
-        const val ID_RECENT_LIST = -1004L
-        const val ID_STARRED_HEADER = -1005L
-        const val ID_STARRED_LIST = -1006L
-        const val ID_ALL_HEADER = -1007L
-    }
-
 }

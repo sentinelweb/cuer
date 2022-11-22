@@ -9,7 +9,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
@@ -58,7 +58,7 @@ interface PlaylistsContract {
         fun showUndo(msg: String, undo: () -> Unit)
         fun showMessage(msg: String)
         fun showError(msg: String)
-        fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
+        fun showPlaylistSelector(model: PlaylistsMviDialogContract.Config)
         fun repaint()
         fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?)
         fun notifyItemRemoved(model: ItemMviContract.Model)
@@ -133,9 +133,7 @@ interface PlaylistsContract {
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 viewModel { State() }
                 scoped { PlaylistsHelpConfig(get()) }
-
             }
         }
-
     }
 }

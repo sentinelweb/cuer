@@ -7,6 +7,7 @@ import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
 import com.arkivanov.mvikotlin.extensions.coroutines.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -17,6 +18,7 @@ class PlaylistsMviController constructor(
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,
     private val store: PlaylistsMviContract.MviStore,
+    private val playlistOrchestrator: PlaylistOrchestrator,
     lifecycle: Lifecycle?,
 ) {
     init {
@@ -27,7 +29,7 @@ class PlaylistsMviController constructor(
     private val eventToIntent: suspend PlaylistsMviContract.View.Event.() -> Intent = {
         when (this) {
 //            is PlayerStateChanged -> PlayState(state)
-            else -> Intent.Load
+            else -> Intent.Empty
         }
     }
 //
@@ -66,6 +68,7 @@ class PlaylistsMviController constructor(
             // view -> store
             view.events.mapNotNull(eventToIntent) bindTo store
         }
+        playlistOrchestrator.updates.mapNotNull { Intent.Refresh } bindTo store
 //        playControls.intentFlow bindTo store
 //        // queue -> store
 //        queueConsumer.currentItemFlow

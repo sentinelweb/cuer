@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
-import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
@@ -88,8 +87,8 @@ class NavigationRouter constructor(
                     PLAY_NOW.name to (nav.params[PLAY_NOW] ?: false),
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                nav.navOpts,
-                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
+//                nav.navOpts,
+//                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
 
             PLAYLISTS -> navController?.navigate(
@@ -97,8 +96,8 @@ class NavigationRouter constructor(
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID]
                 ),
-                nav.navOpts,
-                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
+//                nav.navOpts,
+//                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
             NavigationModel.Target.PLAYLIST_ITEM -> navController?.navigate(
                 R.id.navigation_playlist_item_edit,
@@ -106,8 +105,8 @@ class NavigationRouter constructor(
                     PLAYLIST_ITEM.name to (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain).serialise(),
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                nav.navOpts,
-                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
+//                nav.navOpts,
+//                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
 
             PLAYLIST_EDIT -> navController?.navigate(
@@ -116,11 +115,12 @@ class NavigationRouter constructor(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                nav.navOpts ?: navOptions(optionsBuilder = {
+                /*nav.navOpts ?: */
+                navOptions(optionsBuilder = {
                     launchSingleTop = true
                     popUpTo(R.id.navigation_playlists, { inclusive = false })
                 }),
-                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
+//                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
 
             PLAYLIST_CREATE -> navController?.navigate(
@@ -128,11 +128,12 @@ class NavigationRouter constructor(
                 bundleOf(
                     SOURCE.name to nav.params[SOURCE].toString()
                 ),
-                nav.navOpts ?: navOptions(optionsBuilder = {
+                /*nav.navOpts ?: */
+                navOptions(optionsBuilder = {
                     launchSingleTop = true
                     popUpTo(R.id.navigation_playlists, { inclusive = false })
                 }),
-                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
+                //nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
 
             SHARE -> nav.getParam<String>(LINK)

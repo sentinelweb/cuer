@@ -30,8 +30,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LO
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
@@ -269,7 +269,7 @@ class PlaylistPresenter(
 
     private fun showPlaylistSelector() {
         view.showPlaylistSelector(
-            PlaylistsDialogContract.Config(
+            PlaylistsMviDialogContract.Config(
                 res.getString(R.string.playlist_dialog_title),
                 selectedPlaylists = setOf(state.playlist!!),
                 multi = true,

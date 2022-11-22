@@ -16,7 +16,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config) :
+class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Config) :
     DialogFragment(),
     PlaylistsDialogContract.View,
     ItemContract.Interactions,
@@ -162,7 +162,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     companion object {
 
-        fun newInstance(config: PlaylistsDialogContract.Config): PlaylistsDialogFragment {
+        fun newInstance(config: PlaylistsMviDialogContract.Config): PlaylistsDialogFragment {
             return PlaylistsDialogFragment(config)
         }
 

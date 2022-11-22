@@ -30,8 +30,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -270,7 +270,7 @@ class PlaylistItemEditViewModel constructor(
 
     override fun onSelectPlaylistChipClick(model: ChipModel) {
         _dialogModelLiveData.value =
-            PlaylistsDialogContract.Config(
+            PlaylistsMviDialogContract.Config(
                 res.getString(R.string.playlist_dialog_title),
                 state.selectedPlaylists,
                 true,

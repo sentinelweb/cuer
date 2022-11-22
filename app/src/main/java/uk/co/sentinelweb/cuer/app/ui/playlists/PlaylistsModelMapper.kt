@@ -4,11 +4,11 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Companion.ID_ALL_HEADER
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Companion.ID_APP_HEADER
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Companion.ID_APP_LIST
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Companion.ID_RECENT_LIST
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Companion.ID_STARRED_LIST
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_ALL_HEADER
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_APP_HEADER
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_APP_LIST
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_RECENT_LIST
+import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_STARRED_LIST
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP

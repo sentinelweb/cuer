@@ -31,15 +31,14 @@ import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.scaleDrawableLeftSize
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.*
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageDialogFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -339,7 +338,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         //dialog?.dismiss() // removed 278
         hideDialogFragment()
         when (model) {
-            is PlaylistsDialogContract.Config -> {
+            is PlaylistsMviDialogContract.Config -> {
                 dialogFragment =
                     PlaylistsDialogFragment.newInstance(model)
                 dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())

@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
@@ -95,7 +95,7 @@ interface PlaylistContract {
         fun showUndo(msg: String, undoFunction: () -> Unit)
         fun highlightPlayingItem(currentItemIndex: Int?)
         fun setSubTitle(subtitle: String)
-        fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
+        fun showPlaylistSelector(model: PlaylistsMviDialogContract.Config)
         fun showPlaylistCreateDialog()
         fun showAlertDialog(model: AlertDialogModel)
         fun resetItemsState()

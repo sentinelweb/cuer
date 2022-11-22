@@ -26,11 +26,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel.Type.STAR
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel.Type.UNSTAR
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
@@ -38,8 +36,8 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
@@ -333,7 +331,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         when (model.type) {
             DialogModel.Type.PLAYLIST_FULL -> {
                 dialogFragment =
-                    PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+                    PlaylistsDialogFragment.newInstance(model as PlaylistsMviDialogContract.Config)
                 dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
             }
 

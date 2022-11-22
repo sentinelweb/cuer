@@ -21,7 +21,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -102,7 +102,7 @@ class PlaylistsPresenter(
                 findPlaylist(item)
                     ?.also { movePlaylist ->
                         view.showPlaylistSelector(
-                            PlaylistsDialogContract.Config(
+                            PlaylistsMviDialogContract.Config(
                                 title = res.getString(R.string.playlist_dialog_title),
                                 selectedPlaylists = setOf(),
                                 multi = true,
@@ -271,7 +271,7 @@ class PlaylistsPresenter(
             ?.apply {
                 findPlaylist(item)?.also { delPlaylist ->
                     view.showPlaylistSelector(
-                        PlaylistsDialogContract.Config(
+                        PlaylistsMviDialogContract.Config(
                             title = res.getString(R.string.playlist_dialog_title),
                             selectedPlaylists = setOf(),
                             multi = true,

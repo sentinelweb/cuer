@@ -4,16 +4,13 @@ import androidx.lifecycle.ViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
@@ -26,7 +23,7 @@ interface PlaylistsDialogContract {
         fun onItemClicked(item: ItemMviContract.Model)
         fun onResume()
         fun onPause()
-        fun setConfig(config: Config)
+        fun setConfig(config: PlaylistsMviDialogContract.Config)
         fun onAddPlaylist()
         fun onDismiss()
         fun onPinSelectedPlaylist(b: Boolean)
@@ -38,19 +35,6 @@ interface PlaylistsDialogContract {
         fun updateDialogModel(model: Model)
     }
 
-    data class Config(
-        override val title: String,
-        val selectedPlaylists: Set<PlaylistDomain>,
-        val multi: Boolean,
-        val itemClick: (PlaylistDomain?, Boolean) -> Unit,
-        val confirm: (() -> Unit)?,
-        val dismiss: () -> Unit,
-        val suggestionsMedia: MediaDomain? = null,
-        val showAdd: Boolean = true,
-        val showPin: Boolean = true,
-        val showRoot: Boolean = false
-    ) : DialogModel(Type.PLAYLIST_FULL, title)// R.string.playlist_dialog_title
-
     data class State(
         var playlists: List<PlaylistDomain> = listOf(),
         var dragFrom: Int? = null,
@@ -60,7 +44,7 @@ interface PlaylistsDialogContract {
         var pinWhenSelected: Boolean = false,
         var playlistsModel: PlaylistsContract.Model? = null
     ) : ViewModel() {
-        lateinit var config: Config
+        lateinit var config: PlaylistsMviDialogContract.Config
         lateinit var treeRoot: PlaylistTreeDomain
     }
 

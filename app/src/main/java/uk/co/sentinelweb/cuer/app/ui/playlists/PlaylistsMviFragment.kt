@@ -13,6 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
+import com.arkivanov.essenty.lifecycle.essentyLifecycle
+import com.arkivanov.mvikotlin.core.view.BaseMviView
+import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
@@ -20,7 +24,9 @@ import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
+import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
@@ -30,33 +36,57 @@ import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.getLong
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Label
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Event
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class PlaylistsFragment :
+class PlaylistsMviFragment :
     Fragment(),
-    PlaylistsContract.View,
     ItemContract.Interactions,
     ItemBaseContract.ItemMoveInteractions,
     AndroidScopeComponent {
+    // todo inject?
+    inner class ViewProxy : BaseMviView<Model, Event>(), PlaylistsMviContract.View {
+        override fun processLabel(label: Label) = when (label) {
+            is Label.Error -> showError(msg = label.message)
+            is Label.Message -> showMessage(msg = label.message)
+            Label.Repaint -> repaint()
+            is Label.ShowUndo -> showUndo(msg = label.message, undoType = label.undoType)
+            is Label.ShowPlaylistsSelector -> showPlaylistSelector(config = label.config)
+            is Label.Navigate -> navigate(nav = label.model, null)
+            is Label.ItemRemoved -> notifyItemRemoved(label.model)
+        }
 
-    override val scope: Scope by fragmentScopeWithSource<PlaylistsFragment>()
-    private val presenter: PlaylistsContract.Presenter by inject()
+        override fun render(model: Model) {
+            setList(model) // todo optimise?
+        }
+    }
+
+    private val viewProxy: ViewProxy = ViewProxy()
+
+    override val scope: Scope by fragmentScopeWithSource<PlaylistsMviFragment>()
+
+    //private val presenter: PlaylistsContract.Presenter by inject()
+    private val controller: PlaylistsMviController by inject()
     private val adapter: PlaylistsAdapter
         get() = _adapter ?: throw IllegalStateException("FragmentPlaylistEditBinding not bound")
     private var _adapter: PlaylistsAdapter? = null
@@ -66,7 +96,8 @@ class PlaylistsFragment :
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
-    private val res: ResourceWrapper by inject()
+
+    //    private val res: ResourceWrapper by inject()
     private val playlistsHelpConfig: PlaylistsHelpConfig by inject()
 
     private var _binding: FragmentPlaylistsBinding? = null
@@ -125,7 +156,7 @@ class PlaylistsFragment :
             )
         )
         compactPlayerScroll.addScrollListener(binding.playlistsList, this)
-        binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
+        binding.playlistsSwipe.setOnRefreshListener { viewProxy.dispatch(Event.OnRefresh) }
         binding.playlistsSwipe.isRefreshing = true
         binding.playlistsAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
@@ -147,7 +178,7 @@ class PlaylistsFragment :
                 }
             }
         })
-
+        controller.onViewCreated(listOf(viewProxy), viewLifecycleOwner.essentyLifecycle())
         postponeEnterTransition()
         binding.playlistsList.doOnPreDraw {
             startPostponedEnterTransition()
@@ -168,7 +199,8 @@ class PlaylistsFragment :
             true
         }
         addMenuItem.setOnMenuItemClickListener {
-            presenter.onCreatePlaylist()
+            //presenter.onCreatePlaylist()
+            viewProxy.dispatch(Event.OnCreatePlaylist)
             true
         }
         helpMenuItem.setOnMenuItemClickListener {
@@ -186,12 +218,13 @@ class PlaylistsFragment :
     override fun onResume() {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-        presenter.onResume(PLAYLIST_ID.getLong(arguments))
+        //presenter.onResume(PLAYLIST_ID.getLong(arguments))
+        viewProxy.dispatch(Event.OnRefresh)
     }
 
     override fun onPause() {
         super.onPause()
-        presenter.onPause()
+        //presenter.onPause()
     }
 
     override fun onStop() {
@@ -209,7 +242,7 @@ class PlaylistsFragment :
     // endregion
 
     // region PlaylistContract.View
-    override fun setList(model: PlaylistsContract.Model, animate: Boolean) {
+    private fun setList(model: Model) {
         Glide.with(requireContext())
             .loadFirebaseOrOtherUrl(model.imageUrl, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
@@ -217,75 +250,52 @@ class PlaylistsFragment :
         binding.playlistsSwipe.isRefreshing = false
         binding.playlistsItems.text = "${model.items.size}"
         adapter.currentPlaylistId = model.currentPlaylistId
-        adapter.setData(model.items, animate)
-        binding.playlistsSwipe.setOnRefreshListener { presenter.refreshList() }
+        adapter.setData(model.items, false)
+        binding.playlistsSwipe.setOnRefreshListener { viewProxy.dispatch(Event.OnRefresh) }
         binding.playlistsCollapsingToolbar.title = model.title
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun repaint() {
+    private fun repaint() {
         adapter.notifyDataSetChanged()
     }
 
-    override fun showUndo(msg: String, undo: () -> Unit) {
+    private fun showUndo(msg: String, undoType: PlaylistsMviContract.UndoType) {
         snackbar?.dismiss()
         snackbar = snackbarWrapper.make(msg, length = Snackbar.LENGTH_LONG, actionText = "UNDO") {
-            undo()
+            viewProxy.dispatch(Event.OnUndo(undoType))
             snackbar?.dismiss()
         }
         snackbar?.show()
     }
 
-    override fun showMessage(msg: String) {
+    private fun showMessage(msg: String) {
         snackbar?.dismiss()
         snackbar = snackbarWrapper.make(msg, length = Snackbar.LENGTH_LONG)
             .apply { show() }
     }
 
-    override fun showError(msg: String) {
+    private fun showError(msg: String) {
         snackbar?.dismiss()
         snackbar = snackbarWrapper.makeError(msg)
         snackbar?.show()
     }
 
-//    override fun gotoPlaylist(id: Long, play: Boolean, source: Source) {
-//        PlaylistsFragmentDirections.actionGotoPlaylist(id, play, source.toString())
-//            .apply { findNavController().navigate(this) }
-//
-//    }
-//
-//    override fun gotoEdit(id: Long, source: Source) {
-//        PlaylistsFragmentDirections.actionEditPlaylist(id, source.toString())
-//            .apply { findNavController().navigate(this) }
+//    override fun hideRefresh() {
+//        binding.playlistsSwipe.isRefreshing = false
 //    }
 
-    override fun scrollToItem(index: Int) {
-        (binding.playlistsList.layoutManager as LinearLayoutManager).run {
-            val useIndex = if (index > 0 && index < adapter.data.size) {
-                index
-            } else 0
-
-            if (index !in this.findFirstCompletelyVisibleItemPosition()..this.findLastCompletelyVisibleItemPosition()) {
-                binding.playlistsList.scrollToPosition(useIndex)
-            }
-        }
-    }
-
-    override fun hideRefresh() {
-        binding.playlistsSwipe.isRefreshing = false
-    }
-
-    override fun showPlaylistSelector(model: PlaylistsMviDialogContract.Config) {
+    private fun showPlaylistSelector(config: PlaylistsMviDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()
-        dialogFragment = PlaylistsDialogFragment.newInstance(model)
+        dialogFragment = PlaylistsDialogFragment.newInstance(config)
         dialogFragment?.show(childFragmentManager, "PlaylistsSelector")
     }
 
-    override fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?) {
+    private fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?) {
         when (nav.target) {
             NavigationModel.Target.PLAYLIST ->
                 sourceView?.let { view ->
-                    PlaylistsFragmentDirections.actionGotoPlaylist(
+                    PlaylistsMviFragmentDirections.actionGotoPlaylist(
                         (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
                         nav.params[IMAGE_URL] as String?,
                         nav.params[PLAYLIST_ID] as Long,
@@ -296,7 +306,7 @@ class PlaylistsFragment :
 
             NavigationModel.Target.PLAYLIST_EDIT ->
                 sourceView?.let { view ->
-                    PlaylistsFragmentDirections.actionEditPlaylist(
+                    PlaylistsMviFragmentDirections.actionEditPlaylist(
                         (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
                         nav.params[IMAGE_URL] as String?,
                         nav.params[PLAYLIST_ID] as Long,
@@ -308,33 +318,41 @@ class PlaylistsFragment :
         }
     }
 
+    /*override*/ fun notifyItemRemoved(model: ItemMviContract.Model) {
+        adapter.notifyItemRemoved(adapter.data.indexOf(model))
+    }
     //endregion
 
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-        presenter.moveItem(fromPosition, toPosition)
+//        presenter.moveItem(fromPosition, toPosition)
+        viewProxy.dispatch(Event.OnMove(fromPosition, toPosition))
         // shows the move while dragging
         adapter.notifyItemMoved(fromPosition, toPosition)
         return true
     }
 
     override fun onItemClear() {
-        presenter.commitMove()
+        viewProxy.dispatch(Event.OnCommitMove)
+//        presenter.commitMove()
     }
     //endregion
 
     // region ItemContract.Interactions
     override fun onClick(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        presenter.performOpen(item, sourceView)
+        //presenter.performOpen(item, sourceView)
+        viewProxy.dispatch(Event.OnOpenPlaylist(item))
     }
 
     override fun onRightSwipe(item: ItemMviContract.Model) {
-        presenter.performMove(item)
+        // presenter.performMove(item)
+        viewProxy.dispatch(Event.OnMoveSwipe(item))
     }
 
     override fun onLeftSwipe(item: ItemMviContract.Model) {
         adapter.notifyItemRemoved(adapter.data.indexOf(item))
-        presenter.performDelete(item) // delays for animation
+        // presenter.performDelete(item) // delays for animation
+        viewProxy.dispatch(Event.OnDelete(item))
     }
 
     override fun onPlay(
@@ -342,35 +360,127 @@ class PlaylistsFragment :
         external: Boolean,
         sourceView: ItemContract.ItemView
     ) {
-        presenter.performPlay(item, external, sourceView)
+        //presenter.performPlay(item, external, sourceView)
+        viewProxy.dispatch(Event.OnPlay(item, external))
     }
 
     override fun onStar(item: ItemMviContract.Model) {
-        presenter.performStar(item)
+        //presenter.performStar(item)
+        viewProxy.dispatch(Event.OnStar(item))
     }
 
     override fun onShare(item: ItemMviContract.Model) {
-        presenter.performShare(item)
+        //presenter.performShare(item)
+        viewProxy.dispatch(Event.OnShare(item))
     }
 
     override fun onMerge(item: ItemMviContract.Model) {
-        presenter.performMerge(item)
+        //presenter.performMerge(item)
+        viewProxy.dispatch(Event.OnMerge(item))
     }
 
     override fun onImageClick(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        presenter.onItemImageClicked(item, sourceView)
+        //presenter.onItemImageClicked(item, sourceView)
+        viewProxy.dispatch(Event.OnOpenPlaylist(item))
     }
 
     override fun onEdit(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        presenter.performEdit(item, sourceView)
+        //presenter.performEdit(item, sourceView)
+        viewProxy.dispatch(Event.OnEdit(item))
     }
 
     override fun onDelete(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        presenter.performDelete(item) // delays for animation
-    }
-
-    override fun notifyItemRemoved(model: ItemMviContract.Model) {
-        adapter.notifyItemRemoved(adapter.data.indexOf(model))
+        // presenter.performDelete(item) // delays for animation
+        viewProxy.dispatch(Event.OnDelete(item))
     }
     //endregion
+
+    class PlaylistsMviStrings(private val rw: ResourceWrapper) : PlaylistsMviContract.Strings {
+        override val playlists_section_app: String
+            get() = rw.getString(R.string.playlists_section_app)
+        override val playlists_section_recent: String
+            get() = rw.getString(R.string.playlists_section_recent)
+        override val playlists_section_starred: String
+            get() = rw.getString(R.string.playlists_section_starred)
+        override val playlists_section_all: String
+            get() = rw.getString(R.string.playlists_section_all)
+
+    }
+
+    companion object {
+        val fragmentModule = module {
+            scope(named<PlaylistsMviFragment>()) {
+//                scoped<PlaylistsContract.Presenter> {
+//                    PlaylistsPresenter(
+//                        view = get(),
+//                        state = get(),
+//                        playlistOrchestrator = get(),
+//                        playlistStatsOrchestrator = get(),
+//                        modelMapper = get(),
+//                        queue = get(),
+//                        log = get(),
+//                        toastWrapper = get(),
+//                        prefsWrapper = get(),
+//                        coroutines = get(),
+//                        newMedia = get(),
+//                        recentItems = get(),
+//                        localSearch = get(),
+//                        remoteSearch = get(),
+//                        ytJavaApi = get(),
+//                        searchMapper = get(),
+//                        merge = get(),
+//                        shareWrapper = get(),
+//                        recentLocalPlaylists = get(),
+//                        starredItems = get(),
+//                        unfinishedItems = get(),
+//                        res = get(),
+//                    )
+//                }
+                scoped {
+                    PlaylistsMviController(
+                        store = get(),
+                        modelMapper = get(),
+                        lifecycle = get<PlaylistsMviFragment>().lifecycle.asEssentyLifecycle(),
+                        log = get(),
+                        playlistOrchestrator = get(),
+                        coroutines = get()
+                    )
+                }
+                scoped {
+                    PlaylistsMviStoreFactory(
+                        // fixme circular ref in playlistTreeDomain toString
+//                        storeFactory = LoggingStoreFactory(DefaultStoreFactory()),
+                        storeFactory = DefaultStoreFactory(),
+                        playlistOrchestrator = get(),
+                        playlistStatsOrchestrator = get(),
+                        coroutines = get(),
+                        log = get(),
+                        prefsWrapper = get(),
+                        newMedia = get(),
+                        recentItems = get(),
+                        localSearch = get(),
+                        remoteSearch = get(),
+                        recentLocalPlaylists = get(),
+                        starredItems = get(),
+                        unfinishedItems = get(),
+                    ).create()
+                }
+                scoped<PlaylistsMviContract.Strings> { PlaylistsMviStrings(get()) }
+                scoped { PlaylistsMviModelMapper(get()) }
+                scoped<SnackbarWrapper> {
+                    AndroidSnackbarWrapper(
+                        this.getFragmentActivity(),
+                        get()
+                    )
+                }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped { ShareWrapper(this.getFragmentActivity()) }
+                scoped { ItemFactory(get()) }
+                scoped { ItemModelMapper(get(), get()) }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
+//                viewModel { PlaylistsContract.State() }
+                scoped { PlaylistsHelpConfig(get()) }
+            }
+        }
+    }
 }
