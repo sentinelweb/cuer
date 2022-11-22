@@ -1,13 +1,13 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_ALL_HEADER
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_APP_HEADER
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_APP_LIST
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_RECENT_HEADER
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_RECENT_LIST
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_STARRED_HEADER
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Companion.ID_STARRED_LIST
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_ALL_HEADER
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_APP_HEADER
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_APP_LIST
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_RECENT_HEADER
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_RECENT_LIST
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_STARRED_HEADER
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_STARRED_LIST
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -39,41 +39,41 @@ class PlaylistsMviModelMapper(
         recentPlaylists: List<OrchestratorContract.Identifier<Long>>,
         pinnedId: Long?,
         root: PlaylistTreeDomain
-    ): List<ItemMviContract.Model> {
+    ): List<PlaylistsItemMviContract.Model> {
         val starred = buildStarredList(domains)
         val recent = buildRecentList(domains, recentPlaylists)
         val list = mutableListOf(
 
-            ItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.HeaderModel(
                 ID_APP_HEADER,
                 strings.playlists_section_app
             ),
-            ItemMviContract.Model.ListModel(
+            PlaylistsItemMviContract.Model.ListModel(
                 ID_APP_LIST,
                 appPlaylists.keys.map {
                     itemModel(it, it.id == pinnedId, appPlaylists[it], 0)
                 }),
 
-            ItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.HeaderModel(
                 ID_RECENT_HEADER,
                 strings.playlists_section_recent
             ),
-            ItemMviContract.Model.ListModel(ID_RECENT_LIST,
+            PlaylistsItemMviContract.Model.ListModel(ID_RECENT_LIST,
                 recent.map {
                     itemModel(it, it.id == pinnedId, domains[it], 0)
                 }),
 
-            ItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.HeaderModel(
                 ID_STARRED_HEADER,
                 strings.playlists_section_starred
             ),
-            ItemMviContract.Model.ListModel(
+            PlaylistsItemMviContract.Model.ListModel(
                 ID_STARRED_LIST,
                 starred.map {
                     itemModel(it, it.id == pinnedId, domains[it], 0)
                 }),
 
-            ItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.HeaderModel(
                 ID_ALL_HEADER,
                 strings.playlists_section_all
             ),
@@ -109,7 +109,7 @@ class PlaylistsMviModelMapper(
         pinned: Boolean,
         playlistStatDomain: PlaylistStatDomain?,
         depth: Int
-    ) = ItemMviContract.Model.ItemModel(
+    ) = PlaylistsItemMviContract.Model.ItemModel(
         pl.id ?: throw Exception("Playlist must have an id"),
         pl.title.capitalize(),
         false,

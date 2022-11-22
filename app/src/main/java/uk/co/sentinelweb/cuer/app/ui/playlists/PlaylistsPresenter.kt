@@ -95,7 +95,7 @@ class PlaylistsPresenter(
         coroutines.cancel()
     }
 
-    override fun performMove(item: ItemMviContract.Model) {
+    override fun performMove(item: PlaylistsItemMviContract.Model) {
         findPlaylist(item)
             ?.takeIf { it.type != APP }
             ?.apply {
@@ -136,7 +136,7 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun performDelete(item: ItemMviContract.Model) {
+    override fun performDelete(item: PlaylistsItemMviContract.Model) {
         state.viewModelScope.launch {
             delay(400)
             findPlaylist(item)
@@ -182,8 +182,8 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun performOpen(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        if (item is ItemMviContract.Model.ItemModel) {
+    override fun performOpen(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
+        if (item is PlaylistsItemMviContract.Model.ItemModel) {
             recentLocalPlaylists.addRecentId(item.id)
             prefsWrapper.lastBottomTab = MainContract.LastTab.PLAYLIST.ordinal
             view.navigate(
@@ -195,9 +195,9 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onItemImageClicked(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onItemImageClicked(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         findPlaylist(item)?.id?.apply {
-            if (item is ItemMviContract.Model.ItemModel) {
+            if (item is PlaylistsItemMviContract.Model.ItemModel) {
                 view.navigate(
                     PlaylistContract.makeNav(
                         this, null, false, item.source,
@@ -209,12 +209,12 @@ class PlaylistsPresenter(
     }
 
     override fun performPlay(
-        item: ItemMviContract.Model,
+        item: PlaylistsItemMviContract.Model,
         external: Boolean,
         sourceView: ItemContract.ItemView
     ) {
         if (!external) {
-            if (item is ItemMviContract.Model.ItemModel) {
+            if (item is PlaylistsItemMviContract.Model.ItemModel) {
                 view.navigate(
                     PlaylistContract.makeNav(
                         item.id, null, true, item.source,
@@ -230,7 +230,7 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun performStar(item: ItemMviContract.Model) {
+    override fun performStar(item: PlaylistsItemMviContract.Model) {
         state.viewModelScope.launch {
             findPlaylist(item)
                 ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 }
@@ -239,7 +239,7 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun performShare(item: ItemMviContract.Model) {
+    override fun performShare(item: PlaylistsItemMviContract.Model) {
         findPlaylist(item)
             ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 && it.type != APP }
             ?.let { itemDomain ->
@@ -251,12 +251,12 @@ class PlaylistsPresenter(
             }
     }
 
-    override fun performEdit(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
+    override fun performEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         view.navigate(
             PlaylistEditContract.makeNav(
                 item.id,
                 LOCAL,
-                (item as ItemMviContract.Model.ItemModel).thumbNailUrl
+                (item as PlaylistsItemMviContract.Model.ItemModel).thumbNailUrl
             ), sourceView
         )
     }
@@ -265,7 +265,7 @@ class PlaylistsPresenter(
         view.navigate(PlaylistEditContract.makeCreateNav(LOCAL), null)
     }
 
-    override fun performMerge(item: ItemMviContract.Model) {
+    override fun performMerge(item: PlaylistsItemMviContract.Model) {
         findPlaylist(item)
             ?.takeIf { it.type != APP }
             ?.apply {
@@ -369,6 +369,6 @@ class PlaylistsPresenter(
         }
     }
 
-    private fun findPlaylist(item: ItemMviContract.Model) = state.playlists.find { it.id == item.id }
+    private fun findPlaylist(item: PlaylistsItemMviContract.Model) = state.playlists.find { it.id == item.id }
 
 }

@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
@@ -29,12 +28,10 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsBinding
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
@@ -66,6 +63,10 @@ class PlaylistsMviFragment :
     AndroidScopeComponent {
     // todo inject?
     inner class ViewProxy : BaseMviView<Model, Event>(), PlaylistsMviContract.View {
+        init {
+            log.d("ViewProxy created")
+        }
+
         override fun processLabel(label: Label) = when (label) {
             is Label.Error -> showError(msg = label.message)
             is Label.Message -> showMessage(msg = label.message)
@@ -74,19 +75,20 @@ class PlaylistsMviFragment :
             is Label.ShowPlaylistsSelector -> showPlaylistSelector(config = label.config)
             is Label.Navigate -> navigate(nav = label.model, null)
             is Label.ItemRemoved -> notifyItemRemoved(label.model)
-        }
+        }.also { log.d(label.toString()) }
 
         override fun render(model: Model) {
             setList(model) // todo optimise?
         }
     }
 
-    private val viewProxy: ViewProxy = ViewProxy()
+    private lateinit var viewProxy: ViewProxy
 
     override val scope: Scope by fragmentScopeWithSource<PlaylistsMviFragment>()
 
     //private val presenter: PlaylistsContract.Presenter by inject()
-    private val controller: PlaylistsMviController by inject()
+    //private val controller: PlaylistsMviController by inject()
+    private lateinit var controller: PlaylistsMviController
     private val adapter: PlaylistsAdapter
         get() = _adapter ?: throw IllegalStateException("FragmentPlaylistEditBinding not bound")
     private var _adapter: PlaylistsAdapter? = null
@@ -97,7 +99,7 @@ class PlaylistsMviFragment :
     private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
-    //    private val res: ResourceWrapper by inject()
+    // private val res: ResourceWrapper by inject()
     private val playlistsHelpConfig: PlaylistsHelpConfig by inject()
 
     private var _binding: FragmentPlaylistsBinding? = null
@@ -121,6 +123,18 @@ class PlaylistsMviFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        // todo check this is ok
+        // in sample controller is re-created in every onCreate
+        // https://github.com/arkivanov/MVIKotlin/blob/master/sample/coroutines/app-android/src/main/java/com/arkivanov/mvikotlin/sample/coroutines/app/details/DetailsFragment.kt
+        controller = PlaylistsMviController(
+            store = get(),
+            modelMapper = get(),
+            lifecycle = get<PlaylistsMviFragment>().lifecycle.asEssentyLifecycle(),
+            log = get(),
+            playlistOrchestrator = get(),
+            coroutines = get()
+        )
+        log.d("onCreate()")
         sharedElementReturnTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
     }
@@ -130,6 +144,7 @@ class PlaylistsMviFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        log.d("onCreateView()")
         _binding = FragmentPlaylistsBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -137,6 +152,7 @@ class PlaylistsMviFragment :
     // region Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        log.d("onViewCreated()")
         _adapter = PlaylistsAdapter(get(), this)
         binding.playlistsToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
@@ -178,7 +194,9 @@ class PlaylistsMviFragment :
                 }
             }
         })
+        viewProxy = ViewProxy()
         controller.onViewCreated(listOf(viewProxy), viewLifecycleOwner.essentyLifecycle())
+
         postponeEnterTransition()
         binding.playlistsList.doOnPreDraw {
             startPostponedEnterTransition()
@@ -212,6 +230,7 @@ class PlaylistsMviFragment :
 
     override fun onStart() {
         super.onStart()
+        log.d("onStart()")
         compactPlayerScroll.raisePlayer(this)
     }
 
@@ -220,16 +239,19 @@ class PlaylistsMviFragment :
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         //presenter.onResume(PLAYLIST_ID.getLong(arguments))
         viewProxy.dispatch(Event.OnRefresh)
+        log.d("onResume()")
     }
 
     override fun onPause() {
         super.onPause()
         //presenter.onPause()
+        log.d("onStop()")
     }
 
     override fun onStop() {
         super.onStop()
         dialogFragment?.dismissAllowingStateLoss()
+        log.d("onStop()")
     }
 
     override fun onDestroyView() {
@@ -238,6 +260,14 @@ class PlaylistsMviFragment :
         snackbar = null
         _adapter = null
         dialogFragment = null
+        controller.onViewDestroyed()
+        log.d("onDestroyView()")
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        log.d("onDestroy()")
     }
     // endregion
 
@@ -293,32 +323,33 @@ class PlaylistsMviFragment :
 
     private fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?) {
         when (nav.target) {
-            NavigationModel.Target.PLAYLIST ->
-                sourceView?.let { view ->
-                    PlaylistsMviFragmentDirections.actionGotoPlaylist(
-                        (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
-                        nav.params[IMAGE_URL] as String?,
-                        nav.params[PLAYLIST_ID] as Long,
-                        nav.params[PLAY_NOW] as Boolean,
-                    )
-                        .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
-                }
-
-            NavigationModel.Target.PLAYLIST_EDIT ->
-                sourceView?.let { view ->
-                    PlaylistsMviFragmentDirections.actionEditPlaylist(
-                        (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
-                        nav.params[IMAGE_URL] as String?,
-                        nav.params[PLAYLIST_ID] as Long,
-                    )
-                        .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
-                }
+            // todo fix tansitions
+//            NavigationModel.Target.PLAYLIST ->
+//                sourceView?.let { view ->
+//                    PlaylistsMviFragmentDirections.actionGotoPlaylist(
+//                        (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
+//                        nav.params[IMAGE_URL] as String?,
+//                        nav.params[PLAYLIST_ID] as Long,
+//                        nav.params[PLAY_NOW] as Boolean,
+//                    )
+//                        .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
+//                }
+//
+//            NavigationModel.Target.PLAYLIST_EDIT ->
+//                sourceView?.let { view ->
+//                    PlaylistsMviFragmentDirections.actionEditPlaylist(
+//                        (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
+//                        nav.params[IMAGE_URL] as String?,
+//                        nav.params[PLAYLIST_ID] as Long,
+//                    )
+//                        .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
+//                }
 
             else -> navRouter.navigate(nav)
         }
     }
 
-    /*override*/ fun notifyItemRemoved(model: ItemMviContract.Model) {
+    /*override*/ fun notifyItemRemoved(model: PlaylistsItemMviContract.Model) {
         adapter.notifyItemRemoved(adapter.data.indexOf(model))
     }
     //endregion
@@ -339,24 +370,24 @@ class PlaylistsMviFragment :
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onClick(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         //presenter.performOpen(item, sourceView)
         viewProxy.dispatch(Event.OnOpenPlaylist(item))
     }
 
-    override fun onRightSwipe(item: ItemMviContract.Model) {
+    override fun onRightSwipe(item: PlaylistsItemMviContract.Model) {
         // presenter.performMove(item)
         viewProxy.dispatch(Event.OnMoveSwipe(item))
     }
 
-    override fun onLeftSwipe(item: ItemMviContract.Model) {
+    override fun onLeftSwipe(item: PlaylistsItemMviContract.Model) {
         adapter.notifyItemRemoved(adapter.data.indexOf(item))
         // presenter.performDelete(item) // delays for animation
         viewProxy.dispatch(Event.OnDelete(item))
     }
 
     override fun onPlay(
-        item: ItemMviContract.Model,
+        item: PlaylistsItemMviContract.Model,
         external: Boolean,
         sourceView: ItemContract.ItemView
     ) {
@@ -364,32 +395,32 @@ class PlaylistsMviFragment :
         viewProxy.dispatch(Event.OnPlay(item, external))
     }
 
-    override fun onStar(item: ItemMviContract.Model) {
+    override fun onStar(item: PlaylistsItemMviContract.Model) {
         //presenter.performStar(item)
         viewProxy.dispatch(Event.OnStar(item))
     }
 
-    override fun onShare(item: ItemMviContract.Model) {
+    override fun onShare(item: PlaylistsItemMviContract.Model) {
         //presenter.performShare(item)
         viewProxy.dispatch(Event.OnShare(item))
     }
 
-    override fun onMerge(item: ItemMviContract.Model) {
+    override fun onMerge(item: PlaylistsItemMviContract.Model) {
         //presenter.performMerge(item)
         viewProxy.dispatch(Event.OnMerge(item))
     }
 
-    override fun onImageClick(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onImageClick(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         //presenter.onItemImageClicked(item, sourceView)
         viewProxy.dispatch(Event.OnOpenPlaylist(item))
     }
 
-    override fun onEdit(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         //presenter.performEdit(item, sourceView)
         viewProxy.dispatch(Event.OnEdit(item))
     }
 
-    override fun onDelete(item: ItemMviContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onDelete(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         // presenter.performDelete(item) // delays for animation
         viewProxy.dispatch(Event.OnDelete(item))
     }

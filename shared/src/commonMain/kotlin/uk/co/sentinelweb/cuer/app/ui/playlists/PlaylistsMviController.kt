@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Intent
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Event
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -23,13 +24,28 @@ class PlaylistsMviController constructor(
 ) {
     init {
         log.tag(this)
-        lifecycle?.doOnDestroy { store.dispose() }
+        log.d("init")
+        lifecycle?.doOnDestroy {
+            log.d("dispose onDestroy")
+            store.dispose()
+        }
     }
 
-    private val eventToIntent: suspend PlaylistsMviContract.View.Event.() -> Intent = {
+    private val eventToIntent: suspend Event.() -> Intent = {
         when (this) {
-//            is PlayerStateChanged -> PlayState(state)
-            else -> Intent.Empty
+            Event.OnCommitMove -> Intent.CommitMove
+            Event.OnCreatePlaylist -> Intent.CreatePlaylist
+            is Event.OnDelete -> Intent.Delete(item)
+            is Event.OnEdit -> Intent.Edit(item)
+            is Event.OnMerge -> Intent.Merge(item)
+            is Event.OnMove -> Intent.Move(fromPosition, toPosition)
+            is Event.OnMoveSwipe -> Intent.MoveSwipe(item)
+            is Event.OnOpenPlaylist -> Intent.OpenPlaylist(item)
+            is Event.OnPlay -> Intent.Play(item, external)
+            Event.OnRefresh -> Intent.Refresh
+            is Event.OnShare -> Intent.Share(item)
+            is Event.OnStar -> Intent.Star(item)
+            is Event.OnUndo -> Intent.Undo(undoType)
         }
     }
 //
@@ -44,14 +60,6 @@ class PlaylistsMviController constructor(
     private var binder: Binder? = null
 
     @ExperimentalCoroutinesApi
-    fun onViewCreated(views: List<PlaylistsMviContract.View>) {
-        if (binder != null) throw IllegalStateException("Already bound")
-        binder = bind(coroutines.Main) {
-            bindTheThings(views)
-        }
-    }
-
-    @ExperimentalCoroutinesApi
     fun onViewCreated(views: List<PlaylistsMviContract.View>, viewLifecycle: Lifecycle) {
         if (binder != null) throw IllegalStateException("Already bound")
         binder = bind(viewLifecycle, BinderLifecycleMode.START_STOP) {
@@ -60,6 +68,7 @@ class PlaylistsMviController constructor(
     }
 
     private fun BindingsBuilder.bindTheThings(views: List<PlaylistsMviContract.View>) {
+        log.d("bind onViewCreated")
         views.forEach { view ->
             // store -> view
             store.states.mapNotNull { modelMapper.map(it) } bindTo view
@@ -79,20 +88,8 @@ class PlaylistsMviController constructor(
 //            .mapNotNull { playlistChangeToIntent(it) } bindTo store
     }
 
-    fun onStart() {
-        binder?.start()
-    }
-
-    fun onStop() {
-        binder?.stop()
-    }
-
     fun onViewDestroyed() {
+        log.d("onViewDestroyed")
         binder = null
     }
-
-    fun onDestroy() {
-        store.dispose()
-    }
 }
-

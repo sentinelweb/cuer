@@ -5,9 +5,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.HeaderModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ROOT_PLAYLIST_DUMMY
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Model
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract.Model.HeaderModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP

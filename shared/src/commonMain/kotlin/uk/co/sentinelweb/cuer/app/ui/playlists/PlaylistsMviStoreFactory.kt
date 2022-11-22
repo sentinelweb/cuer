@@ -13,7 +13,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_CREATE
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.*
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Label.Navigate
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviStoreFactory.Action.Init
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
@@ -99,15 +105,31 @@ class PlaylistsMviStoreFactory(
 
         override fun executeAction(action: Action, getState: () -> State) =
             when (action) {
-                Init -> initialize()
+                Init -> refresh()
             }
 
         override fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
+                Intent.Refresh -> refresh()
+                Intent.CreatePlaylist ->
+                    publish(Navigate(NavigationModel(PLAYLIST_CREATE, mapOf(SOURCE to LOCAL))))
+
+                is Intent.OpenPlaylist -> openPlaylist(intent.item)
                 else -> dispatch(Result.Empty)
             }
 
-        private fun initialize() {
+        private fun openPlaylist(item: PlaylistsItemMviContract.Model) {
+            if (item is PlaylistsItemMviContract.Model.ItemModel) {
+                recentLocalPlaylists.addRecentId(item.id)
+                // fixme move lasttab to shared
+                //prefsWrapper.lastBottomTab = MainContract.LastTab.PLAYLIST.ordinal
+                publish(
+                    Navigate(NavigationModel(PLAYLIST, mapOf(SOURCE to item.source, PLAYLIST_ID to item.id)))
+                )
+            } else Unit
+        }
+
+        private fun refresh() {
             scope.launch {
                 executeRefresh()
             }

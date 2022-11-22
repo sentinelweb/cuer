@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
-class ItemMviContract {
+class PlaylistsItemMviContract {
     sealed class Model(override val id: Long) : ItemBaseModel(id) {
 
         data class HeaderModel(

@@ -29,25 +29,25 @@ interface PlaylistsContract {
     interface Presenter {
         fun refreshList()
         fun setFocusMedia(mediaDomain: MediaDomain)
-        fun performMove(item: ItemMviContract.Model)
-        fun performDelete(item: ItemMviContract.Model)
-        fun performOpen(item: ItemMviContract.Model, sourceView: ItemContract.ItemView)
+        fun performMove(item: PlaylistsItemMviContract.Model)
+        fun performDelete(item: PlaylistsItemMviContract.Model)
+        fun performOpen(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView)
         fun performPlay(
-            item: ItemMviContract.Model,
+            item: PlaylistsItemMviContract.Model,
             external: Boolean,
             sourceView: ItemContract.ItemView
         )
 
-        fun performStar(item: ItemMviContract.Model)
-        fun performShare(item: ItemMviContract.Model)
-        fun performMerge(item: ItemMviContract.Model)
+        fun performStar(item: PlaylistsItemMviContract.Model)
+        fun performShare(item: PlaylistsItemMviContract.Model)
+        fun performMerge(item: PlaylistsItemMviContract.Model)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun undoDelete()
         fun commitMove()
         fun onResume(parentId: Long?)
         fun onPause()
-        fun onItemImageClicked(item: ItemMviContract.Model, sourceView: ItemContract.ItemView)
-        fun performEdit(item: ItemMviContract.Model, sourceView: ItemContract.ItemView)
+        fun onItemImageClicked(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView)
+        fun performEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView)
         fun onCreatePlaylist()
     }
 
@@ -61,7 +61,7 @@ interface PlaylistsContract {
         fun showPlaylistSelector(model: PlaylistsMviDialogContract.Config)
         fun repaint()
         fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?)
-        fun notifyItemRemoved(model: ItemMviContract.Model)
+        fun notifyItemRemoved(model: PlaylistsItemMviContract.Model)
     }
 
     data class State constructor(
@@ -78,7 +78,7 @@ interface PlaylistsContract {
         val title: String,
         val imageUrl: String = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         val currentPlaylistId: Identifier<*>?, // todo non null?
-        val items: List<ItemMviContract.Model>
+        val items: List<PlaylistsItemMviContract.Model>
     )
 
     companion object {

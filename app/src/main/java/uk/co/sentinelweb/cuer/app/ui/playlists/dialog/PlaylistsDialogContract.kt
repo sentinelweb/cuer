@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
@@ -20,7 +20,7 @@ interface PlaylistsDialogContract {
     interface Presenter {
         fun destroy()
         fun refreshList()
-        fun onItemClicked(item: ItemMviContract.Model)
+        fun onItemClicked(item: PlaylistsItemMviContract.Model)
         fun onResume()
         fun onPause()
         fun setConfig(config: PlaylistsMviDialogContract.Config)

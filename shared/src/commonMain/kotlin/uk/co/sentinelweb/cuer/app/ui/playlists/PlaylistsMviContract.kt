@@ -15,17 +15,19 @@ class PlaylistsMviContract {
 
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
         sealed class Intent {
-            object Empty : Intent()
             object Refresh : Intent()
             object CreatePlaylist : Intent()
             data class Undo(val undoType: UndoType) : Intent()
             data class Move(val fromPosition: Int, val toPosition: Int) : Intent()
-//            data class ClickCategory(val id: Long, val forceItem: Boolean) : Intent()
-//            object Up : Intent()
-//            object ActionSettings : Intent()
-//            object ActionSearch : Intent()
-//            object ActionHelp : Intent()
-//            data class SetOrder(val order: BrowseContract.Order) : Intent()
+            object CommitMove : Intent()
+            data class OpenPlaylist(val item: PlaylistsItemMviContract.Model) : Intent()
+            data class MoveSwipe(val item: PlaylistsItemMviContract.Model) : Intent()
+            data class Delete(val item: PlaylistsItemMviContract.Model) : Intent()
+            data class Play(val item: PlaylistsItemMviContract.Model, val external: Boolean) : Intent()
+            data class Star(val item: PlaylistsItemMviContract.Model) : Intent()
+            data class Share(val item: PlaylistsItemMviContract.Model) : Intent()
+            data class Merge(val item: PlaylistsItemMviContract.Model) : Intent()
+            data class Edit(val item: PlaylistsItemMviContract.Model) : Intent()
         }
 
         sealed class Label {
@@ -35,17 +37,7 @@ class PlaylistsMviContract {
             data class ShowUndo(val undoType: UndoType, val message: String) : Label()
             data class ShowPlaylistsSelector(val config: PlaylistsMviDialogContract.Config) : Label()
             data class Navigate(val model: NavigationModel) : Label()
-            data class ItemRemoved(val model: ItemMviContract.Model) : Label()
-//            object ActionSettings : Label()
-//            object ActionSearch : Label()
-//            object ActionHelp : Label()
-//
-//            data class AddPlaylist(
-//                val cat: CategoryDomain,
-//                val parentId: Long? = null,
-//            ) : Label()
-//
-//            data class OpenLocalPlaylist(val id: Long, val play: Boolean = false) : Label()
+            data class ItemRemoved(val model: PlaylistsItemMviContract.Model) : Label()
         }
 
         data class State(
@@ -71,7 +63,7 @@ class PlaylistsMviContract {
             val title: String,
             val imageUrl: String = "https://cuer-275020.firebaseapp.com/images/headers/headphones-2588235_640.jpg",
             val currentPlaylistId: Identifier<*>?, // todo non null?
-            val items: List<ItemMviContract.Model>
+            val items: List<PlaylistsItemMviContract.Model>
         )
 
 
@@ -81,14 +73,14 @@ class PlaylistsMviContract {
             data class OnUndo(val undoType: UndoType) : Event()
             data class OnMove(val fromPosition: Int, val toPosition: Int) : Event()
             object OnCommitMove : Event()
-            data class OnOpenPlaylist(val item: ItemMviContract.Model) : Event()
-            data class OnMoveSwipe(val item: ItemMviContract.Model) : Event()
-            data class OnDelete(val item: ItemMviContract.Model) : Event()
-            data class OnPlay(val item: ItemMviContract.Model, val external: Boolean) : Event()
-            data class OnStar(val item: ItemMviContract.Model) : Event()
-            data class OnShare(val item: ItemMviContract.Model) : Event()
-            data class OnMerge(val item: ItemMviContract.Model) : Event()
-            data class OnEdit(val item: ItemMviContract.Model) : Event()
+            data class OnOpenPlaylist(val item: PlaylistsItemMviContract.Model) : Event()
+            data class OnMoveSwipe(val item: PlaylistsItemMviContract.Model) : Event()
+            data class OnDelete(val item: PlaylistsItemMviContract.Model) : Event()
+            data class OnPlay(val item: PlaylistsItemMviContract.Model, val external: Boolean) : Event()
+            data class OnStar(val item: PlaylistsItemMviContract.Model) : Event()
+            data class OnShare(val item: PlaylistsItemMviContract.Model) : Event()
+            data class OnMerge(val item: PlaylistsItemMviContract.Model) : Event()
+            data class OnEdit(val item: PlaylistsItemMviContract.Model) : Event()
 
         }
     }

@@ -6,7 +6,7 @@ import androidx.annotation.DrawableRes
 import androidx.navigation.fragment.FragmentNavigator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.ItemMviContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract
 
 interface ItemContract {
 
@@ -48,7 +48,7 @@ interface ItemContract {
         fun isStarred(): Boolean
     }
 
-    interface External<in T : ItemMviContract.Model> : ItemBaseContract.ItemPresenterBase {
+    interface External<in T : PlaylistsItemMviContract.Model> : ItemBaseContract.ItemPresenterBase {
         fun update(item: T, current: OrchestratorContract.Identifier<*>?)
         fun doLeft()
         fun doRight()
@@ -72,23 +72,23 @@ interface ItemContract {
     }
 
     interface Interactions {
-        fun onClick(item: ItemMviContract.Model, sourceView: ItemView)
-        fun onRightSwipe(item: ItemMviContract.Model)
-        fun onLeftSwipe(item: ItemMviContract.Model)
-        fun onPlay(item: ItemMviContract.Model, external: Boolean, sourceView: ItemView)
-        fun onStar(item: ItemMviContract.Model)
-        fun onShare(item: ItemMviContract.Model)
-        fun onMerge(item: ItemMviContract.Model)
-        fun onImageClick(item: ItemMviContract.Model, sourceView: ItemView)
-        fun onEdit(item: ItemMviContract.Model, sourceView: ItemView)
-        fun onDelete(item: ItemMviContract.Model, sourceView: ItemView)
+        fun onClick(item: PlaylistsItemMviContract.Model, sourceView: ItemView)
+        fun onRightSwipe(item: PlaylistsItemMviContract.Model)
+        fun onLeftSwipe(item: PlaylistsItemMviContract.Model)
+        fun onPlay(item: PlaylistsItemMviContract.Model, external: Boolean, sourceView: ItemView)
+        fun onStar(item: PlaylistsItemMviContract.Model)
+        fun onShare(item: PlaylistsItemMviContract.Model)
+        fun onMerge(item: PlaylistsItemMviContract.Model)
+        fun onImageClick(item: PlaylistsItemMviContract.Model, sourceView: ItemView)
+        fun onEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemView)
+        fun onDelete(item: PlaylistsItemMviContract.Model, sourceView: ItemView)
     }
 
     data class State constructor(
-        var item: ItemMviContract.Model.ItemModel? = null
+        var item: PlaylistsItemMviContract.Model.ItemModel? = null
     )
 
     data class ListState constructor(
-        var presenters: MutableList<External<ItemMviContract.Model.ItemModel>> = mutableListOf()
+        var presenters: MutableList<External<PlaylistsItemMviContract.Model.ItemModel>> = mutableListOf()
     )
 }
