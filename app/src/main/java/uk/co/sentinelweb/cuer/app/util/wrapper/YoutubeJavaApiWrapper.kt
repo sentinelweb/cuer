@@ -24,6 +24,9 @@ class YoutubeJavaApiWrapper(
 ) : PlatformLaunchWrapper {
 
     @VisibleForTesting
+    internal fun canLaunchChannel() = canResolveChannelIntent(activity)
+
+    @VisibleForTesting
     override fun canLaunchVideo() = canResolvePlayVideoIntent(activity)
 
     @VisibleForTesting
@@ -37,7 +40,8 @@ class YoutubeJavaApiWrapper(
             ?: false
 
     // todo launch youtube app with customUrl and NoPlatformId
-    private fun launchChannel(channel: ChannelDomain) =
+    @VisibleForTesting
+    fun launchChannel(channel: ChannelDomain) =
         channel.let {
             if (it.platformId?.isNotEmpty() ?: false && it.platformId != NO_PLATFORM_ID) {
                 return launchChannel(it.platformId!!)
@@ -83,7 +87,7 @@ class YoutubeJavaApiWrapper(
         createPlayVideoIntent(activity, platformId)
             .newTask()
 
-    private fun launchVideo(media: MediaDomain, forceFullScreen: Boolean, finishAfter: Boolean) =
+    fun launchVideo(media: MediaDomain, forceFullScreen: Boolean, finishAfter: Boolean) =
         canLaunchVideoWithOptions()
             .takeIf { it }
             ?.also {
