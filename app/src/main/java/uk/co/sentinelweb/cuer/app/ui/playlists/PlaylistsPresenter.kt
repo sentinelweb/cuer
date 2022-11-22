@@ -236,6 +236,7 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     override fun performStar(item: PlaylistsItemMviContract.Model) {
         state.viewModelScope.launch {
             findPlaylist(item)
@@ -245,6 +246,7 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     override fun performShare(item: PlaylistsItemMviContract.Model) {
         findPlaylist(item)
             ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 && it.type != APP }
@@ -335,10 +337,12 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     private fun refreshPlaylists() {
         state.viewModelScope.launch { executeRefresh() }
     }
 
+    // done
     private suspend fun executeRefresh() {
         try {
             state.playlists =

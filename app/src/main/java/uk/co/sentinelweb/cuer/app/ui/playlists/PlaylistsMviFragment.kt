@@ -425,7 +425,8 @@ class PlaylistsMviFragment :
                         unfinishedItems = get(),
                         strings = get(),
                         platformLauncher = get(),
-                        shareWrapper = get()
+                        shareWrapper = get(),
+                        merge = get()
                     ).create()
                 }
                 scoped<PlaylistsMviContract.Strings> { PlaylistsMviStrings(get()) }

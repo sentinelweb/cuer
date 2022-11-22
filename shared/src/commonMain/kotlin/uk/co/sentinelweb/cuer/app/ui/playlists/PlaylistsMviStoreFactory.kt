@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
+import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
@@ -54,6 +55,7 @@ class PlaylistsMviStoreFactory(
     private val strings: PlaylistsMviContract.Strings,
     private val platformLauncher: PlatformLaunchWrapper,
     private val shareWrapper: ShareWrapper,
+    private val merge: PlaylistMergeOrchestrator,
 ) {
     private sealed class Result {
         data class Load(
@@ -123,7 +125,7 @@ class PlaylistsMviStoreFactory(
                 is Intent.Play -> play(intent, getState())
                 is Intent.Share -> share(intent, getState())
                 is Intent.Star -> star(intent, getState())
-                else -> Unit
+                is Intent.Merge -> showMerge(intent, getState())
             }
 
         // region open
@@ -208,6 +210,34 @@ class PlaylistsMviStoreFactory(
                             ?: publish(Label.Error(strings.playlists_error_cant_load))
                     }
                 }
+        }
+
+        private fun showMerge(intent: Intent.Merge, state: State) {
+            state.findPlaylist(intent.item)
+                ?.takeIf { it.type != PlaylistDomain.PlaylistTypeDomain.APP }
+                ?.also { delPlaylist ->
+                    PlaylistsMviDialogContract.Config(
+                        title = strings.playlist_dialog_title,
+                        selectedPlaylists = setOf(),
+                        multi = true,
+                        itemClick = { p, _ -> merge(p!!, delPlaylist) },
+                        confirm = { },
+                        dismiss = { },
+                        suggestionsMedia = null,
+                        showPin = false,
+                        showAdd = false
+                    ).also { publish(Label.ShowPlaylistsSelector(it)) }
+                }
+        }
+
+        private fun merge(thisPlaylist: PlaylistDomain, delPlaylist: PlaylistDomain) {
+            scope.launch {
+                if (merge.checkMerge(thisPlaylist, delPlaylist)) {
+                    merge.merge(thisPlaylist, delPlaylist)
+                } else {
+                    publish(Label.Error(strings.playlists_error_cant_merge))
+                }
+            }
         }
         // endregion
 

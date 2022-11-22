@@ -112,5 +112,6 @@ class PlaylistsMviContract {
         open val playlists_error_circular = "That's a circular reference ..."
         open val playlists_error_cant_play = "Cannot launch playlist"
         open val playlists_error_cant_load = "Couldn't load playlist ..."
+        open val playlists_error_cant_merge = "Cannot merge this playlist"
     }
 }
