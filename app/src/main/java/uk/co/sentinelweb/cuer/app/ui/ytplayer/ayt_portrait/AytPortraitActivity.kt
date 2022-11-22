@@ -48,7 +48,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.CryptoLauncher
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -80,7 +80,7 @@ class AytPortraitActivity : AppCompatActivity(),
     private val queueConsumer: QueueMediatorContract.Consumer by inject()
     private val cryptoLauncher: CryptoLauncher by inject()
     private val linkNavigator: LinkNavigator by inject()
-    private val shareWrapper: ShareWrapper by inject()
+    private val shareWrapper: AndroidShareWrapper by inject()
     private val multiPrefs: MultiPlatformPreferencesWrapper by inject()
 
     private lateinit var mviView: AytPortraitActivity.MviViewImpl

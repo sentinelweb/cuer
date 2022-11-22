@@ -33,7 +33,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -90,7 +90,7 @@ class PlaylistPresenterTest {
     lateinit var mockYtJavaApi: YoutubeJavaApiWrapper
 
     @MockK
-    lateinit var mockShareWrapper: ShareWrapper
+    lateinit var mockShareWrapper: AndroidShareWrapper
 
     @MockK
     lateinit var mockTimeProvider: TimeProvider

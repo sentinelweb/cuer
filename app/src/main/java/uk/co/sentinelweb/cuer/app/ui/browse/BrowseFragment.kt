@@ -75,6 +75,7 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        // todo make a factory to create the controller here move this to onViewCreated see playlistsMviFrag
         controller.onViewCreated(listOf(browseMviView), lifecycle.asEssentyLifecycle())
     }
 

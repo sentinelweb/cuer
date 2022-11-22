@@ -21,9 +21,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistRowBinding
+import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_IMAGE
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_TITLE
-import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper

@@ -9,12 +9,12 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -29,25 +29,25 @@ interface PlaylistsContract {
     interface Presenter {
         fun refreshList()
         fun setFocusMedia(mediaDomain: MediaDomain)
-        fun performMove(item: ItemContract.Model)
-        fun performDelete(item: ItemContract.Model)
-        fun performOpen(item: ItemContract.Model, sourceView: ItemContract.ItemView)
+        fun performMove(item: PlaylistsItemMviContract.Model)
+        fun performDelete(item: PlaylistsItemMviContract.Model)
+        fun performOpen(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView)
         fun performPlay(
-            item: ItemContract.Model,
+            item: PlaylistsItemMviContract.Model,
             external: Boolean,
             sourceView: ItemContract.ItemView
         )
 
-        fun performStar(item: ItemContract.Model)
-        fun performShare(item: ItemContract.Model)
-        fun performMerge(item: ItemContract.Model)
+        fun performStar(item: PlaylistsItemMviContract.Model)
+        fun performShare(item: PlaylistsItemMviContract.Model)
+        fun performMerge(item: PlaylistsItemMviContract.Model)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun undoDelete()
         fun commitMove()
         fun onResume(parentId: Long?)
         fun onPause()
-        fun onItemImageClicked(item: ItemContract.Model, sourceView: ItemContract.ItemView)
-        fun performEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView)
+        fun onItemImageClicked(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView)
+        fun performEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView)
         fun onCreatePlaylist()
     }
 
@@ -58,10 +58,10 @@ interface PlaylistsContract {
         fun showUndo(msg: String, undo: () -> Unit)
         fun showMessage(msg: String)
         fun showError(msg: String)
-        fun showPlaylistSelector(model: PlaylistsDialogContract.Config)
+        fun showPlaylistSelector(model: PlaylistsMviDialogContract.Config)
         fun repaint()
         fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?)
-        fun notifyItemRemoved(model: ItemContract.Model)
+        fun notifyItemRemoved(model: PlaylistsItemMviContract.Model)
     }
 
     data class State constructor(
@@ -78,7 +78,7 @@ interface PlaylistsContract {
         val title: String,
         val imageUrl: String = "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
         val currentPlaylistId: Identifier<*>?, // todo non null?
-        val items: List<ItemContract.Model>
+        val items: List<PlaylistsItemMviContract.Model>
     )
 
     companion object {
@@ -127,15 +127,13 @@ interface PlaylistsContract {
                     )
                 }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
-                scoped { ShareWrapper(this.getFragmentActivity()) }
+                scoped { AndroidShareWrapper(this.getFragmentActivity()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 viewModel { State() }
                 scoped { PlaylistsHelpConfig(get()) }
-
             }
         }
-
     }
 }

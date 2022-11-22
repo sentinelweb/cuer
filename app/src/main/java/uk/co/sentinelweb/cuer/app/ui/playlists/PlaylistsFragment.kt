@@ -30,11 +30,12 @@ import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.getLong
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
@@ -274,7 +275,7 @@ class PlaylistsFragment :
         binding.playlistsSwipe.isRefreshing = false
     }
 
-    override fun showPlaylistSelector(model: PlaylistsDialogContract.Config) {
+    override fun showPlaylistSelector(model: PlaylistsMviDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()
         dialogFragment = PlaylistsDialogFragment.newInstance(model)
         dialogFragment?.show(childFragmentManager, "PlaylistsSelector")
@@ -323,52 +324,52 @@ class PlaylistsFragment :
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onClick(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.performOpen(item, sourceView)
     }
 
-    override fun onRightSwipe(item: ItemContract.Model) {
+    override fun onRightSwipe(item: PlaylistsItemMviContract.Model) {
         presenter.performMove(item)
     }
 
-    override fun onLeftSwipe(item: ItemContract.Model) {
+    override fun onLeftSwipe(item: PlaylistsItemMviContract.Model) {
         adapter.notifyItemRemoved(adapter.data.indexOf(item))
         presenter.performDelete(item) // delays for animation
     }
 
     override fun onPlay(
-        item: ItemContract.Model,
+        item: PlaylistsItemMviContract.Model,
         external: Boolean,
         sourceView: ItemContract.ItemView
     ) {
         presenter.performPlay(item, external, sourceView)
     }
 
-    override fun onStar(item: ItemContract.Model) {
+    override fun onStar(item: PlaylistsItemMviContract.Model) {
         presenter.performStar(item)
     }
 
-    override fun onShare(item: ItemContract.Model) {
+    override fun onShare(item: PlaylistsItemMviContract.Model) {
         presenter.performShare(item)
     }
 
-    override fun onMerge(item: ItemContract.Model) {
+    override fun onMerge(item: PlaylistsItemMviContract.Model) {
         presenter.performMerge(item)
     }
 
-    override fun onImageClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onImageClick(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.onItemImageClicked(item, sourceView)
     }
 
-    override fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.performEdit(item, sourceView)
     }
 
-    override fun onDelete(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onDelete(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.performDelete(item) // delays for animation
     }
 
-    override fun notifyItemRemoved(model: ItemContract.Model) {
+    override fun notifyItemRemoved(model: PlaylistsItemMviContract.Model) {
         adapter.notifyItemRemoved(adapter.data.indexOf(model))
     }
     //endregion

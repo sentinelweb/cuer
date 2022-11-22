@@ -16,7 +16,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.EmptyPlayerControls
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -122,7 +122,7 @@ interface ShareContract {
                         recentLocalPlaylists = get()
                     )
                 }
-                scoped { ShareWrapper(get<ShareActivity>()) }
+                scoped { AndroidShareWrapper(get<ShareActivity>()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<ShareActivity>(), get()) }
                 viewModel { State() }
                 scoped {

@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.ItemType.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
@@ -22,14 +23,14 @@ class PlaylistsDialogAdapter constructor(
     private val recyclerView: RecyclerView
         get() = _recyclerView ?: throw IllegalStateException("PlaylistsDialogAdapter._recyclerView not bound")
 
-    private var _data: List<ItemContract.Model> = listOf()
+    private var _data: List<PlaylistsItemMviContract.Model> = listOf()
 
-    val data: List<ItemContract.Model>
+    val data: List<PlaylistsItemMviContract.Model>
         get() = _data
 
     var currentPlaylistId: OrchestratorContract.Identifier<*>? = null
 
-    fun setData(data: List<ItemContract.Model>, animate: Boolean = true) {
+    fun setData(data: List<PlaylistsItemMviContract.Model>, animate: Boolean = true) {
         // todo something in diffutil fails here deleting a parent playlist show the child after it fails
         if (animate) {
             DiffUtil.calculateDiff(
@@ -70,9 +71,9 @@ class PlaylistsDialogAdapter constructor(
 
     override fun getItemViewType(position: Int): Int =
         when (data[position]) {
-            is ItemContract.Model.ItemModel -> ROW.ordinal
-            is ItemContract.Model.HeaderModel -> HEADER.ordinal
-            is ItemContract.Model.ListModel -> LIST.ordinal
+            is PlaylistsItemMviContract.Model.ItemModel -> ROW.ordinal
+            is PlaylistsItemMviContract.Model.HeaderModel -> HEADER.ordinal
+            is PlaylistsItemMviContract.Model.ListModel -> LIST.ordinal
         }
 
     @Override
@@ -80,20 +81,20 @@ class PlaylistsDialogAdapter constructor(
         when (holderRow) {
             is ItemRowViewHolder -> _data[position].apply {
                 holderRow.itemPresenter.update(
-                    this as ItemContract.Model.ItemModel,
+                    this as PlaylistsItemMviContract.Model.ItemModel,
                     currentPlaylistId
                 )
             }
 
             is HeaderViewHolder -> _data[position].apply {
                 holderRow.update(
-                    this as ItemContract.Model.HeaderModel
+                    this as PlaylistsItemMviContract.Model.HeaderModel
                 )
             }
 
             is ListViewHolder -> _data[position].apply {
                 holderRow.listPresenter.update(
-                    this as ItemContract.Model.ListModel,
+                    this as PlaylistsItemMviContract.Model.ListModel,
                     currentPlaylistId
                 )
             }

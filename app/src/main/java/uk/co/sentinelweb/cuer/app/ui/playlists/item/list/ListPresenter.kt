@@ -1,8 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item.list
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.ListModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Model.ListModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 
 class ListPresenter(

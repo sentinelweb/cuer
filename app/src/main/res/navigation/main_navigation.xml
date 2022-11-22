@@ -22,6 +22,40 @@
 
     <fragment
         android:id="@+id/navigation_playlists"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment"
+        android:label="@string/bottomnav_title_playlists"
+        tools:layout="@layout/fragment_playlists"
+    >
+        <action
+            android:id="@+id/action_goto_playlist"
+            app:destination="@id/navigation_playlist"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist"
+            app:popUpToInclusive="true"
+            app:popExitAnim="@anim/slide_out_right"
+        />
+
+        <!--            app:enterAnim="@anim/slide_in_right"-->
+        <!--            app:exitAnim="@anim/slide_out_left"-->
+        <!--            app:popEnterAnim="@anim/slide_in_left"-->
+        <!--            app:popExitAnim="@anim/slide_out_right"-->
+        <action
+            android:id="@+id/action_edit_playlist"
+            app:destination="@id/navigation_playlist_edit"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist_edit"
+            app:popUpToInclusive="true"
+            app:popExitAnim="@anim/slide_out_right"
+        />
+
+        <!--            app:enterAnim="@anim/slide_in_right"-->
+        <!--            app:exitAnim="@anim/slide_out_left"-->
+        <!--            app:popEnterAnim="@anim/slide_in_left"-->
+        <!--            app:popExitAnim="@anim/slide_out_right"-->
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_playlists_old"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsFragment"
         android:label="@string/bottomnav_title_playlists"
         tools:layout="@layout/fragment_playlists"

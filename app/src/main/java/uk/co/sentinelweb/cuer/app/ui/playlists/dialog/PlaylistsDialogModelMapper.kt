@@ -6,7 +6,7 @@ class PlaylistsDialogModelMapper() {
 
     fun map(
         playlistsModel: PlaylistsContract.Model?,
-        config: PlaylistsDialogContract.Config,
+        config: PlaylistsMviDialogContract.Config,
         pinOn: Boolean
     ) = PlaylistsDialogContract.Model(
         playlistsModel,

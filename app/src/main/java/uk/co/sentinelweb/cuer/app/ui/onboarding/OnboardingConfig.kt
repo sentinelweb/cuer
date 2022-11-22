@@ -1,8 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.onboarding
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract.Config.Screen
-import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class OnboardingTestConfigBuilder(val res: ResourceWrapper) : OnboardingContract.ConfigBuilder {

@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.onboarding
 
 import kotlinx.serialization.Serializable
-import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
+import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 
 class OnboardingContract {
 

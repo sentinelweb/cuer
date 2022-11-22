@@ -11,11 +11,12 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsDialogBinding
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config) :
+class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Config) :
     DialogFragment(),
     PlaylistsDialogContract.View,
     ItemContract.Interactions,
@@ -109,27 +110,27 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
     //endregion
 
     // region ItemContract.Interactions
-    override fun onClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onClick(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.onItemClicked(item)
     }
 
-    override fun onRightSwipe(item: ItemContract.Model) {
+    override fun onRightSwipe(item: PlaylistsItemMviContract.Model) {
 
     }
 
-    override fun onLeftSwipe(item: ItemContract.Model) {
+    override fun onLeftSwipe(item: PlaylistsItemMviContract.Model) {
 
     }
 
     override fun onPlay(
-        item: ItemContract.Model,
+        item: PlaylistsItemMviContract.Model,
         external: Boolean,
         sourceView: ItemContract.ItemView
     ) {
 
     }
 
-    override fun onStar(item: ItemContract.Model) {
+    override fun onStar(item: PlaylistsItemMviContract.Model) {
 
     }
 
@@ -137,23 +138,23 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
         dismissAllowingStateLoss()
     }
 
-    override fun onShare(item: ItemContract.Model) {
+    override fun onShare(item: PlaylistsItemMviContract.Model) {
         //presenter.onItemShare(item)
     }
 
-    override fun onMerge(item: ItemContract.Model) {
+    override fun onMerge(item: PlaylistsItemMviContract.Model) {
 
     }
 
-    override fun onImageClick(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onImageClick(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         presenter.onItemClicked(item)
     }
 
-    override fun onEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
 
     }
 
-    override fun onDelete(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    override fun onDelete(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
 
     }
 
@@ -161,7 +162,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsDialogContract.Config
 
     companion object {
 
-        fun newInstance(config: PlaylistsDialogContract.Config): PlaylistsDialogFragment {
+        fun newInstance(config: PlaylistsMviDialogContract.Config): PlaylistsDialogFragment {
             return PlaylistsDialogFragment(config)
         }
 

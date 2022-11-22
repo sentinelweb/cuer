@@ -7,9 +7,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ROOT_PLAYLIST_DUMMY
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -44,7 +44,7 @@ class PlaylistsDialogPresenter(
     override fun destroy() {
     }
 
-    override fun onItemClicked(item: ItemContract.Model) {
+    override fun onItemClicked(item: PlaylistsItemMviContract.Model) {
         val findId = if (item.id >= 0) item.id else null // find top level node
         findId
             ?.let { state.playlists.find { it.id == findId } }
@@ -129,7 +129,7 @@ class PlaylistsDialogPresenter(
         view.dismiss()
     }
 
-    override fun setConfig(config: PlaylistsDialogContract.Config) {
+    override fun setConfig(config: PlaylistsMviDialogContract.Config) {
         state.config = config
     }
 

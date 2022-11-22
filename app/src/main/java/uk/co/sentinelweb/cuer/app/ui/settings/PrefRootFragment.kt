@@ -19,8 +19,8 @@ import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.EmailWrapper
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import kotlin.random.Random
 
@@ -30,7 +30,7 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     private val presenter: PrefRootContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val emailWrapper: EmailWrapper by inject()
-    private val shareWrapper: ShareWrapper by inject()
+    private val shareWrapper: AndroidShareWrapper by inject()
 
     private val versionCategory
         get() = findPreference(R.string.prefs_root_version_key)

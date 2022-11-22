@@ -3,11 +3,12 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item.list
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 
 class ListViewHolder(
     private val listView: ListView,
-    val listPresenter: ItemContract.External<ItemContract.Model.ListModel>
+    val listPresenter: ItemContract.External<Model.ListModel>
 ) : RecyclerView.ViewHolder(listView.root), ItemBaseContract.ItemTouchHelperViewHolder {
 
     override val contentView: View

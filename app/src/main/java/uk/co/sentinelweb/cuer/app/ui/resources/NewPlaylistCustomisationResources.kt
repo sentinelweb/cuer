@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.resources
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
+import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class NewPlaylistCustomisationResources(

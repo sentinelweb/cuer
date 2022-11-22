@@ -37,7 +37,7 @@ import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
@@ -56,7 +56,7 @@ class ShareActivity : AppCompatActivity(),
 
     override val scope: Scope by activityScopeWithSource<ShareActivity>()
     private val presenter: ShareContract.Presenter by inject()
-    private val shareWrapper: ShareWrapper by inject()
+    private val shareWrapper: AndroidShareWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()

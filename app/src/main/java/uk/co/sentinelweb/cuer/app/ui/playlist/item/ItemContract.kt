@@ -6,7 +6,7 @@ import androidx.annotation.DrawableRes
 import androidx.navigation.fragment.FragmentNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
-import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
+import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 

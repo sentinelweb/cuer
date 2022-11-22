@@ -32,7 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
-import uk.co.sentinelweb.cuer.app.ui.main.MainContract.LastTab.*
+import uk.co.sentinelweb.cuer.app.ui.main.MainCommonContract.LastTab.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
@@ -308,7 +308,7 @@ class MainActivity :
                 .also { log.d("get LAST_BOTTOM_TAB: $it") }
                 .takeIf { it > 0 }
                 ?.also {
-                    when (MainContract.LastTab.values()[it]) {
+                    when (MainCommonContract.LastTab.values()[it]) {
                         PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
                             R.id.navigation_playlists
                         } else null

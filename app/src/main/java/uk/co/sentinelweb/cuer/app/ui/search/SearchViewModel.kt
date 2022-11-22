@@ -18,7 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DateRangePickerDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -167,7 +167,7 @@ class SearchViewModel(
     fun onPlaylistSelect(chipModel: ChipModel) {
         if (chipModel.type == PLAYLIST_SELECT) {
             _dialogModelLiveData.value =
-                PlaylistsDialogContract.Config(
+                PlaylistsMviDialogContract.Config(
                     res.getString(R.string.playlist_dialog_title),
                     state.local.playlists,
                     true,

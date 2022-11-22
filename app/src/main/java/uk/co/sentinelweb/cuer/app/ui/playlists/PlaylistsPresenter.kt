@@ -18,15 +18,15 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.main.MainContract
+import uk.co.sentinelweb.cuer.app.ui.main.MainCommonContract.LastTab.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -59,7 +59,7 @@ class PlaylistsPresenter(
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val searchMapper: SearchMapper,
     private val merge: PlaylistMergeOrchestrator,
-    private val shareWrapper: ShareWrapper,
+    private val shareWrapper: AndroidShareWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val starredItems: StarredItemsPlayistInteractor,
     private val unfinishedItems: UnfinishedItemsPlayistInteractor,
@@ -95,14 +95,15 @@ class PlaylistsPresenter(
         coroutines.cancel()
     }
 
-    override fun performMove(item: ItemContract.Model) {
+    //done
+    override fun performMove(item: PlaylistsItemMviContract.Model) {
         findPlaylist(item)
             ?.takeIf { it.type != APP }
             ?.apply {
                 findPlaylist(item)
                     ?.also { movePlaylist ->
                         view.showPlaylistSelector(
-                            PlaylistsDialogContract.Config(
+                            PlaylistsMviDialogContract.Config(
                                 title = res.getString(R.string.playlist_dialog_title),
                                 selectedPlaylists = setOf(),
                                 multi = true,
@@ -123,6 +124,7 @@ class PlaylistsPresenter(
             }
     }
 
+    //done
     private fun setParent(parent: PlaylistDomain, child: PlaylistDomain) {
         val childNode = state.treeLookup[child.id]!!
         val parentNode = state.treeLookup[parent.id]
@@ -136,7 +138,8 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun performDelete(item: ItemContract.Model) {
+    // done
+    override fun performDelete(item: PlaylistsItemMviContract.Model) {
         state.viewModelScope.launch {
             delay(400)
             findPlaylist(item)
@@ -182,10 +185,11 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun performOpen(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
-        if (item is ItemContract.Model.ItemModel) {
+    // done
+    override fun performOpen(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
+        if (item is PlaylistsItemMviContract.Model.ItemModel) {
             recentLocalPlaylists.addRecentId(item.id)
-            prefsWrapper.lastBottomTab = MainContract.LastTab.PLAYLIST.ordinal
+            prefsWrapper.lastBottomTab = PLAYLIST.ordinal
             view.navigate(
                 PlaylistContract.makeNav(
                     item.id, null, false, item.source,
@@ -195,9 +199,10 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun onItemImageClicked(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    // done
+    override fun onItemImageClicked(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         findPlaylist(item)?.id?.apply {
-            if (item is ItemContract.Model.ItemModel) {
+            if (item is PlaylistsItemMviContract.Model.ItemModel) {
                 view.navigate(
                     PlaylistContract.makeNav(
                         this, null, false, item.source,
@@ -208,13 +213,14 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     override fun performPlay(
-        item: ItemContract.Model,
+        item: PlaylistsItemMviContract.Model,
         external: Boolean,
         sourceView: ItemContract.ItemView
     ) {
         if (!external) {
-            if (item is ItemContract.Model.ItemModel) {
+            if (item is PlaylistsItemMviContract.Model.ItemModel) {
                 view.navigate(
                     PlaylistContract.makeNav(
                         item.id, null, true, item.source,
@@ -230,7 +236,8 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun performStar(item: ItemContract.Model) {
+    // done
+    override fun performStar(item: PlaylistsItemMviContract.Model) {
         state.viewModelScope.launch {
             findPlaylist(item)
                 ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 }
@@ -239,7 +246,8 @@ class PlaylistsPresenter(
         }
     }
 
-    override fun performShare(item: ItemContract.Model) {
+    // done
+    override fun performShare(item: PlaylistsItemMviContract.Model) {
         findPlaylist(item)
             ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 && it.type != APP }
             ?.let { itemDomain ->
@@ -251,27 +259,29 @@ class PlaylistsPresenter(
             }
     }
 
-    override fun performEdit(item: ItemContract.Model, sourceView: ItemContract.ItemView) {
+    // done
+    override fun performEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         view.navigate(
             PlaylistEditContract.makeNav(
                 item.id,
                 LOCAL,
-                (item as ItemContract.Model.ItemModel).thumbNailUrl
+                (item as PlaylistsItemMviContract.Model.ItemModel).thumbNailUrl
             ), sourceView
         )
     }
 
+    // done
     override fun onCreatePlaylist() {
         view.navigate(PlaylistEditContract.makeCreateNav(LOCAL), null)
     }
 
-    override fun performMerge(item: ItemContract.Model) {
+    override fun performMerge(item: PlaylistsItemMviContract.Model) {
         findPlaylist(item)
             ?.takeIf { it.type != APP }
             ?.apply {
                 findPlaylist(item)?.also { delPlaylist ->
                     view.showPlaylistSelector(
-                        PlaylistsDialogContract.Config(
+                        PlaylistsMviDialogContract.Config(
                             title = res.getString(R.string.playlist_dialog_title),
                             selectedPlaylists = setOf(),
                             multi = true,
@@ -297,6 +307,7 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     override fun moveItem(fromPosition: Int, toPosition: Int) {
         if (state.dragFrom == null) {
             state.dragFrom = fromPosition
@@ -304,6 +315,7 @@ class PlaylistsPresenter(
         state.dragTo = toPosition
     }
 
+    // done
     override fun commitMove() {
         if (state.dragFrom != null && state.dragTo != null) {
             //todo save move ..
@@ -314,6 +326,7 @@ class PlaylistsPresenter(
         state.dragTo = null
     }
 
+    // done
     override fun undoDelete() {
         state.deletedPlaylist?.let { itemDomain ->
             state.viewModelScope.launch {
@@ -324,10 +337,12 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     private fun refreshPlaylists() {
         state.viewModelScope.launch { executeRefresh() }
     }
 
+    // done
     private suspend fun executeRefresh() {
         try {
             state.playlists =
@@ -369,6 +384,6 @@ class PlaylistsPresenter(
         }
     }
 
-    private fun findPlaylist(item: ItemContract.Model) = state.playlists.find { it.id == item.id }
+    private fun findPlaylist(item: PlaylistsItemMviContract.Model) = state.playlists.find { it.id == item.id }
 
 }

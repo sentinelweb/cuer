@@ -4,12 +4,11 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Companion.ID_ALL_HEADER
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Companion.ID_APP_HEADER
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Companion.ID_APP_LIST
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Companion.ID_RECENT_LIST
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Companion.ID_STARRED_LIST
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_ALL_HEADER
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_APP_HEADER
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_APP_LIST
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_RECENT_LIST
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_STARRED_LIST
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
@@ -45,41 +44,41 @@ class PlaylistsModelMapper constructor(
         recentPlaylists: List<OrchestratorContract.Identifier<Long>>,
         pinnedId: Long?,
         root: PlaylistTreeDomain
-    ): List<ItemContract.Model> {
+    ): List<PlaylistsItemMviContract.Model> {
         val starred = buildStarredList(domains)
         val recent = buildRecentList(domains, recentPlaylists)
         val list = mutableListOf(
 
-            ItemContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.HeaderModel(
                 ID_APP_HEADER,
                 res.getString(R.string.playlists_section_app)
             ),
-            ItemContract.Model.ListModel(
+            PlaylistsItemMviContract.Model.ListModel(
                 ID_APP_LIST,
                 appPlaylists.keys.map {
                     itemModel(it, it.id == pinnedId, appPlaylists[it], 0)
                 }),
 
-            ItemContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.HeaderModel(
                 ID_RECENT_LIST,
                 res.getString(R.string.playlists_section_recent)
             ),
-            ItemContract.Model.ListModel(ID_RECENT_LIST,
+            PlaylistsItemMviContract.Model.ListModel(ID_RECENT_LIST,
                 recent.map {
                     itemModel(it, it.id == pinnedId, domains[it], 0)
                 }),
 
-            ItemContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.HeaderModel(
                 ID_STARRED_LIST,
                 res.getString(R.string.playlists_section_starred)
             ),
-            ItemContract.Model.ListModel(
+            PlaylistsItemMviContract.Model.ListModel(
                 ID_STARRED_LIST,
                 starred.map {
                     itemModel(it, it.id == pinnedId, domains[it], 0)
                 }),
 
-            ItemContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.HeaderModel(
                 ID_ALL_HEADER,
                 res.getString(R.string.playlists_section_all)
             ),
@@ -115,7 +114,7 @@ class PlaylistsModelMapper constructor(
         pinned: Boolean,
         playlistStatDomain: PlaylistStatDomain?,
         depth: Int
-    ) = ItemContract.Model.ItemModel(
+    ) = PlaylistsItemMviContract.Model.ItemModel(
         pl.id ?: throw Exception("Playlist must have an id"),
         pl.title.capitalize(Locale.getDefault()),
         false,

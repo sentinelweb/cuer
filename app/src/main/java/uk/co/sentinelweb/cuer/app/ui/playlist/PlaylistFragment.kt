@@ -34,13 +34,10 @@ import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
@@ -48,8 +45,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.CastState.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
@@ -109,6 +106,7 @@ class PlaylistFragment :
 
     private val searchMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_search)
+
     private val cardsMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_view_cards)
 
@@ -501,7 +499,7 @@ class PlaylistFragment :
         (activity as AppCompatActivity?)?.supportActionBar?.setTitle(subtitle)
     }
 
-    override fun showPlaylistSelector(model: PlaylistsDialogContract.Config) {
+    override fun showPlaylistSelector(model: PlaylistsMviDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()
         dialogFragment =
             PlaylistsDialogFragment.newInstance(model)
@@ -523,14 +521,16 @@ class PlaylistFragment :
     }
 
     override fun showItemDescription(modelId: Long, item: PlaylistItemDomain, source: Source) {
-        adapter.getItemViewForId(modelId)?.let { view ->
-            PlaylistFragmentDirections.actionGotoPlaylistItem(
-                item.serialise(),
-                source.toString(),
-                -1,
-                (item.playlistId ?: 0) > 0
-            ).apply { findNavController().navigate(this, view.makeTransitionExtras()) }
-        }
+        adapter
+            .getItemViewForId(modelId)
+            ?.let { view ->
+                PlaylistFragmentDirections.actionGotoPlaylistItem(
+                    item.serialise(),
+                    source.toString(),
+                    -1,
+                    (item.playlistId ?: 0) > 0
+                ).apply { findNavController().navigate(this, view.makeTransitionExtras()) }
+            }
     }
 
     override fun gotoEdit(id: Long, source: Source) {

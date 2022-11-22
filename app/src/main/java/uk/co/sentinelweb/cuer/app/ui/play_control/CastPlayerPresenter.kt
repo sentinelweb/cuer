@@ -271,7 +271,7 @@ class CastPlayerPresenter(
                     PLAYLIST_ITEM,
                     mapOf(
                         NavigationModel.Param.PLAYLIST_ITEM to it,
-                        FRAGMENT_NAV_EXTRAS to view.makeItemTransitionExtras(),
+                        //FRAGMENT_NAV_EXTRAS to view.makeItemTransitionExtras(),
                         SOURCE to state.source
                     )
                 )
