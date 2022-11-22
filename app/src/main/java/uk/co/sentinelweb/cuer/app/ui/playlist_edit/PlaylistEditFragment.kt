@@ -117,6 +117,28 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         return binding.root
     }
 
+    private val onOffsetChangedListener = object : AppBarLayout.OnOffsetChangedListener {
+
+        var isShow = false
+        var scrollRange = -1
+
+        override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
+            if (scrollRange == -1) {
+                scrollRange = appBarLayout.getTotalScrollRange()
+            }
+            if (scrollRange + verticalOffset == 0) {
+                isShow = true
+                // only show the menu items for the non-empty state
+                binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
+                edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+            } else if (isShow) {
+                isShow = false
+                binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+                edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+            }
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -165,27 +187,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         binding.pePlayStart.scaleDrawableLeftSize(0.8f)
         binding.peParentLabel.scaleDrawableLeftSize(0.7f)
 
-        binding.peAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
-
-            var isShow = false
-            var scrollRange = -1
-
-            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange()
-                }
-                if (scrollRange + verticalOffset == 0) {
-                    isShow = true
-                    // only show the menu items for the non-empty state
-                    binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-                } else if (isShow) {
-                    isShow = false
-                    binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-                }
-            }
-        })
+        binding.peAppbar.addOnOffsetChangedListener(onOffsetChangedListener)
         binding.peInfo.setMovementMethod(object : LinkMovementMethod() {
             override fun handleMovementKey(
                 widget: TextView?,
@@ -242,6 +244,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     }
 
     override fun onDestroyView() {
+        binding.peAppbar.removeOnOffsetChangedListener(onOffsetChangedListener)
         _binding = null
         super.onDestroyView()
     }

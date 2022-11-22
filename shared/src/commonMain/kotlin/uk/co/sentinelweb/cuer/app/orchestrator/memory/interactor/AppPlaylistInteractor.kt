@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
+import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain

@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.ItemPassView
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
+import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
@@ -44,7 +45,7 @@ class PlaylistsMviContract {
 
         data class State(
             var playlists: List<PlaylistDomain> = listOf(),
-            var deletedPlaylist: PlaylistDomain? = null,
+            var deletedItem: Domain? = null,
             var dragFrom: Int? = null,
             var dragTo: Int? = null,
             var playlistStats: List<PlaylistStatDomain> = listOf(),
@@ -88,10 +89,18 @@ class PlaylistsMviContract {
         }
     }
 
-    interface Strings {
-        val playlists_section_app: String
-        val playlists_section_recent: String
-        val playlists_section_starred: String
-        val playlists_section_all: String
+    open class Strings {
+        open val playlists_section_app: String = "App"
+        open val playlists_section_recent: String = "Recent"
+        open val playlists_section_starred: String = "Starred"
+        open val playlists_section_all: String = "App"
+        open val search_local: String = "Local"
+        open val search_youtube: String = "Youtube"
+        open fun playlists_message_deleted(title: String) = "Deleted playlist: ${title}"
+        open fun playlists_message_deleted_search(type: String) = "Deleted $type search"
+        open val playlists_error_cant_backup = "Cannot load playlist backup"
+        open val playlists_error_load_failed = "Load failed"
+        open val playlists_error_cant_delete = "Cannot delete playlist"
+        open val playlists_error_delete_children = "Please delete the children first"
     }
 }

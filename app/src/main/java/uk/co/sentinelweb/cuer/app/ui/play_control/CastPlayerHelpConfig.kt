@@ -1,9 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract.Config.Screen
-import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class CastPlayerHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuilder {

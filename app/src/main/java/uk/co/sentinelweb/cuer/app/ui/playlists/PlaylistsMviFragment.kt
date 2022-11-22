@@ -76,7 +76,7 @@ class PlaylistsMviFragment :
             Label.Repaint -> repaint()
             is Label.ShowUndo -> showUndo(msg = label.message, undoType = label.undoType)
             is Label.ShowPlaylistsSelector -> showPlaylistSelector(config = label.config)
-            is Label.Navigate -> navigate(nav = label.model, label.view as ItemContract.ItemView)
+            is Label.Navigate -> navigate(nav = label.model, label.view as ItemContract.ItemView?)
             is Label.ItemRemoved -> notifyItemRemoved(label.model)
         }.also { log.d(label.toString()) }
 
@@ -426,7 +426,7 @@ class PlaylistsMviFragment :
     }
     //endregion
 
-    class PlaylistsMviStrings(private val rw: ResourceWrapper) : PlaylistsMviContract.Strings {
+    class PlaylistsMviStrings(private val rw: ResourceWrapper) : PlaylistsMviContract.Strings() {
         override val playlists_section_app: String
             get() = rw.getString(R.string.playlists_section_app)
         override val playlists_section_recent: String
@@ -468,6 +468,7 @@ class PlaylistsMviFragment :
                         recentLocalPlaylists = get(),
                         starredItems = get(),
                         unfinishedItems = get(),
+                        strings = get()
                     ).create()
                 }
                 scoped<PlaylistsMviContract.Strings> { PlaylistsMviStrings(get()) }

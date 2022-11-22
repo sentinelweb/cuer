@@ -22,7 +22,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
 import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonColors
 import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonStroke
-import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
+import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 
 object OnboardingComposables {
     var isTransitioning = false

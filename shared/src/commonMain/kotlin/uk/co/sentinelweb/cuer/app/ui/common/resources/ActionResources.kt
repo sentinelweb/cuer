@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.resources
+package uk.co.sentinelweb.cuer.app.ui.common.resources
 
 import kotlinx.serialization.Serializable
 
