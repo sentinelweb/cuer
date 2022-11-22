@@ -23,7 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -232,8 +232,8 @@ interface PlaylistContract {
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(),get()) }
-                scoped { ShareWrapper(this.getFragmentActivity()) }
+                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped { AndroidShareWrapper(this.getFragmentActivity()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped {
                     PlayUseCase(

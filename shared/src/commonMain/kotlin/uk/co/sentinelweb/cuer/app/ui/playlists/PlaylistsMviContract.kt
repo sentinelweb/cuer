@@ -111,5 +111,6 @@ class PlaylistsMviContract {
         open val playlist_dialog_title = "Select playlist"
         open val playlists_error_circular = "That's a circular reference ..."
         open val playlists_error_cant_play = "Cannot launch playlist"
+        open val playlists_error_cant_load = "Couldn't load playlist ..."
     }
 }

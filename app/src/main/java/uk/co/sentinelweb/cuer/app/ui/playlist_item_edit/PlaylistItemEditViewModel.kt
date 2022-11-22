@@ -36,7 +36,7 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -57,7 +57,7 @@ class PlaylistItemEditViewModel constructor(
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
-    private val shareWrapper: ShareWrapper,
+    private val shareWrapper: AndroidShareWrapper,
     private val playUseCase: PlayUseCase,
     private val linkNavigator: LinkNavigator,
     private val recentLocalPlaylists: RecentLocalPlaylists,

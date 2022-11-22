@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
@@ -52,6 +53,7 @@ class PlaylistsMviStoreFactory(
     private val unfinishedItems: UnfinishedItemsPlayistInteractor,
     private val strings: PlaylistsMviContract.Strings,
     private val platformLauncher: PlatformLaunchWrapper,
+    private val shareWrapper: ShareWrapper,
 ) {
     private sealed class Result {
         data class Load(
@@ -119,6 +121,8 @@ class PlaylistsMviStoreFactory(
                 is Intent.Move -> moveItem(intent, getState())
                 is Intent.ClearMove -> clearMoveState(getState())
                 is Intent.Play -> play(intent, getState())
+                is Intent.Share -> share(intent, getState())
+                is Intent.Star -> star(intent, getState())
                 else -> Unit
             }
 
@@ -181,6 +185,29 @@ class PlaylistsMviStoreFactory(
                     ?.apply { platformLauncher.launchPlaylist(platformId!!) }
                     ?: let { publish(Label.Error(strings.playlists_error_cant_play)) }
             }
+        }
+        // endregion
+
+        // region actions
+        private fun star(intent: Intent.Star, state: State) {
+            scope.launch {
+                state.findPlaylist(intent.item)
+                    ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 }
+                    ?.let { it.copy(starred = !it.starred) }
+                    ?.also { playlistOrchestrator.save(it, LOCAL.flatOptions()) }
+            }
+        }
+
+        private fun share(intent: Intent.Share, state: State) {
+            state.findPlaylist(intent.item)
+                ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 && it.type != PlaylistDomain.PlaylistTypeDomain.APP }
+                ?.let { itemDomain ->
+                    scope.launch {
+                        playlistOrchestrator.loadById(itemDomain.id!!, LOCAL.deepOptions())
+                            ?.also { shareWrapper.share(it) }
+                            ?: publish(Label.Error(strings.playlists_error_cant_load))
+                    }
+                }
         }
         // endregion
 

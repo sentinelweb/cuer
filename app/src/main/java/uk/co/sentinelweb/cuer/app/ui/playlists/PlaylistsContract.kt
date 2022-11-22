@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -127,7 +127,7 @@ interface PlaylistsContract {
                     )
                 }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
-                scoped { ShareWrapper(this.getFragmentActivity()) }
+                scoped { AndroidShareWrapper(this.getFragmentActivity()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }

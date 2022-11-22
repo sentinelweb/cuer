@@ -27,7 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 
 interface AytPortraitContract {
     companion object {
@@ -96,7 +96,7 @@ interface AytPortraitContract {
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<CommitHost> { EmptyCommitHost() }
                 scoped { AlertDialogCreator(get<AytPortraitActivity>()) }
-                scoped { ShareWrapper(get<AytPortraitActivity>()) }
+                scoped { AndroidShareWrapper(get<AytPortraitActivity>()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 scoped { ShareNavigationHack() }
             }

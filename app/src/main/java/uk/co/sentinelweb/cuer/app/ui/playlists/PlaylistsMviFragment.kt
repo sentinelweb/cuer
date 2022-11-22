@@ -55,7 +55,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -424,14 +424,15 @@ class PlaylistsMviFragment :
                         starredItems = get(),
                         unfinishedItems = get(),
                         strings = get(),
-                        platformLauncher = get()
+                        platformLauncher = get(),
+                        shareWrapper = get()
                     ).create()
                 }
                 scoped<PlaylistsMviContract.Strings> { PlaylistsMviStrings(get()) }
                 scoped { PlaylistsMviModelMapper(get()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
-                scoped { ShareWrapper(this.getFragmentActivity()) }
+                scoped<ShareWrapper> { AndroidShareWrapper(this.getFragmentActivity()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }

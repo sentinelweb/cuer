@@ -26,7 +26,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
@@ -59,7 +59,7 @@ class PlaylistsPresenter(
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val searchMapper: SearchMapper,
     private val merge: PlaylistMergeOrchestrator,
-    private val shareWrapper: ShareWrapper,
+    private val shareWrapper: AndroidShareWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val starredItems: StarredItemsPlayistInteractor,
     private val unfinishedItems: UnfinishedItemsPlayistInteractor,
@@ -213,6 +213,7 @@ class PlaylistsPresenter(
         }
     }
 
+    // done
     override fun performPlay(
         item: PlaylistsItemMviContract.Model,
         external: Boolean,

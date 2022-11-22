@@ -5,17 +5,17 @@ import android.content.Intent.*
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
+import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.channelUrl
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.videoShortUrl
 
-class ShareWrapper(
+class AndroidShareWrapper(
     private val activity: AppCompatActivity
-) {
-    fun share(media: MediaDomain) {
+) : ShareWrapper {
+    override fun share(media: MediaDomain) {
         Intent().apply {
             action = ACTION_SEND
             data = Uri.parse(media.url)
@@ -33,7 +33,7 @@ class ShareWrapper(
         }
     }
 
-    fun share(playlist: PlaylistDomain) {
+    override fun share(playlist: PlaylistDomain) {
         Intent().apply {
             action = ACTION_SEND
             data = Uri.parse(playlistUrl(playlist))
@@ -59,11 +59,9 @@ class ShareWrapper(
             putExtra(EXTRA_TEXT, shareData.text)
             putExtra(EXTRA_SUBJECT, shareData.subject)
             type = "text/plain"
-        }.let {
-            Intent.createChooser(it, shareData.title)
-        }.run {
-            activity.startActivity(this)
         }
+            .let { createChooser(it, shareData.title) }
+            .run { activity.startActivity(this) }
     }
 
     private fun fullMessage(media: MediaDomain): String {
@@ -75,7 +73,7 @@ class ShareWrapper(
                     |by "${media.channelData.title}" (${channelUrl(media)})
                     | 
                     |🌎 https://cuer.app
-                    """
+                    """.trimIndent()
     }
 
     private fun shortMessage(media: MediaDomain): String {
@@ -83,36 +81,40 @@ class ShareWrapper(
                     |${media.url}
                     |
                     |by "${media.channelData.title}" (${channelUrl(media)})
-                    """
+                    """.trimIndent()
     }
 
     private fun playlistMessage(playlist: PlaylistDomain): String {
-        val sb = StringBuilder()
-        sb.append("Playlist: ").append(playlist.title).append("\n\n")
-        if (playlist.type == PLATFORM) {
-            sb.append("URL:").append(playlistUrl(playlist)).append("\n\n")
-        }
-        playlist.config.description?.apply {
-            sb.append(this).append("\n\n")
-        }
-        if (playlist.items.size > 0) {
-            sb.append(Character.toChars(0x1F4FA)).append(" Videos:\n\n")
-            playlist.items.forEach {
-                it.media.apply {
-                    if (starred) {
-                        sb.append(Character.toChars(0x2B50)).append(" ")
-                    }
-                    sb.append(title).append("\n")
-                    sb.append(videoShortUrl(this)).append("\n")
-                    sb.append("   by: ").append(channelData.title).append(" - ")
-                        .append(channelData.customUrl ?: channelUrl(channelData))
-                        .append("\n\n")
-                }
-            }
-        }
+        val header = """
+            Playlist: ${playlist.title}
+            
+            
+        """.trimIndent()
+        val url = playlist.platformId?.let {
+            """
+            URL: ${playlistUrl(playlist)}
+            
+            
+            """.trimIndent()
+        } ?: ""
+        val desc = playlist.config.description?.let { "Description:\n $it\n\n" } ?: ""
 
-        sb.append("\uD83C\uDF0E https://cuer.app")
-        return sb.toString()
+        val items = if (playlist.items.size > 0) {
+            "🎥 Videos:\n\n" +
+                    playlist.items.joinToString("\n") {
+                        it.media.let {
+                            (if (it.starred) "⭐️ " else "") + """
+                        ${it.title}
+                        ${videoShortUrl(it)}
+                           by: ${it.channelData.title} = ${it.channelData.customUrl ?: channelUrl(it.channelData)}
+                        
+                    """.trimIndent()
+                        }
+                    }
+        } else ""
+        val footer = "🌎 https://cuer.app"
+
+        return header + url + desc + items + footer
     }
 
     fun getLinkFromIntent(intent: Intent): String? =
