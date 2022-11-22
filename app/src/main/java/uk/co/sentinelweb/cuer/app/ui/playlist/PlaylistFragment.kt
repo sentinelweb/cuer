@@ -106,6 +106,7 @@ class PlaylistFragment :
 
     private val searchMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_search)
+
     private val cardsMenuItem: MenuItem
         get() = binding.playlistToolbar.menu.findItem(R.id.playlist_view_cards)
 
@@ -520,14 +521,16 @@ class PlaylistFragment :
     }
 
     override fun showItemDescription(modelId: Long, item: PlaylistItemDomain, source: Source) {
-        adapter.getItemViewForId(modelId)?.let { view ->
-            PlaylistFragmentDirections.actionGotoPlaylistItem(
-                item.serialise(),
-                source.toString(),
-                -1,
-                (item.playlistId ?: 0) > 0
-            ).apply { findNavController().navigate(this, view.makeTransitionExtras()) }
-        }
+        adapter
+            .getItemViewForId(modelId)
+            ?.let { view ->
+                PlaylistFragmentDirections.actionGotoPlaylistItem(
+                    item.serialise(),
+                    source.toString(),
+                    -1,
+                    (item.playlistId ?: 0) > 0
+                ).apply { findNavController().navigate(this, view.makeTransitionExtras()) }
+            }
     }
 
     override fun gotoEdit(id: Long, source: Source) {

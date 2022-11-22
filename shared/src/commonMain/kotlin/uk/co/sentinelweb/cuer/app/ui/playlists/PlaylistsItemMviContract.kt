@@ -6,6 +6,10 @@ import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class PlaylistsItemMviContract {
+
+    // used to retain the view while passing through the MVI - Don't hold
+    interface ItemPassView
+
     sealed class Model(override val id: Long) : ItemBaseModel(id) {
 
         data class HeaderModel(

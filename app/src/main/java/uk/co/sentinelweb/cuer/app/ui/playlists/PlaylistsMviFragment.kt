@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
@@ -28,10 +29,12 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsBinding
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
@@ -73,7 +76,7 @@ class PlaylistsMviFragment :
             Label.Repaint -> repaint()
             is Label.ShowUndo -> showUndo(msg = label.message, undoType = label.undoType)
             is Label.ShowPlaylistsSelector -> showPlaylistSelector(config = label.config)
-            is Label.Navigate -> navigate(nav = label.model, null)
+            is Label.Navigate -> navigate(nav = label.model, label.view as ItemContract.ItemView)
             is Label.ItemRemoved -> notifyItemRemoved(label.model)
         }.also { log.d(label.toString()) }
 
@@ -324,26 +327,26 @@ class PlaylistsMviFragment :
     private fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?) {
         when (nav.target) {
             // todo fix tansitions
-//            NavigationModel.Target.PLAYLIST ->
-//                sourceView?.let { view ->
-//                    PlaylistsMviFragmentDirections.actionGotoPlaylist(
-//                        (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
-//                        nav.params[IMAGE_URL] as String?,
-//                        nav.params[PLAYLIST_ID] as Long,
-//                        nav.params[PLAY_NOW] as Boolean,
-//                    )
-//                        .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
-//                }
-//
-//            NavigationModel.Target.PLAYLIST_EDIT ->
-//                sourceView?.let { view ->
-//                    PlaylistsMviFragmentDirections.actionEditPlaylist(
-//                        (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
-//                        nav.params[IMAGE_URL] as String?,
-//                        nav.params[PLAYLIST_ID] as Long,
-//                    )
-//                        .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
-//                }
+            NavigationModel.Target.PLAYLIST ->
+                sourceView?.let { view ->
+                    PlaylistsMviFragmentDirections.actionGotoPlaylist(
+                        (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
+                        nav.params[IMAGE_URL] as String?,
+                        nav.params[PLAYLIST_ID] as Long,
+                        (nav.params[PLAY_NOW] ?: false) as Boolean,
+                    )
+                        .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
+                }
+
+            NavigationModel.Target.PLAYLIST_EDIT ->
+                sourceView?.let { view ->
+                    PlaylistsMviFragmentDirections.actionEditPlaylist(
+                        (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
+                        nav.params[IMAGE_URL] as String?,
+                        nav.params[PLAYLIST_ID] as Long,
+                    )
+                        .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
+                }
 
             else -> navRouter.navigate(nav)
         }
@@ -371,8 +374,7 @@ class PlaylistsMviFragment :
 
     // region ItemContract.Interactions
     override fun onClick(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        //presenter.performOpen(item, sourceView)
-        viewProxy.dispatch(Event.OnOpenPlaylist(item))
+        viewProxy.dispatch(Event.OnOpenPlaylist(item, sourceView))
     }
 
     override fun onRightSwipe(item: PlaylistsItemMviContract.Model) {
@@ -411,13 +413,11 @@ class PlaylistsMviFragment :
     }
 
     override fun onImageClick(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        //presenter.onItemImageClicked(item, sourceView)
-        viewProxy.dispatch(Event.OnOpenPlaylist(item))
+        viewProxy.dispatch(Event.OnOpenPlaylist(item, sourceView))
     }
 
     override fun onEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        //presenter.performEdit(item, sourceView)
-        viewProxy.dispatch(Event.OnEdit(item))
+        viewProxy.dispatch(Event.OnEdit(item, sourceView))
     }
 
     override fun onDelete(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
@@ -441,32 +441,6 @@ class PlaylistsMviFragment :
     companion object {
         val fragmentModule = module {
             scope(named<PlaylistsMviFragment>()) {
-//                scoped<PlaylistsContract.Presenter> {
-//                    PlaylistsPresenter(
-//                        view = get(),
-//                        state = get(),
-//                        playlistOrchestrator = get(),
-//                        playlistStatsOrchestrator = get(),
-//                        modelMapper = get(),
-//                        queue = get(),
-//                        log = get(),
-//                        toastWrapper = get(),
-//                        prefsWrapper = get(),
-//                        coroutines = get(),
-//                        newMedia = get(),
-//                        recentItems = get(),
-//                        localSearch = get(),
-//                        remoteSearch = get(),
-//                        ytJavaApi = get(),
-//                        searchMapper = get(),
-//                        merge = get(),
-//                        shareWrapper = get(),
-//                        recentLocalPlaylists = get(),
-//                        starredItems = get(),
-//                        unfinishedItems = get(),
-//                        res = get(),
-//                    )
-//                }
                 scoped {
                     PlaylistsMviController(
                         store = get(),
@@ -499,17 +473,13 @@ class PlaylistsMviFragment :
                 scoped<PlaylistsMviContract.Strings> { PlaylistsMviStrings(get()) }
                 scoped { PlaylistsMviModelMapper(get()) }
                 scoped<SnackbarWrapper> {
-                    AndroidSnackbarWrapper(
-                        this.getFragmentActivity(),
-                        get()
-                    )
+                    AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }
                 scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped { ShareWrapper(this.getFragmentActivity()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
-//                viewModel { PlaylistsContract.State() }
                 scoped { PlaylistsHelpConfig(get()) }
             }
         }

@@ -4,6 +4,8 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.ItemPassView
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
@@ -20,14 +22,14 @@ class PlaylistsMviContract {
             data class Undo(val undoType: UndoType) : Intent()
             data class Move(val fromPosition: Int, val toPosition: Int) : Intent()
             object CommitMove : Intent()
-            data class OpenPlaylist(val item: PlaylistsItemMviContract.Model) : Intent()
-            data class MoveSwipe(val item: PlaylistsItemMviContract.Model) : Intent()
-            data class Delete(val item: PlaylistsItemMviContract.Model) : Intent()
-            data class Play(val item: PlaylistsItemMviContract.Model, val external: Boolean) : Intent()
-            data class Star(val item: PlaylistsItemMviContract.Model) : Intent()
-            data class Share(val item: PlaylistsItemMviContract.Model) : Intent()
-            data class Merge(val item: PlaylistsItemMviContract.Model) : Intent()
-            data class Edit(val item: PlaylistsItemMviContract.Model) : Intent()
+            data class OpenPlaylist(val item: Model, val view: ItemPassView? = null) : Intent()
+            data class MoveSwipe(val item: Model) : Intent()
+            data class Delete(val item: Model) : Intent()
+            data class Play(val item: Model, val external: Boolean) : Intent()
+            data class Star(val item: Model) : Intent()
+            data class Share(val item: Model) : Intent()
+            data class Merge(val item: Model) : Intent()
+            data class Edit(val item: Model, val view: ItemPassView? = null) : Intent()
         }
 
         sealed class Label {
@@ -36,8 +38,8 @@ class PlaylistsMviContract {
             object Repaint : Label()
             data class ShowUndo(val undoType: UndoType, val message: String) : Label()
             data class ShowPlaylistsSelector(val config: PlaylistsMviDialogContract.Config) : Label()
-            data class Navigate(val model: NavigationModel) : Label()
-            data class ItemRemoved(val model: PlaylistsItemMviContract.Model) : Label()
+            data class Navigate(val model: NavigationModel, val view: ItemPassView? = null) : Label()
+            data class ItemRemoved(val model: Model) : Label()
         }
 
         data class State(
@@ -73,15 +75,16 @@ class PlaylistsMviContract {
             data class OnUndo(val undoType: UndoType) : Event()
             data class OnMove(val fromPosition: Int, val toPosition: Int) : Event()
             object OnCommitMove : Event()
-            data class OnOpenPlaylist(val item: PlaylistsItemMviContract.Model) : Event()
+            data class OnOpenPlaylist(val item: PlaylistsItemMviContract.Model, val view: ItemPassView? = null) :
+                Event()
+
             data class OnMoveSwipe(val item: PlaylistsItemMviContract.Model) : Event()
             data class OnDelete(val item: PlaylistsItemMviContract.Model) : Event()
             data class OnPlay(val item: PlaylistsItemMviContract.Model, val external: Boolean) : Event()
             data class OnStar(val item: PlaylistsItemMviContract.Model) : Event()
             data class OnShare(val item: PlaylistsItemMviContract.Model) : Event()
             data class OnMerge(val item: PlaylistsItemMviContract.Model) : Event()
-            data class OnEdit(val item: PlaylistsItemMviContract.Model) : Event()
-
+            data class OnEdit(val item: PlaylistsItemMviContract.Model, val view: ItemPassView? = null) : Event()
         }
     }
 

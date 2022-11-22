@@ -14,7 +14,7 @@ interface ItemContract {
         ROW, HEADER, LIST, TILE
     }
 
-    interface ItemView {
+    interface ItemView : PlaylistsItemMviContract.ItemPassView {
         fun makeTransitionExtras(): FragmentNavigator.Extras
     }
 

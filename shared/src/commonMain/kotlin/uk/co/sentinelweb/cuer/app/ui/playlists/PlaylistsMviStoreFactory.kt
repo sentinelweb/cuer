@@ -112,19 +112,29 @@ class PlaylistsMviStoreFactory(
             when (intent) {
                 Intent.Refresh -> refresh()
                 Intent.CreatePlaylist ->
-                    publish(Navigate(NavigationModel(PLAYLIST_CREATE, mapOf(SOURCE to LOCAL))))
+                    publish(Navigate(NavigationModel(PLAYLIST_CREATE, mapOf(SOURCE to LOCAL)), null))
 
-                is Intent.OpenPlaylist -> openPlaylist(intent.item)
+                is Intent.OpenPlaylist -> openPlaylist(intent.item, intent.view)
+                is Intent.Edit -> openEdit(intent.item, intent.view)
                 else -> dispatch(Result.Empty)
             }
 
-        private fun openPlaylist(item: PlaylistsItemMviContract.Model) {
+        private fun openPlaylist(item: PlaylistsItemMviContract.Model, view: PlaylistsItemMviContract.ItemPassView?) {
             if (item is PlaylistsItemMviContract.Model.ItemModel) {
                 recentLocalPlaylists.addRecentId(item.id)
                 // fixme move lasttab to shared
                 //prefsWrapper.lastBottomTab = MainContract.LastTab.PLAYLIST.ordinal
                 publish(
-                    Navigate(NavigationModel(PLAYLIST, mapOf(SOURCE to item.source, PLAYLIST_ID to item.id)))
+                    Navigate(NavigationModel(PLAYLIST, mapOf(SOURCE to item.source, PLAYLIST_ID to item.id)), view)
+                )
+            } else Unit
+        }
+
+        private fun openEdit(item: PlaylistsItemMviContract.Model, view: PlaylistsItemMviContract.ItemPassView?) {
+            if (item is PlaylistsItemMviContract.Model.ItemModel) {
+                recentLocalPlaylists.addRecentId(item.id)
+                publish(
+                    Navigate(NavigationModel(PLAYLIST, mapOf(SOURCE to item.source, PLAYLIST_ID to item.id)), view)
                 )
             } else Unit
         }

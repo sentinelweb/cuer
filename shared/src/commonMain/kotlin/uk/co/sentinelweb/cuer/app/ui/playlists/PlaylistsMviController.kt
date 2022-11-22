@@ -36,11 +36,11 @@ class PlaylistsMviController constructor(
             Event.OnCommitMove -> Intent.CommitMove
             Event.OnCreatePlaylist -> Intent.CreatePlaylist
             is Event.OnDelete -> Intent.Delete(item)
-            is Event.OnEdit -> Intent.Edit(item)
+            is Event.OnEdit -> Intent.Edit(item, view)
             is Event.OnMerge -> Intent.Merge(item)
             is Event.OnMove -> Intent.Move(fromPosition, toPosition)
             is Event.OnMoveSwipe -> Intent.MoveSwipe(item)
-            is Event.OnOpenPlaylist -> Intent.OpenPlaylist(item)
+            is Event.OnOpenPlaylist -> Intent.OpenPlaylist(item, view)
             is Event.OnPlay -> Intent.Play(item, external)
             Event.OnRefresh -> Intent.Refresh
             is Event.OnShare -> Intent.Share(item)
@@ -78,14 +78,6 @@ class PlaylistsMviController constructor(
             view.events.mapNotNull(eventToIntent) bindTo store
         }
         playlistOrchestrator.updates.mapNotNull { Intent.Refresh } bindTo store
-//        playControls.intentFlow bindTo store
-//        // queue -> store
-//        queueConsumer.currentItemFlow
-//            .filterNotNull()
-//            .mapNotNull { trackChangeToIntent(it) } bindTo store
-//        queueConsumer.currentPlaylistFlow
-//            .filterNotNull()
-//            .mapNotNull { playlistChangeToIntent(it) } bindTo store
     }
 
     fun onViewDestroyed() {
