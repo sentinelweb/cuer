@@ -16,6 +16,9 @@
 		551322AC292BD9A000212FF5 /* TabViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551322AB292BD9A000212FF5 /* TabViews.swift */; };
 		551322AE292BDA0B00212FF5 /* greek.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 551322AD292BDA0B00212FF5 /* greek.jpg */; };
 		55540C082928010800086F37 /* Identifiables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55540C072928010800086F37 /* Identifiables.swift */; };
+		55724FB0292E659A0014B547 /* IosShareWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FAF292E659A0014B547 /* IosShareWrapper.swift */; };
+		55724FB2292E65E20014B547 /* IosPlatformLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB1292E65E20014B547 /* IosPlatformLauncher.swift */; };
+		55724FB5292E6AE30014B547 /* PlaylistsMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB4292E6AE30014B547 /* PlaylistsMviController.swift */; };
 		BD3F9E98292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
 		BD3F9E99292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
 		BD3F9EA22927952600380350 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; };
@@ -35,7 +38,6 @@
 		BDBEDFBE2922212B0004AEF4 /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFBD2922212B0004AEF4 /* MainCoordinator.swift */; };
 		BDBEDFC02922213B0004AEF4 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFBF2922213B0004AEF4 /* MainView.swift */; };
 		BDBEDFC329228D260004AEF4 /* PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC229228D260004AEF4 /* PlaylistsView.swift */; };
-		BDBEDFC529228D4B0004AEF4 /* PlaylistsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC429228D4B0004AEF4 /* PlaylistsViewModel.swift */; };
 		BDBEDFC729228D5F0004AEF4 /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */; };
 		BDBEDFC929228D700004AEF4 /* PlaylistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */; };
 		BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCA29228D940004AEF4 /* BrowseView.swift */; };
@@ -95,6 +97,9 @@
 		551322AB292BD9A000212FF5 /* TabViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViews.swift; sourceTree = "<group>"; };
 		551322AD292BDA0B00212FF5 /* greek.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = greek.jpg; sourceTree = "<group>"; };
 		55540C072928010800086F37 /* Identifiables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiables.swift; sourceTree = "<group>"; };
+		55724FAF292E659A0014B547 /* IosShareWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosShareWrapper.swift; sourceTree = "<group>"; };
+		55724FB1292E65E20014B547 /* IosPlatformLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosPlatformLauncher.swift; sourceTree = "<group>"; };
+		55724FB4292E6AE30014B547 /* PlaylistsMviController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsMviController.swift; sourceTree = "<group>"; };
 		BD3F9E97292695BF00380350 /* browse_categories.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = browse_categories.json; path = ../../app/src/main/assets/browse_categories.json; sourceTree = "<group>"; };
 		BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstAppearModifier.swift; sourceTree = "<group>"; };
 		BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseMviController.swift; sourceTree = "<group>"; };
@@ -113,7 +118,6 @@
 		BDBEDFBD2922212B0004AEF4 /* MainCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCoordinator.swift; sourceTree = "<group>"; };
 		BDBEDFBF2922213B0004AEF4 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		BDBEDFC229228D260004AEF4 /* PlaylistsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsView.swift; sourceTree = "<group>"; };
-		BDBEDFC429228D4B0004AEF4 /* PlaylistsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsViewModel.swift; sourceTree = "<group>"; };
 		BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistView.swift; sourceTree = "<group>"; };
 		BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistViewModel.swift; sourceTree = "<group>"; };
 		BDBEDFCA29228D940004AEF4 /* BrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseView.swift; sourceTree = "<group>"; };
@@ -192,10 +196,26 @@
 		55540C06292800EB00086F37 /* ui */ = {
 			isa = PBXGroup;
 			children = (
+			);
+			path = ui;
+			sourceTree = "<group>";
+		};
+		55724FAE292E65760014B547 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				55724FAF292E659A0014B547 /* IosShareWrapper.swift */,
+				55724FB1292E65E20014B547 /* IosPlatformLauncher.swift */,
+			);
+			path = util;
+			sourceTree = "<group>";
+		};
+		55724FB3292E692C0014B547 /* ext */ = {
+			isa = PBXGroup;
+			children = (
 				BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */,
 				55540C072928010800086F37 /* Identifiables.swift */,
 			);
-			path = ui;
+			path = ext;
 			sourceTree = "<group>";
 		};
 		BDA559B929264106008C07E1 /* net */ = {
@@ -271,6 +291,7 @@
 		BDBEDFB8292220CD0004AEF4 /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				55724FB3292E692C0014B547 /* ext */,
 				55132297292BADAB00212FF5 /* fonts */,
 				55132294292B9E8700212FF5 /* views */,
 				BDBEDFD6292297A60004AEF4 /* settings */,
@@ -317,7 +338,7 @@
 			isa = PBXGroup;
 			children = (
 				BDBEDFC229228D260004AEF4 /* PlaylistsView.swift */,
-				BDBEDFC429228D4B0004AEF4 /* PlaylistsViewModel.swift */,
+				55724FB4292E6AE30014B547 /* PlaylistsMviController.swift */,
 			);
 			path = playlists;
 			sourceTree = "<group>";
@@ -371,6 +392,7 @@
 		BDBEE01029241FE10004AEF4 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				55724FAE292E65760014B547 /* util */,
 				55132290292B85E100212FF5 /* kotlin */,
 				55540C06292800EB00086F37 /* ui */,
 				BDA559B929264106008C07E1 /* net */,
@@ -556,15 +578,17 @@
 				BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */,
 				BDA559BF292675A8008C07E1 /* Snippets.swift in Sources */,
 				BD3F9EA62927C2EE00380350 /* FirstAppearModifier.swift in Sources */,
+				55724FB2292E65E20014B547 /* IosPlatformLauncher.swift in Sources */,
 				BDBEDFC929228D700004AEF4 /* PlaylistViewModel.swift in Sources */,
 				BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */,
 				BDBEDFC329228D260004AEF4 /* PlaylistsView.swift in Sources */,
+				55724FB0292E659A0014B547 /* IosShareWrapper.swift in Sources */,
+				55724FB5292E6AE30014B547 /* PlaylistsMviController.swift in Sources */,
 				5513228F2928F0E000212FF5 /* CompatKotlin.swift in Sources */,
 				BDBEDFF52923C97A0004AEF4 /* AppDelegate.swift in Sources */,
 				BDBEDFD8292297B70004AEF4 /* SettingsView.swift in Sources */,
 				551322AC292BD9A000212FF5 /* TabViews.swift in Sources */,
 				BDBEDFC729228D5F0004AEF4 /* PlaylistView.swift in Sources */,
-				BDBEDFC529228D4B0004AEF4 /* PlaylistsViewModel.swift in Sources */,
 				BDBEDFC02922213B0004AEF4 /* MainView.swift in Sources */,
 				BDBEDFBE2922212B0004AEF4 /* MainCoordinator.swift in Sources */,
 				551322A0292BB44500212FF5 /* Typeface.swift in Sources */,

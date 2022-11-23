@@ -4,6 +4,8 @@ import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseIosModule
@@ -28,6 +30,8 @@ private fun initKoinInternal(
             }
             factory<ApiKeyProvider>(named(ServiceType.YOUTUBE)) { dependencies.ytApiKey }
             factory<ApiKeyProvider>(named(ServiceType.PIXABAY)) { dependencies.pixabayApiKey }
+            single { dependencies.platformLaunchWrapper }
+            single { dependencies.shareWrapper }
         }
         modules(
             listOf(SharedCoreModule.objectModule, SharedDomainModule.objectModule, DomainNetModule.objectModule)
@@ -48,4 +52,6 @@ data class SharedAppDependencies(
     val config: BuildConfigDomain,
     val ytApiKey: ApiKeyProvider,
     val pixabayApiKey: ApiKeyProvider,
+    val shareWrapper: ShareWrapper,
+    val platformLaunchWrapper: PlatformLaunchWrapper,
 )

@@ -54,7 +54,7 @@ class MainCoordinator: ObservableObject {
     @Published var currentTab: MainTab = MainTab.browse
     @Published var currentPlaylistId: Int = -1
     @Published var playlistViewModel: PlaylistViewModel! = nil
-    @Published var playlistsViewModel: PlaylistsViewModel! = nil
+    @Published var playlistsController: PlaylistsMviControllerHolder! = nil
     @Published var browseController: BrowseControllerHolder! = nil
     @Published var openedURL: URL?
     
@@ -64,7 +64,7 @@ class MainCoordinator: ObservableObject {
         switch(route){
         case .main:
             self.playlistViewModel = createPlaylistViewModel()
-            self.playlistsViewModel = createPlaylistsViewModel()
+            self.playlistsController = createPlaylistsController()
             self.browseController = dependencies.createBrowseHolder()
             self.screen = Parent.main
         case .browse:
@@ -86,11 +86,11 @@ class MainCoordinator: ObservableObject {
         return self.browseController!
     }
     
-    private func createPlaylistsViewModel() -> PlaylistsViewModel {
-        if (self.playlistsViewModel == nil) {
-            self.playlistsViewModel = dependencies.createPlaylistsViewModel()
+    private func createPlaylistsController() -> PlaylistsMviControllerHolder {
+        if (self.playlistsController == nil) {
+            self.playlistsController = dependencies.createPlaylistsHolder()
         }
-        return self.playlistsViewModel!
+        return self.playlistsController!
     }
     
     private func createPlaylistViewModel() -> PlaylistViewModel{

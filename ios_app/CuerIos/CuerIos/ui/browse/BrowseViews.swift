@@ -31,7 +31,6 @@ struct BrowseItem: View {
                 .clipped()
                 .overlay(titleOverlay(item: item), alignment: .bottom)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 25.0))
     }
     
     @ViewBuilder

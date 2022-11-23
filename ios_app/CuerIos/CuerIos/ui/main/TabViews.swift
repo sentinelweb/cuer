@@ -23,6 +23,7 @@ struct TabLabelView: View {
                 .foregroundColor(.primary)
         } icon: {
             Image(systemName: self.systemImage)
+                .font(.system(size: 12)) // fixme size icon: doesnt work
         }
     }
 }

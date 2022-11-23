@@ -38,11 +38,10 @@ class AppDependencies:
 & MainCoordinatorDependency
 & BrowseControllerDependency
 & PlaylistViewModelDependency
-& PlaylistsViewModelDependency
+& PlaylistsControllerDependency
 & SharedDependency
 & SharedFactoriesDependency
 {
-    
     
 #if DEBUG
     private let isDebug = true
@@ -57,7 +56,9 @@ class AppDependencies:
     lazy var shared: SharedAppDependencies = SharedAppDependencies(
         config: self.buildConfig,
         ytApiKey: CuerYoutubeApiKeyProvider(),
-        pixabayApiKey: CuerPixabayApiKeyProvider()
+        pixabayApiKey: CuerPixabayApiKeyProvider(),
+        shareWrapper: IosShareWrapper(),
+        platformLaunchWrapper: IosPlatformLauncher()
     )
     
     var sharedFactories = SharedFactories()
@@ -81,12 +82,11 @@ class AppDependencies:
         )
     }
     
-    func createPlaylistsViewModel() -> PlaylistsViewModel {
-        PlaylistsViewModel(
-            dependencies: PlaylistsViewModelProvider(
-                mainCoordinator: mainCoordinator
-            )
-        )
+    func createPlaylistsHolder() -> PlaylistsMviControllerHolder {
+        PlaylistsMviControllerHolder(dependencies: PlaylistsControllerProvider(
+            mainCoordinator: mainCoordinator,
+            sharedFactories: sharedFactories
+        ))
     }
     
 }

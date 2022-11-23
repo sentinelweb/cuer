@@ -29,7 +29,7 @@ struct MainView: View {
                     .tabItem { TabLabelView(text: "Browse", systemImage: "folder.fill.badge.person.crop") }
                     .tag(MainTab.browse)
                 
-                PlaylistsView(viewModel: coordinator.playlistsViewModel!)
+                PlaylistsView(holder: coordinator.playlistsController!)
                     .tabItem { TabLabelView(text: "Playlists", systemImage: "list.bullet.indent") }
                     .tag(MainTab.playlists)
                 
