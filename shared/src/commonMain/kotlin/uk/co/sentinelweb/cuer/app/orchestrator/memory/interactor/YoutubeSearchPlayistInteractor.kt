@@ -57,7 +57,7 @@ class YoutubeSearchPlayistInteractor constructor(
         type = APP,
         currentIndex = -1,
         starred = true,
-        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/telescope-122960_640.jpg"),
+        image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/telescope-122960_640.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
             playable = false,
             editable = false,

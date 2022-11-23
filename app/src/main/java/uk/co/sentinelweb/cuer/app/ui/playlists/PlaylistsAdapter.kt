@@ -71,9 +71,9 @@ class PlaylistsAdapter constructor(
 
     override fun getItemViewType(position: Int): Int =
         when (data[position]) {
-            is PlaylistsItemMviContract.Model.ItemModel -> ROW.ordinal
-            is PlaylistsItemMviContract.Model.HeaderModel -> HEADER.ordinal
-            is PlaylistsItemMviContract.Model.ListModel -> LIST.ordinal
+            is PlaylistsItemMviContract.Model.Item -> ROW.ordinal
+            is PlaylistsItemMviContract.Model.Header -> HEADER.ordinal
+            is PlaylistsItemMviContract.Model.List -> LIST.ordinal
         }
 
     @Override
@@ -81,18 +81,18 @@ class PlaylistsAdapter constructor(
         when (holderRow) {
             is ItemRowViewHolder -> _data[position].apply {
                 holderRow.itemPresenter.update(
-                    this as PlaylistsItemMviContract.Model.ItemModel,
+                    this as PlaylistsItemMviContract.Model.Item,
                     currentPlaylistId
                 )
             }
             is HeaderViewHolder -> _data[position].apply {
                 holderRow.update(
-                    this as PlaylistsItemMviContract.Model.HeaderModel
+                    this as PlaylistsItemMviContract.Model.Header
                 )
             }
             is ListViewHolder -> _data[position].apply {
                 holderRow.listPresenter.update(
-                    this as PlaylistsItemMviContract.Model.ListModel,
+                    this as PlaylistsItemMviContract.Model.List,
                     currentPlaylistId
                 )
             }

@@ -10,6 +10,8 @@ import shared
 
 extension BrowseContractViewCategoryModel: Identifiable{}
 
+extension PlaylistsItemMviContract.Model: Identifiable{}
+
 extension URL: Identifiable {
 
     public var id: String {

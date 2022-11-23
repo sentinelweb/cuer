@@ -187,7 +187,7 @@ class PlaylistsPresenter(
 
     // done
     override fun performOpen(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        if (item is PlaylistsItemMviContract.Model.ItemModel) {
+        if (item is PlaylistsItemMviContract.Model.Item) {
             recentLocalPlaylists.addRecentId(item.id)
             prefsWrapper.lastBottomTab = PLAYLIST.ordinal
             view.navigate(
@@ -202,7 +202,7 @@ class PlaylistsPresenter(
     // done
     override fun onItemImageClicked(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
         findPlaylist(item)?.id?.apply {
-            if (item is PlaylistsItemMviContract.Model.ItemModel) {
+            if (item is PlaylistsItemMviContract.Model.Item) {
                 view.navigate(
                     PlaylistContract.makeNav(
                         this, null, false, item.source,
@@ -220,7 +220,7 @@ class PlaylistsPresenter(
         sourceView: ItemContract.ItemView
     ) {
         if (!external) {
-            if (item is PlaylistsItemMviContract.Model.ItemModel) {
+            if (item is PlaylistsItemMviContract.Model.Item) {
                 view.navigate(
                     PlaylistContract.makeNav(
                         item.id, null, true, item.source,
@@ -265,7 +265,7 @@ class PlaylistsPresenter(
             PlaylistEditContract.makeNav(
                 item.id,
                 LOCAL,
-                (item as PlaylistsItemMviContract.Model.ItemModel).thumbNailUrl
+                (item as PlaylistsItemMviContract.Model.Item).thumbNailUrl
             ), sourceView
         )
     }

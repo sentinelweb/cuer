@@ -29,7 +29,7 @@ class ItemFactory constructor(
     fun createPresenter(
         view: ItemContract.View,
         interactions: ItemContract.Interactions
-    ): ItemContract.External<PlaylistsItemMviContract.Model.ItemModel> {
+    ): ItemContract.External<PlaylistsItemMviContract.Model.Item> {
         val itemPresenter = ItemPresenter(view, interactions, ItemContract.State(), modelMapper)
         view.setPresenter(itemPresenter)
         return itemPresenter

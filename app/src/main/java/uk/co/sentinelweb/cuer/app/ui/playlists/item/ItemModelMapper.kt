@@ -78,7 +78,7 @@ class ItemModelMapper constructor(
     }
 
     fun mapTopText(
-        model: PlaylistsItemMviContract.Model.ItemModel,
+        model: PlaylistsItemMviContract.Model.Item,
         playing: Boolean,
         type: ItemContract.ItemType
     ): Spannable {
@@ -103,7 +103,7 @@ class ItemModelMapper constructor(
         builder.insert(0, str)
     }
 
-    fun mapBottomText(model: PlaylistsItemMviContract.Model.ItemModel): Spannable {
+    fun mapBottomText(model: PlaylistsItemMviContract.Model.Item): Spannable {
         val countText = if (model.count > 0) model.run { "$newItems / $count " } else ""
         val base = SpannableString("          $countText").let {
             res.replaceSpannableIcon(

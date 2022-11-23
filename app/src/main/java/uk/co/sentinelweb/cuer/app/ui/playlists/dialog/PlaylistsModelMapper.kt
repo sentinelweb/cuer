@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.HeaderModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.Header
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ROOT_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -36,17 +36,17 @@ class PlaylistsModelMapper constructor(
         channelPlaylists
             .takeIf { it.isNotEmpty() }
             ?.let { list ->
-                items.add(HeaderModel(-1L, res.getString(R.string.playlists_section_channel)))
+                items.add(Header(-1L, res.getString(R.string.playlists_section_channel)))
                 items.addAll(channelPlaylists.map { itemModel(it, playlistStats[it.id], pinnedId, 0) })
             }
 
         recentPlaylists
             .takeIf { it.isNotEmpty() }
             ?.let { list ->
-                items.add(HeaderModel(-2L, res.getString(R.string.playlists_section_recent)))
+                items.add(Header(-2L, res.getString(R.string.playlists_section_recent)))
                 items.addAll(list.map { itemModel(it, playlistStats[it.id], pinnedId, 0) })
             }
-        items.add(HeaderModel(-3L, res.getString(R.string.playlists_section_all)))
+        items.add(Header(-3L, res.getString(R.string.playlists_section_all)))
         tree.iterate { treeNode, depth ->
             treeNode.node?.also {
                 items.add(itemModel(it, playlistStats[it.id], pinnedId, depth - 1))
@@ -64,7 +64,7 @@ class PlaylistsModelMapper constructor(
         stats: PlaylistStatDomain?,
         pinnedId: Long?,
         depth: Int
-    ) = Model.ItemModel(
+    ) = Model.Item(
         pl.id ?: -1L,
         pl.title,
         false,

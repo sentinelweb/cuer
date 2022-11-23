@@ -2,19 +2,19 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.Item
 
 class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
     val state: ItemContract.State,
     val modelMapper: ItemModelMapper
-) : ItemContract.Presenter, ItemContract.External<ItemModel> {
+) : ItemContract.Presenter, ItemContract.External<Item> {
 
     override var parentId: Long? = null
 
     override fun update(
-        item: ItemModel,
+        item: Item,
         current: OrchestratorContract.Identifier<*>?
     ) {
         view.setTransitionData(

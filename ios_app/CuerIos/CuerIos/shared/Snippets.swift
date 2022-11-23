@@ -28,3 +28,5 @@ import shared
 //        print("loadPlaylist error: \(error)")
 //    }
 //}
+// print in views
+//let _ = debugPrint("row: \(item.title): \(item.thumbNailUrl)")

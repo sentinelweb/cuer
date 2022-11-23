@@ -10,9 +10,11 @@ import SwiftUI
 
 
 let headerTypeface = Font.custom("DidactGothic-Regular", size: 28)
-let itemTileTypeface = Font.custom("Montserrat-Light", size: 16)
+let itemTileTypeface = Font.custom("Montserrat-Light", size: 14)
 let tabItemTypeface = UIFont(name: "Montserrat-Light", size: 12)
 let tabItemSelectedTypeface = UIFont(name: "Montserrat-Light", size: 14)
+let headerInfoTypeface = Font.custom("Montserrat-Light", size: 14)
+let headerListRowTypeface = Font.custom("Montserrat-Light", size: 16)
 
 //        for fam in UIFont.familyNames {
 //            print(fam)

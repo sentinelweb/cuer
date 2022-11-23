@@ -20,8 +20,8 @@ class HeaderViewHolder(
     override val leftSwipeView: View?
         get() = null
 
-    fun update(headerModel: PlaylistsItemMviContract.Model.HeaderModel) {
-        headerView.setTitle(headerModel.title)
+    fun update(header: PlaylistsItemMviContract.Model.Header) {
+        headerView.setTitle(header.title)
     }
 
     override fun onItemSwiped(left: Boolean) {}

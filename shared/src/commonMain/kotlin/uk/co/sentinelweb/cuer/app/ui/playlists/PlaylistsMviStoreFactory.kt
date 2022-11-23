@@ -134,7 +134,7 @@ class PlaylistsMviStoreFactory(
         }
 
         private fun openPlaylist(intent: Intent.OpenPlaylist) {
-            if (intent.item is PlaylistsItemMviContract.Model.ItemModel) {
+            if (intent.item is PlaylistsItemMviContract.Model.Item) {
                 recentLocalPlaylists.addRecentId(intent.item.id)
                 prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
                 publish(
@@ -147,7 +147,7 @@ class PlaylistsMviStoreFactory(
         }
 
         private fun openEdit(intent: Intent.Edit) {
-            if (intent.item is PlaylistsItemMviContract.Model.ItemModel) {
+            if (intent.item is PlaylistsItemMviContract.Model.Item) {
                 recentLocalPlaylists.addRecentId(intent.item.id)
                 publish(
                     Navigate(
@@ -165,7 +165,7 @@ class PlaylistsMviStoreFactory(
         // region play
         private fun play(intent: Intent.Play, state: State) {
             if (!intent.external) {
-                if (intent.item is PlaylistsItemMviContract.Model.ItemModel) {
+                if (intent.item is PlaylistsItemMviContract.Model.Item) {
                     recentLocalPlaylists.addRecentId(intent.item.id)
                     prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
                     publish(

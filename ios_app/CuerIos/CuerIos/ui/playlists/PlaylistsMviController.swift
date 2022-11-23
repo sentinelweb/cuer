@@ -31,14 +31,14 @@ class PlaylistsMviControllerHolder : ObservableObject {
     private let dependencies: Dependencies
     let lifecycle: LifecycleLifecycleRegistry
     let controller: PlaylistsMviController
-
+    
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
         lifecycle = dependencies.sharedFactories.orchestratorFactory.utils.lifecycleRegistry()
         controller = dependencies.sharedFactories.presentationFactory.playlistsController(lifecycle: lifecycle)
         lifecycle.onCreate()
     }
-
+    
     deinit {
         lifecycle.onDestroy()
     }
@@ -55,9 +55,6 @@ class PlaylistsMviViewProxy : UtilsUBaseView<PlaylistsMviContractViewModel, Play
     var model: PlaylistsMviContractViewModel
     
     private let dependencies: PlaylistsMviControllerHolder.Dependencies
-//    init(dependencies: PlaylistsControllerHolder.Dependencies) {
-//        self.dependencies = dependencies
-//    }
     
     init(dependencies: PlaylistsMviControllerHolder.Dependencies)  {
         model = PlaylistsMviContractViewModel(
@@ -69,17 +66,19 @@ class PlaylistsMviViewProxy : UtilsUBaseView<PlaylistsMviContractViewModel, Play
         self.dependencies = dependencies
         super.init()
     }
-
+    
     override func render(model: PlaylistsMviContractViewModel) {
         self.model = model
     }
     
     func processLabel(label_: PlaylistsMviContractMviStoreLabel) {
         switch(label_) {
-        case is PlaylistsMviContractMviStoreLabel.Message:
-            let messageLabel = label_ as! PlaylistsMviContractMviStoreLabel.Message
+        case let messageLabel as PlaylistsMviContractMviStoreLabel.Message:
             debugPrint("Message: \(messageLabel.message))")
-            // todo show message
+            
+        case let navModel as PlaylistsMviContractMviStoreLabel.Navigate:
+            dependencies.mainCoordinator.navigateModel(model: navModel.model)
+            
         default: debugPrint(label_)
         }
     }

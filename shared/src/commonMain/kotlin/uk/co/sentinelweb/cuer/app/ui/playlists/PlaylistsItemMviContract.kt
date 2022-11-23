@@ -12,17 +12,17 @@ class PlaylistsItemMviContract {
 
     sealed class Model(override val id: Long) : ItemBaseModel(id) {
 
-        data class HeaderModel(
+        data class Header(
             override val id: Long,
             val title: String,
         ) : Model(id)
 
-        data class ListModel(
+        data class List(
             override val id: Long,
-            val items: List<ItemModel>,
+            val items: kotlin.collections.List<Item>,
         ) : Model(id)
 
-        data class ItemModel(
+        data class Item(
             override val id: Long,// todo OrchestratorContract.Identifier
             val title: String,
             val checkIcon: Boolean,

@@ -79,6 +79,15 @@ class MainCoordinator: ObservableObject {
         }
     }
     
+    func navigateModel(model: NavigationModel) {
+        switch(model.target){
+        case .playlist:
+            self.currentTab = MainTab.playlist
+            self.currentPlaylistId = model.params[.playlistId] as! Int
+        default: debugPrint("Not supported: \(model)")
+        }
+    }
+    
     private func createBrowseController() -> BrowseControllerHolder {
         if (self.browseController == nil) {
             self.browseController = dependencies.createBrowseHolder()

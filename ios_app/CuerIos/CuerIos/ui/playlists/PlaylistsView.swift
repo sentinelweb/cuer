@@ -7,13 +7,19 @@
 
 import SwiftUI
 import shared
+import Kingfisher
 
 struct PlaylistsView: View {
+    
     @StateObject
     private var view : PlaylistsMviViewProxy
     
     @StateObject
     private var holder: PlaylistsMviControllerHolder
+    
+    let layout = [
+        GridItem()
+    ]
     
     init(holder: PlaylistsMviControllerHolder) {
         self._holder = StateObject(wrappedValue: holder)
@@ -21,17 +27,46 @@ struct PlaylistsView: View {
     }
     
     var body: some View {
-        VStack {
-            Spacer()
-            Text("Playlists")
-            Spacer()
-            //            Text("Playlist 1").onTapGesture {
-            //                viewModel.navigateToPlaylist(id: 1)
-            //            }
-            //            Text("Playlist 2").onTapGesture {
-            //                viewModel.navigateToPlaylist(id: 2)
-            //            }
-            Spacer()
+        ScrollView {
+            VStack(alignment: .leading) {
+                KFImage(URL(string: view.model.imageUrl))
+                    .fade(duration: 0.3)
+                    .forceTransition()
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: UIScreen.main.bounds.width, height: 150)
+                    .clipped()
+                
+                Text(String(view.model.items.count))
+                    .font(headerInfoTypeface)
+                    .padding(.leading, 8)
+                
+                Text(view.model.title)
+                    .font(headerTypeface)
+                    .padding(.leading, 8)
+                
+                LazyVGrid(columns: layout, alignment: .leading, spacing: 0) {
+                    ForEach(view.model.items) { item in
+                        switch(item) {
+                            
+                        case let header as PlaylistsItemMviContract.ModelHeader:
+                            HeaderItemView(item: header)
+                            
+                        case let itemRow as PlaylistsItemMviContract.ModelItem:
+                            ItemRowView(item: itemRow)
+                                .onTapGesture {view.dispatch(event: PlaylistsMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))}
+                            
+                        case let list as PlaylistsItemMviContract.ModelList:
+                            ListItemView(list: list) { item in
+                                view.dispatch(event: PlaylistsMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))
+                            }
+                            
+                        default:
+                            Text("Unknown Type!")
+                        }
+                    }
+                }
+            }
         }
         .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
         .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }

@@ -49,36 +49,36 @@ class PlaylistsModelMapper constructor(
         val recent = buildRecentList(domains, recentPlaylists)
         val list = mutableListOf(
 
-            PlaylistsItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.Header(
                 ID_APP_HEADER,
                 res.getString(R.string.playlists_section_app)
             ),
-            PlaylistsItemMviContract.Model.ListModel(
+            PlaylistsItemMviContract.Model.List(
                 ID_APP_LIST,
                 appPlaylists.keys.map {
                     itemModel(it, it.id == pinnedId, appPlaylists[it], 0)
                 }),
 
-            PlaylistsItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.Header(
                 ID_RECENT_LIST,
                 res.getString(R.string.playlists_section_recent)
             ),
-            PlaylistsItemMviContract.Model.ListModel(ID_RECENT_LIST,
+            PlaylistsItemMviContract.Model.List(ID_RECENT_LIST,
                 recent.map {
                     itemModel(it, it.id == pinnedId, domains[it], 0)
                 }),
 
-            PlaylistsItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.Header(
                 ID_STARRED_LIST,
                 res.getString(R.string.playlists_section_starred)
             ),
-            PlaylistsItemMviContract.Model.ListModel(
+            PlaylistsItemMviContract.Model.List(
                 ID_STARRED_LIST,
                 starred.map {
                     itemModel(it, it.id == pinnedId, domains[it], 0)
                 }),
 
-            PlaylistsItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.Header(
                 ID_ALL_HEADER,
                 res.getString(R.string.playlists_section_all)
             ),
@@ -114,7 +114,7 @@ class PlaylistsModelMapper constructor(
         pinned: Boolean,
         playlistStatDomain: PlaylistStatDomain?,
         depth: Int
-    ) = PlaylistsItemMviContract.Model.ItemModel(
+    ) = PlaylistsItemMviContract.Model.Item(
         pl.id ?: throw Exception("Playlist must have an id"),
         pl.title.capitalize(Locale.getDefault()),
         false,

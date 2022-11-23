@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item.list
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.ListModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.List
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 
@@ -10,11 +10,11 @@ class ListPresenter(
     private val listView: ItemContract.ListView,
     private val itemFactory: ItemFactory,
     private val interactions: ItemContract.Interactions
-) : ItemContract.ListPresenter, ItemContract.External<ListModel> {
+) : ItemContract.ListPresenter, ItemContract.External<List> {
 
     override var parentId: Long? = null
 
-    override fun update(item: ListModel, current: OrchestratorContract.Identifier<*>?) {
+    override fun update(item: List, current: OrchestratorContract.Identifier<*>?) {
         listView.clear()
         item.items.forEachIndexed { i, itemModel ->
             val itemPresenter = if (state.presenters.size <= i) {
