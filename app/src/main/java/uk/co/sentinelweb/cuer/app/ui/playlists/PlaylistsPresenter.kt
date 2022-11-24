@@ -16,7 +16,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.main.MainCommonContract.LastTab.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
@@ -24,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchMapper
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistMergeUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
@@ -58,7 +58,7 @@ class PlaylistsPresenter(
     private val remoteSearch: YoutubeSearchPlayistInteractor,
     private val ytJavaApi: YoutubeJavaApiWrapper,
     private val searchMapper: SearchMapper,
-    private val merge: PlaylistMergeOrchestrator,
+    private val merge: PlaylistMergeUsecase,
     private val shareWrapper: AndroidShareWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val starredItems: StarredItemsPlayistInteractor,

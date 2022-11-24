@@ -5,7 +5,7 @@ import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor.CustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.browse.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract
@@ -91,9 +91,9 @@ object PresentationModule {
     }
 
     private val resourcesModule = module {
-        factory<CustomisationResources>(named(PlaylistMemoryRepository.MemoryPlaylist.NewItems)) { NewPlaylistCustomisationResources() }
-        factory<CustomisationResources>(named(PlaylistMemoryRepository.MemoryPlaylist.Starred)) { StarredPlaylistCustomisationResources() }
-        factory<CustomisationResources>(named(PlaylistMemoryRepository.MemoryPlaylist.Unfinished)) { UnfinishedPlaylistCustomisationResources() }
+        factory<CustomisationResources>(named(MemoryPlaylist.NewItems)) { NewPlaylistCustomisationResources() }
+        factory<CustomisationResources>(named(MemoryPlaylist.Starred)) { StarredPlaylistCustomisationResources() }
+        factory<CustomisationResources>(named(MemoryPlaylist.Unfinished)) { UnfinishedPlaylistCustomisationResources() }
     }
 
     val modules = listOf(browserModule, playlistsModule, resourcesModule)

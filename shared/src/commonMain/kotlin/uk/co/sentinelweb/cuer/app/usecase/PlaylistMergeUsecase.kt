@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.orchestrator.util
+package uk.co.sentinelweb.cuer.app.usecase
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 
-class PlaylistMergeOrchestrator constructor(
+class PlaylistMergeUsecase constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val log: LogWrapper
 ) {

@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.orchestrator.util
+package uk.co.sentinelweb.cuer.app.usecase
 
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
@@ -11,11 +11,11 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.ext.orderIsAscending
 
-class PlaylistUpdateOrchestrator constructor(
+class PlaylistUpdateUsecase constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
-    private val playlistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator,
+    private val playlistMediaLookupUsecase: PlaylistMediaLookupUsecase,
     private val timeProvider: TimeProvider,
     private val log: LogWrapper,
     private val updateChecker: UpdateCheck
@@ -48,7 +48,7 @@ class PlaylistUpdateOrchestrator constructor(
                             .loadByPlatformId(this, Source.PLATFORM.deepOptions())
                             ?.let { removeExistingItems(it, p) }
                             ?.takeIf { it.items.size > 0 }
-                            ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }
+                            ?.let { playlistMediaLookupUsecase.lookupMediaAndReplace(it) }
                             ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
                             ?.let { UpdateResult(true, it.size) }
                     } ?: updateFail

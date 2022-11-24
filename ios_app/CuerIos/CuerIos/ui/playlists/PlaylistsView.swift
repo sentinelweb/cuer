@@ -36,6 +36,7 @@ struct PlaylistsView: View {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: UIScreen.main.bounds.width, height: 150)
                     .clipped()
+                    .onTapGesture {view.dispatch(event: PlaylistsMviContractViewEvent.OnRefresh())}
                 
                 Text(String(view.model.items.count))
                     .font(headerInfoTypeface)
@@ -50,16 +51,14 @@ struct PlaylistsView: View {
                         switch(item) {
                             
                         case let header as PlaylistsItemMviContract.ModelHeader:
-                            HeaderItemView(item: header)
+                            PlaylistsHeaderItemView(item: header)
                             
                         case let itemRow as PlaylistsItemMviContract.ModelItem:
-                            ItemRowView(item: itemRow)
+                            PlaylistsItemRowView(item: itemRow, actions: view.actions())
                                 .onTapGesture {view.dispatch(event: PlaylistsMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))}
                             
                         case let list as PlaylistsItemMviContract.ModelList:
-                            ListItemView(list: list) { item in
-                                view.dispatch(event: PlaylistsMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))
-                            }
+                            PlaylistsListItemView(list: list, actions: view.actions())
                             
                         default:
                             Text("Unknown Type!")
@@ -71,7 +70,6 @@ struct PlaylistsView: View {
         .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
         .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }
         .onDisappear { holder.lifecycle.onPause();holder.lifecycle.onStop(); }
-        
     }
 }
 

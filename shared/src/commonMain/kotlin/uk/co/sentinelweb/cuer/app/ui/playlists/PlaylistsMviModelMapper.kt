@@ -100,7 +100,11 @@ class PlaylistsMviModelMapper(
             .sortedBy { it.title.lowercase() }
             .toMutableList()
         starred.find { it.default }
-            ?: run { starred.add(0, domains.keys.find { it.default }!!) }
+            ?: run {
+                starred.add(
+                    0,
+                    domains.keys.find { it.default } ?: throw IllegalStateException("No default playlist"))
+            }
         return starred
     }
 

@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.orchestrator.util
+package uk.co.sentinelweb.cuer.app.usecase
 
 import kotlinx.coroutines.delay
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
@@ -9,7 +9,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 
-class PlaylistOrDefaultOrchestrator constructor(
+class PlaylistOrDefaultUsecase constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
     private val playlistMemoryRepository: PlaylistMemoryRepository,
 ) {

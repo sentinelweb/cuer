@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import KMPNativeCoroutinesAsync
 import shared
 
 protocol BrowseControllerDependency {
@@ -62,10 +63,12 @@ class BrowseViewProxy : UtilsUBaseView<BrowseContractViewModel, BrowseContractVi
     @Published
     var model: BrowseContractViewModel
     
+    @Published
+    var loading: Bool = false
+    
     private let dependencies: BrowseControllerHolder.Dependencies
-//    init(dependencies: BrowseControllerHolder.Dependencies) {
-//        self.dependencies = dependencies
-//    }
+
+    //let taskHandler: ((Task<(), Never>) ->Void)?
     
     init(dependencies: BrowseControllerHolder.Dependencies)  {
         model = BrowseContractViewModel(
@@ -87,9 +90,41 @@ class BrowseViewProxy : UtilsUBaseView<BrowseContractViewModel, BrowseContractVi
         case is BrowseContractMviStoreLabel.AddPlaylist:
             let addLabel = label as! BrowseContractMviStoreLabel.AddPlaylist
 //            let str:String = playlistUrl(platformId: addLabel.cat.platformId)
-            let str = "https://www.youtube.com/playlist?list=" + addLabel.cat.platformId!
-            self.dependencies.mainCoordinator.open(URL.init(string: str)!)
+            // let str = "https://www.youtube.com/playlist?list=" + addLabel.cat.platformId!
+            // self.dependencies.mainCoordinator.open(URL.init(string: str)!)
+            
+            addPlaylist(cat: addLabel.cat, parentId: addLabel.parentId)
         default: debugPrint(label)
         }
+    }
+    
+    func addPlaylist(cat: DomainCategoryDomain, parentId: KotlinLong?) {
+        loading = true
+        let task = Task {
+            do {
+                let result = try await asyncFunction(
+                    for: dependencies.sharedFactories.orchestratorFactory.addBrowsePlaylistUsecaseExecute(category: cat, parentId: parentId) //parentId
+                )
+                // debugPrint("addBrowsePlaylistUsecase:\(result)")
+                if result != nil {
+                    if let playlist = result {
+                        DispatchQueue.main.async {
+                            //self.updateCurrentBatch(batchId: actualData as String)
+                            //let str = "https://www.youtube.com/playlist?list=" + playlist.platformId!
+                            //self.dependencies.mainCoordinator.open(URL.init(string: str)!)
+                            self.loading = false
+                            self.dependencies.mainCoordinator.navigate(route: .playlists)
+                        }
+                    }
+                    
+                } else { debugPrint("addBrowsePlaylistUsecase: no data") }
+                
+            } catch {
+                print("addBrowsePlaylistUsecase: Failed with error: \(error)")
+                loading = false
+            }
+        }
+        //self.taskHandler?(task)
+        
     }
 }

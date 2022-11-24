@@ -10,4 +10,11 @@ import shared
 
 class IosShareWrapper: ShareWrapper {
     
+    override func share(media: DomainMediaDomain) {
+        debugPrint("share: \(fullMessage(media: media))")
+    }
+    
+    override func share(playlist: DomainPlaylistDomain) {
+        debugPrint("share: \(playlistMessage(playlist: playlist))")
+    }
 }

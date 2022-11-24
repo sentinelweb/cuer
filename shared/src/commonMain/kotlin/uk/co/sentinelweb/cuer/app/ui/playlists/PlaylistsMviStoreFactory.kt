@@ -13,7 +13,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
@@ -26,6 +25,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.UndoType.Pla
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.UndoType.SearchDelete
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviStoreFactory.Action.Init
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistMergeUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
@@ -55,7 +55,7 @@ class PlaylistsMviStoreFactory(
     private val strings: PlaylistsMviContract.Strings,
     private val platformLauncher: PlatformLaunchWrapper,
     private val shareWrapper: ShareWrapper,
-    private val merge: PlaylistMergeOrchestrator,
+    private val merge: PlaylistMergeUsecase,
 ) {
     private sealed class Result {
         data class Load(

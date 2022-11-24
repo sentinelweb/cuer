@@ -7,24 +7,24 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistMergeUsecase
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.*
 
-class PlaylistMergeOrchestratorTest {
+class PlaylistMergeUsecaseTest {
 
     @MockK
     lateinit var mockPlaylistOrchestrator: PlaylistOrchestrator
 
     private val log = SystemLogWrapper()
 
-    private lateinit var sut: PlaylistMergeOrchestrator
+    private lateinit var sut: PlaylistMergeUsecase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        sut = PlaylistMergeOrchestrator(playlistOrchestrator = mockPlaylistOrchestrator, log = log)
+        sut = PlaylistMergeUsecase(playlistOrchestrator = mockPlaylistOrchestrator, log = log)
     }
 
     @Test

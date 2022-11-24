@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.orchestrator.util
+package uk.co.sentinelweb.cuer.app.usecase
 
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.MediaIdListFilter
@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.domain.ext.summarise
 /**
  * Checks for any existing media items in the playlist.
  */
-class PlaylistMediaLookupOrchestrator constructor(
+class PlaylistMediaLookupUsecase constructor(
     private val mediaOrchestrator: MediaOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val log: LogWrapper
@@ -26,7 +26,7 @@ class PlaylistMediaLookupOrchestrator constructor(
     suspend fun lookupMediaAndReplace(playlist: PlaylistDomain): PlaylistDomain {
         log.i("lookupMediaAndReplace: playlist: ${playlist.summarise()}")
         val mediaLookup = buildMediaLookup(playlist)
-        log.i("lookupMediaAndReplace: mediaLookup: $mediaLookup")
+        //log.i("lookupMediaAndReplace: mediaLookup: $mediaLookup")
         return playlist.copy(
             id = null,
             items = playlist.items.map {
@@ -59,7 +59,7 @@ class PlaylistMediaLookupOrchestrator constructor(
         ).let { existingMedia ->
             // fixme this crashes where the playlist has duplicate media in the source
             val existingMediaPlatformIds = existingMedia.map { it.platformId }
-            log.d("buildMediaLookup: existingMediaPlatformIds: ${existingMedia.map { "${it.id} ${it.platformId}" }}")
+            //log.d("buildMediaLookup: existingMediaPlatformIds: ${existingMedia.map { "${it.id} ${it.platformId}" }}")
             playlist.items
                 .map { it.media }
                 .toMutableList()

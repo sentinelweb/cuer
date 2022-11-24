@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.orchestrator.util
+package uk.co.sentinelweb.cuer.app.usecase
 
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.orchestrator.*
@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-class AddLinkOrchestrator constructor(
+class AddLinkUsecase constructor(
     private val mediaOrchestrator: MediaOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val playlistOrchestrator: PlaylistOrchestrator,
@@ -52,7 +52,7 @@ class AddLinkOrchestrator constructor(
             ?.let { playlistItemOrchestrator.save(item, LOCAL.deepOptions()) }
             ?: let {
                 playlistOrchestrator.loadList(DefaultFilter, LOCAL.flatOptions())
-                    .get(0)// throws exception if not found but should always be there
+                    .get(0) // throws exception if not found but should always be there
                     .let { item.copy(playlistId = it.id) }
                     .let { playlistItemOrchestrator.save(it, LOCAL.deepOptions()) }
             }

@@ -13,12 +13,12 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
-import uk.co.sentinelweb.cuer.app.orchestrator.util.*
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
+import uk.co.sentinelweb.cuer.app.usecase.*
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
 import uk.co.sentinelweb.cuer.app.util.link.TimecodeExtractor
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -37,7 +37,7 @@ object SharedAppModule {
                 log = get(),
                 prefsWrapper = get(),
                 mediaUpdate = get(),
-                playlistOrDefaultOrchestrator = get(),
+                playlistOrDefaultUsecase = get(),
                 recentLocalPlaylists = get()
             )
         }
@@ -54,15 +54,10 @@ object SharedAppModule {
         single { MediaOrchestrator(get(), get()) }
         single { ChannelOrchestrator(get(), get()) }
         single { PlaylistStatsOrchestrator(get()) }
-        factory { PlaylistUpdateOrchestrator(get(), get(), get(), get(), get(), get(), get()) }
-        factory<PlaylistUpdateOrchestrator.UpdateCheck> { PlaylistUpdateOrchestrator.PlatformUpdateCheck() }
-        factory { PlaylistMergeOrchestrator(get(), get()) }
-        factory { PlaylistMediaLookupOrchestrator(get(), get(), get()) }
         single { NewMediaPlayistInteractor(get(), get(), get(), get(named(NewItems))) }
         single { RecentItemsPlayistInteractor(get(), get()) }
         single { StarredItemsPlayistInteractor(get(), get(), get(), get(named(Starred))) }
         single { UnfinishedItemsPlayistInteractor(get(), get(), get(), get(named(Unfinished))) }
-        factory { AddLinkOrchestrator(get(), get(), get(), get(), get()) }
         single { LocalSearchPlayistInteractor(get(), get(), get()) }
         single {
             YoutubeSearchPlayistInteractor(
@@ -72,8 +67,6 @@ object SharedAppModule {
                 YoutubeSearchPlayistInteractor.State()
             )
         }
-        factory { PlaylistMediaUpdateOrchestrator(get()) }
-        factory { PlaylistOrDefaultOrchestrator(get(), get()) }
         factory {
             mapOf(
                 NewItems.id to get<NewMediaPlayistInteractor>(),
@@ -84,6 +77,18 @@ object SharedAppModule {
                 Unfinished.id to get<UnfinishedItemsPlayistInteractor>(),
             )
         }
+    }
+
+    private val usecaseModule = module {
+        factory { PlaylistUpdateUsecase(get(), get(), get(), get(), get(), get(), get()) }
+        factory<PlaylistUpdateUsecase.UpdateCheck> { PlaylistUpdateUsecase.PlatformUpdateCheck() }
+        factory { PlaylistMergeUsecase(get(), get()) }
+        factory { PlaylistMediaLookupUsecase(get(), get(), get()) }
+        factory { AddLinkUsecase(get(), get(), get(), get(), get()) }
+        factory { PlaylistMediaUpdateUsecase(get()) }
+        factory { PlaylistOrDefaultUsecase(get(), get()) }
+        factory { AddPlaylistUsecase(get(), get(), get(), get()) }
+        factory { AddBrowsePlaylistUsecase(get(), get(), get(), get()) }
     }
 
     private val objectModule = module {
@@ -118,5 +123,6 @@ object SharedAppModule {
         .plus(orchestratorModule)
         .plus(queueModule)
         .plus(dbModule)
+        .plus(usecaseModule)
         .plus(DescriptionContract.viewModule)
 }
