@@ -2,7 +2,9 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -73,7 +75,6 @@ class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.C
 
     fun updateDialogModel(model: PlaylistsMviDialogContract.Model) {
         log.d("updateDialogModel: size:${model.playistsModel?.items?.size}")
-        //updateDialogNoList(model)
         setList(model, false)
     }
 
@@ -84,10 +85,6 @@ class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.C
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onResume() {
@@ -179,7 +176,6 @@ class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.C
     //endregion
 
     companion object {
-
         fun newInstance(config: PlaylistsMviDialogContract.Config): PlaylistsVMDialogFragment {
             return PlaylistsVMDialogFragment(config)
         }
@@ -200,15 +196,15 @@ class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.C
                         recentLocalPlaylists = get()
                     )
                 }
-                scoped { PlaylistsModelMapper(/*get()*/) }
+                scoped { PlaylistsModelMapper(get()) }
                 scoped { PlaylistsDialogModelMapper() }
                 scoped { PlaylistsDialogAdapter(get(), get()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped { ItemFactory(get()) }
                 scoped { ItemModelMapper(get(), get()) }
                 scoped { PlaylistsMviDialogContract.State() }
+                scoped { PlaylistsMviDialogContract.Strings() }
             }
         }
-
     }
 }

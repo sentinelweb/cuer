@@ -43,6 +43,13 @@ interface PlaylistsMviDialogContract {
         val showUnPin: Boolean
     )
 
+    open class Strings {
+        open val playlists_section_channel = "For this channel"
+        open val playlists_section_recent = "Recent"
+        open val playlists_section_all = "All"
+        open val playlists_dialog_title = "Select Playlist"
+    }
+
     companion object {
         val ADD_PLAYLIST_DUMMY = PlaylistDomain.createDummy("Add Playlist")
         val ROOT_PLAYLIST_DUMMY = PlaylistDomain.createDummy("Top level")
