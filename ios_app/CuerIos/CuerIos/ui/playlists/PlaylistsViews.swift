@@ -38,8 +38,26 @@ struct PlaylistsItemRowView: View {
             Text(item.title)
             Spacer()
         }
-        .frame(width: UIScreen.main.bounds.width)
+        .frame(maxWidth: .infinity)
         .overlay(contextMenuOverlay(item: item, actions: actions), alignment: .trailing)
+        .padding(.leading, CGFloat(item.depth) * 10.0)
+        .padding(.bottom, 2)
+        .swipeActions(edge: .leading) {
+            Button {
+                actions.moveAction(item: item)
+            } label: {
+                Label("Move", systemImage: "arrow.up.and.down.and.arrow.left.and.right")
+            }
+            .tint(Color.ui.moveColor)
+        }
+        .swipeActions(edge: .trailing) {
+            Button {
+                actions.deleteAction(item: item)
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+            .tint(Color.ui.deleteColor)
+        }
     }
 }
 
@@ -51,7 +69,7 @@ struct PlaylistsListItemView: View {
     let layout = [GridItem(.fixed(100))]
     
     var body: some View {
-        ScrollView{
+        ScrollView(.horizontal){
             LazyHGrid(rows: layout, spacing: 1) {
                 ForEach(list.items) { item in
                     KFImage(URL(string: item.thumbNailUrl ?? DEFAULT_IMAGE))
@@ -95,9 +113,6 @@ private func contextMenuOverlay(
         .frame(width: 30, height: 30, alignment: .center)
         .onTapGesture {}
         .contextMenu {
-//            Section {
-//              Text("Title")
-//            }
             Button() {actions.playAction(item: item)} label: {
                 Label("Launch", systemImage: "arrow.up.right.video.fill")
             }
@@ -129,8 +144,6 @@ private func contextMenuOverlay(
             Button(role: .destructive) {actions.deleteAction(item: item)} label: {
                 Label("Delete", systemImage: "trash")
             }
-            
-            
         }
 }
 

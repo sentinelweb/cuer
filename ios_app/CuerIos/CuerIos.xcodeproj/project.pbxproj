@@ -14,7 +14,6 @@
 		551322A9292BD71000212FF5 /* montserrat_light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A7292BD71000212FF5 /* montserrat_light.ttf */; };
 		551322AA292BD71000212FF5 /* didactgothic_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A8292BD71000212FF5 /* didactgothic_regular.ttf */; };
 		551322AC292BD9A000212FF5 /* TabViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551322AB292BD9A000212FF5 /* TabViews.swift */; };
-		551322AE292BDA0B00212FF5 /* greek.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 551322AD292BDA0B00212FF5 /* greek.jpg */; };
 		55540C082928010800086F37 /* Identifiables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55540C072928010800086F37 /* Identifiables.swift */; };
 		55724FB0292E659A0014B547 /* IosShareWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FAF292E659A0014B547 /* IosShareWrapper.swift */; };
 		55724FB2292E65E20014B547 /* IosPlatformLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB1292E65E20014B547 /* IosPlatformLauncher.swift */; };
@@ -22,6 +21,7 @@
 		55724FB7292EBCEC0014B547 /* PlaylistsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB6292EBCEC0014B547 /* PlaylistsViews.swift */; };
 		55724FB9292EC0E40014B547 /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB8292EC0E40014B547 /* Const.swift */; };
 		55724FBB292EC43F0014B547 /* default-dbinit.json in Resources */ = {isa = PBXBuildFile; fileRef = 55724FBA292EC43F0014B547 /* default-dbinit.json */; };
+		55724FBE29301DD50014B547 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FBD29301DD50014B547 /* Colors.swift */; };
 		BD3F9E98292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
 		BD3F9E99292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
 		BD3F9EA22927952600380350 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; };
@@ -93,10 +93,9 @@
 		55132295292B9EAC00212FF5 /* BrowseViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseViews.swift; sourceTree = "<group>"; };
 		5513229E292BB22800212FF5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5513229F292BB44500212FF5 /* Typeface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typeface.swift; sourceTree = "<group>"; };
-		551322A7292BD71000212FF5 /* montserrat_light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = montserrat_light.ttf; path = ../../../../../app/src/main/res/font/montserrat_light.ttf; sourceTree = "<group>"; };
-		551322A8292BD71000212FF5 /* didactgothic_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = didactgothic_regular.ttf; path = ../../../../../app/src/main/res/font/didactgothic_regular.ttf; sourceTree = "<group>"; };
+		551322A7292BD71000212FF5 /* montserrat_light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = montserrat_light.ttf; path = ../../../../../../app/src/main/res/font/montserrat_light.ttf; sourceTree = "<group>"; };
+		551322A8292BD71000212FF5 /* didactgothic_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = didactgothic_regular.ttf; path = ../../../../../../app/src/main/res/font/didactgothic_regular.ttf; sourceTree = "<group>"; };
 		551322AB292BD9A000212FF5 /* TabViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViews.swift; sourceTree = "<group>"; };
-		551322AD292BDA0B00212FF5 /* greek.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = greek.jpg; sourceTree = "<group>"; };
 		55540C072928010800086F37 /* Identifiables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiables.swift; sourceTree = "<group>"; };
 		55724FAF292E659A0014B547 /* IosShareWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosShareWrapper.swift; sourceTree = "<group>"; };
 		55724FB1292E65E20014B547 /* IosPlatformLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosPlatformLauncher.swift; sourceTree = "<group>"; };
@@ -104,6 +103,7 @@
 		55724FB6292EBCEC0014B547 /* PlaylistsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsViews.swift; sourceTree = "<group>"; };
 		55724FB8292EC0E40014B547 /* Const.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Const.swift; sourceTree = "<group>"; };
 		55724FBA292EC43F0014B547 /* default-dbinit.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "default-dbinit.json"; path = "../../app/src/main/assets/default-dbinit.json"; sourceTree = "<group>"; };
+		55724FBD29301DD50014B547 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		BD3F9E97292695BF00380350 /* browse_categories.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = browse_categories.json; path = ../../app/src/main/assets/browse_categories.json; sourceTree = "<group>"; };
 		BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstAppearModifier.swift; sourceTree = "<group>"; };
 		BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseMviController.swift; sourceTree = "<group>"; };
@@ -178,14 +178,6 @@
 			path = kotlin;
 			sourceTree = "<group>";
 		};
-		55132294292B9E8700212FF5 /* views */ = {
-			isa = PBXGroup;
-			children = (
-				551322AD292BDA0B00212FF5 /* greek.jpg */,
-			);
-			path = views;
-			sourceTree = "<group>";
-		};
 		55132297292BADAB00212FF5 /* fonts */ = {
 			isa = PBXGroup;
 			children = (
@@ -219,6 +211,15 @@
 				55540C072928010800086F37 /* Identifiables.swift */,
 			);
 			path = ext;
+			sourceTree = "<group>";
+		};
+		55724FBC29301DBE0014B547 /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				55132297292BADAB00212FF5 /* fonts */,
+				55724FBD29301DD50014B547 /* Colors.swift */,
+			);
+			path = resources;
 			sourceTree = "<group>";
 		};
 		BDA559B929264106008C07E1 /* net */ = {
@@ -294,10 +295,9 @@
 		BDBEDFB8292220CD0004AEF4 /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				55724FBC29301DBE0014B547 /* resources */,
 				55724FB8292EC0E40014B547 /* Const.swift */,
 				55724FB3292E692C0014B547 /* ext */,
-				55132297292BADAB00212FF5 /* fonts */,
-				55132294292B9E8700212FF5 /* views */,
 				BDBEDFD6292297A60004AEF4 /* settings */,
 				BDBEDFD3292295E20004AEF4 /* safari */,
 				BDBEDFBC292220FD0004AEF4 /* browse */,
@@ -527,7 +527,6 @@
 				BD3F9E98292695BF00380350 /* browse_categories.json in Resources */,
 				BDA559B829264018008C07E1 /* ApiKeys.plist in Resources */,
 				551322A9292BD71000212FF5 /* montserrat_light.ttf in Resources */,
-				551322AE292BDA0B00212FF5 /* greek.jpg in Resources */,
 				BDBEDF9329221FD20004AEF4 /* Assets.xcassets in Resources */,
 				55724FBB292EC43F0014B547 /* default-dbinit.json in Resources */,
 			);
@@ -586,6 +585,7 @@
 				BDBEDFC929228D700004AEF4 /* PlaylistViewModel.swift in Sources */,
 				BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */,
 				BDBEDFC329228D260004AEF4 /* PlaylistsView.swift in Sources */,
+				55724FBE29301DD50014B547 /* Colors.swift in Sources */,
 				55724FB0292E659A0014B547 /* IosShareWrapper.swift in Sources */,
 				55724FB5292E6AE30014B547 /* PlaylistsMviController.swift in Sources */,
 				5513228F2928F0E000212FF5 /* CompatKotlin.swift in Sources */,

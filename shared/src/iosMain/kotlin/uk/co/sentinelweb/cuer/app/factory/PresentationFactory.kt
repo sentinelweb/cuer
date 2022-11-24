@@ -6,6 +6,7 @@ import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseController
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviController
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogViewModel
 
 class PresentationFactory : KoinComponent {
 
@@ -16,4 +17,6 @@ class PresentationFactory : KoinComponent {
     fun playlistsController(lifecycle: Lifecycle): PlaylistsMviController {
         return get(parameters = { parametersOf(lifecycle) })
     }
+
+    fun playlistsDialogViewModel(): PlaylistsDialogViewModel = get()
 }

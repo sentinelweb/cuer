@@ -105,20 +105,14 @@ class BrowseViewProxy : UtilsUBaseView<BrowseContractViewModel, BrowseContractVi
                 let result = try await asyncFunction(
                     for: dependencies.sharedFactories.orchestratorFactory.addBrowsePlaylistUsecaseExecute(category: cat, parentId: parentId) //parentId
                 )
-                // debugPrint("addBrowsePlaylistUsecase:\(result)")
                 if result != nil {
                     if let playlist = result {
                         DispatchQueue.main.async {
-                            //self.updateCurrentBatch(batchId: actualData as String)
-                            //let str = "https://www.youtube.com/playlist?list=" + playlist.platformId!
-                            //self.dependencies.mainCoordinator.open(URL.init(string: str)!)
                             self.loading = false
                             self.dependencies.mainCoordinator.navigate(route: .playlists)
                         }
                     }
-                    
                 } else { debugPrint("addBrowsePlaylistUsecase: no data") }
-                
             } catch {
                 print("addBrowsePlaylistUsecase: Failed with error: \(error)")
                 loading = false

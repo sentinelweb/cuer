@@ -12,6 +12,10 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviController
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviStoreFactory
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogModelMapper
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogViewModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsModelMapper
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.resources.NewPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.StarredPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.UnfinishedPlaylistCustomisationResources
@@ -96,5 +100,25 @@ object PresentationModule {
         factory<CustomisationResources>(named(MemoryPlaylist.Unfinished)) { UnfinishedPlaylistCustomisationResources() }
     }
 
-    val modules = listOf(browserModule, playlistsModule, resourcesModule)
+    val playlistsDialogModule = module {
+        factory {
+            PlaylistsDialogViewModel(
+                state = get(),
+                playlistOrchestrator = get(),
+                playlistStatsOrchestrator = get(),
+                modelMapper = get(),
+                dialogModelMapper = get(),
+                log = get(),
+                prefsWrapper = get(),
+                coroutines = get(),
+                recentLocalPlaylists = get()
+            )
+        }
+        factory { PlaylistsModelMapper(get()) }
+        factory { PlaylistsDialogModelMapper() }
+        factory { PlaylistsMviDialogContract.State() }
+        factory { PlaylistsMviDialogContract.Strings() }
+    }
+
+    val modules = listOf(browserModule, playlistsModule, resourcesModule, playlistsDialogModule)
 }
