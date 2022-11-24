@@ -19,7 +19,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistsItemTileBinding
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
@@ -136,8 +136,8 @@ class ItemTileView() :
 
     override fun makeTransitionExtras(): FragmentNavigator.Extras =
         FragmentNavigatorExtras(
-            _binding.listitemTop to PlaylistsContract.PLAYLIST_TRANS_TITLE,
-            _binding.listitemIcon to PlaylistsContract.PLAYLIST_TRANS_IMAGE
+            _binding.listitemTop to PlaylistsMviFragment.PLAYLIST_TRANS_TITLE,
+            _binding.listitemIcon to PlaylistsMviFragment.PLAYLIST_TRANS_IMAGE
         )
 
 }

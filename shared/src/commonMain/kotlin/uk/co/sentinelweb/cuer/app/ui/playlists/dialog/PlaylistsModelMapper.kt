@@ -1,14 +1,12 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
-import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.Header
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ROOT_PLAYLIST_DUMMY
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ROOT_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
@@ -16,8 +14,9 @@ import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 import uk.co.sentinelweb.cuer.domain.ext.iterate
 
+// todo strings
 class PlaylistsModelMapper constructor(
-    private val res: ResourceWrapper
+    // private val res: ResourceWrapper
 ) {
 
     fun map(
@@ -28,7 +27,7 @@ class PlaylistsModelMapper constructor(
         tree: PlaylistTreeDomain,
         playlistStats: Map<Long?, PlaylistStatDomain?>,
         showRoot: Boolean,
-    ): PlaylistsContract.Model {
+    ): PlaylistsMviContract.View.Model {
         val items = mutableListOf<Model>()
         if (showRoot) {
             items.add(itemModel(ROOT_PLAYLIST_DUMMY, null, pinnedId, 0))
@@ -36,24 +35,24 @@ class PlaylistsModelMapper constructor(
         channelPlaylists
             .takeIf { it.isNotEmpty() }
             ?.let { list ->
-                items.add(Header(-1L, res.getString(R.string.playlists_section_channel)))
+                items.add(Header(-1L, "For this channel"))//res.getString(R.string.playlists_section_channel)
                 items.addAll(channelPlaylists.map { itemModel(it, playlistStats[it.id], pinnedId, 0) })
             }
 
         recentPlaylists
             .takeIf { it.isNotEmpty() }
             ?.let { list ->
-                items.add(Header(-2L, res.getString(R.string.playlists_section_recent)))
+                items.add(Header(-2L, "Recent")) // res.getString(R.string.playlists_section_recent)
                 items.addAll(list.map { itemModel(it, playlistStats[it.id], pinnedId, 0) })
             }
-        items.add(Header(-3L, res.getString(R.string.playlists_section_all)))
+        items.add(Header(-3L, "All")) // res.getString(R.string.playlists_section_all)
         tree.iterate { treeNode, depth ->
             treeNode.node?.also {
                 items.add(itemModel(it, playlistStats[it.id], pinnedId, depth - 1))
             }
         }
-        return PlaylistsContract.Model(
-            title = res.getString(R.string.playlists_title),
+        return PlaylistsMviContract.View.Model(
+            title = "Select playlist",//res.getString(R.string.playlists_title)
             currentPlaylistId = current,
             items = items
         )

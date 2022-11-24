@@ -37,5 +37,5 @@ class OnboardingContract {
         fun build(): Config
     }
 
-    enum class Event { Finished }
+    enum class Label { Finished }
 }

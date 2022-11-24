@@ -8,23 +8,34 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
+import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistsDialogBinding
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindFlow
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Label.Dismiss
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
+import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Config) :
+class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.Config) :
     DialogFragment(),
-    PlaylistsDialogContract.View,
+//    PlaylistsDialogContract.View,
     ItemContract.Interactions,
     ItemBaseContract.ItemMoveInteractions,
     AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource<PlaylistsDialogFragment>()
-    private val presenter: PlaylistsDialogContract.Presenter by inject()
+    override val scope: Scope by fragmentScopeWithSource<PlaylistsVMDialogFragment>()
+
+    //private val presenter: PlaylistsDialogContract.Presenter by inject()
+    private val viewModel: PlaylistsDialogViewModel by inject()
     private val adapter: PlaylistsDialogAdapter by inject()
     private val log: LogWrapper by inject()
 
@@ -46,25 +57,31 @@ class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Con
 
         binding.pdfList.layoutManager = LinearLayoutManager(context)
         binding.pdfList.adapter = adapter
-        binding.pdfSwipe.setOnRefreshListener { presenter.refreshList() }
-        binding.pdfAddButton.setOnClickListener { presenter.onAddPlaylist() }
-        binding.pdfPinSelectedButton.setOnClickListener { presenter.onPinSelectedPlaylist(false) }
-        binding.pdfPinUnselectedButton.setOnClickListener { presenter.onPinSelectedPlaylist(true) }
+        binding.pdfSwipe.setOnRefreshListener { viewModel.refreshList() }
+        binding.pdfAddButton.setOnClickListener { viewModel.onAddPlaylist() }
+        binding.pdfPinSelectedButton.setOnClickListener { viewModel.onPinSelectedPlaylist(false) }
+        binding.pdfPinUnselectedButton.setOnClickListener { viewModel.onPinSelectedPlaylist(true) }
         //itemTouchHelper.attachToRecyclerView(pdf_list)
-
-        presenter.setConfig(config)
+        viewModel.setConfig(config)
+        bindFlow(viewModel.label, ::observeLabel)
+        bindFlow(viewModel.model, ::updateDialogModel)
     }
 
-    override fun updateDialogModel(model: PlaylistsDialogContract.Model) {
-        updateDialogNoList(model)
+    private fun observeLabel(label: PlaylistsMviDialogContract.Label) = when (label) {
+        Dismiss -> dismiss()
+    }
+
+    fun updateDialogModel(model: PlaylistsMviDialogContract.Model) {
+        log.d("updateDialogModel: size:${model.playistsModel?.items?.size}")
+        //updateDialogNoList(model)
+        setList(model, false)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        presenter.onDismiss()
+        viewModel.onDismiss()
     }
 
     override fun onDestroyView() {
-        presenter.destroy()
         _binding = null
         super.onDestroyView()
     }
@@ -75,25 +92,26 @@ class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Con
 
     override fun onResume() {
         super.onResume()
-        presenter.onResume()
+        viewModel.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        presenter.onPause()
+        viewModel.onPause()
     }
     // endregion
 
     // region PlaylistContract.View
-    override fun setList(model: PlaylistsDialogContract.Model, animate: Boolean) {
+    fun setList(model: PlaylistsMviDialogContract.Model, animate: Boolean) {
         updateDialogNoList(model)
         model.playistsModel?.items?.apply { adapter.setData(this, animate) }
     }
 
-    private fun updateDialogNoList(model: PlaylistsDialogContract.Model) {
+    private fun updateDialogNoList(model: PlaylistsMviDialogContract.Model) {
         binding.pdfSwipe.isRefreshing = false
         adapter.currentPlaylistId = model.playistsModel?.currentPlaylistId
         binding.pdfAddButton.isVisible = model.showAdd
+        binding.pdfButtonBg.isVisible = model.showAdd
         binding.pdfPinSelectedButton.isVisible = model.showPin
         binding.pdfPinUnselectedButton.isVisible = model.showUnPin
     }
@@ -111,7 +129,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Con
 
     // region ItemContract.Interactions
     override fun onClick(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        presenter.onItemClicked(item)
+        viewModel.onItemClicked(item)
     }
 
     override fun onRightSwipe(item: PlaylistsItemMviContract.Model) {
@@ -147,7 +165,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Con
     }
 
     override fun onImageClick(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
-        presenter.onItemClicked(item)
+        viewModel.onItemClicked(item)
     }
 
     override fun onEdit(item: PlaylistsItemMviContract.Model, sourceView: ItemContract.ItemView) {
@@ -162,8 +180,34 @@ class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Con
 
     companion object {
 
-        fun newInstance(config: PlaylistsMviDialogContract.Config): PlaylistsDialogFragment {
-            return PlaylistsDialogFragment(config)
+        fun newInstance(config: PlaylistsMviDialogContract.Config): PlaylistsVMDialogFragment {
+            return PlaylistsVMDialogFragment(config)
+        }
+
+        @JvmStatic
+        val fragmentModule = module {
+            scope(named<PlaylistsVMDialogFragment>()) {
+                scoped {
+                    PlaylistsDialogViewModel(
+                        state = get(),
+                        playlistOrchestrator = get(),
+                        playlistStatsOrchestrator = get(),
+                        modelMapper = get(),
+                        log = get(),
+                        prefsWrapper = get(),
+                        coroutines = get(),
+                        dialogModelMapper = get(),
+                        recentLocalPlaylists = get()
+                    )
+                }
+                scoped { PlaylistsModelMapper(/*get()*/) }
+                scoped { PlaylistsDialogModelMapper() }
+                scoped { PlaylistsDialogAdapter(get(), get()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
+                scoped { ItemFactory(get()) }
+                scoped { ItemModelMapper(get(), get()) }
+                scoped { PlaylistsMviDialogContract.State() }
+            }
         }
 
     }

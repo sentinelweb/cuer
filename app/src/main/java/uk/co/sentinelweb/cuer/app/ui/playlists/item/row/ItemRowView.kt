@@ -18,8 +18,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistsItemRowBinding
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract.Companion.PLAYLIST_TRANS_IMAGE
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract.Companion.PLAYLIST_TRANS_TITLE
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment.Companion.PLAYLIST_TRANS_IMAGE
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment.Companion.PLAYLIST_TRANS_TITLE
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider

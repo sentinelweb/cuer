@@ -24,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.context.GlobalContext
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
@@ -43,8 +44,8 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Model
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsVMDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
@@ -286,7 +287,7 @@ class PlaylistsMviFragment :
 
     private fun showPlaylistSelector(config: PlaylistsMviDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()
-        dialogFragment = PlaylistsDialogFragment.newInstance(config)
+        dialogFragment = PlaylistsVMDialogFragment.newInstance(config)
         dialogFragment?.show(childFragmentManager, "PlaylistsSelector")
     }
 
@@ -395,6 +396,13 @@ class PlaylistsMviFragment :
     }
 
     companion object {
+        val PLAYLIST_TRANS_IMAGE by lazy {
+            GlobalContext.get().get<ResourceWrapper>().getString(R.string.playlist_trans_image)
+        }
+        val PLAYLIST_TRANS_TITLE by lazy {
+            GlobalContext.get().get<ResourceWrapper>().getString(R.string.playlist_trans_title)
+        }
+
         val fragmentModule = module {
             scope(named<PlaylistsMviFragment>()) {
                 scoped {

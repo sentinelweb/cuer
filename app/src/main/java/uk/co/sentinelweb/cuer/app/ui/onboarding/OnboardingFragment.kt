@@ -51,8 +51,8 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
 
     }
 
-    private fun observeEvent(event: OnboardingContract.Event) = when (event) {
-        OnboardingContract.Event.Finished -> dismiss()
+    private fun observeLabel(label: OnboardingContract.Label) = when (label) {
+        OnboardingContract.Label.Finished -> dismiss()
     }
 
     override fun onAttach(context: Context) {
@@ -62,7 +62,7 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
 
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
-        bindFlow(viewModel.event, ::observeEvent)
+        bindFlow(viewModel.label, ::observeLabel)
     }
 
     override fun onDestroyView() {

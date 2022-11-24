@@ -1,14 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract
 
 class PlaylistsDialogModelMapper() {
 
     fun map(
-        playlistsModel: PlaylistsContract.Model?,
+        playlistsModel: PlaylistsMviContract.View.Model?,
         config: PlaylistsMviDialogContract.Config,
         pinOn: Boolean
-    ) = PlaylistsDialogContract.Model(
+    ) = PlaylistsMviDialogContract.Model(
         playlistsModel,
         config.showAdd,
         config.showPin && pinOn,
