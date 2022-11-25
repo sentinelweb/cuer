@@ -13,7 +13,7 @@ struct MainView: View {
     // updated from onReceive at bottom of view
     //      @State private var screen: Screen = Screen.launch
     @State private var playlistViewModel: PlaylistViewModel?
-    
+
     init(mainCoordinator: MainCoordinator) {
         self._coordinator = StateObject(wrappedValue: mainCoordinator)
     }
@@ -48,6 +48,7 @@ struct MainView: View {
                 if (coordinator.playlistSelectDialog != nil) {
                     let _ = debugPrint("showPlaylistsDialog")
                     PlaylistsDialogView(holder: coordinator.playlistSelectDialog!)
+                        .transition(.opacity.animation(.easeIn(duration: 0.5)))
                 }
             }
             .onAppear() {

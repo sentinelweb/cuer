@@ -47,7 +47,6 @@ struct PlaylistsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 0))
             
             ForEach(view.model.items) { item in
-                let _ = debugPrint(item.id)
                 switch(item) {
                     
                 case let header as PlaylistsItemMviContract.ModelHeader:
