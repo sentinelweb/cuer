@@ -9,12 +9,19 @@ import Foundation
 import shared
 
 class IosShareWrapper: ShareWrapper {
+    let mainCoordnator: MainCoordinator
+    
+    init(mainCoordinator:MainCoordinator) {
+        self.mainCoordnator = mainCoordinator
+    }
     
     override func share(media: DomainMediaDomain) {
-        debugPrint("share: \(fullMessage(media: media))")
+        mainCoordnator.share(fullMessage(media: media))
+        //debugPrint("share: \(fullMessage(media: media))")
     }
     
     override func share(playlist: DomainPlaylistDomain) {
-        debugPrint("share: \(playlistMessage(playlist: playlist))")
+        mainCoordnator.share(playlistMessage(playlist: playlist))
+        //debugPrint("share: \(playlistMessage(playlist: playlist))")
     }
 }

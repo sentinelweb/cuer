@@ -7,15 +7,15 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import com.google.android.youtube.player.YouTubeIntents.*
+import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl.Companion.channelUrl
+import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl.Companion.videoUrl
+import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl.Companion.videoUrlWithTime
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.NO_PLATFORM_ID
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.channelUrl
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.videoUrl
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.videoUrlWithTime
 
 @Suppress("TooManyFunctions")
 class YoutubeJavaApiWrapper(

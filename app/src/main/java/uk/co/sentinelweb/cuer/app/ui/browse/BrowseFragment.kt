@@ -36,12 +36,12 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl.Companion.playlistUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 
 class BrowseFragment : Fragment(), AndroidScopeComponent {
 

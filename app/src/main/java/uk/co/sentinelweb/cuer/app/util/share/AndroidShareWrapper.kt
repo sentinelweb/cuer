@@ -5,10 +5,10 @@ import android.content.Intent.*
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
+import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl.Companion.playlistUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 
 class AndroidShareWrapper(
     private val activity: AppCompatActivity

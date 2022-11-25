@@ -60,6 +60,10 @@ struct MainView: View {
                 SafariView(url: $0)
                     .edgesIgnoringSafeArea(.all)
             }
+            .sheet(item: $coordinator.shareData) {
+                ShareSheet(activityItems: [$0])
+                    .edgesIgnoringSafeArea(.all)
+            }
             .onReceive(coordinator.$playlistViewModel, perform: {vm in playlistViewModel=vm})
             
         default:

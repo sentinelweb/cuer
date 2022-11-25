@@ -25,6 +25,7 @@
 		55B8622F29303A2300972AD6 /* PlaylistsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B8622E29303A2300972AD6 /* PlaylistsDialogView.swift */; };
 		55B8623129303C9300972AD6 /* PlaylistsDialogViewModelHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B8623029303C9300972AD6 /* PlaylistsDialogViewModelHolder.swift */; };
 		55B862342930ED7F00972AD6 /* TitleNavView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B862332930ED7F00972AD6 /* TitleNavView.swift */; };
+		55B862362931336D00972AD6 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B862352931336D00972AD6 /* ShareSheet.swift */; };
 		BD3F9E98292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
 		BD3F9E99292695BF00380350 /* browse_categories.json in Resources */ = {isa = PBXBuildFile; fileRef = BD3F9E97292695BF00380350 /* browse_categories.json */; };
 		BD3F9EA22927952600380350 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */; };
@@ -110,6 +111,7 @@
 		55B8622E29303A2300972AD6 /* PlaylistsDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsDialogView.swift; sourceTree = "<group>"; };
 		55B8623029303C9300972AD6 /* PlaylistsDialogViewModelHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsDialogViewModelHolder.swift; sourceTree = "<group>"; };
 		55B862332930ED7F00972AD6 /* TitleNavView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleNavView.swift; sourceTree = "<group>"; };
+		55B862352931336D00972AD6 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		BD3F9E97292695BF00380350 /* browse_categories.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = browse_categories.json; path = ../../app/src/main/assets/browse_categories.json; sourceTree = "<group>"; };
 		BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstAppearModifier.swift; sourceTree = "<group>"; };
 		BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseMviController.swift; sourceTree = "<group>"; };
@@ -232,6 +234,7 @@
 			isa = PBXGroup;
 			children = (
 				55B862332930ED7F00972AD6 /* TitleNavView.swift */,
+				55B862352931336D00972AD6 /* ShareSheet.swift */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -594,6 +597,7 @@
 			files = (
 				BDBEE0152924312C0004AEF4 /* PlaylistContract.swift in Sources */,
 				55540C082928010800086F37 /* Identifiables.swift in Sources */,
+				55B862362931336D00972AD6 /* ShareSheet.swift in Sources */,
 				BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */,
 				BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */,
 				55B8622F29303A2300972AD6 /* PlaylistsDialogView.swift in Sources */,

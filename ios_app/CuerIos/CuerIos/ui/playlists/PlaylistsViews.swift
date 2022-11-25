@@ -56,6 +56,7 @@ struct PlaylistsItemRowViewActions: View {
     
     var body: some View {
         PlaylistsItemRowView(item: item)
+            //.background(Color(.green))
             .overlay(contextMenuOverlay(item: item, actions: actions), alignment: .trailing)
             .swipeActions(edge: .leading) {
                 Button {
@@ -95,7 +96,8 @@ struct PlaylistsListItemView: View {
                         .frame(width: 100, height: 100)
                         .clipped()
                         .overlay(titleOverlay(item: item), alignment: .bottom)
-                        .overlay(contextMenuOverlay(item: item, actions: actions), alignment: .topTrailing)
+                        // this doesnt work with List
+                        //.overlay(contextMenuOverlay(item: item, actions: actions), alignment: .topTrailing)
                         .onTapGesture {actions.tapAction(item: item)}
                 }
             }
@@ -126,17 +128,17 @@ private func contextMenuOverlay(
         .padding(.horizontal, 4)
         .padding(.vertical, 4)
         .frame(width: 30, height: 30, alignment: .center)
-        .onTapGesture {}
+        //.background(Color(.red))
+        //.onTapGesture {}
         .contextMenu {
-            
-            Button() {actions.playAction(item: item)} label: {
-                Label("Launch", systemImage: "arrow.up.right.video.fill")
-            }
             Button() {actions.playInAppAction(item: item)} label: {
                 Label("Play", systemImage: "play.fill")
             }
             Button {actions.shareAction(item: item)} label: {
                 Label("Share", systemImage: "square.and.arrow.up")
+            }
+            Button() {actions.playAction(item: item)} label: {
+                Label("Launch", systemImage: "arrow.up.right.video.fill")
             }
             
             Divider()

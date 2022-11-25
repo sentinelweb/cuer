@@ -49,7 +49,6 @@ class MainCoordinator: ObservableObject {
     }
     
     @Published var screen: Parent = Parent.launch // navigate called in view onAppear
-
     @Published var currentRoute: Route = Route.none
     @Published var currentTab: MainTab = MainTab.browse
     @Published var currentPlaylistId: Int = -1
@@ -57,6 +56,7 @@ class MainCoordinator: ObservableObject {
     @Published var playlistsController: PlaylistsMviControllerHolder! = nil
     @Published var browseController: BrowseControllerHolder! = nil
     @Published var openedURL: URL?
+    @Published var shareData: String?
     @Published var playlistSelectDialog: PlaylistsDialogViewModelHolder? = nil
     
     func navigate(route: Route) {
@@ -118,6 +118,10 @@ class MainCoordinator: ObservableObject {
     
     func open(_ url: URL) {
         self.openedURL = url
+    }
+    
+    func share(_ text: String) {
+        self.shareData = text
     }
     
     func showPlaylistSelector(config: PlaylistsMviDialogContractConfig) {

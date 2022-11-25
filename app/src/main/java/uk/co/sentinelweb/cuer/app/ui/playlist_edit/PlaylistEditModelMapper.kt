@@ -2,11 +2,11 @@ package uk.co.sentinelweb.cuer.app.ui.playlist_edit
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
+import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl.Companion.channelUrl
+import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl.Companion.playlistUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.channelUrl
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 
 class PlaylistEditModelMapper constructor(
     private val res: ResourceWrapper,

@@ -1,8 +1,8 @@
 package uk.co.sentinelweb.cuer.app.util.wrapper
 
+import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl
 
 abstract class ShareWrapper {
     abstract fun share(media: MediaDomain)

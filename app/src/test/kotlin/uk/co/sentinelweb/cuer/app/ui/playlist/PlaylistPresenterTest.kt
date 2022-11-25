@@ -25,8 +25,8 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.State
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.usecase.AddPlaylistUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
-import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaLookupUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
@@ -60,7 +60,7 @@ class PlaylistPresenterTest {
     lateinit var mockMediaOrchestrator: MediaOrchestrator
 
     @MockK
-    lateinit var mockPlaylistMediaLookupUsecase: PlaylistMediaLookupUsecase
+    lateinit var mockAddPlaylistUsecase: AddPlaylistUsecase
 
     @MockK
     lateinit var mockPlaylistOrchestrator: PlaylistOrchestrator
@@ -248,7 +248,7 @@ class PlaylistPresenterTest {
             view = mockView,
             state = fixtState!!,
             mediaOrchestrator = mockMediaOrchestrator,
-            playlistMediaLookupUsecase = mockPlaylistMediaLookupUsecase,
+            addPlaylistUsecase = mockAddPlaylistUsecase,
             playlistOrchestrator = mockPlaylistOrchestrator,
             playlistItemOrchestrator = mockPlaylistItemOrchestrator,
             playlistUpdateUsecase = mockPlaylistUpdateUsecase,

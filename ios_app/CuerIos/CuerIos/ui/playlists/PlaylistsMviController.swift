@@ -82,7 +82,7 @@ class PlaylistsMviViewProxy : UtilsUBaseView<PlaylistsMviContractViewModel, Play
             
         case let selectorConfig as PlaylistsMviContractMviStoreLabel.ShowPlaylistsSelector:
             dependencies.mainCoordinator.showPlaylistSelector(config: selectorConfig.config)
-            
+        
         default: debugPrint(label_)
         }
     }

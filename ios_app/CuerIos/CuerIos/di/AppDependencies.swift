@@ -58,8 +58,8 @@ class AppDependencies:
         config: self.buildConfig,
         ytApiKey: CuerYoutubeApiKeyProvider(),
         pixabayApiKey: CuerPixabayApiKeyProvider(),
-        shareWrapper: IosShareWrapper(),
-        platformLaunchWrapper: IosPlatformLauncher()
+        shareWrapper: {IosShareWrapper(mainCoordinator: mainCoordinator)}(),
+        platformLaunchWrapper: {IosPlatformLauncher(mainCoordinator: mainCoordinator)}()
     )
     
     var sharedFactories = SharedFactories()

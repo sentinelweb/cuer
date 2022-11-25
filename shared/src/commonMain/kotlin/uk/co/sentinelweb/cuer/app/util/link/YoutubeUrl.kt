@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.domain.platform
+package uk.co.sentinelweb.cuer.app.util.link
 
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain

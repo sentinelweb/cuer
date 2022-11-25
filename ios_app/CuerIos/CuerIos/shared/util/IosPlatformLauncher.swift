@@ -9,6 +9,13 @@ import Foundation
 import shared
 
 class IosPlatformLauncher: PlatformLaunchWrapper {
+    
+    let mainCoordnator: MainCoordinator
+    
+    init(mainCoordinator:MainCoordinator) {
+        self.mainCoordnator = mainCoordinator
+    }
+    
     func canLaunchVideo() -> Bool {
         true
     }
@@ -28,17 +35,18 @@ class IosPlatformLauncher: PlatformLaunchWrapper {
     }
     
     func launchChannel(media: DomainMediaDomain) -> Bool {
+        mainCoordnator.open(URL.init(string: YoutubeUrl.companion.channelUrl(media: media))!)
         debugPrint("launchChannel: \(media.channelData.title)")
         return true
     }
     
     func launchPlaylist(id: String) -> Bool {
-        debugPrint("launchPlaylist: \(id)")
+        mainCoordnator.open(URL.init(string: YoutubeUrl.companion.playlistUrl(platformId: id))!)
         return true
     }
     
     func launchVideo(media: DomainMediaDomain) -> Bool {
-        debugPrint("launchVideo: \(media.title)")
+        mainCoordnator.open(URL.init(string: YoutubeUrl.companion.videoUrl(media:  media))!)
         return true
     }
     
@@ -48,7 +56,7 @@ class IosPlatformLauncher: PlatformLaunchWrapper {
     }
     
     func launchVideoWithTimeSystem(media: DomainMediaDomain) -> Bool {
-        debugPrint("launchVideoWithTimeSystem: \(media.positon)")
+        mainCoordnator.open(URL.init(string: YoutubeUrl.companion.videoUrlWithTime(media: media))!)
         return true
     }
     

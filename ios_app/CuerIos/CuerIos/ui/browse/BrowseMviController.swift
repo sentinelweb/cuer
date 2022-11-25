@@ -89,18 +89,18 @@ class BrowseViewProxy : UtilsUBaseView<BrowseContractViewModel, BrowseContractVi
         switch(label) {
         case is BrowseContractMviStoreLabel.AddPlaylist:
             let addLabel = label as! BrowseContractMviStoreLabel.AddPlaylist
-//            let str:String = playlistUrl(platformId: addLabel.cat.platformId)
-            // let str = "https://www.youtube.com/playlist?list=" + addLabel.cat.platformId!
-            // self.dependencies.mainCoordinator.open(URL.init(string: str)!)
             
             addPlaylist(cat: addLabel.cat, parentId: addLabel.parentId)
+        case let openPlaylist as BrowseContractMviStoreLabel.OpenLocalPlaylist:
+            self.dependencies.mainCoordinator.navigate(route: .playlist(plId: Int(openPlaylist.id)))
+            
         default: debugPrint(label)
         }
     }
     
     func addPlaylist(cat: DomainCategoryDomain, parentId: KotlinLong?) {
         loading = true
-        let task = Task {
+        /*let task = */Task {
             do {
                 let result = try await asyncFunction(
                     for: dependencies.sharedFactories.orchestratorFactory.addBrowsePlaylistUsecaseExecute(category: cat, parentId: parentId) //parentId

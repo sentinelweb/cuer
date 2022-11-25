@@ -27,39 +27,33 @@ struct BrowseView: View {
     }
     
     var body: some View {
-        
-        VStack (alignment: .leading, spacing:8) {
-            HStack(alignment: .center, spacing: 8) {
-                TitleNavView(title:view.model.title) {
-                    view.dispatch(event: BrowseContractViewEvent.OnUpClicked())
+        ZStack {
+            VStack (alignment: .leading, spacing:8) {
+                HStack(alignment: .center, spacing: 8) {
+                    TitleNavView(title:view.model.title) {
+                        view.dispatch(event: BrowseContractViewEvent.OnUpClicked())
+                    }
+                    
+                    switch (view.model.order) {
+                    case .categories:
+                        Image(systemName: "abc")
+                            .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnSetOrder(order: BrowseContract.Order.aToZ))}
+                            .padding(8)
+                    case .aToZ:
+                        Image(systemName: "folder")
+                            .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnSetOrder(order: BrowseContract.Order.categories))}
+                            .padding(8)
+                    default: EmptyView()
+                    }
                 }
-//                Image(systemName: "arrow.backward")
-//                    .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnUpClicked())}
-//                    .padding(8)
-//
-//                Text(view.model.title)
-//                    .font(headerTypeface)
-                
-                //Spacer()
-                
-                if (view.model.order == BrowseContract.Order.categories) {
-                    Image(systemName: "abc")
-                        .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnSetOrder(order: BrowseContract.Order.aToZ))}
-                        .padding(8)
-                } else {
-                    Image(systemName: "folder")
-                        .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnSetOrder(order: BrowseContract.Order.categories))}
-                        .padding(8)
-                }
-                
-            }
-            ScrollView {
-                LazyVGrid(columns: layout, spacing: 0) {
-                    ForEach(view.model.categories) { item in
-                        let seq = view.model.categories.firstIndex(of: item) ?? 0
-                        
-                        BrowseItem(item: item, seq: seq)
-                            .onTapGesture{ view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: item))}
+                ScrollView {
+                    LazyVGrid(columns: layout, spacing: 0) {
+                        ForEach(view.model.categories) { item in
+                            let seq = view.model.categories.firstIndex(of: item) ?? 0
+                            
+                            BrowseItem(item: item, seq: seq)
+                                .onTapGesture{ view.dispatch(event: BrowseContractViewEvent.OnCategoryClicked(model: item))}
+                        }
                     }
                 }
             }
@@ -67,6 +61,7 @@ struct BrowseView: View {
         .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
         .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }
         .onDisappear { holder.lifecycle.onPause();holder.lifecycle.onStop(); }
+        
     }
 }
 
