@@ -23,7 +23,6 @@ struct PlaylistsHeaderItemView: View {
 struct PlaylistsItemRowView: View {
     
     let item: PlaylistsItemMviContract.ModelItem
-    let actions: PlaylistsMviViewProxy.Actions
     
     var body: some View {
         HStack(alignment: .center) {
@@ -36,28 +35,44 @@ struct PlaylistsItemRowView: View {
                 .clipped()
             
             Text(item.title)
+                .font(itemRowTitleTypeface)
             Spacer()
         }
         .frame(maxWidth: .infinity)
-        .overlay(contextMenuOverlay(item: item, actions: actions), alignment: .trailing)
         .padding(.leading, CGFloat(item.depth) * 10.0)
         .padding(.bottom, 2)
-        .swipeActions(edge: .leading) {
-            Button {
-                actions.moveAction(item: item)
-            } label: {
-                Label("Move", systemImage: "arrow.up.and.down.and.arrow.left.and.right")
+    }
+}
+
+struct PlaylistsItemRowViewActions: View {
+    
+    let item: PlaylistsItemMviContract.ModelItem
+    let actions: PlaylistsMviViewProxy.Actions
+    
+    init(item: PlaylistsItemMviContract.ModelItem, actions: PlaylistsMviViewProxy.Actions) {
+        self.item = item
+        self.actions = actions
+    }
+    
+    var body: some View {
+        PlaylistsItemRowView(item: item)
+            .overlay(contextMenuOverlay(item: item, actions: actions), alignment: .trailing)
+            .swipeActions(edge: .leading) {
+                Button {
+                    actions.moveAction(item: item)
+                } label: {
+                    Label("Move", systemImage: "arrow.up.and.down.and.arrow.left.and.right")
+                }
+                .tint(Color.ui.moveColor)
             }
-            .tint(Color.ui.moveColor)
-        }
-        .swipeActions(edge: .trailing) {
-            Button {
-                actions.deleteAction(item: item)
-            } label: {
-                Label("Delete", systemImage: "trash")
+            .swipeActions(edge: .trailing) {
+                Button {
+                    actions.deleteAction(item: item)
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+                .tint(Color.ui.deleteColor)
             }
-            .tint(Color.ui.deleteColor)
-        }
     }
 }
 
@@ -113,6 +128,7 @@ private func contextMenuOverlay(
         .frame(width: 30, height: 30, alignment: .center)
         .onTapGesture {}
         .contextMenu {
+            
             Button() {actions.playAction(item: item)} label: {
                 Label("Launch", systemImage: "arrow.up.right.video.fill")
             }
@@ -122,7 +138,9 @@ private func contextMenuOverlay(
             Button {actions.shareAction(item: item)} label: {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
+            
             Divider()
+            
             Button {actions.starAction(item: item)} label: {
                 if (item.starred) {
                     Label("Unstar", systemImage: "star")
@@ -130,17 +148,18 @@ private func contextMenuOverlay(
                     Label("Star", systemImage: "star.fill")
                 }
             }
-            
             Button() {actions.moveAction(item: item)} label: {
                 Label("Move", systemImage: "arrow.up.and.down.and.arrow.left.and.right")
             }
             Button() {actions.editAction(item: item)} label: {
                 Label("Edit", systemImage: "pencil")
             }
-            Button() {actions.deleteAction(item: item)} label: {
+            Button() {actions.mergeAction(item: item)} label: {
                 Label("Merge", systemImage: "arrow.triangle.merge")
             }
+            
             Divider()
+            
             Button(role: .destructive) {actions.deleteAction(item: item)} label: {
                 Label("Delete", systemImage: "trash")
             }

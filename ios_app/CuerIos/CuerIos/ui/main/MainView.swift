@@ -24,35 +24,43 @@ struct MainView: View {
             Text("Launching")
                 .onAppear{coordinator.navigate(route: Route.main)}
         case .main:
-            TabView(selection: $coordinator.currentTab) {
-                BrowseView(holder: coordinator.browseController!)
-                    .tabItem { TabLabelView(text: "Browse", systemImage: "folder.fill.badge.person.crop") }
-                    .tag(MainTab.browse)
-                
-                PlaylistsView(holder: coordinator.playlistsController!)
-                    .tabItem { TabLabelView(text: "Playlists", systemImage: "list.bullet.indent") }
-                    .tag(MainTab.playlists)
-                
-                if (playlistViewModel != nil) {
-                    PlaylistView(viewModel: playlistViewModel!)
-                        .tabItem { TabLabelView(text: "Playlist", systemImage: "music.note.list") }
-                        .tag(MainTab.playlist)
+            ZStack {
+                TabView(selection: $coordinator.currentTab) {
+                    BrowseView(holder: coordinator.browseController!)
+                        .tabItem { TabLabelView(text: "Browse", systemImage: "folder.fill.badge.person.crop") }
+                        .tag(MainTab.browse)
+                    
+                    PlaylistsView(holder: coordinator.playlistsController!)
+                        .tabItem { TabLabelView(text: "Playlists", systemImage: "list.bullet.indent") }
+                        .tag(MainTab.playlists)
+                    
+                    if (playlistViewModel != nil) {
+                        PlaylistView(viewModel: playlistViewModel!)
+                            .tabItem { TabLabelView(text: "Playlist", systemImage: "music.note.list") }
+                            .tag(MainTab.playlist)
+                    }
+                    
+                    NavigationView { SettingsView(coordinator: coordinator) }
+                        .navigationViewStyle(StackNavigationViewStyle())
+                        .tabItem { TabLabelView(text: "Settings", systemImage: "gearshape") }
+                        .tag(MainTab.settings)
                 }
-                
-                NavigationView { SettingsView(coordinator: coordinator) }
-                    .navigationViewStyle(StackNavigationViewStyle())
-                    .tabItem { TabLabelView(text: "Settings", systemImage: "gearshape") }
-                    .tag(MainTab.settings)
-                
-            }.onAppear() {
+                if (coordinator.playlistSelectDialog != nil) {
+                    let _ = debugPrint("showPlaylistsDialog")
+                    PlaylistsDialogView(holder: coordinator.playlistSelectDialog!)
+                }
+            }
+            .onAppear() {
                 UITabBar.appearance().backgroundColor = .systemBackground.withAlphaComponent(0.8)
-                 UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: tabItemTypeface], for: .normal)
-                 UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: tabItemSelectedTypeface], for: .selected)
+                UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: tabItemTypeface], for: .normal)
+                UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: tabItemSelectedTypeface], for: .selected)
             }
             .sheet(item: $coordinator.openedURL) {
                 SafariView(url: $0)
                     .edgesIgnoringSafeArea(.all)
-            }.onReceive(coordinator.$playlistViewModel, perform: {vm in playlistViewModel=vm})
+            }
+            .onReceive(coordinator.$playlistViewModel, perform: {vm in playlistViewModel=vm})
+            
         default:
             Text("Unsupported")
         }

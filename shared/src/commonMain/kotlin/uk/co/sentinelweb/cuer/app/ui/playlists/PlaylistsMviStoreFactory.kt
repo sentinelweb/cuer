@@ -248,8 +248,18 @@ class PlaylistsMviStoreFactory(
                 state.findPlaylist(intent.item)
                     ?.also { playlist ->
                         if (playlist.type != PlaylistDomain.PlaylistTypeDomain.APP) {
-                            val node = state.treeLookup[playlist.id]!!
-                            if (node.chidren.size == 0) {
+                            val treeDomain = state.treeLookup[playlist.id]!!
+                            if (treeDomain.node == null) {
+                                //publish(Label.Error(strings.playlists_error_delete_children))
+                                log.e(
+                                    "Attempted to delete root node shouldn't be able to do this",
+                                    NullPointerException()
+                                )
+                            } else if (treeDomain.chidren.size > 0) {
+                                publish(Label.Error(strings.playlists_error_delete_children))
+                            } else if (treeDomain.node?.default ?: false) {
+                                publish(Label.Error(strings.playlists_error_delete_default))
+                            } else {
                                 playlist.id
                                     ?.let { playlistOrchestrator.loadById(it, LOCAL.deepOptions()) }
                                     ?.apply {
@@ -264,8 +274,7 @@ class PlaylistsMviStoreFactory(
                                         publish(Label.Error(strings.playlists_error_cant_backup))
                                         null
                                     }
-                            } else {
-                                publish(Label.Error(strings.playlists_error_delete_children))
+
                             }
                         } else if (playlist.id == LocalSearch.id || playlist.id == YoutubeSearch.id) {
                             val isLocal = playlist.id == LocalSearch.id

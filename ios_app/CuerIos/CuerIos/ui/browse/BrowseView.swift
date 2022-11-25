@@ -30,14 +30,17 @@ struct BrowseView: View {
         
         VStack (alignment: .leading, spacing:8) {
             HStack(alignment: .center, spacing: 8) {
-                Image(systemName: "arrow.backward")
-                    .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnUpClicked())}
-                    .padding(8)
+                TitleNavView(title:view.model.title) {
+                    view.dispatch(event: BrowseContractViewEvent.OnUpClicked())
+                }
+//                Image(systemName: "arrow.backward")
+//                    .onTapGesture {view.dispatch(event: BrowseContractViewEvent.OnUpClicked())}
+//                    .padding(8)
+//
+//                Text(view.model.title)
+//                    .font(headerTypeface)
                 
-                Text(view.model.title)
-                    .font(headerTypeface)
-                
-                Spacer()
+                //Spacer()
                 
                 if (view.model.order == BrowseContract.Order.categories) {
                     Image(systemName: "abc")

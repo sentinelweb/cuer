@@ -46,7 +46,7 @@ class PlaylistsMviControllerHolder : ObservableObject {
     func createMviView() -> PlaylistsMviViewProxy { PlaylistsMviViewProxy(dependencies: self.dependencies)}
 }
 
-class PlaylistsStrings:PlaylistsMviContract.Strings {
+class PlaylistsStrings: PlaylistsMviContract.Strings {
     
 }
 
@@ -72,12 +72,16 @@ class PlaylistsMviViewProxy : UtilsUBaseView<PlaylistsMviContractViewModel, Play
     }
     
     func processLabel(label_: PlaylistsMviContractMviStoreLabel) {
+        let _ = debugPrint("playlists label received",label_)
         switch(label_) {
         case let messageLabel as PlaylistsMviContractMviStoreLabel.Message:
             debugPrint("Message: \(messageLabel.message))")
             
         case let navModel as PlaylistsMviContractMviStoreLabel.Navigate:
             dependencies.mainCoordinator.navigateModel(model: navModel.model)
+            
+        case let selectorConfig as PlaylistsMviContractMviStoreLabel.ShowPlaylistsSelector:
+            dependencies.mainCoordinator.showPlaylistSelector(config: selectorConfig.config)
             
         default: debugPrint(label_)
         }

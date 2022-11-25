@@ -46,7 +46,6 @@ struct PlaylistsView: View {
                 .font(headerTypeface)
                 .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 0))
             
-            
             ForEach(view.model.items) { item in
                 let _ = debugPrint(item.id)
                 switch(item) {
@@ -55,8 +54,9 @@ struct PlaylistsView: View {
                     PlaylistsHeaderItemView(item: header)
                     
                 case let itemRow as PlaylistsItemMviContract.ModelItem:
-                    PlaylistsItemRowView(item: itemRow, actions: view.actions())
+                    PlaylistsItemRowViewActions(item: itemRow, actions: view.actions())
                         .onTapGesture {view.dispatch(event: PlaylistsMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))}
+                    
                 case let list as PlaylistsItemMviContract.ModelList:
                     PlaylistsListItemView(list: list, actions: view.actions())
                     

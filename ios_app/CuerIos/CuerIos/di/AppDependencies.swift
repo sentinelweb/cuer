@@ -41,6 +41,7 @@ class AppDependencies:
 & PlaylistsControllerDependency
 & SharedDependency
 & SharedFactoriesDependency
+& PlaylistsDialogDependency
 {
     
 #if DEBUG
@@ -86,6 +87,14 @@ class AppDependencies:
         PlaylistsMviControllerHolder(dependencies: PlaylistsControllerProvider(
             mainCoordinator: mainCoordinator,
             sharedFactories: sharedFactories
+        ))
+    }
+    
+    func createPlaylistsDialogHolder(config: PlaylistsMviDialogContractConfig) -> PlaylistsDialogViewModelHolder {
+        PlaylistsDialogViewModelHolder(dependencies: PlaylistsDialogProvider(
+            mainCoordinator: mainCoordinator,
+            viewModel: sharedFactories.presentationFactory.playlistsDialogViewModel(),
+            config: config
         ))
     }
     

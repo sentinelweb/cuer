@@ -57,10 +57,12 @@ class MainCoordinator: ObservableObject {
     @Published var playlistsController: PlaylistsMviControllerHolder! = nil
     @Published var browseController: BrowseControllerHolder! = nil
     @Published var openedURL: URL?
+    @Published var playlistSelectDialog: PlaylistsDialogViewModelHolder? = nil
     
     func navigate(route: Route) {
         self.currentRoute = route
         debugPrint("navigate: \(route)")
+        hideDialogs()
         switch(route){
         case .main:
             self.playlistViewModel = createPlaylistViewModel()
@@ -74,12 +76,13 @@ class MainCoordinator: ObservableObject {
         case let .playlist(plId):
             self.currentTab = MainTab.playlist
             self.currentPlaylistId = plId
-        
+            
         default: debugPrint("navigate default: \(route)")
         }
     }
     
     func navigateModel(model: NavigationModel) {
+        hideDialogs()
         switch(model.target){
         case .playlist:
             self.currentTab = MainTab.playlist
@@ -109,9 +112,20 @@ class MainCoordinator: ObservableObject {
         return self.playlistViewModel!
     }
     
+    private func hideDialogs() {
+        hidePlaylistSelector()
+    }
+    
     func open(_ url: URL) {
         self.openedURL = url
     }
     
+    func showPlaylistSelector(config: PlaylistsMviDialogContractConfig) {
+        self.playlistSelectDialog = dependencies.createPlaylistsDialogHolder(config: config)
+    }
+    
+    func hidePlaylistSelector(){
+        self.playlistSelectDialog = nil
+    }
 }
 
