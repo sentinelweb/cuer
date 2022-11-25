@@ -3,12 +3,15 @@ package uk.co.sentinelweb.cuer.app.queue
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaUpdateOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecase
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -26,8 +29,8 @@ class QueueMediator constructor(
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val coroutines: CoroutineContextProvider,
     private val playlistMutator: PlaylistMutator,
-    private val mediaUpdate: PlaylistMediaUpdateOrchestrator,
-    private val playlistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator,
+    private val mediaUpdate: PlaylistMediaUpdateUsecase,
+    private val playlistOrDefaultUsecase: PlaylistOrDefaultUsecase,
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val log: LogWrapper,
     private val recentLocalPlaylists: RecentLocalPlaylists
@@ -180,7 +183,7 @@ class QueueMediator constructor(
     private suspend fun updateCurrentItem(resetPosition: Boolean) {
         state.currentItem = state.playlist
             ?.let { playlist ->
-                playlistOrDefaultOrchestrator.updateCurrentIndex(
+                playlistOrDefaultUsecase.updateCurrentIndex(
                     playlist,
                     state.playlistIdentifier.flatOptions(true)
                 )
@@ -295,7 +298,7 @@ class QueueMediator constructor(
     private suspend fun refreshQueue(identifier: Identifier<*>) {
         identifier
             .let {
-                playlistOrDefaultOrchestrator.getPlaylistOrDefault(
+                playlistOrDefaultUsecase.getPlaylistOrDefault(
                     it.id as Long,
                     Options(it.source, flat = false)
                 )

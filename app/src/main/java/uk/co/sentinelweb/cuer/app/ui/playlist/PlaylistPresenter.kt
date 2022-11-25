@@ -20,9 +20,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
@@ -30,10 +27,13 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LO
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.usecase.AddPlaylistUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.SHOW_VIDEO_CARDS
@@ -57,11 +57,11 @@ class PlaylistPresenter(
     private val view: PlaylistContract.View,
     private val state: PlaylistContract.State,
     private val mediaOrchestrator: MediaOrchestrator,
-    private val playlistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator,
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
-    private val playlistUpdateOrchestrator: PlaylistUpdateOrchestrator,
-    private val playlistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator,
+    private val playlistUpdateUsecase: PlaylistUpdateUsecase,
+    private val playlistOrDefaultUsecase: PlaylistOrDefaultUsecase,
+    private val addPlaylistUsecase: AddPlaylistUsecase,
     private val modelMapper: PlaylistModelMapper,
     private val itemMapper: ItemModelMapper,
     private val queue: QueueMediatorContract.Producer,
@@ -204,7 +204,7 @@ class PlaylistPresenter(
                 }.takeIf { !isQueuedPlaylist && currentIndexBefore != state.playlist?.currentIndex }
                     ?.apply {
                         state.playlist?.apply {
-                            playlistOrDefaultOrchestrator.updateCurrentIndex(
+                            playlistOrDefaultUsecase.updateCurrentIndex(
                                 this,
                                 state.playlistIdentifier.flatOptions()
                             )
@@ -636,8 +636,8 @@ class PlaylistPresenter(
             view.showRefresh()
             try {
                 state.playlist
-                    ?.takeIf { playlistUpdateOrchestrator.checkToUpdate(it) }
-                    ?.let { playlistUpdateOrchestrator.update(it) }
+                    ?.takeIf { playlistUpdateUsecase.checkToUpdate(it) }
+                    ?.let { playlistUpdateUsecase.update(it) }
                     ?.also {
                         if (it.success) view.showMessage("${it.numberItems} new items")
                         else view.showError("Error updating ...")
@@ -684,39 +684,15 @@ class PlaylistPresenter(
     override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit?) {
         if (state.playlistIdentifier.source == MEMORY) {
             log.i("commitPlaylist: id:${state.playlistIdentifier}")
-            state.playlist
-                ?.let { playlistMediaLookupOrchestrator.lookupMediaAndReplace(it) }
-                ?.also { log.i("lookupMediaAndReplace: $it") }
-                ?.let {
-                    it.copy(
-                        items = it.items.map { it.copy(id = null) },
-                        config = it.config.copy(
-                            playable = true,
-                            editable = true,
-                            deletable = true,
-                            deletableItems = true,
-                            editableItems = true
-                        )
-                    )
-                }
-                ?.let { playlist ->
-                    state.addPlaylistParent
-                        ?.takeIf { it > 0 }
-                        ?.let { parentId ->
-                            playlistOrchestrator.loadById(parentId, LOCAL.flatOptions())
-                                ?.let { playlist.copy(parentId = parentId) }
-                        }
-                        ?: playlist
-                }
-                ?.let { playlistOrchestrator.save(it, LOCAL.deepOptions(emit = true)) }
-                ?.also {
+            addPlaylistUsecase
+                .addPlaylist(state.playlist!!, state.addPlaylistParent)
+                .also {
                     state.playlistIdentifier =
                         it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")
                 }
-                ?.also { state.playlist = it }
-                ?.also { updateView() }
-                ?.also { onCommit?.onCommit(PLAYLIST, listOf(it)) }
-                ?.also { recentLocalPlaylists.addRecentId(it.id!!) }
+                .also { state.playlist = it }
+                .also { updateView() }
+                .also { onCommit?.onCommit(PLAYLIST, listOf(it)) }
         } else {
             throw IllegalStateException("Can't save non Memory playlist")
         }
@@ -733,7 +709,7 @@ class PlaylistPresenter(
 //                "executeRefresh: ${state.playlistIdentifier.id}, animate:$animate, scrollToCurrent:$scrollToCurrent",
 //                Exception()
 //            )
-            playlistOrDefaultOrchestrator
+            playlistOrDefaultUsecase
                 .getPlaylistOrDefault(
                     state.playlistIdentifier.id as Long,
                     state.playlistIdentifier.source.flatOptions()

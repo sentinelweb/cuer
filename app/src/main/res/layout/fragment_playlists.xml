@@ -95,7 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="LinearLayoutManager"
-            tools:context=".ui.playlists.PlaylistsFragment"
+            tools:context=".ui.playlists.PlaylistsMviFragment"
             tools:listitem="@layout/view_playlists_item_row"
             android:scrollbars="vertical"
             android:scrollbarThumbVertical="@drawable/scrollbar_thumb"/>

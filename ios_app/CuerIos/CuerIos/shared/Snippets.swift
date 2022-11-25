@@ -28,3 +28,9 @@ import shared
 //        print("loadPlaylist error: \(error)")
 //    }
 //}
+// print in views
+//let _ = debugPrint("row: \(item.title): \(item.thumbNailUrl)")
+
+// show url
+// let str = "https://www.youtube.com/playlist?list=" + addLabel.cat.platformId!
+// self.dependencies.mainCoordinator.open(URL.init(string: str)!)

@@ -112,36 +112,6 @@ class PlaylistsHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigB
                     ),
                 )
             ),
-            // tod context menu
-//            Screen(
-//                title = ActionResources(
-//                    label = "Playlist item - context",
-//                    icon = R.drawable.ic_playlist_black,
-//                    color = R.color.color_on_surface
-//                ),
-//                lines = listOf(
-//                    ActionResources(
-//                        label = res.getString(R.string.help_playlists_ab_create),
-//                        icon = R.drawable.ic_playlist_add,
-//                        color = R.color.color_on_surface
-//                    ),
-//                    ActionResources(
-//                        label = res.getString(R.string.help_playlists_ab_pasteadd),
-//                        icon = R.drawable.ic_menu_paste_add_black,
-//                        color = R.color.color_on_surface
-//                    ),
-//                    ActionResources(
-//                        label = res.getString(R.string.help_playlist_search),
-//                        icon = R.drawable.ic_search,
-//                        color = R.color.color_on_surface
-//                    ),
-//                    ActionResources(
-//                        label = res.getString(R.string.help_playlist_settings),
-//                        icon = R.drawable.ic_menu_settings_black,
-//                        color = R.color.color_on_surface
-//                    ),
-//                )
-//            ),
         )
     )
 }

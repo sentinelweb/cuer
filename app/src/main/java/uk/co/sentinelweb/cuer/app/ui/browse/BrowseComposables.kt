@@ -366,7 +366,7 @@ private fun ChipPreview() {
         id = 1,
         title = "title",
         description = "null",
-        thumbNailUrl = "https://cuer-275020.firebaseapp.com/images/categories/Socrates.jpg",
+        thumbNailUrl = "https://cuer-275020.web.app/images/headers/Socrates.jpg",
         existingPlaylist = null,
         forceItem = false,
         isPlaylist = false,

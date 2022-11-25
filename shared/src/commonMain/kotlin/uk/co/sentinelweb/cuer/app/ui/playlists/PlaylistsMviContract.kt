@@ -108,6 +108,7 @@ class PlaylistsMviContract {
         open val playlists_error_load_failed = "Load failed"
         open val playlists_error_cant_delete = "Cannot delete playlist"
         open val playlists_error_delete_children = "Please delete the children first"
+        open val playlists_error_delete_default = "Please choose another default playlist before deleting"
         open val playlist_dialog_title = "Select playlist"
         open val playlists_error_circular = "That's a circular reference ..."
         open val playlists_error_cant_play = "Cannot launch playlist"

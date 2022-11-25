@@ -36,8 +36,8 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsVMDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
@@ -331,7 +331,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         when (model.type) {
             DialogModel.Type.PLAYLIST_FULL -> {
                 dialogFragment =
-                    PlaylistsDialogFragment.newInstance(model as PlaylistsMviDialogContract.Config)
+                    PlaylistsVMDialogFragment.newInstance(model as PlaylistsMviDialogContract.Config)
                 dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
             }
 

@@ -44,36 +44,36 @@ class PlaylistsMviModelMapper(
         val recent = buildRecentList(domains, recentPlaylists)
         val list = mutableListOf(
 
-            PlaylistsItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.Header(
                 ID_APP_HEADER,
                 strings.playlists_section_app
             ),
-            PlaylistsItemMviContract.Model.ListModel(
+            PlaylistsItemMviContract.Model.List(
                 ID_APP_LIST,
                 appPlaylists.keys.map {
                     itemModel(it, it.id == pinnedId, appPlaylists[it], 0)
                 }),
 
-            PlaylistsItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.Header(
                 ID_RECENT_HEADER,
                 strings.playlists_section_recent
             ),
-            PlaylistsItemMviContract.Model.ListModel(ID_RECENT_LIST,
+            PlaylistsItemMviContract.Model.List(ID_RECENT_LIST,
                 recent.map {
                     itemModel(it, it.id == pinnedId, domains[it], 0)
                 }),
 
-            PlaylistsItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.Header(
                 ID_STARRED_HEADER,
                 strings.playlists_section_starred
             ),
-            PlaylistsItemMviContract.Model.ListModel(
+            PlaylistsItemMviContract.Model.List(
                 ID_STARRED_LIST,
                 starred.map {
                     itemModel(it, it.id == pinnedId, domains[it], 0)
                 }),
 
-            PlaylistsItemMviContract.Model.HeaderModel(
+            PlaylistsItemMviContract.Model.Header(
                 ID_ALL_HEADER,
                 strings.playlists_section_all
             ),
@@ -100,7 +100,11 @@ class PlaylistsMviModelMapper(
             .sortedBy { it.title.lowercase() }
             .toMutableList()
         starred.find { it.default }
-            ?: run { starred.add(0, domains.keys.find { it.default }!!) }
+            ?: run {
+                starred.add(
+                    0,
+                    domains.keys.find { it.default } ?: throw IllegalStateException("No default playlist"))
+            }
         return starred
     }
 
@@ -109,7 +113,7 @@ class PlaylistsMviModelMapper(
         pinned: Boolean,
         playlistStatDomain: PlaylistStatDomain?,
         depth: Int
-    ) = PlaylistsItemMviContract.Model.ItemModel(
+    ) = PlaylistsItemMviContract.Model.Item(
         pl.id ?: throw Exception("Playlist must have an id"),
         pl.title.capitalize(),
         false,

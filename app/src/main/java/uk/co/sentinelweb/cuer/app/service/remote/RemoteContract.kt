@@ -75,7 +75,7 @@ class RemoteContract {
                 AppRemoteDatabaseAdapter(
                     playlistOrchestrator = get(),
                     playlistItemOrchestrator = get(),
-                    addLinkOrchestrator = get()
+                    addLinkUsecase = get()
                 )
             }
             // test injection

@@ -57,7 +57,7 @@ class LocalSearchPlayistInteractor constructor(
         type = APP,
         currentIndex = -1,
         starred = true,
-        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-noelle-otto-906055.jpg"),
+        image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/pexels-noelle-otto-906055.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
             playable = false,
             editable = false

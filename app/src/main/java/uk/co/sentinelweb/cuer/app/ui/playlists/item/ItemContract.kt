@@ -85,10 +85,10 @@ interface ItemContract {
     }
 
     data class State constructor(
-        var item: PlaylistsItemMviContract.Model.ItemModel? = null
+        var item: PlaylistsItemMviContract.Model.Item? = null
     )
 
     data class ListState constructor(
-        var presenters: MutableList<External<PlaylistsItemMviContract.Model.ItemModel>> = mutableListOf()
+        var presenters: MutableList<External<PlaylistsItemMviContract.Model.Item>> = mutableListOf()
     )
 }

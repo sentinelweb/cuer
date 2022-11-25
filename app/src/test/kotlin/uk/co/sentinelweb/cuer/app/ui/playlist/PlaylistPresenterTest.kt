@@ -21,14 +21,14 @@ import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistOrDefaultOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistUpdateOrchestrator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.State
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.usecase.AddPlaylistUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -60,7 +60,7 @@ class PlaylistPresenterTest {
     lateinit var mockMediaOrchestrator: MediaOrchestrator
 
     @MockK
-    lateinit var mockPlaylistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator
+    lateinit var mockAddPlaylistUsecase: AddPlaylistUsecase
 
     @MockK
     lateinit var mockPlaylistOrchestrator: PlaylistOrchestrator
@@ -69,7 +69,7 @@ class PlaylistPresenterTest {
     lateinit var mockPlaylistItemOrchestrator: PlaylistItemOrchestrator
 
     @MockK
-    lateinit var mockPlaylistUpdateOrchestrator: PlaylistUpdateOrchestrator
+    lateinit var mockPlaylistUpdateUsecase: PlaylistUpdateUsecase
 
     @MockK
     lateinit var mockModelMapper: PlaylistModelMapper
@@ -102,7 +102,7 @@ class PlaylistPresenterTest {
     lateinit var mockDbInit: DatabaseInitializer
 
     @MockK
-    lateinit var mockPlaylistOrDefaultOrchestrator: PlaylistOrDefaultOrchestrator
+    lateinit var mockPlaylistOrDefaultUsecase: PlaylistOrDefaultUsecase
 
     @MockK
     lateinit var mockRecentLocalPlaylists: RecentLocalPlaylists
@@ -167,7 +167,10 @@ class PlaylistPresenterTest {
             .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(10))
         fixtCurrentIdentifier = Identifier(fixtCurrentPlaylist.id!!, fixtCurrentSource)
         coEvery {
-            mockPlaylistOrDefaultOrchestrator.getPlaylistOrDefault(fixtCurrentIdentifier.id, fixtCurrentIdentifier.source.flatOptions())
+            mockPlaylistOrDefaultUsecase.getPlaylistOrDefault(
+                fixtCurrentIdentifier.id,
+                fixtCurrentIdentifier.source.flatOptions()
+            )
         } returns (fixtCurrentPlaylist to fixtCurrentSource)
         log.d("cuurrent: id:${fixtCurrentIdentifier.id} opts:${fixtCurrentIdentifier.source.flatOptions()}")
         every {
@@ -194,7 +197,7 @@ class PlaylistPresenterTest {
         fixtNextPlaylistMapped = fixture.build<PlaylistContract.Model>()
             .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(12))
         coEvery {
-            mockPlaylistOrDefaultOrchestrator.getPlaylistOrDefault(
+            mockPlaylistOrDefaultUsecase.getPlaylistOrDefault(
                 fixtNextIdentifier.id,
                 fixtNextIdentifier.source.flatOptions()
             )
@@ -245,10 +248,10 @@ class PlaylistPresenterTest {
             view = mockView,
             state = fixtState!!,
             mediaOrchestrator = mockMediaOrchestrator,
-            playlistMediaLookupOrchestrator = mockPlaylistMediaLookupOrchestrator,
+            addPlaylistUsecase = mockAddPlaylistUsecase,
             playlistOrchestrator = mockPlaylistOrchestrator,
             playlistItemOrchestrator = mockPlaylistItemOrchestrator,
-            playlistUpdateOrchestrator = mockPlaylistUpdateOrchestrator,
+            playlistUpdateUsecase = mockPlaylistUpdateUsecase,
             modelMapper = mockModelMapper,
             queue = mockQueue,
             toastWrapper = mockToastWrapper,
@@ -262,7 +265,7 @@ class PlaylistPresenterTest {
             coroutines = coroutines,
             res = mockResources,
             dbInit = mockDbInit,
-            playlistOrDefaultOrchestrator = mockPlaylistOrDefaultOrchestrator,
+            playlistOrDefaultUsecase = mockPlaylistOrDefaultUsecase,
             recentLocalPlaylists = mockRecentLocalPlaylists,
             playUseCase = mockPlayUseCase,
             itemMapper = mockItemMapper,

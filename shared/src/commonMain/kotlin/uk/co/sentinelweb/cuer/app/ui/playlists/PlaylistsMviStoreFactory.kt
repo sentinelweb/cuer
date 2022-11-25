@@ -13,7 +13,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMergeOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
@@ -26,6 +25,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.UndoType.Pla
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.UndoType.SearchDelete
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviStoreFactory.Action.Init
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistMergeUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
@@ -55,7 +55,7 @@ class PlaylistsMviStoreFactory(
     private val strings: PlaylistsMviContract.Strings,
     private val platformLauncher: PlatformLaunchWrapper,
     private val shareWrapper: ShareWrapper,
-    private val merge: PlaylistMergeOrchestrator,
+    private val merge: PlaylistMergeUsecase,
 ) {
     private sealed class Result {
         data class Load(
@@ -134,7 +134,7 @@ class PlaylistsMviStoreFactory(
         }
 
         private fun openPlaylist(intent: Intent.OpenPlaylist) {
-            if (intent.item is PlaylistsItemMviContract.Model.ItemModel) {
+            if (intent.item is PlaylistsItemMviContract.Model.Item) {
                 recentLocalPlaylists.addRecentId(intent.item.id)
                 prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
                 publish(
@@ -147,7 +147,7 @@ class PlaylistsMviStoreFactory(
         }
 
         private fun openEdit(intent: Intent.Edit) {
-            if (intent.item is PlaylistsItemMviContract.Model.ItemModel) {
+            if (intent.item is PlaylistsItemMviContract.Model.Item) {
                 recentLocalPlaylists.addRecentId(intent.item.id)
                 publish(
                     Navigate(
@@ -165,7 +165,7 @@ class PlaylistsMviStoreFactory(
         // region play
         private fun play(intent: Intent.Play, state: State) {
             if (!intent.external) {
-                if (intent.item is PlaylistsItemMviContract.Model.ItemModel) {
+                if (intent.item is PlaylistsItemMviContract.Model.Item) {
                     recentLocalPlaylists.addRecentId(intent.item.id)
                     prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
                     publish(
@@ -248,8 +248,18 @@ class PlaylistsMviStoreFactory(
                 state.findPlaylist(intent.item)
                     ?.also { playlist ->
                         if (playlist.type != PlaylistDomain.PlaylistTypeDomain.APP) {
-                            val node = state.treeLookup[playlist.id]!!
-                            if (node.chidren.size == 0) {
+                            val treeDomain = state.treeLookup[playlist.id]!!
+                            if (treeDomain.node == null) {
+                                //publish(Label.Error(strings.playlists_error_delete_children))
+                                log.e(
+                                    "Attempted to delete root node shouldn't be able to do this",
+                                    NullPointerException()
+                                )
+                            } else if (treeDomain.chidren.size > 0) {
+                                publish(Label.Error(strings.playlists_error_delete_children))
+                            } else if (treeDomain.node?.default ?: false) {
+                                publish(Label.Error(strings.playlists_error_delete_default))
+                            } else {
                                 playlist.id
                                     ?.let { playlistOrchestrator.loadById(it, LOCAL.deepOptions()) }
                                     ?.apply {
@@ -264,8 +274,7 @@ class PlaylistsMviStoreFactory(
                                         publish(Label.Error(strings.playlists_error_cant_backup))
                                         null
                                     }
-                            } else {
-                                publish(Label.Error(strings.playlists_error_delete_children))
+
                             }
                         } else if (playlist.id == LocalSearch.id || playlist.id == YoutubeSearch.id) {
                             val isLocal = playlist.id == LocalSearch.id

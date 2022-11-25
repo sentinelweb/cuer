@@ -14,8 +14,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsVMDialogFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -64,7 +64,7 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment(), AndroidScopeCompo
         hideDialogFragment()
         when (model) {
             is PlaylistsMviDialogContract.Config -> {
-                dialogFragment = PlaylistsDialogFragment.newInstance(model)
+                dialogFragment = PlaylistsVMDialogFragment.newInstance(model)
                     .also { it.show(childFragmentManager, SELECT_PLAYLIST_TAG) }
             }
 

@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 
 class ListViewHolder(
     private val listView: ListView,
-    val listPresenter: ItemContract.External<Model.ListModel>
+    val listPresenter: ItemContract.External<Model.List>
 ) : RecyclerView.ViewHolder(listView.root), ItemBaseContract.ItemTouchHelperViewHolder {
 
     override val contentView: View

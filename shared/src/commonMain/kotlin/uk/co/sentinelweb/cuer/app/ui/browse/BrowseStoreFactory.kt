@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.domain.ext.allPlatformIds
 import uk.co.sentinelweb.cuer.domain.ext.buildIdLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildParentLookup
 
+// fixme: 'SuspendBootstrapper<Action : Any>' is deprecated. Please use CoroutineBootstrapper
 class BrowseStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
     private val repository: BrowseRepository,
@@ -103,7 +104,7 @@ class BrowseStoreFactory constructor(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-                is Intent.ClickCategory -> {
+                is Intent.ClickCategory -> { // todo extract inside closure
                     getState().categoryLookup.get(intent.id)
                         ?.also { cat ->
                             if (cat.subCategories.size > 0) {

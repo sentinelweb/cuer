@@ -21,7 +21,7 @@ struct BrowseItem: View {
     
     var body: some View {
         VStack {
-            let url = (item.thumbNailUrl ??? {$0?.starts(with: "https") ?? false}) ?? "https://cuer-275020.firebaseapp.com/images/categories/greek.jpg"
+            let url = (item.thumbNailUrl ??? {$0?.starts(with: "https") ?? false}) ?? DEFAULT_IMAGE
             KFImage(URL(string: url))
                 .fade(duration: 0.3 + 0.1 * Double(seq % 10))
                 .forceTransition()
@@ -31,17 +31,16 @@ struct BrowseItem: View {
                 .clipped()
                 .overlay(titleOverlay(item: item), alignment: .bottom)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 25.0))
     }
     
     @ViewBuilder
-    private func titleOverlay(item: BrowseContractViewCategoryModel)-> some View {
+    private func titleOverlay(item: BrowseContractViewCategoryModel) -> some View {
         HStack {
             Text(item.title)
             Spacer()
         }
         .foregroundColor(Color(.label))
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 4)
         .padding(.vertical, 8)
         .background(Color(.systemBackground).opacity(0.75))
         .font(itemTileTypeface)

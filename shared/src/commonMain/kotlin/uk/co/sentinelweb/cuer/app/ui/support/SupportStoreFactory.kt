@@ -7,11 +7,11 @@ import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
+import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LinkDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl
 
 class SupportStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),

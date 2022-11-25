@@ -6,7 +6,7 @@
       "title": "Default",
       "default": true,
       "image": {
-        "url": "gs://cuer-275020.appspot.com/playlist_header/pexels-freestocksorg-34407-600.jpg"
+        "url": "https://cuer-275020.web.app/images/headers/pexels-freestocksorg-34407-600.jpg"
       },
       "config": {
         "deletable": false
@@ -888,7 +888,7 @@
       ],
       "currentIndex": 1,
       "image": {
-        "url": "gs://cuer-275020.appspot.com/playlist_header/art-school-of-athens-1143741_640.jpg"
+        "url": "https://cuer-275020.web.app/images/headers/art-school-of-athens-1143741_640.jpg"
       }
     }
   ],

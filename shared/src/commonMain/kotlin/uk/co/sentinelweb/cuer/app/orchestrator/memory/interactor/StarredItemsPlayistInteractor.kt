@@ -42,11 +42,11 @@ class StarredItemsPlayistInteractor constructor(
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
         id = Starred.id,
-        title = "Starred items",
+        title = "Starred",
         type = APP,
         currentIndex = -1,
         starred = true,
-        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pixabay-star-640-wallpaper-ga4c7c7acf_640.jpg"),
+        image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/pixabay-star-640-wallpaper-ga4c7c7acf_640.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
             playable = false,
             editable = false,
