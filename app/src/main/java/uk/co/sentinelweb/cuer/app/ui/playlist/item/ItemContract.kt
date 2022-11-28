@@ -5,10 +5,8 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.navigation.fragment.FragmentNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
-import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
 import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract.Model.Item
 
 interface ItemContract {
 
@@ -58,52 +56,24 @@ interface ItemContract {
     }
 
     interface External : ItemBaseContract.ItemPresenterBase {
-        fun update(item: Model, highlightPlaying: Boolean)
+        fun update(item: Item, highlightPlaying: Boolean)
         fun doLeft()
         fun doRight()
     }
 
     interface Interactions {
-        fun onClick(item: Model)
-        fun onRightSwipe(item: Model)
-        fun onLeftSwipe(item: Model)
-        fun onPlay(item: Model, external: Boolean)
-        fun onShowChannel(item: Model)
-        fun onStar(item: Model)
-        fun onRelated(item: Model)
-        fun onShare(item: Model)
-        fun onItemIconClick(item: Model)
-        fun onPlayStartClick(item: Model)
-        fun onGotoPlaylist(item: Model)
+        fun onClick(item: Item)
+        fun onRightSwipe(item: Item)
+        fun onLeftSwipe(item: Item)
+        fun onPlay(item: Item, external: Boolean)
+        fun onShowChannel(item: Item)
+        fun onStar(item: Item)
+        fun onRelated(item: Item)
+        fun onShare(item: Item)
+        fun onItemIconClick(item: Item)
+        fun onPlayStartClick(item: Item)
+        fun onGotoPlaylist(item: Item)
     }
 
-    data class Model(
-        override val id: Long,
-        val index: Int,
-        val url: String,
-        val type: MediaDomain.MediaTypeDomain,
-        val title: String,
-        val duration: String,
-        val positon: String,
-        val imageUrl: String?,
-        val thumbUrl: String?,
-        val channelImageUrl: String?,
-        val progress: Float, // 0..1
-        val published: String,
-        val watchedSince: String,
-        val isWatched: Boolean,
-        val isStarred: Boolean,
-        val platform: PlatformDomain,
-        val isLive: Boolean,
-        val isUpcoming: Boolean,
-        @ColorRes val infoTextBackgroundColor: Int,
-        val canEdit: Boolean,
-        val playlistName: String?,
-        val canDelete: Boolean,
-        val canReorder: Boolean,
-        val showOverflow: Boolean,
-        val deleteResources: ActionResources?
-    ) : ItemBaseModel(id)
-
-    data class State constructor(var item: Model? = null)
+    data class State constructor(var item: Item? = null)
 }

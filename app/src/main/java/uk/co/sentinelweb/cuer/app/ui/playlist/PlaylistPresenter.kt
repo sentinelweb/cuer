@@ -25,7 +25,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ADD_PLAYLIST_DUMMY
@@ -250,7 +249,7 @@ class PlaylistPresenter(
     }
 
     // move item to playlist
-    override fun onItemSwipeRight(itemModel: ItemContract.Model) { // move
+    override fun onItemSwipeRight(itemModel: PlaylistItemMviContract.Model.Item) { // move
         state.viewModelScope.launch {
             playlistItemDomain(itemModel)
                 ?.also { itemDomain ->
@@ -368,7 +367,7 @@ class PlaylistPresenter(
     }
 
     // delete item
-    override fun onItemSwipeLeft(itemModel: ItemContract.Model) {
+    override fun onItemSwipeLeft(itemModel: PlaylistItemMviContract.Model.Item) {
         state.viewModelScope.launch {
             delay(400)
 
@@ -405,7 +404,7 @@ class PlaylistPresenter(
         }
     }
 
-    override fun onItemViewClick(itemModel: ItemContract.Model) {
+    override fun onItemViewClick(itemModel: PlaylistItemMviContract.Model.Item) {
         playlistItemDomain(itemModel)
             ?.apply {
                 interactions
@@ -419,7 +418,7 @@ class PlaylistPresenter(
             }
     }
 
-    override fun onItemPlayClicked(itemModel: ItemContract.Model) {
+    override fun onItemPlayClicked(itemModel: PlaylistItemMviContract.Model.Item) {
         playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 if (interactions != null) {
@@ -432,7 +431,7 @@ class PlaylistPresenter(
             }
     }
 
-    override fun onPlayStartClick(itemModel: ItemContract.Model) {
+    override fun onPlayStartClick(itemModel: PlaylistItemMviContract.Model.Item) {
         playlistItemDomain(itemModel)
             ?.let { itemDomain ->
                 if (interactions != null) {
@@ -467,14 +466,14 @@ class PlaylistPresenter(
         return true
     }
 
-    override fun onItemShowChannel(itemModel: ItemContract.Model) {
+    override fun onItemShowChannel(itemModel: PlaylistItemMviContract.Model.Item) {
         playlistItemDomain(itemModel)
             ?.takeUnless { ytJavaApi.launchChannel(it.media) }
             ?.also { toastWrapper.show("can't launch channel") }
             ?: toastWrapper.show("can't find video")
     }
 
-    override fun onItemStar(itemModel: ItemContract.Model) {
+    override fun onItemStar(itemModel: PlaylistItemMviContract.Model.Item) {
         state.viewModelScope.launch {
             playlistItemDomain(itemModel)
                 ?.takeIf { it.id != null }
@@ -483,7 +482,7 @@ class PlaylistPresenter(
         }
     }
 
-    override fun onItemRelated(itemModel: ItemContract.Model) {
+    override fun onItemRelated(itemModel: PlaylistItemMviContract.Model.Item) {
         playlistItemDomain(itemModel)
             ?.also { item ->
                 multiPrefs.lastRemoteSearch = SearchRemoteDomain(
@@ -498,12 +497,12 @@ class PlaylistPresenter(
             }
     }
 
-    override fun onItemShare(itemModel: ItemContract.Model) {
+    override fun onItemShare(itemModel: PlaylistItemMviContract.Model.Item) {
         playlistItemDomain(itemModel)
             ?.let { itemDomain -> shareWrapper.share(itemDomain.media) }
     }
 
-    override fun onItemGotoPlaylist(item: ItemContract.Model) {
+    override fun onItemGotoPlaylist(item: PlaylistItemMviContract.Model.Item) {
         playlistItemDomain(item)
             ?.playlistId
             ?.let {
@@ -526,7 +525,7 @@ class PlaylistPresenter(
         view.scrollTo(direction)
     }
 
-    override fun onItemPlay(itemModel: ItemContract.Model, external: Boolean) {
+    override fun onItemPlay(itemModel: PlaylistItemMviContract.Model.Item, external: Boolean) {
         playlistItemDomain(itemModel)
             ?.also {
                 if (external) {
@@ -544,7 +543,7 @@ class PlaylistPresenter(
             ?: toastWrapper.show("can't find video")
     }
 
-    private fun playlistItemDomain(itemModel: ItemContract.Model) = state.model
+    private fun playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) = state.model
         ?.itemsIdMap
         ?.get(itemModel.id)
 
@@ -590,7 +589,7 @@ class PlaylistPresenter(
         } else {
             if (state.dragFrom != null || state.dragTo != null) {
                 log.d("commitMove: Move failed .. ")
-                refreshPlaylist()
+                updatePlaylist()
             }
         }
         state.dragFrom = null
@@ -623,7 +622,7 @@ class PlaylistPresenter(
                         dbInit.addListener { b: Boolean ->
                             if (b) {
                                 state.playlistIdentifier = 3L.toIdentifier(LOCAL) // philosophy
-                                refreshPlaylist()
+                                updatePlaylist()
                             }
                         }
                     }
@@ -631,7 +630,7 @@ class PlaylistPresenter(
         }
     }
 
-    override fun refreshPlaylist() {
+    override fun updatePlaylist() {
         state.viewModelScope.launch {
             view.showRefresh()
             try {

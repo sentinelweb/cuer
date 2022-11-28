@@ -8,6 +8,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.resources.Icon
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -19,7 +21,8 @@ class PlaylistMviModelMapper constructor(
     private val iconMapper: IconMapper,
     private val stringDecoder: StringDecoder,
     private val appPlaylistInteractors: Map<Long, AppPlaylistInteractor>,
-    private val util: PlaylistMviUtil
+    private val util: PlaylistMviUtil,
+    private val multiPlatformPreferences: MultiPlatformPreferencesWrapper
 ) {
     private var _modelIdGenerator = 0L
     var modelIdGenerator: Long = 0
@@ -66,6 +69,7 @@ class PlaylistMviModelMapper constructor(
             hasChildren = 0,
             itemsIdMap = mutableMapOf(),
             canUpdate = false,
+            isCards = false
         )
 
     fun map(
@@ -125,7 +129,9 @@ class PlaylistMviModelMapper constructor(
             },
             hasChildren = playlists?.get(domain.id)?.chidren?.size ?: 0,
             itemsIdMap = itemsIdMap,
-            canUpdate = domain.platformId != null && domain.platform == YOUTUBE
+            canUpdate = domain.platformId != null && domain.platform == YOUTUBE,
+            isCards = multiPlatformPreferences.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true)
+            /*&& !view.isHeadless*/ // fixme inject headless arg to mvi in bootstrap
         )
     }
 

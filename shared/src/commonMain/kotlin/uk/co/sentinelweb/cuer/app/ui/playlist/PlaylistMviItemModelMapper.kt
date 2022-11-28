@@ -28,7 +28,7 @@ class PlaylistMviItemModelMapper constructor(
         playlistText: String?,
         showOverflow: Boolean,
         deleteResources: ActionResources?
-    ): PlaylistItemMviContract.Model {
+    ): PlaylistItemMviContract.Model.Item {
         val top = "${item.media.title} : ${item.media.channelData.title}"
         val pos = item.media.positon?.toFloat() ?: 0f
         val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f

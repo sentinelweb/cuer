@@ -34,7 +34,8 @@ class ItemFactory constructor(
             interactions,
             ItemContract.State(),
             ItemTextMapper(res, iconMapper),
-            ytContext
+            ytContext,
+            res
         )
         view.setPresenter(itemPresenter)
         return itemPresenter

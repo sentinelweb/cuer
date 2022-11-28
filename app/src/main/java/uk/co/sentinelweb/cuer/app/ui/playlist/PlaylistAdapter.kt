@@ -27,9 +27,9 @@ class PlaylistAdapter constructor(
         get() = _recyclerView ?: throw IllegalStateException("PlaylistAdapter._recyclerView not bound")
 
 
-    private var _data: MutableList<ItemContract.Model> = mutableListOf()
+    private var _data: MutableList<PlaylistItemMviContract.Model.Item> = mutableListOf()
 
-    val data: List<ItemContract.Model>
+    val data: List<PlaylistItemMviContract.Model.Item>
         get() = _data
 
     var highlightItem: Int? = null
@@ -38,7 +38,7 @@ class PlaylistAdapter constructor(
             notifyDataSetChanged()
         }
 
-    fun setData(data: List<ItemContract.Model>, animate: Boolean = true) {
+    fun setData(data: List<PlaylistItemMviContract.Model.Item>, animate: Boolean = true) {
         if (animate) {
             DiffUtil.calculateDiff(
                 ItemDiffCallback(
@@ -95,7 +95,7 @@ class PlaylistAdapter constructor(
         return null
     }
 
-    fun updateItemModel(model: ItemContract.Model) {
+    fun updateItemModel(model: PlaylistItemMviContract.Model.Item) {
         data.indexOfFirst { it.id == model.id }
             .takeIf { it > -1 }
             ?.also { _data.set(it, model) }

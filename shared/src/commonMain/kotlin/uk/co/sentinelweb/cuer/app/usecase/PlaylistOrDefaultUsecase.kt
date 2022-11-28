@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.forceDatabaseSuccessNotNull
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -13,6 +14,10 @@ class PlaylistOrDefaultUsecase constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
     private val playlistMemoryRepository: PlaylistMemoryRepository,
 ) {
+    suspend fun getPlaylistOrDefault(id: OrchestratorContract.Identifier<*>?)
+            : Pair<PlaylistDomain, OrchestratorContract.Source>? =
+        id?.let { getPlaylistOrDefault(it.id as Long, it.source.flatOptions()) }
+
     suspend fun getPlaylistOrDefault(
         playlistId: Long?,
         options: OrchestratorContract.Options,
@@ -20,13 +25,15 @@ class PlaylistOrDefaultUsecase constructor(
         when (options.source) {
             OrchestratorContract.Source.MEMORY ->
                 playlistMemoryRepository.load(playlistId!!, options) // TODO FALLBACK OR ERROR?
-                    ?.apply { delay(20) } // fixme: fucking menu items don't load in time sine memory is sequential
+                    ?.apply { delay(20) } // fixme: menu items don't load in time sine memory is sequential
                     ?.let { it to OrchestratorContract.Source.MEMORY }
                     ?: getPlaylistOrDefault(null, options.flat)
                         ?.let { it to OrchestratorContract.Source.LOCAL }
+
             OrchestratorContract.Source.LOCAL ->
                 getPlaylistOrDefault(playlistId, options.flat)
                     ?.let { it to OrchestratorContract.Source.LOCAL }
+
             else -> throw UnsupportedOperationException("Not supported for ${options.source}")
         }
 

@@ -16,7 +16,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
@@ -37,18 +36,18 @@ interface PlaylistContract {
         val isCards: Boolean
         fun initialise()
         fun destroy()
-        fun refreshPlaylist()
-        fun onItemSwipeRight(itemModel: ItemContract.Model)
-        fun onItemSwipeLeft(itemModel: ItemContract.Model)
-        fun onItemPlayClicked(itemModel: ItemContract.Model)
-        fun onItemPlay(itemModel: ItemContract.Model, external: Boolean)
-        fun onItemShowChannel(itemModel: ItemContract.Model)
-        fun onItemStar(itemModel: ItemContract.Model)
-        fun onItemRelated(itemModel: ItemContract.Model)
-        fun onItemShare(itemModel: ItemContract.Model)
-        fun onPlayStartClick(itemModel: ItemContract.Model)
-        fun onItemViewClick(itemModel: ItemContract.Model)
-        fun onItemGotoPlaylist(item: ItemContract.Model)
+        fun updatePlaylist()
+        fun onItemSwipeRight(itemModel: PlaylistItemMviContract.Model.Item)
+        fun onItemSwipeLeft(itemModel: PlaylistItemMviContract.Model.Item)
+        fun onItemPlayClicked(itemModel: PlaylistItemMviContract.Model.Item)
+        fun onItemPlay(itemModel: PlaylistItemMviContract.Model.Item, external: Boolean)
+        fun onItemShowChannel(itemModel: PlaylistItemMviContract.Model.Item)
+        fun onItemStar(itemModel: PlaylistItemMviContract.Model.Item)
+        fun onItemRelated(itemModel: PlaylistItemMviContract.Model.Item)
+        fun onItemShare(itemModel: PlaylistItemMviContract.Model.Item)
+        fun onPlayStartClick(itemModel: PlaylistItemMviContract.Model.Item)
+        fun onItemViewClick(itemModel: PlaylistItemMviContract.Model.Item)
+        fun onItemGotoPlaylist(item: PlaylistItemMviContract.Model.Item)
         fun moveItem(fromPosition: Int, toPosition: Int)
         fun scroll(direction: ScrollDirection)
         fun undoDelete()
@@ -89,7 +88,7 @@ interface PlaylistContract {
         val external: External
         fun setModel(model: Model, animate: Boolean = true)
         fun setHeaderModel(model: Model)
-        fun setList(items: List<ItemContract.Model>, animate: Boolean)
+        fun setList(items: List<PlaylistItemMviContract.Model.Item>, animate: Boolean)
         fun scrollToItem(index: Int)
         fun scrollTo(direction: ScrollDirection)
         fun showUndo(msg: String, undoFunction: () -> Unit)
@@ -108,7 +107,7 @@ interface PlaylistContract {
         fun showRefresh()
         fun showError(message: String)
         fun showMessage(message: String)
-        fun updateItemModel(model: ItemContract.Model)
+        fun updateItemModel(model: PlaylistItemMviContract.Model.Item)
         fun navigate(nav: NavigationModel)
         fun newAdapter()
         fun getScrollIndex(): Int
@@ -161,7 +160,7 @@ interface PlaylistContract {
         val canDelete: Boolean,
         val canEditItems: Boolean,
         val canDeleteItems: Boolean,
-        val items: List<ItemContract.Model>?,
+        val items: List<PlaylistItemMviContract.Model.Item>?,
         val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
         val hasChildren: Int,
     )

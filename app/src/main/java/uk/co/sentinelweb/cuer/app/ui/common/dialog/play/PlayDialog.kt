@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
@@ -124,16 +125,16 @@ class PlayDialog constructor(
     }
 
     private val emptyInteractions = object : ItemContract.Interactions {
-        override fun onClick(item: ItemContract.Model) {}
-        override fun onRightSwipe(item: ItemContract.Model) {}
-        override fun onLeftSwipe(item: ItemContract.Model) {}
-        override fun onPlay(item: ItemContract.Model, external: Boolean) {}
-        override fun onShowChannel(item: ItemContract.Model) {}
-        override fun onStar(item: ItemContract.Model) {}
-        override fun onRelated(item: ItemContract.Model) {}
-        override fun onShare(item: ItemContract.Model) {}
-        override fun onItemIconClick(item: ItemContract.Model) {}
-        override fun onPlayStartClick(item: ItemContract.Model) {}
-        override fun onGotoPlaylist(item: ItemContract.Model) {}
+        override fun onClick(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onRightSwipe(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onLeftSwipe(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onPlay(item: PlaylistItemMviContract.Model.Item, external: Boolean) {}
+        override fun onShowChannel(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onStar(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onRelated(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onShare(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onItemIconClick(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onPlayStartClick(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onGotoPlaylist(item: PlaylistItemMviContract.Model.Item) {}
     }
 }

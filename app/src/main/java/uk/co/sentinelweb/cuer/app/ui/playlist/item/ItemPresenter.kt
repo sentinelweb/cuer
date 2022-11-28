@@ -1,18 +1,21 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
     val state: ItemContract.State,
     private val textMapper: ItemTextMapper,
-    private val ytContext: ChromecastYouTubePlayerContextHolder
+    private val ytContext: ChromecastYouTubePlayerContextHolder,
+    private val res: ResourceWrapper
 ) : ItemContract.Presenter, ItemContract.External {
 
     override fun update(
-        item: ItemContract.Model,
+        item: PlaylistItemMviContract.Model.Item,
         highlightPlaying: Boolean
     ) {
         view.setTopText(textMapper.mapTopText(item, highlightPlaying))
@@ -28,7 +31,7 @@ class ItemPresenter(
             ?.apply { view.setChannelImageUrl(this) }
             ?: view.setChannelImageResource(R.drawable.ic_platform_youtube)
         view.setDuration(item.duration)
-        view.setDurationBackground(item.infoTextBackgroundColor)
+        view.setDurationBackground(res.getColorResourceId(item.infoTextBackgroundColor))
         view.showProgress(!item.isLive)
         if (!item.isLive) {
             view.setProgress(item.progress)

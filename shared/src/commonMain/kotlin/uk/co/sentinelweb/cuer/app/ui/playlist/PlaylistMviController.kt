@@ -53,6 +53,9 @@ class PlaylistMviController constructor(
 //            is Event.OnShare -> Intent.Share(item)
 //            is Event.OnStar -> Intent.Star(item)
 //            is Event.OnUndo -> Intent.Undo(undoType)
+            else -> {
+                log.d(this.toString()); Intent.Refresh
+            }
         }
     }
 

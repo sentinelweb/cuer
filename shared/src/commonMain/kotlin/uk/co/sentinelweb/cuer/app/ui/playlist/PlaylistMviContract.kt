@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.resources.Icon
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -31,8 +32,9 @@ class PlaylistMviContract {
 
         sealed class Label {
             data class Error(val message: String, val exception: Throwable? = null) : Label()
-//            data class Message(val message: String) : Label()
-//            object Repaint : Label()
+            data class Message(val message: String) : Label()
+            object Loading : Label()
+            object Loaded : Label()
 //            data class ShowUndo(val undoType: UndoType, val message: String) : Label()
 //            data class ShowPlaylistsSelector(val config: PlaylistsMviDialogContract.Config) : Label()
 //            data class Navigate(val model: NavigationModel, val view: PlaylistsItemMviContract.ItemPassView? = null) : Label()
@@ -53,6 +55,7 @@ class PlaylistMviContract {
             var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null,
             var addPlaylistParent: Long? = null,
             var isModified: Boolean = false,
+            var isCards: Boolean = false
         )
     }
 
@@ -81,22 +84,45 @@ class PlaylistMviContract {
             val canDelete: Boolean,
             val canEditItems: Boolean,
             val canDeleteItems: Boolean,
-            val items: List<PlaylistItemMviContract.Model>?,
+            val items: List<PlaylistItemMviContract.Model.Item>?,
             val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
             val hasChildren: Int,
+            var isCards: Boolean
         )
 
 
         sealed class Event {
             object OnRefresh : Event()
-//            object OnCreatePlaylist : Event()
-//            data class OnMove(val fromPosition: Int, val toPosition: Int) : Event()
-//            object OnClearMove : Event()
-//            data class OnMoveSwipe(val item: PlaylistsItemMviContract.Model) : Event()
-//            data class OnDelete(val item: PlaylistsItemMviContract.Model) : Event()
-//
-//            data class OnUndo(val undoType: UndoType) : Event()
-//            data class OnOpenPlaylist(
+            object OnUpdate : Event()
+            object OnPlayModeChange : Event()
+            object OnPlay : Event()
+            object OnEdit : Event()
+            object OnStar : Event()
+            object OnHelp : Event()
+            object OnResume : Event()
+            object OnPause : Event()
+            object OnShowChannel : Event()
+            object OnCheckToSave : Event()
+            object OnCommit : Event()
+            data class OnPlaylistSelected(val playlist: PlaylistDomain) : Event()
+            data class OnSetPlaylistData(
+                val plId: Long? = null,
+                val plItemId: Long? = null,
+                val playNow: Boolean = false,
+                val source: Source = Source.LOCAL,
+                val addPlaylistParent: Long? = null
+            ) : Event()
+
+            data class OnShowCards(val isCards: Boolean) : Event()
+
+            //            object OnCreatePlaylist : Event()
+            data class OnMove(val fromPosition: Int, val toPosition: Int) : Event()
+            object OnClearMove : Event()
+            data class OnMoveSwipe(val item: PlaylistItemMviContract.Model) : Event()
+            data class OnDeleteItem(val item: PlaylistItemMviContract.Model) : Event()
+            data class OnUndo(val undoType: UndoType) : Event()
+
+            //            data class OnOpenPlaylist(
 //                val item: PlaylistsItemMviContract.Model, val view: PlaylistsItemMviContract.ItemPassView? = null
 //            ) :
 //                Event()
@@ -105,7 +131,17 @@ class PlaylistMviContract {
 //                val item: PlaylistsItemMviContract.Model, val external: Boolean, val view: PlaylistsItemMviContract.ItemPassView? = null
 //            ) : Event()
 //
-//            data class OnStar(val item: PlaylistsItemMviContract.Model) : Event()
+            data class OnStarItem(val item: PlaylistItemMviContract.Model) : Event()
+            data class OnPlayItem(
+                val item: PlaylistItemMviContract.Model,
+                val start: Boolean = false,
+                val external: Boolean = false
+            ) : Event()
+
+            data class OnShareItem(val item: PlaylistItemMviContract.Model) : Event()
+            data class OnShowItem(val item: PlaylistItemMviContract.Model) : Event()
+            data class OnRelatedItem(val item: PlaylistItemMviContract.Model) : Event()
+            data class OnGotoPlaylist(val item: PlaylistItemMviContract.Model) : Event()
 //            data class OnShare(val item: PlaylistsItemMviContract.Model) : Event()
 //            data class OnMerge(val item: PlaylistsItemMviContract.Model) : Event()
 //            data class OnEdit(val item: PlaylistsItemMviContract.Model, val view: PlaylistsItemMviContract.ItemPassView? = null) : Event()

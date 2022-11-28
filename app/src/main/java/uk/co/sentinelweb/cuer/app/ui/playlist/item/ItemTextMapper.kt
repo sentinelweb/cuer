@@ -7,6 +7,7 @@ import android.text.style.ImageSpan
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.AndroidIconMapper
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
@@ -72,7 +73,7 @@ class ItemTextMapper constructor(
         }
     }
 
-    fun mapTopText(model: ItemContract.Model, playing: Boolean): SpannableString {
+    fun mapTopText(model: PlaylistItemMviContract.Model.Item, playing: Boolean): SpannableString {
         return if (!playing) {
             SpannableString(model.title)
         } else {
@@ -86,7 +87,7 @@ class ItemTextMapper constructor(
         }
     }
 
-    fun mapBottomText(model: ItemContract.Model): SpannableString {
+    fun mapBottomText(model: PlaylistItemMviContract.Model.Item): SpannableString {
         val posText = model.positon
         val watchedText = model.watchedSince
         val publishedText = model.published
