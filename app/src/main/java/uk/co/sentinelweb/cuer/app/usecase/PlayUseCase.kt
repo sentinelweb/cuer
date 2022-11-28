@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
@@ -69,8 +70,8 @@ class PlayUseCase constructor(
         AlertDialogModel(
             title = res.getString(R.string.playlist_change_dialog_title),
             message = res.getString(R.string.playlist_change_dialog_message),
-            confirm = AlertDialogModel.Button(R.string.ok, confirm),
-            neutral = AlertDialogModel.Button(R.string.dialog_button_view_info, info)
+            confirm = AlertDialogModel.Button(StringResource.ok, confirm),
+            neutral = AlertDialogModel.Button(StringResource.dialog_button_view_info, info)
         )
 
     fun setQueueItem(item: PlaylistItemDomain) {

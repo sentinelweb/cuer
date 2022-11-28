@@ -65,7 +65,7 @@ interface PrefBackupContract {
                     )
                 }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
-                scoped { AlertDialogCreator(this.getFragmentActivity()) }
+                scoped { AlertDialogCreator(this.getFragmentActivity(), get()) }
                 viewModel { State() }
             }
         }

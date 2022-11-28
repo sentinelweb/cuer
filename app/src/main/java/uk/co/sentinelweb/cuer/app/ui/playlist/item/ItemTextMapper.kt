@@ -6,13 +6,13 @@ import android.text.SpannableString
 import android.text.style.ImageSpan
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.AndroidIconMapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
 class ItemTextMapper constructor(
     private val res: ResourceWrapper,
-    private val iconMapper: IconMapper
+    private val iconMapper: AndroidIconMapper
 ) {
 
     private val playDrawable: Drawable by lazy {

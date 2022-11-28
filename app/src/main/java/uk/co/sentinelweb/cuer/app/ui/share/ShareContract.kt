@@ -134,7 +134,7 @@ interface ShareContract {
                 scoped { navigationRouter(false, get<ShareActivity>()) }
                 scoped<ShareStrings> { AndroidShareStrings(get()) }
                 scoped<PlayerContract.PlayerControls> { EmptyPlayerControls() }
-                scoped { AlertDialogCreator(get<ShareActivity>()) }
+                scoped { AlertDialogCreator(get<ShareActivity>(), get()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 // SHARE HACKS
                 scoped<CommitHost> { get<ShareActivity>() }

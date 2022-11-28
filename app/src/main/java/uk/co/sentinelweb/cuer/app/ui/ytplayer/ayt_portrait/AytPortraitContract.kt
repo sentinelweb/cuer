@@ -95,7 +95,7 @@ interface AytPortraitContract {
                 scoped { LocalPlayerCastListener(get<AytPortraitActivity>(), get()) }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<CommitHost> { EmptyCommitHost() }
-                scoped { AlertDialogCreator(get<AytPortraitActivity>()) }
+                scoped { AlertDialogCreator(get<AytPortraitActivity>(), get()) }
                 scoped { AndroidShareWrapper(get<AytPortraitActivity>()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 scoped { ShareNavigationHack() }

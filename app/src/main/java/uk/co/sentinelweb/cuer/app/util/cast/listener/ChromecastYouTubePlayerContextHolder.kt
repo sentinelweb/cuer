@@ -8,19 +8,19 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 class ChromecastYouTubePlayerContextHolder constructor(
     private val creator: YoutubePlayerContextCreator,
     private val chromeCastWrapper: ChromeCastWrapper
-) {
+) : CastPlayerContextHolder {
 
     private var context: ChromecastYouTubePlayerContext? = null
     private var listener: YoutubeCastConnectionListener? = null
 
-    var playerUi: PlayerContract.PlayerControls? = null
+    override var playerUi: PlayerContract.PlayerControls? = null
         get() = field
         set(value) {
             field = value
             listener?.playerUi = field
         }
 
-    fun create() {
+    override fun create() {
         listener = creator.createConnectionListener().also { listener ->
             this.playerUi = playerUi
             creator.createContext(chromeCastWrapper.getCastContext(), listener).also { context ->
@@ -30,14 +30,14 @@ class ChromecastYouTubePlayerContextHolder constructor(
         }
     }
 
-    fun isCreated() = context != null
+    override fun isCreated() = context != null
 
-    fun isConnected() =
+    override fun isConnected() =
         listener?.isConnected() ?: false
 
-    fun onDisconnected(): Unit = TODO()
+    override fun onDisconnected(): Unit = TODO()
 
-    fun destroy() {
+    override fun destroy() {
         listener?.destroy()
         listener = null
         context?.release()

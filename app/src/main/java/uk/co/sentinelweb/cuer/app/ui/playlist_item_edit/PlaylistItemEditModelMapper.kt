@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.convertToLocalMillis
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTextMapper
@@ -51,7 +52,7 @@ class PlaylistItemEditModelMapper(
                 empty = false,
                 isLive = media.isLiveBroadcast,
                 isUpcoming = media.isLiveBroadcastUpcoming,
-                infoTextColor = durationTextColorMapper.mapInfoText(media),
+                infoTextColor = res.getColorResourceId(durationTextColorMapper.mapInfoText(media)),
                 itemText = itemTextMapper.buildBottomText(
                     posText = getPositionText(media),
                     watchedText = media.dateLastPlayed
@@ -98,8 +99,8 @@ class PlaylistItemEditModelMapper(
         AlertDialogModel(
             title = res.getString(R.string.dialog_title_save_check),
             message = res.getString(R.string.dialog_message_save_item_check),
-            confirm = AlertDialogModel.Button(R.string.dialog_button_save, confirm),
-            cancel = AlertDialogModel.Button(R.string.dialog_button_dont_save, cancel),
+            confirm = AlertDialogModel.Button(StringResource.dialog_button_save, confirm),
+            cancel = AlertDialogModel.Button(StringResource.dialog_button_dont_save, cancel),
         )
 
     fun mapItemSettings(

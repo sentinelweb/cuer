@@ -12,12 +12,16 @@ import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.shape.ShapeAppearanceModel
+import uk.co.sentinelweb.cuer.app.ui.common.resources.Color
+import uk.co.sentinelweb.cuer.app.ui.common.resources.Icon
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import java.io.InputStream
 
 
 class ResourceWrapper constructor(
     private val context: Context,
-) {
+) : StringDecoder {
 
     val resources: Resources = context.resources
 
@@ -38,6 +42,36 @@ class ResourceWrapper constructor(
 
     @ColorInt
     fun getColor(@ColorRes id: Int) = ContextCompat.getColor(context, id)
+
+    @ColorInt
+    fun getColor(color: Color): Int {
+        val id = getColorResourceId(color)
+        return ContextCompat.getColor(context, id)
+    }
+
+    // todo check what happen when id isnt found
+    @ColorRes
+    fun getColorResourceId(color: Color) =
+        resources.getIdentifier(color.name, "color", context.getPackageName())
+
+    // todo check what happen when id isnt found
+    @DrawableRes
+    fun getDrawableResourceId(icon: Icon) =
+        resources.getIdentifier(icon.name, "drawable", context.getPackageName())
+
+    // todo check what happen when id isnt found
+    @StringRes
+    fun getStringResourceId(stringRes: StringResource) =
+        resources.getIdentifier(stringRes.name, "strings", context.getPackageName())
+
+    override fun getString(res: StringResource): String =
+        getStringResourceId(res)
+            .let { getString(it) }
+
+
+    @DrawableRes
+    fun getStringResourceId(icon: Icon) =
+        resources.getIdentifier(icon.name, "drawable", context.getPackageName())
 
     @ColorRes
     fun getColorAttr(@AttrRes id: Int): Int {

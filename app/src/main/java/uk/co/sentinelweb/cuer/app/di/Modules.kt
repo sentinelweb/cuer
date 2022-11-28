@@ -25,8 +25,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.AndroidIconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.AndroidRibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
@@ -128,8 +128,7 @@ object Modules {
     private val uiModule = module {
         factory { PlaylistSelectDialogModelCreator(get(), get()) }
         factory { DatePickerCreator() }
-        factory { IconMapper() }
-        factory { DurationTextColorMapper(get()) }
+        factory { AndroidIconMapper(get(), get()) }
         single { AytViewHolder(get(), get()) }
         factory { PlayYangProgress(get()) }
         factory<RibbonCreator> { AndroidRibbonCreator(get()) }
@@ -203,6 +202,7 @@ object Modules {
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }
         factory { ResourceWrapper(androidApplication()) }
+        factory<StringDecoder> { get<ResourceWrapper>() }
         factory<LogWrapper> { CompositeLogWrapper(get(), get()) }
         factory { AndroidLogWrapper(get()) }
         factory { ContentProviderFileWrapper(androidApplication()) }

@@ -5,6 +5,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.ayt_player.live.LivePlaybackController
+import uk.co.sentinelweb.cuer.app.util.cast.listener.CastPlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.cast.listener.YoutubePlayerContextCreator
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
@@ -13,6 +14,7 @@ object CastModule {
     const val CAST_PLAYER = "CAST_PLAYER"
     val castModule = module {
         single { ChromecastYouTubePlayerContextHolder(get(), get()) }
+        single<CastPlayerContextHolder> { get<ChromecastYouTubePlayerContextHolder>() }
         single { CuerCastSessionListener(get(), get()) }
         factory { ChromeCastWrapper(androidApplication()) }
         factory { CuerSimpleVolumeController(get()) }

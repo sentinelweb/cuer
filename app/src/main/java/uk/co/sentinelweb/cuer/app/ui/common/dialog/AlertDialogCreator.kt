@@ -7,15 +7,17 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.setPadding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 
 class AlertDialogCreator(
-    private val context: Context
+    private val context: Context,
+    private val strings: StringDecoder
 ) {
 
     fun create(model: AlertDialogModel): AlertDialog {
         val builder = MaterialAlertDialogBuilder(context)
             .setTitle(model.title)
-            .setPositiveButton(model.confirm.label, object : DialogInterface.OnClickListener {
+            .setPositiveButton(strings.getString(model.confirm.label), object : DialogInterface.OnClickListener {
                 override fun onClick(dialog: DialogInterface?, p1: Int) {
                     model.confirm.action()
                     dialog?.dismiss()
@@ -34,18 +36,18 @@ class AlertDialogCreator(
         }
         model.neutral?.apply {
             builder
-                .setNeutralButton(label, object : DialogInterface.OnClickListener {
+                .setNeutralButton(strings.getString(label), object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface?, p1: Int) {
                         action()
                         dialog?.dismiss()
                     }
                 })
         }
-        model.cancel?.apply {
+        model.cancel?.also { button ->
             builder
-                .setNegativeButton(model.cancel.label, object : DialogInterface.OnClickListener {
+                .setNegativeButton(strings.getString(button.label), object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface?, p1: Int) {
-                        model.cancel.let { it.action() }
+                        model.cancel.let { button.action() }
                         dialog?.dismiss()
                     }
                 })

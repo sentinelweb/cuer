@@ -1,20 +1,21 @@
-package uk.co.sentinelweb.cuer.app.ui.playlist.item
+package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.ktx.convertToLocalMillis
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.core.mappers.Format
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-class ItemModelMapper constructor(
-    private val res: ResourceWrapper,
+class PlaylistMviItemModelMapper constructor(
     private val timeSinceFormatter: TimeSinceFormatter,
     private val timeFormatter: TimeFormatter,
-    private val durationTextColorMapper: DurationTextColorMapper
+    private val durationTextColorMapper: DurationTextColorMapper,
+    private val stringDecoder: StringDecoder
 ) {
 
     fun mapItem(
@@ -27,11 +28,11 @@ class ItemModelMapper constructor(
         playlistText: String?,
         showOverflow: Boolean,
         deleteResources: ActionResources?
-    ): ItemContract.Model {
+    ): PlaylistItemMviContract.Model {
         val top = "${item.media.title} : ${item.media.channelData.title}"
         val pos = item.media.positon?.toFloat() ?: 0f
         val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f
-        return ItemContract.Model(
+        return PlaylistItemMviContract.Model.Item(
             modelId,
             index = index,
             url = item.media.url,
@@ -39,8 +40,8 @@ class ItemModelMapper constructor(
             title = top,
             duration = (
                     if (item.media.isLiveBroadcast) {
-                        if (item.media.isLiveBroadcastUpcoming) res.getString(R.string.upcoming)
-                        else res.getString(R.string.live)
+                        if (item.media.isLiveBroadcastUpcoming) stringDecoder.getString(StringResource.upcoming)
+                        else stringDecoder.getString(StringResource.live)
                     } else (item.media.duration?.let {
                         item.media.duration?.let {
                             timeFormatter.formatMillis(
@@ -50,8 +51,9 @@ class ItemModelMapper constructor(
                         }
                     } ?: "-")
                     ),
-            positon = if (item.media.isLiveBroadcast) res.getString(R.string.live) else (progress * 100).toInt()
-                .toString() + "%",
+            positon =
+            if (item.media.isLiveBroadcast) stringDecoder.getString(StringResource.live)
+            else (progress * 100).toInt().toString() + "%",
             thumbUrl = (item.media.thumbNail ?: item.media.image)?.url,
             imageUrl = (item.media.image ?: item.media.thumbNail)?.url,
             channelImageUrl = item.media.channelData.thumbNail?.url,
@@ -61,12 +63,12 @@ class ItemModelMapper constructor(
                 ?: "-",
             isWatched = item.media.watched,
             published = item.media.published
-                ?.let { timeSinceFormatter.formatTimeSince(it.convertToLocalMillis()) }
+                ?.let { timeSinceFormatter.formatTimeSince(it.toInstant(TimeZone.UTC).epochSeconds) }// todo .convertToLocalMillis()
                 ?: "-",
             platform = item.media.platform,
             isLive = item.media.isLiveBroadcast,
             isUpcoming = item.media.isLiveBroadcastUpcoming,
-            infoTextBackgroundColor = res.getColorResourceId(durationTextColorMapper.mapInfoBackgroundItem(item.media)),
+            infoTextBackgroundColor = durationTextColorMapper.mapInfoBackgroundItem(item.media),
             canEdit = canEdit,
             canDelete = canDelete,
             playlistName = playlistText,

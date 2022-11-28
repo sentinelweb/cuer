@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_ALL_HEADER
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_APP_HEADER
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_APP_LIST
@@ -30,7 +32,6 @@ class PlaylistsMviModelMapper(
             root = state.treeRoot
         ),
         title = "Playlists"
-
     )
 
     private fun buildItems(
@@ -132,7 +133,7 @@ class PlaylistsMviModelMapper(
         type = pl.type,
         platform = pl.platform,
         showOverflow = true,
-        source = if (pl.type == PlaylistDomain.PlaylistTypeDomain.APP) OrchestratorContract.Source.MEMORY else OrchestratorContract.Source.LOCAL,
+        source = if (pl.type == PlaylistDomain.PlaylistTypeDomain.APP) MEMORY else LOCAL,
         canEdit = pl.config.editable,
         canPlay = pl.config.playable,
         canDelete = pl.config.deletable,

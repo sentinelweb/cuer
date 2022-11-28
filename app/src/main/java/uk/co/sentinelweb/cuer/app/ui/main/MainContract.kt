@@ -82,7 +82,7 @@ interface MainContract {
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<MainActivity>(), get()) }
                 scoped<PlaylistContract.Interactions?> { null }
                 scoped { FloatingPlayerCastListener(get(), get(), get()) }
-                scoped { AlertDialogCreator(get<MainActivity>()) }
+                scoped { AlertDialogCreator(get<MainActivity>(), get()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), true) }
                 scoped { EmailWrapper(get<MainActivity>()) }
                 scoped { AndroidShareWrapper(get<MainActivity>()) }
