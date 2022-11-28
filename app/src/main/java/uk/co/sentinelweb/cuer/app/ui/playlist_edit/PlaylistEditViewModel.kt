@@ -149,18 +149,11 @@ class PlaylistEditViewModel constructor(
         if ((state.model?.validation?.valid) == true) {
             viewModelScope.launch {
                 if (state.playlistEdit.default && state.source == LOCAL) {
-                    playlistOrchestrator.loadList(
-                        DefaultFilter,
-                        state.source.flatOptions()
-                    )
-                        .takeIf { it.size > 0 }
-                        ?.map { it.copy(default = false) }
-                        ?.apply {
-                            playlistOrchestrator.save(this, state.source.flatOptions())
-                        }
+                    removePreviousDefault()
                 }
                 playlistOrchestrator.save(state.playlistEdit, state.source.flatOptions())
                     .also {
+                        log.d("Playlist saved: ${it.id} - ${it.title}")
                         it.apply { state.playlistEdit = this }
                         _domainLiveData.value = it // this calls navigate back / listener in fragment
                         recentLocalPlaylists.addRecent(it)
@@ -169,6 +162,18 @@ class PlaylistEditViewModel constructor(
                     ?.also { recentLocalPlaylists.addRecentId(it.id!!) }
             }
         }
+    }
+
+    private suspend fun removePreviousDefault() {
+        playlistOrchestrator.loadList(
+            DefaultFilter,
+            state.source.flatOptions()
+        )
+            .takeIf { it.size > 0 }
+            ?.map { it.copy(default = false) }
+            ?.apply {
+                playlistOrchestrator.save(this, state.source.flatOptions())
+            }
     }
 
     fun onPinClick() {

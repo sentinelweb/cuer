@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -218,7 +219,8 @@ class PlaylistsMviFragment :
     override fun onResume() {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-        viewProxy.dispatch(Event.OnRefresh)
+        controller.onRefresh(lifecycleScope)
+        // log.d("Playlists onResume")
     }
 
     override fun onPause() {
@@ -247,6 +249,7 @@ class PlaylistsMviFragment :
 
     // region PlaylistContract.View
     private fun setList(model: Model) {
+        log.d("Playlists set list:items: ${model.items.size}")
         Glide.with(requireContext())
             .loadFirebaseOrOtherUrl(model.imageUrl, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
