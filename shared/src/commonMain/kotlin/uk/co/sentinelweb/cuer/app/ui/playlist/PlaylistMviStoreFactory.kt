@@ -6,15 +6,18 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Label.Error
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviStoreFactory.Action.Init
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -37,7 +40,15 @@ class PlaylistMviStoreFactory(
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val platformLauncher: PlatformLaunchWrapper,
     private val shareWrapper: ShareWrapper,
+    private val dbInit: DatabaseInitializer,
+    private val recentLocalPlaylists: RecentLocalPlaylists,
+    private val queue: QueueMediatorContract.Producer,
 ) {
+    init {
+        log.tag(this)
+        log.d("init PlaylistMviStoreFactory")
+    }
+
     private sealed class Result {
         data class Load(
             var playlistIdentifier: OrchestratorContract.Identifier<*>,
@@ -89,6 +100,7 @@ class PlaylistMviStoreFactory(
         override fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
                 is Intent.Refresh -> refresh(getState())
+                is Intent.SetPlaylistData -> setPlaylistData(intent, getState())
 //                Intent.CreatePlaylist -> openCreatePlaylist()
 //                is Intent.OpenPlaylist -> openPlaylist(intent)
 //                is Intent.Edit -> openEdit(intent)
@@ -123,6 +135,42 @@ class PlaylistMviStoreFactory(
 
         // endregion
 
+        private fun setPlaylistData(intent: Intent.SetPlaylistData, state: State) {
+            // fixme bit dodgy here - modifying state.
+            coroutines.mainScope.launch {
+                val notLoaded = state.playlist == null
+                intent.plId
+                    ?.takeIf { it != -1L }
+                    ?.toIdentifier(intent.source)
+                    ?.apply {
+                        state.playlistIdentifier = this
+                    }
+                    ?.apply { executeRefresh(scrollToCurrent = notLoaded, state = state) }
+                    ?.apply {
+                        if (intent.playNow) {
+                            queue.playNow(state.playlistIdentifier, intent.plItemId)
+                        }
+                    }
+                    ?.apply {
+                        state.playlist?.also { recentLocalPlaylists.addRecent(it) }
+                    }
+                    ?: run {
+                        if (dbInit.isInitialized()) {
+                            state.playlistIdentifier = prefsWrapper.lastViewedPlaylistId
+                            executeRefresh(scrollToCurrent = notLoaded, state = state)
+                        } else {
+                            dbInit.addListener { b: Boolean ->
+                                if (b) {
+                                    state.playlistIdentifier = 3L.toIdentifier(LOCAL) // philosophy
+                                    //updatePlaylist()
+                                    refresh(state = state)
+                                }
+                            }
+                        }
+                    }
+            }
+        }
+
         private fun refresh(state: State) {
             scope.launch { executeRefresh(false, false, state) }
         }
@@ -131,8 +179,11 @@ class PlaylistMviStoreFactory(
             //view.showRefresh()
             publish(Label.Loading)
             try {
+                val id = state.playlistIdentifier
+                    .takeIf { it != OrchestratorContract.NO_PLAYLIST }
+                    ?: prefsWrapper.currentPlayingPlaylistId
                 val playlistOrDefault = playlistOrDefaultUsecase
-                    .getPlaylistOrDefault(prefsWrapper.currentPlayingPlaylistId)
+                    .getPlaylistOrDefault(id)
                 val playlistsTree = playlistOrchestrator
                     .loadList(AllFilter, LOCAL.flatOptions())
                     .buildTree()

@@ -14,7 +14,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
+import com.arkivanov.essenty.lifecycle.essentyLifecycle
 import com.arkivanov.mvikotlin.core.view.BaseMviView
+import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
@@ -22,12 +25,15 @@ import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
+import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
@@ -41,22 +47,24 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract.Model.Item
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -71,10 +79,10 @@ class PlaylistMviFragment : Fragment(),
     ShareContract.Committer,
     AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource<PlaylistFragment>()
-//    override val external: PlaylistContract.External
-//        get() = presenter as PlaylistContract.External
+    override val scope: Scope by fragmentScopeWithSource<PlaylistMviFragment>()
 
+    //    override val external: PlaylistContract.External
+//        get() = presenter as PlaylistContract.External
     //private val presenter: PlaylistContract.Presenter by inject()
     private val controller: PlaylistMviController by inject()
 
@@ -241,6 +249,9 @@ class PlaylistMviFragment : Fragment(),
         }
         setupRecyclerView()
         imageUrlArg?.also { setImage(it) }
+
+        viewProxy = ViewProxy()
+        controller.onViewCreated(listOf(viewProxy), viewLifecycleOwner.essentyLifecycle())
     }
 
     fun showHelp() {
@@ -740,5 +751,80 @@ class PlaylistMviFragment : Fragment(),
     companion object {
         private const val CREATE_PLAYLIST_TAG = "pe_dialog"
         private const val SELECT_PLAYLIST_TAG = "pdf_dialog"
+
+        val fragmentModule = module {
+            scope(named<PlaylistMviFragment>()) {
+                scoped {
+                    PlaylistMviController(
+                        store = get(),
+                        modelMapper = get(),
+                        lifecycle = get<PlaylistMviFragment>().lifecycle.asEssentyLifecycle(),
+                        log = get(),
+                        playlistOrchestrator = get(),
+                    )
+                }
+                scoped {
+                    PlaylistMviStoreFactory(
+                        // fixme circular ref in playlistTreeDomain toString
+//                        storeFactory = LoggingStoreFactory(DefaultStoreFactory()),
+                        storeFactory = DefaultStoreFactory(),
+                        playlistOrchestrator = get(),
+                        playlistStatsOrchestrator = get(),
+                        coroutines = get(),
+                        log = get(),
+                        prefsWrapper = get(),
+                        platformLauncher = get(),
+                        shareWrapper = get(),
+                        playlistItemOrchestrator = get(),
+                        mediaOrchestrator = get(),
+                        playlistUpdateUsecase = get(),
+                        playlistOrDefaultUsecase = get(),
+                        dbInit = get(),
+                        recentLocalPlaylists = get(),
+                        queue = get()
+                    ).create()
+                }
+                scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }
+                scoped { PlaylistMviItemModelMapper(get(), get(), get(), get()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
+                scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped<ShareWrapper> { AndroidShareWrapper(this.getFragmentActivity()) }
+                scoped { ItemFactory(get(), get(), get()) }
+                scoped { ItemModelMapper(get(), get(), get(), get()) }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
+                scoped { PlaylistHelpConfig(get()) }
+                scoped {
+                    PlayUseCase(
+                        queue = get(),
+                        ytCastContextHolder = get(),
+                        prefsWrapper = get(),
+                        coroutines = get(),
+                        floatingService = get(),
+                        playDialog = get(),
+                        res = get()
+                    )
+                }
+                scoped {
+                    PlayDialog(
+                        get<PlaylistMviFragment>(),
+                        itemFactory = get(),
+                        itemModelMapper = get(),
+                        navigationRouter = get(),
+                        castDialogWrapper = get(),
+                        floatingService = get(),
+                        log = get(),
+                        alertDialogCreator = get(),
+                        youtubeApi = get()
+                    )
+                }
+                scoped {
+                    PlaylistMviUtil(
+                        queue = get(),
+                        ytCastContextHolder = get(),
+                        multiPrefs = get(),
+                    )
+                }
+            }
+        }
     }
 }

@@ -62,7 +62,7 @@ class ResourceWrapper constructor(
     // todo check what happen when id isnt found
     @StringRes
     fun getStringResourceId(stringRes: StringResource) =
-        resources.getIdentifier(stringRes.name, "strings", context.getPackageName())
+        resources.getIdentifier(stringRes.name, "string", context.getPackageName())
 
     override fun getString(res: StringResource): String =
         getStringResourceId(res)

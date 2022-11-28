@@ -10,11 +10,11 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
-
 
 class PlaylistMviModelMapper constructor(
     private val itemModelMapper: PlaylistMviItemModelMapper,
@@ -22,8 +22,13 @@ class PlaylistMviModelMapper constructor(
     private val stringDecoder: StringDecoder,
     private val appPlaylistInteractors: Map<Long, AppPlaylistInteractor>,
     private val util: PlaylistMviUtil,
-    private val multiPlatformPreferences: MultiPlatformPreferencesWrapper
+    private val multiPlatformPreferences: MultiPlatformPreferencesWrapper,
+    private val log: LogWrapper
 ) {
+    init {
+        log.tag(this)
+    }
+
     private var _modelIdGenerator = 0L
     var modelIdGenerator: Long = 0
         get() {

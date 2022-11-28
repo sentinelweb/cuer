@@ -56,6 +56,58 @@
 
     <fragment
         android:id="@+id/navigation_playlist"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment"
+        android:label="@string/bottomnav_title_playlist"
+        tools:layout="@layout/fragment_playlist"
+    >
+        <argument
+            android:name="PLAYLIST_ID"
+            android:defaultValue="-1L"
+            app:argType="long"
+            app:nullable="false"/>
+
+        <argument
+            android:name="PLAY_NOW"
+            android:defaultValue="false"
+            app:argType="boolean"/>
+
+        <argument
+            android:name="SOURCE"
+            app:argType="string"
+            app:nullable="false"/>
+
+        <argument
+            android:name="IMAGE_URL"
+            app:argType="string"
+            app:nullable="true"/>
+
+        <action
+            android:id="@+id/action_goto_playlist_item"
+            app:destination="@id/navigation_playlist_item_edit"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist_item_edit"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_goto_edit_playlist"
+            app:destination="@id/navigation_playlist_edit"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/navigation_playlist_edit"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+        />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_playlist_old"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment"
         android:label="@string/bottomnav_title_playlist"
         tools:layout="@layout/fragment_playlist"

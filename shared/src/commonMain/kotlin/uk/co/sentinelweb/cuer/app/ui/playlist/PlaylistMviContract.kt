@@ -16,6 +16,14 @@ class PlaylistMviContract {
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
         sealed class Intent {
             object Refresh : Intent()
+            data class SetPlaylistData(
+                val plId: Long? = null,
+                val plItemId: Long? = null,
+                val playNow: Boolean = false,
+                val source: Source = Source.LOCAL,
+                val addPlaylistParent: Long? = null
+            ) : Intent()
+
 //            object CreatePlaylist : Intent()
 //            data class Move(val fromPosition: Int, val toPosition: Int) : Intent()
 //            object ClearMove : Intent()

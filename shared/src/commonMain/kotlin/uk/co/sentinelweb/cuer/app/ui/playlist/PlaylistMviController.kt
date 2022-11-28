@@ -40,6 +40,7 @@ class PlaylistMviController constructor(
 
     private val eventToIntent: suspend Event.() -> Intent = {
         when (this) {
+            is Event.OnSetPlaylistData -> Intent.SetPlaylistData(plId, plItemId, playNow, source, addPlaylistParent)
 //            Event.OnClearMove -> Intent.ClearMove
 //            Event.OnCreatePlaylist -> Intent.CreatePlaylist
 //            is Event.OnDelete -> Intent.Delete(item)

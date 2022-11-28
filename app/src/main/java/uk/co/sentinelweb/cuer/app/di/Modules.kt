@@ -35,7 +35,7 @@ import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment
@@ -97,7 +97,8 @@ object Modules {
     val IMAGES_REPO_NAME = "images"
 
     private val scopedModules = listOf(
-        PlaylistContract.fragmentModule,
+        //PlaylistContract.fragmentModule,
+        PlaylistMviFragment.fragmentModule,
         PlaylistsMviFragment.fragmentModule,
         PlaylistsDialogFragment.fragmentModule,
         MainContract.activityModule,
