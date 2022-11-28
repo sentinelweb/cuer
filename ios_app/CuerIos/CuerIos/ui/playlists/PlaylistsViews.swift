@@ -64,7 +64,7 @@ struct PlaylistsItemRowViewActions: View {
                 } label: {
                     Label("Move", systemImage: "arrow.up.and.down.and.arrow.left.and.right")
                 }
-                .tint(Color.ui.moveColor)
+                .tint(Color.ui.colorMove)
             }
             .swipeActions(edge: .trailing) {
                 Button {
@@ -72,7 +72,7 @@ struct PlaylistsItemRowViewActions: View {
                 } label: {
                     Label("Delete", systemImage: "trash")
                 }
-                .tint(Color.ui.deleteColor)
+                .tint(Color.ui.colorDelete)
             }
     }
 }
@@ -124,7 +124,7 @@ private func contextMenuOverlay(
     actions: PlaylistsMviViewProxy.Actions
 ) -> some View {
     Image(systemName: "ellipsis")
-        .foregroundColor(Color(.label))
+        .foregroundColor(Color.ui.light_color_on_surface)
         .padding(.horizontal, 4)
         .padding(.vertical, 4)
         .frame(width: 30, height: 30, alignment: .center)

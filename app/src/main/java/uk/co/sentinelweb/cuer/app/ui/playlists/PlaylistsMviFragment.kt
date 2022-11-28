@@ -44,8 +44,8 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Model
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsVMDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
@@ -218,7 +218,8 @@ class PlaylistsMviFragment :
     override fun onResume() {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-        viewProxy.dispatch(Event.OnRefresh)
+        controller.onRefresh()
+        // log.d("Playlists onResume")
     }
 
     override fun onPause() {
@@ -247,6 +248,7 @@ class PlaylistsMviFragment :
 
     // region PlaylistContract.View
     private fun setList(model: Model) {
+        log.d("Playlists set list:items: ${model.items.size}")
         Glide.with(requireContext())
             .loadFirebaseOrOtherUrl(model.imageUrl, imageProvider)
             .transition(DrawableTransitionOptions.withCrossFade())
@@ -287,7 +289,7 @@ class PlaylistsMviFragment :
 
     private fun showPlaylistSelector(config: PlaylistsMviDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()
-        dialogFragment = PlaylistsVMDialogFragment.newInstance(config)
+        dialogFragment = PlaylistsDialogFragment.newInstance(config)
         dialogFragment?.show(childFragmentManager, "PlaylistsSelector")
     }
 

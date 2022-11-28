@@ -5,8 +5,11 @@ import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.core.binder.Binder
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
 import com.arkivanov.mvikotlin.extensions.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Event
@@ -26,6 +29,12 @@ class PlaylistsMviController constructor(
         log.tag(this)
         lifecycle?.doOnDestroy {
             store.dispose()
+        }
+    }
+
+    fun onRefresh() {
+        CoroutineScope(Dispatchers.Main).launch {
+            store.accept(Intent.Refresh)
         }
     }
 

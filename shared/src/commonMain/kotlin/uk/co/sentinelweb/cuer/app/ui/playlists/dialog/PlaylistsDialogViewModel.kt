@@ -1,8 +1,12 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
@@ -34,10 +38,15 @@ class PlaylistsDialogViewModel(
     }
 
     private val _model: MutableStateFlow<PlaylistsMviDialogContract.Model>
-    val model: StateFlow<PlaylistsMviDialogContract.Model> get() = _model
+    val model: Flow<PlaylistsMviDialogContract.Model>
+        get() = _model
+//            .onSubscription { log.d("model.onSubscription") }
+//            .onStart { log.d("model.onStart") }
+//            .onEach { log.d("model.onEach(items:${it.playistsModel?.items?.size})") }
+//            .onCompletion { log.d("model.onCompletion") }
 
     private val _label: MutableSharedFlow<PlaylistsMviDialogContract.Label>
-    val label: SharedFlow<PlaylistsMviDialogContract.Label> get() = _label
+    val label: Flow<PlaylistsMviDialogContract.Label> get() = _label
 
     init {
         _model = MutableStateFlow(PlaylistsMviDialogContract.Model(null, false, false, false))
@@ -58,9 +67,9 @@ class PlaylistsDialogViewModel(
                 }
             }
             ?.apply { state.config.itemClick(this, true) }
-            ?.also { /*view.*/dismiss() }
+            ?.also { dismiss() }
             ?: apply { state.config.itemClick(ROOT_PLAYLIST_DUMMY, true) }
-                .also { /*view.*/dismiss() }
+                .also { dismiss() }
     }
 
     private fun dismiss() {
@@ -73,21 +82,15 @@ class PlaylistsDialogViewModel(
         coroutines.mainScope.launch { executeRefresh() }
     }
 
-    private suspend fun executeRefresh(animate: Boolean = false) {
+    private suspend fun executeRefresh() {
         state.channelPlaylistIds.clear()
         state.config.suggestionsMedia?.apply {
-            playlistOrchestrator.loadList(
-                OrchestratorContract.Filter.ChannelPlatformIdFilter(this.channelData.platformId!!),
-                OrchestratorContract.Source.LOCAL.flatOptions()
-            )
+            playlistOrchestrator.loadList(ChannelPlatformIdFilter(this.channelData.platformId!!), LOCAL.flatOptions())
                 .apply { state.channelPlaylistIds.addAll(this.map { it.id!! }) }
         }
 
         val pinnedId = prefsWrapper.pinnedPlaylistId
-        state.playlists = playlistOrchestrator.loadList(
-            OrchestratorContract.Filter.AllFilter,
-            OrchestratorContract.Source.LOCAL.flatOptions()
-        )
+        state.playlists = playlistOrchestrator.loadList(AllFilter, LOCAL.flatOptions())
             .filter { it.config.editableItems }
             .apply { state.treeRoot = buildTree().sort(compareBy { it.node?.title?.lowercase() }) }
 
@@ -100,10 +103,7 @@ class PlaylistsDialogViewModel(
             ).toMutableList()
 
         val playlistStats = playlistStatsOrchestrator
-            .loadList(
-                OrchestratorContract.Filter.IdListFilter(state.playlists.mapNotNull { it.id }),
-                OrchestratorContract.Source.LOCAL.flatOptions()
-            )
+            .loadList(IdListFilter(state.playlists.mapNotNull { it.id }), LOCAL.flatOptions())
 
         val recentLocalPlaylists = recentLocalPlaylists
             .buildRecentSelectionList()
@@ -129,7 +129,6 @@ class PlaylistsDialogViewModel(
             ?.also {
                 log.d("emit model")
                 _model.emit(it)
-                //view.setList(it, animate)
             }
     }
 
@@ -137,7 +136,6 @@ class PlaylistsDialogViewModel(
         dialogModelMapper.map(state.playlistsModel, state.config, state.pinWhenSelected)
             .takeIf { coroutines.mainScopeActive }
             ?.also {
-                /*view.updateDialogModel(it)*/
                 coroutines.mainScope.launch { _model.emit(it) }
             }
     }
@@ -149,7 +147,7 @@ class PlaylistsDialogViewModel(
 
     fun onDismiss() {
         state.config.dismiss()
-        /*view.*/dismiss()
+        dismiss()
     }
 
     fun setConfig(config: PlaylistsMviDialogContract.Config) {
@@ -159,7 +157,7 @@ class PlaylistsDialogViewModel(
     fun onAddPlaylist() {
         (state.playlists.size + 1)
             .apply { state.config.itemClick(ADD_PLAYLIST_DUMMY, true) }
-            .also { /*view.*/dismiss() }
+            .also { dismiss() }
     }
 
     fun onResume() {

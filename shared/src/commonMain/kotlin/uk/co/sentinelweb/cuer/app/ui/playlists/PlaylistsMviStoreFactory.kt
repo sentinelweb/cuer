@@ -391,6 +391,8 @@ class PlaylistsMviStoreFactory(
                     .map { it.makeHeader() to it.makeStats() }
                     .toMap()
 
+                log.d("Playlists executeRefresh: playlists:${playlists.size}")
+
                 withContext(scope.coroutineContext) {
                     dispatch(
                         Result.Load(

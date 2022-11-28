@@ -12,8 +12,9 @@ extension Color {
     static let ui = Color.UI()
     
     struct UI {
-        let deleteColor = Color("Delete")
-        let editColor = Color("Edit")
-        let moveColor = Color("Move")
+        let colorDelete = Color("Delete")
+        let colorEdit = Color("Edit")
+        let colorMove = Color("Move")
+        let light_color_on_surface = Color(red: 0.5, green: 0.5, blue: 0.5)
     }
 }

@@ -27,14 +27,14 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.Config) :
+class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Config) :
     DialogFragment(),
 //    PlaylistsDialogContract.View,
     ItemContract.Interactions,
     ItemBaseContract.ItemMoveInteractions,
     AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource<PlaylistsVMDialogFragment>()
+    override val scope: Scope by fragmentScopeWithSource<PlaylistsDialogFragment>()
 
     //private val presenter: PlaylistsDialogContract.Presenter by inject()
     private val viewModel: PlaylistsDialogViewModel by inject()
@@ -60,10 +60,11 @@ class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.C
         binding.pdfList.layoutManager = LinearLayoutManager(context)
         binding.pdfList.adapter = adapter
         binding.pdfSwipe.setOnRefreshListener { viewModel.refreshList() }
+        binding.pdfSwipe.isEnabled = false
         binding.pdfAddButton.setOnClickListener { viewModel.onAddPlaylist() }
         binding.pdfPinSelectedButton.setOnClickListener { viewModel.onPinSelectedPlaylist(false) }
         binding.pdfPinUnselectedButton.setOnClickListener { viewModel.onPinSelectedPlaylist(true) }
-        //itemTouchHelper.attachToRecyclerView(pdf_list)
+        // itemTouchHelper.attachToRecyclerView(pdf_list)
         viewModel.setConfig(config)
         bindFlow(viewModel.label, ::observeLabel)
         bindFlow(viewModel.model, ::updateDialogModel)
@@ -73,7 +74,7 @@ class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.C
         Dismiss -> dismiss()
     }
 
-    fun updateDialogModel(model: PlaylistsMviDialogContract.Model) {
+    private fun updateDialogModel(model: PlaylistsMviDialogContract.Model) {
         log.d("updateDialogModel: size:${model.playistsModel?.items?.size}")
         setList(model, false)
     }
@@ -99,9 +100,10 @@ class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.C
     // endregion
 
     // region PlaylistContract.View
-    fun setList(model: PlaylistsMviDialogContract.Model, animate: Boolean) {
+    private fun setList(model: PlaylistsMviDialogContract.Model, animate: Boolean) {
         updateDialogNoList(model)
-        model.playistsModel?.items?.apply { adapter.setData(this, animate) }
+        model.playistsModel?.items
+            ?.apply { adapter.setData(this, animate) }
     }
 
     private fun updateDialogNoList(model: PlaylistsMviDialogContract.Model) {
@@ -176,13 +178,13 @@ class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.C
     //endregion
 
     companion object {
-        fun newInstance(config: PlaylistsMviDialogContract.Config): PlaylistsVMDialogFragment {
-            return PlaylistsVMDialogFragment(config)
+        fun newInstance(config: PlaylistsMviDialogContract.Config): PlaylistsDialogFragment {
+            return PlaylistsDialogFragment(config)
         }
 
         @JvmStatic
         val fragmentModule = module {
-            scope(named<PlaylistsVMDialogFragment>()) {
+            scope(named<PlaylistsDialogFragment>()) {
                 scoped {
                     PlaylistsDialogViewModel(
                         state = get(),
