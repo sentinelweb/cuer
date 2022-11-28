@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.binder.Binder
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
 import com.arkivanov.mvikotlin.extensions.coroutines.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -31,8 +32,8 @@ class PlaylistsMviController constructor(
         }
     }
 
-    fun onRefresh(scope: CoroutineScope) {
-        scope.launch {
+    fun onRefresh() {
+        CoroutineScope(Dispatchers.Main).launch {
             store.accept(Intent.Refresh)
         }
     }

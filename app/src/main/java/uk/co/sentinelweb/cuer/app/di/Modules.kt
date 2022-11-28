@@ -39,7 +39,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsVMDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.resources.NewPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.StarredPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.UnfinishedPlaylistCustomisationResources
@@ -99,7 +99,7 @@ object Modules {
     private val scopedModules = listOf(
         PlaylistContract.fragmentModule,
         PlaylistsMviFragment.fragmentModule,
-        PlaylistsVMDialogFragment.fragmentModule,
+        PlaylistsDialogFragment.fragmentModule,
         MainContract.activityModule,
         CastPlayerContract.viewModule,
         ShareContract.activityModule,

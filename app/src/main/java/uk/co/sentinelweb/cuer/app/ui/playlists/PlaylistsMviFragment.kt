@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,8 +44,8 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View.Model
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsVMDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemModelMapper
@@ -219,7 +218,7 @@ class PlaylistsMviFragment :
     override fun onResume() {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-        controller.onRefresh(lifecycleScope)
+        controller.onRefresh()
         // log.d("Playlists onResume")
     }
 
@@ -290,7 +289,7 @@ class PlaylistsMviFragment :
 
     private fun showPlaylistSelector(config: PlaylistsMviDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()
-        dialogFragment = PlaylistsVMDialogFragment.newInstance(config)
+        dialogFragment = PlaylistsDialogFragment.newInstance(config)
         dialogFragment?.show(childFragmentManager, "PlaylistsSelector")
     }
 

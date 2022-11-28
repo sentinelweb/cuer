@@ -1,6 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
@@ -34,13 +37,17 @@ class PlaylistsDialogViewModel(
     }
 
     private val _model: MutableStateFlow<PlaylistsMviDialogContract.Model>
-    val model: StateFlow<PlaylistsMviDialogContract.Model> get() = _model
+    val model: Flow<PlaylistsMviDialogContract.Model> get() = _model
 
     private val _label: MutableSharedFlow<PlaylistsMviDialogContract.Label>
-    val label: SharedFlow<PlaylistsMviDialogContract.Label> get() = _label
+    val label: Flow<PlaylistsMviDialogContract.Label> get() = _label
 
     init {
         _model = MutableStateFlow(PlaylistsMviDialogContract.Model(null, false, false, false))
+//            .onStart { log.d("model.onStart") }
+//            .onEach { log.d("model.onEach") }
+//            .onCompletion { log.d("model.onCompletion") }
+//            .onSubscription { log.d("model.onCompletion") }
         _label = MutableSharedFlow()
     }
 
@@ -73,7 +80,7 @@ class PlaylistsDialogViewModel(
         coroutines.mainScope.launch { executeRefresh() }
     }
 
-    private suspend fun executeRefresh(animate: Boolean = false) {
+    private suspend fun executeRefresh() {
         state.channelPlaylistIds.clear()
         state.config.suggestionsMedia?.apply {
             playlistOrchestrator.loadList(

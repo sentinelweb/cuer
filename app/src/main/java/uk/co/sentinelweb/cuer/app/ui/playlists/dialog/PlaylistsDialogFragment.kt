@@ -27,14 +27,14 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.Config) :
+class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Config) :
     DialogFragment(),
 //    PlaylistsDialogContract.View,
     ItemContract.Interactions,
     ItemBaseContract.ItemMoveInteractions,
     AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource<PlaylistsVMDialogFragment>()
+    override val scope: Scope by fragmentScopeWithSource<PlaylistsDialogFragment>()
 
     //private val presenter: PlaylistsDialogContract.Presenter by inject()
     private val viewModel: PlaylistsDialogViewModel by inject()
@@ -176,13 +176,13 @@ class PlaylistsVMDialogFragment(private val config: PlaylistsMviDialogContract.C
     //endregion
 
     companion object {
-        fun newInstance(config: PlaylistsMviDialogContract.Config): PlaylistsVMDialogFragment {
-            return PlaylistsVMDialogFragment(config)
+        fun newInstance(config: PlaylistsMviDialogContract.Config): PlaylistsDialogFragment {
+            return PlaylistsDialogFragment(config)
         }
 
         @JvmStatic
         val fragmentModule = module {
-            scope(named<PlaylistsVMDialogFragment>()) {
+            scope(named<PlaylistsDialogFragment>()) {
                 scoped {
                     PlaylistsDialogViewModel(
                         state = get(),
