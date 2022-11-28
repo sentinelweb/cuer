@@ -60,10 +60,11 @@ class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Con
         binding.pdfList.layoutManager = LinearLayoutManager(context)
         binding.pdfList.adapter = adapter
         binding.pdfSwipe.setOnRefreshListener { viewModel.refreshList() }
+        binding.pdfSwipe.isEnabled = false
         binding.pdfAddButton.setOnClickListener { viewModel.onAddPlaylist() }
         binding.pdfPinSelectedButton.setOnClickListener { viewModel.onPinSelectedPlaylist(false) }
         binding.pdfPinUnselectedButton.setOnClickListener { viewModel.onPinSelectedPlaylist(true) }
-        //itemTouchHelper.attachToRecyclerView(pdf_list)
+        // itemTouchHelper.attachToRecyclerView(pdf_list)
         viewModel.setConfig(config)
         bindFlow(viewModel.label, ::observeLabel)
         bindFlow(viewModel.model, ::updateDialogModel)
@@ -73,7 +74,7 @@ class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Con
         Dismiss -> dismiss()
     }
 
-    fun updateDialogModel(model: PlaylistsMviDialogContract.Model) {
+    private fun updateDialogModel(model: PlaylistsMviDialogContract.Model) {
         log.d("updateDialogModel: size:${model.playistsModel?.items?.size}")
         setList(model, false)
     }
@@ -99,9 +100,10 @@ class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Con
     // endregion
 
     // region PlaylistContract.View
-    fun setList(model: PlaylistsMviDialogContract.Model, animate: Boolean) {
+    private fun setList(model: PlaylistsMviDialogContract.Model, animate: Boolean) {
         updateDialogNoList(model)
-        model.playistsModel?.items?.apply { adapter.setData(this, animate) }
+        model.playistsModel?.items
+            ?.apply { adapter.setData(this, animate) }
     }
 
     private fun updateDialogNoList(model: PlaylistsMviDialogContract.Model) {
