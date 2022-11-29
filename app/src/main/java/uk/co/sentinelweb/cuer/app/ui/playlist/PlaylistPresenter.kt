@@ -97,7 +97,6 @@ class PlaylistPresenter(
     override val isCards: Boolean
         get() = multiPrefs.getBoolean(SHOW_VIDEO_CARDS, true) && !view.isHeadless
 
-
     private fun canPlayPlaylist() = (state.playlist?.id ?: 0) > 0
 
     private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
@@ -366,6 +365,7 @@ class PlaylistPresenter(
         state.addPlaylistParent = id
     }
 
+    // done
     // delete item
     override fun onItemSwipeLeft(itemModel: PlaylistItemMviContract.Model.Item) {
         state.viewModelScope.launch {
@@ -394,6 +394,7 @@ class PlaylistPresenter(
         }
     }
 
+    // done
     override fun undoDelete() {
         state.deletedPlaylistItem?.let { itemDomain ->
             state.viewModelScope.launch {

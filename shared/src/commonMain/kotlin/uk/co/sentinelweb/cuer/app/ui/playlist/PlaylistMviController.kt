@@ -10,6 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.View.Event
@@ -21,6 +23,8 @@ class PlaylistMviController constructor(
     private val log: LogWrapper,
     private val store: PlaylistMviContract.MviStore,
     private val playlistOrchestrator: PlaylistOrchestrator,
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val mediaOrchestrator: MediaOrchestrator,
     lifecycle: Lifecycle?,
 ) {
     private var binder: Binder? = null
@@ -40,23 +44,35 @@ class PlaylistMviController constructor(
 
     private val eventToIntent: suspend Event.() -> Intent = {
         when (this) {
-            is Event.OnSetPlaylistData -> Intent.SetPlaylistData(plId, plItemId, playNow, source, addPlaylistParent)
-//            Event.OnClearMove -> Intent.ClearMove
-//            Event.OnCreatePlaylist -> Intent.CreatePlaylist
-//            is Event.OnDelete -> Intent.Delete(item)
-//            is Event.OnEdit -> Intent.Edit(item, view)
-//            is Event.OnMerge -> Intent.Merge(item)
-//            is Event.OnMove -> Intent.Move(fromPosition, toPosition)
-//            is Event.OnMoveSwipe -> Intent.MoveSwipe(item)
-//            is Event.OnOpenPlaylist -> Intent.OpenPlaylist(item, view)
-//            is Event.OnPlay -> Intent.Play(item, external, view)
             Event.OnRefresh -> Intent.Refresh
-//            is Event.OnShare -> Intent.Share(item)
-//            is Event.OnStar -> Intent.Star(item)
-//            is Event.OnUndo -> Intent.Undo(undoType)
-            else -> {
-                log.d(this.toString()); Intent.Refresh
-            }
+            is Event.OnSetPlaylistData -> Intent.SetPlaylistData(plId, plItemId, playNow, source, addPlaylistParent)
+            Event.OnCheckToSave -> Intent.CheckToSave
+            Event.OnCommit -> Intent.Commit
+            is Event.OnDeleteItem -> Intent.DeleteItem(item = item)
+            Event.OnEdit -> Intent.Edit
+            is Event.OnGotoPlaylist -> Intent.GotoPlaylist(item = item)
+            Event.OnHelp -> Intent.Help
+            is Event.OnMove -> Intent.Move(fromPosition = fromPosition, toPosition = toPosition)
+            is Event.OnMoveSwipe -> Intent.MoveSwipe(item = item)
+            Event.OnClearMove -> Intent.ClearMove
+            Event.OnPause -> Intent.Pause
+            Event.OnPlay -> Intent.Play
+            is Event.OnPlayItem -> Intent.PlayItem(item = item)
+            Event.OnPlayModeChange -> Intent.PlayModeChange
+            is Event.OnPlaylistSelected -> Intent.PlaylistSelected(playlist = playlist)
+            is Event.OnRelatedItem -> Intent.RelatedItem(item = item)
+            Event.OnResume -> Intent.Resume
+            is Event.OnShareItem -> Intent.ShareItem(item = item)
+            is Event.OnShowCards -> Intent.ShowCards(isCards = isCards)
+            Event.OnShowChannel -> Intent.ShowChannel
+            is Event.OnShowItem -> Intent.ShowItem(item = item)
+            Event.OnStar -> Intent.Star
+            is Event.OnStarItem -> Intent.StarItem(item = item)
+            is Event.OnUndo -> Intent.Undo(undoType = undoType)
+            Event.OnUpdate -> Intent.Update
+            Event.OnLaunch -> Intent.Launch
+            Event.OnShare -> Intent.Share
+            Event.OnClearMove -> Intent.ClearMove
         }
     }
 
@@ -77,7 +93,15 @@ class PlaylistMviController constructor(
             // view -> store
             view.events.mapNotNull(eventToIntent) bindTo store
         }
-        playlistOrchestrator.updates.mapNotNull { Intent.Refresh } bindTo store
+        playlistOrchestrator.updates.mapNotNull { Intent.UpdatesPlaylist(it.first, it.second, it.third) } bindTo store
+        playlistItemOrchestrator.updates.mapNotNull {
+            Intent.UpdatesPlaylistItem(
+                it.first,
+                it.second,
+                it.third
+            )
+        } bindTo store
+        mediaOrchestrator.updates.mapNotNull { Intent.UpdatesMedia(it.first, it.second, it.third) } bindTo store
     }
 
     fun onViewDestroyed() {

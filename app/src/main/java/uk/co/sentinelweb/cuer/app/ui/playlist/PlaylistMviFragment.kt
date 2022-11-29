@@ -266,9 +266,15 @@ class PlaylistMviFragment : Fragment(),
             is Label.Message -> showMessage(label.message)
             Label.Loading -> showRefresh()
             Label.Loaded -> hideRefresh()
+            is Label.ItemRemoved -> Unit
+            is Label.Navigate -> navigate(label.model)
+            is Label.ShowPlaylistsSelector -> showPlaylistSelector(label.config)
+            is Label.ShowUndo -> showUndo(label.message) {
+                viewProxy.dispatch(OnUndo(label.undoType))
+            }
         }.also { log.d(label.toString()) }
 
-        override fun render(model: PlaylistMviContract.View.Model) {
+        override fun render(model: PlaylistMviContract.View.Model) {// todo diff, update item
             setModel(model, animate = false)
         }
     }
@@ -761,7 +767,10 @@ class PlaylistMviFragment : Fragment(),
                         lifecycle = get<PlaylistMviFragment>().lifecycle.asEssentyLifecycle(),
                         log = get(),
                         playlistOrchestrator = get(),
-                    )
+                        playlistItemOrchestrator = get(),
+                        mediaOrchestrator = get(),
+
+                        )
                 }
                 scoped {
                     PlaylistMviStoreFactory(
@@ -781,7 +790,8 @@ class PlaylistMviFragment : Fragment(),
                         playlistOrDefaultUsecase = get(),
                         dbInit = get(),
                         recentLocalPlaylists = get(),
-                        queue = get()
+                        queue = get(),
+                        appPlaylistInteractors = get()
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }
