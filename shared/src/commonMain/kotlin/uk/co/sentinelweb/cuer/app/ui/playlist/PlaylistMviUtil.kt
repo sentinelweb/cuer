@@ -10,7 +10,7 @@ class PlaylistMviUtil(
     private val ytCastContextHolder: CastPlayerContextHolder,
     private val multiPrefs: MultiPlatformPreferencesWrapper
 ) {
-    private fun isQueuedPlaylist(state: State): Boolean = state.playlistIdentifier == queue.playlistId
+    fun isQueuedPlaylist(state: State): Boolean = state.playlistIdentifier == queue.playlistId
 
     fun isPlaylistPlaying(state: State): Boolean = isQueuedPlaylist(state) && ytCastContextHolder.isConnected()
 

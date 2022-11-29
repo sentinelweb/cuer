@@ -238,7 +238,6 @@ class PlaylistsMviFragment :
         _adapter = null
         dialogFragment = null
         controller.onViewDestroyed()
-
     }
 
     override fun onDestroy() {

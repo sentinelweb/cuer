@@ -25,11 +25,13 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 import uk.co.sentinelweb.cuer.domain.ext.buildLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildTree
+import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 class PlaylistMviStoreFactory(
     private val storeFactory: StoreFactory,
@@ -48,6 +50,10 @@ class PlaylistMviStoreFactory(
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val queue: QueueMediatorContract.Producer,
     private val appPlaylistInteractors: Map<Long, AppPlaylistInteractor>,
+    private val playlistMutator: PlaylistMutator,
+    private val util: PlaylistMviUtil,
+    private val modelMapper: PlaylistMviModelMapper,
+    private val itemModelMapper: PlaylistMviItemModelMapper,
 ) {
     init {
         log.tag(this)
@@ -64,6 +70,10 @@ class PlaylistMviStoreFactory(
         ) : Result()
 
         data class SetDeletedItem(val item: PlaylistItemDomain?) : Result()
+        data class SetPlaylist(
+            var playlistIdentifier: OrchestratorContract.Identifier<*>,
+            val playlist: PlaylistDomain?
+        ) : Result()
 //        data class SetMoveState(val from: Int?, val to: Int?) : Result()
     }
 
@@ -83,6 +93,7 @@ class PlaylistMviStoreFactory(
                 )
 
                 is Result.SetDeletedItem -> copy(deletedPlaylistItem = msg.item)
+                is Result.SetPlaylist -> copy(playlist = msg.playlist)
                 else -> copy()
             }
     }
@@ -242,17 +253,144 @@ class PlaylistMviStoreFactory(
         }
 
         private fun flowUpdatesPlaylistItem(intent: Intent.UpdatesPlaylistItem, state: State): Unit {
+            log.d("item changed: ${intent.op}, ${intent.source}, id=${intent.item.id} media=${intent.item.media.title}")
+            val currentIndexBefore = state.playlist?.currentIndex
+            when (intent.op) { // todo just apply model updates (instead of full rebuild)
+                OrchestratorContract.Operation.FLAT,
+                OrchestratorContract.Operation.FULL,
+                -> if (intent.item.playlistId?.toIdentifier(intent.source) == state.playlistIdentifier) {
+                    state.playlist
+                        ?.let { playlistMutator.addOrReplaceItem(it, intent.item) }
+                        ?.takeIf { it != state.playlist }
+                        ?.also { state.playlist = it }
+                        ?.also { updateView(state) }
+                } else if (state.playlist?.type == PlaylistDomain.PlaylistTypeDomain.APP) {// check to replace item in an app playlist
+                    state.playlist
+                        ?.items
+                        ?.find { it.media.platformId == intent.item.media.platformId }
+                        ?.also { updatePlaylistItemByMediaId(intent.item, intent.item.media, state) }
+                        ?.let { state.playlist }
+                } else {
+                    state.playlist
+                        ?.let { playlistMutator.remove(it, intent.item) }
+                        ?.takeIf { it != state.playlist }
+                        ?.also { state.playlist = it }
+                        ?.also { updateView(state) }
+                }
 
+                OrchestratorContract.Operation.DELETE ->
+                    state.playlist
+                        ?.let { playlistMutator.remove(it, intent.item) }
+                        ?.takeIf { it != state.playlist }
+                        ?.also { state.playlist = it }
+                        ?.also { updateView(state) }
+            }.takeIf { !util.isQueuedPlaylist(state) && currentIndexBefore != state.playlist?.currentIndex }
+                ?.apply {
+                    scope.launch {
+                        state.playlist?.apply {
+                            playlistOrDefaultUsecase.updateCurrentIndex(this, state.playlistIdentifier.flatOptions())
+                        }
+                    }
+                }
         }
 
-        private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) = model
-            ?.itemsIdMap
-            ?.get(itemModel.id)
+        private fun updateView(state: State, animate: Boolean = true) {
+            state.playlist
+                .takeIf { coroutines.mainScopeActive }
+                ?.let {
+                    modelMapper.map(
+                        domain = it,
+                        isPlaying = util.isPlaylistPlaying(state),
+                        id = state.playlistIdentifier,
+                        playlists = state.playlistsTreeLookup,
+                        pinned = util.isPlaylistPinned(state),
+                        appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] }
+                    )
+                }
+            // fix me uncomment - dont map model need to move out id generation to here and keep just the idmap. i think..
+//                ?.also { state.model = it }
+//                ?.also { view.setModel(it, animate) }
+//                .also {
+//                    state.focusIndex?.apply {
+//                        view.scrollToItem(this)
+//                        state.focusIndex = null
+//                    }
+//                }.also {
+//                    state.playlist
+//                        ?.currentIndex
+//                        ?.also { view.highlightPlayingItem(it) }
+//                }
+        }
+
+        private fun updatePlaylistItemByMediaId(plistItem: PlaylistItemDomain?, media: MediaDomain, state: State) {
+            state.playlist
+                ?.items
+                ?.apply {
+                    indexOfFirst { it.media.platformId == media.platformId }
+                        .takeIf { it > -1 }
+                        ?.let { index ->
+                            state.model?.let { model ->
+                                val originalItemDomain = get(index)
+                                val changedItemDomain =
+                                    plistItem ?: originalItemDomain.copy(media = media)
+                                //model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
+                                model.itemsIdMap.entries.firstOrNull {
+                                    if (originalItemDomain.id != null) {
+                                        it.value.id == originalItemDomain.id
+                                    } else {
+                                        it.value == originalItemDomain
+                                    }
+                                }?.key
+                                    ?.also { updateItem(index, it, changedItemDomain, state) }
+                                    ?: throw Exception("Couldn't lookup model ID for $originalItemDomain keys=${model.itemsIdMap.keys}")
+                            }
+                        }
+                }
+        }
+
+        private fun updateItem(
+            index: Int,
+            modelId: Long,
+            changedItem: PlaylistItemDomain,
+            state: State,
+        ) {
+            state.playlist = state.playlist?.let {
+                it.copy(items = it.items.toMutableList().apply { set(index, changedItem) })
+            }
+
+            val mappedItem = itemModelMapper.mapItem(
+                modelId, changedItem, index,
+                state.playlist?.config?.editableItems ?: false,
+                state.playlist?.config?.deletableItems ?: false,
+                state.playlist?.config?.editable ?: false,
+                playlistText = modelMapper.mapPlaylistText(
+                    changedItem,
+                    state.playlist,
+                    state.playlistsTreeLookup
+                ),
+                showOverflow = true,
+                deleteResources = state.playlist?.id?.let { appPlaylistInteractors[it] }?.customResources?.customDelete
+            )
+            state.model = state.model?.let {
+                it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
+            }?.also { it.itemsIdMap[modelId] = changedItem }
+
+            mappedItem
+                .takeIf { coroutines.mainScopeActive }
+            // fixme label
+            //?.apply { view.updateItemModel(this) }
+        }
+
+        private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) =
+        //model ?.itemsIdMap
+        //?.get(itemModel.id)
+            // fixme figure out if how cache models?
+            playlist?.items?.find { it.id == itemModel.id }
 
         private fun delete(intent: Intent.DeleteItem, state: State): Unit {
             scope.launch {
                 delay(400) // waits for ui animation
-
+                log.d("delete item: ${intent.item.id} ${intent.item.title}")
                 state.playlistItemDomain(intent.item)
                     ?.takeIf { it.id != null }
                     ?.also { log.d("found item ${it.id}") }
@@ -263,15 +401,14 @@ class PlaylistMviStoreFactory(
                         if (state.playlist?.type != PlaylistDomain.PlaylistTypeDomain.APP
                             || !(appPlaylistInteractor?.hasCustomDeleteAction ?: false)
                         ) {
+                            log.d("deleting item: ${intent.item.id}")
                             playlistItemOrchestrator.delete(deleteItem, LOCAL.flatOptions())
+                            log.d("deleted item: ${intent.item.id}")
                         } else {
                             appPlaylistInteractor?.performCustomDeleteAction(deleteItem)
                             executeRefresh(state = state)
                         }
-//                        view.showUndo(
-//                            "$action: ${deleteItem.media.title}",
-//                            ::undoDelete
-//                        )
+                        log.d("deleted item: ${intent.item.id}")
                         publish(Label.ShowUndo(ItemDelete, "$action: ${deleteItem.media.title}"))
                     }
             }

@@ -713,6 +713,7 @@ class PlaylistMviFragment : Fragment(),
         val playlistItemModel = item
         adapter.notifyItemRemoved(playlistItemModel.index)
         //presenter.onItemSwipeLeft(playlistItemModel) // delays for animation
+        log.d("onLeftSwipe")
         viewProxy.dispatch(OnDeleteItem(item))
     }
 
@@ -769,13 +770,12 @@ class PlaylistMviFragment : Fragment(),
                         playlistOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         mediaOrchestrator = get(),
-
-                        )
+                    )
                 }
                 scoped {
                     PlaylistMviStoreFactory(
                         // fixme circular ref in playlistTreeDomain toString
-//                        storeFactory = LoggingStoreFactory(DefaultStoreFactory()),
+                        //storeFactory = LoggingStoreFactory(DefaultStoreFactory()),
                         storeFactory = DefaultStoreFactory(),
                         playlistOrchestrator = get(),
                         playlistStatsOrchestrator = get(),
@@ -791,7 +791,11 @@ class PlaylistMviFragment : Fragment(),
                         dbInit = get(),
                         recentLocalPlaylists = get(),
                         queue = get(),
-                        appPlaylistInteractors = get()
+                        appPlaylistInteractors = get(),
+                        playlistMutator = get(),
+                        modelMapper = get(),
+                        itemModelMapper = get(),
+                        util = get()
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }
