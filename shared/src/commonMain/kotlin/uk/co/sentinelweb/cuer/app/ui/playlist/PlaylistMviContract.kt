@@ -77,7 +77,9 @@ class PlaylistMviContract {
             data class ShowUndo(val undoType: UndoType, val message: String) : Label()
             data class ShowPlaylistsSelector(val config: Config) : Label()
             data class Navigate(val model: NavigationModel, val view: ItemPassView? = null) : Label()
-            data class ItemRemoved(val model: Model) : Label()
+            data class ItemRemoved(val model: Model.Item) : Label()
+            data class ScrollToItem(val pos: Int) : Label()
+            data class HighlightPlayingItem(val pos: Int) : Label()
         }
 
         data class State(
@@ -94,7 +96,8 @@ class PlaylistMviContract {
             var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null,
             var addPlaylistParent: Long? = null,
             var isModified: Boolean = false,
-            var isCards: Boolean = false
+            var isCards: Boolean = false,
+            val itemsIdMap: MutableMap<Long, PlaylistItemDomain> = mutableMapOf(),
         )
     }
 
@@ -103,6 +106,11 @@ class PlaylistMviContract {
         fun processLabel(label: Label)
 
         data class Model(
+            val header: Header,
+            val items: List<PlaylistItemMviContract.Model.Item>?,
+        )
+
+        data class Header(
             val title: String,
             val imageUrl: String,
             val loopModeIndex: Int,
@@ -123,8 +131,6 @@ class PlaylistMviContract {
             val canDelete: Boolean,
             val canEditItems: Boolean,
             val canDeleteItems: Boolean,
-            val items: List<PlaylistItemMviContract.Model.Item>?,
-            val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
             val hasChildren: Int,
             var isCards: Boolean
         )

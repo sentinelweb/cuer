@@ -16,7 +16,9 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.essenty.lifecycle.essentyLifecycle
+import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
+import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -272,11 +274,26 @@ class PlaylistMviFragment : Fragment(),
             is Label.ShowUndo -> showUndo(label.message) {
                 viewProxy.dispatch(OnUndo(label.undoType))
             }
+
+            is Label.HighlightPlayingItem -> highlightPlayingItem(label.pos)
+            is Label.ScrollToItem -> scrollToItem(label.pos)
         }.also { log.d(label.toString()) }
 
-        override fun render(model: PlaylistMviContract.View.Model) {// todo diff, update item
-            setModel(model, animate = false)
-        }
+        //        override fun render(model: PlaylistMviContract.View.Model) {// todo diff, update item
+//            setModel(model, animate = false)
+//        }
+        override val renderer: ViewRenderer<PlaylistMviContract.View.Model> =
+            diff {
+                var previousItems: List<PlaylistItemMviContract.Model.Item> = listOf()
+                diff(get = PlaylistMviContract.View.Model::items, set = {
+                    val items = it ?: listOf()
+                    setList(items, animate = false)
+                    previousItems = items
+                })
+                diff(get = PlaylistMviContract.View.Model::header, set = {
+                    setHeaderModel(it)
+                })
+            }
     }
 
 
@@ -432,7 +449,7 @@ class PlaylistMviFragment : Fragment(),
     // region PlaylistContract.View
     private fun setModel(model: PlaylistMviContract.View.Model, animate: Boolean) {
         commitHost.isReady(true)
-        setHeaderModel(model)
+        setHeaderModel(model.header)
         // update list
         model.items?.apply { setList(this, animate) }
     }
@@ -478,7 +495,7 @@ class PlaylistMviFragment : Fragment(),
         binding.playlistSwipe.isRefreshing = true
     }
 
-    private fun setHeaderModel(model: PlaylistMviContract.View.Model) {
+    private fun setHeaderModel(model: PlaylistMviContract.View.Header) {
         setImage(model.imageUrl)
         binding.playlistCollapsingToolbar.title = model.title
         binding.playlistFabPlay.setIconResource(res.getDrawableResourceId(model.playIcon))

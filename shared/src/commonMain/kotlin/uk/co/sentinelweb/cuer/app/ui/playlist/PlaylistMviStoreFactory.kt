@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -67,6 +68,7 @@ class PlaylistMviStoreFactory(
             var focusIndex: Int?,
             var playlistsTree: PlaylistTreeDomain?,
             var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>?,
+            val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
         ) : Result()
 
         data class SetDeletedItem(val item: PlaylistItemDomain?) : Result()
@@ -90,6 +92,7 @@ class PlaylistMviStoreFactory(
                     focusIndex = msg.focusIndex,
                     playlistsTree = msg.playlistsTree,
                     playlistsTreeLookup = msg.playlistsTreeLookup,
+                    itemsIdMap = msg.itemsIdMap,
                 )
 
                 is Result.SetDeletedItem -> copy(deletedPlaylistItem = msg.item)
@@ -245,7 +248,20 @@ class PlaylistMviStoreFactory(
         }
 
         private fun flowUpdatesMedia(intent: Intent.UpdatesMedia, state: State): Unit {
+            log.d("media changed: ${intent.op}, ${intent.source}, id=${intent.media.id} title=${intent.media.title}")
+            when (intent.op) {
+                FLAT,
+                FULL,
+                -> {
+                    val containsMedia =
+                        state.playlist?.items?.find { it.media.platformId == intent.media.platformId } != null
+                    if (containsMedia) {
+                        updatePlaylistItemMedia(null, intent.media, state)
+                    }
+                }
 
+                DELETE -> Unit
+            }
         }
 
         private fun flowUpdatesPlaylist(intent: Intent.UpdatesPlaylist, state: State): Unit {
@@ -256,8 +272,8 @@ class PlaylistMviStoreFactory(
             log.d("item changed: ${intent.op}, ${intent.source}, id=${intent.item.id} media=${intent.item.media.title}")
             val currentIndexBefore = state.playlist?.currentIndex
             when (intent.op) { // todo just apply model updates (instead of full rebuild)
-                OrchestratorContract.Operation.FLAT,
-                OrchestratorContract.Operation.FULL,
+                FLAT,
+                FULL,
                 -> if (intent.item.playlistId?.toIdentifier(intent.source) == state.playlistIdentifier) {
                     state.playlist
                         ?.let { playlistMutator.addOrReplaceItem(it, intent.item) }
@@ -268,7 +284,7 @@ class PlaylistMviStoreFactory(
                     state.playlist
                         ?.items
                         ?.find { it.media.platformId == intent.item.media.platformId }
-                        ?.also { updatePlaylistItemByMediaId(intent.item, intent.item.media, state) }
+                        ?.also { updatePlaylistItemMedia(intent.item, intent.item.media, state) }
                         ?.let { state.playlist }
                 } else {
                     state.playlist
@@ -278,7 +294,7 @@ class PlaylistMviStoreFactory(
                         ?.also { updateView(state) }
                 }
 
-                OrchestratorContract.Operation.DELETE ->
+                DELETE ->
                     state.playlist
                         ?.let { playlistMutator.remove(it, intent.item) }
                         ?.takeIf { it != state.playlist }
@@ -304,25 +320,30 @@ class PlaylistMviStoreFactory(
                         id = state.playlistIdentifier,
                         playlists = state.playlistsTreeLookup,
                         pinned = util.isPlaylistPinned(state),
-                        appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] }
+                        appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] },
+                        itemsIdMap = state.itemsIdMap
                     )
                 }
-            // fix me uncomment - dont map model need to move out id generation to here and keep just the idmap. i think..
+                // fix me uncomment - dont map model need to move out id generation to here and keep just the idmap. i think..
 //                ?.also { state.model = it }
 //                ?.also { view.setModel(it, animate) }
-//                .also {
-//                    state.focusIndex?.apply {
-//                        view.scrollToItem(this)
-//                        state.focusIndex = null
-//                    }
-//                }.also {
-//                    state.playlist
-//                        ?.currentIndex
-//                        ?.also { view.highlightPlayingItem(it) }
-//                }
+                .also {
+                    state.focusIndex?.apply {
+                        //view.scrollToItem(this)
+                        publish(Label.ScrollToItem(this))
+                        state.focusIndex = null
+                    }
+                }.also {
+                    state.playlist
+                        ?.currentIndex
+                        ?.also {
+                            publish(Label.HighlightPlayingItem(it))
+                            //view.highlightPlayingItem(it)
+                        }
+                }
         }
 
-        private fun updatePlaylistItemByMediaId(plistItem: PlaylistItemDomain?, media: MediaDomain, state: State) {
+        private fun updatePlaylistItemMedia(plistItem: PlaylistItemDomain?, media: MediaDomain, state: State) {
             state.playlist
                 ?.items
                 ?.apply {
@@ -334,7 +355,7 @@ class PlaylistMviStoreFactory(
                                 val changedItemDomain =
                                     plistItem ?: originalItemDomain.copy(media = media)
                                 //model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
-                                model.itemsIdMap.entries.firstOrNull {
+                                state.itemsIdMap.entries.firstOrNull {
                                     if (originalItemDomain.id != null) {
                                         it.value.id == originalItemDomain.id
                                     } else {
@@ -342,7 +363,7 @@ class PlaylistMviStoreFactory(
                                     }
                                 }?.key
                                     ?.also { updateItem(index, it, changedItemDomain, state) }
-                                    ?: throw Exception("Couldn't lookup model ID for $originalItemDomain keys=${model.itemsIdMap.keys}")
+                                    ?: throw Exception("Couldn't lookup model ID for $originalItemDomain keys=${state.itemsIdMap.keys}")
                             }
                         }
                 }
@@ -354,26 +375,30 @@ class PlaylistMviStoreFactory(
             changedItem: PlaylistItemDomain,
             state: State,
         ) {
-            state.playlist = state.playlist?.let {
+            val newPlaylist = state.playlist?.let {
                 it.copy(items = it.items.toMutableList().apply { set(index, changedItem) })
             }
 
             val mappedItem = itemModelMapper.mapItem(
                 modelId, changedItem, index,
-                state.playlist?.config?.editableItems ?: false,
-                state.playlist?.config?.deletableItems ?: false,
-                state.playlist?.config?.editable ?: false,
+                newPlaylist?.config?.editableItems ?: false,
+                newPlaylist?.config?.deletableItems ?: false,
+                newPlaylist?.config?.editable ?: false,
                 playlistText = modelMapper.mapPlaylistText(
                     changedItem,
-                    state.playlist,
+                    newPlaylist,
                     state.playlistsTreeLookup
                 ),
                 showOverflow = true,
-                deleteResources = state.playlist?.id?.let { appPlaylistInteractors[it] }?.customResources?.customDelete
+                deleteResources = newPlaylist?.id?.let { appPlaylistInteractors[it] }?.customResources?.customDelete
             )
-            state.model = state.model?.let {
-                it.copy(items = it.items?.toMutableList()?.apply { set(index, mappedItem) })
-            }?.also { it.itemsIdMap[modelId] = changedItem }
+            state.model = state.model
+                ?.let {
+                    it.copy(items = it.items
+                        ?.toMutableList()
+                        ?.apply { set(index, mappedItem) })
+                }
+                ?.also { state.itemsIdMap[modelId] = changedItem }
 
             mappedItem
                 .takeIf { coroutines.mainScopeActive }
@@ -382,10 +407,9 @@ class PlaylistMviStoreFactory(
         }
 
         private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) =
-        //model ?.itemsIdMap
-        //?.get(itemModel.id)
-            // fixme figure out if how cache models?
-            playlist?.items?.find { it.id == itemModel.id }
+            itemsIdMap.get(itemModel.id)
+        // fixme figure out if how cache models?
+        //playlist?.items?.find { it.id == itemModel.id }
 
         private fun delete(intent: Intent.DeleteItem, state: State): Unit {
             scope.launch {
@@ -511,7 +535,8 @@ class PlaylistMviStoreFactory(
                         playlistsTreeLookup = playlistsTree.buildLookup(),
                         focusIndex = if (scrollToCurrent && state.focusIndex == null) {
                             state.playlist?.currentIndex
-                        } else state.focusIndex
+                        } else state.focusIndex,
+                        itemsIdMap = buildIdList(playlistOrDefault.first)
                     )
                 )
             } catch (e: Throwable) {
@@ -519,6 +544,16 @@ class PlaylistMviStoreFactory(
                 publish(Error("Load failed: ${e::class.simpleName}"))
                 publish(Label.Loaded)
             }
+        }
+
+        fun buildIdList(domain: PlaylistDomain?): MutableMap<Long, PlaylistItemDomain> {
+            val modelIdGenerator = IdGenerator()
+            val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
+            domain?.items?.mapIndexed { index, item ->
+                val modelId = item.id ?: modelIdGenerator.value
+                itemsIdMap[modelId] = item
+            }
+            return itemsIdMap
         }
         // endregion loadRefresh
     }
