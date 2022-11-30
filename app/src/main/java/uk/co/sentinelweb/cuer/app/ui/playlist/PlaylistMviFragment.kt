@@ -277,6 +277,7 @@ class PlaylistMviFragment : Fragment(),
 
             is Label.HighlightPlayingItem -> highlightPlayingItem(label.pos)
             is Label.ScrollToItem -> scrollToItem(label.pos)
+            is Label.UpdateModelItem -> updateItemModel(label.model) // todo do i need this?
         }.also { log.d(label.toString()) }
 
         //        override fun render(model: PlaylistMviContract.View.Model) {// todo diff, update item

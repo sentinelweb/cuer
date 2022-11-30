@@ -80,6 +80,7 @@ class PlaylistMviContract {
             data class ItemRemoved(val model: Model.Item) : Label()
             data class ScrollToItem(val pos: Int) : Label()
             data class HighlightPlayingItem(val pos: Int) : Label()
+            data class UpdateModelItem(val model: PlaylistItemMviContract.Model.Item) : Label()
         }
 
         data class State(
@@ -91,7 +92,6 @@ class PlaylistMviContract {
             var dragFrom: Int? = null,
             var dragTo: Int? = null,
             var selectedPlaylistItem: PlaylistItemDomain? = null,
-            var model: View.Model? = null,
             var playlistsTree: PlaylistTreeDomain? = null,
             var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null,
             var addPlaylistParent: Long? = null,

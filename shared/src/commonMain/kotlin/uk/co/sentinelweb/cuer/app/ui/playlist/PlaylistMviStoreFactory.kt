@@ -73,9 +73,11 @@ class PlaylistMviStoreFactory(
 
         data class SetDeletedItem(val item: PlaylistItemDomain?) : Result()
         data class SetPlaylist(
-            var playlistIdentifier: OrchestratorContract.Identifier<*>,
-            val playlist: PlaylistDomain?
+            val playlist: PlaylistDomain?,
+            var playlistIdentifier: OrchestratorContract.Identifier<*>? = null
         ) : Result()
+
+        data class IdUpdate(val modelId: Long, val changedItem: PlaylistItemDomain) : Result()
 //        data class SetMoveState(val from: Int?, val to: Int?) : Result()
     }
 
@@ -96,7 +98,12 @@ class PlaylistMviStoreFactory(
                 )
 
                 is Result.SetDeletedItem -> copy(deletedPlaylistItem = msg.item)
-                is Result.SetPlaylist -> copy(playlist = msg.playlist)
+                is Result.SetPlaylist -> copy(
+                    playlist = msg.playlist,
+                    playlistIdentifier = msg.playlistIdentifier ?: playlistIdentifier
+                )
+
+                is Result.IdUpdate -> copy(itemsIdMap = itemsIdMap.apply { put(msg.modelId, msg.changedItem) })
                 else -> copy()
             }
     }
@@ -350,7 +357,7 @@ class PlaylistMviStoreFactory(
                     indexOfFirst { it.media.platformId == media.platformId }
                         .takeIf { it > -1 }
                         ?.let { index ->
-                            state.model?.let { model ->
+                            //state.model?.let { model ->
                                 val originalItemDomain = get(index)
                                 val changedItemDomain =
                                     plistItem ?: originalItemDomain.copy(media = media)
@@ -364,7 +371,7 @@ class PlaylistMviStoreFactory(
                                 }?.key
                                     ?.also { updateItem(index, it, changedItemDomain, state) }
                                     ?: throw Exception("Couldn't lookup model ID for $originalItemDomain keys=${state.itemsIdMap.keys}")
-                            }
+//                            }
                         }
                 }
         }
@@ -392,18 +399,23 @@ class PlaylistMviStoreFactory(
                 showOverflow = true,
                 deleteResources = newPlaylist?.id?.let { appPlaylistInteractors[it] }?.customResources?.customDelete
             )
-            state.model = state.model
-                ?.let {
-                    it.copy(items = it.items
-                        ?.toMutableList()
-                        ?.apply { set(index, mappedItem) })
-                }
-                ?.also { state.itemsIdMap[modelId] = changedItem }
-
+//            state.model = state.model
+//                ?.let {
+//                    it.copy(items = it.items
+//                        ?.toMutableList()
+//                        ?.apply { set(index, mappedItem) })
+//                }
+//                ?.also { state.itemsIdMap[modelId] = changedItem }
+            //state.itemsIdMap[modelId] = changedItem
+            dispatch(Result.SetPlaylist(newPlaylist))
+            dispatch(Result.IdUpdate(modelId, changedItem))
             mappedItem
                 .takeIf { coroutines.mainScopeActive }
-            // fixme label
-            //?.apply { view.updateItemModel(this) }
+                ?.apply {
+                    // fixme label
+                    publish(Label.UpdateModelItem(this))
+                    //view.updateItemModel(this)
+                }
         }
 
         private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) =
