@@ -31,8 +31,6 @@ import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
-import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -54,8 +52,8 @@ class PlaylistMviStoreFactory(
     private val playlistUpdateUsecase: PlaylistUpdateUsecase,
     private val playlistOrDefaultUsecase: PlaylistOrDefaultUsecase,
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
-    private val platformLauncher: PlatformLaunchWrapper,
-    private val shareWrapper: ShareWrapper,
+//    private val platformLauncher: PlatformLaunchWrapper,
+//    private val shareWrapper: ShareWrapper,
     private val dbInit: DatabaseInitializer,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val queue: QueueMediatorContract.Producer,
@@ -198,7 +196,7 @@ class PlaylistMviStoreFactory(
         }
 
         private fun help(intent: Intent.Help, state: State) {
-
+            publish(Label.Help)
         }
 
         private fun launch(intent: Intent.Launch, state: State) {

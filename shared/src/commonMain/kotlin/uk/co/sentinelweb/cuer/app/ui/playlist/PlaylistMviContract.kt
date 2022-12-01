@@ -74,6 +74,7 @@ class PlaylistMviContract {
             data class Message(val message: String) : Label()
             object Loading : Label()
             object Loaded : Label()
+            object Help : Label()
             data class ShowUndo(val undoType: UndoType, val message: String) : Label()
             data class ShowPlaylistsSelector(val config: Config) : Label()
             data class Navigate(val model: NavigationModel, val view: ItemPassView? = null) : Label()
