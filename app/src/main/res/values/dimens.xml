@@ -61,6 +61,10 @@
     <dimen name="playlist_row_icon_width">106dp</dimen>
     <dimen name="max_cache_image_size">100dp</dimen>
     <dimen name="notif_image_size_sdk_31">96dp</dimen>
+    <dimen name="floating_player_button_size">48dp</dimen>
+    <dimen name="floating_player_button_outer_padding">16dp</dimen>
+    <dimen name="floating_player_button_inner_padding">4dp</dimen>
+    <dimen name="tile_overflow_button_size">48dp</dimen>
 
     <integer name="anim_transition_time">300</integer>
 </resources>

@@ -2,32 +2,35 @@ package uk.co.sentinelweb.cuer.app.usecase
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
-import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
+import uk.co.sentinelweb.cuer.app.util.cast.listener.CastPlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlayUseCase constructor(
     private val queue: QueueMediatorContract.Producer,
-    private val ytCastContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val ytCastContextHolder: CastPlayerContextHolder,
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
-    private val floatingService: FloatingPlayerServiceManager,
-    private val playDialog: PlayDialog,
-    private val res: ResourceWrapper,
+    private val floatingService: FloatingPlayerContract.Manager,
+    private val playDialog: Dialog,
+    private val strings: StringDecoder,
+) {
 
-    ) {
+    interface Dialog {
+        var playUseCase: PlayUseCase
+        fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?)
+        fun showDialog(model: AlertDialogModel)
+    }
 
     init {
         playDialog.playUseCase = this
@@ -68,8 +71,8 @@ class PlayUseCase constructor(
 
     private fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel =
         AlertDialogModel(
-            title = res.getString(R.string.playlist_change_dialog_title),
-            message = res.getString(R.string.playlist_change_dialog_message),
+            title = strings.getString(StringResource.playlist_change_dialog_title),
+            message = strings.getString(StringResource.playlist_change_dialog_message),
             confirm = AlertDialogModel.Button(StringResource.ok, confirm),
             neutral = AlertDialogModel.Button(StringResource.dialog_button_view_info, info)
         )

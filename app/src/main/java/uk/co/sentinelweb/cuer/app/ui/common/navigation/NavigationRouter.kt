@@ -28,7 +28,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 class NavigationRouter constructor(
     private val activity: Activity,
     private val toastWrapper: ToastWrapper,
-    private val ytJavaApi: YoutubeJavaApiWrapper,
+    private val ytJavaApi: PlatformLaunchWrapper,
     private val navController: NavController?,
     private val log: LogWrapper,
     private val urlLauncher: UrlLauncherWrapper,

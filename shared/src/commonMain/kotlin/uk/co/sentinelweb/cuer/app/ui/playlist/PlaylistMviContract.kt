@@ -52,7 +52,7 @@ class PlaylistMviContract {
             data class Undo(val undoType: UndoType) : Intent()
             data class StarItem(val item: Model.Item) : Intent()
             data class PlayItem(
-                val item: Model,
+                val item: Model.Item,
                 val start: Boolean = false,
                 val external: Boolean = false
             ) : Intent()

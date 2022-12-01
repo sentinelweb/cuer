@@ -14,10 +14,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Label.Error
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.UndoType.ItemDelete
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviStoreFactory.Action.Init
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -55,6 +58,8 @@ class PlaylistMviStoreFactory(
     private val util: PlaylistMviUtil,
     private val modelMapper: PlaylistMviModelMapper,
     private val itemModelMapper: PlaylistMviItemModelMapper,
+    private val playUseCase: PlayUseCase,
+    private val strings: StringDecoder,
 ) {
     init {
         log.tag(this)
@@ -158,103 +163,115 @@ class PlaylistMviStoreFactory(
                 is Intent.UpdatesPlaylistItem -> flowUpdatesPlaylistItem(intent, getState())
             }
 
-        private fun checkToSave(intent: Intent.CheckToSave, state: State): Unit {
+        private fun checkToSave(intent: Intent.CheckToSave, state: State) {
 
         }
 
-        private fun commit(intent: Intent.Commit, state: State): Unit {
+        private fun commit(intent: Intent.Commit, state: State) {
 
         }
 
-        private fun edit(intent: Intent.Edit, state: State): Unit {
+        private fun edit(intent: Intent.Edit, state: State) {
 
         }
 
-        private fun gotoPlaylist(intent: Intent.GotoPlaylist, state: State): Unit {
+        private fun gotoPlaylist(intent: Intent.GotoPlaylist, state: State) {
 
         }
 
-        private fun help(intent: Intent.Help, state: State): Unit {
+        private fun help(intent: Intent.Help, state: State) {
 
         }
 
-        private fun launch(intent: Intent.Launch, state: State): Unit {
+        private fun launch(intent: Intent.Launch, state: State) {
 
         }
 
-        private fun moveItem(intent: Intent.Move, state: State): Unit {
+        private fun moveItem(intent: Intent.Move, state: State) {
 
         }
 
-        private fun performMove(intent: Intent.MoveSwipe, state: State): Unit {
+        private fun performMove(intent: Intent.MoveSwipe, state: State) {
 
         }
 
-        private fun clearMove(intent: Intent.ClearMove, state: State): Unit {
+        private fun clearMove(intent: Intent.ClearMove, state: State) {
 
         }
 
-        private fun pause(intent: Intent.Pause, state: State): Unit {
+        private fun pause(intent: Intent.Pause, state: State) {
 
         }
 
-        private fun play(intent: Intent.Play, state: State): Unit {
+        private fun play(intent: Intent.Play, state: State) {
 
         }
 
-        private fun playItem(intent: Intent.PlayItem, state: State): Unit {
+        private fun playItem(intent: Intent.PlayItem, state: State) {
+            state.playlistItemDomain(intent.item)
+                ?.let { itemDomain ->
+                    // todo publish play
+//                    if (interactions != null) {
+//                        interactions?.onPlay(itemDomain)
+//                    } else
+                    if (!canPlayPlaylistItem(itemDomain)) {
+                        //view.showError()
+                        publish(Label.Message(strings.getString(StringResource.playlist_error_please_add)))
+                    } else {
+                        playUseCase.playLogic(itemDomain, state.playlist, false)
+                    }
+                }
+        }
+
+        private fun playModeChange(intent: Intent.PlayModeChange, state: State) {
 
         }
 
-        private fun playModeChange(intent: Intent.PlayModeChange, state: State): Unit {
+        private fun playlistSelected(intent: Intent.PlaylistSelected, state: State) {
 
         }
 
-        private fun playlistSelected(intent: Intent.PlaylistSelected, state: State): Unit {
+        private fun relatedItems(intent: Intent.RelatedItem, state: State) {
 
         }
 
-        private fun relatedItems(intent: Intent.RelatedItem, state: State): Unit {
+        private fun resume(intent: Intent.Resume, state: State) {
 
         }
 
-        private fun resume(intent: Intent.Resume, state: State): Unit {
+        private fun share(intent: Intent.Share, state: State) {
 
         }
 
-        private fun share(intent: Intent.Share, state: State): Unit {
+        private fun shareItem(intent: Intent.ShareItem, state: State) {
 
         }
 
-        private fun shareItem(intent: Intent.ShareItem, state: State): Unit {
+        private fun showCards(intent: Intent.ShowCards, state: State) {
 
         }
 
-        private fun showCards(intent: Intent.ShowCards, state: State): Unit {
+        private fun showChannel(intent: Intent.ShowChannel, state: State) {
 
         }
 
-        private fun showChannel(intent: Intent.ShowChannel, state: State): Unit {
+        private fun showItem(intent: Intent.ShowItem, state: State) {
 
         }
 
-        private fun showItem(intent: Intent.ShowItem, state: State): Unit {
+        private fun star(intent: Intent.Star, state: State) {
 
         }
 
-        private fun star(intent: Intent.Star, state: State): Unit {
+        private fun starItem(intent: Intent.StarItem, state: State) {
 
         }
 
-        private fun starItem(intent: Intent.StarItem, state: State): Unit {
+        private fun update(intent: Intent.Update, state: State) {
 
         }
 
-        private fun update(intent: Intent.Update, state: State): Unit {
-
-        }
-
-        private fun flowUpdatesMedia(intent: Intent.UpdatesMedia, state: State): Unit {
+        private fun flowUpdatesMedia(intent: Intent.UpdatesMedia, state: State) {
             log.d("media changed: ${intent.op}, ${intent.source}, id=${intent.media.id} title=${intent.media.title}")
             when (intent.op) {
                 FLAT,
@@ -271,11 +288,11 @@ class PlaylistMviStoreFactory(
             }
         }
 
-        private fun flowUpdatesPlaylist(intent: Intent.UpdatesPlaylist, state: State): Unit {
+        private fun flowUpdatesPlaylist(intent: Intent.UpdatesPlaylist, state: State) {
 
         }
 
-        private fun flowUpdatesPlaylistItem(intent: Intent.UpdatesPlaylistItem, state: State): Unit {
+        private fun flowUpdatesPlaylistItem(intent: Intent.UpdatesPlaylistItem, state: State) {
             log.d("item changed: ${intent.op}, ${intent.source}, id=${intent.item.id} media=${intent.item.media.title}")
             val currentIndexBefore = state.playlist?.currentIndex
             when (intent.op) { // todo just apply model updates (instead of full rebuild)
@@ -399,31 +416,18 @@ class PlaylistMviStoreFactory(
                 showOverflow = true,
                 deleteResources = newPlaylist?.id?.let { appPlaylistInteractors[it] }?.customResources?.customDelete
             )
-//            state.model = state.model
-//                ?.let {
-//                    it.copy(items = it.items
-//                        ?.toMutableList()
-//                        ?.apply { set(index, mappedItem) })
-//                }
-//                ?.also { state.itemsIdMap[modelId] = changedItem }
-            //state.itemsIdMap[modelId] = changedItem
             dispatch(Result.SetPlaylist(newPlaylist))
             dispatch(Result.IdUpdate(modelId, changedItem))
+
+            // todo check if this is needed
             mappedItem
                 .takeIf { coroutines.mainScopeActive }
                 ?.apply {
-                    // fixme label
                     publish(Label.UpdateModelItem(this))
-                    //view.updateItemModel(this)
                 }
         }
 
-        private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) =
-            itemsIdMap.get(itemModel.id)
-        // fixme figure out if how cache models?
-        //playlist?.items?.find { it.id == itemModel.id }
-
-        private fun delete(intent: Intent.DeleteItem, state: State): Unit {
+        private fun delete(intent: Intent.DeleteItem, state: State) {
             scope.launch {
                 delay(400) // waits for ui animation
                 log.d("delete item: ${intent.item.id} ${intent.item.title}")
@@ -450,13 +454,12 @@ class PlaylistMviStoreFactory(
             }
         }
 
-        private fun undo(intent: Intent.Undo, state: State): Unit {
+        private fun undo(intent: Intent.Undo, state: State) {
             when (intent.undoType) {
                 ItemDelete ->
                     state.deletedPlaylistItem?.let { itemDomain ->
                         scope.launch {
                             playlistItemOrchestrator.save(itemDomain, LOCAL.deepOptions())
-                            //state.deletedPlaylistItem = null
                             dispatch(Result.SetDeletedItem(null))
                             executeRefresh(state = state)
                         }
@@ -483,6 +486,18 @@ class PlaylistMviStoreFactory(
 //        }
 
         // endregion
+
+        // region utils
+        private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) =
+            itemsIdMap.get(itemModel.id)
+        // fixme figure out if how cache models?
+        //playlist?.items?.find { it.id == itemModel.id }
+
+        private fun State.canPlayPlaylist() = (playlist?.id ?: 0) > 0
+
+        private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
+            (itemDomain.playlistId ?: 0) > 0
+        // endregion utils
 
         // region loadRefresh
         private fun setPlaylistData(intent: Intent.SetPlaylistData, state: State) {

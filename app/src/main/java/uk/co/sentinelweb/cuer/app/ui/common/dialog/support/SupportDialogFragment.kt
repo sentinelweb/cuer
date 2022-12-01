@@ -140,7 +140,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                 scoped { SupportModelMapper() }
                 scoped { SupportMviView(get(), get()) }
                 scoped { UrlLauncherWrapper(this.getFragmentActivity()) }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped<CryptoLauncher> {
                     AndroidCryptoLauncher(this.getFragmentActivity(), get(), get(), get(), get())
                 }

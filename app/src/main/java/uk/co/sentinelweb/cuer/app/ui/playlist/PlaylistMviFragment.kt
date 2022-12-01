@@ -813,7 +813,9 @@ class PlaylistMviFragment : Fragment(),
                         playlistMutator = get(),
                         modelMapper = get(),
                         itemModelMapper = get(),
-                        util = get()
+                        util = get(),
+                        playUseCase = get(),
+                        strings = get()
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }
@@ -833,10 +835,10 @@ class PlaylistMviFragment : Fragment(),
                         coroutines = get(),
                         floatingService = get(),
                         playDialog = get(),
-                        res = get()
+                        strings = get()
                     )
                 }
-                scoped {
+                scoped<PlayUseCase.Dialog> {
                     PlayDialog(
                         get<PlaylistMviFragment>(),
                         itemFactory = get(),

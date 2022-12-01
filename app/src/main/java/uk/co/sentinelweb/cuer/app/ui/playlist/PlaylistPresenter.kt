@@ -39,9 +39,9 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -67,7 +67,7 @@ class PlaylistPresenter(
     private val toastWrapper: ToastWrapper,
     private val ytCastContextHolder: ChromecastYouTubePlayerContextHolder,
     private val chromeCastWrapper: ChromeCastWrapper,
-    private val ytJavaApi: YoutubeJavaApiWrapper,
+    private val ytJavaApi: PlatformLaunchWrapper,
     private val shareWrapper: AndroidShareWrapper,
     private val playlistMutator: PlaylistMutator,
     private val log: LogWrapper,

@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemRowView
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -32,8 +32,8 @@ class PlayDialog constructor(
     private val floatingService: FloatingPlayerServiceManager,
     private val log: LogWrapper,
     private val alertDialogCreator: AlertDialogCreator,
-    private val youtubeApi: YoutubeJavaApiWrapper,
-) {
+    private val youtubeApi: PlatformLaunchWrapper,
+) : PlayUseCase.Dialog {
     init {
         log.tag(this)
     }
@@ -42,11 +42,11 @@ class PlayDialog constructor(
     private val binding: DialogPlayBinding
         get() = _binding ?: throw Exception("DialogPlayBinding not bound")
 
-    lateinit var playUseCase: PlayUseCase
+    override lateinit var playUseCase: PlayUseCase
 
     private lateinit var dialog: AlertDialog
 
-    fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?) {
+    override fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?) {
 
         _binding = DialogPlayBinding.inflate(LayoutInflater.from(f.requireContext()))
         binding.dpLaunchYoutube.setOnClickListener {
@@ -120,7 +120,7 @@ class PlayDialog constructor(
         dialog.show()
     }
 
-    fun showDialog(model: AlertDialogModel) {
+    override fun showDialog(model: AlertDialogModel) {
         alertDialogCreator.create(model).show()
     }
 

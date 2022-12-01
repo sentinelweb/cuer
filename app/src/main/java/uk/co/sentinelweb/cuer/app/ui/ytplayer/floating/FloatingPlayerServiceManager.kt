@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 class FloatingPlayerServiceManager(
     private val app: Application,
     private val overlayPermission: DisplayOverlayPermissionCheck,
-) {
+) : FloatingPlayerContract.Manager {
     fun hasPermission(a: Activity) = overlayPermission.checkOverlayDisplayPermission(a)
     fun requestPermission(a: Activity) = overlayPermission.requestOverlayDisplayPermission(a)
 
@@ -32,11 +32,13 @@ class FloatingPlayerServiceManager(
         }
     }
 
-    fun get(): FloatingPlayerService? = FloatingPlayerService.instance()
+    override fun get(): FloatingPlayerService? = FloatingPlayerService.instance()
 
-    fun isRunning(): Boolean = FloatingPlayerService.instance() != null
+    override fun isRunning(): Boolean = FloatingPlayerService.instance() != null
 
-    fun playItem(item: PlaylistItemDomain) = app.startService(playIntent(item))
+    override fun playItem(item: PlaylistItemDomain) {
+        app.startService(playIntent(item))
+    }
 
     // note this INIT intent doesnt get picked up by the MVI player for some reason
     // video seems to come from queue trackchange

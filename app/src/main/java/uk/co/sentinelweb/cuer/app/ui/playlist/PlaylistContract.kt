@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -231,7 +232,7 @@ interface PlaylistContract {
                 scoped<SnackbarWrapper> {
                     AndroidSnackbarWrapper(this.getFragmentActivity(), get())
                 }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped { AndroidShareWrapper(this.getFragmentActivity()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped {
@@ -242,7 +243,7 @@ interface PlaylistContract {
                         coroutines = get(),
                         floatingService = get(),
                         playDialog = get(),
-                        res = get()
+                        strings = get()
                     )
                 }
                 scoped {

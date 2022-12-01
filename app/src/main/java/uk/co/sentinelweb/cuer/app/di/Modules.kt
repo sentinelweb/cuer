@@ -54,7 +54,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
@@ -120,7 +120,7 @@ object Modules {
         CastPlayerMviFragment.fragmentModule,
         DescriptionView.viewModule,
         BrowseFragment.fragmentModule,
-        FloatingPlayerContract.serviceModule,
+        FloatingPlayerService.serviceModule,
         SupportDialogFragment.fragmentModule,
         AppSelectorBottomSheet.fragmentModule,
         OnboardingFragment.fragmentModule,
