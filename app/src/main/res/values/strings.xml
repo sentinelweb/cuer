@@ -94,8 +94,10 @@
     <string name="playlist_play_items_from_start">Play items from start</string>
     <string name="playlist_error_moveitem_already_exists">Item already exists on this playlist …</string>
     <string name="playlist_item_moved_undo_message">Moved to %1$s</string>
+    <string name="playlist_items_updated">%1$s new items</string>
+    <string name="playlist_error_updating">Error updating: %1$s …</string>
 
-    <!-- playlist edit fragemnt -->
+    <!-- playlist edit fragment -->
     <string name="pe_fragment_title">Edit playlist</string>
     <string name="pe_fragment_title_add">Create playlist</string>
     <string name="pe_title">Title</string>

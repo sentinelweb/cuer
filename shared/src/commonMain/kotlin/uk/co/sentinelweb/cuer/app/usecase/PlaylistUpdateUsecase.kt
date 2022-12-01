@@ -27,36 +27,36 @@ class PlaylistUpdateUsecase constructor(
 
     data class UpdateResult(
         val success: Boolean,
-        val numberItems: Int
+        val reason: String = "",
+        val numberItems: Int = -1
     )
-
-    private val updateFail = UpdateResult(false, -1)
 
     fun checkToUpdate(p: PlaylistDomain): Boolean = updateChecker.shouldUpdate(p)
 
     suspend fun update(playlistDomain: PlaylistDomain): UpdateResult {
-        return playlistDomain.takeIf { playlistDomain.type == PLATFORM }
+        return playlistDomain
+            .takeIf { playlistDomain.type == PLATFORM }
             ?.let {
                 if (it.platform == null) {
                     playlistOrchestrator.save(it.copy(platform = YOUTUBE), LOCAL.flatOptions())
                 } else it
             }
-            ?.let { p ->
-                when (p.platform) {
-                    YOUTUBE -> p.platformId?.run {
+            ?.let { playlist ->
+                when (playlist.platform) {
+                    YOUTUBE -> playlist.platformId?.run {
                         playlistOrchestrator
                             .loadByPlatformId(this, Source.PLATFORM.deepOptions())
-                            ?.let { removeExistingItems(it, p) }
+                            ?.let { removeExistingItems(it, playlist) }
                             ?.takeIf { it.items.size > 0 }
                             ?.let { playlistMediaLookupUsecase.lookupMediaAndReplace(it) }
                             ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
-                            ?.let { UpdateResult(true, it.size) }
-                    } ?: updateFail
+                            ?.let { UpdateResult(true, numberItems = it.size) }
+                    } ?: UpdateResult(false, reason = "No platform id")
 
-                    else -> updateFail
+                    else -> UpdateResult(false, reason = "No platform type")
                 }
             }
-            ?: updateFail
+            ?: UpdateResult(false, reason = "Not platform type")
     }
 
     private suspend fun removeExistingItems(platform: PlaylistDomain, existing: PlaylistDomain): PlaylistDomain {

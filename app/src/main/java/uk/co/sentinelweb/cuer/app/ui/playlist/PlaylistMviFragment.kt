@@ -365,7 +365,6 @@ class PlaylistMviFragment : Fragment(),
 
     override fun onDestroyView() {
         //presenter.destroy()
-
         controller.onViewDestroyed()
         _binding = null
         _adapter = null
@@ -394,7 +393,8 @@ class PlaylistMviFragment : Fragment(),
             viewProxy.dispatch(OnSetPlaylistData())
         }
         //presenter.onResume()
-        viewProxy.dispatch(OnResume)
+        //viewProxy.dispatch(OnResume)
+        controller.onRefresh()
     }
 
     override fun onPause() {
@@ -472,6 +472,12 @@ class PlaylistMviFragment : Fragment(),
 
     private fun navigate(nav: NavigationModel) {
         when (nav.target) {
+            NavigationModel.Target.PLAYLIST_EDIT -> PlaylistFragmentDirections.actionGotoEditPlaylist(
+                nav.params[NavigationModel.Param.SOURCE].toString(),
+                null,
+                nav.params[NavigationModel.Param.PLAYLIST_ID] as Long
+            ).apply { findNavController().navigate(this) }
+
             NavigationModel.Target.NAV_DONE -> doneNavigation.navigateDone()
             else -> navRouter.navigate(nav)
         }
@@ -633,13 +639,13 @@ class PlaylistMviFragment : Fragment(),
             }
     }
 
-    private fun gotoEdit(id: Long, source: OrchestratorContract.Source) {
-        PlaylistFragmentDirections.actionGotoEditPlaylist(
-            source.toString(),
-            null,
-            id
-        ).apply { findNavController().navigate(this) }
-    }
+//    private fun gotoEdit(id: Long, source: OrchestratorContract.Source) {
+//        PlaylistFragmentDirections.actionGotoEditPlaylist(
+//            source.toString(),
+//            null,
+//            id
+//        ).apply { findNavController().navigate(this) }
+//    }
 
     private fun showAlertDialog(model: AlertDialogModel) {
         alertDialogCreator.create(model).show()

@@ -68,6 +68,10 @@ class ResourceWrapper constructor(
         getStringResourceId(res)
             .let { getString(it) }
 
+    override fun getString(res: StringResource, params: List<String>): String =
+        getStringResourceId(res)
+            .let { getString(it, *params.toTypedArray()) }
+
 
     @DrawableRes
     fun getStringResourceId(icon: Icon) =

@@ -22,6 +22,8 @@ enum class StringResource(val default: String) {
 
     // playlist
     playlist_error_please_add("Please add the playlist first"),
+    playlist_error_updating("Error updating: %1\$s …"),
+    playlist_items_updated("%1\$s new items"),
 
     // alert dialogs
     dialog_title_save_check("Save playlist"),
@@ -42,4 +44,5 @@ enum class StringResource(val default: String) {
 
 interface StringDecoder {
     fun getString(res: StringResource): String
+    fun getString(res: StringResource, params: List<String>): String
 }

@@ -14,10 +14,16 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource.playlist_error_updating
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource.playlist_items_updated
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Label.Error
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Label.Message
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.UndoType.ItemDelete
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviStoreFactory.Action.Init
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
@@ -172,7 +178,19 @@ class PlaylistMviStoreFactory(
         }
 
         private fun edit(intent: Intent.Edit, state: State) {
-
+            state.playlistIdentifier
+                .also {
+                    recentLocalPlaylists.addRecentId(it.id as Long)
+                    publish(
+                        Label.Navigate(
+                            NavigationModel(
+                                Target.PLAYLIST_EDIT,
+                                mapOf(Param.SOURCE to it.source, Param.PLAYLIST_ID to it.id)
+                            ),
+                            null
+                        )
+                    )
+                }
         }
 
         private fun gotoPlaylist(intent: Intent.GotoPlaylist, state: State) {
@@ -216,7 +234,7 @@ class PlaylistMviStoreFactory(
 //                    } else
                     if (!canPlayPlaylistItem(itemDomain)) {
                         //view.showError()
-                        publish(Label.Message(strings.getString(StringResource.playlist_error_please_add)))
+                        publish(Message(strings.getString(StringResource.playlist_error_please_add)))
                     } else {
                         playUseCase.playLogic(itemDomain, state.playlist, false)
                     }
@@ -268,7 +286,30 @@ class PlaylistMviStoreFactory(
         }
 
         private fun update(intent: Intent.Update, state: State) {
-
+            scope.launch {
+                publish(Label.Loading)
+                try {
+                    state.playlist
+                        ?.takeIf { playlistUpdateUsecase.checkToUpdate(it) }
+                        ?.let { playlistUpdateUsecase.update(it) }
+                        ?.also {
+                            if (it.success) {
+                                publish(
+                                    Message(
+                                        strings.getString(playlist_items_updated, listOf(it.numberItems.toString()))
+                                    )
+                                )
+                            } else {
+                                publish(Error(strings.getString(playlist_error_updating, listOf(it.reason))))
+                            }
+                        }
+                        ?.also { publish(Label.Loaded) }
+                        ?: executeRefresh(state = state)
+                } catch (e: Exception) {
+                    log.e("Caught Error updating playlist", e)
+                    publish(Label.Loaded)
+                }
+            }
         }
 
         private fun flowUpdatesMedia(intent: Intent.UpdatesMedia, state: State) {
@@ -348,12 +389,8 @@ class PlaylistMviStoreFactory(
                         itemsIdMap = state.itemsIdMap
                     )
                 }
-                // fix me uncomment - dont map model need to move out id generation to here and keep just the idmap. i think..
-//                ?.also { state.model = it }
-//                ?.also { view.setModel(it, animate) }
                 .also {
                     state.focusIndex?.apply {
-                        //view.scrollToItem(this)
                         publish(Label.ScrollToItem(this))
                         state.focusIndex = null
                     }
@@ -362,7 +399,6 @@ class PlaylistMviStoreFactory(
                         ?.currentIndex
                         ?.also {
                             publish(Label.HighlightPlayingItem(it))
-                            //view.highlightPlayingItem(it)
                         }
                 }
         }
@@ -374,21 +410,18 @@ class PlaylistMviStoreFactory(
                     indexOfFirst { it.media.platformId == media.platformId }
                         .takeIf { it > -1 }
                         ?.let { index ->
-                            //state.model?.let { model ->
-                                val originalItemDomain = get(index)
-                                val changedItemDomain =
-                                    plistItem ?: originalItemDomain.copy(media = media)
-                                //model.itemsIdMap.keys.associateBy { model.itemsIdMap[it] }[originalItem]
-                                state.itemsIdMap.entries.firstOrNull {
-                                    if (originalItemDomain.id != null) {
-                                        it.value.id == originalItemDomain.id
-                                    } else {
-                                        it.value == originalItemDomain
-                                    }
-                                }?.key
-                                    ?.also { updateItem(index, it, changedItemDomain, state) }
-                                    ?: throw Exception("Couldn't lookup model ID for $originalItemDomain keys=${state.itemsIdMap.keys}")
-//                            }
+                            val originalItemDomain = get(index)
+                            val changedItemDomain =
+                                plistItem ?: originalItemDomain.copy(media = media)
+                            state.itemsIdMap.entries.firstOrNull {
+                                if (originalItemDomain.id != null) {
+                                    it.value.id == originalItemDomain.id
+                                } else {
+                                    it.value == originalItemDomain
+                                }
+                            }?.key
+                                ?.also { updateItem(index, it, changedItemDomain, state) }
+                                ?: throw Exception("Couldn't lookup model ID for $originalItemDomain keys=${state.itemsIdMap.keys}")
                         }
                 }
         }
@@ -537,7 +570,7 @@ class PlaylistMviStoreFactory(
         }
 
         private fun refresh(state: State) {
-            scope.launch { executeRefresh(false, false, state) }
+            scope.launch { executeRefresh(state = state) }
         }
 
         private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false, state: State) {
@@ -566,6 +599,7 @@ class PlaylistMviStoreFactory(
                         itemsIdMap = buildIdList(playlistOrDefault.first)
                     )
                 )
+                publish(Label.Loaded)
             } catch (e: Throwable) {
                 log.e("Error loading playlist", e)
                 publish(Error("Load failed: ${e::class.simpleName}"))

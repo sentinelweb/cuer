@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.net.youtube.videos.mapper
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubeChannelsDto
 import uk.co.sentinelweb.cuer.net.youtube.videos.dto.YoutubePlaylistDto
@@ -32,8 +33,8 @@ internal class YoutubePlaylistDomainMapper(
             PlaylistDomain(
                 id = null,
                 title = it.snippet.title,
+                type = PLATFORM,
                 platform = PlatformDomain.YOUTUBE,
-                type = PlaylistDomain.PlaylistTypeDomain.PLATFORM,
                 platformId = it.id,
                 thumb = imageMapper.mapThumb(it.snippet.thumbnails),
                 image = imageMapper.mapImage(it.snippet.thumbnails),
