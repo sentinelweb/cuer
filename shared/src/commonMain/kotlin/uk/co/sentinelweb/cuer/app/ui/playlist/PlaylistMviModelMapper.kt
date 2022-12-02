@@ -64,9 +64,9 @@ class PlaylistMviModelMapper constructor(
                 canDeleteItems = false,
                 hasChildren = 0,
                 canUpdate = false,
-                isCards = false
             ),
             items = listOf(),
+            isCards = false,
         )
 
     fun map(
@@ -112,10 +112,10 @@ class PlaylistMviModelMapper constructor(
 
                 hasChildren = playlists?.get(domain.id)?.chidren?.size ?: 0,
                 canUpdate = domain.platformId != null && domain.platform == YOUTUBE,
-                isCards = multiPlatformPreferences.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true)
                 /*&& !view.isHeadless*/ // fixme inject headless arg to mvi in bootstrap
             ),
             items = items,
+            isCards = multiPlatformPreferences.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true)
         )
     }
 
@@ -128,19 +128,23 @@ class PlaylistMviModelMapper constructor(
         //log.d("items: ${itemsIdMap.size}")
         val reverseLookup: Map<PlaylistItemDomain, Long> = itemsIdMap.keys.associateBy { itemsIdMap[it]!! }
         //log.d("reverseLookup: ${reverseLookup.keys.map { "${it.id} -> ${reverseLookup[it]}" }.joinToString(":")}")
-        return domain.items.mapIndexed { index, item ->
-            val modelId = reverseLookup.get(item)!!
-            itemModelMapper.mapItem(
-                modelId,
-                item,
-                index,
-                domain.config.editableItems,
-                domain.config.deletableItems,
-                domain.config.editable,
-                mapPlaylistText(item, domain, playlists),
-                true,
-                appPlaylist?.customResources?.customDelete
-            )
+        return domain.items.mapIndexedNotNull { index, item ->
+            reverseLookup.get(item)?.let { modelId ->
+                itemModelMapper.mapItem(
+                    modelId,
+                    item,
+                    index,
+                    domain.config.editableItems,
+                    domain.config.deletableItems,
+                    domain.config.editable,
+                    mapPlaylistText(item, domain, playlists),
+                    true,
+                    appPlaylist?.customResources?.customDelete
+                )
+            } ?: run {
+                log.e("Couldn't get item: ${item.id} ${item.media.title}")
+                throw IllegalStateException("Couldn't get item: ${item.id} ${item.media.title}")
+            }
         }
     }
 
@@ -162,5 +166,4 @@ class PlaylistMviModelMapper constructor(
             confirm = AlertDialogModel.Button(StringResource.dialog_button_save, confirm),
             cancel = AlertDialogModel.Button(StringResource.dialog_button_dont_save, cancel),
         )
-
 }

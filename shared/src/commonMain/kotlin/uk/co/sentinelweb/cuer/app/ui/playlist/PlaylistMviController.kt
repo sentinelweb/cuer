@@ -54,7 +54,7 @@ class PlaylistMviController constructor(
             Event.OnHelp -> Intent.Help
             is Event.OnMove -> Intent.Move(fromPosition = fromPosition, toPosition = toPosition)
             is Event.OnMoveSwipe -> Intent.MoveSwipe(item = item)
-            Event.OnClearMove -> Intent.ClearMove
+            Event.OnClearMove -> Intent.CommitMove
             Event.OnPause -> Intent.Pause
             Event.OnPlay -> Intent.Play
             is Event.OnPlayItem -> Intent.PlayItem(item = item)
@@ -72,7 +72,7 @@ class PlaylistMviController constructor(
             Event.OnUpdate -> Intent.Update
             Event.OnLaunch -> Intent.Launch
             Event.OnShare -> Intent.Share
-            Event.OnClearMove -> Intent.ClearMove
+            Event.OnClearMove -> Intent.CommitMove
         }
     }
 

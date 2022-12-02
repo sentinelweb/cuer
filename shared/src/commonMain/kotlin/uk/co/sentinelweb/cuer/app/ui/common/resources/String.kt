@@ -24,8 +24,11 @@ enum class StringResource(val default: String) {
     playlist_error_please_add("Please add the playlist first"),
     playlist_error_updating("Error updating: %1\$s …"),
     playlist_items_updated("%1\$s new items"),
+    playlist_error_moveitem_already_exists("Item already exists on this playlist …"),
+    playlist_item_moved_undo_message("Item moved to %1\$s"),
 
     // alert dialogs
+    playlist_dialog_title_move("Move playlist to …"),
     dialog_title_save_check("Save playlist"),
     dialog_message_save_item_check("Do you want to save this playlist"),
     dialog_button_save("Save"),
@@ -39,7 +42,6 @@ enum class StringResource(val default: String) {
 
     // Crypto
     support_crypto_warning_ok("Crypto warning"),
-
 }
 
 interface StringDecoder {

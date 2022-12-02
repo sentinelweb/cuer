@@ -247,6 +247,7 @@ class PlaylistPresenter(
     override fun destroy() {
     }
 
+    // done
     // move item to playlist
     override fun onItemSwipeRight(itemModel: PlaylistItemMviContract.Model.Item) { // move
         state.viewModelScope.launch {
@@ -265,6 +266,7 @@ class PlaylistPresenter(
         }
     }
 
+    // done
     private fun showPlaylistSelector() {
         view.showPlaylistSelector(
             PlaylistsMviDialogContract.Config(
@@ -285,6 +287,7 @@ class PlaylistPresenter(
         )
     }
 
+    // done
     override fun onPlaylistSelected(playlist: PlaylistDomain, selected: Boolean) {
         playlist.id?.let { if (selected) moveItemToPlaylist(playlist) }
     }
@@ -347,6 +350,7 @@ class PlaylistPresenter(
         }
     }
 
+    // done
     override fun undoMoveItem() {
         state.viewModelScope.launch {
             state.movedPlaylistItem
@@ -544,10 +548,12 @@ class PlaylistPresenter(
             ?: toastWrapper.show("can't find video")
     }
 
+    // done
     private fun playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) = state.model
         ?.itemsIdMap
         ?.get(itemModel.id)
 
+    // done
     override fun moveItem(fromPosition: Int, toPosition: Int) {
         if (state.dragFrom == null) {
             state.dragFrom = fromPosition
@@ -555,6 +561,7 @@ class PlaylistPresenter(
         state.dragTo = toPosition
     }
 
+    // done
     override fun commitMove() {
         if (state.dragFrom != null && state.dragTo != null) {
             state.playlist
@@ -597,6 +604,7 @@ class PlaylistPresenter(
         state.dragTo = null
     }
 
+    // done
     override fun setPlaylistData(plId: Long?, plItemId: Long?, playNow: Boolean, source: Source) {
         coroutines.mainScope.launch {
             val notLoaded = state.playlist == null
@@ -631,6 +639,7 @@ class PlaylistPresenter(
         }
     }
 
+    // done
     override fun updatePlaylist() {
         state.viewModelScope.launch {
             view.showRefresh()
@@ -667,6 +676,7 @@ class PlaylistPresenter(
         }
     }
 
+    // done
     override fun onShowCards(cards: Boolean): Boolean {
         multiPrefs.putBoolean(SHOW_VIDEO_CARDS, cards)
         coroutines.mainScope.launch {

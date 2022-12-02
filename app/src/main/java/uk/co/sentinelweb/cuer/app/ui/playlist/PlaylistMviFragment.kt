@@ -42,6 +42,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
@@ -63,7 +64,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.SHOW_VIDEO_CARDS
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
@@ -130,8 +131,8 @@ class PlaylistMviFragment : Fragment(),
     private val isHeadless: Boolean
         get() = NavigationModel.Param.HEADLESS.getBoolean(arguments)
 
-    private val isCards =
-        prefsWrapper.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true) && !isHeadless
+    private val isCards
+        get() = prefsWrapper.getBoolean(SHOW_VIDEO_CARDS, true) && !isHeadless
 
     private var snackbar: Snackbar? = null
     private var dialogFragment: DialogFragment? = null
@@ -279,6 +280,8 @@ class PlaylistMviFragment : Fragment(),
             is Label.ScrollToItem -> scrollToItem(label.pos)
             is Label.UpdateModelItem -> updateItemModel(label.model) // todo do i need this?
             is Label.Help -> showHelp()
+            is Label.ResetItemState -> resetItemsState()
+            is Label.ShowPlaylistsCreator -> showPlaylistCreateDialog()
         }.also { log.d(label.toString()) }
 
         //        override fun render(model: PlaylistMviContract.View.Model) {// todo diff, update item
@@ -286,14 +289,32 @@ class PlaylistMviFragment : Fragment(),
 //        }
         override val renderer: ViewRenderer<PlaylistMviContract.View.Model> =
             diff {
-                var previousItems: List<PlaylistItemMviContract.Model.Item> = listOf()
+                var previousItems: List<Item> = listOf()
+                diff(get = PlaylistMviContract.View.Model::isCards, set = {
+                    val currentScrollIndex = getScrollIndex()
+                    newAdapter()
+                    setList(previousItems, false)
+                    scrollToItem(currentScrollIndex)
+                    //commitHost.isReady(true)
+                    cardsMenuItem.isVisible = !it
+                    rowsMenuItem.isVisible = it
+                    binding.playlistToolbar.menu.setMenuItemsColor(
+                        if (menuState.isCollapsed) R.color.actionbar_icon_collapsed_csl
+                        else R.color.actionbar_icon_expanded_csl
+                    )
+                    log.d("is cards: $it")
+                })
                 diff(get = PlaylistMviContract.View.Model::items, set = {
                     val items = it ?: listOf()
                     setList(items, animate = false)
                     previousItems = items
+
+                    log.d("items: ${it?.size}")
                 })
                 diff(get = PlaylistMviContract.View.Model::header, set = {
                     setHeaderModel(it)
+                    commitHost.isReady(true)
+                    log.d("header: ${it}")
                 })
             }
     }
@@ -382,12 +403,11 @@ class PlaylistMviFragment : Fragment(),
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         // todo review with: https://github.com/sentinelweb/cuer/issues/279
         // see issue as to why this is needed https://github.com/sentinelweb/cuer/issues/105
-        (navigationProvider.checkForPendingNavigation(NavigationModel.Target.PLAYLIST)
-            ?: let { makeNavFromArguments() })
+        (navigationProvider.checkForPendingNavigation(Target.PLAYLIST) ?: makeNavFromArguments())
             ?.apply {
                 log.d("onResume: apply nav args model = $this")
                 setPlaylistData()
-                navigationProvider.clearPendingNavigation(NavigationModel.Target.PLAYLIST)
+                navigationProvider.clearPendingNavigation(Target.PLAYLIST)
             } ?: run {// fixme i don't think we can get here
             log.d("onResume: got no nav args")
             //presenter.setPlaylistData()
@@ -449,12 +469,12 @@ class PlaylistMviFragment : Fragment(),
     // endregion
 
     // region PlaylistContract.View
-    private fun setModel(model: PlaylistMviContract.View.Model, animate: Boolean) {
-        commitHost.isReady(true)
-        setHeaderModel(model.header)
-        // update list
-        model.items?.apply { setList(this, animate) }
-    }
+//    private fun setModel(model: PlaylistMviContract.View.Model, animate: Boolean) {
+//        commitHost.isReady(true)
+//        setHeaderModel(model.header)
+//        // update list
+//        model.items?.apply { setList(this, animate) }
+//    }
 
     private fun setList(items: List<Item>, animate: Boolean) {
         binding.playlistSwipe.isRefreshing = false
@@ -473,13 +493,13 @@ class PlaylistMviFragment : Fragment(),
 
     private fun navigate(nav: NavigationModel) {
         when (nav.target) {
-            NavigationModel.Target.PLAYLIST_EDIT -> PlaylistFragmentDirections.actionGotoEditPlaylist(
+            Target.PLAYLIST_EDIT -> PlaylistFragmentDirections.actionGotoEditPlaylist(
                 nav.params[NavigationModel.Param.SOURCE].toString(),
                 null,
                 nav.params[NavigationModel.Param.PLAYLIST_ID] as Long
             ).apply { findNavController().navigate(this) }
 
-            NavigationModel.Target.NAV_DONE -> doneNavigation.navigateDone()
+            Target.NAV_DONE -> doneNavigation.navigateDone()
             else -> navRouter.navigate(nav)
         }
     }
@@ -822,7 +842,8 @@ class PlaylistMviFragment : Fragment(),
                         itemModelMapper = get(),
                         util = get(),
                         playUseCase = get(),
-                        strings = get()
+                        strings = get(),
+                        timeProvider = get()
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }

@@ -18,7 +18,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
 class PlaylistMviContract {
 
-    enum class UndoType { ItemDelete }
+    enum class UndoType { ItemDelete, ItemMove }
 
     interface MviStore : Store<Intent, State, Label> {
         sealed class Intent {
@@ -32,7 +32,7 @@ class PlaylistMviContract {
             ) : Intent()
 
             data class Move(val fromPosition: Int, val toPosition: Int) : Intent()
-            object ClearMove : Intent()
+            object CommitMove : Intent()
             data class MoveSwipe(val item: Model.Item) : Intent()
             object Update : Intent()
             object PlayModeChange : Intent()
@@ -77,11 +77,13 @@ class PlaylistMviContract {
             object Help : Label()
             data class ShowUndo(val undoType: UndoType, val message: String) : Label()
             data class ShowPlaylistsSelector(val config: Config) : Label()
+            object ShowPlaylistsCreator : Label()
+            object ResetItemState : Label()
             data class Navigate(val model: NavigationModel, val view: ItemPassView? = null) : Label()
             data class ItemRemoved(val model: Model.Item) : Label()
             data class ScrollToItem(val pos: Int) : Label()
             data class HighlightPlayingItem(val pos: Int) : Label()
-            data class UpdateModelItem(val model: PlaylistItemMviContract.Model.Item) : Label()
+            data class UpdateModelItem(val model: Model.Item) : Label()
         }
 
         data class State(
@@ -109,6 +111,7 @@ class PlaylistMviContract {
         data class Model(
             val header: Header,
             val items: List<PlaylistItemMviContract.Model.Item>?,
+            var isCards: Boolean,
         )
 
         data class Header(
@@ -133,7 +136,6 @@ class PlaylistMviContract {
             val canEditItems: Boolean,
             val canDeleteItems: Boolean,
             val hasChildren: Int,
-            var isCards: Boolean
         )
 
 

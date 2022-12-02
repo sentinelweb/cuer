@@ -25,13 +25,17 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Label.Error
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Label.Message
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.UndoType.ItemDelete
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.UndoType.ItemMove
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviStoreFactory.Action.Init
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -64,6 +68,7 @@ class PlaylistMviStoreFactory(
     private val itemModelMapper: PlaylistMviItemModelMapper,
     private val playUseCase: PlayUseCase,
     private val strings: StringDecoder,
+    private val timeProvider: TimeProvider,
 ) {
     init {
         log.tag(this)
@@ -87,7 +92,11 @@ class PlaylistMviStoreFactory(
         ) : Result()
 
         data class IdUpdate(val modelId: Long, val changedItem: PlaylistItemDomain) : Result()
-//        data class SetMoveState(val from: Int?, val to: Int?) : Result()
+        data class SelectedPlaylistItem(val item: PlaylistItemDomain?) : Result()
+        data class MovedPlaylistItem(val item: PlaylistItemDomain?) : Result()
+        data class SetModified(val modified: Boolean = true) : Result()
+        data class SetMoveState(val from: Int?, val to: Int?) : Result()
+        data class SetCards(val isCards: Boolean) : Result()
     }
 
     private sealed class Action {
@@ -113,7 +122,12 @@ class PlaylistMviStoreFactory(
                 )
 
                 is Result.IdUpdate -> copy(itemsIdMap = itemsIdMap.apply { put(msg.modelId, msg.changedItem) })
-                else -> copy()
+                is Result.SelectedPlaylistItem -> copy(selectedPlaylistItem = msg.item)
+                is Result.MovedPlaylistItem -> copy(movedPlaylistItem = msg.item)
+                is Result.SetModified -> copy(isModified = msg.modified)
+                is Result.SetMoveState -> copy(dragFrom = msg.from, dragTo = msg.to)
+                is Result.SetCards -> copy(isCards = isCards)
+                //else -> copy()
             }
     }
 
@@ -144,8 +158,8 @@ class PlaylistMviStoreFactory(
                 is Intent.Help -> help(intent, getState())
                 is Intent.Launch -> launch(intent, getState())
                 is Intent.Move -> moveItem(intent, getState())
-                is Intent.MoveSwipe -> performMove(intent, getState())
-                is Intent.ClearMove -> clearMove(intent, getState())
+                is Intent.MoveSwipe -> performMove(intent, getState)
+                is Intent.CommitMove -> commitMove(intent, getState())
                 is Intent.Pause -> pause(intent, getState())
                 is Intent.Play -> play(intent, getState())
                 is Intent.PlayItem -> playItem(intent, getState())
@@ -204,15 +218,118 @@ class PlaylistMviStoreFactory(
         }
 
         private fun moveItem(intent: Intent.Move, state: State) {
-
+            dispatch(Result.SetMoveState(state.dragFrom ?: intent.fromPosition, intent.toPosition))
         }
 
-        private fun performMove(intent: Intent.MoveSwipe, state: State) {
-
+        private fun performMove(intent: Intent.MoveSwipe, getState: () -> State) {
+            val thisState = getState()
+            thisState.playlistItemDomain(intent.item)
+                ?.also { itemDomain ->
+                    thisState.playlist?.apply {
+                        if (config.editableItems.not()) {
+                            publish(Message(strings.getString(StringResource.playlist_error_please_add)))
+                            updateView(state = thisState)
+                        } else {
+                            dispatch(Result.SelectedPlaylistItem(itemDomain))
+                            publish(
+                                Label.ShowPlaylistsSelector(
+                                    PlaylistsMviDialogContract.Config(
+                                        strings.getString(StringResource.playlist_dialog_title_move),
+                                        selectedPlaylists = setOf(thisState.playlist!!),
+                                        multi = true,
+                                        itemClick = { which: PlaylistDomain?, _ ->
+                                            which
+                                                ?.takeIf { it != PlaylistsMviDialogContract.ADD_PLAYLIST_DUMMY }
+                                                ?.let { moveItemToPlaylist(it, getState()) }
+                                                ?: run {
+                                                    // view.showPlaylistCreateDialog()
+                                                    publish(Label.ShowPlaylistsCreator)
+                                                }
+                                        },
+                                        confirm = { },
+                                        dismiss = {
+                                            //view.resetItemsState()
+                                            publish(Label.ResetItemState)
+                                        },
+                                        suggestionsMedia = itemDomain.media,
+                                        showPin = false,
+                                    )
+                                )
+                            )
+                        }
+                    }
+                }
         }
 
-        private fun clearMove(intent: Intent.ClearMove, state: State) {
+        private fun playlistSelected(intent: Intent.PlaylistSelected, state: State) {
+            intent.playlist.id?.let { /*if (selected) */moveItemToPlaylist(intent.playlist, state) }
+        }
 
+        private fun moveItemToPlaylist(playlist: PlaylistDomain, state: State) {
+            state.selectedPlaylistItem?.let { moveItem ->
+                scope.launch {
+                    moveItem
+                        .takeIf {
+                            playlistItemOrchestrator
+                                .loadList(
+                                    OrchestratorContract.Filter.PlatformIdListFilter(listOf(it.media.platformId)),
+                                    LOCAL.flatOptions()
+                                )
+                                .filter { it.playlistId == playlist.id }.isEmpty()
+                        }
+                        ?.copy(playlistId = playlist.id!!)
+                        ?.apply { dispatch(Result.MovedPlaylistItem(this)) }
+                        ?.copy(order = timeProvider.currentTimeMillis())
+                        ?.apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
+                        ?.apply {
+                            publish(
+                                Label.ShowUndo(
+                                    ItemMove,
+                                    strings.getString(
+                                        StringResource.playlist_item_moved_undo_message,
+                                        listOf(playlist.title)
+                                    )
+                                )
+                            )
+                        }
+                        ?.also { dispatch(Result.SelectedPlaylistItem(null)) }
+                        ?.also { dispatch(Result.SetModified()) }
+                        ?: apply {
+                            publish(Error(strings.getString(StringResource.playlist_error_moveitem_already_exists)))
+                        }
+                }
+            }
+        }
+
+        private fun commitMove(intent: Intent.CommitMove, state: State) {
+            if (state.dragFrom != null && state.dragTo != null) {
+                state.playlist
+                    ?.let { playlist ->
+                        playlistMutator.moveItem(playlist, state.dragFrom!!, state.dragTo!!)
+                    }
+                    ?.also { playlistModified ->
+                        scope.launch {
+                            state.dragTo
+                                ?.let { playlistModified.items[it] }
+                                ?.let { item ->
+                                    item to (item.id ?: 0)
+                                        .toIdentifier(state.playlistIdentifier.source)
+                                        .flatOptions()
+                                }
+                                // updates order
+                                ?.let { playlistItemOrchestrator.save(it.first, it.second) }
+                                // fixme this works where id is there, for generated ids (share) need to find previous item in caches qnd reuse id
+                                ?.also { dispatch(Result.IdUpdate(it.id!!, it)) }
+                                ?.also { dispatch(Result.SetPlaylist(playlistModified)) }
+                        }
+                    }
+            } else {
+                if (state.dragFrom != null || state.dragTo != null) {
+                    log.d("commitMove: Move failed .. ")
+                    refresh(state = state)
+                }
+            }
+            dispatch(Result.SetMoveState(null, null))
         }
 
         private fun pause(intent: Intent.Pause, state: State) {
@@ -243,10 +360,6 @@ class PlaylistMviStoreFactory(
 
         }
 
-        private fun playlistSelected(intent: Intent.PlaylistSelected, state: State) {
-
-        }
-
         private fun relatedItems(intent: Intent.RelatedItem, state: State) {
 
         }
@@ -264,7 +377,10 @@ class PlaylistMviStoreFactory(
         }
 
         private fun showCards(intent: Intent.ShowCards, state: State) {
-
+            prefsWrapper.putBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, intent.isCards)
+            coroutines.mainScope.launch {
+                dispatch(Result.SetCards(isCards = intent.isCards))
+            }
         }
 
         private fun showChannel(intent: Intent.ShowChannel, state: State) {
@@ -314,14 +430,9 @@ class PlaylistMviStoreFactory(
             log.d("media changed: ${intent.op}, ${intent.source}, id=${intent.media.id} title=${intent.media.title}")
             when (intent.op) {
                 FLAT,
-                FULL,
-                -> {
-                    val containsMedia =
-                        state.playlist?.items?.find { it.media.platformId == intent.media.platformId } != null
-                    if (containsMedia) {
-                        updatePlaylistItemMedia(null, intent.media, state)
-                    }
-                }
+                FULL -> state.playlist?.items
+                    ?.find { it.media.platformId == intent.media.platformId }
+                    ?.also { updatePlaylistItemMedia(null, intent.media, state) }
 
                 DELETE -> Unit
             }
@@ -495,6 +606,19 @@ class PlaylistMviStoreFactory(
                             executeRefresh(state = state)
                         }
                     }
+
+                ItemMove ->
+                    state.movedPlaylistItem
+                        ?.copy(playlistId = state.playlistIdentifier.id!! as Long)
+                        ?.also {
+                            scope.launch {
+                                playlistItemOrchestrator.save(
+                                    it,
+                                    state.playlistIdentifier.flatOptions()
+                                )
+                                dispatch(Result.MovedPlaylistItem(null))
+                            }
+                        }
             }
         }
 

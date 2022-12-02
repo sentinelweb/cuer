@@ -213,6 +213,7 @@
 
     <!-- dialogs -->
     <string name="playlist_dialog_add_playlist">Add playlist …</string>
+    <string name="playlist_dialog_title_move">Move playlist to …</string>
     <string name="select_route_dialog_title">Select Route</string>
     <string name="create_playlist_dialog_title">Create playlist</string>
     <string name="dialog_button_view_info">View info</string>
