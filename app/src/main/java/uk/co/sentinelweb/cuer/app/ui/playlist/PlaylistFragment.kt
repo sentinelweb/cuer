@@ -49,7 +49,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
-import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
@@ -72,7 +72,7 @@ class PlaylistFragment :
     PlaylistContract.View,
     ItemContract.Interactions,
     ItemBaseContract.ItemMoveInteractions,
-    ShareContract.Committer,
+    ShareCommitter,
     AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<PlaylistFragment>()
@@ -653,8 +653,8 @@ class PlaylistFragment :
     // endregion
 
     // region ShareContract.Committer
-    override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) {
-        presenter.commitPlaylist(onCommit)
+    override suspend fun commit(afterCommit: ShareCommitter.AfterCommit) {
+        presenter.commitPlaylist(afterCommit)
     }
     // endregion
 

@@ -32,7 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContrac
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ADD_PLAYLIST_DUMMY
-import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
@@ -447,7 +447,7 @@ class PlaylistItemEditViewModel constructor(
         }
     }
 
-    suspend fun commitPlaylistItems(onCommit: ShareContract.Committer.OnCommit? = null) =
+    suspend fun commitPlaylistItems(afterCommit: ShareCommitter.AfterCommit? = null) =
         try {
             val selectedPlaylists = if (state.selectedPlaylists.size > 0) {
                 state.selectedPlaylists
@@ -509,7 +509,7 @@ class PlaylistItemEditViewModel constructor(
                         }
                         ?: listOf()
                     )
-                .also { onCommit?.onCommit(ObjectTypeDomain.PLAYLIST_ITEM, it) }
+                .also { afterCommit?.onCommit(ObjectTypeDomain.PLAYLIST_ITEM, it) }
             state.isSaved = true
         } catch (e: Exception) {
             log.e("Error saving playlistItem", e)

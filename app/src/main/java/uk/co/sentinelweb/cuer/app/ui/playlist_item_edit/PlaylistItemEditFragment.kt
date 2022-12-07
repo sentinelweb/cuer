@@ -39,7 +39,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewMode
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
-import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -53,7 +53,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
-class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidScopeComponent {
+class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<PlaylistItemEditFragment>()
     private val viewModel: PlaylistItemEditViewModel by inject()
@@ -387,8 +387,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         dialogFragment = null
     }
 
-    override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) {
-        viewModel.commitPlaylistItems(onCommit)
+    override suspend fun commit(afterCommit: ShareCommitter.AfterCommit) {
+        viewModel.commitPlaylistItems(afterCommit)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

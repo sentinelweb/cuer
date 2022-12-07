@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
-import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
@@ -69,7 +69,7 @@ interface PlaylistContract {
         fun onFilterPlaylistItems(): Boolean
         fun onResume()
         fun onPause()
-        suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit? = null)
+        suspend fun commitPlaylist(onCommit: ShareCommitter.AfterCommit? = null)
         fun reloadHeader()
         fun undoMoveItem()
         fun setAddPlaylistParent(id: Long)

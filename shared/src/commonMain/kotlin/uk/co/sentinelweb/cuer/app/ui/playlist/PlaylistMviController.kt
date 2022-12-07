@@ -42,12 +42,18 @@ class PlaylistMviController constructor(
         }
     }
 
+    fun onSetPlayListData(intent: Intent.SetPlaylistData) {
+        CoroutineScope(Dispatchers.Main).launch {
+            store.accept(intent)
+        }
+    }
+
     private val eventToIntent: suspend Event.() -> Intent = {
         when (this) {
             Event.OnRefresh -> Intent.Refresh
             is Event.OnSetPlaylistData -> Intent.SetPlaylistData(plId, plItemId, playNow, source, addPlaylistParent)
             Event.OnCheckToSave -> Intent.CheckToSave
-            Event.OnCommit -> Intent.Commit
+            is Event.OnCommit -> Intent.Commit(afterCommit = afterCommit)
             is Event.OnDeleteItem -> Intent.DeleteItem(item = item)
             Event.OnEdit -> Intent.Edit
             is Event.OnGotoPlaylist -> Intent.GotoPlaylist(item = item)

@@ -28,7 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NA
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ADD_PLAYLIST_DUMMY
-import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.usecase.AddPlaylistUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
@@ -691,7 +691,7 @@ class PlaylistPresenter(
         view.showHelp()
     }
 
-    override suspend fun commitPlaylist(onCommit: ShareContract.Committer.OnCommit?) {
+    override suspend fun commitPlaylist(afterCommit: ShareCommitter.AfterCommit?) {
         if (state.playlistIdentifier.source == MEMORY) {
             log.i("commitPlaylist: id:${state.playlistIdentifier}")
             addPlaylistUsecase
@@ -702,7 +702,7 @@ class PlaylistPresenter(
                 }
                 .also { state.playlist = it }
                 .also { updateView() }
-                .also { onCommit?.onCommit(PLAYLIST, listOf(it)) }
+                .also { afterCommit?.onCommit(PLAYLIST, listOf(it)) }
         } else {
             throw IllegalStateException("Can't save non Memory playlist")
         }

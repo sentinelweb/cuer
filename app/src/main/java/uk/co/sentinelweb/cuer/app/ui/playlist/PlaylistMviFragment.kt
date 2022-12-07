@@ -11,6 +11,7 @@ import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +25,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -48,6 +50,7 @@ import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract.Model.Item
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Label
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
@@ -56,7 +59,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
-import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -79,7 +82,7 @@ import kotlin.math.min
 class PlaylistMviFragment : Fragment(),
     ItemContract.Interactions,
     ItemBaseContract.ItemMoveInteractions,
-    ShareContract.Committer,
+    ShareCommitter,
     AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<PlaylistMviFragment>()
@@ -261,7 +264,7 @@ class PlaylistMviFragment : Fragment(),
         OnboardingFragment.show(requireActivity(), playlistHelpConfig)
     }
 
-    inner class ViewProxy : BaseMviView<PlaylistMviContract.View.Model, PlaylistMviContract.View.Event>(),
+    inner class ViewProxy : BaseMviView<PlaylistMviContract.View.Model, Event>(),
         PlaylistMviContract.View {
 
         override fun processLabel(label: Label) = when (label) {
@@ -282,6 +285,9 @@ class PlaylistMviFragment : Fragment(),
             is Label.Help -> showHelp()
             is Label.ResetItemState -> resetItemsState()
             is Label.ShowPlaylistsCreator -> showPlaylistCreateDialog()
+            is Label.AfterCommit ->
+                lifecycleScope.launch { label.afterCommit.onCommit(label.type, label.objects) }
+                    .let { Unit }
         }.also { log.d(label.toString()) }
 
         //        override fun render(model: PlaylistMviContract.View.Model) {// todo diff, update item
@@ -308,7 +314,7 @@ class PlaylistMviFragment : Fragment(),
                     val items = it ?: listOf()
                     setList(items, animate = false)
                     previousItems = items
-
+                    commitHost.isReady(true)
                     log.d("items: ${it?.size}")
                 })
                 diff(get = PlaylistMviContract.View.Model::header, set = {
@@ -376,6 +382,7 @@ class PlaylistMviFragment : Fragment(),
 
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
+        log.d("setArguments($args)")
         if (isHeadless && isAdded) {
             binding.playlistAppbar.isVisible = false
             binding.playlistFabPlay.isVisible = false
@@ -408,14 +415,15 @@ class PlaylistMviFragment : Fragment(),
                 log.d("onResume: apply nav args model = $this")
                 setPlaylistData()
                 navigationProvider.clearPendingNavigation(Target.PLAYLIST)
-            } ?: run {// fixme i don't think we can get here
-            log.d("onResume: got no nav args")
-            //presenter.setPlaylistData()
-            viewProxy.dispatch(OnSetPlaylistData())
-        }
+            }
+            ?: run {// fixme i don't think we can get here
+                log.d("onResume: got no nav args")
+                //presenter.setPlaylistData()
+                //viewProxy.dispatch(OnSetPlaylistData())
+                controller.onRefresh()
+            }
         //presenter.onResume()
         //viewProxy.dispatch(OnResume)
-        controller.onRefresh()
     }
 
     override fun onPause() {
@@ -436,8 +444,8 @@ class PlaylistMviFragment : Fragment(),
 //            params[NavigationModel.Param.PLAY_NOW] as Boolean? ?: false,
 //            params[NavigationModel.Param.SOURCE] as OrchestratorContract.Source
 //        )
-        viewProxy.dispatch(
-            OnSetPlaylistData(
+        controller.onSetPlayListData(
+            PlaylistMviContract.MviStore.Intent.SetPlaylistData(
                 params[NavigationModel.Param.PLAYLIST_ID] as Long?,
                 params[NavigationModel.Param.PLAYLIST_ITEM_ID] as Long?,
                 params[NavigationModel.Param.PLAY_NOW] as Boolean? ?: false,
@@ -794,9 +802,9 @@ class PlaylistMviFragment : Fragment(),
     // endregion
 
     // region ShareContract.Committer
-    override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) {
+    override suspend fun commit(afterCommit: ShareCommitter.AfterCommit) {
         //presenter.commitPlaylist(onCommit)
-        viewProxy.dispatch(OnCommit)// tod fire call back somehow
+        viewProxy.dispatch(Event.OnCommit(afterCommit))// tod fire call back somehow
     }
     // endregion
 
@@ -843,7 +851,8 @@ class PlaylistMviFragment : Fragment(),
                         util = get(),
                         playUseCase = get(),
                         strings = get(),
-                        timeProvider = get()
+                        timeProvider = get(),
+                        addPlaylistUsecase = get()
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }

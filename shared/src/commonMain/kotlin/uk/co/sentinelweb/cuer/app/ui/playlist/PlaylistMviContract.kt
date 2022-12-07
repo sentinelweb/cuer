@@ -11,10 +11,8 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract.ItemPassVi
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract.Model
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Config
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
+import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
+import uk.co.sentinelweb.cuer.domain.*
 
 class PlaylistMviContract {
 
@@ -46,7 +44,7 @@ class PlaylistMviContract {
             object Launch : Intent()
             object ShowChannel : Intent()
             object CheckToSave : Intent()
-            object Commit : Intent()
+            data class Commit(val afterCommit: ShareCommitter.AfterCommit) : Intent()
             data class ShowCards(val isCards: Boolean) : Intent()
             data class DeleteItem(val item: Model.Item) : Intent()
             data class Undo(val undoType: UndoType) : Intent()
@@ -84,6 +82,11 @@ class PlaylistMviContract {
             data class ScrollToItem(val pos: Int) : Label()
             data class HighlightPlayingItem(val pos: Int) : Label()
             data class UpdateModelItem(val model: Model.Item) : Label()
+            data class AfterCommit(
+                val type: ObjectTypeDomain,
+                val objects: List<Domain>,
+                val afterCommit: ShareCommitter.AfterCommit
+            ) : Label()
         }
 
         data class State(
@@ -153,7 +156,7 @@ class PlaylistMviContract {
             object OnShare : Event()
             object OnLaunch : Event()
             object OnCheckToSave : Event()
-            object OnCommit : Event()
+            data class OnCommit(val afterCommit: ShareCommitter.AfterCommit) : Event()
             data class OnPlaylistSelected(val playlist: PlaylistDomain) : Event()
             data class OnSetPlaylistData(
                 val plId: Long? = null,

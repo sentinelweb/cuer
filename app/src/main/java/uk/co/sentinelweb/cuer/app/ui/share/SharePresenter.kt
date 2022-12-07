@@ -70,7 +70,11 @@ class SharePresenter constructor(
                                 .replaceFirstChar { char -> char.uppercase() })
                     )
             }
-            ?.let { mapper.mapShareModel(state, ::finish, view.canCommit(state.scanResult?.type)) }
+            ?.let {
+                val canCommit = view.canCommit(state.scanResult?.type)
+                log.d("canCommit; $canCommit: state.scanResult?.type:${state.scanResult?.type}")
+                mapper.mapShareModel(state, ::finish, canCommit)
+            }
             ?: mapper.mapEmptyModel(::finish))
             .apply {
                 state.model = this
@@ -171,7 +175,7 @@ class SharePresenter constructor(
         coroutines.mainScope.launch {
             if (add) {// fixme if playlist items are changed then they aren't saved here
                 if (view.canCommit(state.scanResult?.type)) {
-                    view.commit(object : ShareContract.Committer.OnCommit {
+                    view.commit(object : ShareCommitter.AfterCommit {
                         override suspend fun onCommit(type: ObjectTypeDomain, data: List<*>) {
                             afterCommit(type, data, play, forward)
                         }

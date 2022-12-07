@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.UndoType.ItemD
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.UndoType.ItemMove
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviStoreFactory.Action.Init
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
+import uk.co.sentinelweb.cuer.app.usecase.AddPlaylistUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
@@ -37,12 +38,11 @@ import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.buildLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildTree
+import uk.co.sentinelweb.cuer.domain.ext.matchesHeader
+import uk.co.sentinelweb.cuer.domain.ext.replaceHeader
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 class PlaylistMviStoreFactory(
@@ -69,6 +69,7 @@ class PlaylistMviStoreFactory(
     private val playUseCase: PlayUseCase,
     private val strings: StringDecoder,
     private val timeProvider: TimeProvider,
+    private val addPlaylistUsecase: AddPlaylistUsecase,
 ) {
     init {
         log.tag(this)
@@ -89,6 +90,10 @@ class PlaylistMviStoreFactory(
         data class SetPlaylist(
             val playlist: PlaylistDomain?,
             var playlistIdentifier: OrchestratorContract.Identifier<*>? = null
+        ) : Result()
+
+        data class SetPlaylistId(
+            var playlistIdentifier: OrchestratorContract.Identifier<*>
         ) : Result()
 
         data class IdUpdate(val modelId: Long, val changedItem: PlaylistItemDomain) : Result()
@@ -126,7 +131,8 @@ class PlaylistMviStoreFactory(
                 is Result.MovedPlaylistItem -> copy(movedPlaylistItem = msg.item)
                 is Result.SetModified -> copy(isModified = msg.modified)
                 is Result.SetMoveState -> copy(dragFrom = msg.from, dragTo = msg.to)
-                is Result.SetCards -> copy(isCards = isCards)
+                is Result.SetCards -> copy(isCards = msg.isCards)
+                is Result.SetPlaylistId -> copy(playlistIdentifier = msg.playlistIdentifier)
                 //else -> copy()
             }
     }
@@ -149,9 +155,9 @@ class PlaylistMviStoreFactory(
         override fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
                 is Intent.Refresh -> refresh(getState())
-                is Intent.SetPlaylistData -> setPlaylistData(intent, getState())
+                is Intent.SetPlaylistData -> setPlaylistData(intent, getState)
                 is Intent.CheckToSave -> checkToSave(intent, getState())
-                is Intent.Commit -> commit(intent, getState())
+                is Intent.Commit -> commit(intent, getState)
                 is Intent.DeleteItem -> delete(intent, getState())
                 is Intent.Edit -> edit(intent, getState())
                 is Intent.GotoPlaylist -> gotoPlaylist(intent, getState())
@@ -185,8 +191,31 @@ class PlaylistMviStoreFactory(
 
         }
 
-        private fun commit(intent: Intent.Commit, state: State) {
-
+        private fun commit(intent: Intent.Commit, getState: () -> State) {
+            val state = getState()
+            if (state.playlistIdentifier.source == OrchestratorContract.Source.MEMORY) {
+                log.i("commitPlaylist: id:${state.playlistIdentifier}")
+                scope.launch {
+                    addPlaylistUsecase
+                        .addPlaylist(state.playlist!!, state.addPlaylistParent)
+//                    .also {
+//                        state.playlistIdentifier =
+//                            it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")
+//                    }
+//                    .also { states.playlist = it }
+                        .also {
+                            val newIdentifier =
+                                it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")
+                            dispatch(Result.SetPlaylist(playlist = it, playlistIdentifier = newIdentifier))
+                            executeRefresh(state = getState())
+                        }
+                        .also { updateView(getState()) }
+                        //.also { onCommit?.onCommit(ObjectTypeDomain.PLAYLIST, listOf(it)) }
+                        .also { publish(Label.AfterCommit(ObjectTypeDomain.PLAYLIST, listOf(it), intent.afterCommit)) }
+                }
+            } else {
+                throw IllegalStateException("Can't save non Memory playlist")
+            }
         }
 
         private fun edit(intent: Intent.Edit, state: State) {
@@ -242,15 +271,11 @@ class PlaylistMviStoreFactory(
                                                 ?.takeIf { it != PlaylistsMviDialogContract.ADD_PLAYLIST_DUMMY }
                                                 ?.let { moveItemToPlaylist(it, getState()) }
                                                 ?: run {
-                                                    // view.showPlaylistCreateDialog()
                                                     publish(Label.ShowPlaylistsCreator)
                                                 }
                                         },
                                         confirm = { },
-                                        dismiss = {
-                                            //view.resetItemsState()
-                                            publish(Label.ResetItemState)
-                                        },
+                                        dismiss = { publish(Label.ResetItemState) },
                                         suggestionsMedia = itemDomain.media,
                                         showPin = false,
                                     )
@@ -439,7 +464,30 @@ class PlaylistMviStoreFactory(
         }
 
         private fun flowUpdatesPlaylist(intent: Intent.UpdatesPlaylist, state: State) {
+            log.d("playlist changed: ${intent.op}, ${intent.source}, id=${intent.plist.id} items=${intent.plist.items.size}")
+            if (intent.plist.id?.toIdentifier(intent.source) == state.playlistIdentifier) {
+                when (intent.op) {
+                    FLAT ->
+                        if (!intent.plist.matchesHeader(state.playlist)) {
+                            state.playlist
+                                ?.replaceHeader(intent.plist)
+                                ?.apply { dispatch(Result.SetPlaylist(this)) }
+                        }
 
+                    FULL ->
+                        if (intent.plist != state.playlist) {
+//                            state.playlist = intent.plist
+//                            updateView()
+                            dispatch(Result.SetPlaylist(intent.plist))
+                        }
+
+                    DELETE -> {
+//                        toastWrapper.show(res.getString(R.string.playlist_msg_deleted))
+//                        view.exit()
+                        // todo exit label? doesn't actually happen atm (maybe make delete button on playlist screen)
+                    }
+                }
+            }
         }
 
         private fun flowUpdatesPlaylistItem(intent: Intent.UpdatesPlaylistItem, state: State) {
@@ -655,35 +703,40 @@ class PlaylistMviStoreFactory(
         // endregion utils
 
         // region loadRefresh
-        private fun setPlaylistData(intent: Intent.SetPlaylistData, state: State) {
+        private fun setPlaylistData(intent: Intent.SetPlaylistData, getState: () -> State) {
             // fixme bit dodgy here - modifying state.
+            log.d("setPlaylistData:" + intent.toString())
+            val currentState = getState()
             coroutines.mainScope.launch {
-                val notLoaded = state.playlist == null
+                val notLoaded = currentState.playlist == null
                 intent.plId
                     ?.takeIf { it != -1L }
                     ?.toIdentifier(intent.source)
                     ?.apply {
-                        state.playlistIdentifier = this
+                        //state.playlistIdentifier = this
+                        dispatch(Result.SetPlaylistId(this))
                     }
-                    ?.apply { executeRefresh(scrollToCurrent = notLoaded, state = state) }
+                    ?.apply { executeRefresh(scrollToCurrent = notLoaded, state = getState()) }
                     ?.apply {
                         if (intent.playNow) {
-                            queue.playNow(state.playlistIdentifier, intent.plItemId)
+                            queue.playNow(currentState.playlistIdentifier, intent.plItemId)
                         }
                     }
                     ?.apply {
-                        state.playlist?.also { recentLocalPlaylists.addRecent(it) }
+                        getState().playlist?.also { recentLocalPlaylists.addRecent(it) }
                     }
                     ?: run {
                         if (dbInit.isInitialized()) {
-                            state.playlistIdentifier = prefsWrapper.lastViewedPlaylistId
-                            executeRefresh(scrollToCurrent = notLoaded, state = state)
+                            //state.playlistIdentifier = prefsWrapper.lastViewedPlaylistId
+                            dispatch(Result.SetPlaylistId(prefsWrapper.lastViewedPlaylistId))
+                            executeRefresh(scrollToCurrent = notLoaded, state = getState())
                         } else {
                             dbInit.addListener { b: Boolean ->
                                 if (b) {
-                                    state.playlistIdentifier = 3L.toIdentifier(LOCAL) // philosophy
+                                    dispatch(Result.SetPlaylistId(3L.toIdentifier(LOCAL)))
+                                    //state.playlistIdentifier = 3L.toIdentifier(LOCAL) // philosophy
                                     //updatePlaylist()
-                                    refresh(state = state)
+                                    refresh(state = getState())
                                 }
                             }
                         }
@@ -692,6 +745,7 @@ class PlaylistMviStoreFactory(
         }
 
         private fun refresh(state: State) {
+            log.e("refresh:" + state.playlistIdentifier.toString(), Exception("debug trace"))
             scope.launch { executeRefresh(state = state) }
         }
 
@@ -699,6 +753,7 @@ class PlaylistMviStoreFactory(
             //view.showRefresh()
             publish(Label.Loading)
             try {
+                log.e("executeRefresh:" + state.playlistIdentifier.toString(), Exception("debug trace"))
                 val id = state.playlistIdentifier
                     .takeIf { it != OrchestratorContract.NO_PLAYLIST }
                     ?: prefsWrapper.currentPlayingPlaylistId
@@ -736,7 +791,7 @@ class PlaylistMviStoreFactory(
                 val modelId = item.id ?: modelIdGenerator.value
                 itemsIdMap[modelId] = item
             }
-            return itemsIdMap
+            return itemsIdMap.also { map -> log.d(map.keys.associateBy { map[it]?.media?.title }.toString()) }
         }
         // endregion loadRefresh
     }
