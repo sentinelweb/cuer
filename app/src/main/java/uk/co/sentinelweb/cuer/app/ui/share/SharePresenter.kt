@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.MediaIdListFilter
@@ -50,6 +52,16 @@ class SharePresenter constructor(
         coroutines.cancel()
     }
 
+    private fun listenForCommit() {
+        playlistOrchestrator.updates
+            .filter { PlatformIdFilter(each = it, state.scanResult?.platform ?: throw IllegalStateException()) }
+            .launchIn(coroutines.mainScope)
+
+        playlistItemOrchestrator.updates
+
+            .launchIn(coroutines.mainScope)
+    }
+
     override fun setPlaylistParent(cat: CategoryDomain?, parentId: Long) {
         state.category = cat
         state.parentPlaylistId = parentId
@@ -57,6 +69,7 @@ class SharePresenter constructor(
 
     override fun onReady(ready: Boolean) {
         state.ready = ready
+        listenForCommit()
         mapModel()
     }
 
