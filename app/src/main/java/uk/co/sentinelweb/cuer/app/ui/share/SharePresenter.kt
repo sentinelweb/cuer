@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.share
 
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.MediaIdListFilter
@@ -10,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.filter.PlatformIdFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -42,6 +44,7 @@ class SharePresenter constructor(
     private val timeProvider: TimeProvider,
     private val shareStrings: ShareContract.ShareStrings,
     private val recentLocalPlaylists: RecentLocalPlaylists,
+    private val platformIdFilter: PlatformIdFilter
 ) : ShareContract.Presenter {
 
     init {
@@ -54,11 +57,13 @@ class SharePresenter constructor(
 
     private fun listenForCommit() {
         playlistOrchestrator.updates
-            .filter { PlatformIdFilter(each = it, state.scanResult?.platform ?: throw IllegalStateException()) }
+            .filter { platformIdFilter.compareTo(it) }
+            .onEach { /*aftercommit*/ }
             .launchIn(coroutines.mainScope)
 
         playlistItemOrchestrator.updates
-
+            .filter { platformIdFilter.compareTo(it) }
+            .onEach { /*aftercommit*/ }
             .launchIn(coroutines.mainScope)
     }
 
@@ -117,8 +122,11 @@ class SharePresenter constructor(
                     if (result.isNew) MEMORY else LOCAL,
                     state.parentPlaylistId
                 )
+                platformIdFilter.targetDomainClass = PlaylistItemDomain::class
+                platformIdFilter.targetPlatformId = it.platformId
                 mapModel()
             }
+
             PLAYLIST -> (result.result as PlaylistDomain).let { playlist ->
                 playlist.id?.let { id ->
                     coroutines.mainScope.launch {
@@ -136,6 +144,8 @@ class SharePresenter constructor(
                                 )
                             }
                         }
+                        platformIdFilter.targetDomainClass = PlaylistDomain::class
+                        platformIdFilter.targetPlatformId = playlist.platformId
                         view.showPlaylist(
                             id.toIdentifier(if (result.isNew) MEMORY else LOCAL),
                             state.parentPlaylistId
@@ -144,6 +154,7 @@ class SharePresenter constructor(
                     }
                 } ?: throw IllegalStateException("Playlist needs an id (isNew = MEMORY)")
             }
+
             else -> throw IllegalArgumentException("unsupported type: ${result.type}")
         }
     }
@@ -209,12 +220,14 @@ class SharePresenter constructor(
                             .let {
                                 afterCommit(PLAYLIST_ITEM, it, play, forward)
                             }
+
                     PLAYLIST -> afterCommit(
                         PLAYLIST,
                         listOf(state.scanResult?.result as PlaylistDomain),
                         play,
                         forward
                     )
+
                     else -> throw IllegalArgumentException("unsupported type: ${state.scanResult?.type}")
                 }
             }
@@ -249,6 +262,7 @@ class SharePresenter constructor(
                             ?.let { it.playlistId!! to it.id }
                             ?: let { currentPlaylistId.id to (null as Long?) }
                     }
+
                 else -> throw java.lang.IllegalStateException("Unsupported type")
             }
             recentLocalPlaylists.addRecentId(playId.first)
@@ -258,7 +272,7 @@ class SharePresenter constructor(
                 view.exit()
             } else { // return play is hidden for not connected
                 playId
-                    .takeIf { play && isConnected}
+                    .takeIf { play && isConnected }
                     ?.let {
                         playId.first.let { itemPlaylistId ->
                             queue.playNow(itemPlaylistId.toIdentifier(LOCAL), playId.second)
@@ -270,6 +284,7 @@ class SharePresenter constructor(
             when (t) {
                 is NoDefaultPlaylistException -> // todo make a dialog or just create the playlist
                     view.error(shareStrings.errorNoDefaultPlaylist)
+
                 else -> view.error(t.message ?: (t::class.java.simpleName + " error ... sorry"))
             }
         }

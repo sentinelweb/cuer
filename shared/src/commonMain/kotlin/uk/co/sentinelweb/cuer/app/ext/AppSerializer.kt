@@ -16,7 +16,7 @@ fun deserialiseOnboarding(input: String) = domainJsonSerializer.decodeFromString
     OnboardingContract.Config.serializer(), input
 )
 
-val domainJsonSerializer = Json {
+private val domainJsonSerializer = Json {
     prettyPrint = true
     isLenient = true
     ignoreUnknownKeys = true
@@ -25,4 +25,3 @@ val domainJsonSerializer = Json {
         contextual(OnboardingContract.Config::class, OnboardingContract.Config.serializer())
     })
 }
-

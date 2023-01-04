@@ -58,7 +58,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `moveItem from start to end - jump fwd over current`() {
+    fun moveItem_from_start_to_end__jump_fwd_over_current() {
         val initialCurrentIndex = 2
         val fromPosition = 0
         val toPosition = fixtPlaylist.items.size - 1
@@ -77,7 +77,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `moveItem from middle to start  - jump back over current`() {
+    fun moveItem_from_middle_to_start___jump_back_over_current() {
         val initialCurrentIndex = 1
         val fromPosition = 2
         val toPosition = 0
@@ -95,7 +95,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `moveItem from middle to middle fwd - ahead of current`() {
+    fun moveItem_from_middle_to_middle_fwd__ahead_of_current() {
         val initialCurrentIndex = 1
         val fromPosition = 3
         val toPosition = 5
@@ -116,7 +116,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `moveItem from middle to end - ahead of current`() {
+    fun moveItem_from_middle_to_end__ahead_of_current() {
         val initialCurrentIndex = 1
         val fromPosition = 2
         val toPosition = fixtPlaylist.items.size - 1
@@ -134,7 +134,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `moveItem from middle to start - behind current`() {
+    fun moveItem_from_middle_to_start__behind_current() {
         val initialCurrentIndex = 8
         val fromPosition = 2
         val toPosition = 0
@@ -152,7 +152,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `move current item changes index`() {
+    fun move_current_item_changes_index() {
         val initialCurrentIndex = 2
         val fromPosition = 2
         val toPosition = 8
@@ -170,7 +170,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `goto previous single`() {
+    fun goto_previous_single() {
         val initialCurrentIndex = 1
         val fixWithIndex = fixtPlaylist.copy(currentIndex = initialCurrentIndex, mode = SINGLE)
 
@@ -180,7 +180,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `goto previous single begin`() {
+    fun goto_previous_single_begin() {
         val fixWithIndex = fixtPlaylist.copy(currentIndex = 0, mode = SINGLE)
 
         val actual = sut.gotoPreviousItem(fixWithIndex)
@@ -189,7 +189,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `goto previous loop begin`() {
+    fun goto_previous_loop_begin() {
         val fixWithIndex = fixtPlaylist.copy(currentIndex = 0, mode = LOOP)
 
         val actual = sut.gotoPreviousItem(fixWithIndex)
@@ -198,7 +198,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `goto Next Item single`() {
+    fun goto_Next_Item_single() {
         val fixWithIndex = fixtPlaylist.copy(currentIndex = 1, mode = SINGLE)
 
         val actual = sut.gotoNextItem(fixWithIndex)
@@ -207,7 +207,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `goto Next Item single end`() {
+    fun goto_Next_Item_single_end() {
         val fixWithIndex =
             fixtPlaylist.copy(currentIndex = fixtPlaylist.items.size - 1, mode = SINGLE)
 
@@ -217,7 +217,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `goto Next Item loop end`() {
+    fun goto_Next_Item_loop_end() {
         val initialCurrentIndex = fixtPlaylist.items.size - 1
         val fixWithIndex = fixtPlaylist.copy(currentIndex = initialCurrentIndex, mode = LOOP)
 
@@ -237,7 +237,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `delete current`() {
+    fun delete_current() {
         val fixtCurrentIndex = 1
         val fixWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
         val deleteItem = fixWithIndex.items[fixtCurrentIndex]
@@ -249,7 +249,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `delete item before current`() {
+    fun delete_item_before_current() {
         val fixtCurrentIndex = 2
         val fixWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
         val deleteItem = fixWithIndex.items[1]
@@ -261,7 +261,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `delete last current`() {
+    fun delete_last_current() {
         val fixtCurrentIndex = fixtPlaylist.items.size - 1
         val fixWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
         val deleteItem = fixWithIndex.items[fixtCurrentIndex]
@@ -273,7 +273,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem - same order - no index change`() {
+    fun addOrReplaceItem__same_order__no_index_change() {
         val fixtReplaceItemIndex = 2
         val fixtCurrentIndex = 3
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
@@ -290,7 +290,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem - behind current item - moved forward - past current Index - decrement index`() {
+    fun addOrReplaceItem__behind_current_item__moved_forward__past_current_Index__decrement_index() {
         val changeItemIndex = 2
         val fixtCurrentIndex = 3
         val targetIndexPreMove = 4
@@ -310,7 +310,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem - is current item - moved forward - moves index with it`() {
+    fun addOrReplaceItem__is_current_item__moved_forward__moves_index_with_it() {
         val changeItemIndex = 3
         val fixtCurrentIndex = 3
         val targetIndexPreMove = 6
@@ -330,7 +330,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem - is current item - moved backward - moves index with it`() {
+    fun addOrReplaceItem__is_current_item__moved_backward__moves_index_with_it() {
         val changeItemIndex = 3
         val fixtCurrentIndex = 3
         val targetIndexPreMove = 1
@@ -350,7 +350,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem - behind current item - moved forward - to before current Index - same index`() {
+    fun addOrReplaceItem__behind_current_item__moved_forward__to_before_current_Index__same_index() {
         val changeItemIndex = 1
         val fixtCurrentIndex = 3
         val targetIndexPreMove = 3
@@ -370,7 +370,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem - ahead of current item - moved backward - to before current Index - inc index`() {
+    fun addOrReplaceItem__ahead_of_current_item__moved_backward__to_before_current_Index__inc_index() {
         val changeItemIndex = 6
         val fixtCurrentIndex = 3
         val targetIndexPreMove = 3
@@ -390,7 +390,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem - ahead of current item - moved backward - to ahead current Index - same index`() {
+    fun addOrReplaceItem__ahead_of_current_item__moved_backward__to_ahead_current_Index__same_index() {
         val changeItemIndex = 6
         val fixtCurrentIndex = 3
         val targetIndexPreMove = 4
@@ -410,7 +410,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem - add new item before index - inc index`() {
+    fun addOrReplaceItem__add_new_item_before_index__inc_index() {
         val fixtCurrentIndex = 3
         val targetIndexPreMove = 3
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
@@ -429,7 +429,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem - add new item after index - inc index`() {
+    fun addOrReplaceItem__add_new_item_after_index__inc_index() {
         val fixtCurrentIndex = 3
         val targetIndexPreMove = 4
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
@@ -448,7 +448,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `addOrReplaceItem - same item replaced - should not change`() {
+    fun addOrReplaceItem__same_item_replaced__should_not_change() {
         val fixtCurrentIndex = 3
         val targetIndexReplace = 4
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
@@ -464,7 +464,7 @@ class PlaylistMutatorTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `addOrReplaceItem - not on playlist throws exception`() {
+    fun addOrReplaceItem__not_on_playlist_throws_exception() {
         val fixtCurrentIndex = 3
         val targetIndexReplace = 4
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
@@ -479,7 +479,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `remove - is before currentIndex`() {
+    fun remove__is_before_currentIndex() {
         val fixtCurrentIndex = 3
         val removedIndex = 2
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
@@ -498,7 +498,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `remove - is after afterIndex`() {
+    fun remove__is_after_afterIndex() {
         val fixtCurrentIndex = 3
         val removedIndex = 4
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
@@ -517,7 +517,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `remove - is not in list - returns same list`() {
+    fun remove__is_not_in_list__returns_same_list() {
         val fixtCurrentIndex = 3
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
         fixtPlaylistWithIndex.scanOrder().apply { println(this.toString()) }
@@ -535,7 +535,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `remove - is not same playlist id after current`() {
+    fun remove__is_not_same_playlist_id_after_current() {
         val fixtCurrentIndex = 3
         val removedIndex = 4
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)
@@ -555,7 +555,7 @@ class PlaylistMutatorTest {
     }
 
     @Test
-    fun `remove - is not same playlist id before current`() {
+    fun remove__is_not_same_playlist_id_before_current() {
         val fixtCurrentIndex = 3
         val removedIndex = 2
         val fixtPlaylistWithIndex = fixtPlaylist.copy(currentIndex = fixtCurrentIndex)

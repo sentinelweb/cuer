@@ -200,7 +200,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlist changed`() {
+    fun test_flow_playlist_changed() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val currentIndex = 3
@@ -220,7 +220,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlist deleted`() {
+    fun test_flow_playlist_deleted() {
         testCoroutineScope.runBlockingTest {
             createSut()
             coEvery {
@@ -244,7 +244,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlistitem changed not current`() {
+    fun test_flow_playlistitem_changed_not_current() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val replaceItemIndex = 3
@@ -265,7 +265,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow current playlistitem changed`() {
+    fun test_flow_current_playlistitem_changed() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex
@@ -286,7 +286,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow current playlistitem moved`() {
+    fun test_flow_current_playlistitem_moved() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex
@@ -309,7 +309,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow current playlistitem moved out of playlist - should play next item`() {
+    fun test_flow_current_playlistitem_moved_out_of_playlist___should_play_next_item() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex
@@ -332,7 +332,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlistitem moved out of playlist before current`() {
+    fun test_flow_playlistitem_moved_out_of_playlist_before_current() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex - 1
@@ -354,7 +354,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlistitem moved out of playlist after current`() {
+    fun test_flow_playlistitem_moved_out_of_playlist_after_current() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val replaceItemIndex = fixtCurrentCurentIndex + 1
@@ -376,7 +376,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlistitem added to playlist before current`() {
+    fun test_flow_playlistitem_added_to_playlist_before_current() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val addItemIndex = fixtCurrentCurentIndex - 1
@@ -400,7 +400,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlistitem added to playlist after current`() {
+    fun test_flow_playlistitem_added_to_playlist_after_current() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val addItemIndex = fixtCurrentCurentIndex + 1
@@ -424,7 +424,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlistitem deleted before current`() {
+    fun test_flow_playlistitem_deleted_before_current() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val deleteItemIndex = fixtCurrentCurentIndex - 1
@@ -446,7 +446,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlistitem deleted after current`() {
+    fun test_flow_playlistitem_deleted_after_current() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val deleteItemIndex = fixtCurrentCurentIndex + 1
@@ -468,7 +468,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlistitem deleted is current`() {
+    fun test_flow_playlistitem_deleted_is_current() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val deleteItemIndex = fixtCurrentCurentIndex
@@ -490,7 +490,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `test flow playlistitem replace same item (no change) does not emit`() {
+    fun test_flow_playlistitem_replace_same_item__no_change__does_not_emit() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val sameItemIndex = fixtCurrentCurentIndex - 1
@@ -545,7 +545,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `onItemSelected - simple`() {
+    fun onItemSelected_simple() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val selectedItemIndex = 8
@@ -564,7 +564,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `onItemSelected - same no force play`() {
+    fun onItemSelected__same_no_force_play() {
         testCoroutineScope.runBlockingTest {
             createSut()
             val currentItem = sut.currentItem!!
@@ -581,7 +581,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `onItemSelected - same force play`() {// todo test force play , reset position
+    fun onItemSelected_same_force_play() {// todo test force play , reset position
         testCoroutineScope.runBlockingTest {
             createSut()
             val currentItem = sut.currentItem!!
@@ -604,11 +604,12 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `onItemSelected - reset position`() {// todo test force play , reset position
+    fun onItemSelected__reset_position() {// todo test force play , reset position
         testCoroutineScope.runBlockingTest {
             createSut()
             val currentItemBefore = sut.currentItem!!
-            val expectedCurrentItem = currentItemBefore.copy(media = currentItemBefore.media.copy(positon = 0, watched = true))
+            val expectedCurrentItem =
+                currentItemBefore.copy(media = currentItemBefore.media.copy(positon = 0, watched = true))
             val mediaPositionUpdate = MediaPositionUpdateDomain(
                 id = expectedCurrentItem.media.id!!,
                 positon = expectedCurrentItem.media.positon,
@@ -646,7 +647,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `onItemSelected - reset position - different item - no force`() {// todo test force play , reset position
+    fun onItemSelected__reset_position__different_item__no_force() {// todo test force play , reset position
         testCoroutineScope.runBlockingTest {
             createSut()
             val selectedItemIndex = 8
@@ -690,12 +691,12 @@ class QueueMediatorTest {
     }
 
     @Test
-    fun `playNow - playlist only`() {
+    fun playNow__playlist_only() {
         // todo
     }
 
     @Test
-    fun `playNow - with playlist item`() {
+    fun playNow__with_playlist_item() {
         // todo
     }
 

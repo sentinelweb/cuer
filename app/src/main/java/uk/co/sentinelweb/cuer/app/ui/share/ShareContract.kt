@@ -10,6 +10,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.filter.PlatformIdFilter
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
@@ -112,7 +113,8 @@ interface ShareContract {
                         playlistItemOrchestrator = get(),
                         playlistOrchestrator = get(),
                         shareStrings = get(),
-                        recentLocalPlaylists = get()
+                        recentLocalPlaylists = get(),
+                        platformIdFilter = PlatformIdFilter()
                     )
                 }
                 scoped { AndroidShareWrapper(get<ShareActivity>()) }
