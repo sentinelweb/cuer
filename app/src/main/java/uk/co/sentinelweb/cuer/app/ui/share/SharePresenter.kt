@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.MediaIdListFilter
@@ -11,7 +8,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.filter.PlatformIdFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -44,7 +40,7 @@ class SharePresenter constructor(
     private val timeProvider: TimeProvider,
     private val shareStrings: ShareContract.ShareStrings,
     private val recentLocalPlaylists: RecentLocalPlaylists,
-    private val platformIdFilter: PlatformIdFilter
+//    private val platformIdFilter: PlatformIdFilter
 ) : ShareContract.Presenter {
 
     init {
@@ -54,18 +50,21 @@ class SharePresenter constructor(
     override fun onStop() {
         coroutines.cancel()
     }
-
-    private fun listenForCommit() {
-        playlistOrchestrator.updates
-            .filter { platformIdFilter.compareTo(it) }
-            .onEach { /*aftercommit*/ }
-            .launchIn(coroutines.mainScope)
-
-        playlistItemOrchestrator.updates
-            .filter { platformIdFilter.compareTo(it) }
-            .onEach { /*aftercommit*/ }
-            .launchIn(coroutines.mainScope)
-    }
+// abandoning commit listening need to wait for all playlist items before cqllingafter commit
+// also need to hold the state params from the finish method as they are also passed to after commit
+// basically a bigger refactor is needed here to get it to work
+// share presenter has gotten too complex and need to be re-designed
+//    private fun listenForCommit() {
+//        playlistOrchestrator.updates
+//            .filter { platformIdFilter.compareTo(it) }
+//            .onEach { /*aftercommit*/ }
+//            .launchIn(coroutines.mainScope)
+//
+//        playlistItemOrchestrator.updates
+//            .filter { platformIdFilter.compareTo(it) }
+//            .onEach { /*aftercommit*/ }
+//            .launchIn(coroutines.mainScope)
+//    }
 
     override fun setPlaylistParent(cat: CategoryDomain?, parentId: Long) {
         state.category = cat
@@ -74,7 +73,7 @@ class SharePresenter constructor(
 
     override fun onReady(ready: Boolean) {
         state.ready = ready
-        listenForCommit()
+        // listenForCommit()
         mapModel()
     }
 
@@ -122,8 +121,8 @@ class SharePresenter constructor(
                     if (result.isNew) MEMORY else LOCAL,
                     state.parentPlaylistId
                 )
-                platformIdFilter.targetDomainClass = PlaylistItemDomain::class
-                platformIdFilter.targetPlatformId = it.platformId
+//                platformIdFilter.targetDomainClass = PlaylistItemDomain::class
+//                platformIdFilter.targetPlatformId = it.platformId
                 mapModel()
             }
 
@@ -144,8 +143,8 @@ class SharePresenter constructor(
                                 )
                             }
                         }
-                        platformIdFilter.targetDomainClass = PlaylistDomain::class
-                        platformIdFilter.targetPlatformId = playlist.platformId
+//                        platformIdFilter.targetDomainClass = PlaylistDomain::class
+//                        platformIdFilter.targetPlatformId = playlist.platformId
                         view.showPlaylist(
                             id.toIdentifier(if (result.isNew) MEMORY else LOCAL),
                             state.parentPlaylistId
@@ -204,6 +203,7 @@ class SharePresenter constructor(
                             afterCommit(type, data, play, forward)
                         }
                     })
+
                 } else {
                     view.warning("Can't save from here")
                 }
@@ -256,8 +256,7 @@ class SharePresenter constructor(
 
                 PLAYLIST_ITEM -> (data as List<PlaylistItemDomain>)
                     .let { playlistItemList ->
-                        val playlistItem: PlaylistItemDomain? =
-                            chooseItem(playlistItemList, currentPlaylistId.id)
+                        val playlistItem: PlaylistItemDomain? = chooseItem(playlistItemList, currentPlaylistId.id)
                         playlistItem
                             ?.let { it.playlistId!! to it.id }
                             ?: let { currentPlaylistId.id to (null as Long?) }
