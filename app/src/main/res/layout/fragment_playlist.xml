@@ -109,6 +109,23 @@
                             app:icon="@drawable/ic_playmode_shuffle"
                         />
 
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/playlist_launch_button"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/menu_launch"
+                            android:text="@string/menu_launch"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_launch_black"
+                        />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/playlist_share_button"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/menu_share"
+                            android:text="@string/menu_share"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_share_black"
+                        />
                     </LinearLayout>
                 </HorizontalScrollView>
 

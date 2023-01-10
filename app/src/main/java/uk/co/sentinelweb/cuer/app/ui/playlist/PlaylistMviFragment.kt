@@ -107,6 +107,8 @@ class PlaylistMviFragment : Fragment(),
     private val res: ResourceWrapper by inject()
     private val playlistHelpConfig: PlaylistHelpConfig by inject()
     private val prefsWrapper: MultiPlatformPreferencesWrapper by inject()
+    private val ytJavaApi: PlatformLaunchWrapper by inject()
+    private val shareWrapper: ShareWrapper by inject()
 
     private var _adapter: PlaylistAdapter? = null
     private val adapter: PlaylistAdapter
@@ -242,7 +244,14 @@ class PlaylistMviFragment : Fragment(),
         binding.playlistStarButton.setOnClickListener {
             //presenter.onStarPlaylist()
             viewProxy.dispatch(OnStar)
-
+        }
+        binding.playlistLaunchButton.setOnClickListener {
+            //presenter.onStarPlaylist()
+            viewProxy.dispatch(OnLaunch)
+        }
+        binding.playlistShareButton.setOnClickListener {
+            //presenter.onStarPlaylist()
+            viewProxy.dispatch(OnShare)
         }
         binding.playlistSwipe.setOnRefreshListener {
             //presenter.updatePlaylist()
@@ -267,28 +276,34 @@ class PlaylistMviFragment : Fragment(),
     inner class ViewProxy : BaseMviView<PlaylistMviContract.View.Model, Event>(),
         PlaylistMviContract.View {
 
-        override fun processLabel(label: Label) = when (label) {
-            is Label.Error -> showError(label.message)
-            is Label.Message -> showMessage(label.message)
-            Label.Loading -> showRefresh()
-            Label.Loaded -> hideRefresh()
-            is Label.ItemRemoved -> Unit
-            is Label.Navigate -> navigate(label.model)
-            is Label.ShowPlaylistsSelector -> showPlaylistSelector(label.config)
-            is Label.ShowUndo -> showUndo(label.message) {
-                viewProxy.dispatch(OnUndo(label.undoType))
-            }
+        @Suppress("IMPLICIT_CAST_TO_ANY")
+        override fun processLabel(label: Label) {
+            when (label) {
+                is Label.Error -> showError(label.message)
+                is Label.Message -> showMessage(label.message)
+                Label.Loading -> showRefresh()
+                Label.Loaded -> hideRefresh()
+                is Label.ItemRemoved -> Unit
+                is Label.Navigate -> navigate(label.model)
+                is Label.ShowPlaylistsSelector -> showPlaylistSelector(label.config)
+                is Label.ShowUndo -> showUndo(label.message) {
+                    viewProxy.dispatch(OnUndo(label.undoType))
+                }
 
-            is Label.HighlightPlayingItem -> highlightPlayingItem(label.pos)
-            is Label.ScrollToItem -> scrollToItem(label.pos)
-            is Label.UpdateModelItem -> updateItemModel(label.model) // todo do i need this?
-            is Label.Help -> showHelp()
-            is Label.ResetItemState -> resetItemsState()
-            is Label.ShowPlaylistsCreator -> showPlaylistCreateDialog()
-            is Label.AfterCommit ->
-                lifecycleScope.launch { label.afterCommit.onCommit(label.type, label.objects) }
-                    .let { Unit }
-        }.also { log.d(label.toString()) }
+                is Label.HighlightPlayingItem -> highlightPlayingItem(label.pos)
+                is Label.ScrollToItem -> scrollToItem(label.pos)
+                is Label.UpdateModelItem -> updateItemModel(label.model) // todo do i need this?
+                is Label.Help -> showHelp()
+                is Label.ResetItemState -> resetItemsState()
+                is Label.ShowPlaylistsCreator -> showPlaylistCreateDialog()
+                is Label.AfterCommit ->
+                    lifecycleScope.launch { label.afterCommit.onCommit(label.type, label.objects) }
+
+                is Label.Launch -> ytJavaApi.launchPlaylist(label.platformId)
+                is Label.Share -> shareWrapper.share(playlist = label.playlist)
+                is Label.ShareItem -> shareWrapper.share(media = label.playlistItem.media)
+            }.also { log.d(label.toString()) }
+        }
 
         //        override fun render(model: PlaylistMviContract.View.Model) {// todo diff, update item
 //            setModel(model, animate = false)
@@ -556,6 +571,8 @@ class PlaylistMviFragment : Fragment(),
         binding.playlistEditButton.isVisible = model.canEdit
         binding.playlistStarButton.isVisible = model.canEdit
         binding.playlistUpdateButton.isVisible = model.canUpdate
+        binding.playlistShareButton.isVisible = true
+        binding.playlistLaunchButton.isVisible = model.canUpdate
         binding.playlistAppbar.layoutParams.height = res.getDimensionPixelSize(
             if (model.canEdit || model.canPlay) R.dimen.app_bar_header_height_playlist
             else R.dimen.app_bar_header_height_playlist_no_actions

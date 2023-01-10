@@ -143,6 +143,7 @@ class PlaylistMviModelMapper constructor(
                 )
             } ?: run {
                 log.e("Couldn't get item: ${item.id} ${item.media.title}")
+                // fixme this might not be the best - should be in itemsIdMap
                 // throw IllegalStateException("Couldn't get item: ${item.id} ${item.media.title}")
                 null
             }

@@ -243,7 +243,9 @@ class PlaylistMviStoreFactory(
         }
 
         private fun launch(intent: Intent.Launch, state: State) {
-
+            state.playlist
+                ?.platformId
+                ?.also { publish(Label.Launch(it)) }
         }
 
         private fun moveItem(intent: Intent.Move, state: State) {
@@ -394,11 +396,13 @@ class PlaylistMviStoreFactory(
         }
 
         private fun share(intent: Intent.Share, state: State) {
-
+            state.playlist
+                ?.also { publish(Label.Share(it)) }
         }
 
         private fun shareItem(intent: Intent.ShareItem, state: State) {
-
+            state.playlistItemDomain(intent.item)
+                ?.also { publish(Label.ShareItem(it)) }
         }
 
         private fun showCards(intent: Intent.ShowCards, state: State) {
