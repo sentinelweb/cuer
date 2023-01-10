@@ -149,7 +149,7 @@ class PlaylistMviStoreFactory(
 
         override fun executeAction(action: Action, getState: () -> State) =
             when (action) {
-                Init -> refresh(getState())
+                Init -> Unit // refresh(getState())
             }
 
         override fun executeIntent(intent: Intent, getState: () -> State) =

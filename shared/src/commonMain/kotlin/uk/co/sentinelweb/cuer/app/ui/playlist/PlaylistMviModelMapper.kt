@@ -143,7 +143,8 @@ class PlaylistMviModelMapper constructor(
                 )
             } ?: run {
                 log.e("Couldn't get item: ${item.id} ${item.media.title}")
-                throw IllegalStateException("Couldn't get item: ${item.id} ${item.media.title}")
+                // throw IllegalStateException("Couldn't get item: ${item.id} ${item.media.title}")
+                null
             }
         }
     }
