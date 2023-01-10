@@ -161,11 +161,11 @@ class PlaylistMviModelMapper constructor(
         return playlistText
     }
 
-    fun mapSaveConfirmAlert(confirm: () -> Unit, cancel: () -> Unit): AlertDialogModel =
+    fun mapSaveConfirmAlert(): AlertDialogModel =
         AlertDialogModel(
             title = stringDecoder.getString(StringResource.dialog_title_save_check),
             message = stringDecoder.getString(StringResource.dialog_message_save_item_check),
-            confirm = AlertDialogModel.Button(StringResource.dialog_button_save, confirm),
-            cancel = AlertDialogModel.Button(StringResource.dialog_button_dont_save, cancel),
+            confirm = AlertDialogModel.Button(StringResource.dialog_button_save) {},
+            cancel = AlertDialogModel.Button(StringResource.dialog_button_dont_save) {},
         )
 }

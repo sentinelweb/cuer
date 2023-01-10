@@ -79,6 +79,7 @@ class PlaylistMviController constructor(
             Event.OnLaunch -> Intent.Launch
             Event.OnShare -> Intent.Share
             Event.OnClearMove -> Intent.CommitMove
+            Event.OnCheckToSaveConfirm -> Intent.CheckToSaveConfirm
         }
     }
 

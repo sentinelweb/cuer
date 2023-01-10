@@ -297,11 +297,21 @@ class PlaylistMviFragment : Fragment(),
                 is Label.ResetItemState -> resetItemsState()
                 is Label.ShowPlaylistsCreator -> showPlaylistCreateDialog()
                 is Label.AfterCommit ->
-                    lifecycleScope.launch { label.afterCommit.onCommit(label.type, label.objects) }
+                    label.afterCommit?.also {
+                        lifecycleScope.launch { it.onCommit(label.type, label.objects) }
+                    }
 
                 is Label.Launch -> ytJavaApi.launchPlaylist(label.platformId)
                 is Label.Share -> shareWrapper.share(playlist = label.playlist)
                 is Label.ShareItem -> shareWrapper.share(media = label.playlistItem.media)
+                is Label.CheckSaveShowDialog ->
+                    showAlertDialog(
+                        label.dialogModel.copy(
+                            confirm = label.dialogModel.confirm.copy(
+                                action = { viewProxy.dispatch(OnCheckToSaveConfirm) }
+                            )
+                        )
+                    )
             }.also { log.d(label.toString()) }
         }
 
@@ -489,9 +499,9 @@ class PlaylistMviFragment : Fragment(),
             PlaylistContract.makeNav(plId, plItemId, playNow, source, addPlaylistParent)
         } else null
     }
-    // endregion
+// endregion
 
-    // region PlaylistContract.View
+// region PlaylistContract.View
 //    private fun setModel(model: PlaylistMviContract.View.Model, animate: Boolean) {
 //        commitHost.isReady(true)
 //        setHeaderModel(model.header)
@@ -741,7 +751,7 @@ class PlaylistMviFragment : Fragment(),
     private fun exit() {
         findNavController().popBackStack()
     }
-    //endregion
+//endregion
 
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
@@ -756,7 +766,7 @@ class PlaylistMviFragment : Fragment(),
         viewProxy.dispatch(OnClearMove)
 //        presenter.commitMove()
     }
-    //endregion
+//endregion
 
     // region ItemContract.Interactions
     override fun onItemIconClick(item: Item) {
@@ -816,14 +826,14 @@ class PlaylistMviFragment : Fragment(),
         //presenter.onItemGotoPlaylist(item)
         viewProxy.dispatch(OnGotoPlaylist(item))
     }
-    // endregion
+// endregion
 
     // region ShareContract.Committer
     override suspend fun commit(afterCommit: ShareCommitter.AfterCommit) {
         //presenter.commitPlaylist(onCommit)
         viewProxy.dispatch(Event.OnCommit(afterCommit))// tod fire call back somehow
     }
-    // endregion
+// endregion
 
     companion object {
         private const val CREATE_PLAYLIST_TAG = "pe_dialog"

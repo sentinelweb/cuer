@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.resources.Icon
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract.ItemPassView
@@ -65,6 +66,8 @@ class PlaylistMviContract {
                 Intent()
 
             data class UpdatesMedia(val op: Operation, val source: Source, val media: MediaDomain) : Intent()
+
+            object CheckToSaveConfirm : Intent()
         }
 
         sealed class Label {
@@ -85,12 +88,13 @@ class PlaylistMviContract {
             data class AfterCommit(
                 val type: ObjectTypeDomain,
                 val objects: List<Domain>,
-                val afterCommit: ShareCommitter.AfterCommit
+                val afterCommit: ShareCommitter.AfterCommit?
             ) : Label()
 
             data class Launch(val platformId: String) : Label()
-            class Share(val playlist: PlaylistDomain) : Label()
-            class ShareItem(val playlistItem: PlaylistItemDomain) : Label()
+            data class Share(val playlist: PlaylistDomain) : Label()
+            data class ShareItem(val playlistItem: PlaylistItemDomain) : Label()
+            data class CheckSaveShowDialog(val dialogModel: AlertDialogModel) : Label()
         }
 
         data class State(
@@ -189,6 +193,7 @@ class PlaylistMviContract {
             data class OnShowItem(val item: Item) : Event()
             data class OnRelatedItem(val item: Item) : Event()
             data class OnGotoPlaylist(val item: Item) : Event()
+            object OnCheckToSaveConfirm : Event()
 //            data class OnShare(val item: PlaylistsItemMviContract.Model) : Event()
 //            data class OnMerge(val item: PlaylistsItemMviContract.Model) : Event()
 //            data class OnEdit(val item: PlaylistsItemMviContract.Model, val view: PlaylistsItemMviContract.ItemPassView? = null) : Event()

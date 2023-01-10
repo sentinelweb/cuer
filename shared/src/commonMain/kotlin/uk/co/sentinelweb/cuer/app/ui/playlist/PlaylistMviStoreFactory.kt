@@ -157,6 +157,7 @@ class PlaylistMviStoreFactory(
                 is Intent.Refresh -> refresh(getState())
                 is Intent.SetPlaylistData -> setPlaylistData(intent, getState)
                 is Intent.CheckToSave -> checkToSave(intent, getState())
+                is Intent.CheckToSaveConfirm -> checkToSaveConfirm(intent, getState)
                 is Intent.Commit -> commit(intent, getState)
                 is Intent.DeleteItem -> delete(intent, getState())
                 is Intent.Edit -> edit(intent, getState())
@@ -188,10 +189,17 @@ class PlaylistMviStoreFactory(
             }
 
         private fun checkToSave(intent: Intent.CheckToSave, state: State) {
-
+            if ((state.playlist?.id ?: 0) <= 0 || state.isModified) {
+                publish(Label.CheckSaveShowDialog(modelMapper.mapSaveConfirmAlert()))
+            } else publish(Label.Navigate(NavigationModel.DONE))
         }
 
-        private fun commit(intent: Intent.Commit, getState: () -> State) {
+        private fun checkToSaveConfirm(intent: Intent.CheckToSaveConfirm, getState: () -> State) {
+            commit(null, getState)
+            publish(Label.Navigate(NavigationModel.DONE))
+        }
+
+        private fun commit(intent: Intent.Commit?, getState: () -> State) {
             val state = getState()
             if (state.playlistIdentifier.source == OrchestratorContract.Source.MEMORY) {
                 log.i("commitPlaylist: id:${state.playlistIdentifier}")
@@ -207,11 +215,11 @@ class PlaylistMviStoreFactory(
                             val newIdentifier =
                                 it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")
                             dispatch(Result.SetPlaylist(playlist = it, playlistIdentifier = newIdentifier))
-                            executeRefresh(state = getState())
+                            executeRefresh(state = getState()) // hmmm will this work after dispatch
                         }
                         .also { updateView(getState()) }
                         //.also { onCommit?.onCommit(ObjectTypeDomain.PLAYLIST, listOf(it)) }
-                        .also { publish(Label.AfterCommit(ObjectTypeDomain.PLAYLIST, listOf(it), intent.afterCommit)) }
+                        .also { publish(Label.AfterCommit(ObjectTypeDomain.PLAYLIST, listOf(it), intent?.afterCommit)) }
                 }
             } else {
                 throw IllegalStateException("Can't save non Memory playlist")
@@ -538,7 +546,7 @@ class PlaylistMviStoreFactory(
 
         private fun updateView(state: State, animate: Boolean = true) {
             state.playlist
-                .takeIf { coroutines.mainScopeActive }
+                ?.takeIf { coroutines.mainScopeActive }
                 ?.let {
                     modelMapper.map(
                         domain = it,
