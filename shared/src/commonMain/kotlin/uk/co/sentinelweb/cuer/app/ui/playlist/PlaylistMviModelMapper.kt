@@ -67,6 +67,7 @@ class PlaylistMviModelMapper constructor(
             ),
             items = listOf(),
             isCards = false,
+            identifier = null
         )
 
     fun map(
@@ -115,7 +116,8 @@ class PlaylistMviModelMapper constructor(
                 /*&& !view.isHeadless*/ // fixme inject headless arg to mvi in bootstrap
             ),
             items = items,
-            isCards = multiPlatformPreferences.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true)
+            isCards = multiPlatformPreferences.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true),
+            identifier = id
         )
     }
 

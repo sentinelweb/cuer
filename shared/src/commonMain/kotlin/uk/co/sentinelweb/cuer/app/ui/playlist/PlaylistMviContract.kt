@@ -66,6 +66,8 @@ class PlaylistMviContract {
                 Intent()
 
             data class UpdatesMedia(val op: Operation, val source: Source, val media: MediaDomain) : Intent()
+            data class QueueItemFlow(val item: PlaylistItemDomain?) : Intent()
+            data class QueuePlaylistFlow(val item: PlaylistDomain?) : Intent()
 
             object CheckToSaveConfirm : Intent()
         }
@@ -122,7 +124,8 @@ class PlaylistMviContract {
         data class Model(
             val header: Header,
             val items: List<Item>?,
-            var isCards: Boolean,
+            val isCards: Boolean,
+            val identifier: OrchestratorContract.Identifier<*>?,
         )
 
         data class Header(

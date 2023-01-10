@@ -62,6 +62,7 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
@@ -109,6 +110,8 @@ class PlaylistMviFragment : Fragment(),
     private val prefsWrapper: MultiPlatformPreferencesWrapper by inject()
     private val ytJavaApi: PlatformLaunchWrapper by inject()
     private val shareWrapper: ShareWrapper by inject()
+    private val queueCastConnectionListener: QueueCastConnectionListener by inject()
+    private val chromeCastWrapper: ChromeCastWrapper by inject()
 
     private var _adapter: PlaylistAdapter? = null
     private val adapter: PlaylistAdapter
@@ -235,7 +238,12 @@ class PlaylistMviFragment : Fragment(),
         }
         binding.playlistFabPlay.setOnClickListener {
 //            presenter.onPlayPlaylist()
-            viewProxy.dispatch(OnPlay)
+            if (queueCastConnectionListener.isPlaylistPlaying()) {
+                chromeCastWrapper.killCurrentSession()
+            } else {
+                viewProxy.dispatch(OnPlay)
+            }
+
         }
         binding.playlistEditButton.setOnClickListener {
             //presenter.onEdit()
@@ -264,7 +272,7 @@ class PlaylistMviFragment : Fragment(),
         }
         setupRecyclerView()
         imageUrlArg?.also { setImage(it) }
-
+        queueCastConnectionListener.callback = { setCastState(it) }
         viewProxy = ViewProxy()
         controller.onViewCreated(listOf(viewProxy), viewLifecycleOwner.essentyLifecycle())
     }
@@ -334,6 +342,9 @@ class PlaylistMviFragment : Fragment(),
                         else R.color.actionbar_icon_expanded_csl
                     )
                     log.d("is cards: $it")
+                })
+                diff(get = PlaylistMviContract.View.Model::identifier, set = {
+                    it?.also { queueCastConnectionListener.playListId = it }
                 })
                 diff(get = PlaylistMviContract.View.Model::items, set = {
                     val items = it ?: listOf()
@@ -447,6 +458,8 @@ class PlaylistMviFragment : Fragment(),
                 //viewProxy.dispatch(OnSetPlaylistData())
                 controller.onRefresh()
             }
+
+        queueCastConnectionListener.listenForState()
         //presenter.onResume()
         //viewProxy.dispatch(OnResume)
     }
@@ -455,6 +468,7 @@ class PlaylistMviFragment : Fragment(),
         super.onPause()
         //presenter.onPause()
         viewProxy.dispatch(OnPause)
+        queueCastConnectionListener.unlistenForState()
     }
 
     override fun onStop() {
@@ -833,7 +847,7 @@ class PlaylistMviFragment : Fragment(),
         //presenter.commitPlaylist(onCommit)
         viewProxy.dispatch(Event.OnCommit(afterCommit))// tod fire call back somehow
     }
-// endregion
+    // endregion
 
     companion object {
         private const val CREATE_PLAYLIST_TAG = "pe_dialog"
@@ -850,6 +864,7 @@ class PlaylistMviFragment : Fragment(),
                         playlistOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         mediaOrchestrator = get(),
+                        queue = get(),
                     )
                 }
                 scoped {
@@ -923,6 +938,7 @@ class PlaylistMviFragment : Fragment(),
                     )
                 }
             }
+            factory { QueueCastConnectionListener(queue = get(), ytCastContextHolder = get()) }
         }
     }
 }

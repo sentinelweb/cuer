@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.View.Event
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -25,6 +26,7 @@ class PlaylistMviController constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
+    private val queue: QueueMediatorContract.Producer,
     lifecycle: Lifecycle?,
 ) {
     private var binder: Binder? = null
@@ -102,13 +104,11 @@ class PlaylistMviController constructor(
         }
         playlistOrchestrator.updates.mapNotNull { Intent.UpdatesPlaylist(it.first, it.second, it.third) } bindTo store
         playlistItemOrchestrator.updates.mapNotNull {
-            Intent.UpdatesPlaylistItem(
-                it.first,
-                it.second,
-                it.third
-            )
+            Intent.UpdatesPlaylistItem(it.first, it.second, it.third)
         } bindTo store
         mediaOrchestrator.updates.mapNotNull { Intent.UpdatesMedia(it.first, it.second, it.third) } bindTo store
+        queue.currentItemFlow.mapNotNull { Intent.QueueItemFlow(it) } bindTo store
+        queue.currentPlaylistFlow.mapNotNull { Intent.QueuePlaylistFlow(it) } bindTo store
     }
 
     fun onViewDestroyed() {

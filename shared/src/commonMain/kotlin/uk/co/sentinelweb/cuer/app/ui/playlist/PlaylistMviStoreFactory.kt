@@ -184,7 +184,27 @@ class PlaylistMviStoreFactory(
                 is Intent.UpdatesMedia -> flowUpdatesMedia(intent, getState())
                 is Intent.UpdatesPlaylist -> flowUpdatesPlaylist(intent, getState())
                 is Intent.UpdatesPlaylistItem -> flowUpdatesPlaylistItem(intent, getState())
+                is Intent.QueueItemFlow -> flowQueueItem(intent, getState())
+                is Intent.QueuePlaylistFlow -> flowQueuePlaylist(intent, getState())
             }
+
+        private fun flowQueuePlaylist(intent: Intent.QueuePlaylistFlow, state: State) {
+//            .filter { isQueuedPlaylist }
+//                .onEach { log.d("q.playlist change id=${it.id} index=${it.currentIndex}") }
+//                .onEach { view.highlightPlayingItem(it.currentIndex) }
+//                .launchIn(coroutines.mainScope)
+            if (state.playlistIdentifier == queue.playlistId) {
+                intent.item?.currentIndex
+                    ?.also { publish(Label.HighlightPlayingItem(it)) }
+            }
+        }
+
+        private fun flowQueueItem(intent: Intent.QueueItemFlow, state: State) {
+            state.playlist?.items
+                ?.indexOfFirst { intent.item?.id == it.id }
+                ?.also { publish(Label.HighlightPlayingItem(it)) }
+//                ?.also { view.highlightPlayingItem(it) }
+        }
 
         private fun checkToSave(intent: Intent.CheckToSave, state: State) {
             if ((state.playlist?.id ?: 0) <= 0 || state.isModified) {
