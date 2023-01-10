@@ -40,10 +40,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
-import uk.co.sentinelweb.cuer.domain.ext.buildLookup
-import uk.co.sentinelweb.cuer.domain.ext.buildTree
-import uk.co.sentinelweb.cuer.domain.ext.matchesHeader
-import uk.co.sentinelweb.cuer.domain.ext.replaceHeader
+import uk.co.sentinelweb.cuer.domain.ext.*
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 class PlaylistMviStoreFactory(
@@ -384,7 +381,13 @@ class PlaylistMviStoreFactory(
         }
 
         private fun play(intent: Intent.Play, state: State) {
-
+//            if (isPlaylistPlaying()) {
+//                chromeCastWrapper.killCurrentSession()
+//            } else if (!canPlayPlaylist()) {
+//                view.showError("Please add the playlist first")
+//            } else {
+            playUseCase.playLogic(state.playlist?.currentItemOrStart(), state.playlist, false)
+//            }
         }
 
         private fun playItem(intent: Intent.PlayItem, state: State) {
