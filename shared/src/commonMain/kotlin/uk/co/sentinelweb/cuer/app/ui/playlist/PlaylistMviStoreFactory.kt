@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource.playlist_error_updating
@@ -243,7 +244,18 @@ class PlaylistMviStoreFactory(
         }
 
         private fun gotoPlaylist(intent: Intent.GotoPlaylist, state: State) {
-
+            state.playlistItemDomain(intent.item)
+                ?.playlistId
+                ?.let {
+                    publish(
+                        Label.Navigate(
+                            NavigationModel(
+                                PLAYLIST,
+                                mapOf(Param.PLAYLIST_ID to it, Param.PLAY_NOW to false, Param.SOURCE to LOCAL)
+                            )
+                        )
+                    )
+                }
         }
 
         private fun help(intent: Intent.Help, state: State) {
