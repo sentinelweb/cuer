@@ -12,10 +12,14 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
@@ -69,6 +73,7 @@ class PlaylistMviStoreFactory(
     private val strings: StringDecoder,
     private val timeProvider: TimeProvider,
     private val addPlaylistUsecase: AddPlaylistUsecase,
+    private val multiPrefs: MultiPlatformPreferencesWrapper,
 ) {
     init {
         log.tag(this)
@@ -222,7 +227,7 @@ class PlaylistMviStoreFactory(
 
         private fun commit(intent: Intent.Commit?, getState: () -> State) {
             val state = getState()
-            if (state.playlistIdentifier.source == OrchestratorContract.Source.MEMORY) {
+            if (state.playlistIdentifier.source == MEMORY) {
                 log.i("commitPlaylist: id:${state.playlistIdentifier}")
                 scope.launch {
                     addPlaylistUsecase
@@ -255,7 +260,7 @@ class PlaylistMviStoreFactory(
                         Label.Navigate(
                             NavigationModel(
                                 Target.PLAYLIST_EDIT,
-                                mapOf(Param.SOURCE to it.source, Param.PLAYLIST_ID to it.id)
+                                mapOf(SOURCE to it.source, PLAYLIST_ID to it.id)
                             ),
                             null
                         )
@@ -271,7 +276,7 @@ class PlaylistMviStoreFactory(
                         Label.Navigate(
                             NavigationModel(
                                 PLAYLIST,
-                                mapOf(Param.PLAYLIST_ID to it, Param.PLAY_NOW to false, Param.SOURCE to LOCAL)
+                                mapOf(PLAYLIST_ID to it, Param.PLAY_NOW to false, SOURCE to LOCAL)
                             )
                         )
                     )
@@ -447,7 +452,19 @@ class PlaylistMviStoreFactory(
         }
 
         private fun relatedItems(intent: Intent.RelatedItem, state: State) {
-
+            state.playlistItemDomain(intent.item)
+                ?.also { item ->
+                    multiPrefs.lastRemoteSearch = SearchRemoteDomain(
+                        relatedToMediaPlatformId = item.media.platformId,
+                        relatedToMediaTitle = item.media.title
+                    )
+                    multiPrefs.lastSearchType = SearchTypeDomain.REMOTE
+                    publish(
+                        Label.Navigate(
+                            NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to YoutubeSearch.id, SOURCE to MEMORY))
+                        )
+                    )
+                }
         }
 
         private fun resume(intent: Intent.Resume, state: State) {
@@ -808,7 +825,8 @@ class PlaylistMviStoreFactory(
         }
 
         private fun refresh(state: State) {
-            log.e("refresh:" + state.playlistIdentifier.toString(), Exception("debug trace"))
+            //log.e("refresh:" + state.playlistIdentifier.toString(), Exception("debug trace"))
+            log.d("refresh:" + state.playlistIdentifier.toString())
             scope.launch { executeRefresh(state = state) }
         }
 
@@ -816,7 +834,8 @@ class PlaylistMviStoreFactory(
             //view.showRefresh()
             publish(Label.Loading)
             try {
-                log.e("executeRefresh:" + state.playlistIdentifier.toString(), Exception("debug trace"))
+                //log.e("executeRefresh:" + state.playlistIdentifier.toString(), Exception("debug trace"))
+                log.d("executeRefresh:" + state.playlistIdentifier.toString())
                 val id = state.playlistIdentifier
                     .takeIf { it != OrchestratorContract.NO_PLAYLIST }
                     ?: prefsWrapper.currentPlayingPlaylistId

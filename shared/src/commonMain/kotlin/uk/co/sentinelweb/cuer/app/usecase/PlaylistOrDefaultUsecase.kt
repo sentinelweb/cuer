@@ -24,7 +24,7 @@ class PlaylistOrDefaultUsecase constructor(
     ): Pair<PlaylistDomain, OrchestratorContract.Source>? =
         when (options.source) {
             OrchestratorContract.Source.MEMORY ->
-                playlistMemoryRepository.load(playlistId!!, options) // TODO FALLBACK OR ERROR?
+                playlistMemoryRepository.load(playlistId!!, options) // todo FALLBACK OR ERROR?
                     ?.apply { delay(20) } // fixme: menu items don't load in time sine memory is sequential
                     ?.let { it to OrchestratorContract.Source.MEMORY }
                     ?: getPlaylistOrDefault(null, options.flat)

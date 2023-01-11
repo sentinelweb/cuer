@@ -2,9 +2,11 @@ package uk.co.sentinelweb.cuer.core.mappers
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 // todo remove and make ktor converters
-expect class TimeStampMapper {
+expect class TimeStampMapper(log: LogWrapper) {
+    val log: LogWrapper
 
     fun parseTimestamp(dateString: String): LocalDateTime?
 

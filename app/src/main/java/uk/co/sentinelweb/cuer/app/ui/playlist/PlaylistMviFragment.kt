@@ -598,7 +598,7 @@ class PlaylistMviFragment : Fragment(),
         binding.playlistShareButton.isVisible = true
         binding.playlistLaunchButton.isVisible = model.canUpdate
         binding.playlistAppbar.layoutParams.height = res.getDimensionPixelSize(
-            if (model.canEdit || model.canPlay) R.dimen.app_bar_header_height_playlist
+            if (model.canEdit || model.canPlay || model.canUpdate || true) R.dimen.app_bar_header_height_playlist
             else R.dimen.app_bar_header_height_playlist_no_actions
         )
         appBarOffsetScrollRange = -1
@@ -894,7 +894,8 @@ class PlaylistMviFragment : Fragment(),
                         playUseCase = get(),
                         strings = get(),
                         timeProvider = get(),
-                        addPlaylistUsecase = get()
+                        addPlaylistUsecase = get(),
+                        multiPrefs = get()
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }

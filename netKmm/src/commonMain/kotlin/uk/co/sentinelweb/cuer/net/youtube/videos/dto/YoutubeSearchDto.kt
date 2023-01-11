@@ -8,7 +8,7 @@ internal data class YoutubeSearchDto constructor(
     val items: List<SearchResultDto>,
     val nextPageToken: String? = null,
     val prevPageToken: String? = null,
-    val pageInfo: PageInfoDto
+    val pageInfo: PageInfoDto? = null
 ) {
     @Serializable
     internal data class SearchResultDto constructor(
