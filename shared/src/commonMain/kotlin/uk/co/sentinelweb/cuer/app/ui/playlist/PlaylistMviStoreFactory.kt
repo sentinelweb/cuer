@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.UndoType.ItemDelete
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.UndoType.ItemMove
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviStoreFactory.Action.Init
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviStoreFactory.Result.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.usecase.AddPlaylistUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
@@ -100,6 +101,7 @@ class PlaylistMviStoreFactory(
         data class SetModified(val modified: Boolean = true) : Result()
         data class SetMoveState(val from: Int?, val to: Int?) : Result()
         data class SetCards(val isCards: Boolean) : Result()
+        data class PlayModeChange(val mode: PlaylistDomain.PlaylistModeDomain) : Result()
     }
 
     private sealed class Action {
@@ -109,7 +111,7 @@ class PlaylistMviStoreFactory(
     private object ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(msg: Result): State =
             when (msg) {
-                is Result.Load -> copy(
+                is Load -> copy(
                     playlistIdentifier = msg.playlistIdentifier,
                     playlist = msg.playlist,
                     focusIndex = msg.focusIndex,
@@ -118,19 +120,20 @@ class PlaylistMviStoreFactory(
                     itemsIdMap = msg.itemsIdMap,
                 )
 
-                is Result.SetDeletedItem -> copy(deletedPlaylistItem = msg.item)
-                is Result.SetPlaylist -> copy(
+                is SetDeletedItem -> copy(deletedPlaylistItem = msg.item)
+                is SetPlaylist -> copy(
                     playlist = msg.playlist,
                     playlistIdentifier = msg.playlistIdentifier ?: playlistIdentifier
                 )
 
-                is Result.IdUpdate -> copy(itemsIdMap = itemsIdMap.apply { put(msg.modelId, msg.changedItem) })
-                is Result.SelectedPlaylistItem -> copy(selectedPlaylistItem = msg.item)
-                is Result.MovedPlaylistItem -> copy(movedPlaylistItem = msg.item)
-                is Result.SetModified -> copy(isModified = msg.modified)
-                is Result.SetMoveState -> copy(dragFrom = msg.from, dragTo = msg.to)
-                is Result.SetCards -> copy(isCards = msg.isCards)
-                is Result.SetPlaylistId -> copy(playlistIdentifier = msg.playlistIdentifier)
+                is IdUpdate -> copy(itemsIdMap = itemsIdMap.apply { put(msg.modelId, msg.changedItem) })
+                is SelectedPlaylistItem -> copy(selectedPlaylistItem = msg.item)
+                is MovedPlaylistItem -> copy(movedPlaylistItem = msg.item)
+                is SetModified -> copy(isModified = msg.modified)
+                is SetMoveState -> copy(dragFrom = msg.from, dragTo = msg.to)
+                is SetCards -> copy(isCards = msg.isCards)
+                is SetPlaylistId -> copy(playlistIdentifier = msg.playlistIdentifier)
+                is PlayModeChange -> copy(playlist = playlist?.copy(mode = msg.mode))
                 //else -> copy()
             }
     }
@@ -286,7 +289,7 @@ class PlaylistMviStoreFactory(
         }
 
         private fun moveItem(intent: Intent.Move, state: State) {
-            dispatch(Result.SetMoveState(state.dragFrom ?: intent.fromPosition, intent.toPosition))
+            dispatch(SetMoveState(state.dragFrom ?: intent.fromPosition, intent.toPosition))
         }
 
         private fun performMove(intent: Intent.MoveSwipe, getState: () -> State) {
@@ -298,7 +301,7 @@ class PlaylistMviStoreFactory(
                             publish(Message(strings.getString(StringResource.playlist_error_please_add)))
                             updateView(state = thisState)
                         } else {
-                            dispatch(Result.SelectedPlaylistItem(itemDomain))
+                            dispatch(SelectedPlaylistItem(itemDomain))
                             publish(
                                 Label.ShowPlaylistsSelector(
                                     PlaylistsMviDialogContract.Config(
@@ -342,7 +345,7 @@ class PlaylistMviStoreFactory(
                                 .filter { it.playlistId == playlist.id }.isEmpty()
                         }
                         ?.copy(playlistId = playlist.id!!)
-                        ?.apply { dispatch(Result.MovedPlaylistItem(this)) }
+                        ?.apply { dispatch(MovedPlaylistItem(this)) }
                         ?.copy(order = timeProvider.currentTimeMillis())
                         ?.apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
                         ?.apply {
@@ -356,8 +359,8 @@ class PlaylistMviStoreFactory(
                                 )
                             )
                         }
-                        ?.also { dispatch(Result.SelectedPlaylistItem(null)) }
-                        ?.also { dispatch(Result.SetModified()) }
+                        ?.also { dispatch(SelectedPlaylistItem(null)) }
+                        ?.also { dispatch(SetModified()) }
                         ?: apply {
                             publish(Error(strings.getString(StringResource.playlist_error_moveitem_already_exists)))
                         }
@@ -383,8 +386,8 @@ class PlaylistMviStoreFactory(
                                 // updates order
                                 ?.let { playlistItemOrchestrator.save(it.first, it.second) }
                                 // fixme this works where id is there, for generated ids (share) need to find previous item in caches qnd reuse id
-                                ?.also { dispatch(Result.IdUpdate(it.id!!, it)) }
-                                ?.also { dispatch(Result.SetPlaylist(playlistModified)) }
+                                ?.also { dispatch(IdUpdate(it.id!!, it)) }
+                                ?.also { dispatch(SetPlaylist(playlistModified)) }
                         }
                     }
             } else {
@@ -393,7 +396,7 @@ class PlaylistMviStoreFactory(
                     refresh(state = state)
                 }
             }
-            dispatch(Result.SetMoveState(null, null))
+            dispatch(SetMoveState(null, null))
         }
 
         private fun pause(intent: Intent.Pause, state: State) {
@@ -427,7 +430,20 @@ class PlaylistMviStoreFactory(
         }
 
         private fun playModeChange(intent: Intent.PlayModeChange, state: State) {
-
+            val mode = when (state.playlist?.mode) {
+                PlaylistDomain.PlaylistModeDomain.SINGLE -> PlaylistDomain.PlaylistModeDomain.SHUFFLE
+                PlaylistDomain.PlaylistModeDomain.SHUFFLE -> PlaylistDomain.PlaylistModeDomain.LOOP
+                PlaylistDomain.PlaylistModeDomain.LOOP -> PlaylistDomain.PlaylistModeDomain.SINGLE
+                else -> PlaylistDomain.PlaylistModeDomain.SINGLE
+            }
+            coroutines.mainScope.launch {
+                state.playlist
+                    ?.copy(mode = mode)
+                    ?.apply { playlistOrchestrator.save(this, LOCAL.flatOptions()) }
+                dispatch(PlayModeChange(mode)) // todo consider general header refresh from db
+            }
+            //    commitHeaderChange(this)
+            //}
         }
 
         private fun relatedItems(intent: Intent.RelatedItem, state: State) {
@@ -451,7 +467,7 @@ class PlaylistMviStoreFactory(
         private fun showCards(intent: Intent.ShowCards, state: State) {
             prefsWrapper.putBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, intent.isCards)
             coroutines.mainScope.launch {
-                dispatch(Result.SetCards(isCards = intent.isCards))
+                dispatch(SetCards(isCards = intent.isCards))
             }
         }
 
@@ -518,14 +534,14 @@ class PlaylistMviStoreFactory(
                         if (!intent.plist.matchesHeader(state.playlist)) {
                             state.playlist
                                 ?.replaceHeader(intent.plist)
-                                ?.apply { dispatch(Result.SetPlaylist(this)) }
+                                ?.apply { dispatch(SetPlaylist(this)) }
                         }
 
                     FULL ->
                         if (intent.plist != state.playlist) {
 //                            state.playlist = intent.plist
 //                            updateView()
-                            dispatch(Result.SetPlaylist(intent.plist))
+                            dispatch(SetPlaylist(intent.plist))
                         }
 
                     DELETE -> {
@@ -653,8 +669,8 @@ class PlaylistMviStoreFactory(
                 showOverflow = true,
                 deleteResources = newPlaylist?.id?.let { appPlaylistInteractors[it] }?.customResources?.customDelete
             )
-            dispatch(Result.SetPlaylist(newPlaylist))
-            dispatch(Result.IdUpdate(modelId, changedItem))
+            dispatch(SetPlaylist(newPlaylist))
+            dispatch(IdUpdate(modelId, changedItem))
 
             // todo check if this is needed
             mappedItem
@@ -672,7 +688,7 @@ class PlaylistMviStoreFactory(
                     ?.takeIf { it.id != null }
                     ?.also { log.d("found item ${it.id}") }
                     ?.let { deleteItem ->
-                        dispatch(Result.SetDeletedItem(deleteItem))
+                        dispatch(SetDeletedItem(deleteItem))
                         val appPlaylistInteractor = appPlaylistInteractors[state.playlist?.id]
                         val action = appPlaylistInteractor?.customResources?.customDelete?.label ?: "Deleted"
                         if (state.playlist?.type != PlaylistDomain.PlaylistTypeDomain.APP
@@ -697,7 +713,7 @@ class PlaylistMviStoreFactory(
                     state.deletedPlaylistItem?.let { itemDomain ->
                         scope.launch {
                             playlistItemOrchestrator.save(itemDomain, LOCAL.deepOptions())
-                            dispatch(Result.SetDeletedItem(null))
+                            dispatch(SetDeletedItem(null))
                             executeRefresh(state = state)
                         }
                     }
@@ -711,7 +727,7 @@ class PlaylistMviStoreFactory(
                                     it,
                                     state.playlistIdentifier.flatOptions()
                                 )
-                                dispatch(Result.MovedPlaylistItem(null))
+                                dispatch(MovedPlaylistItem(null))
                             }
                         }
             }
@@ -761,7 +777,7 @@ class PlaylistMviStoreFactory(
                     ?.toIdentifier(intent.source)
                     ?.apply {
                         //state.playlistIdentifier = this
-                        dispatch(Result.SetPlaylistId(this))
+                        dispatch(SetPlaylistId(this))
                     }
                     ?.apply { executeRefresh(scrollToCurrent = notLoaded, state = getState()) }
                     ?.apply {
@@ -775,12 +791,12 @@ class PlaylistMviStoreFactory(
                     ?: run {
                         if (dbInit.isInitialized()) {
                             //state.playlistIdentifier = prefsWrapper.lastViewedPlaylistId
-                            dispatch(Result.SetPlaylistId(prefsWrapper.lastViewedPlaylistId))
+                            dispatch(SetPlaylistId(prefsWrapper.lastViewedPlaylistId))
                             executeRefresh(scrollToCurrent = notLoaded, state = getState())
                         } else {
                             dbInit.addListener { b: Boolean ->
                                 if (b) {
-                                    dispatch(Result.SetPlaylistId(3L.toIdentifier(LOCAL)))
+                                    dispatch(SetPlaylistId(3L.toIdentifier(LOCAL)))
                                     //state.playlistIdentifier = 3L.toIdentifier(LOCAL) // philosophy
                                     //updatePlaylist()
                                     refresh(state = getState())
@@ -810,7 +826,7 @@ class PlaylistMviStoreFactory(
                     .loadList(AllFilter, LOCAL.flatOptions())
                     .buildTree()
                 dispatch(
-                    Result.Load(
+                    Load(
                         playlist = playlistOrDefault?.first,
                         playlistIdentifier = playlistOrDefault?.first
                             ?.id?.toIdentifier(playlistOrDefault.second)
