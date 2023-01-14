@@ -99,6 +99,13 @@ class PlaylistMviContract {
             data class LaunchChannel(val platformId: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) :
                 Label()
 
+            data class ShowItem(
+                val modelId: Long,
+                val item: PlaylistItemDomain,
+                val source: OrchestratorContract.Source
+            ) :
+                Label()
+
             data class Share(val playlist: PlaylistDomain) : Label()
             data class ShareItem(val playlistItem: PlaylistItemDomain) : Label()
             data class CheckSaveShowDialog(val dialogModel: AlertDialogModel) : Label()

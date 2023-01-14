@@ -105,6 +105,7 @@ class PlaylistMviStoreFactory(
         data class SetMoveState(val from: Int?, val to: Int?) : Result()
         data class SetCards(val isCards: Boolean) : Result()
         data class PlayModeChange(val mode: PlaylistDomain.PlaylistModeDomain) : Result()
+        data class SetFocusIndex(val index: Int) : Result()
     }
 
     private sealed class Action {
@@ -137,6 +138,7 @@ class PlaylistMviStoreFactory(
                 is SetCards -> copy(isCards = msg.isCards)
                 is SetPlaylistId -> copy(playlistIdentifier = msg.playlistIdentifier)
                 is PlayModeChange -> copy(playlist = playlist?.copy(mode = msg.mode))
+                is SetFocusIndex -> copy(focusIndex = msg.index)
                 //else -> copy()
             }
     }
@@ -148,6 +150,7 @@ class PlaylistMviStoreFactory(
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private inner class ExecutorImpl
         : CoroutineExecutor<Intent, Action, State, Result, Label>() {
 
@@ -493,7 +496,20 @@ class PlaylistMviStoreFactory(
         }
 
         private fun showItem(intent: Intent.ShowItem, state: State) {
-
+            state.playlistItemDomain(intent.item)
+                ?.apply {
+//                    interactions
+//                        ?.onView(this)
+//                        ?: run {
+                    // state.focusIndex = itemModel.index
+                    dispatch(SetFocusIndex(intent.item.index))
+                    val source =
+                        if (state.playlist?.type != PlaylistDomain.PlaylistTypeDomain.APP) state.playlistIdentifier.source
+                        else LOCAL
+                    //view.showItemDescription(itemModel.id, this, source)
+                    publish(Label.ShowItem(modelId = intent.item.id, item = this, source = source))
+//                        }
+                }
         }
 
         private fun star(intent: Intent.Star, state: State) {
@@ -830,12 +846,13 @@ class PlaylistMviStoreFactory(
             scope.launch { executeRefresh(state = state) }
         }
 
+        // todo scroll to current might need default true
         private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false, state: State) {
             //view.showRefresh()
             publish(Label.Loading)
             try {
                 //log.e("executeRefresh:" + state.playlistIdentifier.toString(), Exception("debug trace"))
-                log.d("executeRefresh:" + state.playlistIdentifier.toString())
+                log.d("executeRefresh: ${state.playlistIdentifier} focusIndex:${state.focusIndex}")
                 val id = state.playlistIdentifier
                     .takeIf { it != OrchestratorContract.NO_PLAYLIST }
                     ?: prefsWrapper.currentPlayingPlaylistId
@@ -844,6 +861,9 @@ class PlaylistMviStoreFactory(
                 val playlistsTree = playlistOrchestrator
                     .loadList(AllFilter, LOCAL.flatOptions())
                     .buildTree()
+                val focusIndex = if (scrollToCurrent && state.focusIndex == null) {
+                    state.playlist?.currentIndex
+                } else state.focusIndex
                 dispatch(
                     Load(
                         playlist = playlistOrDefault?.first,
@@ -852,13 +872,12 @@ class PlaylistMviStoreFactory(
                             ?: throw IllegalStateException("Need an id"),
                         playlistsTree = playlistsTree,
                         playlistsTreeLookup = playlistsTree.buildLookup(),
-                        focusIndex = if (scrollToCurrent && state.focusIndex == null) {
-                            state.playlist?.currentIndex
-                        } else state.focusIndex,
+                        focusIndex = focusIndex,
                         itemsIdMap = buildIdList(playlistOrDefault.first)
                     )
                 )
                 publish(Label.Loaded)
+                focusIndex?.also { publish(Label.ScrollToItem(it)) }
             } catch (e: Throwable) {
                 log.e("Error loading playlist", e)
                 publish(Error("Load failed: ${e::class.simpleName}"))

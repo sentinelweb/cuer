@@ -321,6 +321,8 @@ class PlaylistMviFragment : Fragment(),
                             )
                         )
                     )
+
+                is Label.ShowItem -> showItemDescription(label.modelId, label.item, label.source)
             }.also { log.d(label.toString()) }
         }
 
