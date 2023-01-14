@@ -20,6 +20,24 @@ class PlaylistMviContract {
     enum class UndoType { ItemDelete, ItemMove }
 
     interface MviStore : Store<Intent, State, Label> {
+        data class State(
+            var playlistIdentifier: OrchestratorContract.Identifier<*> = OrchestratorContract.NO_PLAYLIST,
+            var playlist: PlaylistDomain? = null,
+            var deletedPlaylistItem: PlaylistItemDomain? = null,
+            var movedPlaylistItem: PlaylistItemDomain? = null,
+            var focusIndex: Int? = null,
+            var dragFrom: Int? = null,
+            var dragTo: Int? = null,
+            var selectedPlaylistItem: PlaylistItemDomain? = null,
+            var playlistsTree: PlaylistTreeDomain? = null,
+            var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null,
+            var addPlaylistParent: Long? = null,
+            var isModified: Boolean = false,
+            var isCards: Boolean = false,
+            var isHeadless: Boolean = false,
+            val itemsIdMap: MutableMap<Long, PlaylistItemDomain> = mutableMapOf(),
+        )
+
         sealed class Intent {
             object Refresh : Intent()
             data class SetPlaylistData(
@@ -70,6 +88,7 @@ class PlaylistMviContract {
             data class QueuePlaylistFlow(val item: PlaylistDomain?) : Intent()
 
             object CheckToSaveConfirm : Intent()
+            object Headless : Intent()
         }
 
         sealed class Label {
@@ -108,25 +127,9 @@ class PlaylistMviContract {
 
             data class Share(val playlist: PlaylistDomain) : Label()
             data class ShareItem(val playlistItem: PlaylistItemDomain) : Label()
+            data class PlayItem(val playlistItem: PlaylistItemDomain, val start: Boolean = false) : Label()
             data class CheckSaveShowDialog(val dialogModel: AlertDialogModel) : Label()
         }
-
-        data class State(
-            var playlistIdentifier: OrchestratorContract.Identifier<*> = OrchestratorContract.NO_PLAYLIST,
-            var playlist: PlaylistDomain? = null,
-            var deletedPlaylistItem: PlaylistItemDomain? = null,
-            var movedPlaylistItem: PlaylistItemDomain? = null,
-            var focusIndex: Int? = null,
-            var dragFrom: Int? = null,
-            var dragTo: Int? = null,
-            var selectedPlaylistItem: PlaylistItemDomain? = null,
-            var playlistsTree: PlaylistTreeDomain? = null,
-            var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null,
-            var addPlaylistParent: Long? = null,
-            var isModified: Boolean = false,
-            var isCards: Boolean = false,
-            val itemsIdMap: MutableMap<Long, PlaylistItemDomain> = mutableMapOf(),
-        )
     }
 
     interface View : MviView<View.Model, View.Event> {

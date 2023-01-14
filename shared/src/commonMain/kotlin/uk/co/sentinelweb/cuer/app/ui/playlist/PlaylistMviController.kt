@@ -44,6 +44,12 @@ class PlaylistMviController constructor(
         }
     }
 
+    fun setHeadless() {
+        CoroutineScope(Dispatchers.Main).launch {
+            store.accept(Intent.Headless)
+        }
+    }
+
     fun onSetPlayListData(intent: Intent.SetPlaylistData) {
         CoroutineScope(Dispatchers.Main).launch {
             store.accept(intent)

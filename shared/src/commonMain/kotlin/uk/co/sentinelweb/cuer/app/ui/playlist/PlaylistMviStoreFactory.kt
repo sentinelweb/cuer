@@ -105,6 +105,7 @@ class PlaylistMviStoreFactory(
         data class SetMoveState(val from: Int?, val to: Int?) : Result()
         data class SetCards(val isCards: Boolean) : Result()
         data class SetFocusIndex(val index: Int) : Result()
+        data class SetHeadless(val headless: Boolean) : Result()
     }
 
     private sealed class Action {
@@ -137,6 +138,7 @@ class PlaylistMviStoreFactory(
                 is SetCards -> copy(isCards = msg.isCards)
                 is SetPlaylistId -> copy(playlistIdentifier = msg.playlistIdentifier)
                 is SetFocusIndex -> copy(focusIndex = msg.index)
+                is SetHeadless -> copy(isHeadless = msg.headless)
                 //else -> copy()
             }
     }
@@ -193,7 +195,12 @@ class PlaylistMviStoreFactory(
                 is Intent.UpdatesPlaylistItem -> flowUpdatesPlaylistItem(intent, getState())
                 is Intent.QueueItemFlow -> flowQueueItem(intent, getState())
                 is Intent.QueuePlaylistFlow -> flowQueuePlaylist(intent, getState())
+                Intent.Headless -> headless(intent, getState())
             }
+
+        private fun headless(intent: Intent, state: State) {
+            dispatch(SetHeadless(true))
+        }
 
         private fun flowQueuePlaylist(intent: Intent.QueuePlaylistFlow, state: State) {
 //            .filter { isQueuedPlaylist }
@@ -420,15 +427,13 @@ class PlaylistMviStoreFactory(
         private fun playItem(intent: Intent.PlayItem, state: State) {
             state.playlistItemDomain(intent.item)
                 ?.let { itemDomain ->
-                    // todo publish play, interactions
-//                    if (interactions != null) {
-//                        interactions?.onPlay(itemDomain)
-//                    } else
-                    if (!canPlayPlaylistItem(itemDomain)) {
+                    if (state.isHeadless) {
+                        publish(Label.PlayItem(playlistItem = itemDomain, start = intent.start))
+                    } else if (!canPlayPlaylistItem(itemDomain)) {
                         //view.showError()
                         publish(Message(strings.getString(StringResource.playlist_error_please_add)))
                     } else {
-                        playUseCase.playLogic(itemDomain, state.playlist, false)
+                        playUseCase.playLogic(itemDomain, state.playlist, intent.start)
                     }
                 }
         }
@@ -493,14 +498,15 @@ class PlaylistMviStoreFactory(
         private fun showItem(intent: Intent.ShowItem, state: State) {
             state.playlistItemDomain(intent.item)
                 ?.apply {
-                    // todo support interations?
-//                    interactions
-//                        ?.onView(this)
                     dispatch(SetFocusIndex(intent.item.index))
-                    val source =
-                        if (state.playlist?.type != PlaylistDomain.PlaylistTypeDomain.APP) state.playlistIdentifier.source
-                        else LOCAL
-                    publish(Label.ShowItem(modelId = intent.item.id, item = this, source = source))
+                    if (state.isHeadless) {
+                        publish(Label.PlayItem(playlistItem = this))
+                    } else {
+                        val source =
+                            if (state.playlist?.type != PlaylistDomain.PlaylistTypeDomain.APP) state.playlistIdentifier.source
+                            else LOCAL
+                        publish(Label.ShowItem(modelId = intent.item.id, item = this, source = source))
+                    }
                 }
         }
 

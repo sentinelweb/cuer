@@ -60,6 +60,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
@@ -323,12 +324,12 @@ class PlaylistMviFragment : Fragment(),
                     )
 
                 is Label.ShowItem -> showItemDescription(label.modelId, label.item, label.source)
+                is Label.PlayItem -> (requireActivity() as? AytPortraitActivity) // todo make interface
+                    ?.trackChange(label.playlistItem, label.start)
+
             }.also { log.d(label.toString()) }
         }
 
-        //        override fun render(model: PlaylistMviContract.View.Model) {// todo diff, update item
-//            setModel(model, animate = false)
-//        }
         override val renderer: ViewRenderer<PlaylistMviContract.View.Model> =
             diff {
                 var previousItems: List<Item> = listOf()
@@ -427,6 +428,9 @@ class PlaylistMviFragment : Fragment(),
             binding.playlistFabPlay.isVisible = false
             binding.playlistFabPlaymode.isVisible = false
             newAdapter()
+        }
+        if (isHeadless) {
+            controller.setHeadless()
         }
         activity?.apply { makeNavFromArguments()?.setPlaylistData() }
     }
