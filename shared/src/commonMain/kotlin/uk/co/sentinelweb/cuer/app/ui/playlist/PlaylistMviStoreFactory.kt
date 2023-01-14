@@ -513,7 +513,12 @@ class PlaylistMviStoreFactory(
         }
 
         private fun starItem(intent: Intent.StarItem, state: State) {
-
+            coroutines.mainScope.launch {
+                state.playlistItemDomain(intent.item)
+                    ?.takeIf { it.id != null }
+                    ?.let { it.copy(media = it.media.copy(starred = !it.media.starred)) }
+                    ?.also { playlistItemOrchestrator.save(it, LOCAL.deepOptions()) }
+            }
         }
 
         private fun update(intent: Intent.Update, state: State) {
