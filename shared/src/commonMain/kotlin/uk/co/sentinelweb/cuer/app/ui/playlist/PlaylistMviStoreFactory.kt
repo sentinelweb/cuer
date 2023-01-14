@@ -104,7 +104,6 @@ class PlaylistMviStoreFactory(
         data class SetModified(val modified: Boolean = true) : Result()
         data class SetMoveState(val from: Int?, val to: Int?) : Result()
         data class SetCards(val isCards: Boolean) : Result()
-        data class PlayModeChange(val mode: PlaylistDomain.PlaylistModeDomain) : Result()
         data class SetFocusIndex(val index: Int) : Result()
     }
 
@@ -137,7 +136,6 @@ class PlaylistMviStoreFactory(
                 is SetMoveState -> copy(dragFrom = msg.from, dragTo = msg.to)
                 is SetCards -> copy(isCards = msg.isCards)
                 is SetPlaylistId -> copy(playlistIdentifier = msg.playlistIdentifier)
-                is PlayModeChange -> copy(playlist = playlist?.copy(mode = msg.mode))
                 is SetFocusIndex -> copy(focusIndex = msg.index)
                 //else -> copy()
             }
@@ -422,7 +420,7 @@ class PlaylistMviStoreFactory(
         private fun playItem(intent: Intent.PlayItem, state: State) {
             state.playlistItemDomain(intent.item)
                 ?.let { itemDomain ->
-                    // todo publish play
+                    // todo publish play, interactions
 //                    if (interactions != null) {
 //                        interactions?.onPlay(itemDomain)
 //                    } else
@@ -446,10 +444,7 @@ class PlaylistMviStoreFactory(
                 state.playlist
                     ?.copy(mode = mode)
                     ?.apply { playlistOrchestrator.save(this, LOCAL.flatOptions()) }
-                dispatch(PlayModeChange(mode)) // todo consider general header refresh from db
             }
-            //    commitHeaderChange(this)
-            //}
         }
 
         private fun relatedItems(intent: Intent.RelatedItem, state: State) {
@@ -498,22 +493,23 @@ class PlaylistMviStoreFactory(
         private fun showItem(intent: Intent.ShowItem, state: State) {
             state.playlistItemDomain(intent.item)
                 ?.apply {
+                    // todo support interations?
 //                    interactions
 //                        ?.onView(this)
-//                        ?: run {
-                    // state.focusIndex = itemModel.index
                     dispatch(SetFocusIndex(intent.item.index))
                     val source =
                         if (state.playlist?.type != PlaylistDomain.PlaylistTypeDomain.APP) state.playlistIdentifier.source
                         else LOCAL
-                    //view.showItemDescription(itemModel.id, this, source)
                     publish(Label.ShowItem(modelId = intent.item.id, item = this, source = source))
-//                        }
                 }
         }
 
         private fun star(intent: Intent.Star, state: State) {
-
+            coroutines.mainScope.launch {
+                state.playlist
+                    ?.copy(starred = state.playlist?.starred?.not() ?: false)
+                    ?.apply { playlistOrchestrator.save(this, LOCAL.flatOptions()) }
+            }
         }
 
         private fun starItem(intent: Intent.StarItem, state: State) {
