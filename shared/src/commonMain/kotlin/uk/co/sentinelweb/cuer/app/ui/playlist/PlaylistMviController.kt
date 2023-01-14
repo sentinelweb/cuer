@@ -72,7 +72,7 @@ class PlaylistMviController constructor(
             Event.OnResume -> Intent.Resume
             is Event.OnShareItem -> Intent.ShareItem(item = item)
             is Event.OnShowCards -> Intent.ShowCards(isCards = isCards)
-            Event.OnShowChannel -> Intent.ShowChannel
+            is Event.OnShowChannel -> Intent.ShowChannel(item = item)
             is Event.OnShowItem -> Intent.ShowItem(item = item)
             Event.OnStar -> Intent.Star
             is Event.OnStarItem -> Intent.StarItem(item = item)

@@ -59,8 +59,6 @@ class PlaylistMviStoreFactory(
     private val playlistUpdateUsecase: PlaylistUpdateUsecase,
     private val playlistOrDefaultUsecase: PlaylistOrDefaultUsecase,
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
-//    private val platformLauncher: PlatformLaunchWrapper,
-//    private val shareWrapper: ShareWrapper,
     private val dbInit: DatabaseInitializer,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val queue: QueueMediatorContract.Producer,
@@ -290,7 +288,7 @@ class PlaylistMviStoreFactory(
         private fun launch(intent: Intent.Launch, state: State) {
             state.playlist
                 ?.platformId
-                ?.also { publish(Label.Launch(it)) }
+                ?.also { publish(Label.LaunchPlaylist(it)) }
         }
 
         private fun moveItem(intent: Intent.Move, state: State) {
@@ -489,7 +487,9 @@ class PlaylistMviStoreFactory(
         }
 
         private fun showChannel(intent: Intent.ShowChannel, state: State) {
-
+            state.playlistItemDomain(intent.item)
+                ?.takeIf { it.media.channelData.platformId != null }
+                ?.also { publish(Label.LaunchChannel(it.media.channelData.platformId!!)) }
         }
 
         private fun showItem(intent: Intent.ShowItem, state: State) {

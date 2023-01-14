@@ -309,7 +309,8 @@ class PlaylistMviFragment : Fragment(),
                         lifecycleScope.launch { it.onCommit(label.type, label.objects) }
                     }
 
-                is Label.Launch -> ytJavaApi.launchPlaylist(label.platformId)
+                is Label.LaunchPlaylist -> ytJavaApi.launchPlaylist(label.platformId)
+                is Label.LaunchChannel -> ytJavaApi.launchChannel(label.platformId)
                 is Label.Share -> shareWrapper.share(playlist = label.playlist)
                 is Label.ShareItem -> shareWrapper.share(media = label.playlistItem.media)
                 is Label.CheckSaveShowDialog ->
@@ -818,7 +819,7 @@ class PlaylistMviFragment : Fragment(),
 
     override fun onShowChannel(item: Item) {
 //        presenter.onItemShowChannel(item)
-        viewProxy.dispatch(OnShowChannel)
+        viewProxy.dispatch(OnShowChannel(item = item))
     }
 
     override fun onStar(item: Item) {

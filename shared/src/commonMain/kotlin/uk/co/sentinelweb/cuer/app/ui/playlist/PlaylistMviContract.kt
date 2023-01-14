@@ -43,7 +43,7 @@ class PlaylistMviContract {
             object Pause : Intent()
             object Share : Intent()
             object Launch : Intent()
-            object ShowChannel : Intent()
+            data class ShowChannel(val item: Item) : Intent()
             object CheckToSave : Intent()
             data class Commit(val afterCommit: ShareCommitter.AfterCommit) : Intent()
             data class ShowCards(val isCards: Boolean) : Intent()
@@ -93,7 +93,12 @@ class PlaylistMviContract {
                 val afterCommit: ShareCommitter.AfterCommit?
             ) : Label()
 
-            data class Launch(val platformId: String) : Label()
+            data class LaunchPlaylist(val platformId: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) :
+                Label()
+
+            data class LaunchChannel(val platformId: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) :
+                Label()
+
             data class Share(val playlist: PlaylistDomain) : Label()
             data class ShareItem(val playlistItem: PlaylistItemDomain) : Label()
             data class CheckSaveShowDialog(val dialogModel: AlertDialogModel) : Label()
@@ -163,7 +168,7 @@ class PlaylistMviContract {
             object OnHelp : Event()
             object OnResume : Event()
             object OnPause : Event()
-            object OnShowChannel : Event()
+            data class OnShowChannel(val item: Item) : Event()
             object OnShare : Event()
             object OnLaunch : Event()
             object OnCheckToSave : Event()
