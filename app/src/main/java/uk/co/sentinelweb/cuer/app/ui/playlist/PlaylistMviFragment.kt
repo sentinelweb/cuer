@@ -77,9 +77,6 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 class PlaylistMviFragment : Fragment(),
     ItemContract.Interactions,
@@ -89,9 +86,6 @@ class PlaylistMviFragment : Fragment(),
 
     override val scope: Scope by fragmentScopeWithSource<PlaylistMviFragment>()
 
-    //    override val external: PlaylistContract.External
-//        get() = presenter as PlaylistContract.External
-    //private val presenter: PlaylistContract.Presenter by inject()
     private val controller: PlaylistMviController by inject()
 
     private val snackbarWrapper: SnackbarWrapper by inject()
@@ -159,7 +153,6 @@ class PlaylistMviFragment : Fragment(),
 
     private val saveCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-//            presenter.checkToSave()
             viewProxy.dispatch(OnCheckToSave)
         }
     }
@@ -214,31 +207,22 @@ class PlaylistMviFragment : Fragment(),
         binding.playlistToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
-        //presenter.initialise()
         cardsMenuItem.isVisible = !isCards
         rowsMenuItem.isVisible = isCards
         ItemTouchHelper(ItemTouchHelperCallback(this)).apply {
             attachToRecyclerView(binding.playlistList)
         }
         binding.playlistToolbar.title = ""
-//        binding.playlistFabUp.setOnClickListener { presenter.scroll(Up) }
-//        binding.playlistFabUp.setOnLongClickListener { presenter.scroll(Top);true }
-//        binding.playlistFabDown.setOnClickListener { presenter.scroll(Down) }
-//        binding.playlistFabDown.setOnLongClickListener { presenter.scroll(Bottom);true }
-//        binding.playlistFabRefresh.setOnClickListener { presenter.refreshPlaylist() }
         binding.playlistUpdateButton.setOnClickListener {
-            //presenter.updatePlaylist()
             viewProxy.dispatch(OnUpdate)
         }
 
         binding.playlistAppbar.addOnOffsetChangedListener(appBarOffsetChangedistener)
         compactPlayerScroll.addScrollListener(binding.playlistList, this)
         binding.playlistFabPlaymode.setOnClickListener {
-            //presenter.onPlayModeChange()
             viewProxy.dispatch(OnPlayModeChange)
         }
         binding.playlistFabPlay.setOnClickListener {
-//            presenter.onPlayPlaylist()
             if (queueCastConnectionListener.isPlaylistPlaying()) {
                 chromeCastWrapper.killCurrentSession()
             } else {
@@ -247,23 +231,18 @@ class PlaylistMviFragment : Fragment(),
 
         }
         binding.playlistEditButton.setOnClickListener {
-            //presenter.onEdit()
             viewProxy.dispatch(OnEdit)
         }
         binding.playlistStarButton.setOnClickListener {
-            //presenter.onStarPlaylist()
             viewProxy.dispatch(OnStar)
         }
         binding.playlistLaunchButton.setOnClickListener {
-            //presenter.onStarPlaylist()
             viewProxy.dispatch(OnLaunch)
         }
         binding.playlistShareButton.setOnClickListener {
-            //presenter.onStarPlaylist()
             viewProxy.dispatch(OnShare)
         }
         binding.playlistSwipe.setOnRefreshListener {
-            //presenter.updatePlaylist()
             viewProxy.dispatch(OnUpdate)
         }
         if (isHeadless) {
@@ -345,7 +324,6 @@ class PlaylistMviFragment : Fragment(),
                         if (menuState.isCollapsed) R.color.actionbar_icon_collapsed_csl
                         else R.color.actionbar_icon_expanded_csl
                     )
-                    log.d("is cards: $it")
                 })
                 diff(get = PlaylistMviContract.View.Model::identifier, set = {
                     it?.also { queueCastConnectionListener.playListId = it }
@@ -355,12 +333,10 @@ class PlaylistMviFragment : Fragment(),
                     setList(items, animate = false)
                     previousItems = items
                     commitHost.isReady(true)
-                    log.d("items: ${it?.size}")
                 })
                 diff(get = PlaylistMviContract.View.Model::header, set = {
                     setHeaderModel(it)
                     commitHost.isReady(true)
-                    log.d("header: ${it}")
                 })
             }
     }
@@ -436,7 +412,6 @@ class PlaylistMviFragment : Fragment(),
     }
 
     override fun onDestroyView() {
-        //presenter.destroy()
         controller.onViewDestroyed()
         _binding = null
         _adapter = null
@@ -461,19 +436,14 @@ class PlaylistMviFragment : Fragment(),
             }
             ?: run {// fixme i don't think we can get here
                 log.d("onResume: got no nav args")
-                //presenter.setPlaylistData()
-                //viewProxy.dispatch(OnSetPlaylistData())
                 controller.onRefresh()
             }
 
         queueCastConnectionListener.listenForState()
-        //presenter.onResume()
-        //viewProxy.dispatch(OnResume)
     }
 
     override fun onPause() {
         super.onPause()
-        //presenter.onPause()
         viewProxy.dispatch(OnPause)
         queueCastConnectionListener.unlistenForState()
     }
@@ -484,12 +454,6 @@ class PlaylistMviFragment : Fragment(),
     }
 
     private fun NavigationModel.setPlaylistData() {
-//        presenter.setPlaylistData(
-//            params[NavigationModel.Param.PLAYLIST_ID] as Long?,
-//            params[NavigationModel.Param.PLAYLIST_ITEM_ID] as Long?,
-//            params[NavigationModel.Param.PLAY_NOW] as Boolean? ?: false,
-//            params[NavigationModel.Param.SOURCE] as OrchestratorContract.Source
-//        )
         controller.onSetPlayListData(
             PlaylistMviContract.MviStore.Intent.SetPlaylistData(
                 params[NavigationModel.Param.PLAYLIST_ID] as Long?,
@@ -499,9 +463,6 @@ class PlaylistMviFragment : Fragment(),
                 params[NavigationModel.Param.PLAYLIST_PARENT] as Long?
             )
         )
-//        params[NavigationModel.Param.PLAYLIST_PARENT]?.apply {
-//            presenter.setAddPlaylistParent(this as Long)
-//        }
     }
 
     private fun makeNavFromArguments(): NavigationModel? {
@@ -522,21 +483,44 @@ class PlaylistMviFragment : Fragment(),
     }
 // endregion
 
-// region PlaylistContract.View
-//    private fun setModel(model: PlaylistMviContract.View.Model, animate: Boolean) {
-//        commitHost.isReady(true)
-//        setHeaderModel(model.header)
-//        // update list
-//        model.items?.apply { setList(this, animate) }
-//    }
+    // region PlaylistContract.View
+    private fun setHeaderModel(model: PlaylistMviContract.View.Header) {
+        setImage(model.imageUrl)
+        binding.playlistCollapsingToolbar.title = model.title
+        binding.playlistFabPlay.setIconResource(res.getDrawableResourceId(model.playIcon))
+        binding.playlistFabPlay.text = model.playText
+        binding.playlistFabPlay.isVisible = model.canPlay
+        binding.playlistFabPlaymode.isVisible = model.canPlay
+        binding.playlistFabPlaymode.text = model.loopModeText
+        binding.playlistStarButton.setIconResource(res.getDrawableResourceId(model.starredIcon))
+        binding.playlistStarButton.setText(model.starredText)
+        binding.playlistFlagStar.isVisible = model.isStarred
+        binding.playlistFlagDefault.isVisible = model.isDefault
+        binding.playlistFlagPlayStart.isVisible = model.isPlayFromStart
+        binding.playlistFlagPinned.isVisible = model.isPinned
+        binding.playlistFabPlaymode.setIconResource(res.getDrawableResourceId(model.loopModeIcon))
+        binding.playlistFlagChildren.isVisible = model.hasChildren > 0
+        binding.playlistFlagChildren.text = model.hasChildren.toString()
+        binding.playlistFlagPlayable.isVisible = model.canPlay
+        binding.playlistFlagDeletable.isVisible = model.canDelete
+        binding.playlistFlagEditable.isVisible = model.canEdit
+        binding.playlistFlagDeletableItems.isVisible = model.canDeleteItems
+        binding.playlistFlagEditableItems.isVisible = model.canEditItems
+        binding.playlistEditButton.isVisible = model.canEdit
+        binding.playlistStarButton.isVisible = model.canEdit
+        binding.playlistUpdateButton.isVisible = model.canUpdate
+        binding.playlistShareButton.isVisible = true
+        binding.playlistLaunchButton.isVisible = model.canUpdate
+        binding.playlistAppbar.layoutParams.height = res.getDimensionPixelSize(
+            if (model.canEdit || model.canPlay || model.canUpdate || true) R.dimen.app_bar_header_height_playlist
+            else R.dimen.app_bar_header_height_playlist_no_actions
+        )
+        appBarOffsetScrollRange = -1
+    }
 
     private fun setList(items: List<Item>, animate: Boolean) {
         binding.playlistSwipe.isRefreshing = false
         adapter.setData(items, animate)
-//        val isListLarge = items.size > 30
-//        binding.playlistFabUp.isVisible = isListLarge
-//        binding.playlistFabDown.isVisible = isListLarge
-//        binding.playlistFabRefresh.isVisible = isListLarge || items.size == 0
         binding.playlistEmpty.isVisible = items.size == 0
         binding.playlistSwipe.isVisible = items.size > 0
     }
@@ -577,40 +561,6 @@ class PlaylistMviFragment : Fragment(),
         binding.playlistSwipe.isRefreshing = true
     }
 
-    private fun setHeaderModel(model: PlaylistMviContract.View.Header) {
-        setImage(model.imageUrl)
-        binding.playlistCollapsingToolbar.title = model.title
-        binding.playlistFabPlay.setIconResource(res.getDrawableResourceId(model.playIcon))
-        binding.playlistFabPlay.text = model.playText
-        binding.playlistFabPlay.isVisible = model.canPlay
-        binding.playlistFabPlaymode.isVisible = model.canPlay
-        binding.playlistFabPlaymode.text = model.loopModeText
-        binding.playlistStarButton.setIconResource(res.getDrawableResourceId(model.starredIcon))
-        binding.playlistStarButton.setText(model.starredText)
-        binding.playlistFlagStar.isVisible = model.isStarred
-        binding.playlistFlagDefault.isVisible = model.isDefault
-        binding.playlistFlagPlayStart.isVisible = model.isPlayFromStart
-        binding.playlistFlagPinned.isVisible = model.isPinned
-        binding.playlistFabPlaymode.setIconResource(res.getDrawableResourceId(model.loopModeIcon))
-        binding.playlistFlagChildren.isVisible = model.hasChildren > 0
-        binding.playlistFlagChildren.text = model.hasChildren.toString()
-        binding.playlistFlagPlayable.isVisible = model.canPlay
-        binding.playlistFlagDeletable.isVisible = model.canDelete
-        binding.playlistFlagEditable.isVisible = model.canEdit
-        binding.playlistFlagDeletableItems.isVisible = model.canDeleteItems
-        binding.playlistFlagEditableItems.isVisible = model.canEditItems
-        binding.playlistEditButton.isVisible = model.canEdit
-        binding.playlistStarButton.isVisible = model.canEdit
-        binding.playlistUpdateButton.isVisible = model.canUpdate
-        binding.playlistShareButton.isVisible = true
-        binding.playlistLaunchButton.isVisible = model.canUpdate
-        binding.playlistAppbar.layoutParams.height = res.getDimensionPixelSize(
-            if (model.canEdit || model.canPlay || model.canUpdate || true) R.dimen.app_bar_header_height_playlist
-            else R.dimen.app_bar_header_height_playlist_no_actions
-        )
-        appBarOffsetScrollRange = -1
-    }
-
     private fun setImage(url: String) {
         Glide.with(requireContext())
             .loadFirebaseOrOtherUrl(url, imageProvider)
@@ -625,34 +575,6 @@ class PlaylistMviFragment : Fragment(),
             snackbar = null
         }
         snackbar?.show()
-    }
-
-    private fun scrollTo(direction: PlaylistContract.ScrollDirection) {
-        linearLayoutManager.run {
-            val itemsOnScreen =
-                this.findLastCompletelyVisibleItemPosition() - this.findFirstCompletelyVisibleItemPosition()
-
-            val useIndex = when (direction) {
-                PlaylistContract.ScrollDirection.Up -> max(
-                    this.findFirstCompletelyVisibleItemPosition() - itemsOnScreen,
-                    0
-                )
-
-                PlaylistContract.ScrollDirection.Down ->
-                    min(
-                        this.findLastCompletelyVisibleItemPosition() + itemsOnScreen,
-                        adapter.data.size - 1
-                    )
-
-                PlaylistContract.ScrollDirection.Top -> 0
-                PlaylistContract.ScrollDirection.Bottom -> adapter.data.size - 1
-            }
-            if (abs(this.findLastCompletelyVisibleItemPosition() - useIndex) > 20)
-                binding.playlistList.scrollToPosition(useIndex)
-            else {
-                binding.playlistList.smoothScrollToPosition(useIndex)
-            }
-        }
     }
 
     private fun scrollToItem(index: Int) {
@@ -716,14 +638,6 @@ class PlaylistMviFragment : Fragment(),
             }
     }
 
-//    private fun gotoEdit(id: Long, source: OrchestratorContract.Source) {
-//        PlaylistFragmentDirections.actionGotoEditPlaylist(
-//            source.toString(),
-//            null,
-//            id
-//        ).apply { findNavController().navigate(this) }
-//    }
-
     private fun showAlertDialog(model: AlertDialogModel) {
         alertDialogCreator.create(model).show()
     }
@@ -776,7 +690,6 @@ class PlaylistMviFragment : Fragment(),
 
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-//        presenter.moveItem(fromPosition, toPosition)
         viewProxy.dispatch(OnMove(fromPosition, toPosition))
         // shows the move while dragging
         adapter.notifyItemMoved(fromPosition, toPosition)
@@ -785,74 +698,61 @@ class PlaylistMviFragment : Fragment(),
 
     override fun onItemClear() {
         viewProxy.dispatch(OnClearMove)
-//        presenter.commitMove()
     }
 //endregion
 
     // region ItemContract.Interactions
     override fun onItemIconClick(item: Item) {
-//        presenter.onItemPlayClicked(item)
         viewProxy.dispatch(OnPlayItem(item))
     }
 
     override fun onClick(item: Item) {
-        //presenter.onItemViewClick(item)
         viewProxy.dispatch(OnShowItem(item))
     }
 
     override fun onPlayStartClick(item: Item) {
-        //presenter.onPlayStartClick(item)
         viewProxy.dispatch(OnPlayItem(item, start = true))
     }
 
     override fun onRightSwipe(item: Item) {
-//        presenter.onItemSwipeRight(item)
         viewProxy.dispatch(OnMoveSwipe(item))
     }
 
     override fun onLeftSwipe(item: Item) {
         val playlistItemModel = item
         adapter.notifyItemRemoved(playlistItemModel.index)
-        //presenter.onItemSwipeLeft(playlistItemModel) // delays for animation
         log.d("onLeftSwipe")
         viewProxy.dispatch(OnDeleteItem(item))
     }
 
     override fun onPlay(item: Item, external: Boolean) {
-        //presenter.onItemPlay(item, external)
         viewProxy.dispatch(OnPlayItem(item, external = true))
     }
 
     override fun onShowChannel(item: Item) {
-//        presenter.onItemShowChannel(item)
         viewProxy.dispatch(OnShowChannel(item = item))
     }
 
     override fun onStar(item: Item) {
-        //presenter.onItemStar(item)
         viewProxy.dispatch(OnStarItem(item))
     }
 
     override fun onRelated(item: Item) {
-        //presenter.onItemRelated(item)
         viewProxy.dispatch(OnRelatedItem(item))
     }
 
     override fun onShare(item: Item) {
-        //presenter.onItemShare(item)
         viewProxy.dispatch(OnShareItem(item))
     }
 
     override fun onGotoPlaylist(item: Item) {
-        //presenter.onItemGotoPlaylist(item)
         viewProxy.dispatch(OnGotoPlaylist(item))
     }
 // endregion
 
     // region ShareContract.Committer
     override suspend fun commit(afterCommit: ShareCommitter.AfterCommit) {
-        //presenter.commitPlaylist(onCommit)
-        viewProxy.dispatch(Event.OnCommit(afterCommit))// tod fire call back somehow
+        viewProxy.dispatch(Event.OnCommit(afterCommit))
     }
     // endregion
 
