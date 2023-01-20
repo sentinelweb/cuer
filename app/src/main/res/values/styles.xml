@@ -126,6 +126,7 @@
         <item name="android:letterSpacing">?headlineFontLetterSpacing</item>
         <item name="android:textScaleX">?headlineFontXScaling</item>
         <item name="android:textColor">?colorOnSurface</item>
+        <item name="android:layout_width">match_parent</item>
     </style>
     <!-- end TextAppearance ActionBar-->
 
