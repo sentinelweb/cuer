@@ -488,7 +488,7 @@ class PlaylistFragment :
     }
 
     override fun highlightPlayingItem(currentItemIndex: Int?) {
-        adapter.highlightItem = currentItemIndex
+        adapter.playingItem = currentItemIndex
         _binding?.playlistItems?.setText(mapPlaylistIndexAndSize(currentItemIndex))
     }
 

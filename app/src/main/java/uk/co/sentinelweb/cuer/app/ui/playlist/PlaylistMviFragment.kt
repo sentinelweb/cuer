@@ -328,6 +328,10 @@ class PlaylistMviFragment : Fragment(),
                 diff(get = PlaylistMviContract.View.Model::identifier, set = {
                     it?.also { queueCastConnectionListener.playListId = it }
                 })
+                diff(get = PlaylistMviContract.View.Model::playingIndex, set = {
+                    it?.also { adapter.playingItem = it }
+                })
+
                 diff(get = PlaylistMviContract.View.Model::items, set = { items ->
                     setList(items, animate = false)
                     previousItems = items
@@ -595,7 +599,7 @@ class PlaylistMviFragment : Fragment(),
     }
 
     private fun highlightPlayingItem(currentItemIndex: Int?) {
-        adapter.highlightItem = currentItemIndex
+        adapter.playingItem = currentItemIndex
         _binding?.playlistItems?.setText(mapPlaylistIndexAndSize(currentItemIndex))
     }
 

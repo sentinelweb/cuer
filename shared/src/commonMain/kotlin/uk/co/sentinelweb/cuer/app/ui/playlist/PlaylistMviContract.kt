@@ -141,6 +141,7 @@ class PlaylistMviContract {
             val items: List<Item>?,
             val isCards: Boolean,
             val identifier: OrchestratorContract.Identifier<*>?,
+            val playingIndex: Int?
         )
 
         data class Header(

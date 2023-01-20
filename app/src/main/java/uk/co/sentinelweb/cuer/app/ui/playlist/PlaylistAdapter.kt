@@ -32,7 +32,7 @@ class PlaylistAdapter constructor(
     val data: List<PlaylistItemMviContract.Model.Item>
         get() = _data
 
-    var highlightItem: Int? = null
+    var playingItem: Int? = null
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -79,7 +79,7 @@ class PlaylistAdapter constructor(
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder
             .itemPresenter
-            .update(_data.get(position), position == highlightItem)
+            .update(_data.get(position), position == playingItem)
     }
 
     override fun getItemCount(): Int = _data.size

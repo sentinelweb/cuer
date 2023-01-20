@@ -67,7 +67,8 @@ class PlaylistMviModelMapper constructor(
             ),
             items = null,
             isCards = false,
-            identifier = null
+            identifier = null,
+            playingIndex = null
         )
 
     fun map(
@@ -116,7 +117,8 @@ class PlaylistMviModelMapper constructor(
             ),
             items = items,
             isCards = multiPlatformPreferences.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true),
-            identifier = id
+            identifier = id,
+            playingIndex = domain.currentIndex
         )
     }
 
