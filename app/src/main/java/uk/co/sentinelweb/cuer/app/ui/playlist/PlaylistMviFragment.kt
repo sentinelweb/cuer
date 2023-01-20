@@ -311,7 +311,7 @@ class PlaylistMviFragment : Fragment(),
 
         override val renderer: ViewRenderer<PlaylistMviContract.View.Model> =
             diff {
-                var previousItems: List<Item> = listOf()
+                var previousItems: List<Item>? = listOf()
                 diff(get = PlaylistMviContract.View.Model::isCards, set = {
                     val currentScrollIndex = getScrollIndex()
                     newAdapter()
@@ -328,8 +328,7 @@ class PlaylistMviFragment : Fragment(),
                 diff(get = PlaylistMviContract.View.Model::identifier, set = {
                     it?.also { queueCastConnectionListener.playListId = it }
                 })
-                diff(get = PlaylistMviContract.View.Model::items, set = {
-                    val items = it ?: listOf()
+                diff(get = PlaylistMviContract.View.Model::items, set = { items ->
                     setList(items, animate = false)
                     previousItems = items
                     commitHost.isReady(true)
@@ -518,11 +517,17 @@ class PlaylistMviFragment : Fragment(),
         appBarOffsetScrollRange = -1
     }
 
-    private fun setList(items: List<Item>, animate: Boolean) {
+    private fun setList(items: List<Item>?, animate: Boolean) {
         binding.playlistSwipe.isRefreshing = false
-        adapter.setData(items, animate)
-        binding.playlistEmpty.isVisible = items.size == 0
-        binding.playlistSwipe.isVisible = items.size > 0
+        if (items != null) {
+            adapter.setData(items, animate)
+            binding.playlistEmpty.isVisible = items.size == 0
+            binding.playlistSwipe.isVisible = items.size > 0
+        } else {
+            binding.playlistEmpty.isVisible = false
+            binding.playlistSwipe.isVisible = true
+            binding.playlistSwipe.isRefreshing = true
+        }
     }
 
     private fun updateItemModel(model: Item) {

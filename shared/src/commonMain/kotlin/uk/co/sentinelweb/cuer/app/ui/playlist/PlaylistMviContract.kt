@@ -147,11 +147,11 @@ class PlaylistMviContract {
             val title: String,
             val imageUrl: String,
             val loopModeIndex: Int,
-            /*@DrawableRes*/ val loopModeIcon: Icon,
+            val loopModeIcon: Icon,
             val loopModeText: String,
-            /*@DrawableRes*/ val playIcon: Icon,
+            val playIcon: Icon,
             val playText: String,
-            /*@DrawableRes*/ val starredIcon: Icon,
+            val starredIcon: Icon,
             val starredText: String,
             val isStarred: Boolean,
             val isDefault: Boolean,
@@ -164,7 +164,7 @@ class PlaylistMviContract {
             val canDelete: Boolean,
             val canEditItems: Boolean,
             val canDeleteItems: Boolean,
-            val hasChildren: Int,
+            val hasChildren: Int
         )
 
 
@@ -193,8 +193,6 @@ class PlaylistMviContract {
             ) : Event()
 
             data class OnShowCards(val isCards: Boolean) : Event()
-
-            //            object OnCreatePlaylist : Event()
             data class OnMove(val fromPosition: Int, val toPosition: Int) : Event()
             object OnClearMove : Event()
             data class OnMoveSwipe(val item: Item) : Event()
@@ -212,10 +210,6 @@ class PlaylistMviContract {
             data class OnRelatedItem(val item: Item) : Event()
             data class OnGotoPlaylist(val item: Item) : Event()
             object OnCheckToSaveConfirm : Event()
-//            data class OnShare(val item: PlaylistsItemMviContract.Model) : Event()
-//            data class OnMerge(val item: PlaylistsItemMviContract.Model) : Event()
-//            data class OnEdit(val item: PlaylistsItemMviContract.Model, val view: PlaylistsItemMviContract.ItemPassView? = null) : Event()
         }
     }
-
 }

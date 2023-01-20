@@ -71,8 +71,8 @@ class PlayUseCase constructor(
 
     private fun mapChangePlaylistAlert(confirm: () -> Unit, info: () -> Unit): AlertDialogModel =
         AlertDialogModel(
-            title = strings.getString(StringResource.playlist_change_dialog_title),
-            message = strings.getString(StringResource.playlist_change_dialog_message),
+            title = strings.get(StringResource.playlist_change_dialog_title),
+            message = strings.get(StringResource.playlist_change_dialog_message),
             confirm = AlertDialogModel.Button(StringResource.ok, confirm),
             neutral = AlertDialogModel.Button(StringResource.dialog_button_view_info, info)
         )

@@ -64,11 +64,11 @@ class ResourceWrapper constructor(
     fun getStringResourceId(stringRes: StringResource) =
         resources.getIdentifier(stringRes.name, "string", context.getPackageName())
 
-    override fun getString(res: StringResource): String =
+    override fun get(res: StringResource): String =
         getStringResourceId(res)
             .let { getString(it) }
 
-    override fun getString(res: StringResource, params: List<String>): String =
+    override fun get(res: StringResource, params: List<String>): String =
         getStringResourceId(res)
             .let { getString(it, *params.toTypedArray()) }
 

@@ -17,7 +17,7 @@ class AlertDialogCreator(
     fun create(model: AlertDialogModel): AlertDialog {
         val builder = MaterialAlertDialogBuilder(context)
             .setTitle(model.title)
-            .setPositiveButton(strings.getString(model.confirm.label), object : DialogInterface.OnClickListener {
+            .setPositiveButton(strings.get(model.confirm.label), object : DialogInterface.OnClickListener {
                 override fun onClick(dialog: DialogInterface?, p1: Int) {
                     model.confirm.action()
                     dialog?.dismiss()
@@ -36,7 +36,7 @@ class AlertDialogCreator(
         }
         model.neutral?.apply {
             builder
-                .setNeutralButton(strings.getString(label), object : DialogInterface.OnClickListener {
+                .setNeutralButton(strings.get(label), object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface?, p1: Int) {
                         action()
                         dialog?.dismiss()
@@ -45,7 +45,7 @@ class AlertDialogCreator(
         }
         model.cancel?.also { button ->
             builder
-                .setNegativeButton(strings.getString(button.label), object : DialogInterface.OnClickListener {
+                .setNegativeButton(strings.get(button.label), object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface?, p1: Int) {
                         model.cancel.let { button.action() }
                         dialog?.dismiss()

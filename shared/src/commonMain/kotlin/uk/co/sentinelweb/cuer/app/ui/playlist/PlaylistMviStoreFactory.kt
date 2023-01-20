@@ -309,14 +309,14 @@ class PlaylistMviStoreFactory(
                 ?.also { itemDomain ->
                     thisState.playlist?.apply {
                         if (config.editableItems.not()) {
-                            publish(Message(strings.getString(StringResource.playlist_error_please_add)))
+                            publish(Message(strings.get(StringResource.playlist_error_please_add)))
                             updateView(state = thisState)
                         } else {
                             dispatch(SelectedPlaylistItem(itemDomain))
                             publish(
                                 Label.ShowPlaylistsSelector(
                                     PlaylistsMviDialogContract.Config(
-                                        strings.getString(StringResource.playlist_dialog_title_move),
+                                        strings.get(StringResource.playlist_dialog_title_move),
                                         selectedPlaylists = setOf(thisState.playlist!!),
                                         multi = true,
                                         itemClick = { which: PlaylistDomain?, _ ->
@@ -363,7 +363,7 @@ class PlaylistMviStoreFactory(
                             publish(
                                 Label.ShowUndo(
                                     ItemMove,
-                                    strings.getString(
+                                    strings.get(
                                         StringResource.playlist_item_moved_undo_message,
                                         listOf(playlist.title)
                                     )
@@ -373,7 +373,7 @@ class PlaylistMviStoreFactory(
                         ?.also { dispatch(SelectedPlaylistItem(null)) }
                         ?.also { dispatch(SetModified()) }
                         ?: apply {
-                            publish(Error(strings.getString(StringResource.playlist_error_moveitem_already_exists)))
+                            publish(Error(strings.get(StringResource.playlist_error_moveitem_already_exists)))
                         }
                 }
             }
@@ -431,7 +431,7 @@ class PlaylistMviStoreFactory(
                         publish(Label.PlayItem(playlistItem = itemDomain, start = intent.start))
                     } else if (!canPlayPlaylistItem(itemDomain)) {
                         //view.showError()
-                        publish(Message(strings.getString(StringResource.playlist_error_please_add)))
+                        publish(Message(strings.get(StringResource.playlist_error_please_add)))
                     } else {
                         playUseCase.playLogic(itemDomain, state.playlist, intent.start)
                     }
@@ -538,11 +538,11 @@ class PlaylistMviStoreFactory(
                             if (it.success) {
                                 publish(
                                     Message(
-                                        strings.getString(playlist_items_updated, listOf(it.numberItems.toString()))
+                                        strings.get(playlist_items_updated, listOf(it.numberItems.toString()))
                                     )
                                 )
                             } else {
-                                publish(Error(strings.getString(playlist_error_updating, listOf(it.reason))))
+                                publish(Error(strings.get(playlist_error_updating, listOf(it.reason))))
                             }
                         }
                         ?.also { publish(Label.Loaded) }
@@ -848,17 +848,14 @@ class PlaylistMviStoreFactory(
         }
 
         private fun refresh(state: State) {
-            //log.e("refresh:" + state.playlistIdentifier.toString(), Exception("debug trace"))
             log.d("refresh:" + state.playlistIdentifier.toString())
             scope.launch { executeRefresh(state = state) }
         }
 
         // todo scroll to current might need default true
         private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false, state: State) {
-            //view.showRefresh()
             publish(Label.Loading)
             try {
-                //log.e("executeRefresh:" + state.playlistIdentifier.toString(), Exception("debug trace"))
                 log.d("executeRefresh: ${state.playlistIdentifier} focusIndex:${state.focusIndex}")
                 val id = state.playlistIdentifier
                     .takeIf { it != OrchestratorContract.NO_PLAYLIST }

@@ -40,8 +40,8 @@ class PlaylistMviItemModelMapper constructor(
             title = top,
             duration = (
                     if (item.media.isLiveBroadcast) {
-                        if (item.media.isLiveBroadcastUpcoming) stringDecoder.getString(StringResource.upcoming)
-                        else stringDecoder.getString(StringResource.live)
+                        if (item.media.isLiveBroadcastUpcoming) stringDecoder.get(StringResource.upcoming)
+                        else stringDecoder.get(StringResource.live)
                     } else (item.media.duration?.let {
                         item.media.duration?.let {
                             timeFormatter.formatMillis(
@@ -52,7 +52,7 @@ class PlaylistMviItemModelMapper constructor(
                     } ?: "-")
                     ),
             positon =
-            if (item.media.isLiveBroadcast) stringDecoder.getString(StringResource.live)
+            if (item.media.isLiveBroadcast) stringDecoder.get(StringResource.live)
             else (progress * 100).toInt().toString() + "%",
             thumbUrl = (item.media.thumbNail ?: item.media.image)?.url,
             imageUrl = (item.media.image ?: item.media.thumbNail)?.url,

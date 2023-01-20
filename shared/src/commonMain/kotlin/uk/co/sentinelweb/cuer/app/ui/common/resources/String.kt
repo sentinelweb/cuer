@@ -22,6 +22,7 @@ enum class StringResource(val default: String) {
 
     // playlist
     playlist_error_please_add("Please add the playlist first"),
+    playlist_empty("Empty"),
     playlist_error_updating("Error updating: %1\$s …"),
     playlist_items_updated("%1\$s new items"),
     playlist_error_moveitem_already_exists("Item already exists on this playlist …"),
@@ -45,6 +46,6 @@ enum class StringResource(val default: String) {
 }
 
 interface StringDecoder {
-    fun getString(res: StringResource): String
-    fun getString(res: StringResource, params: List<String>): String
+    fun get(res: StringResource): String
+    fun get(res: StringResource, params: List<String>): String
 }

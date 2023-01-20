@@ -20,7 +20,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 class PlaylistMviModelMapper constructor(
     private val itemModelMapper: PlaylistMviItemModelMapper,
     private val iconMapper: IconMapper,
-    private val stringDecoder: StringDecoder,
+    private val strings: StringDecoder,
     private val appPlaylistInteractors: Map<Long, AppPlaylistInteractor>,
     private val util: PlaylistMviUtil,
     private val multiPlatformPreferences: MultiPlatformPreferencesWrapper,
@@ -43,13 +43,13 @@ class PlaylistMviModelMapper constructor(
             )
         } ?: PlaylistMviContract.View.Model(
             header = Header(
-                title = "Empty",
+                title = "",
                 imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/headphones-2588235_640.jpg",
                 loopModeIndex = 0,
                 loopModeIcon = Icon.ic_playmode_straight,
-                loopModeText = stringDecoder.getString(StringResource.menu_playlist_mode_single),
+                loopModeText = strings.get(StringResource.menu_playlist_mode_single),
                 playIcon = Icon.ic_playlist_play,
-                playText = stringDecoder.getString(StringResource.stop),
+                playText = strings.get(StringResource.stop),
                 starredIcon = Icon.ic_starred_off,
                 starredText = "",
                 isStarred = false,
@@ -63,9 +63,9 @@ class PlaylistMviModelMapper constructor(
                 canEditItems = false,
                 canDeleteItems = false,
                 hasChildren = 0,
-                canUpdate = false,
+                canUpdate = false
             ),
-            items = listOf(),
+            items = null,
             isCards = false,
             identifier = null
         )
@@ -92,14 +92,14 @@ class PlaylistMviModelMapper constructor(
                 loopModeIndex = domain.mode.ordinal,
                 loopModeIcon = iconMapper.map(domain.mode),
                 loopModeText = when (domain.mode) {
-                    PlaylistDomain.PlaylistModeDomain.SINGLE -> stringDecoder.getString(StringResource.menu_playlist_mode_single)
-                    PlaylistDomain.PlaylistModeDomain.LOOP -> stringDecoder.getString(StringResource.menu_playlist_mode_loop)
-                    PlaylistDomain.PlaylistModeDomain.SHUFFLE -> stringDecoder.getString(StringResource.menu_playlist_mode_shuffle)
+                    PlaylistDomain.PlaylistModeDomain.SINGLE -> strings.get(StringResource.menu_playlist_mode_single)
+                    PlaylistDomain.PlaylistModeDomain.LOOP -> strings.get(StringResource.menu_playlist_mode_loop)
+                    PlaylistDomain.PlaylistModeDomain.SHUFFLE -> strings.get(StringResource.menu_playlist_mode_shuffle)
                 },
                 playIcon = if (isPlaying) Icon.ic_playlist_close else Icon.ic_playlist_play,
-                playText = stringDecoder.getString(if (isPlaying) StringResource.stop else StringResource.menu_play),
+                playText = strings.get(if (isPlaying) StringResource.stop else StringResource.menu_play),
                 starredIcon = if (domain.starred) Icon.ic_starred else Icon.ic_starred_off,
-                starredText = stringDecoder.getString(if (domain.starred) StringResource.menu_unstar else StringResource.menu_star),
+                starredText = strings.get(if (domain.starred) StringResource.menu_unstar else StringResource.menu_star),
                 isStarred = domain.starred,
                 isDefault = domain.default,
                 isSaved = id.source == LOCAL,
@@ -112,8 +112,7 @@ class PlaylistMviModelMapper constructor(
                 canDeleteItems = domain.config.deletableItems,
 
                 hasChildren = playlists?.get(domain.id)?.chidren?.size ?: 0,
-                canUpdate = domain.platformId != null && domain.platform == YOUTUBE,
-                /*&& !view.isHeadless*/ // fixme inject headless arg to mvi in bootstrap
+                canUpdate = domain.platformId != null && domain.platform == YOUTUBE
             ),
             items = items,
             isCards = multiPlatformPreferences.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true),
@@ -165,8 +164,8 @@ class PlaylistMviModelMapper constructor(
 
     fun mapSaveConfirmAlert(): AlertDialogModel =
         AlertDialogModel(
-            title = stringDecoder.getString(StringResource.dialog_title_save_check),
-            message = stringDecoder.getString(StringResource.dialog_message_save_item_check),
+            title = strings.get(StringResource.dialog_title_save_check),
+            message = strings.get(StringResource.dialog_message_save_item_check),
             confirm = AlertDialogModel.Button(StringResource.dialog_button_save) {},
             cancel = AlertDialogModel.Button(StringResource.dialog_button_dont_save) {},
         )
