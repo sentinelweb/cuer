@@ -7,7 +7,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +40,7 @@ class PlayerControllerTest {
     }
 
     @Test
-    fun onViewCreated() = rule.dispatcher.runBlockingTest {
+    fun onViewCreated() = runTest {
         val slot = slot<PlayerContract.MviStore.Intent>()
         val mutableSharedFlow = MutableSharedFlow<PlayerContract.MviStore.Intent>()
         coEvery { playControls.intentFlow } returns mutableSharedFlow
