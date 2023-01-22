@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
@@ -23,7 +24,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.State
-import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.usecase.AddPlaylistUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
@@ -52,6 +52,7 @@ import uk.co.sentinelweb.cuer.tools.ext.build
 import uk.co.sentinelweb.cuer.tools.ext.buildCollection
 
 @ExperimentalCoroutinesApi
+@Ignore("superceeded by MVI implementation")
 class PlaylistPresenterTest {
     @MockK
     lateinit var mockView: PlaylistContract.View
@@ -164,7 +165,11 @@ class PlaylistPresenterTest {
             items = fixture.buildCollection<PlaylistItemDomain, List<PlaylistItemDomain>>(10)
                 .map { it.copy(id = idCounter, order = idCounter * 1000, playlistId = fixtCurrentPlaylist.id) })
         fixtCurrentPlaylistMapped = fixture.build<PlaylistContract.Model>()
-            .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(10))
+            .copy(
+                items = fixture.buildCollection<PlaylistItemMviContract.Model.Item, List<PlaylistItemMviContract.Model.Item>>(
+                    10
+                )
+            )
         fixtCurrentIdentifier = Identifier(fixtCurrentPlaylist.id!!, fixtCurrentSource)
         coEvery {
             mockPlaylistOrDefaultUsecase.getPlaylistOrDefault(
@@ -195,7 +200,11 @@ class PlaylistPresenterTest {
             )
         fixtNextIdentifier = Identifier(fixtNextPlaylist.id!!, fixtNextSource)
         fixtNextPlaylistMapped = fixture.build<PlaylistContract.Model>()
-            .copy(items = fixture.buildCollection<ItemContract.Model, List<ItemContract.Model>>(12))
+            .copy(
+                items = fixture.buildCollection<PlaylistItemMviContract.Model.Item, List<PlaylistItemMviContract.Model.Item>>(
+                    12
+                )
+            )
         coEvery {
             mockPlaylistOrDefaultUsecase.getPlaylistOrDefault(
                 fixtNextIdentifier.id,
@@ -701,7 +710,7 @@ class PlaylistPresenterTest {
             val deletedItem = fixtCurrentPlaylist.items.get(deletedItemIndex)
             val fixtExpectedPlaylist = playlistMutator.remove(fixtCurrentPlaylist, deletedItem)
             val fixtExpectedMapped: PlaylistContract.Model = fixture.build()
-            val fixtSwipeItemModel = fixture.build<ItemContract.Model>().copy(id = deletedItem.id!!)
+            val fixtSwipeItemModel = fixture.build<PlaylistItemMviContract.Model.Item>().copy(id = deletedItem.id!!)
             setCurrentlyPlaying(fixtCurrentIdentifier, fixtExpectedPlaylist)
             every {
                 mockModelMapper
