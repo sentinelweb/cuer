@@ -6,8 +6,8 @@ import platform.Foundation.NSLocale
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 // todo test this on ios platform
-actual class TimeStampMapper constructor(
-    private val log: LogWrapper
+actual class TimeStampMapper actual constructor(
+    actual val log: LogWrapper
 ) {
 
     private val timestampDateFormatter: NSDateFormatter
