@@ -695,7 +695,7 @@ class PlaylistMviFragment : Fragment(),
     private fun exit() {
         findNavController().popBackStack()
     }
-//endregion
+    //endregion
 
     // region ItemContract.ItemMoveInteractions
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
@@ -708,7 +708,7 @@ class PlaylistMviFragment : Fragment(),
     override fun onItemClear() {
         viewProxy.dispatch(OnClearMove)
     }
-//endregion
+    //endregion
 
     // region ItemContract.Interactions
     override fun onItemIconClick(item: Item) {
@@ -786,7 +786,7 @@ class PlaylistMviFragment : Fragment(),
                 scoped {
                     PlaylistMviStoreFactory(
                         // fixme circular ref in playlistTreeDomain toString
-                        //storeFactory = LoggingStoreFactory(DefaultStoreFactory()),
+//                        storeFactory = LoggingStoreFactory(DefaultStoreFactory()),
                         storeFactory = DefaultStoreFactory(),
                         playlistOrchestrator = get(),
                         playlistStatsOrchestrator = get(),

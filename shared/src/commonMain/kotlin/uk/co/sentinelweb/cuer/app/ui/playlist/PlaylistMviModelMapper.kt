@@ -81,7 +81,7 @@ class PlaylistMviModelMapper constructor(
         appPlaylist: AppPlaylistInteractor?,
         itemsIdMap: MutableMap<Long, PlaylistItemDomain>
     ): PlaylistMviContract.View.Model {
-
+        log.d("map")
         val items = if (isMapItems) {
             mapItems(domain, itemsIdMap, playlists, appPlaylist)
         } else null

@@ -85,7 +85,7 @@ class PlaylistMviStoreFactory(
             var focusIndex: Int?,
             var playlistsTree: PlaylistTreeDomain?,
             var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>?,
-            val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
+//            val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
         ) : Result()
 
         data class SetDeletedItem(val item: PlaylistItemDomain?) : Result()
@@ -121,13 +121,14 @@ class PlaylistMviStoreFactory(
                     focusIndex = msg.focusIndex,
                     playlistsTree = msg.playlistsTree,
                     playlistsTreeLookup = msg.playlistsTreeLookup,
-                    itemsIdMap = msg.itemsIdMap,
+                    itemsIdMap = buildIdList(msg.playlist),
                 )
 
                 is SetDeletedItem -> copy(deletedPlaylistItem = msg.item)
                 is SetPlaylist -> copy(
                     playlist = msg.playlist,
-                    playlistIdentifier = msg.playlistIdentifier ?: playlistIdentifier
+                    playlistIdentifier = msg.playlistIdentifier ?: playlistIdentifier,
+                    itemsIdMap = buildIdList(msg.playlist)
                 )
 
                 is IdUpdate -> copy(itemsIdMap = itemsIdMap.apply { put(msg.modelId, msg.changedItem) })
@@ -141,6 +142,16 @@ class PlaylistMviStoreFactory(
                 is SetHeadless -> copy(isHeadless = msg.headless)
                 //else -> copy()
             }
+
+        private fun buildIdList(domain: PlaylistDomain?): MutableMap<Long, PlaylistItemDomain> {
+            val modelIdGenerator = IdGenerator()
+            val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
+            domain?.items?.mapIndexed { index, item ->
+                val modelId = item.id ?: modelIdGenerator.value
+                itemsIdMap[modelId] = item
+            }
+            return itemsIdMap //.also { map -> log.d(map.keys.associateBy { map[it]?.media?.title }.toString()) }
+        }
     }
 
     private class BootstrapperImpl() :
@@ -249,7 +260,7 @@ class PlaylistMviStoreFactory(
                             dispatch(Result.SetPlaylist(playlist = it, playlistIdentifier = newIdentifier))
                             executeRefresh(state = getState()) // hmmm will this work after dispatch
                         }
-                        .also { updateView(getState()) }
+                        //.also { updateView(getState()) }
                         //.also { onCommit?.onCommit(ObjectTypeDomain.PLAYLIST, listOf(it)) }
                         .also { publish(Label.AfterCommit(ObjectTypeDomain.PLAYLIST, listOf(it), intent?.afterCommit)) }
                 }
@@ -310,7 +321,7 @@ class PlaylistMviStoreFactory(
                     thisState.playlist?.apply {
                         if (config.editableItems.not()) {
                             publish(Message(strings.get(StringResource.playlist_error_please_add)))
-                            updateView(state = thisState)
+                            // updateView(state = thisState)
                         } else {
                             dispatch(SelectedPlaylistItem(itemDomain))
                             publish(
@@ -603,28 +614,25 @@ class PlaylistMviStoreFactory(
                     state.playlist
                         ?.let { playlistMutator.addOrReplaceItem(it, intent.item) }
                         ?.takeIf { it != state.playlist }
-                        ?.also { state.playlist = it }
-                        ?.also { updateView(state) }
+                        ?.also { dispatch(SetPlaylist(it)) }
                 } else if (state.playlist?.type == PlaylistDomain.PlaylistTypeDomain.APP) {// check to replace item in an app playlist
                     state.playlist
                         ?.items
                         ?.find { it.media.platformId == intent.item.media.platformId }
                         ?.also { updatePlaylistItemMedia(intent.item, intent.item.media, state) }
-                        ?.let { state.playlist }
+                    //?.let { state.playlist }
                 } else {
                     state.playlist
                         ?.let { playlistMutator.remove(it, intent.item) }
                         ?.takeIf { it != state.playlist }
-                        ?.also { state.playlist = it }
-                        ?.also { updateView(state) }
+                        ?.also { dispatch(SetPlaylist(it)) }
                 }
 
                 DELETE ->
                     state.playlist
                         ?.let { playlistMutator.remove(it, intent.item) }
                         ?.takeIf { it != state.playlist }
-                        ?.also { state.playlist = it }
-                        ?.also { updateView(state) }
+                        ?.also { dispatch(SetPlaylist(it)) }
             }.takeIf { !util.isQueuedPlaylist(state) && currentIndexBefore != state.playlist?.currentIndex }
                 ?.apply {
                     scope.launch {
@@ -632,34 +640,6 @@ class PlaylistMviStoreFactory(
                             playlistOrDefaultUsecase.updateCurrentIndex(this, state.playlistIdentifier.flatOptions())
                         }
                     }
-                }
-        }
-
-        private fun updateView(state: State, animate: Boolean = true) {
-            state.playlist
-                ?.takeIf { coroutines.mainScopeActive }
-                ?.let {
-                    modelMapper.map(
-                        domain = it,
-                        isPlaying = util.isPlaylistPlaying(state),
-                        id = state.playlistIdentifier,
-                        playlists = state.playlistsTreeLookup,
-                        pinned = util.isPlaylistPinned(state),
-                        appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] },
-                        itemsIdMap = state.itemsIdMap
-                    )
-                }
-                .also {
-                    state.focusIndex?.apply {
-                        publish(Label.ScrollToItem(this))
-                        state.focusIndex = null
-                    }
-                }.also {
-                    state.playlist
-                        ?.currentIndex
-                        ?.also {
-                            publish(Label.HighlightPlayingItem(it))
-                        }
                 }
         }
 
@@ -731,15 +711,15 @@ class PlaylistMviStoreFactory(
                         dispatch(SetDeletedItem(deleteItem))
                         val appPlaylistInteractor = appPlaylistInteractors[state.playlist?.id]
                         val action = appPlaylistInteractor?.customResources?.customDelete?.label ?: "Deleted"
-                        if (state.playlist?.type != PlaylistDomain.PlaylistTypeDomain.APP
-                            || !(appPlaylistInteractor?.hasCustomDeleteAction ?: false)
+                        if (state.playlist?.type == PlaylistDomain.PlaylistTypeDomain.APP
+                            && (appPlaylistInteractor?.hasCustomDeleteAction ?: false)
                         ) {
+                            appPlaylistInteractor?.performCustomDeleteAction(deleteItem)
+                            executeRefresh(state = state)
+                        } else {
                             log.d("deleting item: ${intent.item.id}")
                             playlistItemOrchestrator.delete(deleteItem, LOCAL.flatOptions())
                             log.d("deleted item: ${intent.item.id}")
-                        } else {
-                            appPlaylistInteractor?.performCustomDeleteAction(deleteItem)
-                            executeRefresh(state = state)
                         }
                         log.d("deleted item: ${intent.item.id}")
                         publish(Label.ShowUndo(ItemDelete, "$action: ${deleteItem.media.title}"))
@@ -877,7 +857,7 @@ class PlaylistMviStoreFactory(
                         playlistsTree = playlistsTree,
                         playlistsTreeLookup = playlistsTree.buildLookup(),
                         focusIndex = focusIndex,
-                        itemsIdMap = buildIdList(playlistOrDefault.first)
+//                        itemsIdMap = buildIdList(playlistOrDefault.first)
                     )
                 )
                 publish(Label.Loaded)
@@ -887,16 +867,6 @@ class PlaylistMviStoreFactory(
                 publish(Error("Load failed: ${e::class.simpleName}"))
                 publish(Label.Loaded)
             }
-        }
-
-        fun buildIdList(domain: PlaylistDomain?): MutableMap<Long, PlaylistItemDomain> {
-            val modelIdGenerator = IdGenerator()
-            val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
-            domain?.items?.mapIndexed { index, item ->
-                val modelId = item.id ?: modelIdGenerator.value
-                itemsIdMap[modelId] = item
-            }
-            return itemsIdMap.also { map -> log.d(map.keys.associateBy { map[it]?.media?.title }.toString()) }
         }
         // endregion loadRefresh
     }
