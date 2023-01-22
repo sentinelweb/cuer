@@ -43,15 +43,18 @@ class PlaylistUpdateUsecase constructor(
             }
             ?.let { playlist ->
                 when (playlist.platform) {
-                    YOUTUBE -> playlist.platformId?.run {
-                        playlistOrchestrator
-                            .loadByPlatformId(this, Source.PLATFORM.deepOptions())
-                            ?.let { removeExistingItems(it, playlist) }
-                            ?.takeIf { it.items.size > 0 }
-                            ?.let { playlistMediaLookupUsecase.lookupMediaAndReplace(it) }
-                            ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
-                            ?.let { UpdateResult(true, numberItems = it.size) }
-                    } ?: UpdateResult(false, reason = "No platform id")
+                    YOUTUBE -> playlist.platformId
+                        ?.run {
+                            playlistOrchestrator
+                                .loadByPlatformId(this, Source.PLATFORM.deepOptions())
+                                ?.let { removeExistingItems(it, playlist) }
+                                ?.takeIf { it.items.size > 0 }
+                                ?.let { playlistMediaLookupUsecase.lookupMediaAndReplace(it) }
+                                ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
+                                ?.let { UpdateResult(true, numberItems = it.size) }
+                                ?: UpdateResult(true, numberItems = 0)
+                        }
+                        ?: UpdateResult(false, reason = "No platform id")
 
                     else -> UpdateResult(false, reason = "No platform type")
                 }
