@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.playlist
+package uk.co.sentinelweb.cuer.app.ui.playlist.old
 
 //import kotlinx.android.synthetic.main.view_playlist_item.view.*
 import android.annotation.SuppressLint
@@ -41,9 +41,12 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PL
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.CastState.*
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.ScrollDirection.*
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistAdapter
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistHelpConfig
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.old.PlaylistContract.CastState.*
+import uk.co.sentinelweb.cuer.app.ui.playlist.old.PlaylistContract.ScrollDirection.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract

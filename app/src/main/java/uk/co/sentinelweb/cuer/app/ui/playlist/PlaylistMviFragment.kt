@@ -481,7 +481,7 @@ class PlaylistMviFragment : Fragment(),
         log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source, addPlaylistParent=$addPlaylistParent")
         val onResumeGotArguments = plId?.let { it != -1L } ?: false
         return if (onResumeGotArguments) {
-            PlaylistContract.makeNav(plId, plItemId, playNow, source, addPlaylistParent)
+            makeNav(plId, plItemId, playNow, source, addPlaylistParent)
         } else null
     }
 // endregion
@@ -540,7 +540,7 @@ class PlaylistMviFragment : Fragment(),
 
     private fun navigate(nav: NavigationModel) {
         when (nav.target) {
-            Target.PLAYLIST_EDIT -> PlaylistFragmentDirections.actionGotoEditPlaylist(
+            Target.PLAYLIST_EDIT -> PlaylistMviFragmentDirections.actionGotoEditPlaylist(
                 nav.params[NavigationModel.Param.SOURCE].toString(),
                 null,
                 nav.params[NavigationModel.Param.PLAYLIST_ID] as Long
@@ -638,7 +638,7 @@ class PlaylistMviFragment : Fragment(),
         adapter
             .getItemViewForId(modelId)
             ?.let { view ->
-                PlaylistFragmentDirections.actionGotoPlaylistItem(
+                PlaylistMviFragmentDirections.actionGotoPlaylistItem(
                     item.serialise(),
                     source.toString(),
                     -1,
@@ -661,21 +661,21 @@ class PlaylistMviFragment : Fragment(),
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun setCastState(state: PlaylistContract.CastState) {
+    private fun setCastState(state: QueueCastConnectionListener.CastState) {
         when (state) {
-            PlaylistContract.CastState.PLAYING -> {
+            QueueCastConnectionListener.CastState.PLAYING -> {
                 binding.playlistFabPlay.setIconResource(R.drawable.ic_playlist_close)
                 binding.playlistFabPlay.text = getString(R.string.stop)
                 adapter.notifyDataSetChanged()
             }
 
-            PlaylistContract.CastState.NOT_CONNECTED -> {
+            QueueCastConnectionListener.CastState.NOT_CONNECTED -> {
                 binding.playlistFabPlay.setIconResource(R.drawable.ic_playlist_play)
                 binding.playlistFabPlay.text = getString(R.string.menu_play)
                 adapter.notifyDataSetChanged()
             }
 
-            PlaylistContract.CastState.CONNECTING -> {
+            QueueCastConnectionListener.CastState.CONNECTING -> {
                 binding.playlistFabPlay.setIconResource(R.drawable.ic_notif_buffer_black)
                 binding.playlistFabPlay.text = getString(R.string.buffering)
             }
@@ -768,6 +768,30 @@ class PlaylistMviFragment : Fragment(),
     companion object {
         private const val CREATE_PLAYLIST_TAG = "pe_dialog"
         private const val SELECT_PLAYLIST_TAG = "pdf_dialog"
+
+        fun makeNav(
+            plId: Long?,
+            plItemId: Long? = null,
+            play: Boolean,
+            source: OrchestratorContract.Source? = OrchestratorContract.Source.LOCAL,
+            addPlaylistParent: Long? = null,
+            imageUrl: String? = null
+        ): NavigationModel {
+            val params = mutableMapOf(
+                NavigationModel.Param.PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
+                NavigationModel.Param.PLAY_NOW to play,
+                NavigationModel.Param.SOURCE to (source ?: throw IllegalArgumentException("No Source"))
+            ).apply {
+                plItemId?.also { put(NavigationModel.Param.PLAYLIST_ITEM_ID, it) }
+            }.apply {
+                addPlaylistParent?.also { put(NavigationModel.Param.PLAYLIST_PARENT, it) }
+            }.apply {
+                imageUrl?.also { put(NavigationModel.Param.IMAGE_URL, it) }
+            }
+            return NavigationModel(
+                Target.PLAYLIST, params
+            )
+        }
 
         val fragmentModule = module {
             scope(named<PlaylistMviFragment>()) {

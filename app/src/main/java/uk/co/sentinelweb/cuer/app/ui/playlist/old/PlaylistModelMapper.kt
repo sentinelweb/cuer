@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.playlist
+package uk.co.sentinelweb.cuer.app.ui.playlist.old
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract

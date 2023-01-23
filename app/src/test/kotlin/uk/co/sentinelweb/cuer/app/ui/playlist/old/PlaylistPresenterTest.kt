@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.playlist
+package uk.co.sentinelweb.cuer.app.ui.playlist.old
 
 import com.flextrade.jfixture.JFixture
 import com.google.common.truth.Truth.assertThat
@@ -23,8 +23,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract.State
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.ui.playlist.old.PlaylistContract.State
 import uk.co.sentinelweb.cuer.app.usecase.AddPlaylistUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase

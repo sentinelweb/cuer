@@ -5,7 +5,7 @@ import androidx.navigation.fragment.NavHostFragment
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 // todo review all of this as part of
@@ -39,7 +39,7 @@ class MainNavigationProvider(
             ?.let {
                 return when (it) {
                     NavigationModel.Target.PLAYLIST.name ->
-                        PlaylistContract.makeNav(
+                        PlaylistMviFragment.makeNav(
                             NavigationModel.Param.PLAYLIST_ID.getLong(intent)
                                 ?: throw IllegalArgumentException("Playlist ID is required"),
                             NavigationModel.Param.PLAYLIST_ITEM_ID.getLong(intent),

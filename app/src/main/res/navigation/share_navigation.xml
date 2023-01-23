@@ -83,7 +83,7 @@
 
     <fragment
         android:id="@+id/share_navigation_playlist_old"
-        android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlist.old.PlaylistFragment"
         android:label="@string/sharenav_title_playlist"
         tools:layout="@layout/fragment_playlist"
     >

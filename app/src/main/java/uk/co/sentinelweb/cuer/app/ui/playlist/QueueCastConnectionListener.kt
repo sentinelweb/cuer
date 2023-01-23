@@ -11,8 +11,11 @@ class QueueCastConnectionListener(
     private val queue: QueueMediatorContract.Producer,
     private val ytCastContextHolder: ChromecastYouTubePlayerContextHolder
 ) {
+
+    enum class CastState { PLAYING, CONNECTING, NOT_CONNECTED }
+
     var playListId: OrchestratorContract.Identifier<*> = (-1L).toLocalIdentifier()
-    lateinit var callback: (PlaylistContract.CastState) -> Unit
+    lateinit var callback: (CastState) -> Unit
 
     private val isQueuedPlaylist: Boolean
         get() = playListId == queue.playlistId
@@ -30,19 +33,19 @@ class QueueCastConnectionListener(
     private val castConnectionListener = object : ChromecastConnectionListener {
         override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
             if (isQueuedPlaylist) {
-                callback(PlaylistContract.CastState.PLAYING)
+                callback(CastState.PLAYING)
             }
         }
 
         override fun onChromecastConnecting() {
             if (isQueuedPlaylist) {
-                callback(PlaylistContract.CastState.CONNECTING)
+                callback(CastState.CONNECTING)
             }
         }
 
         override fun onChromecastDisconnected() {
             if (isQueuedPlaylist) {
-                callback(PlaylistContract.CastState.NOT_CONNECTED)
+                callback(CastState.NOT_CONNECTED)
             }
         }
     }
