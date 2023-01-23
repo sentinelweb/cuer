@@ -59,6 +59,7 @@
         android:icon="@drawable/ic_search"
         android:title="@string/playlist_item_menu_related"
         app:iconTint="?contextMenuItemColor"
+        android:visible="false"
         />
 
     <item

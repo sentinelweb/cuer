@@ -333,7 +333,7 @@ class PlaylistMviFragment : Fragment(),
                 })
 
                 diff(get = PlaylistMviContract.View.Model::items, set = { items ->
-                    setList(items, animate = false)
+                    setList(items, animate = true)
                     previousItems = items
                     commitHost.isReady(true)
                 })
