@@ -38,7 +38,8 @@ ON CONFLICT (platform, platform_id) DO NOTHING
 ;
 
 getInsertId:
-SELECT last_insert_rowid() FROM media LIMIT 1;
+SELECT max(id) FROM media;
+-- SELECT last_insert_rowid() FROM media LIMIT 1;
 
 update:
 REPLACE INTO media ( id, flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,

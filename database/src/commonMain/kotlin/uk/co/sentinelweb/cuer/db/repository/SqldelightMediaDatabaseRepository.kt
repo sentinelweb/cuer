@@ -47,8 +47,11 @@ class SqldelightMediaDatabaseRepository(
     override suspend fun save(domain: MediaDomain, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             try {
+                // fixme problems here saving the channel (i think) - related items save
                 val id = saveInternal(domain, flat)
+                log.d("saved media:  $id ${domain.platformId}")
                 val loadResult = load(id = id, flat)
+                log.d("loaded media:  $id ${loadResult.data?.id}}")
                 if (loadResult.isSuccessful)
                     RepoResult.Data(loadResult.data)
                         .also {
@@ -246,6 +249,7 @@ class SqldelightMediaDatabaseRepository(
             }
             .let {
                 val mediaEntity = mediaMapper.map(it)
+                log.d("save mediaEntity: ${mediaEntity.id} ${mediaEntity.title}")
                 with(database.mediaEntityQueries) {
                     if (mediaEntity.id > 0) {
                         // manual check for platform-platformId duplication
@@ -258,14 +262,17 @@ class SqldelightMediaDatabaseRepository(
                         if (platformCheck != null && platformCheck.id != mediaEntity.id) {
                             throw ConflictException(
                                 "conflicting id for ${mediaEntity.platform}-${mediaEntity.platform_id}" +
-                                        " existing: ${platformCheck.id}  thisid:${mediaEntity.id} "
+                                        " existing: ${platformCheck.id}  this.id:${mediaEntity.id}"
                             )
                         }
                         update(mediaEntity)
                         loadById(mediaDomain.id!!).executeAsOne().id
                     } else {
                         create(mediaEntity)
-                        getInsertId().executeAsOne()
+                        log.d("created mediaEntity: channelId: ${mediaEntity.channel_id} ${mediaEntity.title}")
+                        getInsertId().executeAsOne().max!!.also { id ->
+                            log.d("created mediaEntity id: $id")
+                        }
                     }
                 }
             }
