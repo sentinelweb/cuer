@@ -31,7 +31,7 @@ actual class TimeStampMapper actual constructor(
         return timestampDateFormatter.dateFromString(dateString)?.toKotlinInstant()
     }
 
-    actual fun toTimestamp(date: LocalDateTime): String {// todo check time included?
+    actual fun toTimestamp(date: LocalDateTime): String { // todo check time included?
         val dateComponents = date.toNSDateComponents()
         return dateComponents.date
             ?.let { timestampDateFormatter.stringFromDate(date = it) }
