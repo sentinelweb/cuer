@@ -1,11 +1,17 @@
 package uk.co.sentinelweb.cuer.core.mappers
 
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import kotlin.math.abs
 
 class TimeSinceFormatter(
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val logWrapper: LogWrapper
 ) {
+    init {
+        logWrapper.tag(this)
+    }
+
     fun formatTimeSince(millis: Long): String {
         val differenceSeconds = (timeProvider.currentTimeMillis() - millis) / 1000L
         return if (differenceSeconds >= 0) {
@@ -17,7 +23,7 @@ class TimeSinceFormatter(
                 differenceSeconds < SEC_TO_MONTHS -> "${differenceSeconds / SEC_TO_DAYS}d"
                 differenceSeconds < SEC_TO_YEARS -> "${differenceSeconds / SEC_TO_MONTHS}mth"
                 differenceSeconds < SEC_TO_YEARS * 20 -> "${differenceSeconds / SEC_TO_YEARS}y"
-                else -> "-"
+                else -> "--"
             }
         } else "!"
     }
@@ -33,7 +39,7 @@ class TimeSinceFormatter(
             positiveSeconds < SEC_TO_MONTHS -> "$sign${positiveSeconds / SEC_TO_DAYS}d"
             positiveSeconds < SEC_TO_YEARS -> "$sign${positiveSeconds / SEC_TO_MONTHS}mth"
             positiveSeconds < SEC_TO_YEARS * 20 -> "$sign${positiveSeconds / SEC_TO_YEARS}y"
-            else -> "-"
+            else -> "--"
         }
     }
 

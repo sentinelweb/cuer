@@ -11,7 +11,7 @@ object SharedCoreModule {
     val objectModule = module {
         factory { CoroutineContextProvider() }
         factory { TimeProvider() }
-        factory { TimeSinceFormatter(get()) }
+        factory { TimeSinceFormatter(get(), get()) }
         factory { TimeFormatter() }
         factory { DateTimeFormatter() }
     }

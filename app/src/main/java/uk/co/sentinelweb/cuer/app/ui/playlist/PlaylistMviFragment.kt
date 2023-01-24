@@ -839,7 +839,7 @@ class PlaylistMviFragment : Fragment(),
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }
-                scoped { PlaylistMviItemModelMapper(get(), get(), get(), get()) }
+                scoped { PlaylistMviItemModelMapper(get(), get(), get(), get(), get()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped<ShareWrapper> { AndroidShareWrapper(this.getFragmentActivity()) }

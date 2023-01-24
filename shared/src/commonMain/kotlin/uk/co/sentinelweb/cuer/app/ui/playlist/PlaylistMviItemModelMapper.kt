@@ -9,14 +9,20 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.core.mappers.Format
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlaylistMviItemModelMapper constructor(
     private val timeSinceFormatter: TimeSinceFormatter,
     private val timeFormatter: TimeFormatter,
     private val durationTextColorMapper: DurationTextColorMapper,
-    private val stringDecoder: StringDecoder
+    private val stringDecoder: StringDecoder,
+    private val log: LogWrapper
 ) {
+
+    init {
+        log.tag(this)
+    }
 
     fun mapItem(
         modelId: Long,
@@ -63,7 +69,10 @@ class PlaylistMviItemModelMapper constructor(
                 ?: "-",
             isWatched = item.media.watched,
             published = item.media.published
-                ?.let { timeSinceFormatter.formatTimeSince(it.toInstant(TimeZone.UTC).epochSeconds) }// todo .convertToLocalMillis()
+                ?.let {
+                    val millis = it.toInstant(TimeZone.UTC).toEpochMilliseconds()
+                    timeSinceFormatter.formatTimeSince(millis)
+                }
                 ?: "-",
             platform = item.media.platform,
             isLive = item.media.isLiveBroadcast,
