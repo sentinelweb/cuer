@@ -68,7 +68,7 @@ interface SearchContract {
                 scoped { State() }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { EnumValuesDialogCreator(this.getFragmentActivity()) }
-                scoped { AlertDialogCreator(this.getFragmentActivity()) }
+                scoped { AlertDialogCreator(this.getFragmentActivity(), get()) }
             }
             factory { SearchMapper(get(), get()) }
 

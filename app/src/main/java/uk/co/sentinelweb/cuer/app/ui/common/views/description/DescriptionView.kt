@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.common.views.description
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
@@ -83,6 +84,7 @@ class DescriptionView @JvmOverloads constructor(
         binding.pidAuthorTitle.text = model.channelTitle
         binding.pidAuthorDesc.text = model.channelDescription
         binding.pidAuthorImage.isVisible = true
+        setInfo(model, binding.pidInfo)
         model.channelThumbUrl
             ?.also { url ->
                 Glide.with(context)
@@ -94,7 +96,6 @@ class DescriptionView @JvmOverloads constructor(
                     .into(binding.pidAuthorImage)
             }
             ?: run { binding.pidAuthorImage.setImageDrawable(ytDrawable) }
-
 
         val playlistChipsState = model.playlistChips.joinToString { it.text }
         if (playlistChipsUpdate != playlistChipsState) {
@@ -163,7 +164,15 @@ class DescriptionView @JvmOverloads constructor(
         tv.text = textWithLinks
         tv.linksClickable = true
         tv.movementMethod = LinkMovementMethod.getInstance()
-        tv.isFocusable = false
+        tv.setTextIsSelectable(true)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun setInfo(model: DescriptionModel, pidInfo: TextView) {
+        pidInfo.text = """
+            ID: ${model.info.platformId} (${model.info.platform})
+            DBID: ${model.info.dbId}
+        """.trimIndent()
     }
 
     class InternalURLSpan(

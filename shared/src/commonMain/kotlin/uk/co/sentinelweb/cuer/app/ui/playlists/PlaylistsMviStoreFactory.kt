@@ -92,7 +92,7 @@ class PlaylistsMviStoreFactory(
                 )
 
                 is Result.SetDeletedItem -> copy(deletedItem = msg.item)
-                else -> copy()
+                is Result.SetMoveState -> copy(dragFrom = msg.from, dragTo = msg.to)
             }
     }
 

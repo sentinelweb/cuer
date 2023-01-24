@@ -36,7 +36,6 @@ class PlaylistsDialogFragment(private val config: PlaylistsMviDialogContract.Con
 
     override val scope: Scope by fragmentScopeWithSource<PlaylistsDialogFragment>()
 
-    //private val presenter: PlaylistsDialogContract.Presenter by inject()
     private val viewModel: PlaylistsDialogViewModel by inject()
     private val adapter: PlaylistsDialogAdapter by inject()
     private val log: LogWrapper by inject()

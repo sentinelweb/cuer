@@ -40,6 +40,7 @@ class SharePresenter constructor(
     private val timeProvider: TimeProvider,
     private val shareStrings: ShareContract.ShareStrings,
     private val recentLocalPlaylists: RecentLocalPlaylists,
+//    private val platformIdFilter: PlatformIdFilter
 ) : ShareContract.Presenter {
 
     init {
@@ -49,6 +50,21 @@ class SharePresenter constructor(
     override fun onStop() {
         coroutines.cancel()
     }
+// abandoning commit listening need to wait for all playlist items before cqllingafter commit
+// also need to hold the state params from the finish method as they are also passed to after commit
+// basically a bigger refactor is needed here to get it to work
+// share presenter has gotten too complex and need to be re-designed
+//    private fun listenForCommit() {
+//        playlistOrchestrator.updates
+//            .filter { platformIdFilter.compareTo(it) }
+//            .onEach { /*aftercommit*/ }
+//            .launchIn(coroutines.mainScope)
+//
+//        playlistItemOrchestrator.updates
+//            .filter { platformIdFilter.compareTo(it) }
+//            .onEach { /*aftercommit*/ }
+//            .launchIn(coroutines.mainScope)
+//    }
 
     override fun setPlaylistParent(cat: CategoryDomain?, parentId: Long) {
         state.category = cat
@@ -57,6 +73,7 @@ class SharePresenter constructor(
 
     override fun onReady(ready: Boolean) {
         state.ready = ready
+        // listenForCommit()
         mapModel()
     }
 
@@ -70,7 +87,11 @@ class SharePresenter constructor(
                                 .replaceFirstChar { char -> char.uppercase() })
                     )
             }
-            ?.let { mapper.mapShareModel(state, ::finish, view.canCommit(state.scanResult?.type)) }
+            ?.let {
+                val canCommit = view.canCommit(state.scanResult?.type)
+                log.d("canCommit; $canCommit: state.scanResult?.type:${state.scanResult?.type}")
+                mapper.mapShareModel(state, ::finish, canCommit)
+            }
             ?: mapper.mapEmptyModel(::finish))
             .apply {
                 state.model = this
@@ -100,8 +121,11 @@ class SharePresenter constructor(
                     if (result.isNew) MEMORY else LOCAL,
                     state.parentPlaylistId
                 )
+//                platformIdFilter.targetDomainClass = PlaylistItemDomain::class
+//                platformIdFilter.targetPlatformId = it.platformId
                 mapModel()
             }
+
             PLAYLIST -> (result.result as PlaylistDomain).let { playlist ->
                 playlist.id?.let { id ->
                     coroutines.mainScope.launch {
@@ -119,6 +143,8 @@ class SharePresenter constructor(
                                 )
                             }
                         }
+//                        platformIdFilter.targetDomainClass = PlaylistDomain::class
+//                        platformIdFilter.targetPlatformId = playlist.platformId
                         view.showPlaylist(
                             id.toIdentifier(if (result.isNew) MEMORY else LOCAL),
                             state.parentPlaylistId
@@ -127,6 +153,7 @@ class SharePresenter constructor(
                     }
                 } ?: throw IllegalStateException("Playlist needs an id (isNew = MEMORY)")
             }
+
             else -> throw IllegalArgumentException("unsupported type: ${result.type}")
         }
     }
@@ -171,11 +198,12 @@ class SharePresenter constructor(
         coroutines.mainScope.launch {
             if (add) {// fixme if playlist items are changed then they aren't saved here
                 if (view.canCommit(state.scanResult?.type)) {
-                    view.commit(object : ShareContract.Committer.OnCommit {
+                    view.commit(object : ShareCommitter.AfterCommit {
                         override suspend fun onCommit(type: ObjectTypeDomain, data: List<*>) {
                             afterCommit(type, data, play, forward)
                         }
                     })
+
                 } else {
                     view.warning("Can't save from here")
                 }
@@ -192,12 +220,14 @@ class SharePresenter constructor(
                             .let {
                                 afterCommit(PLAYLIST_ITEM, it, play, forward)
                             }
+
                     PLAYLIST -> afterCommit(
                         PLAYLIST,
                         listOf(state.scanResult?.result as PlaylistDomain),
                         play,
                         forward
                     )
+
                     else -> throw IllegalArgumentException("unsupported type: ${state.scanResult?.type}")
                 }
             }
@@ -226,12 +256,12 @@ class SharePresenter constructor(
 
                 PLAYLIST_ITEM -> (data as List<PlaylistItemDomain>)
                     .let { playlistItemList ->
-                        val playlistItem: PlaylistItemDomain? =
-                            chooseItem(playlistItemList, currentPlaylistId.id)
+                        val playlistItem: PlaylistItemDomain? = chooseItem(playlistItemList, currentPlaylistId.id)
                         playlistItem
                             ?.let { it.playlistId!! to it.id }
                             ?: let { currentPlaylistId.id to (null as Long?) }
                     }
+
                 else -> throw java.lang.IllegalStateException("Unsupported type")
             }
             recentLocalPlaylists.addRecentId(playId.first)
@@ -241,7 +271,7 @@ class SharePresenter constructor(
                 view.exit()
             } else { // return play is hidden for not connected
                 playId
-                    .takeIf { play && isConnected}
+                    .takeIf { play && isConnected }
                     ?.let {
                         playId.first.let { itemPlaylistId ->
                             queue.playNow(itemPlaylistId.toIdentifier(LOCAL), playId.second)
@@ -253,6 +283,7 @@ class SharePresenter constructor(
             when (t) {
                 is NoDefaultPlaylistException -> // todo make a dialog or just create the playlist
                     view.error(shareStrings.errorNoDefaultPlaylist)
+
                 else -> view.error(t.message ?: (t::class.java.simpleName + " error ... sorry"))
             }
         }

@@ -249,7 +249,6 @@ class CastPlayerMviFragment() :
             scope(named<CastPlayerMviFragment>()) {
 
             }
-
         }
     }
 

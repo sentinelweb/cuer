@@ -28,7 +28,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 class NavigationRouter constructor(
     private val activity: Activity,
     private val toastWrapper: ToastWrapper,
-    private val ytJavaApi: YoutubeJavaApiWrapper,
+    private val ytJavaApi: PlatformLaunchWrapper,
     private val navController: NavController?,
     private val log: LogWrapper,
     private val urlLauncher: UrlLauncherWrapper,
@@ -99,6 +99,7 @@ class NavigationRouter constructor(
 //                nav.navOpts,
 //                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
+
             NavigationModel.Target.PLAYLIST_ITEM -> navController?.navigate(
                 R.id.navigation_playlist_item_edit,
                 bundleOf(
@@ -191,5 +192,11 @@ fun Scope.navigationRouter(
     } else null,
     urlLauncher = UrlLauncherWrapper(sourceActivity),
     log = get(),
-    cryptoLauncher = AndroidCryptoLauncher(sourceActivity, get(), AlertDialogCreator(sourceActivity), get(), get())
+    cryptoLauncher = AndroidCryptoLauncher(
+        sourceActivity,
+        get(),
+        AlertDialogCreator(sourceActivity, get()),
+        get(),
+        get()
+    )
 )

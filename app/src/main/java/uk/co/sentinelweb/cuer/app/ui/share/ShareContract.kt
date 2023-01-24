@@ -46,19 +46,12 @@ interface ShareContract {
         fun setData(model: Model)
         fun error(msg: String)
         fun warning(msg: String)
-        suspend fun commit(onCommit: Committer.OnCommit)
+        suspend fun commit(afterCommit: ShareCommitter.AfterCommit)
         fun showMedia(itemDomain: PlaylistItemDomain, source: Source, playlistParentId: Long?)
         fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?)
         fun navigate(nav: NavigationModel)
         fun canCommit(type: ObjectTypeDomain?): Boolean
         fun hideWarning()
-    }
-
-    interface Committer {
-        suspend fun commit(onCommit: OnCommit)
-        interface OnCommit {
-            suspend fun onCommit(type: ObjectTypeDomain, data: List<*>)
-        }
     }
 
     data class Model constructor(
@@ -119,7 +112,8 @@ interface ShareContract {
                         playlistItemOrchestrator = get(),
                         playlistOrchestrator = get(),
                         shareStrings = get(),
-                        recentLocalPlaylists = get()
+                        recentLocalPlaylists = get(),
+//                        platformIdFilter = PlatformIdFilter()
                     )
                 }
                 scoped { AndroidShareWrapper(get<ShareActivity>()) }
@@ -134,7 +128,7 @@ interface ShareContract {
                 scoped { navigationRouter(false, get<ShareActivity>()) }
                 scoped<ShareStrings> { AndroidShareStrings(get()) }
                 scoped<PlayerContract.PlayerControls> { EmptyPlayerControls() }
-                scoped { AlertDialogCreator(get<ShareActivity>()) }
+                scoped { AlertDialogCreator(get<ShareActivity>(), get()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 // SHARE HACKS
                 scoped<CommitHost> { get<ShareActivity>() }

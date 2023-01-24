@@ -67,7 +67,7 @@ interface SearchImageContract {
                         a = this.getFragmentActivity(), res = get(), bitmapSizer = get()
                     )
                 }
-                scoped { AlertDialogCreator(this.getFragmentActivity()) }
+                scoped { AlertDialogCreator(this.getFragmentActivity(), get()) }
             }
             factory { Mapper() }
         }

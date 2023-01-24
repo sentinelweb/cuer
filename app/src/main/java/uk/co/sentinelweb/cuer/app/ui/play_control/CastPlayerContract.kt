@@ -16,8 +16,11 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -119,7 +122,7 @@ interface CastPlayerContract {
                 scoped { CastPlayerUiMapper(get(), get(), get()) }
 
                 // todo play usecase - extract
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 // fixme needed for play dialog - but shouldn't be needed - remove
                 scoped { navigationRouter(false, this.getFragmentActivity(), false) }
                 scoped {
@@ -130,10 +133,10 @@ interface CastPlayerContract {
                         coroutines = get(),
                         floatingService = get(),
                         playDialog = get(),
-                        res = get()
+                        strings = get()
                     )
                 }
-                scoped {
+                scoped<PlayUseCase.Dialog> {
                     PlayDialog(
                         get<CastPlayerFragment>(),
                         itemFactory = get(),
@@ -146,6 +149,8 @@ interface CastPlayerContract {
                         youtubeApi = get(),
                     )
                 }
+                scoped { ItemFactory(get(), get(), get()) }
+                scoped { ItemModelMapper(get(), get(), get(), get()) }
             }
         }
     }

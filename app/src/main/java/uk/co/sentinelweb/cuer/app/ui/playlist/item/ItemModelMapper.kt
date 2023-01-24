@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.convertToLocalMillis
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.Format
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
@@ -27,11 +28,11 @@ class ItemModelMapper constructor(
         playlistText: String?,
         showOverflow: Boolean,
         deleteResources: ActionResources?
-    ): ItemContract.Model {
+    ): PlaylistItemMviContract.Model.Item {
         val top = "${item.media.title} : ${item.media.channelData.title}"
         val pos = item.media.positon?.toFloat() ?: 0f
         val progress = item.media.duration?.let { pos / it.toFloat() } ?: 0f
-        return ItemContract.Model(
+        return PlaylistItemMviContract.Model.Item(
             modelId,
             index = index,
             url = item.media.url,

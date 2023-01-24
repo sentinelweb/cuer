@@ -33,6 +33,7 @@ class FloatingWindowManagement(
     interface Callbacks {
         fun onClose()
         fun onLaunch()
+        fun onPlayPause()
     }
 
     private var _binding: WindowAytFloatBinding? = null
@@ -80,8 +81,7 @@ class FloatingWindowManagement(
             callbacks.onLaunch()
         }
 
-        binding?.floatingPlayerBlockTitle?.setOnClickListener {}
-        binding?.floatingPlayerBlockTitle?.setOnTouchListener { _, _ -> true }
+        binding?.floatingPlayerBlockTitle?.setOnClickListener { callbacks.onPlayPause() }
 
         binding?.fullscreenVideoWrapper?.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
             override fun touched() {

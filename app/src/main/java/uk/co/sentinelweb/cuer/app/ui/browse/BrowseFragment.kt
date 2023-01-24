@@ -29,7 +29,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
@@ -158,7 +158,7 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
                             )
                         }
                         is OpenLocalPlaylist -> navRouter.navigate(
-                            PlaylistContract.makeNav(
+                            PlaylistMviFragment.makeNav(
                                 label.id,
                                 play = label.play
                             )

@@ -173,6 +173,17 @@ android {
         minSdk = app_minSdkVersion.toInt()
         targetSdk = app_targetSdkVersion.toInt()
     }
+    packagingOptions {
+        exclude("META-INF/ASL-2.0.txt")
+        exclude("draftv4/schema")
+        exclude("META-INF/DEPENDENCIES")
+        exclude("META-INF/LICENSE.md")
+        exclude("META-INF/NOTICE.md")
+        exclude("META-INF/io.netty.versions.properties")
+        exclude("META-INF/LGPL-3.0.txt")
+        exclude("draftv3/schema")
+        exclude("META-INF/INDEX.LIST")
+    }
 }
 
 tasks.withType<KotlinCompile>().configureEach {

@@ -15,7 +15,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.EmailWrapper
@@ -80,9 +79,9 @@ interface MainContract {
                 scoped { navigationRouter(false, get<MainActivity>()) }
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<MainActivity>(), get()) }
-                scoped<PlaylistContract.Interactions?> { null }
+                // scoped<PlaylistContract.Interactions?> { null }
                 scoped { FloatingPlayerCastListener(get(), get(), get()) }
-                scoped { AlertDialogCreator(get<MainActivity>()) }
+                scoped { AlertDialogCreator(get<MainActivity>(), get()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), true) }
                 scoped { EmailWrapper(get<MainActivity>()) }
                 scoped { AndroidShareWrapper(get<MainActivity>()) }

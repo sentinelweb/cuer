@@ -22,6 +22,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -149,7 +150,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
         AlertDialogModel(
             title = res.getString(R.string.pref_backup_error_title),
             message = message,
-            confirm = AlertDialogModel.Button(R.string.ok)
+            confirm = AlertDialogModel.Button(StringResource.ok)
         ).apply {
             alertDialogCreator.create(this).show()
         }
@@ -181,10 +182,10 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
             title = res.getString(R.string.pref_backup_restore_auto_title),
             message = res.getString(R.string.pref_backup_restore_auto_message), // says existing data will be lost
             confirm = AlertDialogModel.Button(
-                label = R.string.pref_backup_restore_auto_confirm,
+                label = StringResource.pref_backup_restore_auto_confirm,
                 action = { presenter.onConfirmRestoreAutoBackup() }
             ),
-            cancel = AlertDialogModel.Button(label = R.string.cancel, action = {})
+            cancel = AlertDialogModel.Button(label = StringResource.cancel, action = {})
         ).apply {
             alertDialogCreator.create(this).show()
         }

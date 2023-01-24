@@ -7,8 +7,8 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 
-actual class TimeStampMapper constructor(
-    private val log: LogWrapper
+actual class TimeStampMapper actual constructor(
+    actual val log: LogWrapper
 ) {
 
     private val timeStampFormatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN)

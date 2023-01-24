@@ -4,10 +4,24 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.media.session.MediaButtonReceiver
+import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidApplication
 import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
+import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.CuerAppState
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationMedia
+import uk.co.sentinelweb.cuer.app.ui.common.skip.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -64,5 +78,95 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
 
         private var _instance: FloatingPlayerService? = null
         fun instance(): FloatingPlayerService? = _instance
+
+        @ExperimentalCoroutinesApi
+        val serviceModule = module {
+            factory { FloatingPlayerServiceManager(androidApplication(), get()) }
+            factory<FloatingPlayerContract.Manager> { get<FloatingPlayerServiceManager>() }
+            factory { DisplayOverlayPermissionCheck() }
+            scope(named<FloatingPlayerService>()) {
+                scoped<FloatingPlayerContract.Controller> {
+                    FloatingPlayerController(
+                        service = get(),
+                        playerController = get(),
+                        playerMviViw = get(),
+                        windowManagement = get(),
+                        aytViewHolder = get(),
+                        log = get(),
+                        screenStateReceiver = get(),
+                        toastWrapper = get(),
+                        multiPrefs = get(),
+                    )
+                }
+                scoped<PlayerContract.PlaylistItemLoader> { NoItemLoader() }
+                scoped {
+                    PlayerController(
+                        queueConsumer = get(),
+                        modelMapper = get(),
+                        coroutines = get(),
+                        lifecycle = null,
+                        log = get(),
+                        playControls = get(),
+                        store = get()
+                    )
+                }
+                scoped {
+                    PlayerStoreFactory(
+                        // storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+                        storeFactory = DefaultStoreFactory(),
+                        itemLoader = get(),
+                        queueConsumer = get(),
+                        queueProducer = get(),
+                        skip = get(),
+                        coroutines = get(),
+                        log = get(),
+                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
+                        mediaSessionManager = get(),
+                        playerControls = get(),
+                        mediaOrchestrator = get(),
+                        playlistItemOrchestrator = get()
+                    ).create()
+                }
+                scoped { FloatingWindowMviView(get(), get(), get(), get()) }
+                scoped { FloatingWindowManagement(get(), get(), get(), get()) }
+                scoped<SkipContract.External> {
+                    SkipPresenter(
+                        view = EmptySkipView(),
+                        state = SkipContract.State(),
+                        log = get(),
+                        mapper = SkipModelMapper(timeSinceFormatter = get(), res = get()),
+                        prefsWrapper = get()
+                    )
+                }
+                scoped {
+                    PlayerControlsNotificationController(
+                        view = get(),
+                        context = androidApplication(),
+                        log = get(),
+                        state = get(),
+                        toastWrapper = get(),
+                        skipControl = EmptySkipPresenter(),
+                        mediaSessionManager = get(),
+                        res = get()
+                    )
+                }
+                scoped<PlayerControlsNotificationContract.External> {
+                    get<PlayerControlsNotificationController>()
+                }
+                scoped<PlayerControlsNotificationContract.Controller> {
+                    get<PlayerControlsNotificationController>()
+                }
+                scoped<PlayerControlsNotificationContract.View> {
+                    PlayerControlsNotificationMedia(
+                        service = get(),
+                        appState = get(),
+                        timeProvider = get(),
+                        log = get(),
+                        launchClass = AytPortraitActivity::class.java
+                    )
+                }
+                scoped { PlayerControlsNotificationContract.State() }
+            }
+        }
     }
 }

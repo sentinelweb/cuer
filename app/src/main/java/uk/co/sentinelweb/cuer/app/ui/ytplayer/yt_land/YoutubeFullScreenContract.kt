@@ -73,7 +73,7 @@ interface YoutubeFullScreenContract {
                         )
                     )
                 }
-                scoped { AlertDialogCreator(get<YoutubeFullScreenActivity>()) }
+                scoped { AlertDialogCreator(get<YoutubeFullScreenActivity>(), get()) }
             }
         }
     }

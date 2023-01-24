@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LinkDomain
 
@@ -39,10 +40,10 @@ class AndroidCryptoLauncher(
                 title = res.getString(R.string.support_crypto_warning_title),
                 message = res.getString(R.string.support_crypto_warning_message),
                 confirm = AlertDialogModel.Button(
-                    R.string.support_crypto_warning_ok,
+                    StringResource.support_crypto_warning_ok,
                     { showCryptoAppLauncher() }
                 ),
-                cancel = AlertDialogModel.Button(R.string.cancel)
+                cancel = AlertDialogModel.Button(StringResource.cancel)
             )
         ).show()
     }

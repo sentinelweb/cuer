@@ -74,6 +74,10 @@ class FloatingPlayerController constructor(
                 playerMviViw.launchActivity()
                 service.stopSelf()
             }
+
+            override fun onPlayPause() {
+                playerMviViw.dispatch(PlayPauseClicked())
+            }
         }
         if (!BuildConfig.cuerBackgroundPlay) {
             screenStateReceiver.screenOffCallbacks.add(lockHandler)
@@ -97,7 +101,8 @@ class FloatingPlayerController constructor(
         aytViewHolder.cleanupIfNotSwitching()
     }
 
-    override fun handleAction(intent: Intent) {
+    override fun handleAction(intent: Any) {
+        intent as Intent
         log.d("intent.action = ${intent.action}")
         when (intent.action) {
             ACTION_DISCONNECT -> {

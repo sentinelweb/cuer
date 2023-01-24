@@ -30,7 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
@@ -40,6 +40,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -62,6 +63,7 @@ class ShareActivity : AppCompatActivity(),
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
+    private val log: LogWrapper by inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
@@ -76,14 +78,14 @@ class ShareActivity : AppCompatActivity(),
             ?.run { (getChildFragmentManager().getFragments().get(0) as? ScanContract.View) }
             ?: throw IllegalStateException("Not a scan fragment")
 
-    private val commitFragment: ShareContract.Committer
+    private val commitFragment: ShareCommitter
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            ?.run { (getChildFragmentManager().getFragments().get(0) as? ShareContract.Committer) }
+            ?.run { (getChildFragmentManager().getFragments().get(0) as? ShareCommitter) }
             ?: throw IllegalStateException("Not a commit fragment")
 
     private val isOnPlaylist: Boolean
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            ?.run { (getChildFragmentManager().getFragments().get(0) is PlaylistFragment) }
+            ?.run { (getChildFragmentManager().getFragments().get(0) is PlaylistMviFragment) }
             ?: false
 
     private val isOnPlaylistItem: Boolean
@@ -95,6 +97,10 @@ class ShareActivity : AppCompatActivity(),
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.run { (getChildFragmentManager().getFragments().get(0) is PlaylistEditFragment) }
             ?: false
+
+    init {
+        log.tag(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -243,8 +249,8 @@ class ShareActivity : AppCompatActivity(),
         presenter.scanResult(result)
     }
 
-    override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) =
-        commitFragment.commit(onCommit)
+    override suspend fun commit(afterCommit: ShareCommitter.AfterCommit) =
+        commitFragment.commit(afterCommit)
 
     override fun canCommit(type: ObjectTypeDomain?): Boolean =
         when (type) {
@@ -293,6 +299,7 @@ class ShareActivity : AppCompatActivity(),
 
     // CommitHost
     override fun isReady(ready: Boolean) {
+        log.d("commit host isReady: $ready")
         presenter.onReady(ready)
     }
 

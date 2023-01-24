@@ -80,6 +80,7 @@
     <string name="pl_item_move">Move</string>
     <string name="playlist_change_dialog_title">Change playlist?</string>
     <string name="playlist_change_dialog_message">This will change the current playlist …</string>
+    <string name="playlist_error_please_add">Please add the playlist first …</string>
     <string name="playlist_item_menu_view">View</string>
     <string name="playlist_item_menu_play">Play</string>
     <string name="playlist_item_menu_play_start">Play from start</string>
@@ -93,8 +94,10 @@
     <string name="playlist_play_items_from_start">Play items from start</string>
     <string name="playlist_error_moveitem_already_exists">Item already exists on this playlist …</string>
     <string name="playlist_item_moved_undo_message">Moved to %1$s</string>
+    <string name="playlist_items_updated">%1$s new items</string>
+    <string name="playlist_error_updating">Error updating: %1$s …</string>
 
-    <!-- playlist edit fragemnt -->
+    <!-- playlist edit fragment -->
     <string name="pe_fragment_title">Edit playlist</string>
     <string name="pe_fragment_title_add">Create playlist</string>
     <string name="pe_title">Title</string>
@@ -210,6 +213,7 @@
 
     <!-- dialogs -->
     <string name="playlist_dialog_add_playlist">Add playlist …</string>
+    <string name="playlist_dialog_title_move">Move playlist to …</string>
     <string name="select_route_dialog_title">Select Route</string>
     <string name="create_playlist_dialog_title">Create playlist</string>
     <string name="dialog_button_view_info">View info</string>

@@ -5,8 +5,8 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-actual class TimeStampMapper constructor(
-    private val log: LogWrapper
+actual class TimeStampMapper actual constructor(
+    actual val log: LogWrapper
 ) {
 
     // 2020-04-06T16:00:16Z

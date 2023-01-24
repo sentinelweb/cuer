@@ -3,9 +3,10 @@
     <item>
         <shape android:shape="rectangle">
             <gradient android:angle="0" android:centerX="1" android:centerY="0"
-                android:endColor="@color/transparent" android:gradientRadius="64dp"
-                android:startColor="@color/black" android:type="radial" />
-            <size android:width="64dp" android:height="64dp" />
+                      android:endColor="@color/transparent" android:gradientRadius="@dimen/floating_player_button_size"
+                      android:startColor="@color/black" android:type="radial"/>
+            <size android:width="@dimen/floating_player_button_size"
+                  android:height="@dimen/floating_player_button_size"/>
         </shape>
     </item>
 </selector>

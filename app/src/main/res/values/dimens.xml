@@ -38,11 +38,12 @@
 
     <dimen name="chip_thumb_icon_size">48dp</dimen>
     <dimen name="app_bar_header_height">200dp</dimen>
-    <dimen name="app_bar_header_height_playlist">380dp</dimen>
+    <dimen name="app_bar_header_height_playlist">360dp</dimen>
     <dimen name="app_bar_header_height_playlist_no_actions">320dp</dimen>
     <dimen name="app_bar_header_height_playlist_edit">360dp</dimen>
     <dimen name="app_bar_header_height_playlist_item">360dp</dimen>
     <dimen name="app_bar_header_height_playlists">244dp</dimen>
+    <dimen name="app_bar_header_margin_start">16dp</dimen>
     <dimen name="search_height">300dp</dimen>
     <dimen name="snackbar_icon">15sp</dimen>
     <dimen name="flag_size">24dp</dimen>
@@ -61,6 +62,10 @@
     <dimen name="playlist_row_icon_width">106dp</dimen>
     <dimen name="max_cache_image_size">100dp</dimen>
     <dimen name="notif_image_size_sdk_31">96dp</dimen>
+    <dimen name="floating_player_button_size">48dp</dimen>
+    <dimen name="floating_player_button_outer_padding">16dp</dimen>
+    <dimen name="floating_player_button_inner_padding">4dp</dimen>
+    <dimen name="tile_overflow_button_size">48dp</dimen>
 
     <integer name="anim_transition_time">300</integer>
 </resources>

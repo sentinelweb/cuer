@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -99,7 +100,7 @@ interface PlaylistItemEditContract {
                 scoped { this.getFragmentActivity() }
                 scoped { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped { AndroidShareWrapper(this.getFragmentActivity()) }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped {
                     PlayUseCase(
                         queue = get(),
@@ -108,10 +109,10 @@ interface PlaylistItemEditContract {
                         coroutines = get(),
                         floatingService = get(),
                         playDialog = get(),
-                        res = get()
+                        strings = get()
                     )
                 }
-                scoped {
+                scoped<PlayUseCase.Dialog> {
                     PlayDialog(
                         get<PlaylistItemEditFragment>(),
                         itemFactory = get(),

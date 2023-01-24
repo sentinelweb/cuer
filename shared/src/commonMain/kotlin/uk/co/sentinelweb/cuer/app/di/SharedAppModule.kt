@@ -17,6 +17,8 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.usecase.*
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
@@ -119,10 +121,16 @@ object SharedAppModule {
         }
     }
 
+    private val uiModule = module {
+        factory { IconMapper() }
+        factory { DurationTextColorMapper() }
+    }
+
     val modules = listOf(objectModule)
         .plus(orchestratorModule)
         .plus(queueModule)
         .plus(dbModule)
         .plus(usecaseModule)
+        .plus(uiModule)
         .plus(DescriptionContract.viewModule)
 }
