@@ -6,12 +6,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 
 class TimeSinceFormatterTest {
 
     private var timeProvider: TimeProvider = mockk(relaxUnitFun = true)
 
-    private val sut = TimeSinceFormatter(timeProvider)
+    private val sut = TimeSinceFormatter(timeProvider, SystemLogWrapper())
 
     private val baseTime = System.currentTimeMillis()
 
