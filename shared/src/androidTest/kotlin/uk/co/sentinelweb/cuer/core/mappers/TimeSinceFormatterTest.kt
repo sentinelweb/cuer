@@ -63,7 +63,7 @@ class TimeSinceFormatterTest {
 
     @Test
     fun formatTimeSince_too_long() {
-        assertEquals("-", sut.formatTimeSince(baseTime - 1000L * 60 * 60 * 24 * 365 * 21))
+        assertEquals("--", sut.formatTimeSince(baseTime - 1000L * 60 * 60 * 24 * 365 * 21))
     }
 
     //////////////////// short ////////////////////////////////
@@ -99,7 +99,7 @@ class TimeSinceFormatterTest {
 
     @Test
     fun formatTimeShort_too_long() {
-        assertEquals("-", sut.formatTimeShort(1000L * 60 * 60 * 24 * 365 * 21))
+        assertEquals("--", sut.formatTimeShort(1000L * 60 * 60 * 24 * 365 * 21))
     }
 
 }

@@ -39,7 +39,8 @@ class PlaylistMviModelMapper constructor(
                 playlists = state.playlistsTreeLookup,
                 pinned = util.isPlaylistPinned(state),
                 appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] },
-                itemsIdMap = state.itemsIdMap
+                itemsIdMap = state.itemsIdMap,
+                blockItem = state.deletedPlaylistItem ?: state.movedPlaylistItem
             )
         } ?: PlaylistMviContract.View.Model(
             header = Header(
@@ -79,11 +80,12 @@ class PlaylistMviModelMapper constructor(
         pinned: Boolean,
         playlists: Map<Long, PlaylistTreeDomain>?,
         appPlaylist: AppPlaylistInteractor?,
-        itemsIdMap: MutableMap<Long, PlaylistItemDomain>
+        itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
+        blockItem: PlaylistItemDomain?
     ): PlaylistMviContract.View.Model {
         log.d("map")
         val items = if (isMapItems) {
-            mapItems(domain, itemsIdMap, playlists, appPlaylist)
+            mapItems(domain, itemsIdMap, playlists, appPlaylist, blockItem)
         } else null
         return PlaylistMviContract.View.Model(
             header = Header(
@@ -126,31 +128,34 @@ class PlaylistMviModelMapper constructor(
         domain: PlaylistDomain,
         itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
         playlists: Map<Long, PlaylistTreeDomain>?,
-        appPlaylist: AppPlaylistInteractor?
+        appPlaylist: AppPlaylistInteractor?,
+        blockItem: PlaylistItemDomain?
     ): List<PlaylistItemMviContract.Model.Item> {
         //log.d("items: ${itemsIdMap.size}")
         val reverseLookup: Map<PlaylistItemDomain, Long> = itemsIdMap.keys.associateBy { itemsIdMap[it]!! }
         //log.d("reverseLookup: ${reverseLookup.keys.map { "${it.id} -> ${reverseLookup[it]}" }.joinToString(":")}")
-        return domain.items.mapIndexedNotNull { index, item ->
-            reverseLookup.get(item)?.let { modelId ->
-                itemModelMapper.mapItem(
-                    modelId,
-                    item,
-                    index,
-                    domain.config.editableItems,
-                    domain.config.deletableItems,
-                    domain.config.editable,
-                    mapPlaylistText(item, domain, playlists),
-                    true,
-                    appPlaylist?.customResources?.customDelete
-                )
-            } ?: run {
-                log.e("Couldn't get item: ${item.id} ${item.media.title}")
-                // fixme this might not be the best - should be in itemsIdMap
-                // throw IllegalStateException("Couldn't get item: ${item.id} ${item.media.title}")
-                null
+        return domain.items
+            .filter { blockItem == null || it.id != blockItem.id }
+            .mapIndexedNotNull { index, item ->
+                reverseLookup.get(item)?.let { modelId ->
+                    itemModelMapper.mapItem(
+                        modelId,
+                        item,
+                        index,
+                        domain.config.editableItems,
+                        domain.config.deletableItems,
+                        domain.config.editable,
+                        mapPlaylistText(item, domain, playlists),
+                        true,
+                        appPlaylist?.customResources?.customDelete
+                    )
+                } ?: run {
+                    log.e("Couldn't get item: ${item.id} ${item.media.title}")
+                    // fixme this might not be the best - should be in itemsIdMap
+                    // throw IllegalStateException("Couldn't get item: ${item.id} ${item.media.title}")
+                    null
+                }
             }
-        }
     }
 
     fun mapPlaylistText(
