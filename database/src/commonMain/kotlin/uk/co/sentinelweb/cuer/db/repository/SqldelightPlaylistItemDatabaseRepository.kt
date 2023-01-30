@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
+import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
@@ -58,10 +59,26 @@ class SqldelightPlaylistItemDatabaseRepository(
                 }
                 .let { (domain, itemEntity) ->
                     with(database.playlistItemEntityQueries) {
+                        val platformCheck = try {
+                            loadItemsByMediaIdAndPlaylistId(
+                                mediaId = itemEntity.media_id, playlistId = itemEntity.playlist_id
+                            ).executeAsOne()
+                        } catch (n: NullPointerException) {
+                            null
+                        }
                         domain to if (domain.id != null) {
+                            if (platformCheck != null && platformCheck.id != itemEntity.id) {
+                                throw ConflictException(
+                                    "conflicting playlistitem id for ${itemEntity.media_id}_${itemEntity.playlist_id}" +
+                                            " existing: ${platformCheck.id}  thisid:${itemEntity.id} "
+                                )
+                            }
                             itemEntity.also { update(it) }
                             load(itemEntity.id).executeAsOne()
                         } else {
+                            if (platformCheck != null) {
+                                throw ConflictException("playlistitem already exists: ${itemEntity.media_id}_${itemEntity.playlist_id}")
+                            }
                             create(itemEntity)
                             itemEntity.copy(id = getInsertId().executeAsOne())
                         }

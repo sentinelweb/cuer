@@ -23,16 +23,17 @@ CREATE UNIQUE INDEX playlist_item_media_id_playlist_id_index ON playlist_item(me
 
 create:
 INSERT INTO playlist_item (flags, media_id, ordering, playlist_id, date_added) VALUES ?
-    ON CONFLICT (media_id, ordering, playlist_id) DO UPDATE
-        SET flags = excluded.flags, ordering = excluded.ordering, date_added = excluded.date_added
-        WHERE media_id = excluded.media_id AND playlist_id = excluded.playlist_id;
+--     ON CONFLICT (media_id, ordering, playlist_id) DO UPDATE
+--         SET flags = excluded.flags, ordering = excluded.ordering, date_added = excluded.date_added
+--         WHERE media_id = excluded.media_id AND playlist_id = excluded.playlist_id
+;
 
 getInsertId:
 SELECT last_insert_rowid() FROM playlist_item LIMIT 1;
 
 update:
 REPLACE INTO playlist_item (id, flags, media_id, ordering, playlist_id, date_added) VALUES ?
-  ON CONFLICT (media_id, ordering, playlist_id) DO NOTHING
+--  ON CONFLICT (media_id, ordering, playlist_id) DO NOTHING
 ;
 
 load:
@@ -49,6 +50,9 @@ SELECT * FROM playlist_item WHERE id IN :playlistItemIds;
 
 loadItemsByMediaId:
 SELECT * FROM playlist_item WHERE media_id IN :mediaIds;
+
+loadItemsByMediaIdAndPlaylistId:
+SELECT * FROM playlist_item WHERE media_id == :mediaId AND playlist_id == :playlistId;
 
 delete:
 DELETE FROM playlist_item WHERE id = ?;

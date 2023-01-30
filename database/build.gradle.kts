@@ -135,6 +135,6 @@ sqldelight {
         sourceFolders = listOf("sqldelight")
         schemaOutputDirectory = file("src/commonMain/sqldelight/uk/co/sentinelweb/cuer/app/database")
         verifyMigrations = true
-        dialect = "sqlite:3.24"
+        // dialect = "sqlite:3.24"
     }
 }
