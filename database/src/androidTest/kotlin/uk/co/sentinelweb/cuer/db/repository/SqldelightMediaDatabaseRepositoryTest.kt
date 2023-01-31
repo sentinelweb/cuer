@@ -320,6 +320,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
         val actual = sut.save(duplicatePlatformId, flat = false, emit = false)
         assertFalse(actual.isSuccessful)
+        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
     }
 
     @Test
@@ -337,6 +338,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
         val actual = sut.save(duplicatePlatformIdList, flat = false, emit = false)
         assertFalse(actual.isSuccessful)
+        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
     }
 
     @Test
