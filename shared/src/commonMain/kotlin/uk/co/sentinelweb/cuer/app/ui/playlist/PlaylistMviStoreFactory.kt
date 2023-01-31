@@ -53,9 +53,7 @@ class PlaylistMviStoreFactory(
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,
     private val playlistOrchestrator: PlaylistOrchestrator,
-    private val playlistStatsOrchestrator: PlaylistStatsOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
-    private val mediaOrchestrator: MediaOrchestrator,
     private val playlistUpdateUsecase: PlaylistUpdateUsecase,
     private val playlistOrDefaultUsecase: PlaylistOrDefaultUsecase,
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
@@ -381,6 +379,7 @@ class PlaylistMviStoreFactory(
                                 )
                             )
                         }
+                        ?.also { recentLocalPlaylists.addRecent(playlist) }
                         ?.also { dispatch(SelectedPlaylistItem(null)) }
                         ?.also { dispatch(SetModified()) }
                         ?: apply {
