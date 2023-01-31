@@ -15,8 +15,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_CREATE
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.main.MainCommonContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore.Label.Navigate
@@ -152,7 +151,7 @@ class PlaylistsMviStoreFactory(
                 publish(
                     Navigate(
                         NavigationModel(
-                            PLAYLIST_CREATE,
+                            PLAYLIST_EDIT,
                             mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id)
                         ),
                         intent.view
