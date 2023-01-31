@@ -87,7 +87,7 @@ class PlaylistUpdateUsecase constructor(
                 id = null,
                 playlistId = existing.id,
                 dateAdded = timeProvider.instant(),
-                order = if (orderIsAscending) (maxOrder + (i + 1) * 1000) else (minOrder - ((newItems.size - i)) * 1000)
+                order = if (orderIsAscending) (maxOrder + (i + 1) * SECONDS) else (minOrder - ((newItems.size - i)) * SECONDS)
             )
         })
         log.d(playlistWithNewItemsOnly.summarise())
@@ -106,5 +106,6 @@ class PlaylistUpdateUsecase constructor(
 
     companion object {
         private val UPDATE_INTERVAL_DEFAULT = 1000 * 60 * 60
+        val SECONDS = 1000L
     }
 }

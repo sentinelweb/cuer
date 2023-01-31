@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase.Companion.SECONDS
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
@@ -107,7 +108,7 @@ class PlaylistUpdateUsecaseTest {
                 platformId = platformId,
                 items = pl.items.mapIndexed { i, item ->
                     item.copy(
-                        order = (pl.items.size - i + 7) * 1000L,
+                        order = (pl.items.size - i + 7) * SECONDS,
                         media = item.media.copy(
                             published = localtime.toInstant(tz).plus(-i.seconds).toLocalDateTime(tz)
                         )
@@ -152,7 +153,7 @@ class PlaylistUpdateUsecaseTest {
         // existing order is:: minOrder: 8000 maxOrder: 13000 orderIsAscending: false
         // so least recent is 7000 and most recent is 2000
         actual.newItems?.forEachIndexed { i, item ->
-            assertEquals(8000L - ((6 - i) * 1000L), item.order)
+            assertEquals(8 * SECONDS - ((6 - i) * SECONDS), item.order)
         }
     }
 
@@ -170,7 +171,7 @@ class PlaylistUpdateUsecaseTest {
                 //items = pl.items.mapIndexed { i, item -> item.copy(order = i * 1000L) }
                 items = pl.items.mapIndexed { i, item ->
                     item.copy(
-                        order = i * 1000L,
+                        order = i * SECONDS,
                         media = item.media.copy(published = localtime.toInstant(tz).plus(i.seconds).toLocalDateTime(tz))
                     )
                 }
@@ -213,7 +214,7 @@ class PlaylistUpdateUsecaseTest {
         // existing order is:: minOrder: 8000 maxOrder: 13000 orderIsAscending: false
         // so least recent is 7000 and most recent is 2000
         actual.newItems?.forEachIndexed { i, item ->
-            assertEquals(5000L + ((i + 1) * 1000L), item.order)
+            assertEquals(5 * SECONDS + ((i + 1) * SECONDS), item.order)
         }
     }
 
