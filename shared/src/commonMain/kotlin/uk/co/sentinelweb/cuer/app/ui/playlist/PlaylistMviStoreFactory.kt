@@ -785,11 +785,11 @@ class PlaylistMviStoreFactory(
         // region loadRefresh
         private fun setPlaylistData(intent: Intent.SetPlaylistData, getState: () -> State) {
             // fixme bit dodgy here - modifying state.
-            log.d("setPlaylistData:" + intent.toString())
+            //log.d("setPlaylistData:" + intent.toString())
             val currentState = getState()
             coroutines.mainScope.launch {
                 val notLoaded = currentState.playlist == null
-                log.d("setPlaylistData: notLoaded: $notLoaded")
+                //log.d("setPlaylistData: notLoaded: $notLoaded")
                 intent.plId
                     ?.takeIf { it != -1L }
                     ?.toIdentifier(intent.source)
@@ -827,7 +827,7 @@ class PlaylistMviStoreFactory(
         private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false, state: State) {
             publish(Label.Loading)
             try {
-                log.d("executeRefresh: ${state.playlistIdentifier} scrollToCurrent: $scrollToCurrent focusIndex:${state.focusIndex}")
+                log.d("executeRefresh: ${state.playlistIdentifier} scrollToCurrent: $scrollToCurrent focusIndex: ${state.focusIndex}")
                 val id = state.playlistIdentifier
                     .takeIf { it != OrchestratorContract.NO_PLAYLIST }
                     ?: prefsWrapper.currentPlayingPlaylistId
@@ -842,8 +842,7 @@ class PlaylistMviStoreFactory(
                 dispatch(
                     Load(
                         playlist = playlistOrDefault?.first,
-                        playlistIdentifier = playlistOrDefault?.first
-                            ?.id?.toIdentifier(playlistOrDefault.second)
+                        playlistIdentifier = playlistOrDefault?.first?.id?.toIdentifier(playlistOrDefault.second)
                             ?: throw IllegalStateException("Need an id"),
                         playlistsTree = playlistsTree,
                         playlistsTreeLookup = playlistsTree.buildLookup(),
@@ -851,7 +850,6 @@ class PlaylistMviStoreFactory(
                 )
                 publish(Label.Loaded)
                 focusIndex
-                    ?.also { log.d("after exec: focusIndex: $it") }
                     ?.also { publish(Label.ScrollToItem(it)) }
                     ?.also { dispatch(SetFocusIndex(null)) }
             } catch (e: Throwable) {
