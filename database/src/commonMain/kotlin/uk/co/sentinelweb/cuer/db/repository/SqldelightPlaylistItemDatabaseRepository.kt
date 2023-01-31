@@ -265,9 +265,25 @@ class SqldelightPlaylistItemDatabaseRepository(
             .let { (domains, entities) ->
                 with(database.playlistItemEntityQueries) {
                     domains to entities.map { itemEntity ->
+                        val platformCheck = try {
+                            loadItemsByMediaIdAndPlaylistId(
+                                mediaId = itemEntity.media_id, playlistId = itemEntity.playlist_id
+                            ).executeAsOne()
+                        } catch (n: NullPointerException) {
+                            null
+                        }
                         if (itemEntity.id > 0L) {
+                            if (platformCheck != null && platformCheck.id != itemEntity.id) {
+                                throw ConflictException(
+                                    "conflicting playlistitem id for ${itemEntity.media_id}_${itemEntity.playlist_id}" +
+                                            " existing: ${platformCheck.id}  thisid:${itemEntity.id} "
+                                )
+                            }
                             itemEntity.also { update(it) }
                         } else {
+                            if (platformCheck != null) {
+                                throw ConflictException("playlistitem already exists: ${itemEntity.media_id}_${itemEntity.playlist_id}")
+                            }
                             create(itemEntity)
                             itemEntity.copy(id = getInsertId().executeAsOne())
                         }

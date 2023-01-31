@@ -296,13 +296,12 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                 .copy(
                     id = null,
                     playlistId = itemDomain1.playlistId,
-                    media = itemDomain1.media/*.copy(id = null)*/,
+                    media = itemDomain1.media,
                     order = itemDomain1.order
                 )
 
         // itemConflict should overwrite the original
-        val savedConflict = sut.save(itemConflict, flat = false, emit = false)//.data!!
-        //assertEquals(itemDomain1.id, savedConflict.id)
+        val savedConflict = sut.save(itemConflict, flat = false, emit = false)
         assertFalse(savedConflict.isSuccessful)
         assertEquals((savedConflict as RepoResult.Error<*>).t::class, ConflictException::class)
     }
@@ -317,15 +316,14 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                     .copy(
                         id = null,
                         playlistId = itemDomain1.playlistId,
-                        media = itemDomain1.media/*.copy(id = null)*/,
+                        media = itemDomain1.media,
                         order = itemDomain1.order
                     )
             )
         // itemConflict should overwrite the original
-        val savedConflict = sut.save(itemConflict, flat = false, emit = false)//.data!!
+        val savedConflict = sut.save(itemConflict, flat = false, emit = false)
         assertFalse(savedConflict.isSuccessful)
-        assertEquals("SQLiteException", (savedConflict as RepoResult.Error<*>).t::class.simpleName)
-        //assertEquals(itemDomain1.id, savedConflict[0].id)
+        assertEquals((savedConflict as RepoResult.Error<*>).t::class, ConflictException::class)
     }
 
     // if we try to save the same media on same playlist with different ordering then it will be an exception which is ok
@@ -338,23 +336,13 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                 .copy(
                     id = null,
                     playlistId = itemDomain1.playlistId,
-                    media = itemDomain1.media,/*.copy(id = null)*/
+                    media = itemDomain1.media,
                     archived = itemDomain1.archived.not(),
                 )
 
         val actual = sut.save(itemConflict, flat = false, emit = false)
         assertFalse(actual.isSuccessful)
         assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
-
-//        val actual = sut.save(itemConflict, flat = false, emit = false)
-//        assertTrue(actual.isSuccessful)
-//        log.d("actual: ${actual.data?.id.toString()} ${actual.data?.archived}")
-//        // item won't conflict but won't be saved
-//        // load item by id and check it's the original
-//        val loaded = sut.load(itemDomain1.id!!, flat = false).data!!
-//        log.d("loaded.a:${loaded.archived} i1.a:${itemDomain1.archived} conflict.a:${itemConflict.archived}")
-//        assertEquals(itemDomain1, loaded)
-//        assertNotEquals(itemConflict, loaded)
     }
 
     @Test
@@ -374,28 +362,6 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         val actual = sut.save(itemConflict, flat = false, emit = false)
         assertFalse(actual.isSuccessful)
         assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
-
-//        // save is successful but data shouldn't be written IGNORE
-//        val saved = sut.save(itemConflict, flat = false, emit = false)// should noit save to db
-//        assertTrue(saved.isSuccessful)
-//        val loaded = sut.load(itemDomain2.id!!, flat = false).data!!
-//        assertNotEquals(loaded, itemConflict)
-        // todo need to modify save to check for this conflict and throw error
-
-//        // save is successful but data isn't written REPLACE .. DO NOTHING
-//        val saved = sut.save(itemConflict, flat = false, emit = false)
-//        assertTrue(saved.isSuccessful) //
-//        assertNotEquals(itemConflict, saved.data)
-//
-//        // the item with the id (2) won't be changed
-//        val conflictingItemIdLoad = sut.load(itemEntity2.id, flat = false)
-//        assertTrue(conflictingItemIdLoad.isSuccessful)
-//        assertEquals(itemDomain2, conflictingItemIdLoad.data)
-//
-//        // also the item with conflicting data (1) won't be changed
-//        val load = sut.load(itemDomain1.id!!, flat = false) // load previous record
-//        assertTrue(load.isSuccessful)
-//        assertEquals(itemDomain1, load.data)
     }
 
 //    @Test
