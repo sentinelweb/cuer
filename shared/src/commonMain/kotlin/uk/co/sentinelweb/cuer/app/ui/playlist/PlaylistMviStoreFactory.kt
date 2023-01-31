@@ -80,7 +80,6 @@ class PlaylistMviStoreFactory(
         data class Load(
             var playlistIdentifier: OrchestratorContract.Identifier<*>,
             var playlist: PlaylistDomain?,
-            var focusIndex: Int?,
             var playlistsTree: PlaylistTreeDomain?,
             var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>?,
 //            val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
@@ -102,7 +101,7 @@ class PlaylistMviStoreFactory(
         data class SetModified(val modified: Boolean = true) : Result()
         data class SetMoveState(val from: Int?, val to: Int?) : Result()
         data class SetCards(val isCards: Boolean) : Result()
-        data class SetFocusIndex(val index: Int) : Result()
+        data class SetFocusIndex(val index: Int?) : Result()
         data class SetHeadless(val headless: Boolean) : Result()
     }
 
@@ -116,7 +115,6 @@ class PlaylistMviStoreFactory(
                 is Load -> copy(
                     playlistIdentifier = msg.playlistIdentifier,
                     playlist = msg.playlist,
-                    focusIndex = msg.focusIndex,
                     playlistsTree = msg.playlistsTree,
                     playlistsTreeLookup = msg.playlistsTreeLookup,
                     itemsIdMap = buildIdList(msg.playlist),
@@ -787,37 +785,30 @@ class PlaylistMviStoreFactory(
         // region loadRefresh
         private fun setPlaylistData(intent: Intent.SetPlaylistData, getState: () -> State) {
             // fixme bit dodgy here - modifying state.
-            log.d("setPlaylistData:" + intent.toString())
+            //log.d("setPlaylistData:" + intent.toString())
             val currentState = getState()
             coroutines.mainScope.launch {
                 val notLoaded = currentState.playlist == null
+                //log.d("setPlaylistData: notLoaded: $notLoaded")
                 intent.plId
                     ?.takeIf { it != -1L }
                     ?.toIdentifier(intent.source)
-                    ?.apply {
-                        //state.playlistIdentifier = this
-                        dispatch(SetPlaylistId(this))
-                    }
-                    ?.apply { executeRefresh(scrollToCurrent = notLoaded, state = getState()) }
+                    ?.apply { dispatch(SetPlaylistId(this)) }
+                    ?.apply { executeRefresh(state = getState(), scrollToCurrent = notLoaded) }
                     ?.apply {
                         if (intent.playNow) {
-                            queue.playNow(currentState.playlistIdentifier, intent.plItemId)
+                            queue.playNow(this, intent.plItemId)
                         }
                     }
-                    ?.apply {
-                        getState().playlist?.also { recentLocalPlaylists.addRecent(it) }
-                    }
+                    ?.apply { recentLocalPlaylists.addRecentId(intent.plId) }
                     ?: run {
                         if (dbInit.isInitialized()) {
-                            //state.playlistIdentifier = prefsWrapper.lastViewedPlaylistId
                             dispatch(SetPlaylistId(prefsWrapper.lastViewedPlaylistId))
-                            executeRefresh(scrollToCurrent = notLoaded, state = getState())
+                            executeRefresh(state = getState(), scrollToCurrent = true)
                         } else {
-                            dbInit.addListener { b: Boolean ->
-                                if (b) {
+                            dbInit.addListener { success: Boolean ->
+                                if (success) {
                                     dispatch(SetPlaylistId(3L.toIdentifier(LOCAL)))
-                                    //state.playlistIdentifier = 3L.toIdentifier(LOCAL) // philosophy
-                                    //updatePlaylist()
                                     refresh(state = getState())
                                 }
                             }
@@ -827,15 +818,16 @@ class PlaylistMviStoreFactory(
         }
 
         private fun refresh(state: State) {
-            log.d("refresh:" + state.playlistIdentifier.toString())
-            scope.launch { executeRefresh(state = state) }
+            val notLoaded = state.playlist == null
+            log.d("refresh: ${state.playlistIdentifier} notLoaded: $notLoaded")
+            scope.launch { executeRefresh(state = state, scrollToCurrent = notLoaded) }
         }
 
         // todo scroll to current might need default true
         private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false, state: State) {
             publish(Label.Loading)
             try {
-                log.d("executeRefresh: ${state.playlistIdentifier} focusIndex:${state.focusIndex}")
+                log.d("executeRefresh: ${state.playlistIdentifier} scrollToCurrent: $scrollToCurrent focusIndex: ${state.focusIndex}")
                 val id = state.playlistIdentifier
                     .takeIf { it != OrchestratorContract.NO_PLAYLIST }
                     ?: prefsWrapper.currentPlayingPlaylistId
@@ -845,22 +837,21 @@ class PlaylistMviStoreFactory(
                     .loadList(AllFilter, LOCAL.flatOptions())
                     .buildTree()
                 val focusIndex = if (scrollToCurrent && state.focusIndex == null) {
-                    state.playlist?.currentIndex
+                    playlistOrDefault?.first?.currentIndex
                 } else state.focusIndex
                 dispatch(
                     Load(
                         playlist = playlistOrDefault?.first,
-                        playlistIdentifier = playlistOrDefault?.first
-                            ?.id?.toIdentifier(playlistOrDefault.second)
+                        playlistIdentifier = playlistOrDefault?.first?.id?.toIdentifier(playlistOrDefault.second)
                             ?: throw IllegalStateException("Need an id"),
                         playlistsTree = playlistsTree,
                         playlistsTreeLookup = playlistsTree.buildLookup(),
-                        focusIndex = focusIndex,
-//                        itemsIdMap = buildIdList(playlistOrDefault.first)
                     )
                 )
                 publish(Label.Loaded)
-                focusIndex?.also { publish(Label.ScrollToItem(it)) }
+                focusIndex
+                    ?.also { publish(Label.ScrollToItem(it)) }
+                    ?.also { dispatch(SetFocusIndex(null)) }
             } catch (e: Throwable) {
                 log.e("Error loading playlist", e)
                 publish(Error("Load failed: ${e::class.simpleName}"))

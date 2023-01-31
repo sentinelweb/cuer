@@ -165,7 +165,8 @@ class PlaylistMviContract {
             val canDelete: Boolean,
             val canEditItems: Boolean,
             val canDeleteItems: Boolean,
-            val hasChildren: Int
+            val hasChildren: Int,
+            val itemsText: String
         )
 
 
