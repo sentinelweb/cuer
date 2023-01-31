@@ -17,11 +17,11 @@ internal class PixabayService(
     ): PixabayImageListDto = executor.get(
         path = "",
         urlParams = mapOf(
-            "query" to query,
-            "imageType" to imageType,
+            "q" to query,
+            "image_type" to imageType,
             "key" to key,
             "orientation" to orientation,
-            "perPage" to perPage,
+            "per_page" to perPage,
         )
     )
 }
