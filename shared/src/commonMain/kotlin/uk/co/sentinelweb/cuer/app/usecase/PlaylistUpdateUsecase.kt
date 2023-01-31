@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.orderIsAscending
+import uk.co.sentinelweb.cuer.domain.ext.summarise
 
 class PlaylistUpdateUsecase constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
@@ -89,8 +90,8 @@ class PlaylistUpdateUsecase constructor(
                 order = if (orderIsAscending) (maxOrder + (i + 1) * 1000) else (minOrder - ((newItems.size - i)) * 1000)
             )
         })
-        //log.d(playlistWithNewItemsOnly.summarise())
-        log.d("playlistWithNewItemsOnly: ${playlistWithNewItemsOnly.items.size}")
+        log.d(playlistWithNewItemsOnly.summarise())
+        //log.d("playlistWithNewItemsOnly: ${playlistWithNewItemsOnly.items.size}")
         return playlistWithNewItemsOnly
     }
 

@@ -8,6 +8,9 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -22,6 +25,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import kotlin.time.Duration.Companion.seconds
 
 class PlaylistUpdateUsecaseTest {
     private val fixture = kotlinFixture {
@@ -49,6 +53,7 @@ class PlaylistUpdateUsecaseTest {
     lateinit var updateChecker: PlaylistUpdateUsecase.UpdateCheck
 
     private val log = SystemLogWrapper()
+    private val timeProviderTest: TimeProvider = TimeProvider()
 
     private lateinit var sut: PlaylistUpdateUsecase
 
@@ -92,13 +97,22 @@ class PlaylistUpdateUsecaseTest {
     @Test
     fun update_descending_playlist_must_add_at_top_in_reverse_order() = runTest {
         val platformId = "update_platformId"
+        val tz = TimeZone.UTC
+        val localtime = timeProviderTest.localDateTime()
         val existingPlaylist = generatePlaylist().let { pl ->
             pl.copy(
                 id = 1,
                 type = PLATFORM,
                 platform = PlatformDomain.YOUTUBE,
                 platformId = platformId,
-                items = pl.items.mapIndexed { i, item -> item.copy(order = (pl.items.size - i + 7) * 1000L) }
+                items = pl.items.mapIndexed { i, item ->
+                    item.copy(
+                        order = (pl.items.size - i + 7) * 1000L,
+                        media = item.media.copy(
+                            published = localtime.toInstant(tz).plus(-i.seconds).toLocalDateTime(tz)
+                        )
+                    )
+                }
             )
         }
         //log.d("existingPlaylist: ${existingPlaylist.items.size}")
@@ -139,6 +153,67 @@ class PlaylistUpdateUsecaseTest {
         // so least recent is 7000 and most recent is 2000
         actual.newItems?.forEachIndexed { i, item ->
             assertEquals(8000L - ((6 - i) * 1000L), item.order)
+        }
+    }
+
+    @Test
+    fun update_ascending_playlist_must_add_at_bottom_in_order() = runTest {
+        val platformId = "update_platformId"
+        val tz = TimeZone.UTC
+        val localtime = timeProviderTest.localDateTime()
+        val existingPlaylist = generatePlaylist().let { pl ->
+            pl.copy(
+                id = 1,
+                type = PLATFORM,
+                platform = PlatformDomain.YOUTUBE,
+                platformId = platformId,
+                //items = pl.items.mapIndexed { i, item -> item.copy(order = i * 1000L) }
+                items = pl.items.mapIndexed { i, item ->
+                    item.copy(
+                        order = i * 1000L,
+                        media = item.media.copy(published = localtime.toInstant(tz).plus(i.seconds).toLocalDateTime(tz))
+                    )
+                }
+            )
+        }
+        //log.d("existingPlaylist: ${existingPlaylist.items.size}")
+        val updatedPlatformPlaylist = generatePlaylist().let { pl ->
+            pl.copy(
+                id = null,
+                type = PLATFORM,
+                platform = PlatformDomain.YOUTUBE,
+                platformId = platformId,
+                items = existingPlaylist.items.plus(pl.items)
+            )
+        }
+        //log.d("updatedPlatformPlaylist: ${updatedPlatformPlaylist.items.size}")
+        //log.d(updatedPlatformPlaylist.items.map { it.media.platformId }.joinToString(","))
+
+        coEvery {
+            playlistOrchestrator.loadByPlatformId(platformId, Source.PLATFORM.deepOptions())
+        } returns updatedPlatformPlaylist
+
+        coEvery {
+            mediaOrchestrator.loadList(
+                PlatformIdListFilter(updatedPlatformPlaylist.items.map { it.media.platformId }),
+                LOCAL.flatOptions()
+            )
+        } returns existingPlaylist.items.map { it.media }
+
+        coEvery { playlistMediaLookupUsecase.lookupMediaAndReplace(any()) } answers { firstArg() }
+        coEvery {
+            playlistItemOrchestrator.save(any<List<PlaylistItemDomain>>(), LOCAL.deepOptions())
+        } answers { firstArg() }
+
+        val actual = sut.update(existingPlaylist)
+
+        //log.d("actual; ${actual.success} ${actual.newItems?.size}")
+        assertTrue(actual.success)
+        assertEquals(6, actual.newItems?.size)
+        // existing order is:: minOrder: 8000 maxOrder: 13000 orderIsAscending: false
+        // so least recent is 7000 and most recent is 2000
+        actual.newItems?.forEachIndexed { i, item ->
+            assertEquals(5000L + ((i + 1) * 1000L), item.order)
         }
     }
 
