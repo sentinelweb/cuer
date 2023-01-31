@@ -69,7 +69,8 @@ internal class YoutubePlaylistDomainMapper(
                         dateAdded = it.snippet.publishedAt
                             .let { ts ->
                                 log.d("pli.add: before parse: $ts")
-                                timeStampMapper.parseTimestampInstant(ts).also { log.d("pli.add: after parse: $it") }
+                                timeStampMapper.parseTimestampInstant(ts)
+                                    .also { log.d("pli.add: after parse: $it") }
                             }
                     )
                 }

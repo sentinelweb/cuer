@@ -16,6 +16,12 @@ actual class TimeStampMapper actual constructor(
             dateFormat = TIMESTAMP_PATTERN
         }
 
+    private val timestampNoMillisDateFormatter: NSDateFormatter
+        get() = NSDateFormatter().apply {
+            locale = NSLocale("GMT")
+            dateFormat = TIMESTAMP_PATTERN_NO_MILLIS
+        }
+
     private val simpleDateFormatter: NSDateFormatter
         get() = NSDateFormatter().apply {
             locale = NSLocale("GMT")
@@ -23,12 +29,18 @@ actual class TimeStampMapper actual constructor(
         }
 
     actual fun parseTimestamp(dateString: String): LocalDateTime? {
-        return timestampDateFormatter.dateFromString(dateString)?.toKotlinInstant()
+        return (timestampDateFormatter.dateFromString(dateString) ?: timestampNoMillisDateFormatter.dateFromString(
+            dateString
+        ))
+            ?.toKotlinInstant()
             ?.toLocalDateTime(TimeZone.currentSystemDefault())
     }
 
     actual fun parseTimestampInstant(dateString: String): Instant? {
-        return timestampDateFormatter.dateFromString(dateString)?.toKotlinInstant()
+        return (timestampDateFormatter.dateFromString(dateString) ?: timestampNoMillisDateFormatter.dateFromString(
+            dateString
+        ))
+            ?.toKotlinInstant()
     }
 
     actual fun toTimestamp(date: LocalDateTime): String { // todo check time included?
@@ -88,7 +100,8 @@ actual class TimeStampMapper actual constructor(
     }
 
     companion object {
-        private const val TIMESTAMP_PATTERN = "uuuu-MM-dd'T'HH:mm:ss[.n]'Z'"
+        private const val TIMESTAMP_PATTERN = "uuuu-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        private const val TIMESTAMP_PATTERN_NO_MILLIS = "uuuu-MM-dd'T'HH:mm:ss'Z'"
         private const val SIMPLE_DATETIME_PATTERN = "uuuu-MM-dd_HH:mm:ss"
         private const val DAYS = 24 * 60 * 60
         private const val HOURS = 60 * 60

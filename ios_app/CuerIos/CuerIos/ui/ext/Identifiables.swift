@@ -7,7 +7,8 @@
 
 import Foundation
 import shared
-
+// Redundant conformance of 'BrowseContractViewCategoryModel' to protocol 'Identifiable'
+// for some bizzare reason this file isn't included in the test target or we get the above compile error.
 extension BrowseContractViewCategoryModel: Identifiable{}
 
 extension PlaylistsItemMviContract.Model: Identifiable{}
