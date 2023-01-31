@@ -40,6 +40,7 @@ enum class Icon {
     ic_teespring,
     ic_twitch,
     ic_wikipedia,
+    ic_tiktok,
 
     // crypto
     ic_bitcoin,

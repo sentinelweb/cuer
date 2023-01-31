@@ -199,13 +199,17 @@ class MediaEntityTest : KoinTest {
         assertEquals(0L, actual)
     }
 
-    @Test
+    @Test//(expected = SQLiteException::class)//expected<android.database.sqlite.SQLiteException> but was<org.sqlite.SQLiteException>
     fun onConflictInsert() {
         val initial = (1..4).map { media() }
         val conflicting = initial[2].first.copy(id = 0)
 
         // try to insert conflicting
-        database.mediaEntityQueries.create(conflicting)
+        try {
+            database.mediaEntityQueries.create(conflicting)
+        } catch (e: Exception) {
+            assertEquals("SQLiteException", e::class.simpleName)
+        }
         // item is not inserted
         assertEquals(4, database.mediaEntityQueries.getInsertId().executeAsOne())
         assertEquals(4, database.mediaEntityQueries.count().executeAsOne())

@@ -15,16 +15,22 @@ import org.koin.test.KoinTest
 import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
+import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.db.util.DataCreation
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
     private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
@@ -51,12 +57,15 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
     val sut: PlaylistItemDatabaseRepository by inject()
     val mediaRepo: MediaDatabaseRepository by inject()
 
+    val log: LogWrapper by inject()
+
     lateinit var dataCreation: DataCreation
 
     @Before
     fun before() {
         Database.Schema.create(get())
         dataCreation = DataCreation(database, fixture, get())
+        log.tag(this)
     }
 
     @Test
@@ -287,13 +296,14 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                 .copy(
                     id = null,
                     playlistId = itemDomain1.playlistId,
-                    media = itemDomain1.media.copy(id = null),
+                    media = itemDomain1.media,
                     order = itemDomain1.order
                 )
 
         // itemConflict should overwrite the original
-        val savedConflict = sut.save(itemConflict, flat = false, emit = false).data!!
-        assertEquals(itemDomain1.id, savedConflict.id)
+        val savedConflict = sut.save(itemConflict, flat = false, emit = false)
+        assertFalse(savedConflict.isSuccessful)
+        assertEquals((savedConflict as RepoResult.Error<*>).t::class, ConflictException::class)
     }
 
     @Test
@@ -306,13 +316,14 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                     .copy(
                         id = null,
                         playlistId = itemDomain1.playlistId,
-                        media = itemDomain1.media.copy(id = null),
+                        media = itemDomain1.media,
                         order = itemDomain1.order
                     )
             )
         // itemConflict should overwrite the original
-        val savedConflict = sut.save(itemConflict, flat = false, emit = false).data!!
-        assertEquals(itemDomain1.id, savedConflict[0].id)
+        val savedConflict = sut.save(itemConflict, flat = false, emit = false)
+        assertFalse(savedConflict.isSuccessful)
+        assertEquals((savedConflict as RepoResult.Error<*>).t::class, ConflictException::class)
     }
 
     // if we try to save the same media on same playlist with different ordering then it will be an exception which is ok
@@ -325,11 +336,13 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                 .copy(
                     id = null,
                     playlistId = itemDomain1.playlistId,
-                    media = itemDomain1.media.copy(id = null)
+                    media = itemDomain1.media,
+                    archived = itemDomain1.archived.not(),
                 )
 
         val actual = sut.save(itemConflict, flat = false, emit = false)
         assertFalse(actual.isSuccessful)
+        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
     }
 
     @Test
@@ -346,22 +359,9 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                     media = itemDomain1.media,
                     order = itemDomain1.order
                 )
-
-
-        // save is successful but data isn't written REPLACE .. DO NOTHING
-        val saved = sut.save(itemConflict, flat = false, emit = false)
-        assertTrue(saved.isSuccessful) //
-        assertNotEquals(itemConflict, saved.data)
-
-        // the item with the id (2) won't be changed
-        val conflictingItemIdLoad = sut.load(itemEntity2.id, flat = false)
-        assertTrue(conflictingItemIdLoad.isSuccessful)
-        assertEquals(itemDomain2, conflictingItemIdLoad.data)
-
-        // also the item with conflicting data (1) won't be changed
-        val load = sut.load(itemDomain1.id!!, flat = false) // load previous record
-        assertTrue(load.isSuccessful)
-        assertEquals(itemDomain1, load.data)
+        val actual = sut.save(itemConflict, flat = false, emit = false)
+        assertFalse(actual.isSuccessful)
+        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
     }
 
 //    @Test

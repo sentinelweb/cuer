@@ -34,7 +34,7 @@ CREATE INDEX media_description_index ON media(description);
 create:
 INSERT INTO media ( flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,
 published, channel_id, thumb_id, image_id ) VALUES ?
-ON CONFLICT (platform, platform_id) DO NOTHING
+--ON CONFLICT (platform, platform_id) DO NOTHING
 ;
 
 getInsertId:

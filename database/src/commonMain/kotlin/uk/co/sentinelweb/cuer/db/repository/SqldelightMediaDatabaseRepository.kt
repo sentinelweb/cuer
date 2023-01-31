@@ -247,23 +247,26 @@ class SqldelightMediaDatabaseRepository(
             .let {
                 val mediaEntity = mediaMapper.map(it)
                 with(database.mediaEntityQueries) {
+                    val platformCheck = try {
+                        loadByPlatformId(mediaEntity.platform_id, mediaEntity.platform).executeAsOne()
+                    } catch (n: NullPointerException) {
+                        null
+                    }
                     if (mediaEntity.id > 0) {
                         // manual check for platform-platformId duplication
                         // throw ConflictException if id is different for same platform-platformId
-                        val platformCheck = try {
-                            loadByPlatformId(mediaEntity.platform_id, mediaEntity.platform).executeAsOne()
-                        } catch (n: NullPointerException) {
-                            null
-                        }
                         if (platformCheck != null && platformCheck.id != mediaEntity.id) {
                             throw ConflictException(
-                                "conflicting id for ${mediaEntity.platform}-${mediaEntity.platform_id}" +
-                                        " existing: ${platformCheck.id}  thisid:${mediaEntity.id} "
+                                "conflicting media id for ${mediaEntity.platform}_${mediaEntity.platform_id}" +
+                                        " existing: ${platformCheck.id}  thisid:${mediaEntity.id}"
                             )
                         }
                         update(mediaEntity)
                         loadById(mediaDomain.id!!).executeAsOne().id
                     } else {
+                        if (platformCheck != null) {
+                            throw ConflictException("media already exists: ${mediaEntity.platform}_${mediaEntity.platform_id}")
+                        }
                         create(mediaEntity)
                         getInsertId().executeAsOne()
                     }
