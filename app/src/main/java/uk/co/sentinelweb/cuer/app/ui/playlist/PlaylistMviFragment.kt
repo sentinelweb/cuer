@@ -279,7 +279,7 @@ class PlaylistMviFragment : Fragment(),
                 }
 
                 is Label.HighlightPlayingItem -> highlightPlayingItem(label.pos)
-                is Label.ScrollToItem -> scrollToItem(label.pos)
+                is Label.ScrollToItem -> scrollToItem(label.pos).also { log.d("ScrollToItem: ${label.pos}") }
                 is Label.UpdateModelItem -> updateItemModel(label.model) // todo do i need this?
                 is Label.Help -> showHelp()
                 is Label.ResetItemState -> resetItemsState()
@@ -441,7 +441,6 @@ class PlaylistMviFragment : Fragment(),
                 log.d("onResume: got no nav args")
                 controller.onRefresh()
             }
-
         queueCastConnectionListener.listenForState()
     }
 
@@ -607,10 +606,6 @@ class PlaylistMviFragment : Fragment(),
     private fun mapPlaylistIndexAndSize(currentItemIndex: Int?) =
         "${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}"
 
-    private fun setSubTitle(subtitle: String) {
-        (activity as AppCompatActivity?)?.supportActionBar?.setTitle(subtitle)
-    }
-
     private fun showPlaylistSelector(model: PlaylistsMviDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()
         dialogFragment =
@@ -655,10 +650,6 @@ class PlaylistMviFragment : Fragment(),
     @SuppressLint("NotifyDataSetChanged")
     private fun resetItemsState() {
         adapter.notifyDataSetChanged()
-    }
-
-    private fun showCastRouteSelectorDialog() {
-        castDialogWrapper.showRouteSelector(childFragmentManager)
     }
 
     @SuppressLint("NotifyDataSetChanged")
