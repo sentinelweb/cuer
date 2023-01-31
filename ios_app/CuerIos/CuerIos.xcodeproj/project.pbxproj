@@ -14,6 +14,40 @@
 		551322A9292BD71000212FF5 /* montserrat_light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A7292BD71000212FF5 /* montserrat_light.ttf */; };
 		551322AA292BD71000212FF5 /* didactgothic_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A8292BD71000212FF5 /* didactgothic_regular.ttf */; };
 		551322AC292BD9A000212FF5 /* TabViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551322AB292BD9A000212FF5 /* TabViews.swift */; };
+		5549C7972989C0CC00D8C035 /* DateParseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5549C7962989C0CC00D8C035 /* DateParseTest.swift */; };
+		5549C7982989C12500D8C035 /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFBD2922212B0004AEF4 /* MainCoordinator.swift */; };
+		5549C7992989C13700D8C035 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */; };
+		5549C79A2989C19D00D8C035 /* IosShareWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FAF292E659A0014B547 /* IosShareWrapper.swift */; };
+		5549C79B2989C1A000D8C035 /* IosPlatformLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB1292E65E20014B547 /* IosPlatformLauncher.swift */; };
+		5549C79C2989C1A400D8C035 /* CompatKotlin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5513228E2928F0E000212FF5 /* CompatKotlin.swift */; };
+		5549C79D2989C1A700D8C035 /* ApiKeyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA559BA29264124008C07E1 /* ApiKeyProvider.swift */; };
+		5549C79E2989C1AA00D8C035 /* Snippets.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA559BE292675A8008C07E1 /* Snippets.swift */; };
+		5549C79F2989C1B300D8C035 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFF42923C97A0004AEF4 /* AppDelegate.swift */; };
+		5549C7A02989C1B700D8C035 /* CuerIosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDF8E29221FD20004AEF4 /* CuerIosApp.swift */; };
+		5549C7A12989C1BA00D8C035 /* ApiKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = BDA559B729264017008C07E1 /* ApiKeys.plist */; };
+		5549C7A22989C1C000D8C035 /* TitleNavView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B862332930ED7F00972AD6 /* TitleNavView.swift */; };
+		5549C7A32989C1C400D8C035 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B862352931336D00972AD6 /* ShareSheet.swift */; };
+		5549C7A42989C1CA00D8C035 /* Typeface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5513229F292BB44500212FF5 /* Typeface.swift */; };
+		5549C7A52989C1CE00D8C035 /* didactgothic_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A8292BD71000212FF5 /* didactgothic_regular.ttf */; };
+		5549C7A62989C1D100D8C035 /* montserrat_light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A7292BD71000212FF5 /* montserrat_light.ttf */; };
+		5549C7A72989C1D500D8C035 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FBD29301DD50014B547 /* Colors.swift */; };
+		5549C7A82989C1DA00D8C035 /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB8292EC0E40014B547 /* Const.swift */; };
+		5549C7A92989C1DF00D8C035 /* FirstAppearModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */; };
+		5549C7AB2989C1E800D8C035 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD7292297B70004AEF4 /* SettingsView.swift */; };
+		5549C7AC2989C1EC00D8C035 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD4292295F70004AEF4 /* SafariView.swift */; };
+		5549C7AD2989C1F000D8C035 /* BrowseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55132295292B9EAC00212FF5 /* BrowseViews.swift */; };
+		5549C7AE2989C1F400D8C035 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCA29228D940004AEF4 /* BrowseView.swift */; };
+		5549C7AF2989C1FB00D8C035 /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */; };
+		5549C7B02989C1FF00D8C035 /* PlaylistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */; };
+		5549C7B12989C20100D8C035 /* PlaylistContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEE0142924312C0004AEF4 /* PlaylistContract.swift */; };
+		5549C7B22989C20500D8C035 /* PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC229228D260004AEF4 /* PlaylistsView.swift */; };
+		5549C7B32989C20900D8C035 /* PlaylistsMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB4292E6AE30014B547 /* PlaylistsMviController.swift */; };
+		5549C7B42989C20C00D8C035 /* PlaylistsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB6292EBCEC0014B547 /* PlaylistsViews.swift */; };
+		5549C7B52989C20F00D8C035 /* PlaylistsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B8622E29303A2300972AD6 /* PlaylistsDialogView.swift */; };
+		5549C7B62989C21300D8C035 /* PlaylistsDialogViewModelHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B8623029303C9300972AD6 /* PlaylistsDialogViewModelHolder.swift */; };
+		5549C7B72989C21800D8C035 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFBF2922213B0004AEF4 /* MainView.swift */; };
+		5549C7B82989C21C00D8C035 /* TabViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551322AB292BD9A000212FF5 /* TabViews.swift */; };
+		5549C7B92989C21F00D8C035 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDBEDF9229221FD20004AEF4 /* Assets.xcassets */; };
 		55540C082928010800086F37 /* Identifiables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55540C072928010800086F37 /* Identifiables.swift */; };
 		55724FB0292E659A0014B547 /* IosShareWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FAF292E659A0014B547 /* IosShareWrapper.swift */; };
 		55724FB2292E65E20014B547 /* IosPlatformLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB1292E65E20014B547 /* IosPlatformLauncher.swift */; };
@@ -100,6 +134,7 @@
 		551322A7292BD71000212FF5 /* montserrat_light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = montserrat_light.ttf; path = ../../../../../../app/src/main/res/font/montserrat_light.ttf; sourceTree = "<group>"; };
 		551322A8292BD71000212FF5 /* didactgothic_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = didactgothic_regular.ttf; path = ../../../../../../app/src/main/res/font/didactgothic_regular.ttf; sourceTree = "<group>"; };
 		551322AB292BD9A000212FF5 /* TabViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViews.swift; sourceTree = "<group>"; };
+		5549C7962989C0CC00D8C035 /* DateParseTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateParseTest.swift; sourceTree = "<group>"; };
 		55540C072928010800086F37 /* Identifiables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiables.swift; sourceTree = "<group>"; };
 		55724FAF292E659A0014B547 /* IosShareWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosShareWrapper.swift; sourceTree = "<group>"; };
 		55724FB1292E65E20014B547 /* IosPlatformLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosPlatformLauncher.swift; sourceTree = "<group>"; };
@@ -196,13 +231,6 @@
 			path = fonts;
 			sourceTree = "<group>";
 		};
-		55540C06292800EB00086F37 /* ui */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ui;
-			sourceTree = "<group>";
-		};
 		55724FAE292E65760014B547 /* util */ = {
 			isa = PBXGroup;
 			children = (
@@ -296,6 +324,7 @@
 			isa = PBXGroup;
 			children = (
 				BDBEDF9F29221FD20004AEF4 /* CuerIosTests.swift */,
+				5549C7962989C0CC00D8C035 /* DateParseTest.swift */,
 			);
 			path = CuerIosTests;
 			sourceTree = "<group>";
@@ -419,7 +448,6 @@
 			children = (
 				55724FAE292E65760014B547 /* util */,
 				55132290292B85E100212FF5 /* kotlin */,
-				55540C06292800EB00086F37 /* ui */,
 				BDA559B929264106008C07E1 /* net */,
 				BDA559BE292675A8008C07E1 /* Snippets.swift */,
 			);
@@ -557,6 +585,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				BD3F9E99292695BF00380350 /* browse_categories.json in Resources */,
+				5549C7A12989C1BA00D8C035 /* ApiKeys.plist in Resources */,
+				5549C7A62989C1D100D8C035 /* montserrat_light.ttf in Resources */,
+				5549C7A52989C1CE00D8C035 /* didactgothic_regular.ttf in Resources */,
+				5549C7B92989C21F00D8C035 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -633,8 +665,38 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5549C7B62989C21300D8C035 /* PlaylistsDialogViewModelHolder.swift in Sources */,
+				5549C7B22989C20500D8C035 /* PlaylistsView.swift in Sources */,
+				5549C79F2989C1B300D8C035 /* AppDelegate.swift in Sources */,
 				BD3F9EAA2927D0DA00380350 /* BrowseMviController.swift in Sources */,
+				5549C79B2989C1A000D8C035 /* IosPlatformLauncher.swift in Sources */,
+				5549C79C2989C1A400D8C035 /* CompatKotlin.swift in Sources */,
+				5549C7B12989C20100D8C035 /* PlaylistContract.swift in Sources */,
+				5549C7AB2989C1E800D8C035 /* SettingsView.swift in Sources */,
+				5549C7B72989C21800D8C035 /* MainView.swift in Sources */,
+				5549C79A2989C19D00D8C035 /* IosShareWrapper.swift in Sources */,
+				5549C7B02989C1FF00D8C035 /* PlaylistViewModel.swift in Sources */,
+				5549C7982989C12500D8C035 /* MainCoordinator.swift in Sources */,
+				5549C7A92989C1DF00D8C035 /* FirstAppearModifier.swift in Sources */,
+				5549C7B42989C20C00D8C035 /* PlaylistsViews.swift in Sources */,
+				5549C7A82989C1DA00D8C035 /* Const.swift in Sources */,
+				5549C79E2989C1AA00D8C035 /* Snippets.swift in Sources */,
+				5549C7AE2989C1F400D8C035 /* BrowseView.swift in Sources */,
+				5549C7A42989C1CA00D8C035 /* Typeface.swift in Sources */,
+				5549C7B32989C20900D8C035 /* PlaylistsMviController.swift in Sources */,
+				5549C7A22989C1C000D8C035 /* TitleNavView.swift in Sources */,
+				5549C7AC2989C1EC00D8C035 /* SafariView.swift in Sources */,
+				5549C7A72989C1D500D8C035 /* Colors.swift in Sources */,
+				5549C7B82989C21C00D8C035 /* TabViews.swift in Sources */,
+				5549C7972989C0CC00D8C035 /* DateParseTest.swift in Sources */,
+				5549C7AD2989C1F000D8C035 /* BrowseViews.swift in Sources */,
+				5549C7AF2989C1FB00D8C035 /* PlaylistView.swift in Sources */,
+				5549C79D2989C1A700D8C035 /* ApiKeyProvider.swift in Sources */,
+				5549C7992989C13700D8C035 /* AppDependencies.swift in Sources */,
+				5549C7A02989C1B700D8C035 /* CuerIosApp.swift in Sources */,
 				BDBEDFA029221FD20004AEF4 /* CuerIosTests.swift in Sources */,
+				5549C7B52989C20F00D8C035 /* PlaylistsDialogView.swift in Sources */,
+				5549C7A32989C1C400D8C035 /* ShareSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
