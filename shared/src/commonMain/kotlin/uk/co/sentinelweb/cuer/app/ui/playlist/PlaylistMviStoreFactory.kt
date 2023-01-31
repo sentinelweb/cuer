@@ -791,33 +791,26 @@ class PlaylistMviStoreFactory(
             val currentState = getState()
             coroutines.mainScope.launch {
                 val notLoaded = currentState.playlist == null
+                log.d("setPlaylistData: notLoaded: $notLoaded")
                 intent.plId
                     ?.takeIf { it != -1L }
                     ?.toIdentifier(intent.source)
-                    ?.apply {
-                        //state.playlistIdentifier = this
-                        dispatch(SetPlaylistId(this))
-                    }
+                    ?.apply { dispatch(SetPlaylistId(this)) }
                     ?.apply { executeRefresh(scrollToCurrent = notLoaded, state = getState()) }
                     ?.apply {
                         if (intent.playNow) {
-                            queue.playNow(currentState.playlistIdentifier, intent.plItemId)
+                            queue.playNow(this, intent.plItemId)
                         }
                     }
-                    ?.apply {
-                        getState().playlist?.also { recentLocalPlaylists.addRecent(it) }
-                    }
+                    ?.apply { recentLocalPlaylists.addRecentId(intent.plId) }
                     ?: run {
                         if (dbInit.isInitialized()) {
-                            //state.playlistIdentifier = prefsWrapper.lastViewedPlaylistId
                             dispatch(SetPlaylistId(prefsWrapper.lastViewedPlaylistId))
                             executeRefresh(scrollToCurrent = notLoaded, state = getState())
                         } else {
-                            dbInit.addListener { b: Boolean ->
-                                if (b) {
+                            dbInit.addListener { success: Boolean ->
+                                if (success) {
                                     dispatch(SetPlaylistId(3L.toIdentifier(LOCAL)))
-                                    //state.playlistIdentifier = 3L.toIdentifier(LOCAL) // philosophy
-                                    //updatePlaylist()
                                     refresh(state = getState())
                                 }
                             }
