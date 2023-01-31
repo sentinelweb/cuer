@@ -67,6 +67,7 @@ class IconMapper {
             TWITCH -> Icon.ic_twitch
             WIKIPEDIA -> Icon.ic_wikipedia
             ANCHOR_FM -> Icon.ic_platfrom_web
+            TIKTOK -> Icon.ic_tiktok
             UNKNOWN -> Icon.ic_platfrom_web
         }
 

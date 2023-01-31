@@ -33,9 +33,10 @@ sealed class LinkDomain constructor(
         ANCHOR_FM("anchor.fm"),
         BUY_ME_A_COFFEE("buymeacoffee.com"),
         KO_FI("ko-fi.com"),
-        FACEBOOK("facebook.com", "fb.me"),
+        FACEBOOK("facebook.com", "fb.me", "fb.com"),
         INSTAGRAM("instagram.com"),
         TWITTER("twitter.com", "t.co"),
+        TIKTOK("tiktok.com"),
         DISCORD("discord.gg", "discord.io"),
         YOUTUBE("youtube.com", "youtu.be"),
         VIMEO("vimeo.com"),
@@ -53,7 +54,7 @@ sealed class LinkDomain constructor(
             DomainHost.PATREON, DomainHost.PAYPAL, DomainHost.AMAZON, DomainHost.KO_FI,
             DomainHost.BUY_ME_A_COFFEE, DomainHost.TEESPRING
         ),
-        VIDEO(DomainHost.YOUTUBE, DomainHost.VIMEO, DomainHost.TWITCH),
+        VIDEO(DomainHost.YOUTUBE, DomainHost.VIMEO, DomainHost.TWITCH, DomainHost.TIKTOK),
         SOCIAL(
             DomainHost.TWITTER, DomainHost.FACEBOOK, DomainHost.INSTAGRAM,
             DomainHost.GOOGLE, DomainHost.DISCORD
