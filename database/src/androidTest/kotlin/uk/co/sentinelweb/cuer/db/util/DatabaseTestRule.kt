@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 
 class DatabaseTestRule : TestWatcher(), KoinComponent {
 
@@ -23,6 +24,7 @@ class DatabaseTestRule : TestWatcher(), KoinComponent {
 
     private val utilTestModule = module {
         factory { TimeProvider() }
+        factory { GuidCreator() }
     }
 
     val modules = listOf(driverModule, dbTestModule, utilTestModule)

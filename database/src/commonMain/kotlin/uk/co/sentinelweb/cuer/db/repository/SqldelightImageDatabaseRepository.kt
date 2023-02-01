@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -15,7 +16,7 @@ import uk.co.sentinelweb.cuer.database.entity.Image
 import uk.co.sentinelweb.cuer.db.mapper.ImageMapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.ImageDomain
-import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class SqldelightImageDatabaseRepository(
@@ -23,7 +24,7 @@ class SqldelightImageDatabaseRepository(
     private val imageMapper: ImageMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
-    private val guidCreator: GUIDCreator,
+    private val guidCreator: GuidCreator,
     private val source: OrchestratorContract.Source,
 ) : ImageDatabaseRepository {
     init {
@@ -161,7 +162,8 @@ class SqldelightImageDatabaseRepository(
                 loadByUrl(domain.url)
                     .executeAsOneOrNull()
 //                ?.let { imageEntity.copy(id = it.id) }
-//                ?.also { database.imageEntityQueries.update(it) }
+                    ?.let { imageMapper.map(domain.copy(id = it.id.toGuidIdentifier(source))) }
+                    ?.also { database.imageEntityQueries.update(it) }
                     ?: let {
                         guidCreator.create().toIdentifier(source)
                             .let { imageMapper.map(domain.copy(id = it)) }

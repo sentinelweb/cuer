@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -15,7 +16,7 @@ import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.GUID
-import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
@@ -25,7 +26,7 @@ class SqldelightChannelDatabaseRepository(
     private val channelMapper: ChannelMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
-    private val guidCreator: GUIDCreator,
+    private val guidCreator: GuidCreator,
     private val source: Source,
 ) : ChannelDatabaseRepository {
 
@@ -214,7 +215,7 @@ class SqldelightChannelDatabaseRepository(
                         .executeAsOneOrNull()
                         ?.let { saved ->
                             // check for updated channel data + save
-                            val entity = channelMapper.map(toCheckImages)
+                            val entity = channelMapper.map(toCheckImages.copy(id = saved.id.toGuidIdentifier(source)))
                             if (entity.image_id != saved.image_id ||
                                 entity.thumb_id != saved.thumb_id ||
                                 entity.published != saved.published ||
@@ -228,7 +229,7 @@ class SqldelightChannelDatabaseRepository(
 //                            create(entity)
 //                            getInsertId().executeAsOne()
                             guidCreator.create().toIdentifier(source).apply {
-                                create(channelMapper.map(domain.copy(id = this)))
+                                create(channelMapper.map(toCheckImages.copy(id = this)))
                             }.id
                         }
                 }

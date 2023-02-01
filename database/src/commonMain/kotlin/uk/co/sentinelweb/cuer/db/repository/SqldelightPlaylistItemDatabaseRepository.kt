@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
@@ -29,7 +29,7 @@ class SqldelightPlaylistItemDatabaseRepository(
     private val playlistItemMapper: PlaylistItemMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
-    private val guidCreator: GUIDCreator,
+    private val guidCreator: GuidCreator,
     private val source: OrchestratorContract.Source,
 ) : PlaylistItemDatabaseRepository {
 
@@ -76,7 +76,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                         itemDomain to if (itemDomain.id != null) {
                             if (platformCheck != null && platformCheck.id != itemDomain.id!!.id.value) {
                                 throw ConflictException(
-                                    "conflicting playlistitem id for ${itemDomain.media.id}_${itemDomain.playlistId.id}" +
+                                    "conflicting playlistitem id for ${itemDomain.media.id}_${itemDomain.playlistId!!.id}" +
                                             " existing: ${platformCheck.id}  thisid: ${itemDomain.id} "
                                 )
                             }
@@ -291,7 +291,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                         if (itemDomain.id != null) {
                             if (platformCheck != null && platformCheck.id != itemDomain.id!!.id.value) {
                                 throw ConflictException(
-                                    "conflicting playlistitem id for ${itemDomain.media.id!!.id.value}_${itemDomain.playlistId.id.value}" +
+                                    "conflicting playlistitem id for ${itemDomain.media.id!!.id.value}_${itemDomain.playlistId!!.id.value}" +
                                             " existing: ${platformCheck.id}  thisid:${itemDomain.id}"
                                 )
                             }
@@ -299,7 +299,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                             playlistItemMapper.map(itemDomain).also { update(it) }
                         } else {
                             if (platformCheck != null) {
-                                throw ConflictException("playlistitem already exists: ${itemDomain.media.id!!.id.value}_${itemDomain.playlistId.id.value}")
+                                throw ConflictException("playlistitem already exists: ${itemDomain.media.id!!.id.value}_${itemDomain.playlistId!!.id.value}")
                             }
                             guidCreator.create().toIdentifier(source)
                                 .let { playlistItemMapper.map(itemDomain.copy(id = it)) }

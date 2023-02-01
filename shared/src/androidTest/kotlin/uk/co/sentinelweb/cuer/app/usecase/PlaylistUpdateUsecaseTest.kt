@@ -25,7 +25,7 @@ import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import kotlin.time.Duration.Companion.seconds
 
@@ -33,7 +33,7 @@ class PlaylistUpdateUsecaseTest {
     private val fixture = kotlinFixture {
         nullabilityStrategy(NeverNullStrategy)
         repeatCount { 6 }
-        factory { OrchestratorContract.Identifier(GUIDCreator().create(), fixture()) }
+        factory { OrchestratorContract.Identifier(GuidCreator().create(), fixture()) }
         // repeatCount(PlaylistDomain::items) { 7 }
     }
 

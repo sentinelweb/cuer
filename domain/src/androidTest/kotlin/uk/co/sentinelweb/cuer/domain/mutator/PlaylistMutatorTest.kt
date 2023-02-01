@@ -16,7 +16,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.LOOP
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.ext.scanOrder
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import java.lang.Integer.max
@@ -25,7 +25,7 @@ class PlaylistMutatorTest {
     private val fixture = kotlinFixture {
         nullabilityStrategy(NeverNullStrategy)
         repeatCount { 6 }
-        factory { Identifier(GUIDCreator().create(), fixture()) }
+        factory { Identifier(GuidCreator().create(), fixture()) }
     }
 
     //@Fixture
@@ -482,10 +482,10 @@ class PlaylistMutatorTest {
         fixtPlaylistWithIndex.scanOrder().apply { println(this) }
         val fixtNotOnPlaylistItem = fixtPlaylist.items.get(targetIndexReplace).copy(
             id = fixture(),
-            playlistId = Identifier(GUIDCreator().create(), LOCAL)
+            playlistId = Identifier(GuidCreator().create(), LOCAL)
         )
 
-        val actual = sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtNotOnPlaylistItem)
+        sut.addOrReplaceItem(fixtPlaylistWithIndex, fixtNotOnPlaylistItem)
         // throws exception
     }
 
@@ -553,7 +553,7 @@ class PlaylistMutatorTest {
         fixtPlaylistWithIndex.scanOrder().apply { println(this) }
         val fixtRemovedItem = fixture<PlaylistItemDomain>().copy(
             id = fixtPlaylistWithIndex.items.get(removedIndex).id,
-            playlistId = Identifier(GUIDCreator().create(), LOCAL) //fixtPlaylistWithIndex.id!! + 1
+            playlistId = Identifier(GuidCreator().create(), LOCAL) //fixtPlaylistWithIndex.id!! + 1
         )
 
         val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)
@@ -573,7 +573,7 @@ class PlaylistMutatorTest {
         fixtPlaylistWithIndex.scanOrder().apply { println(this) }
         val fixtRemovedItem = fixture<PlaylistItemDomain>().copy(
             id = fixtPlaylistWithIndex.items.get(removedIndex).id,
-            playlistId = Identifier(GUIDCreator().create(), LOCAL) //fixtPlaylistWithIndex.id!! + 1
+            playlistId = Identifier(GuidCreator().create(), LOCAL) //fixtPlaylistWithIndex.id!! + 1
         )
 
         val actual = sut.remove(fixtPlaylistWithIndex, fixtRemovedItem)

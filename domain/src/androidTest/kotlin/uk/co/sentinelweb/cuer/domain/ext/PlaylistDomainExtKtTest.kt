@@ -8,10 +8,10 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 
 class PlaylistDomainExtKtTest {
-    private val guidCreator = GUIDCreator()
+    private val guidCreator = GuidCreator()
 
     private val ids = listOf(
         Identifier(guidCreator.create(), LOCAL),
@@ -82,7 +82,8 @@ class PlaylistDomainExtKtTest {
                                     .toLocalDateTime(TimeZone.currentSystemDefault())
                             ),
                         dateAdded = now,
-                        order = it.toLong()
+                        order = it.toLong(),
+                        playlistId = null
                     )
                 }
             )
@@ -105,7 +106,8 @@ class PlaylistDomainExtKtTest {
                                     .toLocalDateTime(TimeZone.currentSystemDefault())
                             ),
                         dateAdded = now,
-                        order = it.toLong()
+                        order = it.toLong(),
+                        playlistId = null
                     )
                 }
             )

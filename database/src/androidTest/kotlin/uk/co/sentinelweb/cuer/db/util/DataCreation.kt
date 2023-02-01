@@ -8,8 +8,10 @@ import uk.co.sentinelweb.cuer.database.entity.Media
 import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.database.entity.Playlist_item
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 
 class DataCreation(private val database: Database, private val fixture: Fixture, val timeProvider: TimeProvider) {
+    private val guidCreator = GuidCreator()
     fun createPlaylistAndItem(): Pair<Playlist, Playlist_item> {
         val playlist = createPlaylist()
         val item = createPlaylistItem(playlist.id)
@@ -17,29 +19,37 @@ class DataCreation(private val database: Database, private val fixture: Fixture,
     }
 
     fun createPlaylist(): Playlist {
+        val guid = guidCreator.create()
         val playlistInitial =
-            fixture<Playlist>().copy(id = 0, parent_id = null, channel_id = null, image_id = null, thumb_id = null)
+            fixture<Playlist>().copy(id = guid.value, parent_id = null, channel_id = null, image_id = null, thumb_id = null)
         database.playlistEntityQueries.create(playlistInitial)
-        val playlistId = database.playlistEntityQueries.getInsertId().executeAsOne()
-        return playlistInitial.copy(id = playlistId)
+        return playlistInitial
+//        val playlistId = database.playlistEntityQueries.getInsertId().executeAsOne()
+//        return playlistInitial.copy(id = playlistId)
     }
 
-    fun createPlaylistItem(playlistId: Long): Playlist_item {
-        val channel = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
+    fun createPlaylistItem(playlistId: String): Playlist_item {
+        val guidChannel = guidCreator.create()
+        val channel = fixture<Channel>().copy(id = guidChannel.value, image_id = null, thumb_id = null)
         database.channelEntityQueries.create(channel)
-        val channelId = database.channelEntityQueries.getInsertId().executeAsOne()
-        val media = fixture<Media>().copy(id = 0, channel_id = channelId, image_id = null, thumb_id = null)
+        //val channelId = database.channelEntityQueries.getInsertId().executeAsOne()
+
+        val guidMedia = guidCreator.create()
+        val media = fixture<Media>().copy(id = guidMedia.value, channel_id = guidChannel.value, image_id = null, thumb_id = null)
         database.mediaEntityQueries.create(media)
-        val mediaId = database.mediaEntityQueries.getInsertId().executeAsOne()
-        val initial = fixture<Playlist_item>().copy(
-            id = 0,
-            media_id = mediaId,
+        // val mediaId = database.mediaEntityQueries.getInsertId().executeAsOne()
+
+        val guidItem = guidCreator.create()
+        val item = fixture<Playlist_item>().copy(
+            id = guidItem.value,
+            media_id = guidMedia.value,
             playlist_id = playlistId,
             date_added = timeProvider.instant()
         )
-        database.playlistItemEntityQueries.create(initial)
-        val insertId = database.playlistItemEntityQueries.getInsertId().executeAsOne()
-        return initial.copy(id = insertId)
+        database.playlistItemEntityQueries.create(item)
+        //val insertId = database.playlistItemEntityQueries.getInsertId().executeAsOne()
+        //return initial.copy(id = insertId)
+        return item
     }
 }
 

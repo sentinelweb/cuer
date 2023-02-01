@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistMapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
-import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.ext.summarise
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
@@ -32,7 +32,7 @@ class SqldelightPlaylistDatabaseRepository(
     private val playlistMapper: PlaylistMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
-    private val guidCreator: GUIDCreator,
+    private val guidCreator: GuidCreator,
     private val source: OrchestratorContract.Source,
 ) : PlaylistDatabaseRepository {
 

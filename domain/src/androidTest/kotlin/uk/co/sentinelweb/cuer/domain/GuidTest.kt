@@ -5,7 +5,7 @@ import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
 import com.appmattus.kotlinfixture.kotlinFixture
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
-import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import kotlin.test.assertNotNull
 
 class GuidTest {
@@ -13,7 +13,7 @@ class GuidTest {
     private val fixture = kotlinFixture {
         nullabilityStrategy(NeverNullStrategy)
         repeatCount { 6 }
-        factory { Identifier(GUIDCreator().create(), fixture()) }
+        factory { Identifier(GuidCreator().create(), fixture()) }
         // repeatCount(PlaylistDomain::items) { 7 }
     }
 

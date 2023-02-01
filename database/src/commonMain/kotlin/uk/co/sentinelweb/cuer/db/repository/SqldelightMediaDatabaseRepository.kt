@@ -20,7 +20,7 @@ import uk.co.sentinelweb.cuer.db.update.MediaUpdateMapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
-import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.MediaUpdateDomain
@@ -34,7 +34,7 @@ class SqldelightMediaDatabaseRepository(
     private val mediaUpdateMapper: MediaUpdateMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
-    private val guidCreator: GUIDCreator,
+    private val guidCreator: GuidCreator,
     private val source: Source,
 ) : MediaDatabaseRepository {
 
@@ -249,16 +249,15 @@ class SqldelightMediaDatabaseRepository(
                 it.copy(image = it.image
                     ?.let { imageDatabaseRepository.checkToSaveImage(it) })
             }
-            .let { domain ->
-
+            .let { toSaveDomain ->
                 with(database.mediaEntityQueries) {
                     val platformCheck = try {
-                        loadByPlatformId(domain.platformId, domain.platform).executeAsOne()
+                        loadByPlatformId(toSaveDomain.platformId, toSaveDomain.platform).executeAsOne()
                     } catch (n: NullPointerException) {
                         null
                     }
-                    if (domain.id != null) {
-                        val mediaEntity = mediaMapper.map(domain)
+                    if (toSaveDomain.id != null) {
+                        val mediaEntity = mediaMapper.map(toSaveDomain)
                         // manual check for platform-platformId duplication
                         // throw ConflictException if id is different for same platform-platformId
                         if (platformCheck != null && platformCheck.id != mediaEntity.id) {
@@ -268,13 +267,13 @@ class SqldelightMediaDatabaseRepository(
                             )
                         }
                         update(mediaEntity)
-                        loadById(domain.id!!.id.value).executeAsOne().id.toGUID()
+                        loadById(toSaveDomain.id!!.id.value).executeAsOne().id.toGUID()
                     } else {
                         if (platformCheck != null) {
-                            throw ConflictException("media already exists: ${domain.platform}_${domain.platformId}")
+                            throw ConflictException("media already exists: ${toSaveDomain.platform}_${toSaveDomain.platformId}")
                         }
                         guidCreator.create().toIdentifier(source)
-                            .apply { create(mediaMapper.map(domain.copy(id = this))) }
+                            .apply { create(mediaMapper.map(toSaveDomain.copy(id = this))) }
                             .id
 //                        create(mediaEntity)
 //                        getInsertId().executeAsOne()

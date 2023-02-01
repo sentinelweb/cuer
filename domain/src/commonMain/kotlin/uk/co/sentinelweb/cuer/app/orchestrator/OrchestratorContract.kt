@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
-import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import kotlin.reflect.KClass
@@ -127,7 +127,7 @@ interface OrchestratorContract<Domain> {
 
 
     companion object {
-        val NO_PLAYLIST = Identifier<GUID>(GUIDCreator().create(), Source.MEMORY)
+        val NO_PLAYLIST = Identifier<GUID>(GuidCreator().create(), Source.MEMORY)
     }
 }
 

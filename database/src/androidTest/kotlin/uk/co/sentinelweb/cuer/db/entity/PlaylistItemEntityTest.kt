@@ -57,7 +57,7 @@ class PlaylistItemEntityTest : KoinTest {
     fun createLoadEntity() {
         val (_, expected) = dataCreation.createPlaylistAndItem()
 
-        val actual = database.playlistItemEntityQueries.load(1).executeAsOne()
+        val actual = database.playlistItemEntityQueries.load(expected.id).executeAsOne()
         assertEquals(expected, actual)
     }
 
@@ -81,8 +81,13 @@ class PlaylistItemEntityTest : KoinTest {
         dataCreation.createPlaylistItem(item0.playlist_id)
         val item2 = dataCreation.createPlaylistItem(item0.playlist_id)
 
-        val actual = database.playlistItemEntityQueries.loadAllByIds(listOf(1, 3)).executeAsList()
-        assertEquals(listOf(item0, item2), actual)
+        val playlistItemIds = listOf(item0.id, item2.id)
+        val actual = database.playlistItemEntityQueries.loadAllByIds(playlistItemIds)
+            .executeAsList()
+            .sortedBy { it.id }
+        val expected = listOf(item0, item2).sortedBy { it.id }
+
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -102,7 +107,10 @@ class PlaylistItemEntityTest : KoinTest {
 
         val actual = database.playlistItemEntityQueries.loadItemsByMediaId(listOf(item0.media_id, item2.media_id))
             .executeAsList()
-        assertEquals(listOf(item0, item2), actual)
+            .sortedBy { it.id }
+        val expected = listOf(item0, item2).sortedBy { it.id }
+
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -280,11 +288,12 @@ class PlaylistItemEntityTest : KoinTest {
         val actual = database.playlistItemEntityQueries
             .findPlaylistItemsForChannelPlatformId(channel.platform_id)
             .executeAsList()
+            .sortedBy { it.id }
+
+        val expected = listOf(item0, item1, item2).sortedBy { it.id }
 
         assertEquals(3, actual.size)
-        assertEquals(item0, actual[0])
-        assertEquals(item1, actual[1])
-        assertEquals(item2, actual[2])
+        assertEquals(expected, actual)
     }
 
     @Test

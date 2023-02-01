@@ -14,7 +14,7 @@ class PlaylistItemCreator constructor(
             id = null,
             media = media,
             dateAdded = dateAdded ?: timeProvider.instant(),
-            playlistId = playlist?.id,
+            playlistId = playlist?.id!!,
             order = order ?: timeProvider.currentTimeMillis(), // fixme this could give duplicate ordering numbers
             archived = false
         )

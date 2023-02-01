@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
@@ -26,6 +27,7 @@ import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -33,7 +35,11 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 
 class SqldelightMediaDatabaseRepositoryTest : KoinTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+
+    private val fixture = kotlinFixture {
+        nullabilityStrategy(NeverNullStrategy)
+        factory { OrchestratorContract.Identifier(GuidCreator().create(), fixture()) }
+    }
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
@@ -51,8 +57,8 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
         )
     }
 
-    val database: Database by inject()
-    val channelDatabaseRepository: ChannelDatabaseRepository by inject()
+    private val database: Database by inject()
+    private val channelDatabaseRepository: ChannelDatabaseRepository by inject()
 
     val sut: MediaDatabaseRepository by inject()
 
@@ -63,7 +69,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
     @Test
     fun saveCreate() = runTest {
-        val initial = fixture<MediaDomain>().copy(id = 0)
+        val initial = fixture<MediaDomain>().copy(id = null)
         sut.updates.test {
             val saved = sut.save(initial, emit = true, flat = false).data!!
 
@@ -88,7 +94,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
     @Test
     fun saveCreateChannelExists() = runTest {
-        val initial = fixture<MediaDomain>().copy(id = 0)
+        val initial = fixture<MediaDomain>().copy(id = null)
         val savedChannel = channelDatabaseRepository.save(initial.channelData, flat = false, emit = false).data!!
         val initialWithChannel = initial.copy(channelData = savedChannel)
         sut.updates.test {
@@ -113,7 +119,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
     @Test
     fun saveUpdate() = runTest {
-        val initial = fixture<MediaDomain>().copy(id = 0)
+        val initial = fixture<MediaDomain>().copy(id = null)
         val initialSaved = sut.save(initial, emit = false, flat = false).data!!
         sut.updates.test {
             val changed = fixture<MediaDomain>().copy(
@@ -138,7 +144,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
     @Test
     fun saveListCreate() = runTest {
-        val initial = fixture<List<MediaDomain>>().map { it.copy(id = 0) }
+        val initial = fixture<List<MediaDomain>>().map { it.copy(id = null) }
         sut.updates.test {
             val saved = sut.save(initial, emit = true, flat = false).data!!
 
@@ -169,7 +175,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
     @Test
     fun saveListUpdate() = runTest {
-        val initial = fixture<List<MediaDomain>>().map { it.copy(id = 0) }
+        val initial = fixture<List<MediaDomain>>().map { it.copy(id = null) }
         val initialSaved = sut.save(initial, emit = false, flat = false).data!!
         sut.updates.test {
             val changed = initialSaved.map {
@@ -207,11 +213,12 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
         val expected = initialSaved
             .filterIndexed { index, _ -> index.mod(2) == 0 }
-        val expectedIds = expected.map { it.id!! }
+            .sortedBy { it.id!!.id.value }
+        val expectedIds = expected.map { it.id!!.id }
 
         val actual = sut.loadList(filter = IdListFilter(expectedIds), flat = false)
 
-        assertEquals(expected, actual.data)
+        assertEquals(expected, actual.data?.sortedBy { it.id!!.id.value })
     }
 
     @Test
@@ -264,7 +271,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
             assertEquals(true, actual.data!!)
             assertEquals(DELETE to toDelete, awaitItem())
         }
-        val tryToLoadDeleted = sut.load(toDelete.id!!, flat = false)
+        val tryToLoadDeleted = sut.load(toDelete.id!!.id, flat = false)
         assertFalse { tryToLoadDeleted.isSuccessful }
     }
 
@@ -298,7 +305,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
         sut.updates.test {
             val update = fixture<MediaPositionUpdateDomain>().copy(id = saved.id!!)
             val actual = sut.update(update, flat = false, emit = true)
-            val expected = sut.load(saved.id!!, flat = false)
+            val expected = sut.load(saved.id!!.id, flat = false)
             assertEquals(expected.data!!, actual.data!!)
             assertEquals(FULL to actual.data!!, awaitItem())
             expectNoEvents()
@@ -347,7 +354,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
         val duplicatePlatformId = fixture<MediaDomain>().run {
             copy(
                 title = "duplicate title",
-                id = 2,
+                id = initialSaved[2].id,
                 platform = initialSaved[0].platform,
                 platformId = initialSaved[0].platformId,
                 thumbNail = thumbNail?.copy(id = null),
@@ -364,7 +371,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 //        println("--- db")
 //        println(sut.loadList(AllFilter()).data?.map { it.summarise() }?.joinToString("\n"))
 
-        val load = sut.load(duplicatePlatformId.id!!, flat = false).data!!
+        val load = sut.load(duplicatePlatformId.id!!.id, flat = false).data!!
         // The item won't save as it do nothing - but the db record won't be changed
         assertFalse(actual.isSuccessful)
         assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
@@ -377,7 +384,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
         val duplicatePlatformId = listOf(fixture<MediaDomain>().run {
             copy(
                 title = "duplicate title",
-                id = 2,
+                id = initialSaved[2].id,
                 platform = initialSaved[0].platform,
                 platformId = initialSaved[0].platformId,
                 thumbNail = thumbNail?.copy(id = null),
@@ -386,7 +393,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
         })
 
         val actual = sut.save(duplicatePlatformId, flat = false, emit = false)
-        val load = sut.load(duplicatePlatformId[0].id!!, flat = false).data!!
+        val load = sut.load(duplicatePlatformId[0].id!!.id, flat = false).data!!
         // The item won't save as it do nothing - but the db record won't be changed
         assertFalse(actual.isSuccessful)
         assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
