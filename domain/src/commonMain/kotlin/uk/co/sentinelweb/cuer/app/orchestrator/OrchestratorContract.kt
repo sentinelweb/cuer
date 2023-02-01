@@ -3,7 +3,8 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
@@ -47,8 +48,8 @@ interface OrchestratorContract<Domain> {
     sealed class Filter {
         object DefaultFilter : Filter()
         object AllFilter : Filter()
-        data class IdListFilter(val ids: List<Long>) : Filter()
-        data class MediaIdListFilter(val ids: List<Long>) : Filter()
+        data class IdListFilter(val ids: List<GUID>) : Filter()
+        data class MediaIdListFilter(val ids: List<GUID>) : Filter()
         data class PlatformIdListFilter(
             val ids: List<String>,
             val platform: PlatformDomain = PlatformDomain.YOUTUBE
@@ -65,10 +66,10 @@ interface OrchestratorContract<Domain> {
             val isWatched: Boolean,
             val isNew: Boolean,
             val isLive: Boolean,
-            val playlistIds: List<Long>?
+            val playlistIds: List<GUID>?
         ) : Filter()
 
-        data class PlaylistIdLFilter(val id: Long) : Filter()
+        data class PlaylistIdLFilter(val id: GUID) : Filter()
     }
 
     class InvalidOperationException(
@@ -111,6 +112,8 @@ interface OrchestratorContract<Domain> {
 //
 //        override fun toString(): String = "${this::class.simpleName}(id=$id, source=$source)"
     }
+
+
 //
 //    data class LocalIdentifier(override val id: GUID) : Identifier<GUID>(id, LOCAL) {
 //        override fun equals(other: Any?): Boolean = super.equals(other)
@@ -122,7 +125,11 @@ interface OrchestratorContract<Domain> {
 //        override fun hashCode(): Int = super.hashCode()
 //    }
 
+
     companion object {
-        val NO_PLAYLIST = Identifier<GUID>(GUIDCreator().create(), LOCAL)
+        val NO_PLAYLIST = Identifier<GUID>(GUIDCreator().create(), Source.MEMORY)
     }
 }
+
+fun String.toGuidIdentifier(source: Source): Identifier<GUID> = Identifier(GUID(this), source)
+fun GUID.toIdentifier(source: Source): Identifier<GUID> = Identifier(this, source)

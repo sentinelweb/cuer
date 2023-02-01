@@ -1,7 +1,7 @@
 PRAGMA foreign_keys = 'ON';
 
 CREATE TABLE playlist (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id TEXT NOT NULL PRIMARY KEY,
     flags INTEGER  NOT NULL DEFAULT 0,
     title TEXT NOT NULL,
     currentIndex INTEGER  NOT NULL DEFAULT -1,
@@ -9,10 +9,10 @@ CREATE TABLE playlist (
     type TEXT AS uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain NOT NULL DEFAULT "USER",
     platform TEXT AS uk.co.sentinelweb.cuer.domain.PlatformDomain,
     platform_id TEXT,
-    channel_id INTEGER,
-    parent_id INTEGER,
-    thumb_id INTEGER,
-    image_id INTEGER,
+    channel_id TEXT,
+    parent_id TEXT,
+    thumb_id TEXT,
+    image_id TEXT,
     config_json TEXT AS uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistConfigDomain NOT NULL DEFAULT "{}",
     FOREIGN KEY (channel_id) REFERENCES channel(id),
     FOREIGN KEY (parent_id) REFERENCES playlist(id),
@@ -28,12 +28,12 @@ CREATE UNIQUE INDEX playlist_platform_platform_id_index ON channel(platform, pla
 
 create:
 INSERT INTO playlist (
-flags, title, currentIndex, mode, type, platform, platform_id, channel_id,
+id, flags, title, currentIndex, mode, type, platform, platform_id, channel_id,
 parent_id, thumb_id, image_id, config_json
 ) VALUES ?;
 
-getInsertId:
-SELECT last_insert_rowid() FROM playlist LIMIT 1;
+-- getInsertId:
+-- SELECT last_insert_rowid() FROM playlist LIMIT 1;
 
 update:
 REPLACE INTO playlist (

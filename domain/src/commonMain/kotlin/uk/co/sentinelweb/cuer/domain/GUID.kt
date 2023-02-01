@@ -4,3 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GUID(val value: String)
+
+fun String.toGUID(): GUID = GUID(this)

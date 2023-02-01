@@ -15,7 +15,7 @@ interface DatabaseRepository<Domain, Stats> {
 
     suspend fun save(domains: List<Domain>, flat: Boolean, emit: Boolean): RepoResult<List<Domain>>
 
-    suspend fun load(id: Long, flat: Boolean): RepoResult<Domain>
+    suspend fun load(id: GUID, flat: Boolean): RepoResult<Domain>
 
     suspend fun loadList(filter: Filter, flat: Boolean): RepoResult<List<Domain>>
 

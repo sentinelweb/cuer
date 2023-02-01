@@ -6,14 +6,17 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.db.mapper.ChannelMapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
+import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
+import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class SqldelightChannelDatabaseRepository(
@@ -22,6 +25,8 @@ class SqldelightChannelDatabaseRepository(
     private val channelMapper: ChannelMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
+    private val guidCreator: GUIDCreator,
+    private val source: Source,
 ) : ChannelDatabaseRepository {
 
     init {
@@ -57,18 +62,21 @@ class SqldelightChannelDatabaseRepository(
                         it.copy(image = it.image
                             ?.let { imageDatabaseRepository.checkToSaveImage(it) })
                     }
-                    .let {
-                        val channel = channelMapper.map(it)
+                    .let { domain ->
                         val id = with(database.channelEntityQueries) {
-                            if (channel.id > 0) {
+                            if (domain.id != null) {
+                                val channel = channelMapper.map(domain)
                                 update(channel)
                                 domain.id!!
                             } else {
-                                create(channel)
-                                getInsertId().executeAsOne()
+                                guidCreator.create().toIdentifier(source).apply {
+                                    create(channelMapper.map(domain.copy(id = this)))
+                                }
+                                //getInsertId().executeAsOne()
                             }
                         }
-                        it.copy(id = id)
+                        //domain.copy(id = id)
+                        loadChannelInternal(id.id).data!!
                     }
                     .let { channel: ChannelDomain -> RepoResult.Data(channel) }
             } catch (e: Throwable) {
@@ -101,7 +109,7 @@ class SqldelightChannelDatabaseRepository(
         }
     }
 
-    override suspend fun load(id: Long, flat: Boolean): RepoResult<ChannelDomain> = loadChannel(id)
+    override suspend fun load(id: GUID, flat: Boolean): RepoResult<ChannelDomain> = loadChannel(id)
 
     override suspend fun loadList(
         filter: Filter,
@@ -158,20 +166,20 @@ class SqldelightChannelDatabaseRepository(
         result
     }
 
-    internal suspend fun loadChannel(id: Long): RepoResult<ChannelDomain> =
+    internal suspend fun loadChannel(id: GUID): RepoResult<ChannelDomain> =
         withContext(coProvider.IO) {
             loadChannelInternal(id)
         }
 
-    internal fun loadChannelInternal(id: Long) = try {
+    internal fun loadChannelInternal(id: GUID) = try {
         database.channelEntityQueries
-            .load(id)
+            .load(id.value)
             .executeAsOneOrNull()!!
             .let { channel: Channel ->
                 channelMapper.map(
                     channel,
-                    imageDatabaseRepository.loadEntity(channel.thumb_id),
-                    imageDatabaseRepository.loadEntity(channel.image_id),
+                    imageDatabaseRepository.loadEntity(channel.thumb_id?.toGUID()),
+                    imageDatabaseRepository.loadEntity(channel.image_id?.toGUID()),
                 )
             }
             .let { channel: ChannelDomain -> RepoResult.Data(channel) }
@@ -201,12 +209,12 @@ class SqldelightChannelDatabaseRepository(
                             ?.let { imageDatabaseRepository.checkToSaveImage(it) })
                 }
 
-                val entity = channelMapper.map(toCheckImages)
                 with(database.channelEntityQueries) {
-                    findByPlatformId(entity.platform_id, entity.platform)
+                    findByPlatformId(toCheck.platformId!!, toCheck.platform)
                         .executeAsOneOrNull()
                         ?.let { saved ->
                             // check for updated channel data + save
+                            val entity = channelMapper.map(toCheckImages)
                             if (entity.image_id != saved.image_id ||
                                 entity.thumb_id != saved.thumb_id ||
                                 entity.published != saved.published ||
@@ -214,11 +222,14 @@ class SqldelightChannelDatabaseRepository(
                             ) {
                                 update(entity.copy(id = saved.id))
                             }
-                            saved.id
+                            saved.id.toGUID()
                         }
                         ?: let {
-                            create(entity)
-                            getInsertId().executeAsOne()
+//                            create(entity)
+//                            getInsertId().executeAsOne()
+                            guidCreator.create().toIdentifier(source).apply {
+                                create(channelMapper.map(domain.copy(id = this)))
+                            }.id
                         }
                 }
             }

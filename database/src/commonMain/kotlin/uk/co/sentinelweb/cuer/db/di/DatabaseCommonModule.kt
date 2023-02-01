@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.db.di
 
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.repository.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.db.factory.DatabaseFactory
 import uk.co.sentinelweb.cuer.db.mapper.*
 import uk.co.sentinelweb.cuer.db.repository.*
@@ -14,24 +15,26 @@ object DatabaseCommonModule {
     }
 
     private val mapperModule = module {
-        factory { PlaylistMapper(get()) }
-        factory { PlaylistItemMapper() }
-        factory { MediaMapper(get()) }
-        factory { ChannelMapper(get()) }
-        factory { ImageMapper() }
+        val source = OrchestratorContract.Source.LOCAL // todo pass param
+        factory { PlaylistMapper(get(), source) }
+        factory { PlaylistItemMapper(source) }
+        factory { MediaMapper(get(), source) }
+        factory { ChannelMapper(get(), source) }
+        factory { ImageMapper(source) }
         factory { MediaUpdateMapper() }
     }
 
     private val repoModule = module {
-        single { SqldelightPlaylistDatabaseRepository(get(), get(), get(), get(), get(), get(), get()) }
+        val source = OrchestratorContract.Source.LOCAL // todo pass param
+        single { SqldelightPlaylistDatabaseRepository(get(), get(), get(), get(), get(), get(), get(), get(), source) }
         single<PlaylistDatabaseRepository> { get<SqldelightPlaylistDatabaseRepository>() }
-        single { SqldelightPlaylistItemDatabaseRepository(get(), get(), get(), get(), get()) }
+        single { SqldelightPlaylistItemDatabaseRepository(get(), get(), get(), get(), get(), get(), source) }
         single<PlaylistItemDatabaseRepository> { get<SqldelightPlaylistItemDatabaseRepository>() }
-        single { SqldelightMediaDatabaseRepository(get(), get(), get(), get(), get(), get(), get()) }
+        single { SqldelightMediaDatabaseRepository(get(), get(), get(), get(), get(), get(), get(), get(), source) }
         single<MediaDatabaseRepository> { get<SqldelightMediaDatabaseRepository>() }
-        single { SqldelightChannelDatabaseRepository(get(), get(), get(), get(), get()) }
+        single { SqldelightChannelDatabaseRepository(get(), get(), get(), get(), get(), get(), source) }
         single<ChannelDatabaseRepository> { get<SqldelightChannelDatabaseRepository>() }
-        single { SqldelightImageDatabaseRepository(get(), get(), get(), get()) }
+        single { SqldelightImageDatabaseRepository(get(), get(), get(), get(), get(), source) }
         single<ImageDatabaseRepository> { get<SqldelightImageDatabaseRepository>() }
     }
 
