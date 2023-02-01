@@ -11,6 +11,7 @@ class PlaylistItemCreator constructor(
 ) {
     fun buildPlayListItem(media: MediaDomain, playlist: PlaylistDomain?, order: Long? = null, dateAdded: Instant?) =
         PlaylistItemDomain(
+            id = null,
             media = media,
             dateAdded = dateAdded ?: timeProvider.instant(),
             playlistId = playlist?.id,

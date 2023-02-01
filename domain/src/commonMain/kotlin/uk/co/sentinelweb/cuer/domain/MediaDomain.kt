@@ -4,10 +4,11 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 
 @Serializable
 data class MediaDomain(
-    val id: Long?,
+    val id: OrchestratorContract.Identifier<GUID>?,
     val url: String,
     val platformId: String,
     val mediaType: MediaTypeDomain,
@@ -47,6 +48,7 @@ data class MediaDomain(
             mediaType = MediaTypeDomain.VIDEO,
             platform = PlatformDomain.YOUTUBE,
             channelData = ChannelDomain(
+                id = null,
                 platformId = null,
                 platform = PlatformDomain.YOUTUBE
             )

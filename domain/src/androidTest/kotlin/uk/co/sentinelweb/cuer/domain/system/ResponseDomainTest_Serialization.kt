@@ -1,22 +1,31 @@
 package uk.co.sentinelweb.cuer.domain.system
 
-import com.flextrade.jfixture.FixtureAnnotations
-import com.flextrade.jfixture.annotations.Fixture
+import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
+import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
+import com.appmattus.kotlinfixture.kotlinFixture
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseResponse
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class ResponseDomainTest_Serialization {
+    private val fixture = kotlinFixture {
+        nullabilityStrategy(NeverNullStrategy)
+        repeatCount { 6 }
+        factory { OrchestratorContract.Identifier(GUIDCreator().create(), fixture()) }
+    }
 
-    @Fixture
+    // @Fixture
     private lateinit var playlist: PlaylistDomain
 
     @Before
     fun setUp() {
-        FixtureAnnotations.initFixtures(this)
+        // FixtureAnnotations.initFixtures(this)
+        playlist = fixture()
     }
 
     @Test

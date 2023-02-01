@@ -1,9 +1,12 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.creator.GUIDCreator
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import kotlin.reflect.KClass
@@ -86,40 +89,40 @@ interface OrchestratorContract<Domain> {
 //        class IdLong(id:Long)
 //        class IdString(id:String)
 //    }
-    // @Serializable
+    @Serializable
     // todo make a data class - no need to subclass
-    open class Identifier<IdType>(
-        open val id: IdType,
+    data class Identifier<IdType>(
+        val id: IdType,
         val source: Source,
     ) {
 
-        override fun equals(other: Any?): Boolean {
-            return when (other) {
-                is Identifier<*> -> this.id == other.id && this.source == other.source
-                else -> super.equals(other)
-            }
-        }
-
-        override fun hashCode(): Int {
-            var result = id?.hashCode() ?: 0
-            result = 31 * result + source.hashCode()
-            return result
-        }
-
-        override fun toString(): String = "${this::class.simpleName}(id=$id, source=$source)"
+//        override fun equals(other: Any?): Boolean {
+//            return when (other) {
+//                is Identifier<*> -> this.id == other.id && this.source == other.source
+//                else -> super.equals(other)
+//            }
+//        }
+//
+//        override fun hashCode(): Int {
+//            var result = id?.hashCode() ?: 0
+//            result = 31 * result + source.hashCode()
+//            return result
+//        }
+//
+//        override fun toString(): String = "${this::class.simpleName}(id=$id, source=$source)"
     }
-
-    data class LocalIdentifier(override val id: Long) : Identifier<Long>(id, LOCAL) {
-        override fun equals(other: Any?): Boolean = super.equals(other)
-        override fun hashCode(): Int = super.hashCode()
-    }
-
-    data class MemoryIdentifier(override val id: Long) : Identifier<Long>(id, Source.MEMORY) {
-        override fun equals(other: Any?): Boolean = super.equals(other)
-        override fun hashCode(): Int = super.hashCode()
-    }
+//
+//    data class LocalIdentifier(override val id: GUID) : Identifier<GUID>(id, LOCAL) {
+//        override fun equals(other: Any?): Boolean = super.equals(other)
+//        override fun hashCode(): Int = super.hashCode()
+//    }
+//
+//    data class MemoryIdentifier(override val id: GUID) : Identifier<GUID>(id, Source.MEMORY) {
+//        override fun equals(other: Any?): Boolean = super.equals(other)
+//        override fun hashCode(): Int = super.hashCode()
+//    }
 
     companion object {
-        val NO_PLAYLIST = LocalIdentifier(-1L)
+        val NO_PLAYLIST = Identifier<GUID>(GUIDCreator().create(), LOCAL)
     }
 }

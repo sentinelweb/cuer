@@ -4,17 +4,17 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 
-
 @Serializable
 data class PlaylistDomain constructor(
-    val id: Long? = null,
+    val id: Identifier<GUID>?,
     val title: String,
     val items: List<PlaylistItemDomain> = listOf(),
     val currentIndex: Int = 0, // todo make nullable
-    val parentId: Long? = null,
+    val parentId: Identifier<GUID>? = null,
     val mode: PlaylistModeDomain = SINGLE,
     val type: PlaylistTypeDomain = USER,
     val platform: PlatformDomain? = null,

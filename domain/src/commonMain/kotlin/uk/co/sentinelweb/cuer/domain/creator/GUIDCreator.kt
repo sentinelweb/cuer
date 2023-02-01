@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.domain.creator
 
-expect class GUIDCreator {
-    fun create(): String
+import uk.co.sentinelweb.cuer.domain.GUID
+
+expect class GUIDCreator() {
+    fun create(): GUID
 }
