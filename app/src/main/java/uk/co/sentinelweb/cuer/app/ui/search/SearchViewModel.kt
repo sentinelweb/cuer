@@ -158,7 +158,7 @@ class SearchViewModel(
         _navigateLiveData.value = NavigationModel(
             NavigationModel.Target.PLAYLIST,
             mapOf(
-                NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LocalSearch.id else YoutubeSearch.id,
+                NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LocalSearch.id.value else YoutubeSearch.id.value,
                 NavigationModel.Param.PLAY_NOW to false,
                 NavigationModel.Param.SOURCE to MEMORY
             )
