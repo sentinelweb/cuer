@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.database.entity.Media
 import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.database.entity.Playlist_item
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 
 class DataCreation(private val database: Database, private val fixture: Fixture, val timeProvider: TimeProvider) {
@@ -50,6 +51,18 @@ class DataCreation(private val database: Database, private val fixture: Fixture,
         //val insertId = database.playlistItemEntityQueries.getInsertId().executeAsOne()
         //return initial.copy(id = insertId)
         return item
+    }
+
+    fun generatePlaylist(fixture: Fixture): PlaylistDomain {
+        var fixPlaylist = fixture<PlaylistDomain>()
+        while (fixPlaylist.items.size == 0) fixPlaylist = fixture()
+        return fixPlaylist
+    }
+
+    fun fixturePlaylistItemList(): List<PlaylistItemDomain> {
+        var list = fixture<List<PlaylistItemDomain>>()
+        while (list.size == 0) list = fixture()
+        return list
     }
 }
 
