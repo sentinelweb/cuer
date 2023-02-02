@@ -319,9 +319,7 @@ class PlaylistMviStoreFactory(
                                             which
                                                 ?.takeIf { it != PlaylistsMviDialogContract.ADD_PLAYLIST_DUMMY }
                                                 ?.let { moveItemToPlaylist(it, getState()) }
-                                                ?: run {
-                                                    publish(Label.ShowPlaylistsCreator)
-                                                }
+                                                ?: run { publish(Label.ShowPlaylistsCreator) }
                                         },
                                         confirm = { },
                                         dismiss = { publish(Label.ResetItemState) },

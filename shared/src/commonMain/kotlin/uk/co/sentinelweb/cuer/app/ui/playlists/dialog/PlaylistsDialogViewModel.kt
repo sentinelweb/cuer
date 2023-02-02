@@ -58,9 +58,9 @@ class PlaylistsDialogViewModel(
     }
 
     fun onItemClicked(item: PlaylistsItemMviContract.Model) {
-        val findId = item.id.source.takeIf { it == LOCAL } // null finds top level node
+        val findId = item.id.takeIf { it.source == LOCAL }?.id// null finds top level node
         findId
-            ?.let { state.playlists.find { it.id == findId } }
+            ?.let { state.playlists.find { it.id?.id == findId } }
             ?.apply { if (state.pinWhenSelected) prefsWrapper.pinnedPlaylistId = id!!.id }
             ?.apply { state.config.itemClick(this, true) }
             ?.also { dismiss() }

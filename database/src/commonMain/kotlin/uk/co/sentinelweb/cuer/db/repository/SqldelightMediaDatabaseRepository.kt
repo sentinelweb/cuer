@@ -270,13 +270,13 @@ class SqldelightMediaDatabaseRepository(
                         loadById(toSaveDomain.id!!.id.value).executeAsOne().id.toGUID()
                     } else {
                         if (platformCheck != null) {
-                            throw ConflictException("media already exists: ${toSaveDomain.platform}_${toSaveDomain.platformId}")
+                            //throw ConflictException("media already exists: ${toSaveDomain.platform}_${toSaveDomain.platformId}")
+                            return platformCheck.id.toGUID()
+                        } else {
+                            guidCreator.create().toIdentifier(source)
+                                .apply { create(mediaMapper.map(toSaveDomain.copy(id = this))) }
+                                .id
                         }
-                        guidCreator.create().toIdentifier(source)
-                            .apply { create(mediaMapper.map(toSaveDomain.copy(id = this))) }
-                            .id
-//                        create(mediaEntity)
-//                        getInsertId().executeAsOne()
                     }
                 }
             }
