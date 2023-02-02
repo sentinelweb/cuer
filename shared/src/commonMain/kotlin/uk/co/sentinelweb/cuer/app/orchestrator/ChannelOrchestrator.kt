@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 
@@ -14,7 +15,7 @@ class ChannelOrchestrator constructor(
     override val updates: Flow<Triple<Operation, Source, ChannelDomain>>
         get() = throw NotImplementedException()
 
-    suspend override fun loadById(id: Long, options: Options): ChannelDomain? {
+    suspend override fun loadById(id: GUID, options: Options): ChannelDomain? {
         throw NotImplementedException()
     }
 

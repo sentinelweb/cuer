@@ -7,7 +7,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
-import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import kotlin.reflect.KClass
@@ -22,7 +21,7 @@ interface OrchestratorContract<Domain> {
 
     suspend fun loadByDomain(domain: Domain, options: Options): Domain?
 
-    suspend fun loadById(id: Long, options: Options): Domain?
+    suspend fun loadById(id: GUID, options: Options): Domain?
 
     suspend fun loadList(filter: Filter, options: Options): List<Domain>
 
@@ -127,7 +126,7 @@ interface OrchestratorContract<Domain> {
 
 
     companion object {
-        val NO_PLAYLIST = Identifier<GUID>(GuidCreator().create(), Source.MEMORY)
+        val NO_PLAYLIST = Identifier(GUID("029f6179-70f0-42dc-a7e2-31ec43828f6e"), Source.MEMORY)
     }
 }
 

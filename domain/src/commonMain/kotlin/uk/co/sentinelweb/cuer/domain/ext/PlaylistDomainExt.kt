@@ -66,6 +66,9 @@ fun PlaylistDomain.replaceMediaByPlatformId(media: MediaDomain) =
             )
         } ?: this
 
+/**
+ * Replace the item in the playlist with the same platform id
+ */
 fun PlaylistDomain.replaceItemByPlatformId(item: PlaylistItemDomain) =
     this.items
         .indexOfFirst { matchPlatform(it, item) }
@@ -75,10 +78,13 @@ fun PlaylistDomain.replaceItemByPlatformId(item: PlaylistItemDomain) =
             } else this
         }
 
+/**
+ * Match the platform id and platform
+ */
 private fun matchPlatform(it: PlaylistItemDomain, item: PlaylistItemDomain) =
     it.media.platformId == item.media.platformId && it.media.platform == item.media.platform
 
-fun PlaylistDomain.scanOrder(): String {
+fun PlaylistDomain.orderString(): String {
     var lastorder = -1L
     var orderString = "cur: $currentIndex ["
     items.forEachIndexed { i, item ->

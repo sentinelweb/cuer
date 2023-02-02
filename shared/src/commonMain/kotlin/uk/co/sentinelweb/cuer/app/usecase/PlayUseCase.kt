@@ -2,8 +2,6 @@ package uk.co.sentinelweb.cuer.app.usecase
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
@@ -53,18 +51,17 @@ class PlayUseCase constructor(
     }
 
     private fun playItem(itemDomain: PlaylistItemDomain, resetPos: Boolean) {
-        if (queue.playlistId == itemDomain.playlistId?.toIdentifier(LOCAL)) {
+        if (queue.playlistId == itemDomain.playlistId) {
             queue.onItemSelected(itemDomain, resetPosition = resetPos)
         } else {
             playDialog.showDialog(mapChangePlaylistAlert({
-                val toIdentifier = itemDomain.playlistId!!.toIdentifier(LOCAL)
 
-                prefsWrapper.currentPlayingPlaylistId = toIdentifier
+                prefsWrapper.currentPlayingPlaylistId = itemDomain.playlistId!!
                 coroutines.computationScope.launch {
-                    queue.switchToPlaylist(toIdentifier)
+                    queue.switchToPlaylist(itemDomain.playlistId!!)
                     queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)
                 }
-            }, {/*cancel*/}
+            }, {/*cancel*/ }
             ))
         }
     }
@@ -79,7 +76,7 @@ class PlayUseCase constructor(
 
     fun setQueueItem(item: PlaylistItemDomain) {
         coroutines.computationScope.launch {
-            val toIdentifier = item.playlistId?.toIdentifier(LOCAL)
+            val toIdentifier = item.playlistId
                 ?: throw IllegalArgumentException("item is not in a playlist")
             queue.switchToPlaylist(toIdentifier)
             queue.onItemSelected(item, forcePlay = true, resetPosition = false)

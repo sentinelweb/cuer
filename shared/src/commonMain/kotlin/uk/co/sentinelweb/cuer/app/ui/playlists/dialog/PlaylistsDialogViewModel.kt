@@ -58,14 +58,10 @@ class PlaylistsDialogViewModel(
     }
 
     fun onItemClicked(item: PlaylistsItemMviContract.Model) {
-        val findId = if (item.id >= 0) item.id else null // find top level node
+        val findId = item.id.source.takeIf { it == LOCAL } // null finds top level node
         findId
             ?.let { state.playlists.find { it.id == findId } }
-            ?.apply {
-                if (state.pinWhenSelected) {
-                    prefsWrapper.pinnedPlaylistId = id
-                }
-            }
+            ?.apply { if (state.pinWhenSelected) prefsWrapper.pinnedPlaylistId = id!!.id }
             ?.apply { state.config.itemClick(this, true) }
             ?.also { dismiss() }
             ?: apply { state.config.itemClick(ROOT_PLAYLIST_DUMMY, true) }
@@ -97,18 +93,18 @@ class PlaylistsDialogViewModel(
         val channelPlaylists = state.playlists.filter { state.channelPlaylistIds.contains(it.id) }
             .sortedWith(
                 compareBy(
-                    { it.id != pinnedId },
+                    { it.id?.id != pinnedId },
                     { !it.starred },
                     { it.title.lowercase() })
             ).toMutableList()
 
         val playlistStats = playlistStatsOrchestrator
-            .loadList(IdListFilter(state.playlists.mapNotNull { it.id }), LOCAL.flatOptions())
+            .loadList(IdListFilter(state.playlists.mapNotNull { it.id?.id }), LOCAL.flatOptions())
 
         val recentLocalPlaylists = recentLocalPlaylists
             .buildRecentSelectionList()
             .let { it.subList(0, min(10, it.size)) }
-            .mapNotNull { recentId -> state.playlists.find { it.id == recentId.id } }
+            .mapNotNull { recentId -> state.playlists.find { it.id?.id == recentId.id } }
 
         state.playlists.map { it.id }
             .associateWith { id -> playlistStats.find { it.playlistId == id } }

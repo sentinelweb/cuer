@@ -206,7 +206,7 @@ class BrowseStoreFactory constructor(
                     it,
                     existingPlaylists = existingPlaylists,
                     existingPlaylistStats = playlistStatsOrchestrator.loadList(
-                        IdListFilter(existingPlaylists.mapNotNull { it.id }),
+                        IdListFilter(existingPlaylists.mapNotNull { it.id?.id }),
                         LOCAL.flatOptions()
                     )
                 )

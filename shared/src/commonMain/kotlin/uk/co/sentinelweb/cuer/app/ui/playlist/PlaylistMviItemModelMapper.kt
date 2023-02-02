@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
@@ -10,6 +11,7 @@ import uk.co.sentinelweb.cuer.core.mappers.Format
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class PlaylistMviItemModelMapper constructor(
@@ -25,7 +27,7 @@ class PlaylistMviItemModelMapper constructor(
     }
 
     fun mapItem(
-        modelId: Long,
+        modelId: OrchestratorContract.Identifier<GUID>,
         item: PlaylistItemDomain,
         index: Int,
         canEdit: Boolean,

@@ -2,9 +2,11 @@ package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.SearchFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
@@ -48,11 +50,11 @@ class LocalSearchPlayistInteractor constructor(
         isNew = searchDomain.isNew,
         isLive = searchDomain.isLive,
         playlistIds = if (searchDomain.playlists.isEmpty()) null
-        else searchDomain.playlists.mapNotNull { it.id }
+        else searchDomain.playlists.mapNotNull { it.id?.id }
     )
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
-        id = LocalSearch.id,
+        id = LocalSearch.id.toIdentifier(MEMORY),
         title = mapTitle(),
         type = APP,
         currentIndex = -1,
@@ -74,7 +76,7 @@ class LocalSearchPlayistInteractor constructor(
 
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = LocalSearch.id,
+        playlistId = LocalSearch.id.toIdentifier(MEMORY),
         itemCount = -1,
         watchedItemCount = -1
     )

@@ -47,7 +47,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.matchesHeader
-import uk.co.sentinelweb.cuer.domain.ext.scanOrder
+import uk.co.sentinelweb.cuer.domain.ext.orderString
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.tools.ext.build
 import uk.co.sentinelweb.cuer.tools.ext.buildCollection
@@ -717,7 +717,7 @@ class PlaylistPresenterTest {
                 mockModelMapper
                     .map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), null, any())
             } returns fixtExpectedMapped //
-            log.d("before:${fixtCurrentPlaylist.scanOrder()}")
+            log.d("before:${fixtCurrentPlaylist.orderString()}")
             fixtState?.model = fixtCurrentPlaylistMapped.copy(
                 itemsIdMap = fixtCurrentPlaylistMapped.itemsIdMap.toMutableMap()
                     .apply { put(fixtSwipeItemModel.id, deletedItem) }
@@ -729,8 +729,8 @@ class PlaylistPresenterTest {
             queuePlaylistFlow.emit(fixtExpectedPlaylist)
 
             // verify
-            log.d("state:${fixtState!!.playlist!!.scanOrder()}")
-            log.d("expected:${fixtExpectedPlaylist.scanOrder()}")
+            log.d("state:${fixtState!!.playlist!!.orderString()}")
+            log.d("expected:${fixtExpectedPlaylist.orderString()}")
             assertThat(fixtState!!.playlist!!).isEqualTo(fixtExpectedPlaylist)
             assertThat(fixtState!!.playlist!!.currentIndex).isEqualTo(fixtCurrentCurentIndex - 1)
             assertThat(fixtState!!.playlistIdentifier).isEqualTo(fixtCurrentIdentifier)
@@ -919,7 +919,7 @@ class PlaylistPresenterTest {
                 mockModelMapper
                     .map(fixtExpectedPlaylist, any(), true, fixtCurrentIdentifier, any(), any(), any())
             } returns fixtExpectedMapped //
-            log.d("before:${fixtCurrentPlaylist.scanOrder()}")
+            log.d("before:${fixtCurrentPlaylist.orderString()}")
             // test
             sut.undoDelete()
             testCoroutineDispatcher.advanceUntilIdle()

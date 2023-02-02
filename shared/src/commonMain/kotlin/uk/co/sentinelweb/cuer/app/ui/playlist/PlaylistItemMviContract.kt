@@ -1,8 +1,10 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseModel
 import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.ui.common.resources.Color
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
@@ -11,7 +13,7 @@ class PlaylistItemMviContract {
     // used to retain the view while passing through the MVI - Don't hold
     interface ItemPassView
 
-    sealed class Model(override val id: Long) : ItemBaseModel(id) {
+    sealed class Model(override val id: OrchestratorContract.Identifier<GUID>) : ItemBaseModel(id) {
 
 //        data class Header(
 //            override val id: Long,
@@ -24,7 +26,7 @@ class PlaylistItemMviContract {
 //        ) : Model(id)
 
         data class Item(
-            override val id: Long,
+            override val id: OrchestratorContract.Identifier<GUID>,
             val index: Int,
             val url: String,
             val type: MediaDomain.MediaTypeDomain,

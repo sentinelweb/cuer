@@ -4,9 +4,10 @@ import kotlinx.coroutines.delay
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
-import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.forceDatabaseSuccessNotNull
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 
@@ -14,37 +15,29 @@ class PlaylistOrDefaultUsecase constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
     private val playlistMemoryRepository: PlaylistMemoryRepository,
 ) {
-    suspend fun getPlaylistOrDefault(id: OrchestratorContract.Identifier<*>?)
-            : Pair<PlaylistDomain, OrchestratorContract.Source>? =
-        id?.let { getPlaylistOrDefault(it.id as Long, it.source.flatOptions()) }
+//    suspend fun getPlaylistOrDefault(id: OrchestratorContract.Identifier<GUID>?): PlaylistDomain? =
+//        id?.let { getPlaylistOrDefault(it.id) }
 
     suspend fun getPlaylistOrDefault(
-        playlistId: Long?,
-        options: OrchestratorContract.Options,
-    ): Pair<PlaylistDomain, OrchestratorContract.Source>? =
-        when (options.source) {
+        playlistId: OrchestratorContract.Identifier<GUID>?,
+    ): PlaylistDomain? =
+        when (playlistId?.source) {
             OrchestratorContract.Source.MEMORY ->
-                playlistMemoryRepository.load(playlistId!!, options) // todo FALLBACK OR ERROR?
-                    ?.apply { delay(20) } // fixme: menu items don't load in time sine memory is sequential
-                    ?.let { it to OrchestratorContract.Source.MEMORY }
-                    ?: getPlaylistOrDefault(null, options.flat)
-                        ?.let { it to OrchestratorContract.Source.LOCAL }
+                playlistMemoryRepository.load(playlistId.id, playlistId.source.deepOptions()) // todo FALLBACK OR ERROR?
+                    ?.apply { delay(20) } // fixme: menu items don't load in time since memory is sequential
+                    ?: getPlaylistOrDefaultInternal(null)
 
-            OrchestratorContract.Source.LOCAL ->
-                getPlaylistOrDefault(playlistId, options.flat)
-                    ?.let { it to OrchestratorContract.Source.LOCAL }
-
-            else -> throw UnsupportedOperationException("Not supported for ${options.source}")
+            OrchestratorContract.Source.LOCAL -> getPlaylistOrDefaultInternal(playlistId)
+            else -> throw UnsupportedOperationException("Not supported: playlistId: $playlistId")
         }
 
-    private suspend fun getPlaylistOrDefault(playlistId: Long?, flat: Boolean = false) =
+    private suspend fun getPlaylistOrDefaultInternal(playlistId: OrchestratorContract.Identifier<GUID>?): PlaylistDomain? =
         (playlistId
-            ?.takeIf { it >= 0 }
-            ?.let { playlistDatabaseRepository.load(it, flat = false) }
+            ?.let { playlistDatabaseRepository.load(it.id, flat = false) }
             ?.takeIf { it.isSuccessful }
             ?.data
             ?: run {
-                playlistDatabaseRepository.loadList(DefaultFilter, flat)
+                playlistDatabaseRepository.loadList(DefaultFilter, false)
                     .takeIf { it.isSuccessful && (it.data?.size ?: 0) > 0 }
                     ?.data?.get(0)
             })

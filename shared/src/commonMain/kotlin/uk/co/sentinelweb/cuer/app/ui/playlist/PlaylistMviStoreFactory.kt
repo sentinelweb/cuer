@@ -9,7 +9,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
@@ -60,7 +62,7 @@ class PlaylistMviStoreFactory(
     private val dbInit: DatabaseInitializer,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val queue: QueueMediatorContract.Producer,
-    private val appPlaylistInteractors: Map<Long, AppPlaylistInteractor>,
+    private val appPlaylistInteractors: Map<OrchestratorContract.Identifier<GUID>, AppPlaylistInteractor>,
     private val playlistMutator: PlaylistMutator,
     private val util: PlaylistMviUtil,
     private val modelMapper: PlaylistMviModelMapper,
@@ -70,6 +72,7 @@ class PlaylistMviStoreFactory(
     private val timeProvider: TimeProvider,
     private val addPlaylistUsecase: AddPlaylistUsecase,
     private val multiPrefs: MultiPlatformPreferencesWrapper,
+    private val idGenerator: IdGenerator
 ) {
     init {
         log.tag(this)
@@ -78,24 +81,24 @@ class PlaylistMviStoreFactory(
 
     private sealed class Result {
         data class Load(
-            var playlistIdentifier: OrchestratorContract.Identifier<*>,
+            var playlistIdentifier: Identifier<GUID>,
             var playlist: PlaylistDomain?,
             var playlistsTree: PlaylistTreeDomain?,
-            var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>?,
+            var playlistsTreeLookup: Map<Identifier<GUID>, PlaylistTreeDomain>?,
 //            val itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
         ) : Result()
 
         data class SetDeletedItem(val item: PlaylistItemDomain?) : Result()
         data class SetPlaylist(
             val playlist: PlaylistDomain?,
-            var playlistIdentifier: OrchestratorContract.Identifier<*>? = null
+            var playlistIdentifier: Identifier<GUID>? = null
         ) : Result()
 
         data class SetPlaylistId(
-            var playlistIdentifier: OrchestratorContract.Identifier<*>
+            var playlistIdentifier: Identifier<GUID>
         ) : Result()
 
-        data class IdUpdate(val modelId: Long, val changedItem: PlaylistItemDomain) : Result()
+        data class IdUpdate(val modelId: Identifier<GUID>, val changedItem: PlaylistItemDomain) : Result()
         data class SelectedPlaylistItem(val item: PlaylistItemDomain?) : Result()
         data class MovedPlaylistItem(val item: PlaylistItemDomain?) : Result()
         data class SetModified(val modified: Boolean = true) : Result()
@@ -109,7 +112,7 @@ class PlaylistMviStoreFactory(
         object Init : Action()
     }
 
-    private object ReducerImpl : Reducer<State, Result> {
+    private class ReducerImpl(private val idGenerator: IdGenerator) : Reducer<State, Result> {
         override fun State.reduce(msg: Result): State =
             when (msg) {
                 is Load -> copy(
@@ -139,14 +142,13 @@ class PlaylistMviStoreFactory(
                 //else -> copy()
             }
 
-        private fun buildIdList(domain: PlaylistDomain?): MutableMap<Long, PlaylistItemDomain> {
-            val modelIdGenerator = IdGenerator()
-            val itemsIdMap = mutableMapOf<Long, PlaylistItemDomain>()
+        private fun buildIdList(domain: PlaylistDomain?): MutableMap<Identifier<GUID>, PlaylistItemDomain> {
+            val itemsIdMap = mutableMapOf<Identifier<GUID>, PlaylistItemDomain>()
             domain?.items?.mapIndexed { index, item ->
-                val modelId = item.id ?: modelIdGenerator.value
+                val modelId = item.id ?: idGenerator.value
                 itemsIdMap[modelId] = item
             }
-            return itemsIdMap //.also { map -> log.d(map.keys.associateBy { map[it]?.media?.title }.toString()) }
+            return itemsIdMap
         }
     }
 
@@ -228,7 +230,8 @@ class PlaylistMviStoreFactory(
         }
 
         private fun checkToSave(intent: Intent.CheckToSave, state: State) {
-            if ((state.playlist?.id ?: 0) <= 0 || state.isModified) {
+            //if ((state.playlist?.id ?: 0) <= 0 || state.isModified) {
+            if (state.playlist?.id?.source == MEMORY || state.isModified) {
                 publish(Label.CheckSaveShowDialog(modelMapper.mapSaveConfirmAlert()))
             } else publish(Label.Navigate(NavigationModel.DONE))
         }
@@ -252,8 +255,8 @@ class PlaylistMviStoreFactory(
 //                    .also { states.playlist = it }
                         .also {
                             val newIdentifier =
-                                it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")
-                            dispatch(Result.SetPlaylist(playlist = it, playlistIdentifier = newIdentifier))
+                                it.id ?: throw IllegalStateException("Save failure")
+                            dispatch(SetPlaylist(playlist = it, playlistIdentifier = newIdentifier))
                             executeRefresh(state = getState()) // hmmm will this work after dispatch
                         }
                         //.also { updateView(getState()) }
@@ -268,7 +271,7 @@ class PlaylistMviStoreFactory(
         private fun edit(intent: Intent.Edit, state: State) {
             state.playlistIdentifier
                 .also {
-                    recentLocalPlaylists.addRecentId(it.id as Long)
+                    recentLocalPlaylists.addRecentId(it.id)
                     publish(
                         Label.Navigate(
                             NavigationModel(
@@ -398,9 +401,7 @@ class PlaylistMviStoreFactory(
                             state.dragTo
                                 ?.let { playlistModified.items[it] }
                                 ?.let { item ->
-                                    item to (item.id ?: 0)
-                                        .toIdentifier(state.playlistIdentifier.source)
-                                        .flatOptions()
+                                    item to item.id!!.flatOptions()
                                 }
                                 // updates order
                                 ?.let { playlistItemOrchestrator.save(it.first, it.second) }
@@ -513,7 +514,7 @@ class PlaylistMviStoreFactory(
                         val source =
                             if (state.playlist?.type != PlaylistDomain.PlaylistTypeDomain.APP) state.playlistIdentifier.source
                             else LOCAL
-                        publish(Label.ShowItem(modelId = intent.item.id, item = this, source = source))
+                        publish(Label.ShowItem(modelId = intent.item.id, item = this))
                     }
                 }
         }
@@ -576,7 +577,7 @@ class PlaylistMviStoreFactory(
 
         private fun flowUpdatesPlaylist(intent: Intent.UpdatesPlaylist, state: State) {
             log.d("playlist changed: ${intent.op}, ${intent.source}, id=${intent.plist.id} items=${intent.plist.items.size}")
-            if (intent.plist.id?.toIdentifier(intent.source) == state.playlistIdentifier) {
+            if (intent.plist.id == state.playlistIdentifier) {
                 when (intent.op) {
                     FLAT ->
                         if (!intent.plist.matchesHeader(state.playlist)) {
@@ -607,7 +608,7 @@ class PlaylistMviStoreFactory(
             when (intent.op) { // todo just apply model updates (instead of full rebuild)
                 FLAT,
                 FULL,
-                -> if (intent.item.playlistId?.toIdentifier(intent.source) == state.playlistIdentifier) {
+                -> if (intent.item.playlistId == state.playlistIdentifier) {
                     state.playlist
                         ?.let { playlistMutator.addOrReplaceItem(it, intent.item) }
                         ?.takeIf { it != state.playlist }
@@ -665,7 +666,7 @@ class PlaylistMviStoreFactory(
 
         private fun updateItem(
             index: Int,
-            modelId: Long,
+            modelId: OrchestratorContract.Identifier<GUID>,
             changedItem: PlaylistItemDomain,
             state: State,
         ) {
@@ -737,7 +738,7 @@ class PlaylistMviStoreFactory(
 
                 ItemMove ->
                     state.movedPlaylistItem
-                        ?.copy(playlistId = state.playlistIdentifier.id!! as Long)
+                        ?.copy(playlistId = state.playlistIdentifier)
                         ?.also {
                             scope.launch {
                                 playlistItemOrchestrator.save(
@@ -771,15 +772,11 @@ class PlaylistMviStoreFactory(
         // endregion
 
         // region utils
-        private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) =
-            itemsIdMap.get(itemModel.id)
-        // fixme figure out if how cache models?
-        //playlist?.items?.find { it.id == itemModel.id }
-
-        private fun State.canPlayPlaylist() = (playlist?.id ?: 0) > 0
+        private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) = itemsIdMap.get(itemModel.id)
+        private fun State.canPlayPlaylist() = playlist?.id?.source == LOCAL
 
         private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
-            (itemDomain.playlistId ?: 0) > 0
+            itemDomain.playlistId?.source == LOCAL
         // endregion utils
 
         // region loadRefresh
@@ -790,14 +787,15 @@ class PlaylistMviStoreFactory(
             coroutines.mainScope.launch {
                 val notLoaded = currentState.playlist == null
                 //log.d("setPlaylistData: notLoaded: $notLoaded")
+                // todo make identifier serializable
                 intent.plId
-                    ?.takeIf { it != -1L }
+                    ?.takeIf { it != NO_PLAYLIST.id }
                     ?.toIdentifier(intent.source)
                     ?.apply { dispatch(SetPlaylistId(this)) }
                     ?.apply { executeRefresh(state = getState(), scrollToCurrent = notLoaded) }
                     ?.apply {
                         if (intent.playNow) {
-                            queue.playNow(this, intent.plItemId)
+                            queue.playNow(this, intent.plItemId?.toIdentifier(intent.source))
                         }
                     }
                     ?.apply { recentLocalPlaylists.addRecentId(intent.plId) }
@@ -808,7 +806,7 @@ class PlaylistMviStoreFactory(
                         } else {
                             dbInit.addListener { success: Boolean ->
                                 if (success) {
-                                    dispatch(SetPlaylistId(3L.toIdentifier(LOCAL)))
+                                    dispatch(SetPlaylistId(DatabaseInitializer.DEFAULT_PLAYLIST_ID))
                                     refresh(state = getState())
                                 }
                             }
@@ -837,12 +835,12 @@ class PlaylistMviStoreFactory(
                     .loadList(AllFilter, LOCAL.flatOptions())
                     .buildTree()
                 val focusIndex = if (scrollToCurrent && state.focusIndex == null) {
-                    playlistOrDefault?.first?.currentIndex
+                    playlistOrDefault?.currentIndex
                 } else state.focusIndex
                 dispatch(
                     Load(
-                        playlist = playlistOrDefault?.first,
-                        playlistIdentifier = playlistOrDefault?.first?.id?.toIdentifier(playlistOrDefault.second)
+                        playlist = playlistOrDefault,
+                        playlistIdentifier = playlistOrDefault?.id
                             ?: throw IllegalStateException("Need an id"),
                         playlistsTree = playlistsTree,
                         playlistsTreeLookup = playlistsTree.buildLookup(),
@@ -868,6 +866,6 @@ class PlaylistMviStoreFactory(
                 initialState = State(),
                 bootstrapper = BootstrapperImpl(),
                 executorFactory = { ExecutorImpl() },
-                reducer = ReducerImpl
+                reducer = ReducerImpl(idGenerator)
             ) {}
 }

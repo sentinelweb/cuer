@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.Platf
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.core.ntuple.then
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
@@ -30,7 +31,7 @@ class PlaylistOrchestrator constructor(
                 .map { it.first to MEMORY then it.second })
         )
 
-    suspend override fun loadById(id: Long, options: Options): PlaylistDomain? = when (options.source) {
+    suspend override fun loadById(id: GUID, options: Options): PlaylistDomain? = when (options.source) {
         MEMORY -> playlistMemoryRepository.load(id, options)
         LOCAL -> playlistDatabaseRepository.load(id, options.flat)
             .forceDatabaseSuccess()

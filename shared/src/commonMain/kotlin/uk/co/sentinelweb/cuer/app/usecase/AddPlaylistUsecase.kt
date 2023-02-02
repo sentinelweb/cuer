@@ -1,11 +1,13 @@
 package uk.co.sentinelweb.cuer.app.usecase
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class AddPlaylistUsecase(
@@ -21,7 +23,7 @@ class AddPlaylistUsecase(
 
     suspend fun addPlaylist(
         playlistDomain: PlaylistDomain,
-        addPlaylistParent: Long?
+        addPlaylistParent: Identifier<GUID>?
     ): PlaylistDomain = playlistDomain
         .let { playlistMediaLookupUsecase.lookupMediaAndReplace(it) }
 //            ?.also { log.i("lookupMediaAndReplace: $it") }
@@ -39,13 +41,12 @@ class AddPlaylistUsecase(
         }
         .let { playlist ->
             addPlaylistParent
-                ?.takeIf { it > 0 }
                 ?.let { parentId ->
-                    playlistOrchestrator.loadById(parentId, OrchestratorContract.Source.LOCAL.flatOptions())
+                    playlistOrchestrator.loadById(parentId.id, parentId.source.flatOptions())
                         ?.let { playlist.copy(parentId = parentId) }
                 }
                 ?: playlist
         }
         .let { playlistOrchestrator.save(it, OrchestratorContract.Source.LOCAL.deepOptions(emit = true)) }
-        .also { recentLocalPlaylists.addRecentId(it.id!!) }
+        .also { recentLocalPlaylists.addRecentId(it.id!!.id) }
 }

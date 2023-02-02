@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.queue
 
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -20,8 +21,8 @@ interface QueueMediatorContract {
     interface Producer : Shared {
         fun onItemSelected(playlistItem: PlaylistItemDomain, forcePlay: Boolean = false, resetPosition: Boolean = false)
         fun destroy()
-        suspend fun playNow(identifier: OrchestratorContract.Identifier<*>, playlistItemId: Long?)
-        suspend fun switchToPlaylist(identifier: OrchestratorContract.Identifier<*>)
+        suspend fun playNow(identifier: OrchestratorContract.Identifier<GUID>, playlistItemId: OrchestratorContract.Identifier<GUID>?)
+        suspend fun switchToPlaylist(identifier: OrchestratorContract.Identifier<GUID>)
     }
 
     interface Consumer : Shared {

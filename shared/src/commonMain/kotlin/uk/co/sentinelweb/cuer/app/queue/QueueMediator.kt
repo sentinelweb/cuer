@@ -9,13 +9,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -68,18 +68,19 @@ class QueueMediator constructor(
         playlistOrchestrator.updates
             .onEach { (op, source, plist) ->
                 try {
-                    if (plist.id?.toIdentifier(source) == state.playlistIdentifier) {
+                    if (plist.id == state.playlistIdentifier) {
                         when (op) {
                             FLAT -> {
                                 if (!plist.matchesHeader(state.playlist)) {
                                     state.playlist
-                                        ?.apply { refreshQueueFrom(replaceHeader(plist), source) }
-                                        ?: refreshQueueFrom(plist, source)
+                                        ?.apply { refreshQueueFrom(replaceHeader(plist)) }
+                                        ?: refreshQueueFrom(plist)
                                 }
                             }
+
                             FULL -> {
                                 if (plist != state.playlist) {
-                                    refreshQueueFrom(plist, source)
+                                    refreshQueueFrom(plist)
                                 }
                             }
                             DELETE -> {
@@ -99,22 +100,22 @@ class QueueMediator constructor(
                 try {
                     when (op) {
                         FLAT,
-                        FULL -> if (plistItem.playlistId?.toIdentifier(source) == state.playlistIdentifier) {
+                        FULL -> if (plistItem.playlistId == state.playlistIdentifier) {
                             state.playlist
                                 ?.let { playlistMutator.addOrReplaceItem(it, plistItem) }
                                 ?.takeIf { it != state.playlist }
-                                ?.apply { refreshQueueFrom(this, source) }
+                                ?.apply { refreshQueueFrom(this) }
                         } else { // moved out?
                             state.playlist
                                 ?.let { playlistMutator.remove(it, plistItem) }
                                 ?.takeIf { it != state.playlist }
-                                ?.apply { refreshQueueFrom(this, source) }
+                                ?.apply { refreshQueueFrom(this) }
                         }
                         DELETE ->
                             state.playlist
                                 ?.let { playlistMutator.remove(it, plistItem) }
                                 ?.takeIf { it != state.playlist }
-                                ?.apply { refreshQueueFrom(this, source) }
+                                ?.apply { refreshQueueFrom(this) }
                     }
                 } catch (e: Exception) {
                     log.e(
@@ -125,7 +126,7 @@ class QueueMediator constructor(
             }.launchIn(coroutines.computationScope)
     }
 
-    override suspend fun switchToPlaylist(identifier: Identifier<*>) {
+    override suspend fun switchToPlaylist(identifier: Identifier<GUID>) {
         refreshQueue(identifier)
     }
 
@@ -143,14 +144,14 @@ class QueueMediator constructor(
     }.ignoreJob()
 
     // todo refactor / consolidate the playNow's
-    override suspend fun playNow(identifier: Identifier<*>, playlistItemId: Long?) {
-        playlistOrchestrator.loadById(identifier.id as Long, Options(identifier.source, false))
+    override suspend fun playNow(identifier: Identifier<GUID>, playlistItemId: Identifier<GUID>?) {
+        playlistOrchestrator.loadById(identifier.id, Options(identifier.source, false))
             ?.let {
                 playNow(it, playlistItemId, identifier.source)
             }
     }
 
-    private suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Long?, source: Source) {
+    private suspend fun playNow(playlist: PlaylistDomain, playlistItemId: Identifier<GUID>?, source: Source) {
         (playlist.indexOfItemId(playlistItemId)
             ?.let { foundIndex ->
                 playlist.copy(currentIndex = foundIndex).apply {
@@ -159,7 +160,7 @@ class QueueMediator constructor(
             }
             ?: playlist)
             .also {
-                refreshQueueFrom(it, source)
+                refreshQueueFrom(it)
                 playNow()
             }
     }
@@ -273,9 +274,9 @@ class QueueMediator constructor(
         nextItem()
     }
 
-    private suspend fun refreshQueueFrom(playlistDomain: PlaylistDomain, source: Source) {
+    private suspend fun refreshQueueFrom(playlistDomain: PlaylistDomain) {
         // if the playlist is the same then don't change the current item
-        val playlistIdentifier = playlistDomain.id?.toIdentifier(source)
+        val playlistIdentifier = playlistDomain.id
         if (state.playlistIdentifier != playlistIdentifier) {
             state.playlistIdentifier = playlistIdentifier
                 ?: throw IllegalStateException("No playlist ID")
@@ -295,15 +296,10 @@ class QueueMediator constructor(
         state.playlist?.also { _currentPlaylistFlow.emit(it) }
     }
 
-    private suspend fun refreshQueue(identifier: Identifier<*>) {
+    private suspend fun refreshQueue(identifier: Identifier<GUID>) {
         identifier
-            .let {
-                playlistOrDefaultUsecase.getPlaylistOrDefault(
-                    it.id as Long,
-                    Options(it.source, flat = false)
-                )
-            }
-            ?.also { refreshQueueFrom(it.first, it.second) }
+            .let { playlistOrDefaultUsecase.getPlaylistOrDefault(it) }
+            ?.also { refreshQueueFrom(it) }
     }
 
     @Suppress("unused")

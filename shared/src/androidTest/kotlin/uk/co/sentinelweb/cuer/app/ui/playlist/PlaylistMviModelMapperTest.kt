@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.*
@@ -10,20 +7,21 @@ import org.junit.Before
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
-import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 
 class PlaylistMviModelMapperTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+    private val fixture = kotlinFixtureDefaultConfig
 
     private val itemModelMapper: PlaylistMviItemModelMapper = mockk(relaxed = true)
     private val iconMapper: IconMapper = mockk(relaxed = true)
     private val strings: StringDecoder = mockk(relaxed = true)
-    private val appPlaylistInteractors: Map<Long, AppPlaylistInteractor> = mapOf()
+    private val appPlaylistInteractors: Map<OrchestratorContract.Identifier<GUID>, AppPlaylistInteractor> = mapOf()
     private val util: PlaylistMviUtil = mockk(relaxed = true)
     private val multiPlatformPreferences: MultiPlatformPreferencesWrapper = mockk(relaxed = true)
     private val log: LogWrapper = mockk(relaxed = true)
@@ -59,10 +57,10 @@ class PlaylistMviModelMapperTest {
     @Test
     fun mapPlaylist() {
         val playlist = fixture<PlaylistDomain>().let {
-            it.copy(id = it.id ?: 3L, items = it.items.filter { it.id != null })
+            it.copy(id = it.id!!, items = it.items.filter { it.id != null })
         }
 
-        val identifier = playlist.id!!.toIdentifier(OrchestratorContract.Source.LOCAL)
+        val identifier = playlist.id!!
         val state = PlaylistMviContract.MviStore.State(
             playlist = playlist,
             playlistIdentifier = identifier,

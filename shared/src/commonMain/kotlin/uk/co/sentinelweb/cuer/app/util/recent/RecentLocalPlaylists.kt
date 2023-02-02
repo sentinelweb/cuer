@@ -5,7 +5,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.toGUID
 
 class RecentLocalPlaylists constructor(
     private val prefs: MultiPlatformPreferencesWrapper,
@@ -16,41 +18,39 @@ class RecentLocalPlaylists constructor(
         log.tag(this)
     }
 
-    fun getRecent(): List<Long> = prefs.recentIds
+    fun getRecent(): List<GUID> = prefs.recentIds
         ?.split(",")
-        ?.map { it.toLong() }
+        ?.map { it.toGUID() }
         ?.toMutableList()
         ?: mutableListOf()
 
     fun addRecent(pl: PlaylistDomain) {
-        val id = pl.id
+        pl.id?.apply { addPlaylistId(id) }
+    }
+
+    fun addRecentId(id: GUID) {
         addPlaylistId(id)
     }
 
-    fun addRecentId(id: Long) {
-        addPlaylistId(id)
-    }
-
-    private fun addPlaylistId(id: Long?) {
+    private fun addPlaylistId(id: GUID?) {
         val current = getRecent().toMutableList()
         if (id != null) {
             current.remove(id)
             current.add(id)
             while (current.size > MAX_RECENT) current.removeAt(0)
-            prefs.recentIds = current.toTypedArray().joinToString(",")
+            prefs.recentIds = current.toTypedArray().map { it.value }.joinToString(",")
         }
     }
 
-    fun buildRecentSelectionList(): List<Identifier<Long>> {
-        val recent = mutableListOf<Identifier<Long>>()
+    fun buildRecentSelectionList(): List<Identifier<GUID>> {
+        val recent = mutableListOf<Identifier<GUID>>()
 
 //        prefs.lastAddedPlaylistId
 //            ?.toIdentifier(LOCAL)
 //            ?.also { recent.add(it) }
 
         prefs.pinnedPlaylistId
-            ?.toIdentifier(LOCAL)
-            ?.also { recent.add(0, it) }
+            ?.also { recent.add(0, it.toIdentifier(LOCAL)) }
 
 //        localSearch.search()
 //            ?.playlists

@@ -2,8 +2,10 @@ package uk.co.sentinelweb.cuer.app.ui.browse
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.CategoryDomain.Companion.EMPTY_CATEGORY
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
@@ -32,10 +34,10 @@ class BrowseContract {
 
             data class AddPlaylist(
                 val cat: CategoryDomain,
-                val parentId: Long? = null,
+                val parentId: OrchestratorContract.Identifier<GUID>? = null,
             ) : Label()
 
-            data class OpenLocalPlaylist(val id: Long, val play: Boolean = false) : Label()
+            data class OpenLocalPlaylist(val id: OrchestratorContract.Identifier<GUID>, val play: Boolean = false) : Label()
         }
 
         data class State(

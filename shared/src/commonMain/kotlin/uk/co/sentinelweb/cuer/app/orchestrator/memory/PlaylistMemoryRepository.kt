@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -26,17 +27,19 @@ class PlaylistMemoryRepository constructor(
     private val remoteSearchOrchestrator: YoutubeSearchPlayistInteractor
 ) : MemoryRepository<PlaylistDomain> {
 
-    enum class MemoryPlaylist(val id: Long) {
-        Shared(-100),
-        NewItems(-101),
-        Recent(-102),
-        LocalSearch(-103),
-        YoutubeSearch(-104),
-        Starred(-105),
-        Unfinished(-106)
+    enum class MemoryPlaylist(val id: GUID) {
+        Shared(GUID("1ae0c7a4-0ae2-45fd-b90b-8e7a142c20d8")),
+        NewItems(GUID("c7c6a812-0f39-496f-b769-a3c6606e4773")),
+        Recent(GUID("9636c334-4219-4179-8c87-d3dc3fa8ebf8")),
+        LocalSearch(GUID("aa4f2c64-bc51-4fab-8846-78093fd2562a")),
+        YoutubeSearch(GUID("9ac7d9bf-32c1-4efe-a2a2-d0cd9ad6263b")),
+        Starred(GUID("f54f43f7-3ad8-43cb-99f7-115d7868b20b")),
+        Unfinished(GUID("0430c6c0-5153-4910-8306-562f21d6bbcc"));
+
+        fun identifier() = Identifier(id, Source.MEMORY)
     }
 
-    private val data: MutableMap<Long, PlaylistDomain> = mutableMapOf()
+    private val data: MutableMap<GUID, PlaylistDomain> = mutableMapOf()
 
     val playlistItemMemoryRepository = PlayListItemMemoryRepository()
     val mediaMemoryRepository = MediaMemoryRepository()
@@ -53,7 +56,7 @@ class PlaylistMemoryRepository constructor(
         throw NotImplementedException()
     }
 
-    override suspend fun load(id: Long, options: Options): PlaylistDomain? = when (id) {
+    override suspend fun load(id: GUID, options: Options): PlaylistDomain? = when (id) {
         NewItems.id -> newItemsInteractor.getPlaylist()
         Recent.id -> recentItemsInteractor.getPlaylist()
         LocalSearch.id -> localSearchInteractor.getPlaylist()
@@ -75,21 +78,19 @@ class PlaylistMemoryRepository constructor(
 
     override fun save(domain: PlaylistDomain, options: Options): PlaylistDomain =
         domain.id?.let { playlistId ->
-            if (!options.flat || !data.containsKey(playlistId)) {
+            if (!options.flat || !data.containsKey(playlistId.id)) {
                 domain.copy(
-                    items = domain.items.mapIndexed { _, item ->
-                        item.copy(
-                            playlistId = playlistId,
-                        )
+                    items = domain.items.map { item ->
+                        item.copy(playlistId = playlistId)
                     }
                 )
             } else {
                 domain.copy(
-                    items = data[playlistId]?.items
+                    items = data[playlistId.id]?.items
                         ?: throw IllegalStateException("Data got emptied")
                 )
             }
-        }?.also { data[it.id!!] = it }
+        }?.also { data[it.id!!.id] = it }
             ?.also {
                 if (options.emit) {
                     coroutines.computationScope.launch {
@@ -109,7 +110,7 @@ class PlaylistMemoryRepository constructor(
 
     override fun delete(domain: PlaylistDomain, options: Options): Boolean =
         domain.id
-            ?.let { data.remove(it) }
+            ?.let { data.remove(it.id) }
             .let { it != null }
 
     inner class PlayListItemMemoryRepository : MemoryRepository<PlaylistItemDomain> {
@@ -125,7 +126,7 @@ class PlaylistMemoryRepository constructor(
             throw NotImplementedException()
         }
 
-        override suspend fun load(id: Long, options: Options): PlaylistItemDomain? {
+        override suspend fun load(id: GUID, options: Options): PlaylistItemDomain? {
             throw NotImplementedException()
         }
 
@@ -134,16 +135,16 @@ class PlaylistMemoryRepository constructor(
                 is MediaIdListFilter -> data.values
                     .map { it.items }
                     .flatten()
-                    .filter { filter.ids.contains(it.media.id) }
+                    .filter { filter.ids.contains(it.media.id!!.id) } // todo check -> !! added
                 else -> throw NotImplementedException()
             }
 
         override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
             domain.playlistId
-                ?.takeIf { data.contains(it) }
+                ?.takeIf { data.contains(it.id) }
                 ?.let { playlistId ->
-                    data[playlistId]?.let {
-                        data.set(playlistId, it.replaceItemByPlatformId(domain))
+                    data[playlistId.id]?.let {
+                        data.set(playlistId.id, it.replaceItemByPlatformId(domain))
                         if (options.emit) {
                             coroutines.computationScope.launch {
                                 _playlistItemFlow.emit((if (options.flat) FLAT else FULL) to domain)
@@ -166,10 +167,10 @@ class PlaylistMemoryRepository constructor(
 
         override fun delete(domain: PlaylistItemDomain, options: Options): Boolean =
             domain.playlistId
-                ?.takeIf { data.contains(it) }
+                ?.takeIf { data.contains(it.id) }
                 ?.let { playlistId ->
-                    data[playlistId]?.let {
-                        data.set(playlistId, it.removeItemByPlatformId(domain) ?: it)
+                    data[playlistId.id]?.let {
+                        data.set(playlistId.id, it.removeItemByPlatformId(domain) ?: it)
                         if (options.emit) {
                             coroutines.computationScope.launch {
                                 _playlistItemFlow.emit(DELETE to domain)
@@ -182,9 +183,9 @@ class PlaylistMemoryRepository constructor(
     }
 
     inner class MediaMemoryRepository : MemoryRepository<MediaDomain> {
-        private val _playlistItemFlow = MutableSharedFlow<Pair<Operation, MediaDomain>>()
+        private val _mediaFlow = MutableSharedFlow<Pair<Operation, MediaDomain>>()
         override val updates: Flow<Pair<Operation, MediaDomain>>
-            get() = _playlistItemFlow
+            get() = _mediaFlow
 
         override fun load(platformId: String, options: Options): MediaDomain? {
             throw NotImplementedException()
@@ -194,7 +195,7 @@ class PlaylistMemoryRepository constructor(
             throw NotImplementedException()
         }
 
-        override suspend fun load(id: Long, options: Options): MediaDomain? {
+        override suspend fun load(id: GUID, options: Options): MediaDomain? {
             throw NotImplementedException()
         }
 
