@@ -19,6 +19,7 @@ internal class YoutubeImageMapper {
     private fun map(thumbNail: ThumbnailDto?) =
         thumbNail?.let {
             ImageDomain(
+                id = null,
                 url = it.url,
                 width = it.width,
                 height = it.height

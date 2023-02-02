@@ -58,6 +58,7 @@ internal class YoutubeSearchMapper(
     ): PlaylistDomain {
         val channelLookup = channelDtos.associateBy({ it.id }, { channelMapper.map(it) })
         return PlaylistDomain(
+            id = null,
             title = "Search results",
             platform = PlatformDomain.YOUTUBE,
             type = PLATFORM,

@@ -14,6 +14,7 @@ val ver_ktor: String by project
 val ver_mockk: String by project
 val ver_jfixture: String by project
 val ver_jvm: String by project
+val ver_kotlin_fixture: String by project
 
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
@@ -83,6 +84,7 @@ kotlin {
                 implementation("io.insert-koin:koin-test:$ver_koin")
                 implementation("io.mockk:mockk:$ver_mockk")
                 implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
+                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
             }
         }
         val jvmMain by getting {

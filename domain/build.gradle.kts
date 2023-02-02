@@ -67,7 +67,6 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation("io.insert-koin:koin-test:$ver_koin")
-                implementation("io.mockk:mockk:$ver_mockk")
             }
         }
 
@@ -75,14 +74,16 @@ kotlin {
             dependencies {
 //                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
 //                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-                implementation("com.google.truth:truth:$ver_truth")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
                 implementation("app.cash.turbine:turbine:$ver_turbine")
             }
         }
         val androidTest by getting {
             dependencies {
+                implementation("io.mockk:mockk:$ver_mockk")
+                implementation("com.google.truth:truth:$ver_truth")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
+                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
+
             }
         }
         val jvmMain by getting {
