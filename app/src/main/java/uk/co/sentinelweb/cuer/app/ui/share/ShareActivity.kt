@@ -21,8 +21,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityShareBinding
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -42,9 +41,11 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseCategory
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseGuidIdentifier
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import java.io.File
 
@@ -191,11 +192,12 @@ class ShareActivity : AppCompatActivity(),
     }
 
     private fun checkIntentParams() {
-        presenter.setPlaylistParent(
-            intent.getStringExtra(CATEGORY.toString())
-                ?.let { deserialiseCategory(it) },
-            intent.getLongExtra(PLAYLIST_PARENT.toString(), -1)
-        )
+        intent.getStringExtra(PLAYLIST_PARENT.toString())
+            ?.let { deserialiseGuidIdentifier(it) }
+            ?.also {
+                val cat = intent.getStringExtra(CATEGORY.toString())?.let { deserialiseCategory(it) }
+                presenter.setPlaylistParent(cat, it)
+            }
     }
 
     override fun onStop() {
@@ -203,8 +205,8 @@ class ShareActivity : AppCompatActivity(),
         presenter.onStop()
     }
 
-    override fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean) {
-        MainActivity.start(this, plId, plItemId, source, play)
+    override fun gotoMain(plId: Identifier<GUID>, plItemId: Identifier<GUID>?, play: Boolean) {
+        MainActivity.start(this, plId, plItemId, play)
     }
 
     override fun setData(model: ShareContract.Model) {
@@ -222,25 +224,22 @@ class ShareActivity : AppCompatActivity(),
         setEnabled(model.enabled)
     }
 
-    override fun showMedia(
-        itemDomain: PlaylistItemDomain,
-        source: Source,
-        playlistParentId: Long?
-    ) {
+    // todo serialize identifiers
+    override fun showMedia(itemDomain: PlaylistItemDomain, playlistParentId: Identifier<GUID>?) {
         ScanFragmentDirections.actionGotoPlaylistItem(
             itemDomain.serialise(),
-            source.toString(),
-            playlistParentId ?: -1,
+            itemDomain.id?.source.toString(),
+            playlistParentId?.id?.value,
             false
         ).apply { navController.navigate(this) }
         //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
     }
 
-    override fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?) {
+    override fun showPlaylist(id: Identifier<GUID>, playlistParentId: Identifier<GUID>?) {
         ScanFragmentDirections.actionGotoPlaylist(
+            id.id.value,
             id.source.toString(),
-            id.id,
-            playlistParentId ?: -1,
+            playlistParentId?.id?.value,
             false
         ).apply { navController.navigate(this) }
     }
@@ -271,12 +270,12 @@ class ShareActivity : AppCompatActivity(),
         snackbar = snackbarWrapper.make("ERROR: $msg").apply { show() }
     }
 
-    override fun warning(msg: String) = with (binding.shareWarning) {
+    override fun warning(msg: String) = with(binding.shareWarning) {
         text = msg
         isVisible = true
     }
 
-    override fun hideWarning() = with (binding.shareWarning) {
+    override fun hideWarning() = with(binding.shareWarning) {
         isVisible = false
     }
 
@@ -321,31 +320,31 @@ class ShareActivity : AppCompatActivity(),
             paste: Boolean = false,
             parentId: Long? = null
         ) = Intent(c, ShareActivity::class.java).apply {
-                action = Intent.ACTION_VIEW
-                if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
-                if (paste) {
-                    putExtra(PASTE.toString(), true)
-                }
-                if (parentId != null) {
-                    this.putExtra(PLAYLIST_PARENT.toString(), parentId)
-                }
+            action = Intent.ACTION_VIEW
+            if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
+            if (paste) {
+                putExtra(PASTE.toString(), true)
             }
+            if (parentId != null) {
+                this.putExtra(PLAYLIST_PARENT.toString(), parentId)
+            }
+        }
 
         fun urlIntent(
             c: Context,
             url: String,
-            parentId: Long? = null,
+            parentId: Identifier<GUID>? = null,
             fromCategory: CategoryDomain? = null
         ) = Intent(c, ShareActivity::class.java).apply {
-                action = Intent.ACTION_VIEW
-                if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
-                data = Uri.parse(url)
-                if (fromCategory != null) {
-                    this.putExtra(CATEGORY.toString(), fromCategory.serialise())
-                }
-                if (parentId != null) {
-                    this.putExtra(PLAYLIST_PARENT.toString(), parentId)
-                }
+            action = Intent.ACTION_VIEW
+            if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
+            data = Uri.parse(url)
+            if (fromCategory != null) {
+                this.putExtra(CATEGORY.toString(), fromCategory.serialise())
             }
+            if (parentId != null) {
+                this.putExtra(PLAYLIST_PARENT.toString(), parentId.serialise())
+            }
+        }
     }
 }

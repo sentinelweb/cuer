@@ -4,9 +4,11 @@ import android.text.SpannableString
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.navigation.fragment.FragmentNavigator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract.Model.Item
+import uk.co.sentinelweb.cuer.domain.GUID
 
 interface ItemContract {
 
@@ -34,7 +36,7 @@ interface ItemContract {
         fun setPlayIcon(@DrawableRes icon: Int)
         fun dismissMenu()
         fun setShowOverflow(showOverflow: Boolean)
-        fun isViewForId(id: Long): Boolean
+        fun isViewForId(id: Identifier<GUID>): Boolean
         fun setDeleteResources(deleteResources: ActionResources?)
     }
 
@@ -49,7 +51,7 @@ interface ItemContract {
         fun doPlayStartClick()
         fun doGotoPlaylist()
         fun updateProgress()
-        fun isViewForId(id: Long): Boolean
+        fun isViewForId(id: Identifier<GUID>): Boolean
         fun isStarred(): Boolean
         fun isCompositePlaylist(): Boolean
         fun doAuthorClick()

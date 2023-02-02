@@ -4,9 +4,10 @@ import android.text.Spannable
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.navigation.fragment.FragmentNavigator
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract
+import uk.co.sentinelweb.cuer.domain.GUID
 
 interface ItemContract {
 
@@ -49,10 +50,10 @@ interface ItemContract {
     }
 
     interface External<in T : PlaylistsItemMviContract.Model> : ItemBaseContract.ItemPresenterBase {
-        fun update(item: T, current: OrchestratorContract.Identifier<*>?)
+        var parentId: Identifier<GUID>?
+        fun update(item: T, current: Identifier<GUID>?)
         fun doLeft()
         fun doRight()
-        var parentId: Long?
     }
 
     interface HeaderView : ItemView {

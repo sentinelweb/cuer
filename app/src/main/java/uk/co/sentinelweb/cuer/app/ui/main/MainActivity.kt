@@ -27,7 +27,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter.BackupResult.*
 import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -45,6 +45,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 
 class MainActivity :
     AppCompatActivity(),
@@ -133,7 +134,7 @@ class MainActivity :
                 navController.navigate(
                     R.id.navigation_settings_backup, bundleOf(DO_AUTO_BACKUP.name to true)
                 )
-            }.show()
+            }//.show()// todo enable after fixing
 
             FAIL -> snackBarWrapper.makeError(
                 msg = getString(R.string.backup_fix_message),
@@ -347,14 +348,14 @@ class MainActivity :
             setOf(R.id.navigation_browse, R.id.navigation_playlists, R.id.navigation_playlist)
         private const val SERVICES_REQUEST_CODE = 1
 
-        fun start(c: Context, plId: Long, plItemId: Long?, source: Source, play: Boolean) {
+        fun start(c: Context, plId: Identifier<GUID>, plItemId: Identifier<GUID>?, play: Boolean) {
             c.startActivity(
                 Intent(c, MainActivity::class.java).apply {
                     putExtra(Target.KEY, Target.PLAYLIST.name)
-                    putExtra(PLAYLIST_ID.name, plId)
-                    plItemId?.also { putExtra(PLAYLIST_ITEM_ID.name, it) }
+                    putExtra(PLAYLIST_ID.name, plId.id.value)
+                    plItemId?.also { putExtra(PLAYLIST_ITEM_ID.name, it.id.value) }
                     putExtra(PLAY_NOW.name, play)
-                    putExtra(SOURCE.name, source.toString())
+                    putExtra(SOURCE.name, plId.source.toString())
                 })
         }
 

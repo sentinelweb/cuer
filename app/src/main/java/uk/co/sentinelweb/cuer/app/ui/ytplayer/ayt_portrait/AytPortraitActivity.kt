@@ -203,8 +203,8 @@ class AytPortraitActivity : AppCompatActivity(),
         playlistFragment.arguments = bundleOf(
             HEADLESS.name to true,
             SOURCE.name to OrchestratorContract.Source.LOCAL.toString(),
-            PLAYLIST_ID.name to (playlistItem.playlistId),
-            PLAYLIST_ITEM_ID.name to (playlistItem.id),
+            PLAYLIST_ID.name to (playlistItem.playlistId?.id?.value),
+            PLAYLIST_ITEM_ID.name to (playlistItem.id?.id?.value),
         )
         log.d("onPostCreate")
     }

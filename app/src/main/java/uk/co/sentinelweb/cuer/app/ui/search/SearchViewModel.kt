@@ -30,6 +30,7 @@ import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.LOCAL
 import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.REMOTE
+import uk.co.sentinelweb.cuer.domain.toGUID
 
 class SearchViewModel(
     private val state: SearchContract.State,
@@ -179,7 +180,7 @@ class SearchViewModel(
                 )
         } else if (chipModel.type == PLAYLIST) {
             state.local.playlists
-                .removeIf { it.id == chipModel.value?.toLong() }
+                .removeIf { it.id?.id == chipModel.value?.toGUID() }
                 .also { model = mapper.map(state) }
         }
     }

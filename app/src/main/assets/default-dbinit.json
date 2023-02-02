@@ -4,9 +4,9 @@
     {
       "id": {
         "id": {
-          "value": "8bbbdf48-83d5-49cb-a29a-f0e3e67dd207",
-          "source": "LOCAL"
-        }
+          "value": "8bbbdf48-83d5-49cb-a29a-f0e3e67dd207"
+        },
+        "source": "LOCAL"
       },
       "title": "Default",
       "default": true,
@@ -20,9 +20,9 @@
     {
       "id": {
         "id": {
-          "value": "2e479e7f-d09b-4c52-8f32-176a15b6dfc5",
-          "source": "LOCAL"
-        }
+          "value": "2e479e7f-d09b-4c52-8f32-176a15b6dfc5"
+        },
+        "source": "LOCAL"
       },
       "title": "Philosophy",
       "items": [],

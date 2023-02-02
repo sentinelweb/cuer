@@ -23,6 +23,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistEditBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -31,8 +32,11 @@ import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.scaleDrawableLeftSize
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.getEnum
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.getString
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.*
@@ -50,7 +54,9 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.toGUID
 
 class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
@@ -79,8 +85,8 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val helpMenuItem: MenuItem
         get() = binding.peToolbar.menu.findItem(R.id.pe_help)
 
-    private val playlistIdArg: Long? by lazy {
-        PLAYLIST_ID.getLong(arguments)?.takeIf { it > 0 || it < -1 }
+    private val playlistIdArg: GUID? by lazy {
+        PLAYLIST_ID.getString(arguments)?.toGUID()
     }
 
     private val imageUrlArg: String? by lazy {
@@ -209,7 +215,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
         imageUrlArg?.also { setImage(it) }
         (playlistIdArg to (SOURCE.getEnum(arguments) ?: Source.LOCAL))
-            .apply { viewModel.setData(first, second) }
+            .apply { viewModel.setData(first!!.toIdentifier(second)) } // todo check for create
     }
 
     override fun onAttach(context: Context) {

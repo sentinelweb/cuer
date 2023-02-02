@@ -157,12 +157,11 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
                                 )
                             )
                         }
+
                         is OpenLocalPlaylist -> navRouter.navigate(
-                            PlaylistMviFragment.makeNav(
-                                label.id,
-                                play = label.play
-                            )
+                            PlaylistMviFragment.makeNav(label.id.id, play = label.play, source = label.id.source)
                         )
+
                         None -> Unit
                     }
                 }

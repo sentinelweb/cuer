@@ -106,10 +106,10 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
 //        set(value) = value
 //            .let { putPair(LAST_PLAYLIST_VIEWED, it.toPair()) }
 
-    var lastAddedPlaylistId: Long?
-        get() = getLong(LAST_PLAYLIST_ADDED_TO)
+    var lastAddedPlaylistId: GUID?
+        get() = getString(LAST_PLAYLIST_ADDED_TO, null)?.toGUID()
         set(value) = value
-            ?.let { putLong(LAST_PLAYLIST_ADDED_TO, it) }
+            ?.let { putString(LAST_PLAYLIST_ADDED_TO, it.value) }
             ?: let { remove(LAST_PLAYLIST_ADDED_TO) }
 
     var pinnedPlaylistId: GUID?

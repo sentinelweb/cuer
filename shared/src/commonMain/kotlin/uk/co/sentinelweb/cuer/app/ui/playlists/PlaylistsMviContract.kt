@@ -62,7 +62,7 @@ class PlaylistsMviContract {
         data class Model(
             val title: String,
             val imageUrl: String = "https://cuer-275020.firebaseapp.com/images/headers/headphones-2588235_640.jpg",
-            val currentPlaylistId: Identifier<*>?, // todo non null?
+            val currentPlaylistId: Identifier<GUID>?, // todo non null?
             val items: List<PlaylistsItemMviContract.Model>
         )
 

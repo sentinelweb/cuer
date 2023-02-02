@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.backup.version
 
 import uk.co.sentinelweb.cuer.app.backup.version.v2.V2Parser
 import uk.co.sentinelweb.cuer.app.db.backup.version.v2.V3Parser
+import uk.co.sentinelweb.cuer.app.db.backup.version.v2.V4Parser
 
 class ParserFactory {
 
@@ -11,6 +12,7 @@ class ParserFactory {
             //1 -> V1Parser(V1Mapper())
             2 -> V2Parser()
             3 -> V3Parser()
+            4 -> V4Parser()
             else -> throw UnsupportedOperationException("Can't get parser for version:$version")
         }
     }

@@ -34,7 +34,8 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistBinding
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
@@ -44,6 +45,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
@@ -74,9 +76,11 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
+import uk.co.sentinelweb.cuer.domain.toGUID
 
 class PlaylistMviFragment : Fragment(),
     ItemContract.Interactions,
@@ -148,7 +152,7 @@ class PlaylistMviFragment : Fragment(),
     private val menuState = MenuState()
 
     private val imageUrlArg: String? by lazy {
-        NavigationModel.Param.IMAGE_URL.getString(arguments)
+        IMAGE_URL.getString(arguments)
     }
 
     private val saveCallback = object : OnBackPressedCallback(false) {
@@ -302,7 +306,7 @@ class PlaylistMviFragment : Fragment(),
                         )
                     )
 
-                is Label.ShowItem -> showItemDescription(label.modelId, label.item, label.source)
+                is Label.ShowItem -> showItemDescription(label.modelId, label.item)
                 is Label.PlayItem -> (requireActivity() as? AytPortraitActivity) // todo make interface
                     ?.trackChange(label.playlistItem, label.start)
 
@@ -458,28 +462,24 @@ class PlaylistMviFragment : Fragment(),
     private fun NavigationModel.setPlaylistData() {
         controller.onSetPlayListData(
             PlaylistMviContract.MviStore.Intent.SetPlaylistData(
-                params[NavigationModel.Param.PLAYLIST_ID] as Long?,
-                params[NavigationModel.Param.PLAYLIST_ITEM_ID] as Long?,
-                params[NavigationModel.Param.PLAY_NOW] as Boolean? ?: false,
-                params[NavigationModel.Param.SOURCE] as OrchestratorContract.Source,
-                params[NavigationModel.Param.PLAYLIST_PARENT] as Long?
+                (params[PLAYLIST_ID] as String?)?.toGUID(),
+                (params[PLAYLIST_ITEM_ID] as String?)?.toGUID(),
+                params[PLAY_NOW] as Boolean? ?: false,
+                params[SOURCE] as Source,
+                (params[PLAYLIST_PARENT] as String?)?.toGUID()
             )
         )
     }
 
     private fun makeNavFromArguments(): NavigationModel? {
-        val plId = NavigationModel.Param.PLAYLIST_ID.getLong(arguments)
-        val source: OrchestratorContract.Source? =
-            NavigationModel.Param.SOURCE.getEnum<OrchestratorContract.Source>(arguments)
-        val plItemId = NavigationModel.Param.PLAYLIST_ITEM_ID.getLong(arguments)
-        val playNow = NavigationModel.Param.PLAY_NOW.getBoolean(arguments)
-        val addPlaylistParent =
-            NavigationModel.Param.PLAYLIST_PARENT.getLong(arguments)
-                ?.takeIf { it > 0 }
-        arguments?.putBoolean(NavigationModel.Param.PLAY_NOW.name, false)
+        val plId = PLAYLIST_ID.getString(arguments)?.toGUID()
+        val source: Source? = SOURCE.getEnum<Source>(arguments)
+        val plItemId = PLAYLIST_ITEM_ID.getString(arguments)?.toGUID()
+        val playNow = PLAY_NOW.getBoolean(arguments)
+        val addPlaylistParent = PLAYLIST_PARENT.getString(arguments)?.toGUID()
+        arguments?.putBoolean(PLAY_NOW.name, false)
         log.d("onResume: got arguments pl=$plId, item=$plItemId, src=$source, addPlaylistParent=$addPlaylistParent")
-        val onResumeGotArguments = plId?.let { it != -1L } ?: false
-        return if (onResumeGotArguments) {
+        return if (plId != null /* onResumeGotArguments */) {
             makeNav(plId, plItemId, playNow, source, addPlaylistParent)
         } else null
     }
@@ -541,9 +541,9 @@ class PlaylistMviFragment : Fragment(),
     private fun navigate(nav: NavigationModel) {
         when (nav.target) {
             Target.PLAYLIST_EDIT -> PlaylistMviFragmentDirections.actionGotoEditPlaylist(
-                nav.params[NavigationModel.Param.SOURCE].toString(),
-                null,
-                nav.params[NavigationModel.Param.PLAYLIST_ID] as Long
+                nav.params[PLAYLIST_ID] as String,
+                nav.params[SOURCE].toString(),
+                null
             ).apply { findNavController().navigate(this) }
 
             Target.NAV_DONE -> doneNavigation.navigateDone()
@@ -630,15 +630,15 @@ class PlaylistMviFragment : Fragment(),
         dialogFragment?.show(childFragmentManager, CREATE_PLAYLIST_TAG)
     }
 
-    private fun showItemDescription(modelId: Long, item: PlaylistItemDomain, source: OrchestratorContract.Source) {
+    private fun showItemDescription(modelId: Identifier<GUID>, item: PlaylistItemDomain) {
         adapter
             .getItemViewForId(modelId)
             ?.let { view ->
                 PlaylistMviFragmentDirections.actionGotoPlaylistItem(
                     item.serialise(),
-                    source.toString(),
-                    -1,
-                    (item.playlistId ?: 0) > 0
+                    modelId.source.toString(),
+                    null,
+                    item.playlistId?.let { it.source == Source.LOCAL } ?: false,
                 ).apply { findNavController().navigate(this, view.makeTransitionExtras()) }
             }
     }
@@ -762,27 +762,22 @@ class PlaylistMviFragment : Fragment(),
         private const val SELECT_PLAYLIST_TAG = "pdf_dialog"
 
         fun makeNav(
-            plId: Long?,
-            plItemId: Long? = null,
+            plId: GUID,
+            plItemId: GUID? = null,
             play: Boolean,
-            source: OrchestratorContract.Source? = OrchestratorContract.Source.LOCAL,
-            addPlaylistParent: Long? = null,
+            source: Source? = Source.LOCAL,
+            addPlaylistParent: GUID? = null,
             imageUrl: String? = null
         ): NavigationModel {
             val params = mutableMapOf(
-                NavigationModel.Param.PLAYLIST_ID to (plId ?: throw IllegalArgumentException("No Playlist Id")),
-                NavigationModel.Param.PLAY_NOW to play,
-                NavigationModel.Param.SOURCE to (source ?: throw IllegalArgumentException("No Source"))
-            ).apply {
-                plItemId?.also { put(NavigationModel.Param.PLAYLIST_ITEM_ID, it) }
-            }.apply {
-                addPlaylistParent?.also { put(NavigationModel.Param.PLAYLIST_PARENT, it) }
-            }.apply {
-                imageUrl?.also { put(NavigationModel.Param.IMAGE_URL, it) }
-            }
-            return NavigationModel(
-                Target.PLAYLIST, params
+                PLAYLIST_ID to (plId.value),
+                PLAY_NOW to play,
+                SOURCE to (source ?: throw IllegalArgumentException("No Source"))
             )
+                .apply { plItemId?.also { put(PLAYLIST_ITEM_ID, it.value) } }
+                .apply { addPlaylistParent?.also { put(PLAYLIST_PARENT, it.value) } }
+                .apply { imageUrl?.also { put(IMAGE_URL, it) } }
+            return NavigationModel(Target.PLAYLIST, params)
         }
 
         val fragmentModule = module {
@@ -823,7 +818,8 @@ class PlaylistMviFragment : Fragment(),
                         strings = get(),
                         timeProvider = get(),
                         addPlaylistUsecase = get(),
-                        multiPrefs = get()
+                        multiPrefs = get(),
+                        idGenerator = get()
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }

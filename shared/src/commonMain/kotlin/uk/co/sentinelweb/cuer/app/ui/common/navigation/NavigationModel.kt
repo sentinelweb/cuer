@@ -63,19 +63,19 @@ data class NavigationModel constructor(
     enum class Param(
         val type: KClass<*>
     ) {
-        PLATFORM_ID(String::class),
-        CHANNEL_ID(String::class),
+        PLATFORM_ID(String::class), // platform id
+        CHANNEL_ID(String::class), // platform id
         LINK(String::class),
         CRYPTO_ADDRESS(LinkDomain.CryptoLinkDomain::class),
         PLAY_NOW(Boolean::class),
-        PLAYLIST_ID(Long::class),
-        PLAYLIST_ITEM_ID(Long::class),
+        PLAYLIST_ID(String::class), // guid
+        PLAYLIST_ITEM_ID(String::class), // guid
         PLAYLIST_ITEM((PlaylistItemDomain::class)),
 
         //FRAGMENT_NAV_EXTRAS(FragmentNavigator.Extras::class),
         SOURCE(OrchestratorContract.Source::class),
         HEADLESS(Boolean::class),
-        PLAYLIST_PARENT(Long::class),
+        PLAYLIST_PARENT(String::class),
         CATEGORY(CategoryDomain::class),
         PASTE(Boolean::class),
         IMAGE_URL(String::class),

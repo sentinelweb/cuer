@@ -139,7 +139,7 @@ class PlaylistsMviStoreFactory(
                 prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
                 publish(
                     Navigate(
-                        NavigationModel(PLAYLIST, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id)),
+                        NavigationModel(PLAYLIST, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id.id.value)),
                         intent.view
                     )
                 )
@@ -151,10 +151,7 @@ class PlaylistsMviStoreFactory(
                 recentLocalPlaylists.addRecentId(intent.item.id.id)
                 publish(
                     Navigate(
-                        NavigationModel(
-                            PLAYLIST_EDIT,
-                            mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id)
-                        ),
+                        NavigationModel(PLAYLIST_EDIT, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id.id.value)),
                         intent.view
                     )
                 )
@@ -170,13 +167,7 @@ class PlaylistsMviStoreFactory(
                     prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
                     publish(
                         Navigate(
-                            NavigationModel(
-                                PLAYLIST, mapOf(
-                                    SOURCE to intent.item.source,
-                                    PLAYLIST_ID to intent.item.id,
-                                    PLAY_NOW to true
-                                )
-                            ),
+                            NavigationModel(PLAYLIST, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id.id.value, PLAY_NOW to true)),
                             intent.view
                         )
                     )

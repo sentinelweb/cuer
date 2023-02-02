@@ -36,6 +36,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.item.ItemTouchHelperCallback
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_EDIT
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.views.HeaderFooterDecoration
@@ -293,24 +295,25 @@ class PlaylistsMviFragment :
     }
 
     private fun navigate(nav: NavigationModel, sourceView: ItemContract.ItemView?) {
+        log.d(nav.toString())
         when (nav.target) {
-            NavigationModel.Target.PLAYLIST ->
+            PLAYLIST ->
                 sourceView?.let { view ->
                     PlaylistsMviFragmentDirections.actionGotoPlaylist(
+                        nav.params[PLAYLIST_ID] as String,
                         (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
                         nav.params[IMAGE_URL] as String?,
-                        nav.params[PLAYLIST_ID] as Long,
                         (nav.params[PLAY_NOW] ?: false) as Boolean,
                     )
                         .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
                 }
 
-            NavigationModel.Target.PLAYLIST_EDIT ->
+            PLAYLIST_EDIT ->
                 sourceView?.let { view ->
                     PlaylistsMviFragmentDirections.actionEditPlaylist(
+                        nav.params[PLAYLIST_ID] as String,
                         (nav.params[SOURCE] as OrchestratorContract.Source).toString(),
                         nav.params[IMAGE_URL] as String?,
-                        nav.params[PLAYLIST_ID] as Long,
                     )
                         .apply { findNavController().navigate(this, view.makeTransitionExtras()) }
                 }

@@ -19,7 +19,7 @@ class PlaylistsModelMapper constructor(
     fun map(
         channelPlaylists: List<PlaylistDomain>,
         recentPlaylists: List<PlaylistDomain>,
-        current: Identifier<*>?,
+        current: Identifier<GUID>?,
         pinnedId: GUID?,
         tree: PlaylistTreeDomain,
         playlistStats: Map<Identifier<GUID>?, PlaylistStatDomain?>,

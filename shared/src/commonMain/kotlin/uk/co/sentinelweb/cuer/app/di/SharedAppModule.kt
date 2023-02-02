@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
 import uk.co.sentinelweb.cuer.app.usecase.*
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
 import uk.co.sentinelweb.cuer.app.util.link.TimecodeExtractor
@@ -105,6 +106,7 @@ object SharedAppModule {
         factory { LinkExtractor() }
         factory { TimecodeExtractor() }
         factory { BackupCheck(get(), get(), get(), get()) }
+        factory { IdGenerator(get()) }
         factory<IBackupJsonManager> {
             BackupUseCase(
                 channelRepository = get(),

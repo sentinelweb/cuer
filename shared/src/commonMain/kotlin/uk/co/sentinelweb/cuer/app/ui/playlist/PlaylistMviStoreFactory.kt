@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
@@ -272,15 +273,7 @@ class PlaylistMviStoreFactory(
             state.playlistIdentifier
                 .also {
                     recentLocalPlaylists.addRecentId(it.id)
-                    publish(
-                        Label.Navigate(
-                            NavigationModel(
-                                Target.PLAYLIST_EDIT,
-                                mapOf(SOURCE to it.source, PLAYLIST_ID to it.id)
-                            ),
-                            null
-                        )
-                    )
+                    publish(Label.Navigate(NavigationModel(Target.PLAYLIST_EDIT, mapOf(SOURCE to it.source, PLAYLIST_ID to it.id.value)), null))
                 }
         }
 
@@ -288,14 +281,7 @@ class PlaylistMviStoreFactory(
             state.playlistItemDomain(intent.item)
                 ?.playlistId
                 ?.let {
-                    publish(
-                        Label.Navigate(
-                            NavigationModel(
-                                PLAYLIST,
-                                mapOf(PLAYLIST_ID to it, Param.PLAY_NOW to false, SOURCE to LOCAL)
-                            )
-                        )
-                    )
+                    publish(Label.Navigate(NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to it.id.value, Param.PLAY_NOW to false, SOURCE to LOCAL))))
                 }
         }
 
@@ -359,11 +345,9 @@ class PlaylistMviStoreFactory(
                     moveItem
                         .takeIf {
                             playlistItemOrchestrator
-                                .loadList(
-                                    OrchestratorContract.Filter.PlatformIdListFilter(listOf(it.media.platformId)),
-                                    LOCAL.flatOptions()
-                                )
-                                .filter { it.playlistId == playlist.id }.isEmpty()
+                                .loadList(PlatformIdListFilter(listOf(it.media.platformId)), LOCAL.flatOptions())
+                                .filter { it.playlistId == playlist.id }
+                                .isEmpty()
                         }
                         ?.copy(playlistId = playlist.id!!)
                         ?.apply { dispatch(MovedPlaylistItem(this)) }
@@ -471,7 +455,7 @@ class PlaylistMviStoreFactory(
                     multiPrefs.lastSearchType = SearchTypeDomain.REMOTE
                     publish(
                         Label.Navigate(
-                            NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to YoutubeSearch.id, SOURCE to MEMORY))
+                            NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to YoutubeSearch.id.value, SOURCE to MEMORY))
                         )
                     )
                 }

@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.convertToLocalMillis
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
@@ -9,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.Format
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class ItemModelMapper constructor(
@@ -19,7 +21,7 @@ class ItemModelMapper constructor(
 ) {
 
     fun mapItem(
-        modelId: Long,
+        modelId: Identifier<GUID>,
         item: PlaylistItemDomain,
         index: Int,
         canEdit: Boolean,

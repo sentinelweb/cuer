@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -53,7 +54,7 @@ interface PlaylistItemEditContract {
         var isMediaChanged: Boolean = false,
         var isSaved: Boolean = false,
         val editSettings: Edit = Edit(),
-        var parentPlaylistId: Long = -1,
+        var parentPlaylistId: OrchestratorContract.Identifier<GUID>? = null,
         var allowPlay: Boolean = false,
         val deletedPlayLists: MutableSet<PlaylistDomain> = mutableSetOf(),
         var isOnSharePlaylist: Boolean = false,
