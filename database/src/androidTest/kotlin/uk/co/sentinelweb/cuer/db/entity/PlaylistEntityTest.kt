@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.db.entity
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,6 +16,7 @@ import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.database.entity.Playlist_item
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.db.util.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
@@ -26,7 +24,7 @@ import uk.co.sentinelweb.cuer.domain.ext.hasFlag
 import kotlin.test.assertEquals
 
 class PlaylistEntityTest : KoinTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+    private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()

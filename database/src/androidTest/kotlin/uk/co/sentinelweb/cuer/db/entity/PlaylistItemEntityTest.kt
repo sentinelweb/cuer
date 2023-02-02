@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.db.entity
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit.Companion.SECOND
 import kotlinx.datetime.minus
@@ -20,13 +17,14 @@ import uk.co.sentinelweb.cuer.database.entity.Playlist_item
 import uk.co.sentinelweb.cuer.db.util.DataCreation
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.db.util.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class PlaylistItemEntityTest : KoinTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+    private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()

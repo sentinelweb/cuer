@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.db.entity
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -16,11 +13,12 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.database.entity.Image
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.db.util.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import kotlin.test.assertEquals
 
 class ImageEntityTest : KoinTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+    private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()

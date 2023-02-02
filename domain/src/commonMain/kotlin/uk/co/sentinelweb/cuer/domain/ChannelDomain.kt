@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 
 @Serializable
 data class ChannelDomain constructor(
-    val id: Identifier<GUID>?,
+    val id: Identifier<GUID>? = null,
     val platformId: String?,
     val platform: PlatformDomain,
     val country: String? = null,

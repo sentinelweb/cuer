@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.domain.mutator
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -19,25 +16,18 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.ext.scanOrder
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
+import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 import java.lang.Integer.max
 
 class PlaylistMutatorTest {
-    private val fixture = kotlinFixture {
-        nullabilityStrategy(NeverNullStrategy)
-        repeatCount { 6 }
-        factory { Identifier(GuidCreator().create(), fixture()) }
-    }
+    private val fixture = kotlinFixtureDefaultConfig
 
-    //@Fixture
     private lateinit var fixtPlaylist: PlaylistDomain
 
     private val sut = PlaylistMutator()
-    // private val fixture = JFixture()
 
     @Before
     fun setUp() {
-        // FixtureAnnotations.initFixtures(this)
-
         fixtPlaylist = generatePlaylist(fixture).let { pl ->
             pl.copy(
                 items = (0..10).map { idx ->

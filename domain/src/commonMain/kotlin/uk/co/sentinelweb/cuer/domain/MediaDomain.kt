@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 
 @Serializable
 data class MediaDomain(
-    val id: OrchestratorContract.Identifier<GUID>?,
+    val id: OrchestratorContract.Identifier<GUID>? = null,
     val url: String,
     val platformId: String,
     val mediaType: MediaTypeDomain,

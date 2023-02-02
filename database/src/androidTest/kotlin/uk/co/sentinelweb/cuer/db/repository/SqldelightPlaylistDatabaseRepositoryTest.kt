@@ -1,9 +1,6 @@
 package uk.co.sentinelweb.cuer.db.repository
 
 import app.cash.turbine.test
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Ignore
@@ -19,18 +16,13 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistMapper
-import uk.co.sentinelweb.cuer.db.util.DataCreation
-import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
-import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
-import uk.co.sentinelweb.cuer.db.util.resetIds
+import uk.co.sentinelweb.cuer.db.util.*
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 import kotlin.test.assertEquals
@@ -38,10 +30,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
-    private val fixture = kotlinFixture {
-        nullabilityStrategy(NeverNullStrategy)
-        factory { OrchestratorContract.Identifier(GuidCreator().create(), fixture()) }
-    }
+    private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()

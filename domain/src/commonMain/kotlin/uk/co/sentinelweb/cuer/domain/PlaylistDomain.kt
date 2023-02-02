@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 
 @Serializable
 data class PlaylistDomain constructor(
-    val id: Identifier<GUID>?,
+    val id: Identifier<GUID>? = null,
     val title: String,
     val items: List<PlaylistItemDomain> = listOf(),
     val currentIndex: Int = 0, // todo make nullable

@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 
 @Serializable
 data class PlaylistItemDomain(
-    val id: Identifier<GUID>?,
+    val id: Identifier<GUID>? = null,
     val media: MediaDomain,
     @Contextual val dateAdded: Instant,
     val order: Long,

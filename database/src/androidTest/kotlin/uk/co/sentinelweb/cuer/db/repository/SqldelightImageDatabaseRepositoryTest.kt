@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.db.repository
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -15,13 +12,13 @@ import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ImageDatabaseRepository
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.db.util.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import kotlin.test.assertEquals
@@ -30,10 +27,7 @@ import kotlin.test.assertTrue
 
 class SqldelightImageDatabaseRepositoryTest : KoinTest {
 
-    private val fixture = kotlinFixture {
-        nullabilityStrategy(NeverNullStrategy)
-        factory { OrchestratorContract.Identifier(GuidCreator().create(), fixture()) }
-    }
+    private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()

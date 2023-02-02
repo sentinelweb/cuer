@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.tools.ext
 
-import com.appmattus.kotlinfixture.Fixture
 import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
 import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
 import com.appmattus.kotlinfixture.decorator.optional.NeverOptionalStrategy
@@ -21,10 +20,4 @@ val kotlinFixtureDefaultConfig = kotlinFixture {
         propertyOverride(ImageDomain::id, NeverOptionalStrategy)
         propertyOverride(ChannelDomain::id, NeverOptionalStrategy)
     }
-}
-
-fun generatePlaylist(fixture: Fixture): PlaylistDomain {
-    var fixPlaylist = fixture<PlaylistDomain>()
-    while (fixPlaylist.items.size == 0) fixPlaylist = fixture()
-    return fixPlaylist
 }
