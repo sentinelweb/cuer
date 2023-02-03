@@ -62,22 +62,15 @@ object SharedAppModule {
         single { StarredItemsPlayistInteractor(get(), get(), get(), get(named(Starred))) }
         single { UnfinishedItemsPlayistInteractor(get(), get(), get(), get(named(Unfinished))) }
         single { LocalSearchPlayistInteractor(get(), get(), get()) }
-        single {
-            YoutubeSearchPlayistInteractor(
-                get(),
-                get(),
-                get(),
-                YoutubeSearchPlayistInteractor.State()
-            )
-        }
+        single { YoutubeSearchPlayistInteractor(get(), get(), get(), YoutubeSearchPlayistInteractor.State()) }
         factory {
             mapOf(
-                NewItems.id to get<NewMediaPlayistInteractor>(),
-                Recent.id to get<RecentItemsPlayistInteractor>(),
-                LocalSearch.id to get<LocalSearchPlayistInteractor>(),
-                YoutubeSearch.id to get<YoutubeSearchPlayistInteractor>(),
-                Starred.id to get<StarredItemsPlayistInteractor>(),
-                Unfinished.id to get<UnfinishedItemsPlayistInteractor>(),
+                NewItems.identifier() to get<NewMediaPlayistInteractor>(),
+                Recent.identifier() to get<RecentItemsPlayistInteractor>(),
+                LocalSearch.identifier() to get<LocalSearchPlayistInteractor>(),
+                YoutubeSearch.identifier() to get<YoutubeSearchPlayistInteractor>(),
+                Starred.identifier() to get<StarredItemsPlayistInteractor>(),
+                Unfinished.identifier() to get<UnfinishedItemsPlayistInteractor>(),
             )
         }
     }

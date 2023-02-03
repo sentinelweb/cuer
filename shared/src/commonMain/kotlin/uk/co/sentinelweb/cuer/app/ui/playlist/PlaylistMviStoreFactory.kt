@@ -63,7 +63,7 @@ class PlaylistMviStoreFactory(
     private val dbInit: DatabaseInitializer,
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val queue: QueueMediatorContract.Producer,
-    private val appPlaylistInteractors: Map<OrchestratorContract.Identifier<GUID>, AppPlaylistInteractor>,
+    private val appPlaylistInteractors: Map<Identifier<GUID>, AppPlaylistInteractor>,
     private val playlistMutator: PlaylistMutator,
     private val util: PlaylistMviUtil,
     private val modelMapper: PlaylistMviModelMapper,
