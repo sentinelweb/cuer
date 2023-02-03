@@ -278,37 +278,25 @@ class PlaylistMviFragment : Fragment(),
                 is Label.ItemRemoved -> Unit
                 is Label.Navigate -> navigate(label.model)
                 is Label.ShowPlaylistsSelector -> showPlaylistSelector(label.config)
-                is Label.ShowUndo -> showUndo(label.message) {
-                    viewProxy.dispatch(OnUndo(label.undoType))
-                }
-
+                is Label.ShowUndo -> showUndo(label.message) { viewProxy.dispatch(OnUndo(label.undoType)) }
                 is Label.HighlightPlayingItem -> highlightPlayingItem(label.pos)
                 is Label.ScrollToItem -> scrollToItem(label.pos).also { log.d("ScrollToItem: ${label.pos}") }
                 is Label.UpdateModelItem -> updateItemModel(label.model) // todo do i need this?
                 is Label.Help -> showHelp()
                 is Label.ResetItemState -> resetItemsState()
                 is Label.ShowPlaylistsCreator -> showPlaylistCreateDialog()
-                is Label.AfterCommit ->
-                    label.afterCommit?.also {
-                        lifecycleScope.launch { it.onCommit(label.type, label.objects) }
-                    }
-
                 is Label.LaunchPlaylist -> ytJavaApi.launchPlaylist(label.platformId)
                 is Label.LaunchChannel -> ytJavaApi.launchChannel(label.platformId)
                 is Label.Share -> shareWrapper.share(playlist = label.playlist)
                 is Label.ShareItem -> shareWrapper.share(media = label.playlistItem.media)
-                is Label.CheckSaveShowDialog ->
-                    showAlertDialog(
-                        label.dialogModel.copy(
-                            confirm = label.dialogModel.confirm.copy(
-                                action = { viewProxy.dispatch(OnCheckToSaveConfirm) }
-                            )
-                        )
-                    )
-
+                is Label.CheckSaveShowDialog -> showAlertDialog(addSaveConfirmActionToDialogModel(label))
                 is Label.ShowItem -> showItemDescription(label.modelId, label.item)
                 is Label.PlayItem -> (requireActivity() as? AytPortraitActivity) // todo make interface
                     ?.trackChange(label.playlistItem, label.start)
+
+                is Label.AfterCommit -> label.afterCommit
+                    ?.also { lifecycleScope.launch { it.onCommit(label.type, label.objects) } }
+
 
             }.also { log.d(label.toString()) }
         }
@@ -321,7 +309,6 @@ class PlaylistMviFragment : Fragment(),
                     newAdapter()
                     setList(previousItems, false)
                     scrollToItem(currentScrollIndex)
-                    //commitHost.isReady(true)
                     cardsMenuItem.isVisible = !it
                     rowsMenuItem.isVisible = it
                     binding.playlistToolbar.menu.setMenuItemsColor(
@@ -347,6 +334,13 @@ class PlaylistMviFragment : Fragment(),
                 })
             }
     }
+
+    private fun addSaveConfirmActionToDialogModel(label: Label.CheckSaveShowDialog) =
+        label.dialogModel.copy(
+            confirm = label.dialogModel.confirm.copy(
+                action = { viewProxy.dispatch(OnCheckToSaveConfirm) }
+            )
+        )
 
 
     private fun setupRecyclerView() {

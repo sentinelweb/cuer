@@ -763,18 +763,15 @@ class PlaylistMviStoreFactory(
 
         // region loadRefresh
         private fun setPlaylistData(intent: Intent.SetPlaylistData, getState: () -> State) {
-            // fixme bit dodgy here - modifying state.
-            //log.d("setPlaylistData:" + intent.toString())
+            log.d("setPlaylistData:" + intent.toString())
             val currentState = getState()
             coroutines.mainScope.launch {
                 val notLoaded = currentState.playlist == null
                 //log.d("setPlaylistData: notLoaded: $notLoaded")
-                // todo make identifier serializable
                 intent.plId
                     ?.takeIf { it != NO_PLAYLIST.id }
                     ?.toIdentifier(intent.source)
-                    ?.apply { dispatch(SetPlaylistId(this)) }
-                    ?.apply { executeRefresh(state = getState(), scrollToCurrent = notLoaded) }
+                    ?.apply { executeRefresh(state = getState(), scrollToCurrent = notLoaded, id = this) }
                     ?.apply {
                         if (intent.playNow) {
                             queue.playNow(this, intent.plItemId?.toIdentifier(intent.source))
@@ -783,12 +780,10 @@ class PlaylistMviStoreFactory(
                     ?.apply { recentLocalPlaylists.addRecentId(intent.plId) }
                     ?: run {
                         if (dbInit.isInitialized()) {
-                            dispatch(SetPlaylistId(prefsWrapper.lastViewedPlaylistId))
-                            executeRefresh(state = getState(), scrollToCurrent = true)
+                            executeRefresh(state = getState(), scrollToCurrent = true, id = prefsWrapper.lastViewedPlaylistId)
                         } else {
                             dbInit.addListener { success: Boolean ->
                                 if (success) {
-                                    dispatch(SetPlaylistId(DatabaseInitializer.DEFAULT_PLAYLIST_ID))
                                     refresh(state = getState())
                                 }
                             }
@@ -799,20 +794,23 @@ class PlaylistMviStoreFactory(
 
         private fun refresh(state: State) {
             val notLoaded = state.playlist == null
-            log.d("refresh: ${state.playlistIdentifier} notLoaded: $notLoaded")
-            scope.launch { executeRefresh(state = state, scrollToCurrent = notLoaded) }
+            log.d("refresh: notLoaded: $notLoaded")
+            scope.launch {
+                executeRefresh(state = state, scrollToCurrent = notLoaded, id = prefsWrapper.lastViewedPlaylistId)
+            }
         }
 
-        // todo scroll to current might need default true
-        private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false, state: State) {
+        private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false, state: State, id: Identifier<GUID>? = null) {
             publish(Label.Loading)
             try {
-                log.d("executeRefresh: ${state.playlistIdentifier} scrollToCurrent: $scrollToCurrent focusIndex: ${state.focusIndex}")
-                val id = state.playlistIdentifier
-                    .takeIf { it != OrchestratorContract.NO_PLAYLIST }
-                    ?: prefsWrapper.currentPlayingPlaylistId
-                val playlistOrDefault = playlistOrDefaultUsecase
-                    .getPlaylistOrDefault(id)
+                log.d("executeRefresh: state.id: ${state.playlistIdentifier} scrollToCurrent: $scrollToCurrent focusIndex: ${state.focusIndex} id: $id")
+                val loadId =
+                    id
+                        ?: state.playlistIdentifier.takeIf { it != NO_PLAYLIST }
+                        ?: prefsWrapper.lastViewedPlaylistId.takeIf { it != NO_PLAYLIST }
+                        ?: prefsWrapper.currentPlayingPlaylistId
+                log.d("executeRefresh: loadId: $loadId")
+                val playlistOrDefault = playlistOrDefaultUsecase.getPlaylistOrDefault(loadId)
                 val playlistsTree = playlistOrchestrator
                     .loadList(AllFilter, LOCAL.flatOptions())
                     .buildTree()
@@ -832,6 +830,7 @@ class PlaylistMviStoreFactory(
                 focusIndex
                     ?.also { publish(Label.ScrollToItem(it)) }
                     ?.also { dispatch(SetFocusIndex(null)) }
+                prefsWrapper.lastViewedPlaylistId = loadId
             } catch (e: Throwable) {
                 log.e("Error loading playlist", e)
                 publish(Error("Load failed: ${e::class.simpleName}"))

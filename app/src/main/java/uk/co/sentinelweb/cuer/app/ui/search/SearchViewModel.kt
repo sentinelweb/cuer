@@ -18,6 +18,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DateRangePickerDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -156,11 +158,11 @@ class SearchViewModel(
         }
 
         _navigateLiveData.value = NavigationModel(
-            NavigationModel.Target.PLAYLIST,
+            Target.PLAYLIST,
             mapOf(
-                NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LocalSearch.id.value else YoutubeSearch.id.value,
-                NavigationModel.Param.PLAY_NOW to false,
-                NavigationModel.Param.SOURCE to MEMORY
+                PLAYLIST_ID to if (state.searchType == LOCAL) LocalSearch.id.value else YoutubeSearch.id.value,
+                PLAY_NOW to false,
+                SOURCE to MEMORY
             )
         )
     }

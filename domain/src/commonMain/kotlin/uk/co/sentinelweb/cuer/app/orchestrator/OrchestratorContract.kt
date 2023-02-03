@@ -77,8 +77,7 @@ interface OrchestratorContract<Domain> {
         clazz: KClass<out OrchestratorContract<out Any>>,
         filter: Filter?,
         options: Options
-    ) :
-        UnsupportedOperationException("class = ${clazz.simpleName} filter = $filter options = $options")
+    ) : UnsupportedOperationException("class = ${clazz.simpleName} filter = $filter options = $options")
 
     class NotImplementedException(msg: String? = null) : Exception(msg)
     class DoesNotExistException(msg: String? = null) : Exception(msg)
@@ -86,50 +85,16 @@ interface OrchestratorContract<Domain> {
     class NetException(result: NetResult<*>) : Exception((result as NetResult.Error<*>).msg, result.t)
     class MemoryException(msg: String, cause: Throwable? = null) : Exception(msg, cause)
 
-    // todo make this Identifier serialzable and make a sealed class for ID add ObjectType
-//    sealed class Id {
-//        class IdLong(id:Long)
-//        class IdString(id:String)
-//    }
     @Serializable
     // todo make a data class - no need to subclass
     data class Identifier<IdType>(
         val id: IdType,
         val source: Source,
-    ) {
-
-//        override fun equals(other: Any?): Boolean {
-//            return when (other) {
-//                is Identifier<*> -> this.id == other.id && this.source == other.source
-//                else -> super.equals(other)
-//            }
-//        }
-//
-//        override fun hashCode(): Int {
-//            var result = id?.hashCode() ?: 0
-//            result = 31 * result + source.hashCode()
-//            return result
-//        }
-//
-//        override fun toString(): String = "${this::class.simpleName}(id=$id, source=$source)"
-    }
-
-
-//
-//    data class LocalIdentifier(override val id: GUID) : Identifier<GUID>(id, LOCAL) {
-//        override fun equals(other: Any?): Boolean = super.equals(other)
-//        override fun hashCode(): Int = super.hashCode()
-//    }
-//
-//    data class MemoryIdentifier(override val id: GUID) : Identifier<GUID>(id, Source.MEMORY) {
-//        override fun equals(other: Any?): Boolean = super.equals(other)
-//        override fun hashCode(): Int = super.hashCode()
-//    }
-
+    )
 
     companion object {
-        val NO_PLAYLIST = Identifier("029f6179-70f0-42dc-a7e2-31ec43828f6e".toGUID(), MEMORY)
-        val EMPTY_ID = Identifier("".toGUID(), MEMORY)
+        val NO_PLAYLIST = Identifier("no-playlist".toGUID(), MEMORY)
+        val EMPTY_ID = Identifier("empty-id".toGUID(), MEMORY)
     }
 }
 
