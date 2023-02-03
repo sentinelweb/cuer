@@ -8,14 +8,15 @@ import kotlinx.serialization.modules.plus
 import uk.co.sentinelweb.cuer.domain.serialization.InstantSerializer
 import uk.co.sentinelweb.cuer.domain.serialization.LocalDateTimeSerializer
 
-// backup
+typealias V4PlaylistConfigDomain = uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistConfigDomain
 
+// backup
 fun deserialiseV3BackupFileModel(input: String) = v3JsonSerializer.decodeFromString(BackupFileModel.serializer(), input)
 
 val v3SerializersModule = SerializersModule {
     mapOf(
         PlaylistItemDomain::class to PlaylistItemDomain.serializer(),
-        PlaylistDomain.PlaylistConfigDomain::class to PlaylistDomain.PlaylistConfigDomain.serializer(),
+        V4PlaylistConfigDomain::class to V4PlaylistConfigDomain.serializer(),
         PlaylistDomain::class to PlaylistDomain.serializer(),
         ChannelDomain::class to ChannelDomain.serializer(),
         MediaDomain::class to MediaDomain.serializer(),

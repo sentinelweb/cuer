@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.backup.version.v3
 
 import uk.co.sentinelweb.cuer.app.backup.version.Parser
 import uk.co.sentinelweb.cuer.app.backup.version.v3.domain.deserialiseV3BackupFileModel
+import uk.co.sentinelweb.cuer.app.backup.version.v3.mapper.V3ToV4Mapper
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 
 class V3Parser(val v4Mapper: V3ToV4Mapper) : Parser {
@@ -16,7 +17,7 @@ class V3Parser(val v4Mapper: V3ToV4Mapper) : Parser {
                 .map { it.items.map { it.media } }
                 .flatten()
                 .distinctBy { it.platformId }
-                .map { it.copy(channelData = it.channelData.copy(id = null)) }
+            //.map { it.copy(channelData = it.channelData.copy(id = null)) }
         )
     }
 }
