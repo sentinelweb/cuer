@@ -133,11 +133,12 @@ class PlaylistMviModelMapper constructor(
         appPlaylist: AppPlaylistInteractor?,
         blockItem: PlaylistItemDomain?
     ): List<PlaylistItemMviContract.Model.Item> {
-        //log.d("items: ${itemsIdMap.size}")
-        val reverseLookup: Map<PlaylistItemDomain, Identifier<GUID>> = itemsIdMap.keys.associateBy { itemsIdMap[it]!! }
-        //log.d("reverseLookup: ${reverseLookup.keys.map { "${it.id} -> ${reverseLookup[it]}" }.joinToString(":")}")
+        val reverseLookup = itemsIdMap.keys.associateBy { itemsIdMap[it]!! }
         return domain.items
-            .filter { blockItem == null || it.id != blockItem.id }
+//            .also { log.d("state.items: ${it.size}") }
+//            .also { log.d("guids: ${it.map { it.id }.joinToString(", ")}") }
+            .filter { blockItem == null || blockItem.id == null || it.id != blockItem.id }
+//            .also { log.d("state.items.filtered: ${it.size}, blockItem: $blockItem") }
             .mapIndexedNotNull { index, item ->
                 reverseLookup.get(item)?.let { modelId ->
                     itemModelMapper.mapItem(
@@ -157,7 +158,7 @@ class PlaylistMviModelMapper constructor(
                     // throw IllegalStateException("Couldn't get item: ${item.id} ${item.media.title}")
                     null
                 }
-            }
+            }//.also { log.d("mapped.items: ${it.size}") }
     }
 
     fun mapPlaylistText(

@@ -2,8 +2,7 @@ package uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings
 
 import com.russhwolf.settings.Settings
 
-class MultiPlatformPreferencesWrapperImpl constructor(
-) : MultiPlatformPreferencesWrapper {
+class MultiPlatformPreferencesWrapperImpl : MultiPlatformPreferencesWrapper {
 
     private val prefs: Settings by lazy {
         Settings()

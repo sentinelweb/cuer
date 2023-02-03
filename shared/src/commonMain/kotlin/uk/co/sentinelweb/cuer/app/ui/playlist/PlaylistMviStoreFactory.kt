@@ -121,14 +121,14 @@ class PlaylistMviStoreFactory(
                     playlist = msg.playlist,
                     playlistsTree = msg.playlistsTree,
                     playlistsTreeLookup = msg.playlistsTreeLookup,
-                    itemsIdMap = buildIdList(msg.playlist),
+                    itemsIdMap = buildIdList(msg.playlist, this),
                 )
 
                 is SetDeletedItem -> copy(deletedPlaylistItem = msg.item)
                 is SetPlaylist -> copy(
                     playlist = msg.playlist,
                     playlistIdentifier = msg.playlistIdentifier ?: playlistIdentifier,
-                    itemsIdMap = buildIdList(msg.playlist)
+                    itemsIdMap = buildIdList(msg.playlist, this)
                 )
 
                 is IdUpdate -> copy(itemsIdMap = itemsIdMap.apply { put(msg.modelId, msg.changedItem) })
@@ -143,10 +143,11 @@ class PlaylistMviStoreFactory(
                 //else -> copy()
             }
 
-        private fun buildIdList(domain: PlaylistDomain?): MutableMap<Identifier<GUID>, PlaylistItemDomain> {
+        private fun buildIdList(domain: PlaylistDomain?, state: State): MutableMap<Identifier<GUID>, PlaylistItemDomain> {
+            val reverseLookup = state.itemsIdMap.let { m -> m.keys.associateBy { m[it]!! } }
             val itemsIdMap = mutableMapOf<Identifier<GUID>, PlaylistItemDomain>()
             domain?.items?.mapIndexed { index, item ->
-                val modelId = item.id ?: idGenerator.value
+                val modelId = item.id ?: reverseLookup[item] ?: idGenerator.value
                 itemsIdMap[modelId] = item
             }
             return itemsIdMap

@@ -16,9 +16,7 @@ import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-enum class MultiPlatformPreferences constructor(
-    override val fname: String,
-) : Field {
+enum class MultiPlatformPreferences constructor(override val fname: String) : Field {
     BROWSE_CAT_TITLE("browseNodeId"),
     BROWSE_RECENT_TITLES("browseRecent"),
     RECENT_PLAYLISTS("recentPlaylists"),
