@@ -215,7 +215,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
         imageUrlArg?.also { setImage(it) }
         (playlistIdArg to (SOURCE.getEnum(arguments) ?: Source.LOCAL))
-            .apply { viewModel.setData(first!!.toIdentifier(second)) } // todo check for create
+            .apply { viewModel.setData(first?.toIdentifier(second)) } // todo check for create
     }
 
     override fun onAttach(context: Context) {

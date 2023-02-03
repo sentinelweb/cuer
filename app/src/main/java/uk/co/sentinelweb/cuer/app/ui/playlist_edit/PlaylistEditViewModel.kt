@@ -68,22 +68,24 @@ class PlaylistEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun setData(playlistId: OrchestratorContract.Identifier<GUID>) {
+    fun setData(playlistId: OrchestratorContract.Identifier<GUID>?) {
         viewModelScope.launch {
             if (!state.isLoaded) {
-                state.source = playlistId.source
-                playlistId.let {
-                    playlistOrchestrator.loadById(it.id, it.source.deepOptions())
-                        ?.also {
-                            state.isAllWatched = it.isAllWatched()
-                            state.defaultInitial = it.default
-                            state.playlistEdit = it.copy(items = listOf())
-                            it.parentId?.also {
-                                state.playlistParent =
-                                    playlistOrchestrator.loadById(it.id, LOCAL.flatOptions())
+                state.source = playlistId?.source ?: LOCAL
+                playlistId
+                    ?.let {
+                        playlistOrchestrator.loadById(it.id, it.source.deepOptions())
+                            ?.also {
+                                state.isAllWatched = it.isAllWatched()
+                                state.defaultInitial = it.default
+                                state.playlistEdit = it.copy(items = listOf())
+                                it.parentId?.also {
+                                    state.playlistParent =
+                                        playlistOrchestrator.loadById(it.id, LOCAL.flatOptions())
+                                }
                             }
-                        } ?: makeCreateModel()
-                } ?: makeCreateModel()
+                    }
+                    ?: makeCreateModel()
                 update()
                 state.isLoaded = true
             }
