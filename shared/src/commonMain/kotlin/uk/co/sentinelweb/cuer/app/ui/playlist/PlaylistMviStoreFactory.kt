@@ -116,22 +116,32 @@ class PlaylistMviStoreFactory(
     private class ReducerImpl(private val idGenerator: IdGenerator) : Reducer<State, Result> {
         override fun State.reduce(msg: Result): State =
             when (msg) {
-                is Load -> copy(
-                    playlistIdentifier = msg.playlistIdentifier,
-                    playlist = msg.playlist,
-                    playlistsTree = msg.playlistsTree,
-                    playlistsTreeLookup = msg.playlistsTreeLookup,
-                    itemsIdMap = buildIdList(msg.playlist, this),
-                )
+                is Load -> buildIdList(msg.playlist, this).let {
+                    copy(
+                        playlistIdentifier = msg.playlistIdentifier,
+                        playlist = msg.playlist,
+                        playlistsTree = msg.playlistsTree,
+                        playlistsTreeLookup = msg.playlistsTreeLookup,
+                        itemsIdMap = it,
+                        itemsIdMapReversed = it.reverseLookup()
+                    )
+                }
 
                 is SetDeletedItem -> copy(deletedPlaylistItem = msg.item)
-                is SetPlaylist -> copy(
-                    playlist = msg.playlist,
-                    playlistIdentifier = msg.playlistIdentifier ?: playlistIdentifier,
-                    itemsIdMap = buildIdList(msg.playlist, this)
+                is SetPlaylist -> buildIdList(msg.playlist, this).let {
+                    copy(
+                        playlist = msg.playlist,
+                        playlistIdentifier = msg.playlistIdentifier ?: playlistIdentifier,
+                        itemsIdMap = it,
+                        itemsIdMapReversed = it.reverseLookup()
+                    )
+                }
+
+                is IdUpdate -> copy(
+                    itemsIdMap = itemsIdMap.apply { put(msg.modelId, msg.changedItem) },
+                    itemsIdMapReversed = itemsIdMapReversed.apply { put(msg.changedItem, msg.modelId) }
                 )
 
-                is IdUpdate -> copy(itemsIdMap = itemsIdMap.apply { put(msg.modelId, msg.changedItem) })
                 is SelectedPlaylistItem -> copy(selectedPlaylistItem = msg.item)
                 is MovedPlaylistItem -> copy(movedPlaylistItem = msg.item)
                 is SetModified -> copy(isModified = msg.modified)
@@ -144,14 +154,16 @@ class PlaylistMviStoreFactory(
             }
 
         private fun buildIdList(domain: PlaylistDomain?, state: State): MutableMap<Identifier<GUID>, PlaylistItemDomain> {
-            val reverseLookup = state.itemsIdMap.let { m -> m.keys.associateBy { m[it]!! } }
+            val existingReverseLookup = state.itemsIdMapReversed
             val itemsIdMap = mutableMapOf<Identifier<GUID>, PlaylistItemDomain>()
             domain?.items?.mapIndexed { index, item ->
-                val modelId = item.id ?: reverseLookup[item] ?: idGenerator.value
+                val modelId = item.id ?: existingReverseLookup[item] ?: idGenerator.value
                 itemsIdMap[modelId] = item
             }
             return itemsIdMap
         }
+
+        private fun MutableMap<Identifier<GUID>, PlaylistItemDomain>.reverseLookup() = this.let { m -> m.keys.associateBy { m[it]!! } }.toMutableMap()
     }
 
     private class BootstrapperImpl() :

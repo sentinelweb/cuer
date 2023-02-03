@@ -40,7 +40,7 @@ class PlaylistMviModelMapper constructor(
                 playlists = state.playlistsTreeLookup,
                 pinned = util.isPlaylistPinned(state),
                 appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] },
-                itemsIdMap = state.itemsIdMap,
+                itemsIdMapReversed = state.itemsIdMapReversed,
                 blockItem = state.deletedPlaylistItem ?: state.movedPlaylistItem
             )
         } ?: PlaylistMviContract.View.Model(
@@ -82,12 +82,12 @@ class PlaylistMviModelMapper constructor(
         pinned: Boolean,
         playlists: Map<Identifier<GUID>, PlaylistTreeDomain>?,
         appPlaylist: AppPlaylistInteractor?,
-        itemsIdMap: MutableMap<Identifier<GUID>, PlaylistItemDomain>,
+        itemsIdMapReversed: MutableMap<PlaylistItemDomain, Identifier<GUID>>,
         blockItem: PlaylistItemDomain?
     ): PlaylistMviContract.View.Model {
         log.d("map")
         val items = if (isMapItems) {
-            mapItems(domain, itemsIdMap, playlists, appPlaylist, blockItem)
+            mapItems(domain, itemsIdMapReversed, playlists, appPlaylist, blockItem)
         } else null
         return PlaylistMviContract.View.Model(
             header = Header(
@@ -128,12 +128,11 @@ class PlaylistMviModelMapper constructor(
 
     private fun mapItems(
         domain: PlaylistDomain,
-        itemsIdMap: MutableMap<Identifier<GUID>, PlaylistItemDomain>,
+        reverseLookup: MutableMap<PlaylistItemDomain, Identifier<GUID>>,
         playlists: Map<Identifier<GUID>, PlaylistTreeDomain>?,
         appPlaylist: AppPlaylistInteractor?,
         blockItem: PlaylistItemDomain?
     ): List<PlaylistItemMviContract.Model.Item> {
-        val reverseLookup = itemsIdMap.keys.associateBy { itemsIdMap[it]!! }
         return domain.items
 //            .also { log.d("state.items: ${it.size}") }
 //            .also { log.d("guids: ${it.map { it.id }.joinToString(", ")}") }

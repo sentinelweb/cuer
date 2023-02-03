@@ -35,6 +35,7 @@ class PlaylistMviContract {
             var isCards: Boolean = false,
             var isHeadless: Boolean = false,
             val itemsIdMap: MutableMap<Identifier<GUID>, PlaylistItemDomain> = mutableMapOf(),
+            val itemsIdMapReversed: MutableMap<PlaylistItemDomain, Identifier<GUID>> = mutableMapOf(),
         )
 
         sealed class Intent {
