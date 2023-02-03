@@ -8,6 +8,7 @@ import com.appmattus.kotlinfixture.decorator.optional.optionalStrategy
 import com.appmattus.kotlinfixture.kotlinFixture
 import com.flextrade.jfixture.JFixture
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 
@@ -23,6 +24,9 @@ val kotlinFixtureDefaultConfig = kotlinFixture {
         propertyOverride(ChannelDomain::id, NeverOptionalStrategy)
     }
 }
+
+private val fixture = kotlinFixtureDefaultConfig
+
 // todo figure out how to share this file with test module sources
 inline fun <reified T> JFixture.build() = this.create(T::class.java)
 
@@ -37,3 +41,5 @@ fun generatePlaylist(fixture: Fixture): PlaylistDomain {
     return fixPlaylist
 }
 
+fun guid() = GuidCreator().create()
+fun id() = GuidCreator().create().toIdentifier(fixture())

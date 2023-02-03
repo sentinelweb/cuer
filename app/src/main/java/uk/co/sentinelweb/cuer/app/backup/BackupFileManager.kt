@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.backup
 import android.content.Context
 import android.os.Build
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.db.repository.*
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository.Companion.REPO_SCHEME
@@ -73,8 +73,8 @@ class BackupFileManager constructor(
     private suspend fun backupDataJson(playlists: List<PlaylistDomain>) =
         withContext(contextProvider.IO) {
             BackupFileModel(
-                version = 3,
-                medias = listOf(),
+                version = 3, // todo to v4
+                medias = listOf(), // todo remove
                 playlists = playlists
             ).serialise()
         }
