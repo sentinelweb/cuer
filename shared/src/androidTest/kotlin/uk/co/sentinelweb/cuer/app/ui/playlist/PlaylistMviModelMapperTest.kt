@@ -12,7 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 
 class PlaylistMviModelMapperTest {
@@ -56,15 +56,16 @@ class PlaylistMviModelMapperTest {
 
     @Test
     fun mapPlaylist() {
-        val playlist = fixture<PlaylistDomain>().let {
+        val initial = generatePlaylist(fixture).let {
             it.copy(id = it.id!!, items = it.items.filter { it.id != null })
         }
 
-        val identifier = playlist.id!!
+        val identifier = initial.id!!
         val state = PlaylistMviContract.MviStore.State(
-            playlist = playlist,
+            playlist = initial,
             playlistIdentifier = identifier,
-            itemsIdMap = playlist.items.associate { it.id!! to it }.toMutableMap()
+            itemsIdMap = initial.items.associate { it.id!! to it }.toMutableMap(),
+            itemsIdMapReversed = initial.items.associate { it to it.id!! }.toMutableMap(),
         )
         every {
             itemModelMapper.mapItem(
@@ -75,7 +76,7 @@ class PlaylistMviModelMapperTest {
         val actual = sut.map(state)
 
         assertEquals(identifier, actual.identifier)
-        assertEquals(playlist.items.size, actual.items?.size)
-        assertEquals(playlist.currentIndex, actual.playingIndex)
+        assertEquals(initial.items.size, actual.items?.size)
+        assertEquals(initial.currentIndex, actual.playingIndex)
     }
 }
