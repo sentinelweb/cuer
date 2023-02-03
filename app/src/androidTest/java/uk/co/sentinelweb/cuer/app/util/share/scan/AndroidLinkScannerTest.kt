@@ -18,10 +18,10 @@ class AndroidLinkScannerTest {
 
     @Test
     fun shorts_url() {
-        val expectedLink = "https://www.youtube.com/shorts/lq9hzALa4Po?feature=share"
+        val testLink = "https://www.youtube.com/shorts/lq9hzALa4Po?feature=share"
 
-        val actual = sut.scan(expectedLink)
-        val expectedMedia = MediaDomain.createYoutube(expectedLink, "lq9hzALa4Po")
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube(testLink, "lq9hzALa4Po")
         assertNotNull(actual)
         assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
         assertEquals(actual?.second, expectedMedia)
@@ -29,10 +29,10 @@ class AndroidLinkScannerTest {
 
     @Test
     fun shorts_url_with_c() {
-        val expectedLink = "https://youtube.com/shorts/WsciBZQACk4?feature=share"
+        val testLink = "https://youtube.com/shorts/WsciBZQACk4?feature=share"
 
-        val actual = sut.scan(expectedLink)
-        val expectedMedia = MediaDomain.createYoutube(expectedLink, "WsciBZQACk4")
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube(testLink, "WsciBZQACk4")
         assertNotNull(actual)
         assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
         assertEquals(actual?.second, expectedMedia)
@@ -40,9 +40,9 @@ class AndroidLinkScannerTest {
 
     @Test
     fun channel_url_with_c() {
-        val expectedLink = "https://www.youtube.com/c/MattGreenComedy"
+        val testLink = "https://www.youtube.com/c/MattGreenComedy"
 
-        val actual = sut.scan(expectedLink)
+        val actual = sut.scan(testLink)
         val expectedChannel = ChannelDomain.createYoutubeCustomUrl("/c/MattGreenComedy")
         assertNotNull(actual)
         assertEquals(actual?.first, ObjectTypeDomain.CHANNEL)
@@ -54,9 +54,9 @@ class AndroidLinkScannerTest {
 
     @Test
     fun channel_url_with_id() {
-        val expectedLink = "https://www.youtube.com/channel/UCM191aISRy5AQ51wCXOGiEg"
+        val testLink = "https://www.youtube.com/channel/UCM191aISRy5AQ51wCXOGiEg"
 
-        val actual = sut.scan(expectedLink)
+        val actual = sut.scan(testLink)
         val expectedChannel = ChannelDomain.createYoutube("/channel/UCM191aISRy5AQ51wCXOGiEg")
         assertNotNull(actual)
         assertEquals(actual?.first, ObjectTypeDomain.CHANNEL)
@@ -68,10 +68,10 @@ class AndroidLinkScannerTest {
 
     @Test
     fun media_watch_url() {
-        val expectedLink = "https://www.youtube.com/watch?v=JqsQ_JjiFmg"
+        val testLink = "https://www.youtube.com/watch?v=JqsQ_JjiFmg"
 
-        val actual = sut.scan(expectedLink)
-        val expectedMedia = MediaDomain.createYoutube(expectedLink, "JqsQ_JjiFmg")
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube(testLink, "JqsQ_JjiFmg")
         assertNotNull(actual)
         assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
         assertEquals(actual?.second, expectedMedia)
@@ -81,10 +81,10 @@ class AndroidLinkScannerTest {
 
     @Test
     fun media_short_url() {
-        val expectedLink = "https://youtu.be/JqsQ_JjiFmg"
+        val testLink = "https://youtu.be/JqsQ_JjiFmg"
 
-        val actual = sut.scan(expectedLink)
-        val expectedMedia = MediaDomain.createYoutube(expectedLink, "JqsQ_JjiFmg")
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube(testLink, "JqsQ_JjiFmg")
         assertNotNull(actual)
         assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
         assertEquals(actual?.second, expectedMedia)
@@ -94,17 +94,31 @@ class AndroidLinkScannerTest {
 
     @Test
     fun playlist_url() {
-        val expectedLink =
+        val testLink =
             "https://www.youtube.com/playlist?list=PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe"
 
-        val actual = sut.scan(expectedLink)
+        val actual = sut.scan(testLink)
         val expectedPlaylist =
-            PlaylistDomain.createYoutube(expectedLink, "PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe")
+            PlaylistDomain.createYoutube(testLink, "PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe")
         assertNotNull(actual)
         assertEquals(actual?.first, ObjectTypeDomain.PLAYLIST)
         assertEquals(actual?.second, expectedPlaylist)
         val actualPlaylist = actual!!.second as PlaylistDomain
         assertEquals(actualPlaylist.platformId, "PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe")
+    }
+
+    @Test
+    fun live_url() {
+        val testLink =
+            "https://www.youtube.com/live/nBkfPrWj3xQ?feature=share"
+
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube(testLink, "nBkfPrWj3xQ")
+        assertNotNull(actual)
+        assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
+        assertEquals(actual?.second, expectedMedia)
+        val actualMedia = actual!!.second as MediaDomain
+        assertEquals(actualMedia.platformId, "nBkfPrWj3xQ")
     }
 
     @Test
