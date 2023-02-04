@@ -170,7 +170,10 @@ private func contextMenuOverlay(
 
 struct TitleView_Previews: PreviewProvider {
     static var previews: some View {
-        let item = PlaylistsItemMviContract.ModelHeader(id:1, title: "Header title")
+        let item = PlaylistsItemMviContract.ModelHeader(
+            id: DomainOrchestratorContractIdentifier<DomainGUID>(id:DomainGUID(value:"header-guid"), source: DomainOrchestratorContractSource.local),
+            title: "Header title"
+        )
         PlaylistsHeaderItemView(item: item)
     }
 }

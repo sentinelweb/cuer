@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import shared
 
 struct PlaylistView: View {
     @StateObject private var viewModel: PlaylistViewModel
@@ -15,7 +16,7 @@ struct PlaylistView: View {
     }
     
     var body: some View {
-        Text("Playlist: \(viewModel.plId)")
+        Text("Playlist: \(viewModel.plId?.source ?? DomainOrchestratorContractSource.memory) : \(viewModel.plId?.id?.value ?? "NONE")")
     }
 }
 

@@ -28,7 +28,7 @@ enum Route {
     case main
     case browse
     case playlists
-    case playlist(plId: Int)
+    case playlist(plId: DomainOrchestratorContractIdentifier<DomainGUID>)
     case itemEdit
     case playlistEdit
     case none
@@ -51,7 +51,7 @@ class MainCoordinator: ObservableObject {
     @Published var screen: Parent = Parent.launch // navigate called in view onAppear
     @Published var currentRoute: Route = Route.none
     @Published var currentTab: MainTab = MainTab.browse
-    @Published var currentPlaylistId: Int = -1
+    @Published var currentPlaylistId: DomainOrchestratorContractIdentifier<DomainGUID>? = nil
     @Published var playlistViewModel: PlaylistViewModel! = nil
     @Published var playlistsController: PlaylistsMviControllerHolder! = nil
     @Published var browseController: BrowseControllerHolder! = nil
@@ -74,6 +74,7 @@ class MainCoordinator: ObservableObject {
         case .playlists:
             self.currentTab = MainTab.playlists
         case let .playlist(plId):
+            debugPrint("playlisId:", plId)
             self.currentTab = MainTab.playlist
             self.currentPlaylistId = plId
             
@@ -86,7 +87,9 @@ class MainCoordinator: ObservableObject {
         switch(model.target){
         case .playlist:
             self.currentTab = MainTab.playlist
-            self.currentPlaylistId = model.params[.playlistId] as! Int
+            let id = DomainOrchestratorContractIdentifier<DomainGUID>(id: DomainGUID(value: model.params[.playlistId] as! String), source: model.params[.source] as! DomainOrchestratorContractSource)
+            debugPrint("navigateModel:", id)
+            self.currentPlaylistId = id
         default: debugPrint("Not supported: \(model)")
         }
     }
