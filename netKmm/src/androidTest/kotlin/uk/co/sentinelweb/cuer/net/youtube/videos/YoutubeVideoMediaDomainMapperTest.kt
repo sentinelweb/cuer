@@ -99,8 +99,8 @@ class YoutubeVideoMediaDomainMapperTest {
         val actual = sut.map(dto)
 
         actual.forEachIndexed { index, domain ->
-            assertEquals(domain.title, dto.items[index].snippet.title)
-            assertEquals(domain.description, dto.items[index].snippet.description)
+            assertEquals(dto.items[index].snippet.title, domain.title)
+            assertEquals(dto.items[index].snippet.description, domain.description)
             assertEquals(
                 domain.channelData, ChannelDomain(
                     id = null,
@@ -109,23 +109,19 @@ class YoutubeVideoMediaDomainMapperTest {
                     platform = PlatformDomain.YOUTUBE
                 )
             )
-            assertEquals(domain.published, fixtDate)
-            assertEquals(domain.duration, fixtDuration)
-            assertEquals(domain.platformId, dto.items[index].id)
-            assertEquals(domain.mediaType, MediaDomain.MediaTypeDomain.VIDEO)
-            assertEquals(domain.platform, PlatformDomain.YOUTUBE)
-            dto.items[index].snippet.thumbnails.medium!!.apply {
-                assertEquals(
-                    domain.thumbNail,
-                    fixtMediumDomain
-                )
+            assertEquals(fixtDate, domain.published)
+            if (dto.items[index].contentDetails != null) {
+                assertEquals(fixtDuration, domain.duration)
+            } else {
+                assertEquals(-1, domain.duration)
             }
-            dto.items[index].snippet.thumbnails.maxres!!.apply {
-                assertEquals(
-                    domain.image,
-                    fixMaxResDomain
-                )
-            }
+            assertEquals(dto.items[index].id, domain.platformId)
+            assertEquals(MediaDomain.MediaTypeDomain.VIDEO, domain.mediaType)
+            assertEquals(PlatformDomain.YOUTUBE, domain.platform)
+            dto.items[index].snippet.thumbnails.medium!!
+                .apply { assertEquals(fixtMediumDomain, domain.thumbNail) }
+            dto.items[index].snippet.thumbnails.maxres!!
+                .apply { assertEquals(fixMaxResDomain, domain.image) }
             assertNull(domain.dateLastPlayed)
             assertNull(domain.positon)
             assertNull(domain.id)
